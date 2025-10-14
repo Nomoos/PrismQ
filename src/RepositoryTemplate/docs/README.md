@@ -21,12 +21,10 @@ Organize your documentation by topic:
 ## Target Platform
 
 This module is designed for:
-- **Operating System**: Windows (required)
+- **Operating System**: Windows
 - **GPU**: NVIDIA RTX 5090
 - **CPU**: AMD Ryzen processor
 - **RAM**: 64GB
-
-> **Note**: Limited Linux support is available for development purposes only. macOS is not supported.
 
 ## Related Projects
 

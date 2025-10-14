@@ -16,12 +16,12 @@ Thank you for your interest in contributing to this PrismQ module!
 
 1. Clone the repository
 2. Create a virtual environment:
-   ```bash
+   ```batch
    python -m venv venv
-   venv\Scripts\activate  # On Windows
+   venv\Scripts\activate
    ```
 3. Install dependencies:
-   ```bash
+   ```batch
    pip install -r requirements.txt
    pip install -r requirements-dev.txt  # For development
    ```
@@ -33,7 +33,7 @@ Thank you for your interest in contributing to this PrismQ module!
 2. **Make your changes** following the coding standards
 3. **Write tests** for new functionality
 4. **Run tests** to ensure everything works:
-   ```bash
+   ```batch
    pytest
    ```
 5. **Submit a pull request** with a clear description
