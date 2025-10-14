@@ -55,8 +55,6 @@ The sync scripts automatically discover modules with `REMOTE.md` files.
 ### Quick Start
 
 ```bash
-# Linux/macOS - Sync all modules
-./scripts/sync-modules.sh
 
 # Windows - Sync all modules
 scripts\sync-modules.bat
