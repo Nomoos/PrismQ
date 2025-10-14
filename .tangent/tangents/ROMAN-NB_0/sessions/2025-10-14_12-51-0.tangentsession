@@ -1,0 +1,108 @@
+{
+	"threadHistory": [
+		{
+			"thread": [
+				"FILES/README.md"
+			],
+			"currentNode": "FILES/README.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/REMOTE.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/REMOTE.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/README.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/README.md"
+		},
+		{
+			"thread": [
+				"FILES/README.md"
+			],
+			"currentNode": "FILES/README.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/REMOTE.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/REMOTE.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/README.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/README.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/REMOTE.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/REMOTE.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/tests/README.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/tests/README.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/docs/README.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/docs/README.md"
+		},
+		{
+			"thread": [
+				"FILES/src/RepositoryTemplate/scripts/README.md"
+			],
+			"currentNode": "FILES/src/RepositoryTemplate/scripts/README.md"
+		}
+	],
+	"threadIndex": 9,
+	"previousSession": "",
+	"map": {
+		"nodes": {
+			"FILES/README.md": {
+				"node": "FILES/README.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:51:54.826Z"
+			},
+			"FILES/src/RepositoryTemplate/REMOTE.md": {
+				"node": "FILES/src/RepositoryTemplate/REMOTE.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:52:00.659Z"
+			},
+			"FILES/src/RepositoryTemplate/README.md": {
+				"node": "FILES/src/RepositoryTemplate/README.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:52:02.014Z"
+			},
+			"FILES/src/RepositoryTemplate/tests/README.md": {
+				"node": "FILES/src/RepositoryTemplate/tests/README.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:52:13.084Z"
+			},
+			"FILES/src/RepositoryTemplate/docs/README.md": {
+				"node": "FILES/src/RepositoryTemplate/docs/README.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:52:16.673Z"
+			},
+			"FILES/src/RepositoryTemplate/scripts/README.md": {
+				"node": "FILES/src/RepositoryTemplate/scripts/README.md",
+				"isRoot": false,
+				"strength": 2,
+				"dateCreated": "2025-10-14T10:52:22.790Z"
+			}
+		},
+		"connections": []
+	},
+	"version": 1
+}
