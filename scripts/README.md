@@ -2,6 +2,46 @@
 
 Utility scripts for managing the PrismQ modular repository.
 
+## Module Creation Scripts
+
+These scripts help you create new PrismQ modules with the proper structure and configuration.
+
+### Available Scripts
+
+- **`add-module.sh`** - Linux/macOS module creation script
+- **`add-module.bat`** - Windows module creation script
+
+### Quick Start
+
+#### Linux/macOS
+
+```bash
+# Make script executable (first time only)
+chmod +x scripts/add-module.sh
+
+# Run the interactive script
+./scripts/add-module.sh
+```
+
+#### Windows
+
+```batch
+# Run the interactive script
+scripts\add-module.bat
+```
+
+The script will interactively prompt you for:
+- Module name (e.g., `MyNewModule`)
+- Module description
+- GitHub owner/organization (default: `Nomoos`)
+
+It will then:
+1. Create the module directory structure
+2. Generate configuration files (`module.json`, `README.md`, etc.)
+3. Initialize a Git repository
+4. Set up the remote URL
+5. Create an initial commit
+
 ## Module Synchronization Scripts
 
 These scripts automate the synchronization of first-level modules from their separate repositories into the main PrismQ repository using Git subtree.
