@@ -98,42 +98,42 @@ for /f "tokens=1,2,3,4 delims=|" %%a in ("%module_config%") do (
 
 echo.
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-echo Syncing module: %module_path%
+echo Syncing module: !module_path!
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 REM Check if module directory exists
-if not exist "%module_path%" (
-    echo Module directory '%module_path%' does not exist yet
+if not exist "!module_path!" (
+    echo Module directory '!module_path!' does not exist yet
     echo This module will be added on first sync from remote
 )
 
 REM Check if remote exists
-git remote | findstr /x "%remote_name%" >nul 2>&1
+git remote | findstr /x "!remote_name!" >nul 2>&1
 if errorlevel 1 (
-    echo Adding remote '%remote_name%' -^> %remote_url%
-    git remote add "%remote_name%" "%remote_url%"
+    echo Adding remote '!remote_name!' -^> !remote_url!
+    git remote add "!remote_name!" "!remote_url!"
 ) else (
-    echo Remote '%remote_name%' already exists
+    echo Remote '!remote_name!' already exists
 )
 
 REM Fetch from remote
-echo Fetching from %remote_name%...
-git fetch "%remote_name%" "%branch%" >nul 2>&1
+echo Fetching from !remote_name!...
+git fetch "!remote_name!" "!branch!" >nul 2>&1
 if errorlevel 1 (
-    echo Failed to fetch from %remote_name%
-    echo Repository may not exist yet: %remote_url%
+    echo Failed to fetch from !remote_name!
+    echo Repository may not exist yet: !remote_url!
     set /a sync_errors+=1
     goto :eof
 )
 
 REM Pull updates using subtree
-echo Pulling updates to %module_path%...
-git subtree pull --prefix="%module_path%" "%remote_name%" "%branch%" --squash
+echo Pulling updates to !module_path!...
+git subtree pull --prefix="!module_path!" "!remote_name!" "!branch!" --squash
 if errorlevel 1 (
-    echo ✗ Failed to sync %module_path%
+    echo ✗ Failed to sync !module_path!
     set /a sync_errors+=1
 ) else (
-    echo ✓ Successfully synced %module_path%
+    echo ✓ Successfully synced !module_path!
 )
 goto :eof
 
