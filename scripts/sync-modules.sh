@@ -15,10 +15,10 @@ NC='\033[0m' # No Color
 # Configuration: Map module directories to their remote repositories
 # Format: "module_path|remote_name|remote_url|branch"
 # Add your module configurations here
-# NOTE: If a module has a REMOTE.md file, it will be read automatically
+# NOTE: If a module has a module.json file, it will be read automatically
 declare -a MODULES=(
-    "src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
-    "src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
+    "src/RepositoryTemplate|prismq-repositorytemplate|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
+    "src/IdeaInspiration|prismq-ideainspiration|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
     # Add more modules as needed:
     # "src/ModuleName|modulename-remote|https://github.com/Nomoos/PrismQ.ModuleName.git|main"
 )
@@ -29,39 +29,52 @@ remote_exists() {
     git remote | grep -q "^${remote_name}$"
 }
 
-# Function to read remote config from REMOTE.md file
+# Function to derive remote name from repository URL
+# Converts URL like "https://github.com/Nomoos/PrismQ.RepositoryTemplate.git" 
+# to "prismq-repository-template"
+derive_remote_name() {
+    local url=$1
+    # Extract repo name from URL (remove .git suffix and get last part)
+    local repo_name=$(echo "$url" | sed 's/\.git$//' | sed 's|.*/||')
+    # Convert to lowercase and replace dots/underscores with hyphens
+    echo "$repo_name" | tr '[:upper:]' '[:lower:]' | tr '._' '--'
+}
+
+# Function to read remote config from module.json file
 read_remote_config() {
     local module_path=$1
-    local remote_file="$module_path/REMOTE.md"
+    local config_file="$module_path/module.json"
     
-    if [ ! -f "$remote_file" ]; then
+    if [ ! -f "$config_file" ]; then
         return 1
     fi
     
-    # Extract configuration from REMOTE.md
-    # Look for lines like: REMOTE_URL=https://...
-    local url=$(grep "^REMOTE_URL=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
-    local name=$(grep "^REMOTE_NAME=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
-    local branch=$(grep "^BRANCH=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
+    # Extract URL from JSON (simple grep-based parsing)
+    local url=$(grep -o '"url"[[:space:]]*:[[:space:]]*"[^"]*"' "$config_file" 2>/dev/null | sed 's/.*"\([^"]*\)".*/\1/')
     
-    if [ -n "$url" ] && [ -n "$name" ] && [ -n "$branch" ]; then
-        echo "$name|$url|$branch"
-        return 0
+    if [ -z "$url" ]; then
+        return 1
     fi
     
-    return 1
+    # Derive remote name from URL
+    local name=$(derive_remote_name "$url")
+    # Branch is always main
+    local branch="main"
+    
+    echo "$name|$url|$branch"
+    return 0
 }
 
-# Function to discover modules with REMOTE.md files
+# Function to discover modules with module.json files
 discover_modules_from_remote_files() {
     # Find all first-level module directories (those with src/ subdirectory)
     for module_dir in src/*/; do
         if [ -d "$module_dir" ] && [ -d "${module_dir}src" ]; then
             module_path="${module_dir%/}"  # Remove trailing slash
             
-            # Check if REMOTE.md exists
-            if [ -f "$module_path/REMOTE.md" ]; then
-                # Read configuration from REMOTE.md
+            # Check if module.json exists
+            if [ -f "$module_path/module.json" ]; then
+                # Read configuration from module.json
                 config=$(read_remote_config "$module_path")
                 if [ $? -eq 0 ]; then
                     IFS='|' read -r remote_name remote_url branch <<< "$config"
@@ -79,7 +92,7 @@ discover_modules_from_remote_files() {
                     # Add to MODULES if not already configured
                     if [ "$already_configured" == false ]; then
                         MODULES+=("$module_path|$remote_name|$remote_url|$branch")
-                        echo -e "${GREEN}Discovered module from REMOTE.md: $module_path${NC}" >&2
+                        echo -e "${GREEN}Discovered module from module.json: $module_path${NC}" >&2
                     fi
                 fi
             fi
@@ -150,7 +163,7 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
-# Discover modules with REMOTE.md files
+# Discover modules with module.json files
 discover_modules_from_remote_files
 
 # Process command line arguments
@@ -163,11 +176,15 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "  --all, -a         Sync all configured modules (default)"
     echo ""
     echo "Module Discovery:"
-    echo "  Modules can be configured in this script or via REMOTE.md files"
-    echo "  in each module directory. REMOTE.md format:"
-    echo "    REMOTE_URL=https://github.com/..."
-    echo "    REMOTE_NAME=module-remote"
-    echo "    BRANCH=main"
+    echo "  Modules can be configured in this script or via module.json files"
+    echo "  in each module directory. module.json format:"
+    echo "    {"
+    echo "      \"remote\": {"
+    echo "        \"url\": \"https://github.com/...\""
+    echo "      }"
+    echo "    }"
+    echo "  Remote name is auto-derived from URL (lowercase with hyphens)"
+    echo "  Branch is always 'main'"
     echo ""
     echo "Arguments:"
     echo "  MODULE_PATH       Sync only the specified module (e.g., src/RepositoryTemplate)"
