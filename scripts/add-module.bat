@@ -10,11 +10,21 @@ echo         PrismQ Module Creation Script
 echo ========================================================
 echo.
 
-REM Check if we're in a git repository
+REM Check if we're in a git repository and get the root directory
 git rev-parse --git-dir >nul 2>&1
 if errorlevel 1 (
     echo Error: Not in a git repository
     echo Please run this script from the root of the PrismQ repository
+    exit /b 1
+)
+
+REM Change to repository root to ensure correct relative paths
+for /f "delims=" %%i in ('git rev-parse --show-toplevel') do set repo_root=%%i
+REM Convert forward slashes to backslashes for Windows
+set repo_root=!repo_root:/=\!
+cd /d "!repo_root!"
+if errorlevel 1 (
+    echo Error: Failed to change to repository root
     exit /b 1
 )
 
