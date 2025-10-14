@@ -451,8 +451,71 @@ echo.
 exit /b 0
 
 :create_module_hierarchy
+REM ============================================================================
 REM Creates GitHub repositories for all levels of the module hierarchy
 REM and sets up git subtree relationships
+REM 
+REM HOW GIT SUBTREE WORKS - DETAILED EXAMPLE:
+REM ============================================================================
+REM 
+REM Example: Creating PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource
+REM 
+REM STEP 1: Create Hierarchy of Repositories
+REM -----------------------------------------
+REM This function creates 5 GitHub repositories:
+REM   1. Nomoos/PrismQ.IdeaInspiration
+REM   2. Nomoos/PrismQ.IdeaInspiration.Sources
+REM   3. Nomoos/PrismQ.IdeaInspiration.Sources.Content
+REM   4. Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts
+REM   5. Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource
+REM 
+REM Each repository is PUBLIC and created if it doesn't exist.
+REM 
+REM STEP 2: Module Directory Structure
+REM -----------------------------------
+REM Creates nested directory in main PrismQ repository:
+REM   src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeSource/
+REM 
+REM STEP 3: Initialize Module Repository
+REM -------------------------------------
+REM Inside YouTubeSource directory:
+REM   - git init (creates local git repo)
+REM   - git remote add origin https://github.com/Nomoos/PrismQ...YouTubeSource.git
+REM   - git add . (stages all template files)
+REM   - git commit -m "Initial commit: Create module"
+REM   - git push -u origin main (pushes to GitHub)
+REM 
+REM STEP 4: Add Remotes to Main PrismQ Repository
+REM ----------------------------------------------
+REM In main PrismQ repo, add remotes for ALL hierarchy levels:
+REM   git remote add prismq-ideainspiration https://github.com/Nomoos/PrismQ.IdeaInspiration.git
+REM   git remote add prismq-ideainspiration-sources https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.git
+REM   git remote add prismq-ideainspiration-sources-content https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Content.git
+REM   ... (and so on for all levels)
+REM 
+REM STEP 5: Commit Module to Main Repository
+REM -----------------------------------------
+REM   git add src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeSource/
+REM   git commit -m "Add module with hierarchy info"
+REM 
+REM STEP 6: Future Syncing with Git Subtree (via sync-modules.bat)
+REM ---------------------------------------------------------------
+REM When you later run sync-modules.bat, it will:
+REM   git fetch prismq-ideainspiration-sources-content-shorts-youtubesource main
+REM   git subtree pull --prefix=src/IdeaInspiration/.../YouTubeSource prismq-...youtubesource main --squash
+REM 
+REM This PULLS changes from the YouTubeSource GitHub repository into the main
+REM PrismQ repository at the correct path, maintaining the subtree relationship.
+REM 
+REM BENEFITS:
+REM ---------
+REM 1. Module can be developed independently in its own GitHub repository
+REM 2. Module is also embedded in main PrismQ repository for integrated development
+REM 3. Changes can flow both ways: module repo <-> main repo
+REM 4. All hierarchy levels can be synced independently
+REM 5. Each module maintains its own git history while also being part of main repo
+REM 
+REM ============================================================================
 set full_repo_name=%~1
 set repo_owner=%~2
 set final_module_dir=%~3
