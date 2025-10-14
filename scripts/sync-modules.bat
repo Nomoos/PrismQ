@@ -7,9 +7,9 @@ setlocal enabledelayedexpansion
 
 REM Configuration: Module definitions
 REM Format: module_path|remote_name|remote_url|branch
-REM NOTE: If a module has a REMOTE.md file, it will be read automatically
-set "modules[0]=src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
-set "modules[1]=src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
+REM NOTE: If a module has a module.json file, it will be read automatically
+set "modules[0]=src/RepositoryTemplate|prismq-repositorytemplate|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
+set "modules[1]=src/IdeaInspiration|prismq-ideainspiration|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
 REM Add more modules as needed
 
 set module_count=2
@@ -32,7 +32,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Discover modules from REMOTE.md files
+REM Discover modules from module.json files
 call :discover_modules_from_remote_files
 
 REM Determine operation mode
@@ -91,10 +91,10 @@ if %sync_errors%==0 (
 )
 
 :discover_modules_from_remote_files
-REM Discover modules with REMOTE.md files
+REM Discover modules with module.json files
 for /d %%d in (src\*) do (
     if exist "%%d\src" (
-        if exist "%%d\REMOTE.md" (
+        if exist "%%d\module.json" (
             call :read_and_add_module "%%d"
         )
     )
@@ -103,36 +103,36 @@ goto :eof
 
 :read_and_add_module
 set module_dir=%~1
-set remote_file=%module_dir%\REMOTE.md
+set config_file=%module_dir%\module.json
 set remote_url_found=
-set remote_name_found=
-set branch_found=
 
-REM Read REMOTE.md file line by line
-for /f "usebackq tokens=1,* delims==" %%a in ("%remote_file%") do (
-    if "%%a"=="REMOTE_URL" set remote_url_found=%%b
-    if "%%a"=="REMOTE_NAME" set remote_name_found=%%b
-    if "%%a"=="BRANCH" set branch_found=%%b
+REM Read module.json file to extract URL
+for /f "usebackq delims=" %%a in ("%config_file%") do (
+    set line=%%a
+    echo !line! | findstr /C:"\"url\"" >nul
+    if !errorlevel! equ 0 (
+        REM Extract URL from JSON line
+        for /f "tokens=2 delims=:," %%b in ("!line!") do (
+            set url_part=%%b
+            REM Remove quotes and spaces
+            set url_part=!url_part:"=!
+            set url_part=!url_part: =!
+            if not "!url_part!"=="" set remote_url_found=!url_part!
+        )
+    )
 )
 
-REM Remove spaces from values
-set remote_url_found=!remote_url_found: =!
-set remote_name_found=!remote_name_found: =!
-set branch_found=!branch_found: =!
-
-REM Validate that all required fields are present
+REM Validate that URL was found
 if "!remote_url_found!"=="" (
-    echo WARNING: %module_dir%\REMOTE.md is missing REMOTE_URL configuration
+    echo WARNING: %module_dir%\module.json is missing remote URL configuration
     goto :eof
 )
-if "!remote_name_found!"=="" (
-    echo WARNING: %module_dir%\REMOTE.md is missing REMOTE_NAME configuration
-    goto :eof
-)
-if "!branch_found!"=="" (
-    echo WARNING: %module_dir%\REMOTE.md is missing BRANCH configuration
-    goto :eof
-)
+
+REM Derive remote name from URL (convert to lowercase with hyphens)
+call :derive_remote_name "!remote_url_found!" remote_name_found
+
+REM Branch is always main
+set branch_found=main
 
 REM Check if module already configured in modules array
 set already_configured=0
@@ -148,8 +148,58 @@ REM Add to modules if not already configured
 if !already_configured!==0 (
     set /a module_count+=1
     set "modules[!module_count!]=%module_dir%|!remote_name_found!|!remote_url_found!|!branch_found!"
-    echo Discovered module from REMOTE.md: %module_dir%
+    echo Discovered module from module.json: %module_dir%
 )
+goto :eof
+
+:derive_remote_name
+REM Derive remote name from repository URL
+REM Converts URL like "https://github.com/Nomoos/PrismQ.RepositoryTemplate.git"
+REM to "prismq-repositorytemplate"
+set url=%~1
+set result_var=%~2
+
+REM Extract repo name from URL (remove .git and get last part)
+set repo_name=!url:.git=!
+for %%a in ("!repo_name!") do set repo_name=%%~na
+
+REM Convert to lowercase and replace dots/underscores with hyphens
+set repo_name=!repo_name:.=-!
+set repo_name=!repo_name:_=-!
+
+REM Convert to lowercase (PowerShell method for batch)
+for %%L in (A B C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    set repo_name=!repo_name:%%L=%%L!
+)
+REM Simple lowercase conversion
+set repo_name=!repo_name:A=a!
+set repo_name=!repo_name:B=b!
+set repo_name=!repo_name:C=c!
+set repo_name=!repo_name:D=d!
+set repo_name=!repo_name:E=e!
+set repo_name=!repo_name:F=f!
+set repo_name=!repo_name:G=g!
+set repo_name=!repo_name:H=h!
+set repo_name=!repo_name:I=i!
+set repo_name=!repo_name:J=j!
+set repo_name=!repo_name:K=k!
+set repo_name=!repo_name:L=l!
+set repo_name=!repo_name:M=m!
+set repo_name=!repo_name:N=n!
+set repo_name=!repo_name:O=o!
+set repo_name=!repo_name:P=p!
+set repo_name=!repo_name:Q=q!
+set repo_name=!repo_name:R=r!
+set repo_name=!repo_name:S=s!
+set repo_name=!repo_name:T=t!
+set repo_name=!repo_name:U=u!
+set repo_name=!repo_name:V=v!
+set repo_name=!repo_name:W=w!
+set repo_name=!repo_name:X=x!
+set repo_name=!repo_name:Y=y!
+set repo_name=!repo_name:Z=z!
+
+set %result_var%=!repo_name!
 goto :eof
 
 :sync_module
@@ -171,11 +221,11 @@ if not exist "!module_path!" (
     echo Module directory '!module_path!' does not exist yet
     echo This module will be added on first sync from remote
 ) else (
-    REM Check for REMOTE.md and validate/set origin
-    if exist "!module_path!\REMOTE.md" (
+    REM Check for module.json and validate/set origin
+    if exist "!module_path!\module.json" (
         call :validate_and_set_origin "!module_path!" "!remote_url!"
     ) else (
-        echo WARNING: !module_path!\REMOTE.md not found
+        echo WARNING: !module_path!\module.json not found
         echo The module repository may not have proper remote configuration
     )
 )
@@ -214,20 +264,27 @@ goto :eof
 set validate_module_path=%~1
 set validate_remote_url=%~2
 
-REM Read REMOTE.md to get configuration
-set remote_md_file=!validate_module_path!\REMOTE.md
+REM Read module.json to get configuration
+set config_file=!validate_module_path!\module.json
 set remote_url_from_file=
 
-for /f "usebackq tokens=1,* delims==" %%a in ("!remote_md_file!") do (
-    if "%%a"=="REMOTE_URL" set remote_url_from_file=%%b
+REM Extract URL from JSON
+for /f "usebackq delims=" %%a in ("!config_file!") do (
+    set line=%%a
+    echo !line! | findstr /C:"\"url\"" >nul
+    if !errorlevel! equ 0 (
+        for /f "tokens=2 delims=:," %%b in ("!line!") do (
+            set url_part=%%b
+            set url_part=!url_part:"=!
+            set url_part=!url_part: =!
+            if not "!url_part!"=="" set remote_url_from_file=!url_part!
+        )
+    )
 )
 
-REM Remove spaces
-set remote_url_from_file=!remote_url_from_file: =!
-
-REM Validate REMOTE.md has proper URL
+REM Validate module.json has proper URL
 if "!remote_url_from_file!"=="" (
-    echo WARNING: !remote_md_file! is missing REMOTE_URL
+    echo WARNING: !config_file! is missing remote URL
 ) else (
     REM Check if we're in the module directory to set origin
     pushd !validate_module_path! 2>nul
