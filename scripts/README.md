@@ -199,6 +199,31 @@ The sync scripts use **Git subtree** to manage module synchronization:
 - ✅ No `.gitmodules` file needed
 - ✅ Works with standard Git commands
 
+## Module Structure and Git Directories
+
+### Why Modules Have `.git` and `.github` Directories
+
+Each module in the PrismQ repository has its own `.git` and `.github` directories. This is **intentional and not duplication**:
+
+**`.git` Directories:**
+- Modules are **separate git repositories** that can be independently developed
+- The `.git` directory allows modules to have their own git history
+- Git subtree is used to sync between the module repo and the main PrismQ repo
+- The parent repository's git automatically ignores nested `.git` directories
+- This enables a **bidirectional workflow**: develop in either the module repo or main repo
+
+**`.github` Directories:**
+- Contains module-specific GitHub configuration (issue templates, PR templates, etc.)
+- Allows each module to have its own GitHub Actions workflows (if needed)
+- Provides module-specific Copilot instructions
+- Not duplicative since these are module-specific configurations
+
+This architecture provides:
+- ✅ **Module independence**: Each module can be developed, tested, and versioned separately
+- ✅ **Flexible workflows**: Work in module repo OR main repo
+- ✅ **Easy synchronization**: Git subtree handles syncing automatically
+- ✅ **No external dependencies**: Full code available in main repo
+
 ## Configuration
 
 Modules are configured using `module.json` files in each module directory:
