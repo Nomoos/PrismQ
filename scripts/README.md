@@ -6,16 +6,46 @@ Utility scripts for managing the PrismQ modular repository on Windows.
 
 This script helps you create new PrismQ modules with the proper structure and configuration.
 
-### Available Script
+### Available Scripts
 
-- **`add-module.bat`** - Windows module creation script
+- **`add-module.bat`** - Windows wrapper script (sets up Python environment and runs add_module.py)
+- **`add_module.py`** - Python implementation with GitHub API integration
+- **`setup_env.bat`** - Virtual environment setup script
+
+### Python Implementation
+
+The module creation script is now implemented in Python for better:
+- **Testability** - Can be tested with pytest
+- **Cross-platform compatibility** - Works on Windows, Linux, and macOS
+- **GitHub integration** - Uses PyGithub for robust API access
+- **Maintainability** - Easier to debug and extend
+- **Error handling** - Better validation and error messages
+
+### Prerequisites
+
+- Python 3.11 or higher
+- Git
+- GitHub CLI (`gh`) authenticated (run `gh auth login`)
 
 ### Quick Start
 
 ```batch
-# Run the interactive script
+# Run the interactive script (Windows)
 scripts\add-module.bat
+
+# Or run Python script directly (any platform)
+python scripts/add_module.py
+
+# With command-line options
+python scripts/add_module.py --github-url "Nomoos/PrismQ.MyModule" --description "My module"
 ```
+
+The first time you run `add-module.bat`, it will automatically:
+1. Create a Python virtual environment in `scripts/.venv/`
+2. Install required dependencies (PyGithub, GitPython, click)
+3. Run the Python script
+
+The virtual environment is reused for subsequent runs.
 
 The script will interactively prompt you for:
 
@@ -47,19 +77,24 @@ The script then:
 
 ### Examples
 
-**Example 1: Using GitHub URL for simple module**
+**Example 1: Interactive mode (Windows)**
 ```batch
 scripts\add-module.bat
 # Select option: 1
 # GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule.git
 # Description: My new module for PrismQ
 ```
-Result: 
-- Creates `src/MyNewModule/` with complete template structure
-- Adds remote to parent repository
-- Commits module to parent repository automatically
 
-**Example 2: Using GitHub URL for nested module**
+**Example 2: Command-line mode (any platform)**
+```bash
+# Using GitHub URL
+python scripts/add_module.py --github-url "Nomoos/PrismQ.MyModule" --description "My module"
+
+# Using module name
+python scripts/add_module.py --module-name "MyModule" --description "My module" --owner "Nomoos"
+```
+
+**Example 3: Nested module**
 ```batch
 scripts\add-module.bat
 # Select option: 1
@@ -71,19 +106,6 @@ Result:
 - **Creates GitHub repositories**: PrismQ.IdeaInspiration, PrismQ.IdeaInspiration.Classification
 - Adds remotes to parent repository
 - Pushes module to GitHub
-- Commits module to parent repository automatically
-
-**Example 3: Using manual input**
-```batch
-scripts\add-module.bat
-# Select option: 2
-# Module name: MyModule
-# Description: A new PrismQ module
-# GitHub owner: MyOrg
-```
-Result: 
-- Creates `src/MyModule/` with complete template structure
-- Adds remote to parent repository
 - Commits module to parent repository automatically
 
 ### Hierarchical Module Creation
