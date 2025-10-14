@@ -7,6 +7,7 @@ setlocal enabledelayedexpansion
 
 REM Configuration: Module definitions
 REM Format: module_path|remote_name|remote_url|branch
+REM NOTE: If a module has a REMOTE.md file, it will be read automatically
 set "modules[0]=src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
 set "modules[1]=src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
 REM Add more modules as needed

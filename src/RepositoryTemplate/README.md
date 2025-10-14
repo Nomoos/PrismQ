@@ -46,9 +46,37 @@ git remote set-url origin https://github.com/Nomoos/PrismQ.YourModule.git
 git push -u origin main
 ```
 
-### 2. Configure Sync in Main Repository
+### 2. Create REMOTE.md File (Recommended)
 
-Add your module to the sync script configuration in the main PrismQ repository:
+Create a `REMOTE.md` file in your module root to specify the remote repository configuration:
+
+```markdown
+# Remote Repository Configuration
+
+This module is synchronized with its own repository.
+
+## Repository Information
+
+- **Remote URL**: `https://github.com/Nomoos/PrismQ.YourModule.git`
+- **Remote Name**: `yourmodule-remote`
+- **Branch**: `main`
+
+## Configuration Format
+
+This file uses a standard format that can be read by automation tools:
+
+```
+REMOTE_URL=https://github.com/Nomoos/PrismQ.YourModule.git
+REMOTE_NAME=yourmodule-remote
+BRANCH=main
+```
+```
+
+The sync scripts will automatically discover your module via the `REMOTE.md` file.
+
+### 3. Alternative: Manual Script Configuration
+
+Alternatively, add your module to the sync script configuration in the main PrismQ repository:
 
 **In `scripts/sync-modules.sh`:**
 ```bash
@@ -64,12 +92,14 @@ set "modules[N]=src/YourModule|yourmodule-remote|https://github.com/Nomoos/Prism
 set module_count=N+1
 ```
 
-### 3. Sync to Main Repository
+### 4. Sync to Main Repository
 
 ```bash
 # From main PrismQ repository
 ./scripts/sync-modules.sh src/YourModule
 ```
+
+The sync uses **git subtree** for bidirectional synchronization between module and main repositories.
 
 For complete synchronization documentation, see [../../scripts/README.md](../../scripts/README.md).
 

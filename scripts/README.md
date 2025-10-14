@@ -67,9 +67,43 @@ The sync scripts use **Git subtree** to manage module synchronization:
 
 ## Configuration
 
-To add a new module to sync, edit the configuration in the script:
+There are two ways to configure modules for synchronization:
 
-### In `sync-modules.sh` (Linux/macOS)
+### Option 1: REMOTE.md File (Recommended)
+
+Each module can have a `REMOTE.md` file in its root directory that specifies the remote repository configuration. This is the recommended approach as it keeps configuration with the module.
+
+**Create `src/YourModule/REMOTE.md`:**
+
+```markdown
+# Remote Repository Configuration
+
+This module is synchronized with its own repository.
+
+## Repository Information
+
+- **Remote URL**: `https://github.com/Nomoos/PrismQ.YourModule.git`
+- **Remote Name**: `yourmodule-remote`
+- **Branch**: `main`
+
+## Configuration Format
+
+This file uses a standard format that can be read by automation tools:
+
+```
+REMOTE_URL=https://github.com/Nomoos/PrismQ.YourModule.git
+REMOTE_NAME=yourmodule-remote
+BRANCH=main
+```
+```
+
+The sync script will automatically discover and use modules with `REMOTE.md` files.
+
+### Option 2: Script Configuration
+
+Alternatively, edit the configuration array in the script:
+
+**In `sync-modules.sh` (Linux/macOS):**
 
 ```bash
 declare -a MODULES=(
@@ -80,7 +114,7 @@ declare -a MODULES=(
 )
 ```
 
-### In `sync-modules.bat` (Windows)
+**In `sync-modules.bat` (Windows):**
 
 ```batch
 set "modules[0]=src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"

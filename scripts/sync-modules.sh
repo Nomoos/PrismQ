@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 # Configuration: Map module directories to their remote repositories
 # Format: "module_path|remote_name|remote_url|branch"
 # Add your module configurations here
+# NOTE: If a module has a REMOTE.md file, it will be read automatically
 declare -a MODULES=(
     "src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
     "src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
@@ -26,6 +27,64 @@ declare -a MODULES=(
 remote_exists() {
     local remote_name=$1
     git remote | grep -q "^${remote_name}$"
+}
+
+# Function to read remote config from REMOTE.md file
+read_remote_config() {
+    local module_path=$1
+    local remote_file="$module_path/REMOTE.md"
+    
+    if [ ! -f "$remote_file" ]; then
+        return 1
+    fi
+    
+    # Extract configuration from REMOTE.md
+    # Look for lines like: REMOTE_URL=https://...
+    local url=$(grep "^REMOTE_URL=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
+    local name=$(grep "^REMOTE_NAME=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
+    local branch=$(grep "^BRANCH=" "$remote_file" 2>/dev/null | cut -d'=' -f2- | tr -d ' ')
+    
+    if [ -n "$url" ] && [ -n "$name" ] && [ -n "$branch" ]; then
+        echo "$name|$url|$branch"
+        return 0
+    fi
+    
+    return 1
+}
+
+# Function to discover modules with REMOTE.md files
+discover_modules_from_remote_files() {
+    # Find all first-level module directories (those with src/ subdirectory)
+    for module_dir in src/*/; do
+        if [ -d "$module_dir" ] && [ -d "${module_dir}src" ]; then
+            module_path="${module_dir%/}"  # Remove trailing slash
+            
+            # Check if REMOTE.md exists
+            if [ -f "$module_path/REMOTE.md" ]; then
+                # Read configuration from REMOTE.md
+                config=$(read_remote_config "$module_path")
+                if [ $? -eq 0 ]; then
+                    IFS='|' read -r remote_name remote_url branch <<< "$config"
+                    
+                    # Check if this module is already in MODULES array
+                    local already_configured=false
+                    for existing_module in "${MODULES[@]}"; do
+                        IFS='|' read -r existing_path _ _ _ <<< "$existing_module"
+                        if [ "$existing_path" == "$module_path" ]; then
+                            already_configured=true
+                            break
+                        fi
+                    done
+                    
+                    # Add to MODULES if not already configured
+                    if [ "$already_configured" == false ]; then
+                        MODULES+=("$module_path|$remote_name|$remote_url|$branch")
+                        echo -e "${GREEN}Discovered module from REMOTE.md: $module_path${NC}" >&2
+                    fi
+                fi
+            fi
+        fi
+    done
 }
 
 # Function to add remote if it doesn't exist
@@ -91,6 +150,9 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
+# Discover modules with REMOTE.md files
+discover_modules_from_remote_files
+
 # Process command line arguments
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Usage: $0 [OPTIONS] [MODULE_PATH]"
@@ -99,6 +161,13 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "  --help, -h        Show this help message"
     echo "  --list, -l        List configured modules"
     echo "  --all, -a         Sync all configured modules (default)"
+    echo ""
+    echo "Module Discovery:"
+    echo "  Modules can be configured in this script or via REMOTE.md files"
+    echo "  in each module directory. REMOTE.md format:"
+    echo "    REMOTE_URL=https://github.com/..."
+    echo "    REMOTE_NAME=module-remote"
+    echo "    BRANCH=main"
     echo ""
     echo "Arguments:"
     echo "  MODULE_PATH       Sync only the specified module (e.g., src/RepositoryTemplate)"

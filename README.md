@@ -38,7 +38,19 @@ Nested modules follow a dot notation based on their path:
 
 ## Module Synchronization
 
-First-level modules can be developed in separate repositories and synchronized to the main PrismQ repository using automated sync scripts.
+First-level modules can be developed in separate repositories and synchronized to the main PrismQ repository using automated sync scripts with **git subtree**.
+
+### Configuration
+
+Each first-level module can have a `REMOTE.md` file specifying its remote repository:
+
+```markdown
+REMOTE_URL=https://github.com/Nomoos/PrismQ.ModuleName.git
+REMOTE_NAME=modulename-remote
+BRANCH=main
+```
+
+The sync scripts automatically discover modules with `REMOTE.md` files.
 
 ### Quick Start
 
