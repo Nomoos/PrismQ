@@ -145,6 +145,19 @@ class ModuleCreator:
         """Copy template structure, excluding git-related files."""
         import shutil
         
+        # Check if module_dir is a subdirectory of template_dir
+        # This would cause infinite recursion during copy
+        try:
+            module_dir.resolve().relative_to(template_dir.resolve())
+            # If we get here, module_dir is inside template_dir - cannot copy!
+            click.echo("Warning: Cannot copy template - target is subdirectory of template")
+            click.echo("Creating basic structure instead...")
+            self._create_basic_structure(module_dir)
+            return
+        except ValueError:
+            # module_dir is NOT a subdirectory of template_dir, safe to proceed
+            pass
+        
         def ignore_files(directory, files):
             """Ignore .git directories and module-specific files."""
             ignore = {'.git', 'module.json', 'README.md', 'pyproject.toml'}
@@ -159,6 +172,9 @@ class ModuleCreator:
 
     def _create_basic_structure(self, module_dir: Path):
         """Create basic module directory structure."""
+        # Ensure module_dir exists
+        module_dir.mkdir(parents=True, exist_ok=True)
+        
         # Create subdirectories
         (module_dir / "src").mkdir(exist_ok=True)
         (module_dir / "tests").mkdir(exist_ok=True)
