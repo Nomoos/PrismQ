@@ -208,7 +208,8 @@ class ModuleSyncer:
         # Fetch from remote
         click.echo(f"Fetching from {remote_name}...")
         try:
-            remote.fetch(branch)
+            # Explicitly fetch the main branch from the remote
+            remote.fetch(refspec='refs/heads/main:refs/remotes/{}/{}'.format(remote_name, branch))
         except GitCommandError as e:
             click.echo(f"Failed to fetch from {remote_name}")
             click.echo(f"Repository may not exist yet: {remote_url}")

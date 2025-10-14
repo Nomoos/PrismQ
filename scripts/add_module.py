@@ -329,6 +329,17 @@ build-backend = "poetry.core.masonry.api"
             
             repo = Repo.init(module_dir)
             
+            # Ensure we're on 'main' branch (not 'master')
+            # Check if we have a HEAD (initial repo might not)
+            try:
+                current_branch = repo.active_branch.name
+                if current_branch != 'main':
+                    # Rename the current branch to 'main'
+                    repo.git.branch('-M', 'main')
+            except (TypeError, GitCommandError):
+                # No active branch yet (empty repo), will be set on first commit
+                pass
+            
             click.echo("Setting up Git remote...")
             try:
                 repo.create_remote('origin', remote_url)
@@ -338,9 +349,16 @@ build-backend = "poetry.core.masonry.api"
                 click.echo(f"  cd {module_dir}")
                 click.echo(f"  git remote add origin {remote_url}")
             
-            # Create initial commit
+            # Create initial commit on 'main' branch
             repo.index.add(['*'])
             repo.index.commit(f"Initial commit: Create {module_name} module")
+            
+            # Ensure we're on 'main' branch after commit
+            try:
+                if repo.active_branch.name != 'main':
+                    repo.git.checkout('-B', 'main')
+            except (TypeError, GitCommandError):
+                pass
             
             click.echo("Module git repository initialized successfully")
             return True
@@ -428,7 +446,8 @@ build-backend = "poetry.core.masonry.api"
         try:
             repo = Repo(final_module_dir)
             origin = repo.remote('origin')
-            origin.push('main')
+            # Push main branch to origin/main explicitly
+            origin.push(refspec='refs/heads/main:refs/heads/main')
         except Exception as e:
             click.echo(f"Warning: Failed to push to {repos[-1][0]}: {e}")
         
@@ -452,6 +471,11 @@ build-backend = "poetry.core.masonry.api"
                 # Initialize git repo if not already initialized
                 if not (parent_dir / '.git').exists():
                     repo = Repo.init(parent_dir)
+                    # Ensure we're on 'main' branch
+                    try:
+                        repo.git.branch('-M', 'main')
+                    except GitCommandError:
+                        pass  # Branch doesn't exist yet
                     repo.create_remote('origin', parent_url)
                 else:
                     repo = Repo(parent_dir)
@@ -465,13 +489,13 @@ build-backend = "poetry.core.masonry.api"
                 except GitCommandError:
                     pass  # Remote already exists
                 
-                # Fetch and add subtree
+                # Fetch and add subtree from origin/main
                 repo.git.fetch(child_remote_name, 'main')
                 repo.git.subtree('add', f'--prefix=src/{child_dir_name}', child_remote_name, 'main', '--squash')
                 
-                # Push parent to its GitHub repository
+                # Push parent to its GitHub repository's main branch
                 origin = repo.remote('origin')
-                origin.push('main')
+                origin.push(refspec='refs/heads/main:refs/heads/main')
                 
             except Exception as e:
                 click.echo(f"Warning: Failed to integrate {child_repo} into {parent_repo}: {e}")
