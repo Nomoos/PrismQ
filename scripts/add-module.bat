@@ -453,9 +453,9 @@ exit /b 0
 :create_module_hierarchy
 REM ============================================================================
 REM Creates GitHub repositories for all levels of the module hierarchy
-REM and sets up git subtree relationships
+REM and sets up NESTED git subtree relationships (child integrated into parent)
 REM 
-REM HOW GIT SUBTREE WORKS - DETAILED EXAMPLE:
+REM HOW NESTED GIT SUBTREE WORKS - DETAILED EXAMPLE:
 REM ============================================================================
 REM 
 REM Example: Creating PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource
@@ -485,35 +485,59 @@ REM   - git add . (stages all template files)
 REM   - git commit -m "Initial commit: Create module"
 REM   - git push -u origin main (pushes to GitHub)
 REM 
-REM STEP 4: Add Remotes to Main PrismQ Repository
-REM ----------------------------------------------
-REM In main PrismQ repo, add remotes for ALL hierarchy levels:
+REM STEP 4: Build Nested Subtree Hierarchy (BOTTOM-UP)
+REM --------------------------------------------------
+REM Working from deepest to shallowest:
+REM 
+REM 4a. YouTubeSource → Shorts (as git subtree)
+REM     cd src/IdeaInspiration/src/Sources/src/Content/src/Shorts
+REM     git init
+REM     git remote add origin https://github.com/Nomoos/PrismQ...Shorts.git
+REM     git remote add child-remote https://github.com/Nomoos/PrismQ...YouTubeSource.git
+REM     git fetch child-remote main
+REM     git subtree add --prefix=src/YouTubeSource child-remote main --squash
+REM     git push -u origin main
+REM 
+REM 4b. Shorts → Content (as git subtree)
+REM     cd src/IdeaInspiration/src/Sources/src/Content
+REM     git init
+REM     git remote add origin https://github.com/Nomoos/PrismQ...Content.git
+REM     git remote add child-remote https://github.com/Nomoos/PrismQ...Shorts.git
+REM     git fetch child-remote main
+REM     git subtree add --prefix=src/Shorts child-remote main --squash
+REM     git push -u origin main
+REM 
+REM 4c. Content → Sources (as git subtree)
+REM 4d. Sources → IdeaInspiration (as git subtree)
+REM 4e. IdeaInspiration → PrismQ (as git subtree)
+REM 
+REM Each parent pulls its immediate child as a git subtree!
+REM 
+REM STEP 5: Final Integration into Main PrismQ
+REM -------------------------------------------
+REM   cd <PrismQ root>
 REM   git remote add prismq-ideainspiration https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-REM   git remote add prismq-ideainspiration-sources https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.git
-REM   git remote add prismq-ideainspiration-sources-content https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Content.git
-REM   ... (and so on for all levels)
+REM   git fetch prismq-ideainspiration main
+REM   git subtree add --prefix=src/IdeaInspiration prismq-ideainspiration main --squash
 REM 
-REM STEP 5: Commit Module to Main Repository
-REM -----------------------------------------
-REM   git add src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeSource/
-REM   git commit -m "Add module with hierarchy info"
+REM STEP 6: Future Syncing (via sync-modules.bat)
+REM ----------------------------------------------
+REM To sync changes FROM child TO parent:
+REM   cd <parent directory>
+REM   git subtree pull --prefix=src/<child> <child-remote> main --squash
 REM 
-REM STEP 6: Future Syncing with Git Subtree (via sync-modules.bat)
-REM ---------------------------------------------------------------
-REM When you later run sync-modules.bat, it will:
-REM   git fetch prismq-ideainspiration-sources-content-shorts-youtubesource main
-REM   git subtree pull --prefix=src/IdeaInspiration/.../YouTubeSource prismq-...youtubesource main --squash
+REM To push changes FROM parent TO child:
+REM   cd <parent directory>
+REM   git subtree push --prefix=src/<child> <child-remote> main
 REM 
-REM This PULLS changes from the YouTubeSource GitHub repository into the main
-REM PrismQ repository at the correct path, maintaining the subtree relationship.
-REM 
-REM BENEFITS:
-REM ---------
-REM 1. Module can be developed independently in its own GitHub repository
-REM 2. Module is also embedded in main PrismQ repository for integrated development
-REM 3. Changes can flow both ways: module repo <-> main repo
-REM 4. All hierarchy levels can be synced independently
-REM 5. Each module maintains its own git history while also being part of main repo
+REM NESTED STRUCTURE BENEFITS:
+REM --------------------------
+REM 1. Each module can be developed independently in its own repository
+REM 2. Each module is ALSO a subtree in its parent's repository
+REM 3. Changes flow: Child ↔ Parent ↔ Grandparent ... ↔ PrismQ
+REM 4. Full git history maintained at every level
+REM 5. Each level can be cloned and worked on independently
+REM 6. True hierarchical organization matching repository structure
 REM 
 REM ============================================================================
 set full_repo_name=%~1
@@ -571,56 +595,122 @@ for /l %%i in (0,1,!level_count!) do (
             echo Repository already exists: !current_repo!
         )
         
-        REM Derive remote name for this module
-        call :derive_remote_name "!current_url!" temp_remote_name
-        
-        REM Add remote to main PrismQ repository
-        git remote | findstr /x "!temp_remote_name!" >nul 2>&1
-        if errorlevel 1 (
-            echo Adding remote '!temp_remote_name!' to main repository...
-            git remote add "!temp_remote_name!" "!current_url!" >nul 2>&1
-        )
+        REM Store module info for later use
+        set module_repo[%%i]=!current_repo!
+        set module_url[%%i]=!current_url!
+        set module_path[%%i]=!temp_path!
     )
 )
 
-REM Push the final module to its GitHub repository
-echo Pushing module to GitHub repository: !full_repo_name!
+REM Now create nested git subtree structure from bottom to top
+echo.
+echo Setting up nested git subtree hierarchy...
+
+REM Push the final (deepest) module to its GitHub repository
+echo Pushing deepest module to GitHub: !full_repo_name!
 pushd "!final_module_dir_win!"
 git push -u origin main >nul 2>&1
 if errorlevel 1 (
     echo Warning: Failed to push to !full_repo_name!
-    echo You may need to push manually:
-    echo   cd !final_module_dir_win!
-    echo   git push -u origin main
-) else (
-    echo Successfully pushed module to !full_repo_name!
 )
 popd
 
-REM Add final module files to parent repository
-set convert_path=!final_module_dir:/=\!
-echo Adding module files to parent repository...
-git add "!convert_path!" >nul 2>&1
-if errorlevel 1 (
-    echo Warning: Failed to add module to parent repository
-    goto :eof
+REM Work backwards through hierarchy, integrating each child into parent
+set /a last_index=!level_count!-1
+for /l %%i in (!last_index!,-1,0) do (
+    if defined hierarchy_level[%%i] (
+        set parent_module=!module_repo[%%i]!
+        set parent_url=!module_url[%%i]!
+        set parent_path=!module_path[%%i]!
+        set /a child_index=%%i+1
+        
+        if defined hierarchy_level[!child_index!] (
+            REM There is a child to integrate
+            set child_module=!module_repo[%child_index%]!
+            set child_url=!module_url[%child_index%]!
+            set child_path=!module_path[%child_index%]!
+            
+            REM Derive child directory name (last component of path)
+            for %%a in ("!child_path:/=" "!") do set child_dir_name=%%~a
+            
+            echo Integrating !child_module! into !parent_module! as subtree...
+            
+            REM Convert parent path to Windows format
+            set parent_path_win=!parent_path:/=\!
+            
+            REM Change to parent module directory
+            pushd "!parent_path_win!" 2>nul
+            if errorlevel 1 (
+                echo Warning: Parent directory !parent_path_win! not found
+                popd
+                goto :skip_integration_%%i
+            )
+            
+            REM Initialize git repo if not already initialized
+            if not exist ".git" (
+                git init >nul 2>&1
+                git remote add origin "!parent_url!" >nul 2>&1
+            )
+            
+            REM Add child as subtree
+            call :derive_remote_name "!child_url!" child_remote_name
+            git remote | findstr /x "!child_remote_name!" >nul 2>&1
+            if errorlevel 1 (
+                git remote add "!child_remote_name!" "!child_url!" >nul 2>&1
+            )
+            
+            REM Fetch and add subtree
+            git fetch "!child_remote_name!" main >nul 2>&1
+            git subtree add --prefix=src/!child_dir_name! "!child_remote_name!" main --squash >nul 2>&1
+            if errorlevel 1 (
+                echo Warning: Failed to add subtree for !child_module!
+            )
+            
+            REM Push parent to its GitHub repository
+            git push -u origin main >nul 2>&1
+            if errorlevel 1 (
+                echo Warning: Failed to push !parent_module! to GitHub
+            )
+            
+            popd
+            
+            :skip_integration_%%i
+        )
+    )
 )
 
-REM Create commit in parent repository
-echo Creating commit in parent repository...
-git commit -m "Add !hierarchy! module
-
-- Module path: !final_module_dir!
-- Repository: !full_repo_name!
-- Owner: !repo_owner!
-
-This module is part of a hierarchical git subtree structure." >nul 2>&1
-if errorlevel 1 (
-    echo Warning: Failed to create commit
-    echo The module files are staged but not committed
-) else (
-    echo Module hierarchy successfully set up
+REM Finally, integrate top-level module into main PrismQ repository
+if defined hierarchy_level[0] (
+    set top_module=!module_repo[0]!
+    set top_url=!module_url[0]!
+    set top_path=!module_path[0]!
+    
+    REM Derive top directory name
+    for %%a in ("!top_path:/=" "!") do set top_dir_name=%%~a
+    
+    echo Integrating !top_module! into main PrismQ repository...
+    
+    REM Return to main repository
+    cd /d "!repo_root!"
+    
+    REM Add remote and subtree
+    call :derive_remote_name "!top_url!" top_remote_name
+    git remote | findstr /x "!top_remote_name!" >nul 2>&1
+    if errorlevel 1 (
+        git remote add "!top_remote_name!" "!top_url!" >nul 2>&1
+    )
+    
+    git fetch "!top_remote_name!" main >nul 2>&1
+    git subtree add --prefix=!top_path! "!top_remote_name!" main --squash >nul 2>&1
+    if errorlevel 1 (
+        echo Warning: Failed to add subtree for !top_module!
+        REM Fallback: just add files normally
+        git add "!top_path!" >nul 2>&1
+        git commit -m "Add !hierarchy! module" >nul 2>&1
+    )
 )
+
+echo Nested git subtree hierarchy successfully set up!
 
 goto :eof
 
