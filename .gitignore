@@ -7,3 +7,8 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Nested git repositories in modules
+# (Git automatically ignores these, but listing explicitly for clarity)
+src/*/.git/
+src/*/*/.git/

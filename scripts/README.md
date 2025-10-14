@@ -199,6 +199,47 @@ The sync scripts use **Git subtree** to manage module synchronization:
 - ✅ No `.gitmodules` file needed
 - ✅ Works with standard Git commands
 
+## Module Structure and Git Directories
+
+### Why Modules Have `.git` and `.github` Directories
+
+Each module in the PrismQ repository has its own `.git` and `.github` directories. This is **intentional and not duplication**:
+
+**`.git` Directories:**
+- Modules are **separate git repositories** that can be independently developed
+- The `.git` directory allows modules to have their own git history
+- Git subtree is used to sync between the module repo and the main PrismQ repo
+- The parent repository's git automatically ignores nested `.git` directories (they're not tracked)
+- This enables a **bidirectional workflow**: develop in either the module repo or main repo
+- When you see `.git` in a module directory, it's there to support independent module development
+
+**Important:** The `.git` directories in modules are NOT part of the parent repository's git history. They exist in your working tree but are automatically ignored by git. This is standard behavior for nested git repositories and git subtree workflows.
+
+**`.github` Directories:**
+- Contains module-specific GitHub configuration (issue templates, PR templates, etc.)
+- Allows each module to have its own GitHub Actions workflows (if needed)
+- Provides module-specific Copilot instructions
+- Not duplicative since these are module-specific configurations
+- These ARE tracked in git (unlike `.git` directories)
+
+This architecture provides:
+- ✅ **Module independence**: Each module can be developed, tested, and versioned separately
+- ✅ **Flexible workflows**: Work in module repo OR main repo
+- ✅ **Easy synchronization**: Git subtree handles syncing automatically
+- ✅ **No external dependencies**: Full code available in main repo
+
+### Verifying the Setup
+
+You can verify that `.git` directories are properly ignored:
+```bash
+# Check git status - .git directories should not appear
+git status
+
+# Check what's tracked in modules
+git ls-files src/
+# You'll see .github files are tracked, but no .git files
+```
+
 ## Configuration
 
 Modules are configured using `module.json` files in each module directory:
