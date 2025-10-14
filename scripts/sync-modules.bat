@@ -161,7 +161,7 @@ set result_var=%~2
 
 REM Extract repo name from URL (remove .git and get last part)
 set repo_name=!url:.git=!
-for %%a in ("!repo_name!") do set repo_name=%%~na
+for %%a in ("!repo_name!") do set repo_name=%%~nxa
 
 REM Convert to lowercase and replace dots/underscores with hyphens
 set repo_name=!repo_name:.=-!
