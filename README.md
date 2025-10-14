@@ -42,22 +42,26 @@ First-level modules can be developed in separate repositories and synchronized t
 
 ### Configuration
 
-Each first-level module can have a `REMOTE.md` file specifying its remote repository:
+Each first-level module should have a `module.json` file specifying its remote repository:
 
-```markdown
-REMOTE_URL=https://github.com/Nomoos/PrismQ.ModuleName.git
-REMOTE_NAME=modulename-remote
-BRANCH=main
+```json
+{
+  "remote": {
+    "url": "https://github.com/Nomoos/PrismQ.ModuleName.git"
+  }
+}
 ```
 
-The sync scripts automatically discover modules with `REMOTE.md` files.
+The sync scripts automatically discover modules with `module.json` files.
 
 ### Quick Start
 
 ```bash
-
 # Windows - Sync all modules
 scripts\sync-modules.bat
+
+# Cross-platform - Direct Python usage
+python scripts/sync_modules.py
 ```
 
 For detailed usage, configuration, and integration guide, see [scripts/README.md](scripts/README.md).

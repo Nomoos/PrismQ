@@ -663,7 +663,7 @@ def main(github_url: Optional[str], module_name: Optional[str], description: str
     click.echo("  2. The module has been committed to the parent repository")
     click.echo("  3. Push the parent repository changes:")
     click.echo("     git push")
-    click.echo("  4. Use scripts\\sync-modules.bat to sync future updates")
+    click.echo("  4. Use scripts/sync_modules.py (or scripts\\sync-modules.bat on Windows) to sync future updates")
     click.echo("     The module is managed as a git subtree hierarchy")
     click.echo()
 

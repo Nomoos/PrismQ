@@ -139,14 +139,24 @@ This will:
 
 This script automates the synchronization of first-level modules from their separate repositories into the main PrismQ repository using Git subtree.
 
-### Available Script
+### Available Scripts
 
-- **`sync-modules.bat`** - Windows synchronization script
+- **`sync-modules.bat`** - Windows wrapper script (sets up Python environment and runs sync_modules.py)
+- **`sync_modules.py`** - Python implementation with improved error handling
+
+### Python Implementation
+
+The module sync script is now implemented in Python for better:
+- **Error handling** - Clear error messages and validation
+- **Testability** - Can be tested with pytest
+- **Cross-platform compatibility** - Works on Windows, Linux, and macOS
+- **Maintainability** - Easier to debug and extend
+- **Module discovery** - Automatically discovers modules from module.json files
 
 ### Quick Start
 
 ```batch
-# Sync all modules
+# Windows - Sync all modules
 scripts\sync-modules.bat
 
 # Sync specific module
@@ -155,9 +165,13 @@ scripts\sync-modules.bat src\RepositoryTemplate
 # List configured modules
 scripts\sync-modules.bat --list
 
-# Show help
-scripts\sync-modules.bat --help
+# Cross-platform - Direct Python usage
+python scripts/sync_modules.py
+python scripts/sync_modules.py --list
+python scripts/sync_modules.py src/RepositoryTemplate
 ```
+
+The first time you run `sync-modules.bat`, it will automatically set up the Python virtual environment and install dependencies (same environment as add-module.bat).
 
 ## How It Works
 
@@ -178,64 +192,57 @@ The sync scripts use **Git subtree** to manage module synchronization:
 
 ## Configuration
 
-There are two ways to configure modules for synchronization:
+Modules are configured using `module.json` files in each module directory:
 
-### Option 1: REMOTE.md File (Recommended)
+### Module Configuration with module.json
 
-Each module can have a `REMOTE.md` file in its root directory that specifies the remote repository configuration. This is the recommended approach as it keeps configuration with the module.
+Each module should have a `module.json` file in its root directory:
 
-**Create `src/YourModule/REMOTE.md`:**
+**Create `src/YourModule/module.json`:**
 
-```markdown
-# Remote Repository Configuration
+```json
+{
+  "remote": {
+    "url": "https://github.com/Nomoos/PrismQ.YourModule.git"
+  }
+}
+```
 
-This module is synchronized with its own repository.
+The sync script will automatically:
+1. Discover all modules with `module.json` files
+2. Extract the remote URL
+3. Derive the remote name from the URL (e.g., `prismq-yourmodule`)
+4. Set up git remotes and sync using git subtree
 
-## Repository Information
+### Hardcoded Fallback
 
-- **Remote URL**: `https://github.com/Nomoos/PrismQ.YourModule.git`
-- **Remote Name**: `yourmodule-remote`
-- **Branch**: `main`
+The sync script also includes hardcoded configurations for core modules:
+- `src/RepositoryTemplate` - Template module structure
+- `src/IdeaInspiration` - Idea generation module
 
-## Configuration Format
+These will be used if `module.json` files are not found.
 
-This file uses a standard format that can be read by automation tools:
+### Migration from REMOTE.md
 
+If you have old `REMOTE.md` files, migrate to `module.json`:
+
+**Old format (REMOTE.md):**
 ```
 REMOTE_URL=https://github.com/Nomoos/PrismQ.YourModule.git
 REMOTE_NAME=yourmodule-remote
 BRANCH=main
 ```
+
+**New format (module.json):**
+```json
+{
+  "remote": {
+    "url": "https://github.com/Nomoos/PrismQ.YourModule.git"
+  }
+}
 ```
 
-The sync script will automatically discover and use modules with `REMOTE.md` files.
-
-### Option 2: Script Configuration
-
-Alternatively, edit the configuration array in the script:
-
-**In `sync-modules.bat`:**
-
-```batch
-set "modules[0]=src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
-set "modules[1]=src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
-REM Add your new module:
-set "modules[2]=src/YourModule|yourmodule-remote|https://github.com/Nomoos/PrismQ.YourModule.git|main"
-
-REM Update module count
-set module_count=3
-```
-
-### Configuration Format
-
-```
-module_path|remote_name|remote_url|branch
-```
-
-- **module_path**: Relative path to module (e.g., `src/RepositoryTemplate`)
-- **remote_name**: Name for Git remote (e.g., `repositorytemplate-remote`)
-- **remote_url**: GitHub repository URL
-- **branch**: Branch to sync from (usually `main`)
+The remote name and branch are automatically derived.
 
 ## Usage Examples
 
