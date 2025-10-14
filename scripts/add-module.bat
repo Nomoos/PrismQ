@@ -14,8 +14,20 @@ REM Check if we're in a git repository
 git rev-parse --git-dir >nul 2>&1
 if errorlevel 1 (
     echo Error: Not in a git repository
-    echo Please run this script from the root of the PrismQ repository
+    echo Please run this script from within the PrismQ repository
     exit /b 1
+)
+
+REM Get the path to navigate to repository root
+for /f "delims=" %%i in ('git rev-parse --show-cdup 2^>nul') do set repo_cdup=%%i
+
+REM Change to repository root directory if we're not already there
+if defined repo_cdup (
+    cd "%repo_cdup%"
+    if errorlevel 1 (
+        echo Error: Failed to change to repository root directory
+        exit /b 1
+    )
 )
 
 REM Prompt for module name
