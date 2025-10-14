@@ -41,9 +41,7 @@ PrismQ.RepositoryTemplate/
 │   └── README.md              # Issue tracking guide
 ├── scripts/                    # Utility scripts
 │   ├── setup.bat              # Windows setup script
-│   ├── setup.sh               # Linux setup script (development only)
 │   ├── quickstart.bat         # Windows quick start
-│   ├── quickstart.sh          # Linux quick start (development only)
 │   └── README.md              # Scripts documentation
 ├── src/                        # Source code
 │   ├── __init__.py            # Package initialization
@@ -65,13 +63,11 @@ PrismQ.RepositoryTemplate/
 ### Prerequisites
 
 - Python 3.10 or higher
-- Windows OS (required)
+- Windows OS
 - NVIDIA RTX 5090 with latest drivers
 - 64GB RAM
 
 ### Installation
-
-#### Windows
 
 1. Clone this template repository:
    ```batch
@@ -95,8 +91,6 @@ PrismQ.RepositoryTemplate/
    scripts\quickstart.bat
    ```
 
-> **Note for Linux users**: Limited Linux support is available for development purposes only. See the scripts folder for Linux shell scripts. macOS is not supported.
-
 ## 🛠️ Development
 
 ### Creating Your Module
@@ -119,7 +113,7 @@ PrismQ.RepositoryTemplate/
 ### Running Tests
 
 ```batch
-# Activate virtual environment first (Windows)
+# Activate virtual environment first
 venv\Scripts\activate
 
 # Run tests
@@ -128,8 +122,6 @@ pytest
 # Run tests with coverage
 pytest --cov=src --cov-report=html
 ```
-
-> **Note for Linux users**: Use `source venv/bin/activate` to activate the virtual environment on Linux.
 
 ## 📚 Documentation
 
@@ -196,9 +188,8 @@ The `PYTHON_EXECUTABLE` setting allows you to specify which Python interpreter t
 
 **Examples:**
 - Windows: `PYTHON_EXECUTABLE=python` or `PYTHON_EXECUTABLE=C:\Python310\python.exe`
-- Linux: `PYTHON_EXECUTABLE=python3` or `PYTHON_EXECUTABLE=/usr/bin/python3.11`
 
-The setup scripts (`scripts/setup.bat` and `scripts/setup.sh`) will automatically use this configuration when creating the virtual environment.
+The setup scripts will automatically use this configuration when creating the virtual environment.
 
 ## 🚨 Hardware Requirements
 
