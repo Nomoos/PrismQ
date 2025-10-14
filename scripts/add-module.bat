@@ -28,7 +28,75 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM Prompt for input method
+echo Choose input method:
+echo   1. Enter GitHub repository URL (recommended)
+echo   2. Enter module details manually
+echo.
+set /p input_method="Select option (1 or 2): "
+
+if "!input_method!"=="1" (
+    goto :github_url_input
+) else if "!input_method!"=="2" (
+    goto :manual_input
+) else (
+    echo Error: Invalid option. Please select 1 or 2
+    exit /b 1
+)
+
+:github_url_input
+echo.
+echo Enter the GitHub repository URL (e.g., https://github.com/Nomoos/PrismQ.RepositoryTemplate.git):
+echo This can be:
+echo   - Full repository URL: https://github.com/Owner/PrismQ.Module.Name.git
+echo   - Short format: Owner/PrismQ.Module.Name
+set /p github_input="GitHub URL: "
+
+if "!github_input!"=="" (
+    echo Error: GitHub URL cannot be empty
+    exit /b 1
+)
+
+REM Parse GitHub URL to extract owner and repository name
+call :parse_github_url "!github_input!" github_owner repo_name
+
+if "!github_owner!"=="" (
+    echo Error: Failed to parse GitHub URL
+    exit /b 1
+)
+
+if "!repo_name!"=="" (
+    echo Error: Failed to parse repository name
+    exit /b 1
+)
+
+REM Derive module name and path from repository name
+call :derive_module_path "!repo_name!" module_name module_dir
+
+echo.
+echo Parsed from GitHub URL:
+echo   Owner: !github_owner!
+echo   Repository: !repo_name!
+echo   Module Name: !module_name!
+echo   Module Path: !module_dir!
+echo.
+
+REM Prompt for module description
+echo Please enter a short description for the module (optional):
+set /p module_description="Description: "
+
+if "!module_description!"=="" (
+    set module_description=A PrismQ module
+)
+
+REM Construct remote URL
+set remote_url=https://github.com/!github_owner!/!repo_name!.git
+
+goto :after_input
+
+:manual_input
 REM Prompt for module name
+echo.
 echo Please enter the module name (e.g., MyNewModule):
 echo Note: This will be used as part of the repository name (PrismQ.ModuleName)
 set /p module_name="Module name: "
@@ -60,6 +128,8 @@ REM Construct paths and URLs
 set module_dir=src/!module_name!
 set repo_name=PrismQ.!module_name!
 set remote_url=https://github.com/!github_owner!/!repo_name!.git
+
+:after_input
 
 REM Derive remote name
 call :derive_remote_name "!remote_url!" remote_name
@@ -94,25 +164,30 @@ if exist "!module_dir!" (
     exit /b 1
 )
 
-REM Create module directory structure
+REM Create module directory structure (handling nested paths)
 echo Creating directory: !module_dir!
-mkdir "!module_dir!" 2>nul
+
+REM Convert forward slashes to backslashes for Windows
+set module_dir_win=!module_dir:/=\!
+
+REM Create the directory and all parent directories
+mkdir "!module_dir_win!" 2>nul
 if errorlevel 1 (
     echo Error: Failed to create module directory
     exit /b 1
 )
 
 REM Create subdirectories
-mkdir "!module_dir!\src" 2>nul
-mkdir "!module_dir!\tests" 2>nul
-mkdir "!module_dir!\docs" 2>nul
-mkdir "!module_dir!\scripts" 2>nul
-mkdir "!module_dir!\issues" 2>nul
-mkdir "!module_dir!\issues\new" 2>nul
-mkdir "!module_dir!\issues\wip" 2>nul
-mkdir "!module_dir!\issues\done" 2>nul
-mkdir "!module_dir!\.github" 2>nul
-mkdir "!module_dir!\.github\ISSUE_TEMPLATE" 2>nul
+mkdir "!module_dir_win!\src" 2>nul
+mkdir "!module_dir_win!\tests" 2>nul
+mkdir "!module_dir_win!\docs" 2>nul
+mkdir "!module_dir_win!\scripts" 2>nul
+mkdir "!module_dir_win!\issues" 2>nul
+mkdir "!module_dir_win!\issues\new" 2>nul
+mkdir "!module_dir_win!\issues\wip" 2>nul
+mkdir "!module_dir_win!\issues\done" 2>nul
+mkdir "!module_dir_win!\.github" 2>nul
+mkdir "!module_dir_win!\.github\ISSUE_TEMPLATE" 2>nul
 
 echo Creating configuration files...
 
@@ -124,7 +199,7 @@ echo   "remote": {
 echo     "url": "!remote_url!"
 echo   }
 echo }
-) > "!module_dir!\module.json"
+) > "!module_dir_win!\module.json"
 
 REM Create README.md
 echo Creating README.md...
@@ -173,7 +248,7 @@ echo.
 echo ## License
 echo.
 echo This project is licensed under the MIT License - see the LICENSE file for details.
-) > "!module_dir!\README.md"
+) > "!module_dir_win!\README.md"
 
 REM Create .gitignore
 echo Creating .gitignore...
@@ -208,7 +283,7 @@ echo # Tests
 echo .pytest_cache/
 echo .coverage
 echo htmlcov/
-) > "!module_dir!\.gitignore"
+) > "!module_dir_win!\.gitignore"
 
 REM Create basic Python structure
 echo Creating Python package structure...
@@ -216,7 +291,7 @@ echo Creating Python package structure...
 echo """!module_name! - !module_description!"""
 echo.
 echo __version__ = "0.1.0"
-) > "!module_dir!\src\__init__.py"
+) > "!module_dir_win!\src\__init__.py"
 
 (
 echo """Main entry point for !module_name!"""
@@ -227,7 +302,7 @@ echo     print^("!module_name! module initialized"^)
 echo.
 echo if __name__ == "__main__":
 echo     main^(^)
-) > "!module_dir!\src\main.py"
+) > "!module_dir_win!\src\main.py"
 
 REM Create pyproject.toml
 echo Creating pyproject.toml...
@@ -247,14 +322,14 @@ echo.
 echo [build-system]
 echo requires = ["poetry-core^>=1.0.0"]
 echo build-backend = "poetry.core.masonry.api"
-) > "!module_dir!\pyproject.toml"
+) > "!module_dir_win!\pyproject.toml"
 
 REM Create requirements.txt
 echo Creating requirements.txt...
 (
 echo # Core dependencies
 echo # Add your dependencies here
-) > "!module_dir!\requirements.txt"
+) > "!module_dir_win!\requirements.txt"
 
 REM Create LICENSE
 echo Creating LICENSE...
@@ -280,13 +355,13 @@ echo AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 echo LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 echo OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 echo SOFTWARE.
-) > "!module_dir!\LICENSE"
+) > "!module_dir_win!\LICENSE"
 
 echo.
 echo Initializing Git repository...
 
 REM Change to module directory
-pushd "!module_dir!"
+pushd "!module_dir_win!"
 
 REM Initialize git repository
 git init >nul 2>&1
@@ -301,7 +376,7 @@ git remote add origin "!remote_url!" >nul 2>&1
 if errorlevel 1 (
     echo Warning: Failed to add git remote
     echo You can add it manually later with:
-    echo   cd !module_dir!
+    echo   cd !module_dir_win!
     echo   git remote add origin !remote_url!
 )
 
@@ -322,19 +397,98 @@ echo Module created successfully!
 echo ========================================================
 echo.
 echo Next steps:
-echo   1. Review the generated files in !module_dir!
+echo   1. Review the generated files in !module_dir_win!
 echo   2. Create the GitHub repository at:
 echo      !remote_url!
 echo   3. Push the initial commit:
-echo      cd !module_dir!
+echo      cd !module_dir_win!
 echo      git push -u origin main
 echo   4. Add the module to the main repository:
-echo      git add !module_dir!
+echo      git add !module_dir_win!
 echo      git commit -m "Add !module_name! module"
 echo   5. Use scripts\sync-modules.bat to sync the module
 echo.
 
 exit /b 0
+
+:parse_github_url
+REM Parse GitHub URL to extract owner and repository name
+REM Supports formats:
+REM   - https://github.com/Owner/RepoName.git
+REM   - https://github.com/Owner/RepoName
+REM   - git@github.com:Owner/RepoName.git
+REM   - Owner/RepoName
+set input_url=%~1
+set owner_var=%~2
+set repo_var=%~3
+
+REM Remove .git suffix if present
+set input_url=!input_url:.git=!
+
+REM Handle different URL formats
+echo !input_url! | findstr /C:"github.com/" >nul
+if !errorlevel! equ 0 (
+    REM Full URL format
+    set input_url=!input_url:https://github.com/=!
+    set input_url=!input_url:http://github.com/=!
+    set input_url=!input_url:git@github.com:=!
+)
+
+REM Extract owner and repo from "Owner/RepoName" format
+for /f "tokens=1,2 delims=/" %%a in ("!input_url!") do (
+    set %owner_var%=%%a
+    set %repo_var%=%%b
+)
+
+goto :eof
+
+:derive_module_path
+REM Derive module path from repository name
+REM Converts repository name like "PrismQ.IdeaInspiration.Sources" 
+REM to module name "IdeaInspiration.Sources" and path "src/IdeaInspiration/src/Sources"
+set repo_full_name=%~1
+set name_var=%~2
+set path_var=%~3
+
+REM Remove "PrismQ." prefix if present
+set module_full_name=!repo_full_name:PrismQ.=!
+
+REM Split by dots and build path
+REM First component goes to src/, rest go to nested src/ folders
+set first_component=
+set remaining_components=
+set component_count=0
+
+REM Count components and split
+for %%a in ("!module_full_name:.=" "!") do (
+    set /a component_count+=1
+    if !component_count! equ 1 (
+        set first_component=%%~a
+    ) else (
+        if "!remaining_components!"=="" (
+            set remaining_components=%%~a
+        ) else (
+            set remaining_components=!remaining_components!.%%~a
+        )
+    )
+)
+
+REM Build the module path
+if "!remaining_components!"=="" (
+    REM Single component: src/Component
+    set %name_var%=!first_component!
+    set %path_var%=src/!first_component!
+) else (
+    REM Multiple components: src/First/src/Second/src/Third...
+    set module_path=src/!first_component!
+    for %%a in ("!remaining_components:.=" "!") do (
+        set module_path=!module_path!/src/%%~a
+    )
+    set %name_var%=!module_full_name!
+    set %path_var%=!module_path!
+)
+
+goto :eof
 
 :derive_remote_name
 REM Derive remote name from repository URL
