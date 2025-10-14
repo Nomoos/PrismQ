@@ -160,46 +160,46 @@ set url=%~1
 set result_var=%~2
 
 REM Extract repo name from URL (remove .git and get last part)
-set repo_name=!url:.git=!
-for %%a in ("!repo_name!") do set repo_name=%%~nxa
+set temp_repo_name=!url:.git=!
+for %%a in ("!temp_repo_name!") do set temp_repo_name=%%~nxa
 
 REM Convert to lowercase and replace dots/underscores with hyphens
-set repo_name=!repo_name:.=-!
-set repo_name=!repo_name:_=-!
+set temp_repo_name=!temp_repo_name:.=-!
+set temp_repo_name=!temp_repo_name:_=-!
 
 REM Convert to lowercase (PowerShell method for batch)
 for %%L in (A B C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
-    set repo_name=!repo_name:%%L=%%L!
+    set temp_repo_name=!temp_repo_name:%%L=%%L!
 )
 REM Simple lowercase conversion
-set repo_name=!repo_name:A=a!
-set repo_name=!repo_name:B=b!
-set repo_name=!repo_name:C=c!
-set repo_name=!repo_name:D=d!
-set repo_name=!repo_name:E=e!
-set repo_name=!repo_name:F=f!
-set repo_name=!repo_name:G=g!
-set repo_name=!repo_name:H=h!
-set repo_name=!repo_name:I=i!
-set repo_name=!repo_name:J=j!
-set repo_name=!repo_name:K=k!
-set repo_name=!repo_name:L=l!
-set repo_name=!repo_name:M=m!
-set repo_name=!repo_name:N=n!
-set repo_name=!repo_name:O=o!
-set repo_name=!repo_name:P=p!
-set repo_name=!repo_name:Q=q!
-set repo_name=!repo_name:R=r!
-set repo_name=!repo_name:S=s!
-set repo_name=!repo_name:T=t!
-set repo_name=!repo_name:U=u!
-set repo_name=!repo_name:V=v!
-set repo_name=!repo_name:W=w!
-set repo_name=!repo_name:X=x!
-set repo_name=!repo_name:Y=y!
-set repo_name=!repo_name:Z=z!
+set temp_repo_name=!temp_repo_name:A=a!
+set temp_repo_name=!temp_repo_name:B=b!
+set temp_repo_name=!temp_repo_name:C=c!
+set temp_repo_name=!temp_repo_name:D=d!
+set temp_repo_name=!temp_repo_name:E=e!
+set temp_repo_name=!temp_repo_name:F=f!
+set temp_repo_name=!temp_repo_name:G=g!
+set temp_repo_name=!temp_repo_name:H=h!
+set temp_repo_name=!temp_repo_name:I=i!
+set temp_repo_name=!temp_repo_name:J=j!
+set temp_repo_name=!temp_repo_name:K=k!
+set temp_repo_name=!temp_repo_name:L=l!
+set temp_repo_name=!temp_repo_name:M=m!
+set temp_repo_name=!temp_repo_name:N=n!
+set temp_repo_name=!temp_repo_name:O=o!
+set temp_repo_name=!temp_repo_name:P=p!
+set temp_repo_name=!temp_repo_name:Q=q!
+set temp_repo_name=!temp_repo_name:R=r!
+set temp_repo_name=!temp_repo_name:S=s!
+set temp_repo_name=!temp_repo_name:T=t!
+set temp_repo_name=!temp_repo_name:U=u!
+set temp_repo_name=!temp_repo_name:V=v!
+set temp_repo_name=!temp_repo_name:W=w!
+set temp_repo_name=!temp_repo_name:X=x!
+set temp_repo_name=!temp_repo_name:Y=y!
+set temp_repo_name=!temp_repo_name:Z=z!
 
-set %result_var%=!repo_name!
+set %result_var%=!temp_repo_name!
 goto :eof
 
 :sync_module
