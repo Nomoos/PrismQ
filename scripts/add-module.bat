@@ -177,6 +177,36 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM Check if RepositoryTemplate exists to use as template
+set template_dir=src\RepositoryTemplate
+if exist "!template_dir!" (
+    echo Using RepositoryTemplate as base structure...
+    
+    REM Copy template structure
+    xcopy "!template_dir!" "!module_dir_win!" /E /I /Q >nul 2>&1
+    if errorlevel 1 (
+        echo Warning: Failed to copy template structure, creating basic structure instead
+        goto :create_basic_structure
+    )
+    
+    REM Remove template-specific files
+    if exist "!module_dir_win!\module.json" del "!module_dir_win!\module.json" >nul 2>&1
+    if exist "!module_dir_win!\README.md" del "!module_dir_win!\README.md" >nul 2>&1
+    if exist "!module_dir_win!\pyproject.toml" del "!module_dir_win!\pyproject.toml" >nul 2>&1
+    
+    REM Clean up git-related files if they exist
+    if exist "!module_dir_win!\.git" (
+        rmdir /s /q "!module_dir_win!\.git" >nul 2>&1
+    )
+    
+    echo Template structure copied successfully
+    goto :create_custom_files
+) else (
+    echo RepositoryTemplate not found, creating basic structure...
+    goto :create_basic_structure
+)
+
+:create_basic_structure
 REM Create subdirectories
 mkdir "!module_dir_win!\src" 2>nul
 mkdir "!module_dir_win!\tests" 2>nul
@@ -189,6 +219,91 @@ mkdir "!module_dir_win!\issues\done" 2>nul
 mkdir "!module_dir_win!\.github" 2>nul
 mkdir "!module_dir_win!\.github\ISSUE_TEMPLATE" 2>nul
 
+REM Create basic Python structure
+echo Creating Python package structure...
+(
+echo """!module_name! - !module_description!"""
+echo.
+echo __version__ = "0.1.0"
+) > "!module_dir_win!\src\__init__.py"
+
+(
+echo """Main entry point for !module_name!"""
+echo.
+echo def main^(^):
+echo     """Main function"""
+echo     print^("!module_name! module initialized"^)
+echo.
+echo if __name__ == "__main__":
+echo     main^(^)
+) > "!module_dir_win!\src\main.py"
+
+REM Create .gitignore
+(
+echo # Python
+echo __pycache__/
+echo *.py[cod]
+echo *$py.class
+echo *.so
+echo .Python
+echo venv/
+echo env/
+echo ENV/
+echo .venv
+echo.
+echo # IDE
+echo .vscode/
+echo .idea/
+echo *.swp
+echo *.swo
+echo *~
+echo.
+echo # Environment
+echo .env
+echo.
+echo # Build
+echo dist/
+echo build/
+echo *.egg-info/
+echo.
+echo # Tests
+echo .pytest_cache/
+echo .coverage
+echo htmlcov/
+) > "!module_dir_win!\.gitignore"
+
+REM Create requirements.txt
+(
+echo # Core dependencies
+echo # Add your dependencies here
+) > "!module_dir_win!\requirements.txt"
+
+REM Create LICENSE
+(
+echo MIT License
+echo.
+echo Copyright ^(c^) 2025 !github_owner!
+echo.
+echo Permission is hereby granted, free of charge, to any person obtaining a copy
+echo of this software and associated documentation files ^(the "Software"^), to deal
+echo in the Software without restriction, including without limitation the rights
+echo to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+echo copies of the Software, and to permit persons to whom the Software is
+echo furnished to do so, subject to the following conditions:
+echo.
+echo The above copyright notice and this permission notice shall be included in all
+echo copies or substantial portions of the Software.
+echo.
+echo THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+echo IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+echo FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+echo AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+echo LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+echo OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+echo SOFTWARE.
+) > "!module_dir_win!\LICENSE"
+
+:create_custom_files
 echo Creating configuration files...
 
 REM Create module.json
@@ -250,60 +365,6 @@ echo.
 echo This project is licensed under the MIT License - see the LICENSE file for details.
 ) > "!module_dir_win!\README.md"
 
-REM Create .gitignore
-echo Creating .gitignore...
-(
-echo # Python
-echo __pycache__/
-echo *.py[cod]
-echo *$py.class
-echo *.so
-echo .Python
-echo venv/
-echo env/
-echo ENV/
-echo .venv
-echo.
-echo # IDE
-echo .vscode/
-echo .idea/
-echo *.swp
-echo *.swo
-echo *~
-echo.
-echo # Environment
-echo .env
-echo.
-echo # Build
-echo dist/
-echo build/
-echo *.egg-info/
-echo.
-echo # Tests
-echo .pytest_cache/
-echo .coverage
-echo htmlcov/
-) > "!module_dir_win!\.gitignore"
-
-REM Create basic Python structure
-echo Creating Python package structure...
-(
-echo """!module_name! - !module_description!"""
-echo.
-echo __version__ = "0.1.0"
-) > "!module_dir_win!\src\__init__.py"
-
-(
-echo """Main entry point for !module_name!"""
-echo.
-echo def main^(^):
-echo     """Main function"""
-echo     print^("!module_name! module initialized"^)
-echo.
-echo if __name__ == "__main__":
-echo     main^(^)
-) > "!module_dir_win!\src\main.py"
-
 REM Create pyproject.toml
 echo Creating pyproject.toml...
 (
@@ -323,39 +384,6 @@ echo [build-system]
 echo requires = ["poetry-core^>=1.0.0"]
 echo build-backend = "poetry.core.masonry.api"
 ) > "!module_dir_win!\pyproject.toml"
-
-REM Create requirements.txt
-echo Creating requirements.txt...
-(
-echo # Core dependencies
-echo # Add your dependencies here
-) > "!module_dir_win!\requirements.txt"
-
-REM Create LICENSE
-echo Creating LICENSE...
-(
-echo MIT License
-echo.
-echo Copyright ^(c^) 2025 !github_owner!
-echo.
-echo Permission is hereby granted, free of charge, to any person obtaining a copy
-echo of this software and associated documentation files ^(the "Software"^), to deal
-echo in the Software without restriction, including without limitation the rights
-echo to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-echo copies of the Software, and to permit persons to whom the Software is
-echo furnished to do so, subject to the following conditions:
-echo.
-echo The above copyright notice and this permission notice shall be included in all
-echo copies or substantial portions of the Software.
-echo.
-echo THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-echo IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-echo FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-echo AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-echo LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-echo OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-echo SOFTWARE.
-) > "!module_dir_win!\LICENSE"
 
 echo.
 echo Initializing Git repository...
