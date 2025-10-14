@@ -32,6 +32,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM Discover modules from REMOTE.md files
+call :discover_modules_from_remote_files
+
 REM Determine operation mode
 set sync_all=1
 set specific_module=
@@ -87,6 +90,68 @@ if %sync_errors%==0 (
     exit /b 1
 )
 
+:discover_modules_from_remote_files
+REM Discover modules with REMOTE.md files
+for /d %%d in (src\*) do (
+    if exist "%%d\src" (
+        if exist "%%d\REMOTE.md" (
+            call :read_and_add_module "%%d"
+        )
+    )
+)
+goto :eof
+
+:read_and_add_module
+set module_dir=%~1
+set remote_file=%module_dir%\REMOTE.md
+set remote_url_found=
+set remote_name_found=
+set branch_found=
+
+REM Read REMOTE.md file line by line
+for /f "usebackq tokens=1,* delims==" %%a in ("%remote_file%") do (
+    if "%%a"=="REMOTE_URL" set remote_url_found=%%b
+    if "%%a"=="REMOTE_NAME" set remote_name_found=%%b
+    if "%%a"=="BRANCH" set branch_found=%%b
+)
+
+REM Remove spaces from values
+set remote_url_found=!remote_url_found: =!
+set remote_name_found=!remote_name_found: =!
+set branch_found=!branch_found: =!
+
+REM Validate that all required fields are present
+if "!remote_url_found!"=="" (
+    echo WARNING: %module_dir%\REMOTE.md is missing REMOTE_URL configuration
+    goto :eof
+)
+if "!remote_name_found!"=="" (
+    echo WARNING: %module_dir%\REMOTE.md is missing REMOTE_NAME configuration
+    goto :eof
+)
+if "!branch_found!"=="" (
+    echo WARNING: %module_dir%\REMOTE.md is missing BRANCH configuration
+    goto :eof
+)
+
+REM Check if module already configured in modules array
+set already_configured=0
+for /l %%i in (0,1,%module_count%) do (
+    if defined modules[%%i] (
+        for /f "tokens=1 delims=|" %%a in ("!modules[%%i]!") do (
+            if "%%a"=="%module_dir%" set already_configured=1
+        )
+    )
+)
+
+REM Add to modules if not already configured
+if !already_configured!==0 (
+    set /a module_count+=1
+    set "modules[!module_count!]=%module_dir%|!remote_name_found!|!remote_url_found!|!branch_found!"
+    echo Discovered module from REMOTE.md: %module_dir%
+)
+goto :eof
+
 :sync_module
 set module_config=%~1
 for /f "tokens=1,2,3,4 delims=|" %%a in ("%module_config%") do (
@@ -105,6 +170,14 @@ REM Check if module directory exists
 if not exist "!module_path!" (
     echo Module directory '!module_path!' does not exist yet
     echo This module will be added on first sync from remote
+) else (
+    REM Check for REMOTE.md and validate/set origin
+    if exist "!module_path!\REMOTE.md" (
+        call :validate_and_set_origin "!module_path!" "!remote_url!"
+    ) else (
+        echo WARNING: !module_path!\REMOTE.md not found
+        echo The module repository may not have proper remote configuration
+    )
 )
 
 REM Check if remote exists
@@ -135,6 +208,51 @@ if errorlevel 1 (
 ) else (
     echo ✓ Successfully synced !module_path!
 )
+goto :eof
+
+:validate_and_set_origin
+set validate_module_path=%~1
+set validate_remote_url=%~2
+
+REM Read REMOTE.md to get configuration
+set remote_md_file=!validate_module_path!\REMOTE.md
+set remote_url_from_file=
+
+for /f "usebackq tokens=1,* delims==" %%a in ("!remote_md_file!") do (
+    if "%%a"=="REMOTE_URL" set remote_url_from_file=%%b
+)
+
+REM Remove spaces
+set remote_url_from_file=!remote_url_from_file: =!
+
+REM Validate REMOTE.md has proper URL
+if "!remote_url_from_file!"=="" (
+    echo WARNING: !remote_md_file! is missing REMOTE_URL
+) else (
+    REM Check if we're in the module directory to set origin
+    pushd !validate_module_path! 2>nul
+    if errorlevel 1 goto :validate_end
+    
+    REM Check if this is a git repository (has .git)
+    if exist ".git" (
+        REM Get current origin URL
+        for /f "delims=" %%i in ('git remote get-url origin 2^>nul') do set current_origin=%%i
+        
+        if "!current_origin!"=="" (
+            REM No origin set, add it
+            echo Setting origin for !validate_module_path! to !remote_url_from_file!
+            git remote add origin "!remote_url_from_file!"
+        ) else if not "!current_origin!"=="!remote_url_from_file!" (
+            REM Origin exists but different, update it
+            echo Updating origin for !validate_module_path! to !remote_url_from_file!
+            git remote set-url origin "!remote_url_from_file!"
+        )
+    )
+    
+    popd
+)
+
+:validate_end
 goto :eof
 
 :show_help
