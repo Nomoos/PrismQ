@@ -80,12 +80,12 @@ if %sync_all%==1 (
 )
 
 echo.
-echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo ========================================================
 if %sync_errors%==0 (
-    echo ✓ All modules synced successfully
+    echo [OK] All modules synced successfully
     exit /b 0
 ) else (
-    echo ✗ %sync_errors% module(s) failed to sync
+    echo [ERROR] %sync_errors% module(s) failed to sync
     echo Note: Some modules may not have remote repositories yet
     exit /b 1
 )
@@ -161,7 +161,7 @@ set result_var=%~2
 
 REM Extract repo name from URL (remove .git and get last part)
 set repo_name=!url:.git=!
-for %%a in ("!repo_name!") do set repo_name=%%~na
+for %%a in ("!repo_name!") do set repo_name=%%~nxa
 
 REM Convert to lowercase and replace dots/underscores with hyphens
 set repo_name=!repo_name:.=-!
@@ -212,9 +212,9 @@ for /f "tokens=1,2,3,4 delims=|" %%a in ("%module_config%") do (
 )
 
 echo.
-echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo ========================================================
 echo Syncing module: !module_path!
-echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo ========================================================
 
 REM Check if module directory exists
 if not exist "!module_path!" (
@@ -253,10 +253,10 @@ REM Pull updates using subtree
 echo Pulling updates to !module_path!...
 git subtree pull --prefix="!module_path!" "!remote_name!" "!branch!" --squash
 if errorlevel 1 (
-    echo ✗ Failed to sync !module_path!
+    echo [ERROR] Failed to sync !module_path!
     set /a sync_errors+=1
 ) else (
-    echo ✓ Successfully synced !module_path!
+    echo [OK] Successfully synced !module_path!
 )
 goto :eof
 
