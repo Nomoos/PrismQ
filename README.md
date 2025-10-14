@@ -35,3 +35,19 @@ Nested modules follow a dot notation based on their path:
 - `src/RepositoryTemplate` → `PrismQ.RepositoryTemplate`
 - `src/IdeaInspiration/src/Sources` → `PrismQ.IdeaInspiration.Sources`
 - `src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource` → `PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeShortsSource`
+
+## Module Synchronization
+
+First-level modules can be developed in separate repositories and synchronized to the main PrismQ repository using automated sync scripts.
+
+### Quick Start
+
+```bash
+# Linux/macOS - Sync all modules
+./scripts/sync-modules.sh
+
+# Windows - Sync all modules
+scripts\sync-modules.bat
+```
+
+For detailed usage, configuration, and integration guide, see [scripts/README.md](scripts/README.md).
