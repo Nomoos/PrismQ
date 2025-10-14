@@ -18,16 +18,100 @@ scripts\add-module.bat
 ```
 
 The script will interactively prompt you for:
+
+**Option 1: GitHub URL Input (Recommended)**
+- GitHub repository URL (e.g., `https://github.com/Nomoos/PrismQ.MyModule.git` or `Nomoos/PrismQ.MyModule`)
+- Module description (optional)
+
+The script automatically:
+- Parses the GitHub URL to extract owner and repository name
+- Derives the module path from the repository name (e.g., `PrismQ.IdeaInspiration.Sources` → `src/IdeaInspiration/src/Sources`)
+- Copies the complete RepositoryTemplate structure (if available)
+
+**Option 2: Manual Input**
 - Module name (e.g., `MyNewModule`)
 - Module description
 - GitHub owner/organization (default: `Nomoos`)
 
-It will then:
-1. Create the module directory structure
-2. Generate configuration files (`module.json`, `README.md`, etc.)
-3. Initialize a Git repository
-4. Set up the remote URL
-5. Create an initial commit
+The script then:
+1. Creates the module directory structure (with nested paths if needed)
+2. Copies files from RepositoryTemplate (if available) or creates basic structure
+3. Generates configuration files (`module.json`, `README.md`, `pyproject.toml`)
+4. Initializes a Git repository in the module directory
+5. Sets up the remote URL for the module
+6. Creates an initial commit in the module
+7. **Creates GitHub repositories for all hierarchy levels** (using GitHub CLI)
+8. Pushes the module to its GitHub repository
+9. Adds remotes to the parent repository for all hierarchy levels
+10. Adds and commits the module to the parent repository
+
+### Examples
+
+**Example 1: Using GitHub URL for simple module**
+```batch
+scripts\add-module.bat
+# Select option: 1
+# GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule.git
+# Description: My new module for PrismQ
+```
+Result: 
+- Creates `src/MyNewModule/` with complete template structure
+- Adds remote to parent repository
+- Commits module to parent repository automatically
+
+**Example 2: Using GitHub URL for nested module**
+```batch
+scripts\add-module.bat
+# Select option: 1
+# GitHub URL: Nomoos/PrismQ.IdeaInspiration.Classification
+# Description: Classify idea inspirations
+```
+Result: 
+- Creates `src/IdeaInspiration/src/Classification/` with complete template structure
+- **Creates GitHub repositories**: PrismQ.IdeaInspiration, PrismQ.IdeaInspiration.Classification
+- Adds remotes to parent repository
+- Pushes module to GitHub
+- Commits module to parent repository automatically
+
+**Example 3: Using manual input**
+```batch
+scripts\add-module.bat
+# Select option: 2
+# Module name: MyModule
+# Description: A new PrismQ module
+# GitHub owner: MyOrg
+```
+Result: 
+- Creates `src/MyModule/` with complete template structure
+- Adds remote to parent repository
+- Commits module to parent repository automatically
+
+### Hierarchical Module Creation
+
+The script supports creating deeply nested modules and automatically creates all parent repositories:
+
+**Example: Deep nesting**
+```batch
+scripts\add-module.bat
+# Select option: 1
+# GitHub URL: Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource
+```
+
+This will:
+1. Check and create repositories for each level:
+   - `PrismQ.IdeaInspiration`
+   - `PrismQ.IdeaInspiration.Sources`
+   - `PrismQ.IdeaInspiration.Sources.Content`
+   - `PrismQ.IdeaInspiration.Sources.Content.Shorts`
+   - `PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource`
+2. Create module at: `src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeSource/`
+3. Push the module to its GitHub repository
+4. Add all remotes to the main PrismQ repository
+5. Set up git subtree relationships
+
+**Requirements:**
+- GitHub CLI (`gh`) must be installed and authenticated
+- Run `gh auth login` if repositories cannot be created
 
 ## Module Synchronization Script
 
