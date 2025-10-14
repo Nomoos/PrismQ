@@ -494,7 +494,36 @@ build-backend = "poetry.core.masonry.api"
                         pass  # Branch doesn't exist yet
                     repo.create_remote('origin', parent_url)
                 else:
+                    # Parent directory already has a git repository
                     repo = Repo(parent_dir)
+                    
+                    # Ensure origin remote exists and is set correctly
+                    try:
+                        origin = repo.remote('origin')
+                        # Update remote URL if it differs
+                        if origin.url != parent_url:
+                            repo.delete_remote('origin')
+                            repo.create_remote('origin', parent_url)
+                    except ValueError:
+                        # No origin remote exists, create it
+                        repo.create_remote('origin', parent_url)
+                    
+                    # Pull latest changes from GitHub repository if it exists
+                    try:
+                        click.echo(f"  Pulling latest changes from {parent_repo}...")
+                        origin = repo.remote('origin')
+                        origin.fetch('main')
+                        
+                        # Check if remote has a main branch
+                        try:
+                            # Try to pull changes if there's existing content
+                            repo.git.pull('origin', 'main', '--no-rebase')
+                            click.echo(f"  ✓ Pulled latest changes from {parent_repo}")
+                        except GitCommandError as pull_error:
+                            # If pull fails (e.g., no commits yet), that's fine
+                            click.echo(f"  No existing content to pull from {parent_repo}")
+                    except Exception as pull_error:
+                        click.echo(f"  Warning: Could not pull from {parent_repo}: {pull_error}")
                 
                 # Add child as subtree
                 child_remote_name = self.derive_remote_name(child_url)
@@ -521,6 +550,35 @@ build-backend = "poetry.core.masonry.api"
             top_repo, top_url, top_path = repos[0]
             
             click.echo(f"Integrating {top_repo} into main PrismQ repository...")
+            
+            # Check if top-level module directory already exists locally
+            top_level_dir = self.repo_root / top_path
+            if top_level_dir.exists() and (top_level_dir / '.git').exists():
+                # Directory exists with git repo, pull latest changes first
+                try:
+                    click.echo(f"  Existing repository found at {top_path}, pulling latest changes...")
+                    top_repo_obj = Repo(top_level_dir)
+                    
+                    # Ensure origin exists and is correct
+                    try:
+                        origin = top_repo_obj.remote('origin')
+                        if origin.url != top_url:
+                            top_repo_obj.delete_remote('origin')
+                            top_repo_obj.create_remote('origin', top_url)
+                    except ValueError:
+                        top_repo_obj.create_remote('origin', top_url)
+                    
+                    # Pull latest changes
+                    origin = top_repo_obj.remote('origin')
+                    origin.fetch('main')
+                    try:
+                        top_repo_obj.git.pull('origin', 'main', '--no-rebase')
+                        click.echo(f"  ✓ Pulled latest changes from {top_repo}")
+                    except GitCommandError:
+                        click.echo(f"  No existing content to pull from {top_repo}")
+                        
+                except Exception as pull_err:
+                    click.echo(f"  Warning: Could not pull from existing {top_repo}: {pull_err}")
             
             try:
                 main_repo = Repo(self.repo_root)
