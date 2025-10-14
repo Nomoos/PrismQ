@@ -20,9 +20,9 @@ if "%1"=="-h" goto :show_help
 if "%1"=="--list" goto :list_modules
 if "%1"=="-l" goto :list_modules
 
-echo ╔════════════════════════════════════════════════════════╗
-echo ║        PrismQ Module Synchronization Script           ║
-echo ╚════════════════════════════════════════════════════════╝
+echo 
+echo         PrismQ Module Synchronization Script
+echo 
 echo.
 
 REM Check if we're in a git repository

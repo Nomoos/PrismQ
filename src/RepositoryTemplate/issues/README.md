@@ -1,21 +1,39 @@
 # Issues
 
-Module-specific issue tracking.
+This directory contains issue tracking and project management files.
 
 ## Structure
 
-- `new/` - Newly identified issues
-- `wip/` - Issues currently being worked on
-- `done/` - Completed issues
+- **new/** - New issues and feature requests
+- **wip/** - Issues currently being worked on (Work In Progress)
+- **done/** - Completed issues and features
+- **KNOWN_ISSUES.md** - List of known issues
+- **ROADMAP.md** - Project roadmap and future plans
 
-## Files
+## Issue Workflow
 
-- `KNOWN_ISSUES.md` - List of known issues
-- `ROADMAP.md` - Development roadmap
+1. **New Issues** - Create a new file in `new/` directory
+2. **Work In Progress** - Move to `wip/` when work begins
+3. **Completed** - Move to `done/` when finished
 
-## Workflow
+## File Naming
 
-1. Create issue file in `new/`
-2. Move to `wip/` when work starts
-3. Move to `done/` when completed
-4. Update KNOWN_ISSUES.md and ROADMAP.md as needed
+Use descriptive names for issue files:
+- `001-feature-name.md`
+- `002-bug-description.md`
+- `003-enhancement-name.md`
+
+## Template
+
+Each issue file should include:
+- **Title** - Clear, descriptive title
+- **Description** - Detailed description of the issue
+- **Type** - Bug, Feature, Enhancement, etc.
+- **Priority** - High, Medium, Low
+- **Status** - New, In Progress, Done
+- **Assignee** - Who is working on it
+- **Target Platform** - Windows, NVIDIA RTX 5090, AMD Ryzen, 64GB RAM
+
+## Integration
+
+GitHub Issues can also be used for tracking. This directory provides an alternative or supplementary tracking system.
