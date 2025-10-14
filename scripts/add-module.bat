@@ -106,6 +106,106 @@ mkdir "!module_dir!\.github\ISSUE_TEMPLATE" 2>nul
 
 echo Creating configuration files...
 
+REM Create README.md in scripts folder
+echo Creating scripts/README.md...
+(
+echo # Scripts
+echo.
+echo Module utility scripts.
+echo.
+echo ## Structure
+echo.
+echo - `setup.bat` / `setup.sh` - Module setup scripts
+echo - `quickstart.bat` / `quickstart.sh` - Quick start scripts
+echo - Additional utility scripts as needed
+echo.
+echo ## Usage
+echo.
+echo Scripts in this directory help with:
+echo - Environment setup
+echo - Running the module
+echo - Testing
+echo - Deployment
+echo - Maintenance tasks
+) > "!module_dir!\scripts\README.md"
+
+REM Create README.md in docs folder
+echo Creating docs/README.md...
+(
+echo # Documentation
+echo.
+echo Module documentation goes here.
+echo.
+echo ## Structure
+echo.
+echo - `README.md` - Main documentation
+echo - Additional documentation files as needed
+echo.
+echo ## Guidelines
+echo.
+echo - Keep documentation up-to-date with code changes
+echo - Include usage examples
+echo - Document API interfaces
+echo - Explain design decisions
+) > "!module_dir!\docs\README.md"
+
+REM Create README.md in issues folder
+echo Creating issues/README.md...
+(
+echo # Issues
+echo.
+echo Module-specific issue tracking.
+echo.
+echo ## Structure
+echo.
+echo - `new/` - Newly identified issues
+echo - `wip/` - Issues currently being worked on
+echo - `done/` - Completed issues
+echo.
+echo ## Files
+echo.
+echo - `KNOWN_ISSUES.md` - List of known issues
+echo - `ROADMAP.md` - Development roadmap
+echo.
+echo ## Workflow
+echo.
+echo 1. Create issue file in `new/`
+echo 2. Move to `wip/` when work starts
+echo 3. Move to `done/` when completed
+echo 4. Update KNOWN_ISSUES.md and ROADMAP.md as needed
+) > "!module_dir!\issues\README.md"
+
+REM Create README.md in tests folder
+echo Creating tests/README.md...
+(
+echo # Tests
+echo.
+echo Module test suite.
+echo.
+echo ## Structure
+echo.
+echo - Mirror the structure of the `src/` directory
+echo - Use `test_*.py` naming convention
+echo - Use pytest for testing
+echo.
+echo ## Running Tests
+echo.
+echo ```bash
+echo # From module root
+echo pytest tests/
+echo.
+echo # With coverage
+echo pytest --cov=src --cov-report=html tests/
+echo ```
+echo.
+echo ## Guidelines
+echo.
+echo - Write tests for all public APIs
+echo - Aim for high code coverage
+echo - Use fixtures for common setup
+echo - Keep tests isolated and independent
+) > "!module_dir!\tests\README.md"
+
 REM Create module.json
 echo Creating module.json...
 (
