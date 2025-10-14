@@ -40,12 +40,21 @@ class ModuleSyncer:
         
         return remote_name
 
-    def discover_modules_from_json(self):
+    def discover_modules_from_json(self, recursive: bool = False):
         """Discover modules with module.json files."""
         src_dir = self.repo_root / "src"
         if not src_dir.exists():
             return
         
+        if recursive:
+            # Recursively find all module.json files
+            self._discover_modules_recursive(src_dir)
+        else:
+            # Only discover first-level modules
+            self._discover_first_level_modules(src_dir)
+    
+    def _discover_first_level_modules(self, src_dir: Path):
+        """Discover first-level modules only."""
         for module_dir in src_dir.iterdir():
             if not module_dir.is_dir():
                 continue
@@ -59,41 +68,55 @@ class ModuleSyncer:
             if not config_file.exists():
                 continue
             
-            # Read module.json
-            try:
-                with open(config_file, 'r') as f:
-                    config = json.load(f)
+            self._add_module_from_config(config_file, module_dir)
+    
+    def _discover_modules_recursive(self, base_dir: Path):
+        """Recursively discover all modules with module.json files."""
+        for item in base_dir.rglob("module.json"):
+            module_dir = item.parent
+            
+            # Check if it's a valid module (has src/ subdirectory)
+            if not (module_dir / "src").exists():
+                continue
+            
+            self._add_module_from_config(item, module_dir)
+    
+    def _add_module_from_config(self, config_file: Path, module_dir: Path):
+        """Add a module from its module.json configuration."""
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            
+            remote_url = config.get('remote', {}).get('url')
+            if not remote_url:
+                click.echo(f"WARNING: {config_file} is missing remote URL configuration")
+                return
+            
+            # Derive remote name from URL
+            remote_name = self.derive_remote_name(remote_url)
+            
+            # Branch is always main
+            branch = "main"
+            
+            # Get module path relative to repo root
+            module_path = module_dir.relative_to(self.repo_root)
+            
+            # Check if module already configured
+            already_configured = any(
+                m['path'] == str(module_path) for m in self.modules
+            )
+            
+            if not already_configured:
+                self.modules.append({
+                    'path': str(module_path),
+                    'remote_name': remote_name,
+                    'remote_url': remote_url,
+                    'branch': branch
+                })
+                click.echo(f"Discovered module from module.json: {module_path}")
                 
-                remote_url = config.get('remote', {}).get('url')
-                if not remote_url:
-                    click.echo(f"WARNING: {config_file} is missing remote URL configuration")
-                    continue
-                
-                # Derive remote name from URL
-                remote_name = self.derive_remote_name(remote_url)
-                
-                # Branch is always main
-                branch = "main"
-                
-                # Get module path relative to repo root
-                module_path = module_dir.relative_to(self.repo_root)
-                
-                # Check if module already configured
-                already_configured = any(
-                    m['path'] == str(module_path) for m in self.modules
-                )
-                
-                if not already_configured:
-                    self.modules.append({
-                        'path': str(module_path),
-                        'remote_name': remote_name,
-                        'remote_url': remote_url,
-                        'branch': branch
-                    })
-                    click.echo(f"Discovered module from module.json: {module_path}")
-                    
-            except (json.JSONDecodeError, IOError) as e:
-                click.echo(f"WARNING: Failed to read {config_file}: {e}")
+        except (json.JSONDecodeError, IOError) as e:
+            click.echo(f"WARNING: Failed to read {config_file}: {e}")
 
     def add_hardcoded_modules(self):
         """Add hardcoded module configurations."""
@@ -252,8 +275,9 @@ class ModuleSyncer:
 @click.command()
 @click.option('--list', '-l', 'list_only', is_flag=True, help='List configured modules')
 @click.option('--all', '-a', 'sync_all_flag', is_flag=True, help='Sync all configured modules (default)')
+@click.option('--recursive', '-r', 'recursive', is_flag=True, help='Recursively discover and sync all nested modules')
 @click.argument('module_path', required=False)
-def main(list_only: bool, sync_all_flag: bool, module_path: Optional[str]):
+def main(list_only: bool, sync_all_flag: bool, recursive: bool, module_path: Optional[str]):
     """
     PrismQ Module Synchronization Script
     
@@ -261,8 +285,11 @@ def main(list_only: bool, sync_all_flag: bool, module_path: Optional[str]):
     
     Examples:
     
-        # Sync all modules
+        # Sync all first-level modules
         python sync_modules.py
+        
+        # Recursively sync all modules (including nested)
+        python sync_modules.py --recursive
         
         # List configured modules
         python sync_modules.py --list
@@ -287,7 +314,7 @@ def main(list_only: bool, sync_all_flag: bool, module_path: Optional[str]):
     syncer = ModuleSyncer(repo_root)
     
     # Discover modules from module.json files
-    syncer.discover_modules_from_json()
+    syncer.discover_modules_from_json(recursive=recursive)
     
     # Add hardcoded modules
     syncer.add_hardcoded_modules()

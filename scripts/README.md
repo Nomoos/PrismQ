@@ -156,8 +156,11 @@ The module sync script is now implemented in Python for better:
 ### Quick Start
 
 ```batch
-# Windows - Sync all modules
+# Windows - Sync all first-level modules
 scripts\sync-modules.bat
+
+# Windows - Recursively sync all modules (including nested)
+scripts\sync-modules.bat --recursive
 
 # Sync specific module
 scripts\sync-modules.bat src\RepositoryTemplate
@@ -167,9 +170,15 @@ scripts\sync-modules.bat --list
 
 # Cross-platform - Direct Python usage
 python scripts/sync_modules.py
+python scripts/sync_modules.py --recursive
 python scripts/sync_modules.py --list
 python scripts/sync_modules.py src/RepositoryTemplate
 ```
+
+**Key Features:**
+- **Recursive sync**: Use `--recursive` flag to discover and sync all nested modules automatically
+- **Works from anywhere**: Can be run from the main repo or from within any submodule
+- **Automatic discovery**: Finds all modules with `module.json` files
 
 The first time you run `sync-modules.bat`, it will automatically set up the Python virtual environment and install dependencies (same environment as add-module.bat).
 
@@ -246,12 +255,44 @@ The remote name and branch are automatically derived.
 
 ## Usage Examples
 
-### Sync All Modules
+### Sync All First-Level Modules
 
-This is the most common operation - sync all configured first-level modules:
+Sync all configured first-level modules from the main repository:
 
 ```batch
 scripts\sync-modules.bat
+```
+
+### Recursively Sync All Modules
+
+Discover and sync all modules including nested ones:
+
+```batch
+# From main repository
+scripts\sync-modules.bat --recursive
+
+# Or direct Python
+python scripts/sync_modules.py --recursive
+```
+
+This will:
+1. Recursively scan for all `module.json` files
+2. Discover nested modules at any depth (e.g., `src/IdeaInspiration/src/Sources/src/Content`)
+3. Sync each module from its configured remote repository
+
+### Sync from Within a Submodule
+
+The script works from any location in the repository hierarchy:
+
+```batch
+# Navigate to a submodule
+cd src\IdeaInspiration
+
+# Run sync from the submodule (paths are relative to git root)
+..\..\scripts\sync-modules.bat
+
+# Or sync recursively from submodule
+..\..\scripts\sync-modules.bat --recursive
 ```
 
 ### Sync Single Module
@@ -268,6 +309,9 @@ See which modules are configured for synchronization:
 
 ```batch
 scripts\sync-modules.bat --list
+
+# With recursive discovery
+scripts\sync-modules.bat --list --recursive
 ```
 
 ## Integration into Module Template
