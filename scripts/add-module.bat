@@ -626,9 +626,9 @@ for /l %%i in (!last_index!,-1,0) do (
         
         if defined hierarchy_level[!child_index!] (
             REM There is a child to integrate
-            set child_module=!module_repo[%child_index%]!
-            set child_url=!module_url[%child_index%]!
-            set child_path=!module_path[%child_index%]!
+            set child_module=!module_repo[!child_index!]!
+            set child_url=!module_url[!child_index!]!
+            set child_path=!module_path[!child_index!]!
             
             REM Derive child directory name (last component of path)
             for %%a in ("!child_path:/=" "!") do set child_dir_name=%%~a
