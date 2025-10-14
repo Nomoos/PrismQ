@@ -1,29 +1,16 @@
 # PrismQ Scripts
 
-Utility scripts for managing the PrismQ modular repository.
+Utility scripts for managing the PrismQ modular repository on Windows.
 
-## Module Creation Scripts
+## Module Creation Script
 
-These scripts help you create new PrismQ modules with the proper structure and configuration.
+This script helps you create new PrismQ modules with the proper structure and configuration.
 
-### Available Scripts
+### Available Script
 
-- **`add-module.sh`** - Linux/macOS module creation script
 - **`add-module.bat`** - Windows module creation script
 
 ### Quick Start
-
-#### Linux/macOS
-
-```bash
-# Make script executable (first time only)
-chmod +x scripts/add-module.sh
-
-# Run the interactive script
-./scripts/add-module.sh
-```
-
-#### Windows
 
 ```batch
 # Run the interactive script
@@ -42,44 +29,22 @@ It will then:
 4. Set up the remote URL
 5. Create an initial commit
 
-## Module Synchronization Scripts
+## Module Synchronization Script
 
-These scripts automate the synchronization of first-level modules from their separate repositories into the main PrismQ repository using Git subtree.
+This script automates the synchronization of first-level modules from their separate repositories into the main PrismQ repository using Git subtree.
 
-### Available Scripts
+### Available Script
 
-- **`sync-modules.sh`** - Linux/macOS synchronization script
 - **`sync-modules.bat`** - Windows synchronization script
 
-## Quick Start
-
-### Linux/macOS
-
-```bash
-# Make script executable (first time only)
-chmod +x scripts/sync-modules.sh
-
-# Sync all modules
-./scripts/sync-modules.sh
-
-# Sync specific module
-./scripts/sync-modules.sh src/RepositoryTemplate
-
-# List configured modules
-./scripts/sync-modules.sh --list
-
-# Show help
-./scripts/sync-modules.sh --help
-```
-
-### Windows
+### Quick Start
 
 ```batch
 # Sync all modules
 scripts\sync-modules.bat
 
 # Sync specific module
-scripts\sync-modules.bat src/RepositoryTemplate
+scripts\sync-modules.bat src\RepositoryTemplate
 
 # List configured modules
 scripts\sync-modules.bat --list
@@ -143,18 +108,7 @@ The sync script will automatically discover and use modules with `REMOTE.md` fil
 
 Alternatively, edit the configuration array in the script:
 
-**In `sync-modules.sh` (Linux/macOS):**
-
-```bash
-declare -a MODULES=(
-    "src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
-    "src/IdeaInspiration|ideainspiration-remote|https://github.com/Nomoos/PrismQ.IdeaInspiration.git|main"
-    # Add your new module:
-    "src/YourModule|yourmodule-remote|https://github.com/Nomoos/PrismQ.YourModule.git|main"
-)
-```
-
-**In `sync-modules.bat` (Windows):**
+**In `sync-modules.bat`:**
 
 ```batch
 set "modules[0]=src/RepositoryTemplate|repositorytemplate-remote|https://github.com/Nomoos/PrismQ.RepositoryTemplate.git|main"
@@ -183,11 +137,7 @@ module_path|remote_name|remote_url|branch
 
 This is the most common operation - sync all configured first-level modules:
 
-```bash
-# Linux/macOS
-./scripts/sync-modules.sh
-
-# Windows
+```batch
 scripts\sync-modules.bat
 ```
 
@@ -195,11 +145,7 @@ scripts\sync-modules.bat
 
 When you only want to update one specific module:
 
-```bash
-# Linux/macOS
-./scripts/sync-modules.sh src/RepositoryTemplate
-
-# Windows
+```batch
 scripts\sync-modules.bat src\RepositoryTemplate
 ```
 
@@ -207,11 +153,7 @@ scripts\sync-modules.bat src\RepositoryTemplate
 
 See which modules are configured for synchronization:
 
-```bash
-# Linux/macOS
-./scripts/sync-modules.sh --list
-
-# Windows
+```batch
 scripts\sync-modules.bat --list
 ```
 
@@ -223,15 +165,15 @@ To use this sync approach in your module development workflow:
 
 Create a new repository for your module using the RepositoryTemplate structure:
 
-```bash
-# Example: Creating PrismQ.NewModule repository
+```batch
+REM Example: Creating PrismQ.NewModule repository
 git clone https://github.com/Nomoos/PrismQ.RepositoryTemplate.git PrismQ.NewModule
 cd PrismQ.NewModule
 
-# Update module-specific content
-# ... make your changes ...
+REM Update module-specific content
+REM ... make your changes ...
 
-# Push to your module repository
+REM Push to your module repository
 git remote set-url origin https://github.com/Nomoos/PrismQ.NewModule.git
 git push -u origin main
 ```
@@ -244,8 +186,8 @@ Update the sync scripts in the main PrismQ repository to include your new module
 
 First sync will pull the module into the main repository:
 
-```bash
-./scripts/sync-modules.sh src/NewModule
+```batch
+scripts\sync-modules.bat src\NewModule
 ```
 
 ### 4. Development Workflow
@@ -256,16 +198,16 @@ First sync will pull the module into the main repository:
 2. Commit and push changes to module repo
 3. Sync to main PrismQ repo using sync script
 
-```bash
-# In module repository
+```batch
+REM In module repository
 cd PrismQ.NewModule
-# ... make changes ...
+REM ... make changes ...
 git commit -am "Update feature"
 git push
 
-# In main PrismQ repository
+REM In main PrismQ repository
 cd PrismQ
-./scripts/sync-modules.sh src/NewModule
+scripts\sync-modules.bat src\NewModule
 ```
 
 #### Option B: Develop in Main Repository
@@ -274,13 +216,13 @@ cd PrismQ
 2. Commit changes
 3. Push to module repository using subtree push
 
-```bash
-# In main PrismQ repository
+```batch
+REM In main PrismQ repository
 cd PrismQ
-# ... make changes to src/NewModule ...
+REM ... make changes to src\NewModule ...
 git commit -am "Update module"
 
-# Push changes to module repository
+REM Push changes to module repository
 git subtree push --prefix=src/NewModule newmodule-remote main
 ```
 
@@ -290,7 +232,7 @@ git subtree push --prefix=src/NewModule newmodule-remote main
 
 If you see "Remote already exists", the script will use the existing remote. To update the URL:
 
-```bash
+```batch
 git remote set-url remote-name new-url
 ```
 
@@ -305,10 +247,10 @@ This usually means:
 
 If sync encounters conflicts:
 
-```bash
-# Resolve conflicts manually
-git status  # See conflicted files
-# Edit files to resolve conflicts
+```batch
+REM Resolve conflicts manually
+git status  REM See conflicted files
+REM Edit files to resolve conflicts
 git add .
 git commit -m "Resolve sync conflicts"
 ```
@@ -317,8 +259,8 @@ git commit -m "Resolve sync conflicts"
 
 When syncing a module for the first time with existing content:
 
-```bash
-# Use --allow-unrelated-histories
+```batch
+REM Use --allow-unrelated-histories
 git subtree add --prefix=src/Module remote-name main --squash
 ```
 
@@ -328,18 +270,17 @@ git subtree add --prefix=src/Module remote-name main --squash
 
 After making changes in the main repository:
 
-```bash
-# Linux/macOS
+```batch
 git subtree push --prefix=src/RepositoryTemplate repositorytemplate-remote main
 
-# This updates the module repository with changes made in main repo
+REM This updates the module repository with changes made in main repo
 ```
 
 ### Fetch Without Merging
 
 To see what changes are available without merging:
 
-```bash
+```batch
 git fetch remote-name main
 git diff HEAD..remote-name/main -- src/Module
 ```
@@ -352,43 +293,6 @@ git diff HEAD..remote-name/main -- src/Module
 4. **Testing**: Test changes in module repo before syncing to main repo
 5. **Documentation**: Keep module READMEs updated
 6. **Branching**: Use branches in module repos for features, sync from `main`
-
-## Automation
-
-### GitHub Actions
-
-You can automate syncing with GitHub Actions:
-
-```yaml
-name: Sync Modules
-
-on:
-  schedule:
-    - cron: '0 0 * * *'  # Daily at midnight
-  workflow_dispatch:  # Manual trigger
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Sync Modules
-        run: |
-          ./scripts/sync-modules.sh
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git push
-```
-
-### Cron Job (Linux/macOS)
-
-```bash
-# Edit crontab
-crontab -e
-
-# Add daily sync at 2 AM
-0 2 * * * cd /path/to/PrismQ && ./scripts/sync-modules.sh >> /var/log/prismq-sync.log 2>&1
-```
 
 ## Related Documentation
 
