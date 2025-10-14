@@ -1,1 +1,9 @@
 .tangent/
+
+# Python virtual environment
+scripts/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
