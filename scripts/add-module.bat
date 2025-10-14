@@ -413,7 +413,11 @@ git add . >nul 2>&1
 git commit -m "Initial commit: Create !module_name! module" >nul 2>&1
 if errorlevel 1 (
     echo Warning: Failed to create initial commit
+    popd
+    goto :skip_git
 )
+
+echo Module git repository initialized successfully
 
 popd
 
@@ -421,55 +425,14 @@ popd
 
 echo.
 echo ========================================================
-echo Adding module to parent repository...
+echo Creating GitHub repositories and setting up hierarchy...
 echo ========================================================
 
 REM Return to parent repository root
 cd /d "!repo_root!"
 
-REM Add remote for the new module to parent repository
-git remote | findstr /x "!remote_name!" >nul 2>&1
-if errorlevel 1 (
-    echo Adding remote '!remote_name!' to parent repository...
-    git remote add "!remote_name!" "!remote_url!" >nul 2>&1
-    if errorlevel 1 (
-        echo Warning: Failed to add remote to parent repository
-    ) else (
-        echo Remote '!remote_name!' added successfully
-    )
-) else (
-    echo Remote '!remote_name!' already exists in parent repository
-)
-
-REM Add module files to parent repository
-echo Adding module files to parent repository...
-git add "!module_dir_win!" >nul 2>&1
-if errorlevel 1 (
-    echo Warning: Failed to add module to parent repository
-    echo You can add it manually with:
-    echo   git add !module_dir_win!
-    goto :skip_parent_commit
-)
-
-REM Create commit in parent repository
-echo Creating commit in parent repository...
-git commit -m "Add !module_name! module
-
-- Module path: !module_dir!
-- Remote: !remote_url!
-- Remote name: !remote_name!
-
-This module can be synced using scripts\sync-modules.bat" >nul 2>&1
-if errorlevel 1 (
-    echo Warning: Failed to create commit in parent repository
-    echo The module files are staged but not committed
-    echo You can commit manually with:
-    echo   git commit -m "Add !module_name! module"
-) else (
-    echo Module successfully added to parent repository
-)
-
-:skip_parent_commit
+REM Parse module hierarchy and create repositories
+call :create_module_hierarchy "!repo_name!" "!github_owner!" "!module_dir!" "!module_dir_win!"
 
 echo.
 echo ========================================================
@@ -478,19 +441,125 @@ echo ========================================================
 echo.
 echo Next steps:
 echo   1. Review the generated files in !module_dir_win!
-echo   2. Create the GitHub repository at:
-echo      !remote_url!
-echo   3. Push the module's initial commit:
-echo      cd !module_dir_win!
-echo      git push -u origin main
-echo   4. Push the parent repository changes:
-echo      cd !repo_root!
+echo   2. The module has been committed to the parent repository
+echo   3. Push the parent repository changes:
 echo      git push
-echo   5. Use scripts\sync-modules.bat to sync future updates
-echo      The module will be managed as a git subtree on first sync
+echo   4. Use scripts\sync-modules.bat to sync future updates
+echo      The module is managed as a git subtree hierarchy
 echo.
 
 exit /b 0
+
+:create_module_hierarchy
+REM Creates GitHub repositories for all levels of the module hierarchy
+REM and sets up git subtree relationships
+set full_repo_name=%~1
+set repo_owner=%~2
+set final_module_dir=%~3
+set final_module_dir_win=%~4
+
+REM Remove PrismQ. prefix to get module hierarchy
+set hierarchy=!full_repo_name:PrismQ.=!
+
+REM Build array of all hierarchy levels
+REM For example: IdeaInspiration.Sources.Content.Shorts -> 
+REM   Level 0: IdeaInspiration
+REM   Level 1: IdeaInspiration.Sources
+REM   Level 2: IdeaInspiration.Sources.Content
+REM   Level 3: IdeaInspiration.Sources.Content.Shorts
+
+set level_count=0
+set current_level=
+for %%a in ("!hierarchy:.=" "!") do (
+    if "!current_level!"=="" (
+        set current_level=%%~a
+    ) else (
+        set current_level=!current_level!.%%~a
+    )
+    set hierarchy_level[!level_count!]=!current_level!
+    set /a level_count+=1
+)
+
+REM Process each level and create repositories if needed
+for /l %%i in (0,1,!level_count!) do (
+    if defined hierarchy_level[%%i] (
+        set current_module=!hierarchy_level[%%i]!
+        set current_repo=PrismQ.!current_module!
+        set current_url=https://github.com/!repo_owner!/!current_repo!.git
+        
+        REM Derive module path for this level
+        call :derive_module_path "!current_repo!" temp_name temp_path
+        
+        REM Check if repository exists on GitHub
+        echo Checking repository: !current_repo!
+        gh repo view !repo_owner!/!current_repo! >nul 2>&1
+        if errorlevel 1 (
+            REM Repository doesn't exist, create it
+            echo Creating GitHub repository: !current_repo!
+            gh repo create !repo_owner!/!current_repo! --public --description "PrismQ module: !current_module!" >nul 2>&1
+            if errorlevel 1 (
+                echo Warning: Failed to create repository !current_repo!
+                echo You may need to authenticate with: gh auth login
+                echo Or create it manually at: https://github.com/!repo_owner!/!current_repo!
+            ) else (
+                echo Successfully created repository: !current_repo!
+            )
+        ) else (
+            echo Repository already exists: !current_repo!
+        )
+        
+        REM Derive remote name for this module
+        call :derive_remote_name "!current_url!" temp_remote_name
+        
+        REM Add remote to main PrismQ repository
+        git remote | findstr /x "!temp_remote_name!" >nul 2>&1
+        if errorlevel 1 (
+            echo Adding remote '!temp_remote_name!' to main repository...
+            git remote add "!temp_remote_name!" "!current_url!" >nul 2>&1
+        )
+    )
+)
+
+REM Push the final module to its GitHub repository
+echo Pushing module to GitHub repository: !full_repo_name!
+pushd "!final_module_dir_win!"
+git push -u origin main >nul 2>&1
+if errorlevel 1 (
+    echo Warning: Failed to push to !full_repo_name!
+    echo You may need to push manually:
+    echo   cd !final_module_dir_win!
+    echo   git push -u origin main
+) else (
+    echo Successfully pushed module to !full_repo_name!
+)
+popd
+
+REM Add final module files to parent repository
+set convert_path=!final_module_dir:/=\!
+echo Adding module files to parent repository...
+git add "!convert_path!" >nul 2>&1
+if errorlevel 1 (
+    echo Warning: Failed to add module to parent repository
+    goto :eof
+)
+
+REM Create commit in parent repository
+echo Creating commit in parent repository...
+git commit -m "Add !hierarchy! module
+
+- Module path: !final_module_dir!
+- Repository: !full_repo_name!
+- Owner: !repo_owner!
+
+This module is part of a hierarchical git subtree structure." >nul 2>&1
+if errorlevel 1 (
+    echo Warning: Failed to create commit
+    echo The module files are staged but not committed
+) else (
+    echo Module hierarchy successfully set up
+)
+
+goto :eof
 
 :parse_github_url
 REM Parse GitHub URL to extract owner and repository name

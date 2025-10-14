@@ -40,8 +40,10 @@ The script then:
 4. Initializes a Git repository in the module directory
 5. Sets up the remote URL for the module
 6. Creates an initial commit in the module
-7. Adds the remote to the parent repository
-8. Adds and commits the module to the parent repository
+7. **Creates GitHub repositories for all hierarchy levels** (using GitHub CLI)
+8. Pushes the module to its GitHub repository
+9. Adds remotes to the parent repository for all hierarchy levels
+10. Adds and commits the module to the parent repository
 
 ### Examples
 
@@ -66,7 +68,9 @@ scripts\add-module.bat
 ```
 Result: 
 - Creates `src/IdeaInspiration/src/Classification/` with complete template structure
-- Adds remote to parent repository
+- **Creates GitHub repositories**: PrismQ.IdeaInspiration, PrismQ.IdeaInspiration.Classification
+- Adds remotes to parent repository
+- Pushes module to GitHub
 - Commits module to parent repository automatically
 
 **Example 3: Using manual input**
@@ -81,6 +85,33 @@ Result:
 - Creates `src/MyModule/` with complete template structure
 - Adds remote to parent repository
 - Commits module to parent repository automatically
+
+### Hierarchical Module Creation
+
+The script supports creating deeply nested modules and automatically creates all parent repositories:
+
+**Example: Deep nesting**
+```batch
+scripts\add-module.bat
+# Select option: 1
+# GitHub URL: Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource
+```
+
+This will:
+1. Check and create repositories for each level:
+   - `PrismQ.IdeaInspiration`
+   - `PrismQ.IdeaInspiration.Sources`
+   - `PrismQ.IdeaInspiration.Sources.Content`
+   - `PrismQ.IdeaInspiration.Sources.Content.Shorts`
+   - `PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource`
+2. Create module at: `src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeSource/`
+3. Push the module to its GitHub repository
+4. Add all remotes to the main PrismQ repository
+5. Set up git subtree relationships
+
+**Requirements:**
+- GitHub CLI (`gh`) must be installed and authenticated
+- Run `gh auth login` if repositories cannot be created
 
 ## Module Synchronization Script
 
