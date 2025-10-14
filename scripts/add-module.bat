@@ -421,6 +421,58 @@ popd
 
 echo.
 echo ========================================================
+echo Adding module to parent repository...
+echo ========================================================
+
+REM Return to parent repository root
+cd /d "!repo_root!"
+
+REM Add remote for the new module to parent repository
+git remote | findstr /x "!remote_name!" >nul 2>&1
+if errorlevel 1 (
+    echo Adding remote '!remote_name!' to parent repository...
+    git remote add "!remote_name!" "!remote_url!" >nul 2>&1
+    if errorlevel 1 (
+        echo Warning: Failed to add remote to parent repository
+    ) else (
+        echo Remote '!remote_name!' added successfully
+    )
+) else (
+    echo Remote '!remote_name!' already exists in parent repository
+)
+
+REM Add module files to parent repository
+echo Adding module files to parent repository...
+git add "!module_dir_win!" >nul 2>&1
+if errorlevel 1 (
+    echo Warning: Failed to add module to parent repository
+    echo You can add it manually with:
+    echo   git add !module_dir_win!
+    goto :skip_parent_commit
+)
+
+REM Create commit in parent repository
+echo Creating commit in parent repository...
+git commit -m "Add !module_name! module
+
+- Module path: !module_dir!
+- Remote: !remote_url!
+- Remote name: !remote_name!
+
+This module can be synced using scripts\sync-modules.bat" >nul 2>&1
+if errorlevel 1 (
+    echo Warning: Failed to create commit in parent repository
+    echo The module files are staged but not committed
+    echo You can commit manually with:
+    echo   git commit -m "Add !module_name! module"
+) else (
+    echo Module successfully added to parent repository
+)
+
+:skip_parent_commit
+
+echo.
+echo ========================================================
 echo Module created successfully!
 echo ========================================================
 echo.
@@ -428,13 +480,14 @@ echo Next steps:
 echo   1. Review the generated files in !module_dir_win!
 echo   2. Create the GitHub repository at:
 echo      !remote_url!
-echo   3. Push the initial commit:
+echo   3. Push the module's initial commit:
 echo      cd !module_dir_win!
 echo      git push -u origin main
-echo   4. Add the module to the main repository:
-echo      git add !module_dir_win!
-echo      git commit -m "Add !module_name! module"
-echo   5. Use scripts\sync-modules.bat to sync the module
+echo   4. Push the parent repository changes:
+echo      cd !repo_root!
+echo      git push
+echo   5. Use scripts\sync-modules.bat to sync future updates
+echo      The module will be managed as a git subtree on first sync
 echo.
 
 exit /b 0

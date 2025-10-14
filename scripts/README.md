@@ -37,9 +37,11 @@ The script then:
 1. Creates the module directory structure (with nested paths if needed)
 2. Copies files from RepositoryTemplate (if available) or creates basic structure
 3. Generates configuration files (`module.json`, `README.md`, `pyproject.toml`)
-4. Initializes a Git repository
-5. Sets up the remote URL
-6. Creates an initial commit
+4. Initializes a Git repository in the module directory
+5. Sets up the remote URL for the module
+6. Creates an initial commit in the module
+7. Adds the remote to the parent repository
+8. Adds and commits the module to the parent repository
 
 ### Examples
 
@@ -50,7 +52,10 @@ scripts\add-module.bat
 # GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule.git
 # Description: My new module for PrismQ
 ```
-Result: Creates `src/MyNewModule/` with complete template structure
+Result: 
+- Creates `src/MyNewModule/` with complete template structure
+- Adds remote to parent repository
+- Commits module to parent repository automatically
 
 **Example 2: Using GitHub URL for nested module**
 ```batch
@@ -59,7 +64,10 @@ scripts\add-module.bat
 # GitHub URL: Nomoos/PrismQ.IdeaInspiration.Classification
 # Description: Classify idea inspirations
 ```
-Result: Creates `src/IdeaInspiration/src/Classification/` with complete template structure
+Result: 
+- Creates `src/IdeaInspiration/src/Classification/` with complete template structure
+- Adds remote to parent repository
+- Commits module to parent repository automatically
 
 **Example 3: Using manual input**
 ```batch
@@ -69,7 +77,10 @@ scripts\add-module.bat
 # Description: A new PrismQ module
 # GitHub owner: MyOrg
 ```
-Result: Creates `src/MyModule/` with complete template structure
+Result: 
+- Creates `src/MyModule/` with complete template structure
+- Adds remote to parent repository
+- Commits module to parent repository automatically
 
 ## Module Synchronization Script
 
