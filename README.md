@@ -38,4 +38,3 @@ See [scripts/README.md](scripts/README.md) for detailed script documentation.
 ## 📖 Additional Resources
 
 - [RepositoryTemplate Documentation](https://github.com/Nomoos/PrismQ.RepositoryTemplate)
-- [Contribution Guidelines](docs/CONTRIBUTING.md) (coming soon)
