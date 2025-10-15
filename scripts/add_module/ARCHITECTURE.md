@@ -211,7 +211,16 @@ hypothesis>=6.0.0        # Property-based testing
 ## Backward Compatibility
 
 The legacy `__main__.py` with click-based interactive CLI is preserved for compatibility.
-New code should use the `add_module.py` entry point with argparse.
+
+**Interactive Mode Support:**
+- The legacy CLI supports interactive mode where you can simply paste a GitHub URL
+- Run `python -m scripts.add_module` without arguments to enter interactive mode
+- The script will prompt you for the GitHub URL and module description
+
+**New CLI:**
+- The new `add_module.py` entry point uses argparse
+- Does NOT support interactive mode (requires module name as positional argument)
+- Recommended for scripting and automation
 
 ## Future Enhancements
 

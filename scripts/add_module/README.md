@@ -48,12 +48,37 @@ owner, repo = creator.parse_github_url("https://github.com/Owner/Repo")
 
 ### As a CLI Tool
 
-```bash
-# Using the wrapper script
-python scripts/add_module.py --github-url "Owner/Repo"
+There are two CLI interfaces available:
 
-# Using the package directly
-python -m add_module --github-url "Owner/Repo"
+#### Legacy CLI (Interactive Mode - Recommended for Beginners)
+
+Supports interactive mode where you can paste just a GitHub URL:
+
+```bash
+# Run without arguments for interactive mode
+python -m scripts.add_module
+
+# Or with command-line arguments
+python -m scripts.add_module --github-url "https://github.com/Owner/Repo"
+```
+
+**Interactive Mode Example:**
+```
+$ python -m scripts.add_module
+========================================================
+        PrismQ Module Creation Script
+========================================================
+
+Enter the GitHub repository URL: https://github.com/Nomoos/PrismQ.MyModule
+```
+
+#### New CLI (Command-Line Only)
+
+Does NOT support interactive mode. Requires module name as argument:
+
+```bash
+# Required: specify module name
+python -m scripts.add_module.add_module PrismQ.NewModule --owner Nomoos --public
 ```
 
 ## Benefits of Refactoring
