@@ -140,6 +140,32 @@ class TestBatchScripts:
         assert not re.search(r'%SCRIPT_DIR%setup_env\.bat(?!\\)', content), \
             "sync-modules.bat should not reference %SCRIPT_DIR%setup_env.bat directly"
 
+    def test_setup_env_uses_parent_venv_for_add_module(self, scripts_dir):
+        """Verify add_module/setup_env.bat uses parent directory for venv."""
+        setup_file = scripts_dir / "add_module" / "setup_env.bat"
+        content = setup_file.read_text(encoding='utf-8')
+        
+        # Check that it uses parent directory logic
+        assert "PARENT_DIR" in content, \
+            "setup_env.bat should define PARENT_DIR for parent directory venv"
+        assert 'for %%i in ("%SCRIPT_DIR%..")' in content, \
+            "setup_env.bat should use parent directory navigation"
+        assert '%PARENT_DIR%.venv' in content, \
+            "setup_env.bat should use PARENT_DIR for venv location"
+
+    def test_setup_env_uses_parent_venv_for_sync_modules(self, scripts_dir):
+        """Verify sync_modules/setup_env.bat uses parent directory for venv."""
+        setup_file = scripts_dir / "sync_modules" / "setup_env.bat"
+        content = setup_file.read_text(encoding='utf-8')
+        
+        # Check that it uses parent directory logic
+        assert "PARENT_DIR" in content, \
+            "setup_env.bat should define PARENT_DIR for parent directory venv"
+        assert 'for %%i in ("%SCRIPT_DIR%..")' in content, \
+            "setup_env.bat should use parent directory navigation"
+        assert '%PARENT_DIR%.venv' in content, \
+            "setup_env.bat should use PARENT_DIR for venv location"
+
     def test_requirements_exist_for_add_module(self, scripts_dir):
         """Verify requirements.txt exists for add_module."""
         req_file = scripts_dir / "add_module" / "requirements.txt"
