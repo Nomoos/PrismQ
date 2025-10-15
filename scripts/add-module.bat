@@ -32,7 +32,7 @@ if not exist "%VENV_DIR%" (
     echo Python virtual environment not found
     echo Setting up environment for the first time...
     echo.
-    call "%SCRIPT_DIR%setup_env.bat"
+    call "%SCRIPT_DIR%add_module\setup_env.bat"
     if errorlevel 1 (
         echo Error: Failed to setup Python environment
         exit /b 1
@@ -44,7 +44,7 @@ REM Activate virtual environment
 call "%VENV_DIR%\Scripts\activate.bat"
 if errorlevel 1 (
     echo Error: Failed to activate virtual environment
-    echo Please run: %SCRIPT_DIR%setup_env.bat
+    echo Please run: %SCRIPT_DIR%add_module\setup_env.bat
     exit /b 1
 )
 

@@ -114,6 +114,32 @@ class TestBatchScripts:
         setup_file = scripts_dir / "sync_modules" / "setup_env.bat"
         assert setup_file.exists(), "sync_modules/setup_env.bat not found"
 
+    def test_add_module_bat_references_correct_setup_env(self, scripts_dir):
+        """Verify add-module.bat references the correct setup_env.bat path."""
+        bat_file = scripts_dir / "add-module.bat"
+        content = bat_file.read_text(encoding='utf-8')
+        
+        # Check for correct path to setup_env.bat in add_module subdirectory
+        assert "add_module\\setup_env.bat" in content, \
+            "add-module.bat should reference add_module\\setup_env.bat"
+        
+        # Ensure it doesn't reference the wrong path
+        assert not re.search(r'%SCRIPT_DIR%setup_env\.bat(?!\\)', content), \
+            "add-module.bat should not reference %SCRIPT_DIR%setup_env.bat directly"
+
+    def test_sync_modules_bat_references_correct_setup_env(self, scripts_dir):
+        """Verify sync-modules.bat references the correct setup_env.bat path."""
+        bat_file = scripts_dir / "sync-modules.bat"
+        content = bat_file.read_text(encoding='utf-8')
+        
+        # Check for correct path to setup_env.bat in sync_modules subdirectory
+        assert "sync_modules\\setup_env.bat" in content, \
+            "sync-modules.bat should reference sync_modules\\setup_env.bat"
+        
+        # Ensure it doesn't reference the wrong path
+        assert not re.search(r'%SCRIPT_DIR%setup_env\.bat(?!\\)', content), \
+            "sync-modules.bat should not reference %SCRIPT_DIR%setup_env.bat directly"
+
     def test_requirements_exist_for_add_module(self, scripts_dir):
         """Verify requirements.txt exists for add_module."""
         req_file = scripts_dir / "add_module" / "requirements.txt"
