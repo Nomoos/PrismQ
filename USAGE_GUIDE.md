@@ -28,7 +28,7 @@ The test suite validates:
 
 This is normal and expected behavior. The batch files will install dependencies on first run.
 
-## Repository Tree View
+## Repository Module Tree View
 
 ### Viewing the Tree
 
@@ -47,12 +47,19 @@ xdg-open docs/repository-tree.html
 
 ### Features
 
-1. **Collapsible Folders** - Click any folder to expand or collapse its contents
-2. **Search** - Type in the search box to find files and folders
-   - Matching items are highlighted in yellow
-   - Parent folders auto-expand to show matches
+1. **Collapsible Modules** - Click any module to expand or collapse its sub-modules
+2. **Search** - Type in the search box to find modules
+   - Matching modules are highlighted in yellow
+   - Parent modules auto-expand to show matches
 3. **Expand All / Collapse All** - Quick navigation buttons
-4. **Statistics** - View total folders, files, and maximum depth
+4. **Statistics** - View total modules and maximum hierarchy depth
+
+The tree shows the PrismQ module hierarchy using the naming convention:
+- PrismQ
+  - PrismQ.IdeaInspiration
+    - PrismQ.IdeaInspiration.Sources
+      - PrismQ.IdeaInspiration.Sources.Content
+  - PrismQ.RepositoryTemplate
 
 ### Regenerating the Tree
 
@@ -64,25 +71,25 @@ python3 generate_tree.py
 ```
 
 This will:
-1. Scan the entire repository
-2. Generate `repository-tree-data.json`
+1. Scan the entire repository for modules
+2. Generate `repository-tree-data.json` with the module hierarchy
 3. Create `repository-tree.html` with embedded data
-4. Display statistics
+4. Display module statistics
 
 ### Search Examples
 
-- Search for `.bat` to find all batch files
-- Search for `README` to find all README files
-- Search for `scripts` to find all script-related items
-- Search for module names like `IdeaInspiration`
+- Search for `IdeaInspiration` to find all related modules
+- Search for `Sources` to find source-related modules
+- Search for `Content` to find content processing modules
+- Search for `RepositoryTemplate` to find the template module
 
 ## Directory Structure
 
 ```
 PrismQ/
 ├── docs/                          # Documentation and tools
-│   ├── repository-tree.html       # Interactive tree view (open this!)
-│   ├── repository-tree-data.json  # Tree structure data
+│   ├── repository-tree.html       # Interactive module tree (open this!)
+│   ├── repository-tree-data.json  # Module hierarchy data
 │   ├── generate_tree.py           # Generator script
 │   └── README.md                  # Documentation README
 ├── scripts/                       # Utility scripts
@@ -93,6 +100,10 @@ PrismQ/
 └── src/                           # Source modules
     ├── RepositoryTemplate/        # Template module
     └── IdeaInspiration/           # Idea generation module
+        └── src/
+            └── Sources/           # Sources sub-module
+                └── src/
+                    └── Content/   # Content sub-module
 ```
 
 ## Quick Commands
@@ -101,7 +112,7 @@ PrismQ/
 # Test batch scripts
 cd scripts && python3 -m pytest test_bat_scripts.py -v
 
-# View repository tree
+# View repository module tree
 # (Open docs/repository-tree.html in browser)
 
 # Regenerate tree view

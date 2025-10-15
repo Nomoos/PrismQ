@@ -4,21 +4,21 @@ This directory contains additional documentation and tools for the PrismQ reposi
 
 ## Files
 
-### Repository Tree View
+### Repository Module Tree View
 
-- **`repository-tree.html`** - Interactive HTML page with collapsible repository tree view
-- **`repository-tree-data.json`** - JSON data representing the repository structure
-- **`generate_tree.py`** - Python script to generate the tree view
+- **`repository-tree.html`** - Interactive HTML page with collapsible module tree view
+- **`repository-tree-data.json`** - JSON data representing the module hierarchy
+- **`generate_tree.py`** - Python script to generate the module tree
 
-### Using the Repository Tree View
+### Using the Repository Module Tree View
 
-The repository tree view provides an interactive visualization of the PrismQ repository structure with the following features:
+The repository module tree view provides an interactive visualization of the PrismQ module hierarchy using the PrismQ naming convention (e.g., PrismQ.IdeaInspiration.Sources):
 
-- **Collapsible folders** - Click on folders to expand/collapse their contents
-- **Search functionality** - Search for files and folders by name or path
-- **Statistics** - View total folders, files, and maximum depth
+- **Collapsible modules** - Click on modules to expand/collapse their sub-modules
+- **Search functionality** - Search for modules by name
+- **Statistics** - View total modules and maximum depth
 - **Dark theme** - VS Code-inspired dark theme for comfortable viewing
-- **Keyboard shortcuts** - Expand All / Collapse All buttons for quick navigation
+- **Expand All / Collapse All** - Quick navigation buttons
 
 #### Opening the Tree View
 
@@ -34,28 +34,28 @@ python3 generate_tree.py
 ```
 
 This will:
-1. Scan the repository structure
-2. Generate `repository-tree-data.json`
+1. Scan the repository structure for modules (based on `src/` directories)
+2. Generate `repository-tree-data.json` with the module hierarchy
 3. Generate `repository-tree.html` with embedded data
-4. Display statistics about the repository
+4. Display module statistics
 
 #### Features Demonstrated
 
-1. **Collapsible Branches** - Click any folder to expand/collapse its children
-2. **Search** - Type in the search box to filter and highlight matching files/folders
-3. **Visual Indicators** - Folder icons change when opened, search results are highlighted
-4. **Statistics** - View total counts at the bottom of the page
+1. **Collapsible Modules** - Click any module to expand/collapse its sub-modules
+2. **Search** - Type in the search box to filter and highlight matching modules
+3. **Visual Indicators** - Module icons change when opened, search results are highlighted
+4. **Statistics** - View total module count and hierarchy depth at the bottom
 
 ## Screenshots
 
-- Initial view with collapsed folders
-- Expanded scripts folder showing .bat files and Python modules
-- Search functionality highlighting matching items
+- Module tree with collapsed view
+- Expanded module hierarchy showing all PrismQ modules
+- Search functionality highlighting matching modules
 
 ## Purpose
 
-The tree view provides:
+The module tree view provides:
 - Easy navigation of the modular repository structure
-- Quick location of files and folders
-- Visual understanding of the repository hierarchy
+- Quick location of specific modules
+- Visual understanding of the module hierarchy using PrismQ naming convention (PrismQ.Module.SubModule)
 - Documentation of the repository organization

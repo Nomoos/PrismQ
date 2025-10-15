@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrismQ Repository Tree View</title>
+    <title>PrismQ Repository Module Tree</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -158,15 +158,11 @@
         }
 
         .folder-icon::before {
-            content: '📁';
+            content: '📦';
         }
 
         .folder-icon.open::before {
             content: '📂';
-        }
-
-        .file-icon::before {
-            content: '📄';
         }
 
         .toggle {
@@ -189,13 +185,9 @@
             transform: rotate(90deg);
         }
 
-        .folder-name {
+        .module-name {
             color: var(--folder-color);
             font-weight: 500;
-        }
-
-        .file-name {
-            color: var(--file-color);
         }
 
         .children {
@@ -245,26 +237,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌲 PrismQ Repository Tree View</h1>
-            <p>Explore the modular structure of the PrismQ repository</p>
+            <h1>🌲 PrismQ Repository Module Tree</h1>
+            <p>Explore the modular structure of PrismQ repositories</p>
         </div>
 
         <div class="controls">
             <button class="btn" onclick="expandAll()">Expand All</button>
             <button class="btn" onclick="collapseAll()">Collapse All</button>
-            <input type="text" class="search-box" id="searchBox" placeholder="Search files and folders..." oninput="searchTree()">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search modules..." oninput="searchTree()">
         </div>
 
         <div class="tree-container" id="treeContainer"></div>
 
         <div class="stats" id="stats" style="display: none;">
             <div class="stat-item">
-                <span class="stat-label">Total Folders</span>
-                <span class="stat-value" id="folderCount">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Total Files</span>
-                <span class="stat-value" id="fileCount">0</span>
+                <span class="stat-label">Total Modules</span>
+                <span class="stat-value" id="moduleCount">0</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Max Depth</span>
@@ -273,7 +261,7 @@
         </div>
 
         <div class="footer">
-            Generated: 2025-10-15 07:40:05 | 
+            Generated: 2025-10-15 07:58:20 | 
             <a href="https://github.com/Nomoos/PrismQ" target="_blank" style="color: var(--highlight-color);">View on GitHub</a>
         </div>
     </div>
@@ -281,987 +269,56 @@
     <script>
         const treeData = [
   {
-    "name": "docs",
-    "path": "docs",
+    "name": "PrismQ",
+    "path": "",
     "is_dir": true,
     "children": [
       {
-        "name": "generate_tree.py",
-        "path": "docs/generate_tree.py",
-        "is_dir": false,
+        "name": "PrismQ.IdeaInspiration",
+        "path": "PrismQ/src/IdeaInspiration",
+        "is_dir": true,
+        "children": [
+          {
+            "name": "PrismQ.IdeaInspiration.Sources",
+            "path": "IdeaInspiration/src/Sources",
+            "is_dir": true,
+            "children": [
+              {
+                "name": "PrismQ.IdeaInspiration.Sources.Content",
+                "path": "Sources/src/Content",
+                "is_dir": true,
+                "children": [
+                  {
+                    "name": "PrismQ.IdeaInspiration.Sources.Content.Shorts",
+                    "path": "Content/src/Shorts",
+                    "is_dir": true,
+                    "children": [
+                      {
+                        "name": "PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeShortsSource",
+                        "path": "Shorts/src/YouTubeShortsSource",
+                        "is_dir": true,
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "PrismQ.RepositoryTemplate",
+        "path": "PrismQ/src/RepositoryTemplate",
+        "is_dir": true,
         "children": []
       }
     ]
-  },
-  {
-    "name": "scripts",
-    "path": "scripts",
-    "is_dir": true,
-    "children": [
-      {
-        "name": "add_module",
-        "path": "scripts/add_module",
-        "is_dir": true,
-        "children": [
-          {
-            "name": "README.md",
-            "path": "scripts/add_module/README.md",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "__init__.py",
-            "path": "scripts/add_module/__init__.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "__main__.py",
-            "path": "scripts/add_module/__main__.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "git_operations.py",
-            "path": "scripts/add_module/git_operations.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "github_client.py",
-            "path": "scripts/add_module/github_client.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module_creator.py",
-            "path": "scripts/add_module/module_creator.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module_structure.py",
-            "path": "scripts/add_module/module_structure.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "path_utils.py",
-            "path": "scripts/add_module/path_utils.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "requirements.txt",
-            "path": "scripts/add_module/requirements.txt",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "setup_env.bat",
-            "path": "scripts/add_module/setup_env.bat",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "tests.py",
-            "path": "scripts/add_module/tests.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "url_parser.py",
-            "path": "scripts/add_module/url_parser.py",
-            "is_dir": false,
-            "children": []
-          }
-        ]
-      },
-      {
-        "name": "sync_modules",
-        "path": "scripts/sync_modules",
-        "is_dir": true,
-        "children": [
-          {
-            "name": "README.md",
-            "path": "scripts/sync_modules/README.md",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "__init__.py",
-            "path": "scripts/sync_modules/__init__.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "__main__.py",
-            "path": "scripts/sync_modules/__main__.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "git_sync.py",
-            "path": "scripts/sync_modules/git_sync.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module_discovery.py",
-            "path": "scripts/sync_modules/module_discovery.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module_syncer.py",
-            "path": "scripts/sync_modules/module_syncer.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "path_utils.py",
-            "path": "scripts/sync_modules/path_utils.py",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "requirements.txt",
-            "path": "scripts/sync_modules/requirements.txt",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "setup_env.bat",
-            "path": "scripts/sync_modules/setup_env.bat",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "tests.py",
-            "path": "scripts/sync_modules/tests.py",
-            "is_dir": false,
-            "children": []
-          }
-        ]
-      },
-      {
-        "name": "README.md",
-        "path": "scripts/README.md",
-        "is_dir": false,
-        "children": []
-      },
-      {
-        "name": "add-module.bat",
-        "path": "scripts/add-module.bat",
-        "is_dir": false,
-        "children": []
-      },
-      {
-        "name": "sync-modules.bat",
-        "path": "scripts/sync-modules.bat",
-        "is_dir": false,
-        "children": []
-      },
-      {
-        "name": "test_bat_scripts.py",
-        "path": "scripts/test_bat_scripts.py",
-        "is_dir": false,
-        "children": []
-      }
-    ]
-  },
-  {
-    "name": "src",
-    "path": "src",
-    "is_dir": true,
-    "children": [
-      {
-        "name": "IdeaInspiration",
-        "path": "src/IdeaInspiration",
-        "is_dir": true,
-        "children": [
-          {
-            "name": "docs",
-            "path": "src/IdeaInspiration/docs",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "README.md",
-                "path": "src/IdeaInspiration/docs/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "issues",
-            "path": "src/IdeaInspiration/issues",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "done",
-                "path": "src/IdeaInspiration/issues/done",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/IdeaInspiration/issues/done/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "new",
-                "path": "src/IdeaInspiration/issues/new",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/IdeaInspiration/issues/new/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "wip",
-                "path": "src/IdeaInspiration/issues/wip",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/IdeaInspiration/issues/wip/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "README.md",
-                "path": "src/IdeaInspiration/issues/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "scripts",
-            "path": "src/IdeaInspiration/scripts",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "README.md",
-                "path": "src/IdeaInspiration/scripts/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "src",
-            "path": "src/IdeaInspiration/src",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "Sources",
-                "path": "src/IdeaInspiration/src/Sources",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": "docs",
-                    "path": "src/IdeaInspiration/src/Sources/docs",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "README.md",
-                        "path": "src/IdeaInspiration/src/Sources/docs/README.md",
-                        "is_dir": false,
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "name": "issues",
-                    "path": "src/IdeaInspiration/src/Sources/issues",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "done",
-                        "path": "src/IdeaInspiration/src/Sources/issues/done",
-                        "is_dir": true,
-                        "children": [
-                          {
-                            "name": ".gitkeep",
-                            "path": "src/IdeaInspiration/src/Sources/issues/done/.gitkeep",
-                            "is_dir": false,
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "name": "new",
-                        "path": "src/IdeaInspiration/src/Sources/issues/new",
-                        "is_dir": true,
-                        "children": [
-                          {
-                            "name": ".gitkeep",
-                            "path": "src/IdeaInspiration/src/Sources/issues/new/.gitkeep",
-                            "is_dir": false,
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "name": "wip",
-                        "path": "src/IdeaInspiration/src/Sources/issues/wip",
-                        "is_dir": true,
-                        "children": [
-                          {
-                            "name": ".gitkeep",
-                            "path": "src/IdeaInspiration/src/Sources/issues/wip/.gitkeep",
-                            "is_dir": false,
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "name": "README.md",
-                        "path": "src/IdeaInspiration/src/Sources/issues/README.md",
-                        "is_dir": false,
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "name": "scripts",
-                    "path": "src/IdeaInspiration/src/Sources/scripts",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "README.md",
-                        "path": "src/IdeaInspiration/src/Sources/scripts/README.md",
-                        "is_dir": false,
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "name": "src",
-                    "path": "src/IdeaInspiration/src/Sources/src",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "Content",
-                        "path": "src/IdeaInspiration/src/Sources/src/Content",
-                        "is_dir": true,
-                        "children": [
-                          {
-                            "name": "docs",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/docs",
-                            "is_dir": true,
-                            "children": [
-                              {
-                                "name": "README.md",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/docs/README.md",
-                                "is_dir": false,
-                                "children": []
-                              }
-                            ]
-                          },
-                          {
-                            "name": "issues",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/issues",
-                            "is_dir": true,
-                            "children": [
-                              {
-                                "name": "done",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/issues/done",
-                                "is_dir": true,
-                                "children": [
-                                  {
-                                    "name": ".gitkeep",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/issues/done/.gitkeep",
-                                    "is_dir": false,
-                                    "children": []
-                                  }
-                                ]
-                              },
-                              {
-                                "name": "new",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/issues/new",
-                                "is_dir": true,
-                                "children": [
-                                  {
-                                    "name": ".gitkeep",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/issues/new/.gitkeep",
-                                    "is_dir": false,
-                                    "children": []
-                                  }
-                                ]
-                              },
-                              {
-                                "name": "wip",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/issues/wip",
-                                "is_dir": true,
-                                "children": [
-                                  {
-                                    "name": ".gitkeep",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/issues/wip/.gitkeep",
-                                    "is_dir": false,
-                                    "children": []
-                                  }
-                                ]
-                              },
-                              {
-                                "name": "README.md",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/issues/README.md",
-                                "is_dir": false,
-                                "children": []
-                              }
-                            ]
-                          },
-                          {
-                            "name": "scripts",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/scripts",
-                            "is_dir": true,
-                            "children": [
-                              {
-                                "name": "README.md",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/scripts/README.md",
-                                "is_dir": false,
-                                "children": []
-                              }
-                            ]
-                          },
-                          {
-                            "name": "src",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/src",
-                            "is_dir": true,
-                            "children": [
-                              {
-                                "name": "Shorts",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts",
-                                "is_dir": true,
-                                "children": [
-                                  {
-                                    "name": "docs",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/docs",
-                                    "is_dir": true,
-                                    "children": [
-                                      {
-                                        "name": "README.md",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/docs/README.md",
-                                        "is_dir": false,
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "name": "issues",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues",
-                                    "is_dir": true,
-                                    "children": [
-                                      {
-                                        "name": "done",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/done",
-                                        "is_dir": true,
-                                        "children": [
-                                          {
-                                            "name": ".gitkeep",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/done/.gitkeep",
-                                            "is_dir": false,
-                                            "children": []
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "name": "new",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/new",
-                                        "is_dir": true,
-                                        "children": [
-                                          {
-                                            "name": ".gitkeep",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/new/.gitkeep",
-                                            "is_dir": false,
-                                            "children": []
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "name": "wip",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/wip",
-                                        "is_dir": true,
-                                        "children": [
-                                          {
-                                            "name": ".gitkeep",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/wip/.gitkeep",
-                                            "is_dir": false,
-                                            "children": []
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "name": "README.md",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/issues/README.md",
-                                        "is_dir": false,
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "name": "scripts",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/scripts",
-                                    "is_dir": true,
-                                    "children": [
-                                      {
-                                        "name": "README.md",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/scripts/README.md",
-                                        "is_dir": false,
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "name": "src",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src",
-                                    "is_dir": true,
-                                    "children": [
-                                      {
-                                        "name": "YouTubeShortsSource",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource",
-                                        "is_dir": true,
-                                        "children": [
-                                          {
-                                            "name": "docs",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/docs",
-                                            "is_dir": true,
-                                            "children": []
-                                          },
-                                          {
-                                            "name": "issues",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/issues",
-                                            "is_dir": true,
-                                            "children": []
-                                          },
-                                          {
-                                            "name": "scripts",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/scripts",
-                                            "is_dir": true,
-                                            "children": []
-                                          },
-                                          {
-                                            "name": "src",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/src",
-                                            "is_dir": true,
-                                            "children": []
-                                          },
-                                          {
-                                            "name": "tests",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/tests",
-                                            "is_dir": true,
-                                            "children": []
-                                          },
-                                          {
-                                            "name": "README.md",
-                                            "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource/README.md",
-                                            "is_dir": false,
-                                            "children": []
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "name": "README.md",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/README.md",
-                                        "is_dir": false,
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "name": "tests",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/tests",
-                                    "is_dir": true,
-                                    "children": [
-                                      {
-                                        "name": "README.md",
-                                        "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/tests/README.md",
-                                        "is_dir": false,
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "name": "README.md",
-                                    "path": "src/IdeaInspiration/src/Sources/src/Content/src/Shorts/README.md",
-                                    "is_dir": false,
-                                    "children": []
-                                  }
-                                ]
-                              },
-                              {
-                                "name": "README.md",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/src/README.md",
-                                "is_dir": false,
-                                "children": []
-                              }
-                            ]
-                          },
-                          {
-                            "name": "tests",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/tests",
-                            "is_dir": true,
-                            "children": [
-                              {
-                                "name": "README.md",
-                                "path": "src/IdeaInspiration/src/Sources/src/Content/tests/README.md",
-                                "is_dir": false,
-                                "children": []
-                              }
-                            ]
-                          },
-                          {
-                            "name": "README.md",
-                            "path": "src/IdeaInspiration/src/Sources/src/Content/README.md",
-                            "is_dir": false,
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "name": "README.md",
-                        "path": "src/IdeaInspiration/src/Sources/src/README.md",
-                        "is_dir": false,
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "name": "tests",
-                    "path": "src/IdeaInspiration/src/Sources/tests",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "README.md",
-                        "path": "src/IdeaInspiration/src/Sources/tests/README.md",
-                        "is_dir": false,
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "name": "README.md",
-                    "path": "src/IdeaInspiration/src/Sources/README.md",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "README.md",
-                "path": "src/IdeaInspiration/src/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "tests",
-            "path": "src/IdeaInspiration/tests",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "README.md",
-                "path": "src/IdeaInspiration/tests/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "README.md",
-            "path": "src/IdeaInspiration/README.md",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "REMOTE.md",
-            "path": "src/IdeaInspiration/REMOTE.md",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module.json",
-            "path": "src/IdeaInspiration/module.json",
-            "is_dir": false,
-            "children": []
-          }
-        ]
-      },
-      {
-        "name": "RepositoryTemplate",
-        "path": "src/RepositoryTemplate",
-        "is_dir": true,
-        "children": [
-          {
-            "name": ".github",
-            "path": "src/RepositoryTemplate/.github",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "ISSUE_TEMPLATE",
-                "path": "src/RepositoryTemplate/.github/ISSUE_TEMPLATE",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": "bug_report.md",
-                    "path": "src/RepositoryTemplate/.github/ISSUE_TEMPLATE/bug_report.md",
-                    "is_dir": false,
-                    "children": []
-                  },
-                  {
-                    "name": "feature_request.md",
-                    "path": "src/RepositoryTemplate/.github/ISSUE_TEMPLATE/feature_request.md",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "PULL_REQUEST_TEMPLATE.md",
-                "path": "src/RepositoryTemplate/.github/PULL_REQUEST_TEMPLATE.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "copilot-instructions.md",
-                "path": "src/RepositoryTemplate/.github/copilot-instructions.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "docs",
-            "path": "src/RepositoryTemplate/docs",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "CONTRIBUTING.md",
-                "path": "src/RepositoryTemplate/docs/CONTRIBUTING.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "MODULE_CONFIGURATION.md",
-                "path": "src/RepositoryTemplate/docs/MODULE_CONFIGURATION.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "README.md",
-                "path": "src/RepositoryTemplate/docs/README.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "issues",
-            "path": "src/RepositoryTemplate/issues",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "done",
-                "path": "src/RepositoryTemplate/issues/done",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/RepositoryTemplate/issues/done/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "new",
-                "path": "src/RepositoryTemplate/issues/new",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/RepositoryTemplate/issues/new/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "wip",
-                "path": "src/RepositoryTemplate/issues/wip",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": ".gitkeep",
-                    "path": "src/RepositoryTemplate/issues/wip/.gitkeep",
-                    "is_dir": false,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "KNOWN_ISSUES.md",
-                "path": "src/RepositoryTemplate/issues/KNOWN_ISSUES.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "README.md",
-                "path": "src/RepositoryTemplate/issues/README.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "ROADMAP.md",
-                "path": "src/RepositoryTemplate/issues/ROADMAP.md",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "scripts",
-            "path": "src/RepositoryTemplate/scripts",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "README.md",
-                "path": "src/RepositoryTemplate/scripts/README.md",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "quickstart.bat",
-                "path": "src/RepositoryTemplate/scripts/quickstart.bat",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "setup.bat",
-                "path": "src/RepositoryTemplate/scripts/setup.bat",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "src",
-            "path": "src/RepositoryTemplate/src",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "__init__.py",
-                "path": "src/RepositoryTemplate/src/__init__.py",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "config.py",
-                "path": "src/RepositoryTemplate/src/config.py",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "main.py",
-                "path": "src/RepositoryTemplate/src/main.py",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "tests",
-            "path": "src/RepositoryTemplate/tests",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "__init__.py",
-                "path": "src/RepositoryTemplate/tests/__init__.py",
-                "is_dir": false,
-                "children": []
-              },
-              {
-                "name": "test_config.py",
-                "path": "src/RepositoryTemplate/tests/test_config.py",
-                "is_dir": false,
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": ".env.example",
-            "path": "src/RepositoryTemplate/.env.example",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": ".gitignore",
-            "path": "src/RepositoryTemplate/.gitignore",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "LICENSE",
-            "path": "src/RepositoryTemplate/LICENSE",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "README.md",
-            "path": "src/RepositoryTemplate/README.md",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "module.json",
-            "path": "src/RepositoryTemplate/module.json",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "pyproject.toml",
-            "path": "src/RepositoryTemplate/pyproject.toml",
-            "is_dir": false,
-            "children": []
-          },
-          {
-            "name": "requirements.txt",
-            "path": "src/RepositoryTemplate/requirements.txt",
-            "is_dir": false,
-            "children": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": ".gitignore",
-    "path": ".gitignore",
-    "is_dir": false,
-    "children": []
-  },
-  {
-    "name": "README.md",
-    "path": "README.md",
-    "is_dir": false,
-    "children": []
   }
 ];
 
         let stats = {
-            folders: 0,
-            files: 0,
+            modules: 0,
             maxDepth: 0
         };
 
@@ -1278,48 +335,33 @@
                 itemDiv.dataset.path = item.path;
                 itemDiv.dataset.name = item.name.toLowerCase();
 
-                if (item.is_dir) {
-                    stats.folders++;
-                    
-                    const toggle = document.createElement('span');
-                    toggle.className = 'toggle';
-                    itemDiv.appendChild(toggle);
+                stats.modules++;
+                
+                const toggle = document.createElement('span');
+                toggle.className = 'toggle';
+                itemDiv.appendChild(toggle);
 
-                    const icon = document.createElement('span');
-                    icon.className = 'icon folder-icon';
-                    itemDiv.appendChild(icon);
+                const icon = document.createElement('span');
+                icon.className = 'icon folder-icon';
+                itemDiv.appendChild(icon);
 
-                    const name = document.createElement('span');
-                    name.className = 'folder-name';
-                    name.textContent = item.name;
-                    itemDiv.appendChild(name);
+                const name = document.createElement('span');
+                name.className = 'module-name';
+                name.textContent = item.name;
+                itemDiv.appendChild(name);
 
-                    itemDiv.onclick = function(e) {
-                        e.stopPropagation();
-                        toggleFolder(this);
-                    };
+                itemDiv.onclick = function(e) {
+                    e.stopPropagation();
+                    toggleFolder(this);
+                };
 
-                    li.appendChild(itemDiv);
+                li.appendChild(itemDiv);
 
-                    if (item.children && item.children.length > 0) {
-                        const childrenDiv = document.createElement('div');
-                        childrenDiv.className = 'children';
-                        renderTree(item.children, childrenDiv, depth + 1);
-                        li.appendChild(childrenDiv);
-                    }
-                } else {
-                    stats.files++;
-
-                    const icon = document.createElement('span');
-                    icon.className = 'icon file-icon';
-                    itemDiv.appendChild(icon);
-
-                    const name = document.createElement('span');
-                    name.className = 'file-name';
-                    name.textContent = item.name;
-                    itemDiv.appendChild(name);
-
-                    li.appendChild(itemDiv);
+                if (item.children && item.children.length > 0) {
+                    const childrenDiv = document.createElement('div');
+                    childrenDiv.className = 'children';
+                    renderTree(item.children, childrenDiv, depth + 1);
+                    li.appendChild(childrenDiv);
                 }
 
                 ul.appendChild(li);
@@ -1408,8 +450,7 @@
         }
 
         function updateStats() {
-            document.getElementById('folderCount').textContent = stats.folders;
-            document.getElementById('fileCount').textContent = stats.files;
+            document.getElementById('moduleCount').textContent = stats.modules;
             document.getElementById('maxDepth').textContent = stats.maxDepth;
             document.getElementById('stats').style.display = 'flex';
         }

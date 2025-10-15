@@ -3,7 +3,7 @@
 Generate repository tree data for the HTML tree view.
 
 This script scans the PrismQ repository structure and generates
-a JSON file with the complete directory tree.
+a JSON file with the module hierarchy tree (not file system).
 """
 
 import json
@@ -12,54 +12,73 @@ from pathlib import Path
 from datetime import datetime
 
 
-def generate_tree_data(directory, max_depth=10, current_depth=0, parent_path=''):
+def find_modules(directory, parent_module='PrismQ'):
     """
-    Generate tree data structure for HTML rendering.
+    Find all modules in the repository based on src/ directory structure.
+    
+    Modules follow the pattern:
+    - src/ModuleName -> PrismQ.ModuleName
+    - src/ModuleName/src/SubModule -> PrismQ.ModuleName.SubModule
     
     Args:
-        directory: Directory to scan
-        max_depth: Maximum depth to traverse
-        current_depth: Current depth level
-        parent_path: Parent path for relative path construction
+        directory: Directory to scan for modules
+        parent_module: Parent module name
         
     Returns:
-        List of dictionaries representing the tree structure
+        List of module dictionaries with hierarchy
     """
-    if current_depth > max_depth:
-        return []
-    
-    items = []
-    excluded = {'.git', '__pycache__', '.venv', 'venv', '.tangent', 
-                'node_modules', '.pytest_cache', '.mypy_cache', 'dist', 'build'}
+    modules = []
     
     try:
-        dir_path = Path(directory)
-        dir_items = sorted(dir_path.iterdir(), key=lambda x: (not x.is_dir(), x.name))
-        dir_items = [i for i in dir_items if i.name not in excluded]
+        src_path = Path(directory)
+        if not src_path.exists():
+            return modules
         
-        for item in dir_items:
-            rel_path = os.path.join(parent_path, item.name) if parent_path else item.name
+        # Get all immediate subdirectories in src/
+        subdirs = sorted([d for d in src_path.iterdir() if d.is_dir() and not d.name.startswith('.')])
+        
+        for subdir in subdirs:
+            module_name = f"{parent_module}.{subdir.name}"
             
-            item_data = {
-                'name': item.name,
-                'path': rel_path,
-                'is_dir': item.is_dir(),
+            module_data = {
+                'name': module_name,
+                'path': str(subdir.relative_to(src_path.parent.parent)),
+                'is_dir': True,
                 'children': []
             }
             
-            if item.is_dir():
-                item_data['children'] = generate_tree_data(
-                    item, 
-                    max_depth, 
-                    current_depth + 1,
-                    rel_path
-                )
+            # Check if this module has sub-modules (src/ subdirectory)
+            nested_src = subdir / 'src'
+            if nested_src.exists() and nested_src.is_dir():
+                # Recursively find sub-modules
+                module_data['children'] = find_modules(nested_src, module_name)
             
-            items.append(item_data)
+            modules.append(module_data)
+    
     except PermissionError:
         pass
     
-    return items
+    return modules
+
+
+def generate_tree_data(repo_root):
+    """
+    Generate module tree data structure for HTML rendering.
+    
+    Args:
+        repo_root: Repository root directory
+        
+    Returns:
+        List with single root item containing all modules
+    """
+    root_module = {
+        'name': 'PrismQ',
+        'path': '',
+        'is_dir': True,
+        'children': find_modules(Path(repo_root) / 'src', 'PrismQ')
+    }
+    
+    return [root_module]
 
 
 def generate_html_with_inline_data(tree_data, output_file):
@@ -75,7 +94,7 @@ def generate_html_with_inline_data(tree_data, output_file):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrismQ Repository Tree View</title>
+    <title>PrismQ Repository Module Tree</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -230,15 +249,11 @@ def generate_html_with_inline_data(tree_data, output_file):
         }
 
         .folder-icon::before {
-            content: '📁';
+            content: '📦';
         }
 
         .folder-icon.open::before {
             content: '📂';
-        }
-
-        .file-icon::before {
-            content: '📄';
         }
 
         .toggle {
@@ -261,13 +276,9 @@ def generate_html_with_inline_data(tree_data, output_file):
             transform: rotate(90deg);
         }
 
-        .folder-name {
+        .module-name {
             color: var(--folder-color);
             font-weight: 500;
-        }
-
-        .file-name {
-            color: var(--file-color);
         }
 
         .children {
@@ -317,26 +328,22 @@ def generate_html_with_inline_data(tree_data, output_file):
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌲 PrismQ Repository Tree View</h1>
-            <p>Explore the modular structure of the PrismQ repository</p>
+            <h1>🌲 PrismQ Repository Module Tree</h1>
+            <p>Explore the modular structure of PrismQ repositories</p>
         </div>
 
         <div class="controls">
             <button class="btn" onclick="expandAll()">Expand All</button>
             <button class="btn" onclick="collapseAll()">Collapse All</button>
-            <input type="text" class="search-box" id="searchBox" placeholder="Search files and folders..." oninput="searchTree()">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search modules..." oninput="searchTree()">
         </div>
 
         <div class="tree-container" id="treeContainer"></div>
 
         <div class="stats" id="stats" style="display: none;">
             <div class="stat-item">
-                <span class="stat-label">Total Folders</span>
-                <span class="stat-value" id="folderCount">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Total Files</span>
-                <span class="stat-value" id="fileCount">0</span>
+                <span class="stat-label">Total Modules</span>
+                <span class="stat-value" id="moduleCount">0</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Max Depth</span>
@@ -354,8 +361,7 @@ def generate_html_with_inline_data(tree_data, output_file):
         const treeData = TREE_DATA_PLACEHOLDER;
 
         let stats = {
-            folders: 0,
-            files: 0,
+            modules: 0,
             maxDepth: 0
         };
 
@@ -372,48 +378,33 @@ def generate_html_with_inline_data(tree_data, output_file):
                 itemDiv.dataset.path = item.path;
                 itemDiv.dataset.name = item.name.toLowerCase();
 
-                if (item.is_dir) {
-                    stats.folders++;
-                    
-                    const toggle = document.createElement('span');
-                    toggle.className = 'toggle';
-                    itemDiv.appendChild(toggle);
+                stats.modules++;
+                
+                const toggle = document.createElement('span');
+                toggle.className = 'toggle';
+                itemDiv.appendChild(toggle);
 
-                    const icon = document.createElement('span');
-                    icon.className = 'icon folder-icon';
-                    itemDiv.appendChild(icon);
+                const icon = document.createElement('span');
+                icon.className = 'icon folder-icon';
+                itemDiv.appendChild(icon);
 
-                    const name = document.createElement('span');
-                    name.className = 'folder-name';
-                    name.textContent = item.name;
-                    itemDiv.appendChild(name);
+                const name = document.createElement('span');
+                name.className = 'module-name';
+                name.textContent = item.name;
+                itemDiv.appendChild(name);
 
-                    itemDiv.onclick = function(e) {
-                        e.stopPropagation();
-                        toggleFolder(this);
-                    };
+                itemDiv.onclick = function(e) {
+                    e.stopPropagation();
+                    toggleFolder(this);
+                };
 
-                    li.appendChild(itemDiv);
+                li.appendChild(itemDiv);
 
-                    if (item.children && item.children.length > 0) {
-                        const childrenDiv = document.createElement('div');
-                        childrenDiv.className = 'children';
-                        renderTree(item.children, childrenDiv, depth + 1);
-                        li.appendChild(childrenDiv);
-                    }
-                } else {
-                    stats.files++;
-
-                    const icon = document.createElement('span');
-                    icon.className = 'icon file-icon';
-                    itemDiv.appendChild(icon);
-
-                    const name = document.createElement('span');
-                    name.className = 'file-name';
-                    name.textContent = item.name;
-                    itemDiv.appendChild(name);
-
-                    li.appendChild(itemDiv);
+                if (item.children && item.children.length > 0) {
+                    const childrenDiv = document.createElement('div');
+                    childrenDiv.className = 'children';
+                    renderTree(item.children, childrenDiv, depth + 1);
+                    li.appendChild(childrenDiv);
                 }
 
                 ul.appendChild(li);
@@ -502,8 +493,7 @@ def generate_html_with_inline_data(tree_data, output_file):
         }
 
         function updateStats() {
-            document.getElementById('folderCount').textContent = stats.folders;
-            document.getElementById('fileCount').textContent = stats.files;
+            document.getElementById('moduleCount').textContent = stats.modules;
             document.getElementById('maxDepth').textContent = stats.maxDepth;
             document.getElementById('stats').style.display = 'flex';
         }
@@ -556,23 +546,17 @@ def main():
     
     # Count stats
     def count_items(items):
-        folders = 0
-        files = 0
+        modules = 0
         for item in items:
-            if item['is_dir']:
-                folders += 1
-                f, fi = count_items(item['children'])
-                folders += f
-                files += fi
-            else:
-                files += 1
-        return folders, files
+            modules += 1
+            if item.get('children'):
+                modules += count_items(item['children'])
+        return modules
     
-    folders, files = count_items(tree_data)
+    total_modules = count_items(tree_data)
     print(f"\nStatistics:")
-    print(f"  Total folders: {folders}")
-    print(f"  Total files: {files}")
-    print(f"\nOpen {html_file} in a web browser to view the repository tree.")
+    print(f"  Total modules: {total_modules}")
+    print(f"\nOpen {html_file} in a web browser to view the repository module tree.")
 
 
 if __name__ == '__main__':
