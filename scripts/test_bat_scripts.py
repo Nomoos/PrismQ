@@ -140,6 +140,48 @@ class TestBatchScripts:
         assert not re.search(r'%SCRIPT_DIR%setup_env\.bat(?!\\)', content), \
             "sync-modules.bat should not reference %SCRIPT_DIR%setup_env.bat directly"
 
+    def test_add_module_bat_uses_subdirectory_venv(self, scripts_dir):
+        """Verify add-module.bat uses add_module subdirectory for venv."""
+        bat_file = scripts_dir / "add-module.bat"
+        content = bat_file.read_text(encoding='utf-8')
+        
+        # Check that it uses subdirectory venv
+        assert 'VENV_DIR=%SCRIPT_DIR%add_module\\.venv' in content, \
+            "add-module.bat should use add_module\\.venv for venv location"
+
+    def test_sync_modules_bat_uses_subdirectory_venv(self, scripts_dir):
+        """Verify sync-modules.bat uses sync_modules subdirectory for venv."""
+        bat_file = scripts_dir / "sync-modules.bat"
+        content = bat_file.read_text(encoding='utf-8')
+        
+        # Check that it uses subdirectory venv
+        assert 'VENV_DIR=%SCRIPT_DIR%sync_modules\\.venv' in content, \
+            "sync-modules.bat should use sync_modules\\.venv for venv location"
+
+    def test_setup_env_uses_own_directory_venv_for_add_module(self, scripts_dir):
+        """Verify add_module/setup_env.bat uses its own directory for venv."""
+        setup_file = scripts_dir / "add_module" / "setup_env.bat"
+        content = setup_file.read_text(encoding='utf-8')
+        
+        # Check that it uses its own directory
+        assert 'VENV_DIR=%SCRIPT_DIR%.venv' in content, \
+            "setup_env.bat should use %SCRIPT_DIR%.venv for venv location"
+        # Make sure it doesn't use parent directory logic
+        assert "PARENT_DIR" not in content, \
+            "setup_env.bat should not use PARENT_DIR"
+
+    def test_setup_env_uses_own_directory_venv_for_sync_modules(self, scripts_dir):
+        """Verify sync_modules/setup_env.bat uses its own directory for venv."""
+        setup_file = scripts_dir / "sync_modules" / "setup_env.bat"
+        content = setup_file.read_text(encoding='utf-8')
+        
+        # Check that it uses its own directory
+        assert 'VENV_DIR=%SCRIPT_DIR%.venv' in content, \
+            "setup_env.bat should use %SCRIPT_DIR%.venv for venv location"
+        # Make sure it doesn't use parent directory logic
+        assert "PARENT_DIR" not in content, \
+            "setup_env.bat should not use PARENT_DIR"
+
     def test_requirements_exist_for_add_module(self, scripts_dir):
         """Verify requirements.txt exists for add_module."""
         req_file = scripts_dir / "add_module" / "requirements.txt"

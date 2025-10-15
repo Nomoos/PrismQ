@@ -6,7 +6,7 @@ setlocal enabledelayedexpansion
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
-set "VENV_DIR=%SCRIPT_DIR%.venv"
+set "VENV_DIR=%SCRIPT_DIR%sync_modules\.venv"
 set "PYTHON_SCRIPT=%SCRIPT_DIR%sync_modules.py"
 
 REM Check if we're in a git repository
