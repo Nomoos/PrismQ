@@ -66,6 +66,9 @@ scripts/add_module/
 # Create a simple module
 python -m scripts.add_module.add_module PrismQ.NewModule
 
+# Create from GitHub URL (owner auto-detected)
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+
 # Create a deeply nested module
 python -m scripts.add_module.add_module \
   PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource \
@@ -79,13 +82,27 @@ python -m scripts.add_module.add_module \
 
 ### CLI Options
 
-- `module` (required): PrismQ module name in dot-notation
-- `--owner`: GitHub repository owner (default: Nomoos)
+- `module` (required): PrismQ module name in dot-notation **or GitHub URL**
+- `--owner`: GitHub repository owner (default: Nomoos, auto-detected from URL if provided)
 - `--branch`: Git branch name (default: main)
 - `--public/--private`: Repository visibility (default: public)
 - `--remote-origin-prefix`: Remote URL prefix (default: https://github.com)
 - `--description`: Module description
 - `--verbose, -v`: Enable verbose logging
+
+### URL Parsing Feature
+
+The CLI now supports GitHub URLs as input! When you provide a URL:
+
+```bash
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+The system will:
+- Extract owner from URL (e.g., "Nomoos")
+- Extract repository name (e.g., "PrismQ.MyModule")
+- Use default values: branch=main, visibility=public
+- You can still override with command-line flags
 
 ## Path Derivation
 

@@ -76,11 +76,23 @@ The repository has **two CLI interfaces**:
 - **Technology:** Click library
 - **Interactive Mode:** **YES - Fully Supported**
 
-### 2. New CLI (Command-Line Only) ❌
+### 2. New CLI (Supports URL Parsing) ✅
 - **Command:** `python -m scripts.add_module.add_module PrismQ.Module`
 - **File:** `scripts/add_module/add_module.py`
 - **Technology:** argparse
-- **Interactive Mode:** **NO - Requires module name as argument**
+- **Interactive Mode:** **NO - Requires module name or URL as argument**
+- **URL Parsing:** **YES - Now supports GitHub URLs!**
+
+**New Feature:** The new CLI now accepts GitHub URLs directly:
+```bash
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+When you provide a URL, it:
+- Auto-detects owner from URL (default: Nomoos)
+- Uses default branch "main"
+- Creates public repositories by default
+- Extracts module name from repository name
 
 The legacy CLI was **preserved for backward compatibility** during a refactoring, so the interactive mode functionality you're asking about is still fully available.
 

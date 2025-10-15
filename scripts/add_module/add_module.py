@@ -26,6 +26,7 @@ from .core.paths import (
 from .core.vcs import GitService, GitHubService, VCSError
 from .core.template import TemplateService, TemplateSyncError
 from .core.subtree import SubtreeService, SubtreeError
+from .url_parser import parse_github_url
 
 
 # Configure logging
@@ -56,6 +57,9 @@ Examples:
   # Create a simple module
   python -m scripts.add_module.add_module PrismQ.NewModule
   
+  # Create from GitHub URL (owner and repo name auto-detected)
+  python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+  
   # Create a nested module with custom owner
   python -m scripts.add_module.add_module \\
     PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource \\
@@ -70,7 +74,7 @@ Examples:
     
     parser.add_argument(
         'module',
-        help='PrismQ module name in dot-notation (e.g., PrismQ.IdeaInspiration.Sources)'
+        help='PrismQ module name in dot-notation (e.g., PrismQ.IdeaInspiration.Sources) or GitHub URL'
     )
     
     parser.add_argument(
@@ -323,20 +327,42 @@ def main(argv: Optional[list] = None) -> int:
         print("=" * 60)
         print()
         
+        # Check if module argument is a GitHub URL and parse it
+        module_input = args.module
+        owner_from_url = None
+        
+        # Try to parse as GitHub URL
+        if '/' in module_input or 'github.com' in module_input.lower():
+            owner_parsed, repo_name_parsed = parse_github_url(module_input)
+            if owner_parsed and repo_name_parsed:
+                # Successfully parsed as URL
+                module_input = repo_name_parsed
+                owner_from_url = owner_parsed
+                logger.info(f"Parsed GitHub URL: {args.module}")
+                logger.info(f"  Owner: {owner_from_url}")
+                logger.info(f"  Repository: {repo_name_parsed}")
+                print(f"Detected GitHub URL input")
+                print(f"  Parsed Owner:      {owner_from_url}")
+                print(f"  Parsed Repository: {repo_name_parsed}")
+                print()
+        
+        # Use owner from URL if parsed, otherwise use command-line argument
+        effective_owner = owner_from_url if owner_from_url else args.owner
+        
         # Validate inputs
-        validate_module_name(args.module)
+        validate_module_name(module_input)
         
         # Get repository root
         repo_root = get_repo_root()
         
         # Derive module path
-        module_name, module_path = derive_module_path(args.module)
+        module_name, module_path = derive_module_path(module_input)
         
         # Display configuration
         print("Configuration:")
         print(f"  Module Name:     {module_name}")
         print(f"  Module Path:     {module_path}")
-        print(f"  Owner:           {args.owner}")
+        print(f"  Owner:           {effective_owner}")
         print(f"  Visibility:      {'Public' if not args.private else 'Private'}")
         print(f"  Branch:          {args.branch}")
         print()
@@ -351,8 +377,8 @@ def main(argv: Optional[list] = None) -> int:
         # Create repository hierarchy
         is_public = not args.private
         repos = create_hierarchy_repositories(
-            args.module,
-            args.owner,
+            module_input,
+            effective_owner,
             is_public,
             args.remote_origin_prefix,
             github_service

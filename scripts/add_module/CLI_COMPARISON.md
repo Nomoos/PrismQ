@@ -9,8 +9,9 @@ This document compares the two CLI interfaces available for the add_module packa
 | **Command** | `python -m scripts.add_module` | `python -m scripts.add_module.add_module` |
 | **Technology** | Click | argparse |
 | **Interactive Mode** | ✅ Yes | ❌ No |
-| **Required Arguments** | None (prompts) | `module` (positional) |
-| **GitHub URL Input** | As prompt or `--github-url` | Derived from module name |
+| **Required Arguments** | None (prompts) | `module` or URL (positional) |
+| **GitHub URL Input** | As prompt or `--github-url` | ✅ **Now supported!** |
+| **URL Auto-parsing** | ✅ Yes | ✅ **Yes (new!)** |
 | **Best For** | Manual operations | Scripting/automation |
 | **Tests** | 30 legacy tests | 52 comprehensive tests |
 | **Architecture** | Monolithic | SOLID principles |
@@ -72,6 +73,7 @@ Parsed from GitHub URL:
 ### New CLI - Command Line Only
 
 ```bash
+# Using module name
 $ python -m scripts.add_module.add_module PrismQ.MyModule --owner Nomoos --public
 
 ============================================================
@@ -93,6 +95,31 @@ Checking: PrismQ.MyModule
 ...
 ```
 
+### New CLI - With URL Parsing (New Feature!)
+
+```bash
+# Using GitHub URL directly - owner auto-detected!
+$ python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+
+============================================================
+        PrismQ Module Creation Script
+============================================================
+
+Detected GitHub URL input
+  Parsed Owner:      Nomoos
+  Parsed Repository: PrismQ.MyModule
+
+Configuration:
+  Module Name:     MyModule
+  Module Path:     src/MyModule
+  Owner:           Nomoos
+  Visibility:      Public
+  Branch:          main
+
+Creating GitHub repository hierarchy...
+...
+```
+
 ## When to Use Each
 
 ### Use Legacy CLI When:
@@ -111,12 +138,16 @@ python -m scripts.add_module
 
 1. **Automating module creation** - Scripts, CI/CD pipelines
 2. **Creating multiple modules** - Batch operations
-3. **Know exact module structure** - No need for prompts
+3. **Have a GitHub URL** - Now supports URL parsing with auto-detection!
 4. **Need programmatic control** - Better for scripting
 
 **Command:**
 ```bash
+# With module name
 python -m scripts.add_module.add_module PrismQ.MyModule --owner Nomoos
+
+# With GitHub URL (new feature!)
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
 ```
 
 ## Supported URL Formats (Legacy CLI Only)
