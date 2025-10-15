@@ -279,6 +279,166 @@ class TestURLParsing:
         assert repo == "MyRepo"
 
 
+class TestDirectoryStructureDerivation:
+    """
+    Testy pro odvozování správné struktury adresářů.
+    
+    Tyto testy ověřují, že add_module správně vytváří vnořenou strukturu
+    s mezilehlými src/ adresáři pro víceúrovňové moduly.
+    """
+
+    @pytest.fixture
+    def creator(self, tmp_path):
+        """Vytvoří instanci ModuleCreator pro testování."""
+        return ModuleCreator(tmp_path)
+
+    def test_repository_template_module_example_path(self, creator):
+        """
+        Test odvození cesty pro PrismQ.RepositoryTemplate.ModuleExample.
+        
+        Repository: PrismQ.RepositoryTemplate.ModuleExample
+        Očekávaná cesta: src/RepositoryTemplate/src/ModuleExample
+        
+        Tento test ověřuje konkrétní příklad z problémového výstupu.
+        """
+        module_name, module_path = creator.derive_module_path("PrismQ.RepositoryTemplate.ModuleExample")
+        
+        assert module_name == "RepositoryTemplate.ModuleExample"
+        assert module_path == "src/RepositoryTemplate/src/ModuleExample"
+        
+        # Ověření správné struktury vnořování
+        parts = module_path.split('/')
+        assert parts == ['src', 'RepositoryTemplate', 'src', 'ModuleExample']
+
+    def test_single_level_has_no_intermediate_src(self, creator):
+        """
+        Test, že jednoduchý modul nemá mezilehlé src/.
+        
+        Repository: PrismQ.SimpleModule
+        Očekávaná cesta: src/SimpleModule (NE src/SimpleModule/src/)
+        """
+        module_name, module_path = creator.derive_module_path("PrismQ.SimpleModule")
+        
+        assert module_name == "SimpleModule"
+        assert module_path == "src/SimpleModule"
+        
+        # Ujistit se, že cesta končí názvem modulu, ne 'src'
+        assert module_path.endswith("SimpleModule")
+
+    def test_two_level_has_one_intermediate_src(self, creator):
+        """
+        Test, že dvouúrovňový modul má jedno mezilehlé src/.
+        
+        Repository: PrismQ.Parent.Child
+        Očekávaná cesta: src/Parent/src/Child
+        """
+        module_name, module_path = creator.derive_module_path("PrismQ.Parent.Child")
+        
+        assert module_name == "Parent.Child"
+        assert module_path == "src/Parent/src/Child"
+        
+        # Počet výskytů 'src/' by měl být 2
+        src_count = module_path.count('src/')
+        assert src_count == 2
+
+    def test_three_level_has_two_intermediate_src(self, creator):
+        """
+        Test, že tříúrovňový modul má dvě mezilehlé src/.
+        
+        Repository: PrismQ.A.B.C
+        Očekávaná cesta: src/A/src/B/src/C
+        """
+        module_name, module_path = creator.derive_module_path("PrismQ.A.B.C")
+        
+        assert module_name == "A.B.C"
+        assert module_path == "src/A/src/B/src/C"
+        
+        # Počet výskytů 'src/' by měl být 3
+        src_count = module_path.count('src/')
+        assert src_count == 3
+
+    def test_path_structure_pattern_validation(self, creator):
+        """
+        Test validace vzoru struktury cesty.
+        
+        Pro N-úrovňový modul by mělo být N výskytů 'src/'.
+        Mezi každými dvěma úrovněmi by mělo být '/src/' kromě začátku.
+        """
+        # Test 4-úrovňový modul
+        module_name, module_path = creator.derive_module_path("PrismQ.Level1.Level2.Level3.Level4")
+        
+        assert module_name == "Level1.Level2.Level3.Level4"
+        assert module_path == "src/Level1/src/Level2/src/Level3/src/Level4"
+        
+        # Ověření vzoru
+        expected_pattern = "src/Level1/src/Level2/src/Level3/src/Level4"
+        assert module_path == expected_pattern
+        
+        # Počet komponent by měl odpovídat počtu 'src/'
+        components = module_name.split('.')
+        src_count = module_path.count('src/')
+        assert len(components) == src_count
+
+    def test_idea_inspiration_sources_structure(self, creator):
+        """
+        Test reálného příkladu z repozitáře: IdeaInspiration.Sources.
+        
+        Repository: PrismQ.IdeaInspiration.Sources
+        Očekávaná cesta: src/IdeaInspiration/src/Sources
+        """
+        module_name, module_path = creator.derive_module_path("PrismQ.IdeaInspiration.Sources")
+        
+        assert module_name == "IdeaInspiration.Sources"
+        assert module_path == "src/IdeaInspiration/src/Sources"
+
+    def test_path_does_not_have_double_src(self, creator):
+        """
+        Test, že cesta nemá duplicitní src/ na stejné úrovni.
+        
+        Špatně: src/src/Module nebo Module/src/src/
+        Správně: src/Module nebo Parent/src/Child
+        """
+        test_cases = [
+            "PrismQ.Module",
+            "PrismQ.Parent.Child",
+            "PrismQ.A.B.C",
+            "PrismQ.RepositoryTemplate.ModuleExample"
+        ]
+        
+        for repo_name in test_cases:
+            _, module_path = creator.derive_module_path(repo_name)
+            
+            # Ověřit, že neexistuje 'src/src' v cestě
+            assert 'src/src' not in module_path, f"Path {module_path} contains 'src/src'"
+            
+            # Ověřit, že cesta začíná 'src/'
+            assert module_path.startswith('src/'), f"Path {module_path} doesn't start with 'src/'"
+
+    def test_without_prismq_prefix_still_correct(self, creator):
+        """
+        Test, že i bez PrismQ. prefixu je struktura správná.
+        
+        Repository: SimpleModule (bez PrismQ. prefixu)
+        Očekávaná cesta: src/SimpleModule
+        """
+        module_name, module_path = creator.derive_module_path("SimpleModule")
+        
+        assert module_name == "SimpleModule"
+        assert module_path == "src/SimpleModule"
+
+    def test_nested_without_prefix(self, creator):
+        """
+        Test vnořených modulů bez PrismQ. prefixu.
+        
+        Repository: Parent.Child (bez PrismQ. prefixu)
+        Očekávaná cesta: src/Parent/src/Child
+        """
+        module_name, module_path = creator.derive_module_path("Parent.Child")
+        
+        assert module_name == "Parent.Child"
+        assert module_path == "src/Parent/src/Child"
+
+
 if __name__ == "__main__":
     # Spuštění testů přímo z tohoto souboru
     pytest.main([__file__, "-v"])
