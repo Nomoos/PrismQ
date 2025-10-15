@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/path_utils.py
-# hypothesis_version: 6.141.0
-
-['-', '.', '.git', '/', 'PrismQ.', '_']

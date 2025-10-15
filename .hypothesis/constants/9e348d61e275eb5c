@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/core/__init__.py
-# hypothesis_version: 6.141.0
-
-['paths', 'subtree', 'template', 'vcs']

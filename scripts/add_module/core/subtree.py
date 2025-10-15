@@ -8,7 +8,7 @@ PEP 484: Type hints throughout
 """
 
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import logging
 
 from .vcs import GitService, VCSError
@@ -25,7 +25,7 @@ class SubtreeError(Exception):
 class SubtreeService:
     """Service for orchestrating git subtree hierarchy."""
     
-    def __init__(self, git_service: GitService = None):
+    def __init__(self, git_service: Optional[GitService] = None):
         """
         Initialize SubtreeService.
         

@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/url_parser.py
-# hypothesis_version: 6.141.0
-
-['.git', '/', 'git@github.com:', 'github.com/', 'github.com:', 'http://github.com/', 'https://github.com/']

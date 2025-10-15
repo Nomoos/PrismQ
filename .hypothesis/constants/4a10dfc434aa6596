@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/git_operations.py
-# hypothesis_version: 6.141.0
-
-[404, '*', '--no-rebase', '--squash', '-B', '-M', '.', '.git', '=', 'PrismQ.', 'add', 'main', 'origin']

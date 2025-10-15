@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/github_client.py
-# hypothesis_version: 6.141.0
-
-['auth', 'gh', 'token']

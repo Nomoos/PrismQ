@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/module_structure.py
-# hypothesis_version: 6.141.0
-
-['--no-rebase', '.git', '.github', '.gitignore', 'ISSUE_TEMPLATE', 'LICENSE', 'README.md', 'RepositoryTemplate', '__init__.py', 'docs', 'done', 'issues', 'main', 'module.json', 'new', 'origin', 'pyproject.toml', 'requirements.txt', 'scripts', 'src', 'tests', 'wip']

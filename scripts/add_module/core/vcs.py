@@ -30,7 +30,7 @@ class CommandRunner(Protocol):
     """Protocol for command execution (dependency injection)."""
     
     def run(self, cmd: List[str], cwd: Optional[Path] = None, 
-            check: bool = True, capture_output: bool = True) -> subprocess.CompletedProcess:
+            check: bool = True, capture_output: bool = True) -> 'subprocess.CompletedProcess[str]':
         """
         Run a command.
         
@@ -50,7 +50,7 @@ class SubprocessCommandRunner:
     """Default command runner using subprocess."""
     
     def run(self, cmd: List[str], cwd: Optional[Path] = None,
-            check: bool = True, capture_output: bool = True) -> subprocess.CompletedProcess:
+            check: bool = True, capture_output: bool = True) -> 'subprocess.CompletedProcess[str]':
         """Run command using subprocess."""
         logger.debug(f"Running command: {' '.join(cmd)} (cwd={cwd})")
         result = subprocess.run(
@@ -67,7 +67,7 @@ class SubprocessCommandRunner:
 class GitService:
     """Service for Git operations."""
     
-    def __init__(self, runner: CommandRunner = None):
+    def __init__(self, runner: Optional[CommandRunner] = None):
         """
         Initialize GitService.
         
@@ -188,7 +188,7 @@ class GitService:
 class GitHubService:
     """Service for GitHub operations using gh CLI."""
     
-    def __init__(self, runner: CommandRunner = None):
+    def __init__(self, runner: Optional[CommandRunner] = None):
         """
         Initialize GitHubService.
         

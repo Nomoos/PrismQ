@@ -1,4 +1,0 @@
-# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/core/vcs.py
-# hypothesis_version: 6.141.0
-
-['--confirm', '--description', '--no-rebase', '--private', '--public', '-b', '-m', '.', '.git', 'add', 'commit', 'create', 'get-url', 'gh', 'git', 'init', 'main', 'origin', 'pull', 'push', 'remote', 'repo', 'set-url', 'view']
