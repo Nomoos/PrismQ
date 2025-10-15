@@ -120,8 +120,47 @@ class ModuleCreator:
         """Create the module directory structure and initial files."""
         
         if module_dir.exists():
-            click.echo(f"Error: Module directory '{module_dir}' already exists")
-            return False
+            # Check if it's a git repository that we can pull from
+            if (module_dir / '.git').exists():
+                click.echo(f"Module directory '{module_dir}' already exists as git repository")
+                click.echo(f"Pulling latest changes from {repo_name}...")
+                
+                try:
+                    from git import Repo, GitCommandError
+                    repo = Repo(module_dir)
+                    
+                    # Ensure origin remote exists and is set correctly
+                    try:
+                        origin = repo.remote('origin')
+                        # Update remote URL if it differs
+                        if origin.url != remote_url:
+                            click.echo(f"  Updating origin URL to {remote_url}")
+                            repo.delete_remote('origin')
+                            repo.create_remote('origin', remote_url)
+                    except ValueError:
+                        # No origin remote exists, create it
+                        click.echo(f"  Adding origin remote: {remote_url}")
+                        repo.create_remote('origin', remote_url)
+                    
+                    # Pull latest changes
+                    origin = repo.remote('origin')
+                    origin.fetch('main')
+                    try:
+                        repo.git.pull('origin', 'main', '--no-rebase')
+                        click.echo(f"  ✓ Pulled latest changes from {repo_name}")
+                    except GitCommandError:
+                        click.echo(f"  No existing content to pull from {repo_name}")
+                    
+                    # Module already exists and is up to date, return success
+                    return True
+                    
+                except Exception as e:
+                    click.echo(f"  Warning: Could not pull from {repo_name}: {e}")
+                    click.echo(f"  Continuing with existing directory...")
+                    return True
+            else:
+                click.echo(f"Error: Module directory '{module_dir}' already exists but is not a git repository")
+                return False
         
         click.echo(f"Creating directory: {module_dir}")
         module_dir.mkdir(parents=True, exist_ok=True)
@@ -145,6 +184,19 @@ class ModuleCreator:
         """Copy template structure, excluding git-related files."""
         import shutil
         
+        # Check if module_dir is a subdirectory of template_dir
+        # This would cause infinite recursion during copy
+        try:
+            module_dir.resolve().relative_to(template_dir.resolve())
+            # If we get here, module_dir is inside template_dir - cannot copy!
+            click.echo("Warning: Cannot copy template - target is subdirectory of template")
+            click.echo("Creating basic structure instead...")
+            self._create_basic_structure(module_dir)
+            return
+        except ValueError:
+            # module_dir is NOT a subdirectory of template_dir, safe to proceed
+            pass
+        
         def ignore_files(directory, files):
             """Ignore .git directories and module-specific files."""
             ignore = {'.git', 'module.json', 'README.md', 'pyproject.toml'}
@@ -159,6 +211,9 @@ class ModuleCreator:
 
     def _create_basic_structure(self, module_dir: Path):
         """Create basic module directory structure."""
+        # Ensure module_dir exists
+        module_dir.mkdir(parents=True, exist_ok=True)
+        
         # Create subdirectories
         (module_dir / "src").mkdir(exist_ok=True)
         (module_dir / "tests").mkdir(exist_ok=True)
@@ -325,6 +380,11 @@ build-backend = "poetry.core.masonry.api"
     def initialize_git_repo(self, module_dir: Path, remote_url: str, module_name: str) -> bool:
         """Initialize git repository in the module directory."""
         try:
+            # Check if git repository already exists
+            if (module_dir / '.git').exists():
+                click.echo("Git repository already exists, skipping initialization...")
+                return True
+            
             click.echo("Initializing Git repository...")
             
             repo = Repo.init(module_dir)
@@ -478,7 +538,36 @@ build-backend = "poetry.core.masonry.api"
                         pass  # Branch doesn't exist yet
                     repo.create_remote('origin', parent_url)
                 else:
+                    # Parent directory already has a git repository
                     repo = Repo(parent_dir)
+                    
+                    # Ensure origin remote exists and is set correctly
+                    try:
+                        origin = repo.remote('origin')
+                        # Update remote URL if it differs
+                        if origin.url != parent_url:
+                            repo.delete_remote('origin')
+                            repo.create_remote('origin', parent_url)
+                    except ValueError:
+                        # No origin remote exists, create it
+                        repo.create_remote('origin', parent_url)
+                    
+                    # Pull latest changes from GitHub repository if it exists
+                    try:
+                        click.echo(f"  Pulling latest changes from {parent_repo}...")
+                        origin = repo.remote('origin')
+                        origin.fetch('main')
+                        
+                        # Check if remote has a main branch
+                        try:
+                            # Try to pull changes if there's existing content
+                            repo.git.pull('origin', 'main', '--no-rebase')
+                            click.echo(f"  ✓ Pulled latest changes from {parent_repo}")
+                        except GitCommandError as pull_error:
+                            # If pull fails (e.g., no commits yet), that's fine
+                            click.echo(f"  No existing content to pull from {parent_repo}")
+                    except Exception as pull_error:
+                        click.echo(f"  Warning: Could not pull from {parent_repo}: {pull_error}")
                 
                 # Add child as subtree
                 child_remote_name = self.derive_remote_name(child_url)
@@ -505,6 +594,35 @@ build-backend = "poetry.core.masonry.api"
             top_repo, top_url, top_path = repos[0]
             
             click.echo(f"Integrating {top_repo} into main PrismQ repository...")
+            
+            # Check if top-level module directory already exists locally
+            top_level_dir = self.repo_root / top_path
+            if top_level_dir.exists() and (top_level_dir / '.git').exists():
+                # Directory exists with git repo, pull latest changes first
+                try:
+                    click.echo(f"  Existing repository found at {top_path}, pulling latest changes...")
+                    top_repo_obj = Repo(top_level_dir)
+                    
+                    # Ensure origin exists and is correct
+                    try:
+                        origin = top_repo_obj.remote('origin')
+                        if origin.url != top_url:
+                            top_repo_obj.delete_remote('origin')
+                            top_repo_obj.create_remote('origin', top_url)
+                    except ValueError:
+                        top_repo_obj.create_remote('origin', top_url)
+                    
+                    # Pull latest changes
+                    origin = top_repo_obj.remote('origin')
+                    origin.fetch('main')
+                    try:
+                        top_repo_obj.git.pull('origin', 'main', '--no-rebase')
+                        click.echo(f"  ✓ Pulled latest changes from {top_repo}")
+                    except GitCommandError:
+                        click.echo(f"  No existing content to pull from {top_repo}")
+                        
+                except Exception as pull_err:
+                    click.echo(f"  Warning: Could not pull from existing {top_repo}: {pull_err}")
             
             try:
                 main_repo = Repo(self.repo_root)
