@@ -120,8 +120,47 @@ class ModuleCreator:
         """Create the module directory structure and initial files."""
         
         if module_dir.exists():
-            click.echo(f"Error: Module directory '{module_dir}' already exists")
-            return False
+            # Check if it's a git repository that we can pull from
+            if (module_dir / '.git').exists():
+                click.echo(f"Module directory '{module_dir}' already exists as git repository")
+                click.echo(f"Pulling latest changes from {repo_name}...")
+                
+                try:
+                    from git import Repo, GitCommandError
+                    repo = Repo(module_dir)
+                    
+                    # Ensure origin remote exists and is set correctly
+                    try:
+                        origin = repo.remote('origin')
+                        # Update remote URL if it differs
+                        if origin.url != remote_url:
+                            click.echo(f"  Updating origin URL to {remote_url}")
+                            repo.delete_remote('origin')
+                            repo.create_remote('origin', remote_url)
+                    except ValueError:
+                        # No origin remote exists, create it
+                        click.echo(f"  Adding origin remote: {remote_url}")
+                        repo.create_remote('origin', remote_url)
+                    
+                    # Pull latest changes
+                    origin = repo.remote('origin')
+                    origin.fetch('main')
+                    try:
+                        repo.git.pull('origin', 'main', '--no-rebase')
+                        click.echo(f"  ✓ Pulled latest changes from {repo_name}")
+                    except GitCommandError:
+                        click.echo(f"  No existing content to pull from {repo_name}")
+                    
+                    # Module already exists and is up to date, return success
+                    return True
+                    
+                except Exception as e:
+                    click.echo(f"  Warning: Could not pull from {repo_name}: {e}")
+                    click.echo(f"  Continuing with existing directory...")
+                    return True
+            else:
+                click.echo(f"Error: Module directory '{module_dir}' already exists but is not a git repository")
+                return False
         
         click.echo(f"Creating directory: {module_dir}")
         module_dir.mkdir(parents=True, exist_ok=True)
@@ -341,6 +380,11 @@ build-backend = "poetry.core.masonry.api"
     def initialize_git_repo(self, module_dir: Path, remote_url: str, module_name: str) -> bool:
         """Initialize git repository in the module directory."""
         try:
+            # Check if git repository already exists
+            if (module_dir / '.git').exists():
+                click.echo("Git repository already exists, skipping initialization...")
+                return True
+            
             click.echo("Initializing Git repository...")
             
             repo = Repo.init(module_dir)
