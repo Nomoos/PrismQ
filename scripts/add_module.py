@@ -229,7 +229,9 @@ class ModuleCreator:
         init_file.write_text(f'"""Module package initialization."""\n\n__version__ = "0.1.0"\n')
         
         # Create .gitignore
-        gitignore_content = """# Python
+        gitignore_content = """.tangent/
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
