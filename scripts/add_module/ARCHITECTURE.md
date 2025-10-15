@@ -101,18 +101,29 @@ python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModul
 The system will:
 - Extract owner from URL (e.g., "Nomoos")
 - Extract repository name (e.g., "PrismQ.MyModule")
+- **Automatically derive the module path** (e.g., `src/MyModule`)
 - Use default values: branch=main, visibility=public
 - You can still override with command-line flags
 
+**Example with nested module:**
+```bash
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.Parent.Child
+# Automatically creates path: src/Parent/src/Child
+```
+
 ## Path Derivation
 
-The system converts PrismQ dot-notation into correct nested folder structures:
+The system converts PrismQ dot-notation into correct nested folder structures automatically:
 
-| Input | Output Path |
+| Input (from URL or direct) | Output Path |
 |-------|-------------|
 | `PrismQ.RepositoryTemplate` | `src/RepositoryTemplate` |
 | `PrismQ.IdeaInspiration.Sources` | `src/IdeaInspiration/src/Sources` |
 | `PrismQ.Module.Nested.Path` | `src/Module/src/Nested/src/Path` |
+
+**This works whether you provide:**
+- A module name directly: `python -m scripts.add_module.add_module PrismQ.MyModule`
+- A GitHub URL: `python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule`
 
 ### Validation
 

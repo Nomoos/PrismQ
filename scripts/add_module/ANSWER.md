@@ -88,11 +88,12 @@ The repository has **two CLI interfaces**:
 python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
 ```
 
-When you provide a URL, it:
+When you provide a URL, it automatically:
 - Auto-detects owner from URL (default: Nomoos)
 - Uses default branch "main"
 - Creates public repositories by default
 - Extracts module name from repository name
+- **Derives module path** (e.g., `PrismQ.MyModule.SubModule` → `src/MyModule/src/SubModule`)
 
 The legacy CLI was **preserved for backward compatibility** during a refactoring, so the interactive mode functionality you're asking about is still fully available.
 

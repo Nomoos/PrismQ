@@ -38,16 +38,29 @@ All standard GitHub URL formats are supported:
 
 ## What Gets Auto-Detected
 
-When you provide a GitHub URL, the following values are automatically detected:
+When you provide a GitHub URL, the following values are automatically detected and derived:
 
 | Parameter | Value | Can Override? |
 |-----------|-------|---------------|
 | `--owner` | Extracted from URL (e.g., "Nomoos") | ✅ Yes with `--owner` flag |
+| **Module Path** | **Auto-derived from repository name** | ❌ No (automatic) |
 | `--branch` | Default: "main" | ✅ Yes with `--branch` flag |
 | `--public/--private` | Default: public | ✅ Yes with `--private` flag |
 | `--description` | Empty | ✅ Yes with `--description` flag |
 
+### Module Path Derivation
+
+The module path is automatically derived from the repository name:
+
+- `PrismQ.MyModule` → `src/MyModule`
+- `PrismQ.MyModule.SubModule` → `src/MyModule/src/SubModule`
+- `PrismQ.Deep.Nested.Path` → `src/Deep/src/Nested/src/Path`
+
+This follows PrismQ's nested module structure convention where each level after the first is prefixed with `src/`.
+
 ## Example Output
+
+### Single-level Module
 
 ```
 $ python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
@@ -63,6 +76,27 @@ Detected GitHub URL input
 Configuration:
   Module Name:     MyModule
   Module Path:     src/MyModule
+  Owner:           Nomoos
+  Visibility:      Public
+  Branch:          main
+```
+
+### Nested Module (Auto-derived Path)
+
+```
+$ python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule.SubModule
+
+============================================================
+        PrismQ Module Creation Script
+============================================================
+
+Detected GitHub URL input
+  Parsed Owner:      Nomoos
+  Parsed Repository: PrismQ.MyModule.SubModule
+
+Configuration:
+  Module Name:     MyModule.SubModule
+  Module Path:     src/MyModule/src/SubModule
   Owner:           Nomoos
   Visibility:      Public
   Branch:          main

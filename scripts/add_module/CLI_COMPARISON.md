@@ -120,6 +120,23 @@ Creating GitHub repository hierarchy...
 ...
 ```
 
+**Nested modules also work** - path is auto-derived:
+
+```bash
+$ python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule.SubModule
+
+Detected GitHub URL input
+  Parsed Owner:      Nomoos
+  Parsed Repository: PrismQ.MyModule.SubModule
+
+Configuration:
+  Module Name:     MyModule.SubModule
+  Module Path:     src/MyModule/src/SubModule  ← Auto-derived!
+  Owner:           Nomoos
+  Visibility:      Public
+  Branch:          main
+```
+
 ## When to Use Each
 
 ### Use Legacy CLI When:
