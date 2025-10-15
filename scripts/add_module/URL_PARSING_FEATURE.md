@@ -6,34 +6,55 @@ The new CLI (`add_module.py`) now supports GitHub URL parsing with automatic own
 
 ## How to Use
 
-Simply pass a GitHub URL as the module argument:
+The new CLI accepts **both** module names and GitHub URLs:
 
+**Option 1: Module name directly**
+```bash
+python -m scripts.add_module.add_module PrismQ.MyModule
+```
+
+**Option 2: GitHub URL**
 ```bash
 python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
 ```
 
-## Supported URL Formats
+Both formats produce the same result! This flexibility is useful for:
+- **Scripts/Batch files**: Accept user input that could be either format
+- **Interactive workflows**: Users can paste URLs or type module names
+- **Automation**: Works with both repository URLs and module names
 
-All standard GitHub URL formats are supported:
+## Supported Input Formats
 
-1. **HTTPS with .git**
+All these input formats are supported:
+
+1. **Module name (dot-notation)**
+   ```bash
+   python -m scripts.add_module.add_module PrismQ.Module
+   # Uses default owner: Nomoos
+   ```
+
+2. **HTTPS URL with .git**
    ```bash
    python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.Module.git
+   # Owner auto-detected: Nomoos
    ```
 
-2. **HTTPS without .git**
+3. **HTTPS URL without .git**
    ```bash
    python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.Module
+   # Owner auto-detected: Nomoos
    ```
 
-3. **SSH format**
+4. **SSH format**
    ```bash
    python -m scripts.add_module.add_module git@github.com:Nomoos/PrismQ.Module.git
+   # Owner auto-detected: Nomoos
    ```
 
-4. **Short format (Owner/Repo)**
+5. **Short format (Owner/Repo)**
    ```bash
    python -m scripts.add_module.add_module Nomoos/PrismQ.Module
+   # Owner auto-detected: Nomoos
    ```
 
 ## What Gets Auto-Detected

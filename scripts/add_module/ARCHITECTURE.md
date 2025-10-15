@@ -92,7 +92,18 @@ python -m scripts.add_module.add_module \
 
 ### URL Parsing Feature
 
-The CLI now supports GitHub URLs as input! When you provide a URL:
+The CLI accepts **both module names and GitHub URLs** as input! This flexibility is useful for batch files and interactive scripts where user input could be either format.
+
+**Both of these work identically:**
+```bash
+# Option 1: Module name
+python -m scripts.add_module.add_module PrismQ.MyModule
+
+# Option 2: GitHub URL
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+When you provide a URL:
 
 ```bash
 python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
