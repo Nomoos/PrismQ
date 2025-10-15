@@ -8,6 +8,11 @@ __pycache__/
 *.pyd
 .Python
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Nested git repositories in modules
 # (Git automatically ignores these, but listing explicitly for clarity)
 src/*/.git/
