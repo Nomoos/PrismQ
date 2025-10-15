@@ -41,7 +41,6 @@ class TestBatchScripts:
         assert "setlocal enabledelayedexpansion" in content, "Missing delayed expansion"
         assert "SCRIPT_DIR" in content, "Missing SCRIPT_DIR variable"
         assert "VENV_DIR" in content, "Missing VENV_DIR variable"
-        assert "PYTHON_SCRIPT" in content, "Missing PYTHON_SCRIPT variable"
         
         # Check for git repository validation
         assert "git rev-parse --git-dir" in content, "Missing git repository check"
@@ -50,8 +49,8 @@ class TestBatchScripts:
         assert "activate.bat" in content, "Missing venv activation"
         assert "setup_env.bat" in content, "Missing setup_env.bat reference"
         
-        # Check for Python script execution
-        assert "python" in content.lower(), "Missing Python execution"
+        # Check for Python module execution (after refactor, uses python -m)
+        assert "python -m add_module" in content, "Missing python -m add_module execution"
         assert "deactivate" in content, "Missing venv deactivation"
 
     def test_sync_modules_bat_structure(self, scripts_dir):
@@ -63,7 +62,6 @@ class TestBatchScripts:
         assert "setlocal enabledelayedexpansion" in content, "Missing delayed expansion"
         assert "SCRIPT_DIR" in content, "Missing SCRIPT_DIR variable"
         assert "VENV_DIR" in content, "Missing VENV_DIR variable"
-        assert "PYTHON_SCRIPT" in content, "Missing PYTHON_SCRIPT variable"
         
         # Check for git repository validation
         assert "git rev-parse --git-dir" in content, "Missing git repository check"
@@ -72,8 +70,8 @@ class TestBatchScripts:
         assert "activate.bat" in content, "Missing venv activation"
         assert "setup_env.bat" in content, "Missing setup_env.bat reference"
         
-        # Check for Python script execution
-        assert "python" in content.lower(), "Missing Python execution"
+        # Check for Python module execution (after refactor, uses python -m)
+        assert "python -m sync_modules" in content, "Missing python -m sync_modules execution"
         assert "deactivate" in content, "Missing venv deactivation"
 
     def test_add_module_python_module_exists(self, scripts_dir):
