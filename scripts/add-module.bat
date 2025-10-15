@@ -6,7 +6,7 @@ setlocal enabledelayedexpansion
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
-set "VENV_DIR=%SCRIPT_DIR%.venv"
+set "VENV_DIR=%SCRIPT_DIR%add_module\.venv"
 set "PYTHON_SCRIPT=%SCRIPT_DIR%add_module.py"
 
 REM Check if we're in a git repository and get the root directory

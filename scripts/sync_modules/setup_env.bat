@@ -10,11 +10,9 @@ echo      PrismQ Python Environment Setup
 echo ========================================================
 echo.
 
-REM Get script directory (this setup script's directory: scripts/sync_modules/)
+REM Get script directory
 set "SCRIPT_DIR=%~dp0"
-REM Set venv directory to parent directory (scripts/.venv)
-for %%i in ("%SCRIPT_DIR%..") do set "PARENT_DIR=%%~fi\"
-set "VENV_DIR=%PARENT_DIR%.venv"
+set "VENV_DIR=%SCRIPT_DIR%.venv"
 
 REM Check if Python is installed
 python --version >nul 2>&1
