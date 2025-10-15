@@ -2,6 +2,8 @@
 
 A modular AI-powered content generation ecosystem. Each subfolder follows the [RepositoryTemplate](https://github.com/Nomoos/PrismQ.RepositoryTemplate) structure.
 
+📖 **[Usage Guide](USAGE_GUIDE.md)** - Quick start guide for batch scripts and repository tree view
+
 ## Repository Structure
 
 PrismQ uses a nested modular architecture where each module follows the RepositoryTemplate pattern with the following structure:
@@ -65,3 +67,17 @@ python scripts/sync_modules.py
 ```
 
 For detailed usage, configuration, and integration guide, see [scripts/README.md](scripts/README.md).
+
+## Repository Module Tree View
+
+An interactive HTML-based module tree view is available to explore the complete module hierarchy:
+
+📄 [**View Module Tree**](docs/repository-tree.html)
+
+Features:
+- 🌳 Collapsible module navigation using PrismQ naming convention
+- 🔍 Search functionality for modules
+- 📊 Module statistics (7 modules, depth 5)
+- 🎨 Dark theme with VS Code-inspired design
+
+See [docs/README.md](docs/README.md) for more information.
