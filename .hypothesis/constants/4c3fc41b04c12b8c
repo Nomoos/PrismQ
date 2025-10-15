@@ -1,0 +1,4 @@
+# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/core/template.py
+# hypothesis_version: 6.141.0
+
+['*', '.git', '.gitignore', 'README.md', '__init__.py', 'docs', 'issues/done', 'issues/new', 'issues/wip', 'module.json', 'pyproject.toml', 'scripts', 'src', 'tests']

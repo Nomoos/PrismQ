@@ -1,0 +1,4 @@
+# file: /home/runner/work/PrismQ/PrismQ/scripts/add_module/core/paths.py
+# hypothesis_version: 6.141.0
+
+['-', '.', '.git', '/', 'PrismQ.', '_', 'src', 'src/src']
