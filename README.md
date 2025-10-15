@@ -65,3 +65,17 @@ python scripts/sync_modules.py
 ```
 
 For detailed usage, configuration, and integration guide, see [scripts/README.md](scripts/README.md).
+
+## Repository Tree View
+
+An interactive HTML-based repository tree view is available to explore the complete repository structure:
+
+📄 [**View Repository Tree**](docs/repository-tree.html)
+
+Features:
+- 🌳 Collapsible folder navigation
+- 🔍 Search functionality for files and folders
+- 📊 Repository statistics (58 folders, 96 files)
+- 🎨 Dark theme with VS Code-inspired design
+
+See [docs/README.md](docs/README.md) for more information.

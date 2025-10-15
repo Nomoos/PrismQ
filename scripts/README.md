@@ -482,11 +482,34 @@ git diff HEAD..remote-name/main -- src/Module
 5. **Documentation**: Keep module READMEs updated
 6. **Branching**: Use branches in module repos for features, sync from `main`
 
+## Testing
+
+### Batch Script Tests
+
+The repository includes tests to verify the Windows batch scripts are properly configured:
+
+```bash
+# Run batch script tests
+cd scripts
+python3 -m pytest test_bat_scripts.py -v
+```
+
+The tests verify:
+- ✅ Batch files exist and are properly structured
+- ✅ Python modules are accessible and importable
+- ✅ Virtual environment setup scripts exist
+- ✅ Requirements files are present and non-empty
+- ✅ Proper error handling and exit codes
+- ✅ Correct encoding and file structure
+
+**Test file**: `scripts/test_bat_scripts.py`
+
 ## Related Documentation
 
 - [Git Subtree Documentation](https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging)
 - [PrismQ.RepositoryTemplate](https://github.com/Nomoos/PrismQ.RepositoryTemplate)
 - [Main README](../README.md)
+- [Repository Tree View](../docs/README.md) - Interactive HTML visualization of repository structure
 
 ## Support
 
