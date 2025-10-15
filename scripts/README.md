@@ -49,7 +49,7 @@ The virtual environment is reused for subsequent runs.
 
 The script will interactively prompt you for:
 
-**Option 1: GitHub URL Input (Recommended)**
+**GitHub URL Input (Only Option)**
 - GitHub repository URL (e.g., `https://github.com/Nomoos/PrismQ.MyModule.git` or `Nomoos/PrismQ.MyModule`)
 - Module description (optional)
 
@@ -57,11 +57,6 @@ The script automatically:
 - Parses the GitHub URL to extract owner and repository name
 - Derives the module path from the repository name (e.g., `PrismQ.IdeaInspiration.Sources` → `src/IdeaInspiration/src/Sources`)
 - Copies the complete RepositoryTemplate structure (if available)
-
-**Option 2: Manual Input**
-- Module name (e.g., `MyNewModule`)
-- Module description
-- GitHub owner/organization (default: `Nomoos`)
 
 The script then:
 1. Creates the module directory structure (with nested paths if needed)
@@ -80,7 +75,6 @@ The script then:
 **Example 1: Interactive mode (Windows)**
 ```batch
 scripts\add-module.bat
-# Select option: 1
 # GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule.git
 # Description: My new module for PrismQ
 ```
@@ -89,15 +83,11 @@ scripts\add-module.bat
 ```bash
 # Using GitHub URL
 python scripts/add_module.py --github-url "Nomoos/PrismQ.MyModule" --description "My module"
-
-# Using module name
-python scripts/add_module.py --module-name "MyModule" --description "My module" --owner "Nomoos"
 ```
 
 **Example 3: Nested module**
 ```batch
 scripts\add-module.bat
-# Select option: 1
 # GitHub URL: Nomoos/PrismQ.IdeaInspiration.Classification
 # Description: Classify idea inspirations
 ```

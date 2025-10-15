@@ -34,7 +34,9 @@ class ModuleCreator:
                     check=True
                 )
                 token = result.stdout.strip()
-                self.github_client = Github(token)
+                from github import Auth
+                auth = Auth.Token(token)
+                self.github_client = Github(auth=auth)
             except (subprocess.CalledProcessError, FileNotFoundError):
                 click.echo("Warning: GitHub CLI not authenticated. Repository operations may fail.")
                 click.echo("Please run: gh auth login")
@@ -652,10 +654,8 @@ build-backend = "poetry.core.masonry.api"
 
 @click.command()
 @click.option('--github-url', help='GitHub repository URL or Owner/RepoName format')
-@click.option('--module-name', help='Module name (for manual input)')
 @click.option('--description', default='A PrismQ module', help='Module description')
-@click.option('--owner', default='Nomoos', help='GitHub owner/organization')
-def main(github_url: Optional[str], module_name: Optional[str], description: str, owner: str):
+def main(github_url: Optional[str], description: str):
     """PrismQ Module Creation Script - Create a new PrismQ module with GitHub integration."""
     
     click.echo()
@@ -675,78 +675,37 @@ def main(github_url: Optional[str], module_name: Optional[str], description: str
     
     creator = ModuleCreator(repo_root)
     
-    # Determine input method
+    # Always use GitHub URL input method
     if github_url:
-        # GitHub URL provided
-        github_owner, repo_name = creator.parse_github_url(github_url)
-        
-        if not github_owner or not repo_name:
-            click.echo("Error: Failed to parse GitHub URL")
-            sys.exit(1)
-        
-        # Derive module name and path from repository name
-        module_name_derived, module_dir_path = creator.derive_module_path(repo_name)
-        
-        click.echo("Parsed from GitHub URL:")
-        click.echo(f"  Owner: {github_owner}")
-        click.echo(f"  Repository: {repo_name}")
-        click.echo(f"  Module Name: {module_name_derived}")
-        click.echo(f"  Module Path: {module_dir_path}")
-        click.echo()
-        
-        if not description or description == 'A PrismQ module':
-            description = click.prompt("Please enter a short description for the module (optional)", 
-                                      default="A PrismQ module", show_default=False)
-        
-        remote_url = f"https://github.com/{github_owner}/{repo_name}.git"
-        
-    elif module_name:
-        # Manual input
-        github_owner = owner
-        repo_name = f"PrismQ.{module_name}"
-        module_name_derived, module_dir_path = creator.derive_module_path(repo_name)
-        remote_url = f"https://github.com/{github_owner}/{repo_name}.git"
-        
+        # GitHub URL provided via command line
+        github_input = github_url
     else:
-        # Interactive mode
-        input_method = click.prompt("Choose input method:\n  1. Enter GitHub repository URL (recommended)\n  2. Enter module details manually\n\nSelect option", 
-                                   type=click.IntRange(1, 2))
-        
-        if input_method == 1:
-            github_input = click.prompt("Enter the GitHub repository URL (e.g., https://github.com/Nomoos/PrismQ.RepositoryTemplate.git)")
-            
-            github_owner, repo_name = creator.parse_github_url(github_input)
-            
-            if not github_owner or not repo_name:
-                click.echo("Error: Failed to parse GitHub URL")
-                sys.exit(1)
-            
-            module_name_derived, module_dir_path = creator.derive_module_path(repo_name)
-            
-            click.echo()
-            click.echo("Parsed from GitHub URL:")
-            click.echo(f"  Owner: {github_owner}")
-            click.echo(f"  Repository: {repo_name}")
-            click.echo(f"  Module Name: {module_name_derived}")
-            click.echo(f"  Module Path: {module_dir_path}")
-            click.echo()
-            
-            description = click.prompt("Please enter a short description for the module (optional)", 
-                                      default="A PrismQ module", show_default=False)
-            
-            remote_url = f"https://github.com/{github_owner}/{repo_name}.git"
-            
-        else:
-            # Manual input
-            module_name = click.prompt("Please enter the module name (e.g., MyNewModule)")
-            description = click.prompt("Please enter a short description for the module", 
-                                      default="A PrismQ module")
-            github_owner = click.prompt("Please enter your GitHub username or organization", 
-                                       default="Nomoos")
-            
-            repo_name = f"PrismQ.{module_name}"
-            module_name_derived, module_dir_path = creator.derive_module_path(repo_name)
-            remote_url = f"https://github.com/{github_owner}/{repo_name}.git"
+        # Interactive mode - prompt for GitHub URL
+        github_input = click.prompt("Enter the GitHub repository URL (e.g., https://github.com/Nomoos/PrismQ.RepositoryTemplate.git)")
+    
+    # Parse GitHub URL
+    github_owner, repo_name = creator.parse_github_url(github_input)
+    
+    if not github_owner or not repo_name:
+        click.echo("Error: Failed to parse GitHub URL")
+        sys.exit(1)
+    
+    # Derive module name and path from repository name
+    module_name_derived, module_dir_path = creator.derive_module_path(repo_name)
+    
+    click.echo()
+    click.echo("Parsed from GitHub URL:")
+    click.echo(f"  Owner: {github_owner}")
+    click.echo(f"  Repository: {repo_name}")
+    click.echo(f"  Module Name: {module_name_derived}")
+    click.echo(f"  Module Path: {module_dir_path}")
+    click.echo()
+    
+    if not description or description == 'A PrismQ module':
+        description = click.prompt("Please enter a short description for the module (optional)", 
+                                  default="A PrismQ module", show_default=False)
+    
+    remote_url = f"https://github.com/{github_owner}/{repo_name}.git"
     
     # Derive remote name
     remote_name = creator.derive_remote_name(remote_url)
