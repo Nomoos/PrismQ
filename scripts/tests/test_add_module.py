@@ -13,7 +13,7 @@ import sys
 # Přidání rodičovského adresáře do PYTHONPATH pro import add_module
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from add_module import ModuleCreator
+from add_module.module_creator import ModuleCreator
 
 
 class TestModuleCreator:
