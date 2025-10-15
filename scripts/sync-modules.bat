@@ -1,13 +1,12 @@
 @echo off
 REM PrismQ Module Sync Script (Windows)
-REM This script sets up Python environment and runs the sync_modules.py script
+REM This script sets up Python environment and runs the sync_modules module
 
 setlocal enabledelayedexpansion
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
 set "VENV_DIR=%SCRIPT_DIR%sync_modules\.venv"
-set "PYTHON_SCRIPT=%SCRIPT_DIR%sync_modules.py"
 
 REM Check if we're in a git repository
 git rev-parse --git-dir >nul 2>&1
@@ -37,9 +36,11 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Run the Python script with all arguments passed to this batch file
-python "%PYTHON_SCRIPT%" %*
+REM Run the Python module with all arguments passed to this batch file
+python -m sync_modules %*
 set PYTHON_EXIT_CODE=!errorlevel!
 
 REM Deactivate virtual environment
 call deactivate
+
+exit /b !PYTHON_EXIT_CODE!

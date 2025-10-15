@@ -1,13 +1,12 @@
 @echo off
 REM PrismQ Add Module Script (Windows)
-REM This script sets up Python environment and runs the add_module.py script
+REM This script sets up Python environment and runs the add_module module
 
 setlocal enabledelayedexpansion
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
 set "VENV_DIR=%SCRIPT_DIR%add_module\.venv"
-set "PYTHON_SCRIPT=%SCRIPT_DIR%add_module.py"
 
 REM Check if we're in a git repository and get the root directory
 git rev-parse --git-dir >nul 2>&1
@@ -48,8 +47,8 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Run the Python script with all arguments passed to this batch file
-python "%PYTHON_SCRIPT%" %*
+REM Run the Python module with all arguments passed to this batch file
+python -m add_module %*
 set PYTHON_EXIT_CODE=!errorlevel!
 
 REM Deactivate virtual environment
