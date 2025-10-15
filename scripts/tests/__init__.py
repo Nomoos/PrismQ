@@ -1,1 +1,0 @@
-"""Testy pro PrismQ skripty."""
