@@ -2,6 +2,8 @@
 
 A modular AI-powered content generation ecosystem. Each subfolder follows the [RepositoryTemplate](https://github.com/Nomoos/PrismQ.RepositoryTemplate) structure.
 
+📖 **[Usage Guide](USAGE_GUIDE.md)** - Quick start guide for batch scripts and repository tree view
+
 ## Repository Structure
 
 PrismQ uses a nested modular architecture where each module follows the RepositoryTemplate pattern with the following structure:
