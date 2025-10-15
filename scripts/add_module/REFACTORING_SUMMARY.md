@@ -114,16 +114,40 @@ mypy scripts/add_module/core/ --strict --ignore-missing-imports
 
 ## Usage
 
-### New CLI (Recommended)
+### New CLI (Command-Line Only)
 
 ```bash
+# Requires module name as positional argument
 python -m scripts.add_module.add_module PrismQ.NewModule --owner Nomoos --public
 ```
 
-### Legacy CLI (Still works)
+**Note:** The new CLI does NOT support interactive mode.
+
+### Legacy CLI (Supports Interactive Mode)
 
 ```bash
+# Interactive mode - just paste a GitHub URL when prompted
+python -m scripts.add_module
+
+# Or with command-line arguments
 python -m scripts.add_module --github-url https://github.com/Nomoos/PrismQ.NewModule
+```
+
+**Interactive Mode Example:**
+```
+$ python -m scripts.add_module
+
+========================================================
+        PrismQ Module Creation Script
+========================================================
+
+Enter the GitHub repository URL (e.g., https://github.com/Nomoos/PrismQ.RepositoryTemplate.git): https://github.com/Nomoos/PrismQ.MyModule
+
+Parsed from GitHub URL:
+  Owner: Nomoos
+  Repository: PrismQ.MyModule
+  Module Name: MyModule
+  Module Path: src/MyModule
 ```
 
 ## Benefits

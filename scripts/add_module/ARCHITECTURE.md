@@ -66,6 +66,9 @@ scripts/add_module/
 # Create a simple module
 python -m scripts.add_module.add_module PrismQ.NewModule
 
+# Create from GitHub URL (owner auto-detected)
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+
 # Create a deeply nested module
 python -m scripts.add_module.add_module \
   PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeSource \
@@ -79,23 +82,59 @@ python -m scripts.add_module.add_module \
 
 ### CLI Options
 
-- `module` (required): PrismQ module name in dot-notation
-- `--owner`: GitHub repository owner (default: Nomoos)
+- `module` (required): PrismQ module name in dot-notation **or GitHub URL**
+- `--owner`: GitHub repository owner (default: Nomoos, auto-detected from URL if provided)
 - `--branch`: Git branch name (default: main)
 - `--public/--private`: Repository visibility (default: public)
 - `--remote-origin-prefix`: Remote URL prefix (default: https://github.com)
 - `--description`: Module description
 - `--verbose, -v`: Enable verbose logging
 
+### URL Parsing Feature
+
+The CLI accepts **both module names and GitHub URLs** as input! This flexibility is useful for batch files and interactive scripts where user input could be either format.
+
+**Both of these work identically:**
+```bash
+# Option 1: Module name
+python -m scripts.add_module.add_module PrismQ.MyModule
+
+# Option 2: GitHub URL
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+When you provide a URL:
+
+```bash
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+The system will:
+- Extract owner from URL (e.g., "Nomoos")
+- Extract repository name (e.g., "PrismQ.MyModule")
+- **Automatically derive the module path** (e.g., `src/MyModule`)
+- Use default values: branch=main, visibility=public
+- You can still override with command-line flags
+
+**Example with nested module:**
+```bash
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.Parent.Child
+# Automatically creates path: src/Parent/src/Child
+```
+
 ## Path Derivation
 
-The system converts PrismQ dot-notation into correct nested folder structures:
+The system converts PrismQ dot-notation into correct nested folder structures automatically:
 
-| Input | Output Path |
+| Input (from URL or direct) | Output Path |
 |-------|-------------|
 | `PrismQ.RepositoryTemplate` | `src/RepositoryTemplate` |
 | `PrismQ.IdeaInspiration.Sources` | `src/IdeaInspiration/src/Sources` |
 | `PrismQ.Module.Nested.Path` | `src/Module/src/Nested/src/Path` |
+
+**This works whether you provide:**
+- A module name directly: `python -m scripts.add_module.add_module PrismQ.MyModule`
+- A GitHub URL: `python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule`
 
 ### Validation
 
@@ -211,7 +250,16 @@ hypothesis>=6.0.0        # Property-based testing
 ## Backward Compatibility
 
 The legacy `__main__.py` with click-based interactive CLI is preserved for compatibility.
-New code should use the `add_module.py` entry point with argparse.
+
+**Interactive Mode Support:**
+- The legacy CLI supports interactive mode where you can simply paste a GitHub URL
+- Run `python -m scripts.add_module` without arguments to enter interactive mode
+- The script will prompt you for the GitHub URL and module description
+
+**New CLI:**
+- The new `add_module.py` entry point uses argparse
+- Does NOT support interactive mode (requires module name as positional argument)
+- Recommended for scripting and automation
 
 ## Future Enhancements
 
