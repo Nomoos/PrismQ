@@ -34,11 +34,17 @@ The module creation script is now implemented in Python for better:
 scripts\add-module.bat
 
 # Or run Python script directly (any platform)
-python scripts/add_module.py
+python -m scripts.add_module
 
 # With command-line options
-python scripts/add_module.py --github-url "Nomoos/PrismQ.MyModule" --description "My module"
+python -m scripts.add_module --github-url "https://github.com/Nomoos/PrismQ.MyModule"
 ```
+
+**Interactive Mode:**
+- Run `python -m scripts.add_module` without arguments
+- Simply paste a GitHub URL when prompted
+- Supported formats: Full HTTPS, SSH, or short format (Owner/Repo)
+- See [add_module/INTERACTIVE_MODE.md](add_module/INTERACTIVE_MODE.md) for details
 
 The first time you run `add-module.bat`, it will automatically:
 1. Create a Python virtual environment in `scripts/.venv/`
