@@ -33,36 +33,41 @@ The module creation script is now implemented in Python for better:
 # Run the interactive script (Windows)
 scripts\add-module.bat
 
-# Or run Python script directly (any platform)
-python -m scripts.add_module
+# Or pass module name/URL directly
+scripts\add-module.bat PrismQ.MyModule
+scripts\add-module.bat https://github.com/Nomoos/PrismQ.MyModule
 
-# With command-line options
-python -m scripts.add_module --github-url "https://github.com/Nomoos/PrismQ.MyModule"
+# Or run Python CLI directly (any platform)
+python -m scripts.add_module.add_module PrismQ.MyModule
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
 ```
 
-**Interactive Mode:**
-- Run `python -m scripts.add_module` without arguments
-- Simply paste a GitHub URL when prompted
-- Supported formats: Full HTTPS, SSH, or short format (Owner/Repo)
-- See [add_module/INTERACTIVE_MODE.md](add_module/INTERACTIVE_MODE.md) for details
+**Windows Batch Script Features:**
+- Checks GitHub CLI authentication status
+- Prompts to run `gh auth login` if not authenticated
+- Accepts module name or GitHub URL as input
+- Supports both command-line argument or interactive prompt
+- Automatically sets up Python virtual environment
+
+**Input Formats:**
+- Module name: `PrismQ.MyModule`
+- GitHub URL: `https://github.com/Nomoos/PrismQ.MyModule`
+- Short format: `Nomoos/PrismQ.MyModule`
+- See [add_module/URL_PARSING_FEATURE.md](add_module/URL_PARSING_FEATURE.md) for details
 
 The first time you run `add-module.bat`, it will automatically:
-1. Create a Python virtual environment in `scripts/.venv/`
-2. Install required dependencies (PyGithub, GitPython, click)
-3. Run the Python script
+1. Check GitHub CLI authentication (prompts to login if needed)
+2. Create a Python virtual environment in `scripts/add_module/.venv/`
+3. Install required dependencies (PyGithub, GitPython, click)
+4. Prompt for module name or URL if not provided as argument
 
 The virtual environment is reused for subsequent runs.
 
-The script will interactively prompt you for:
-
-**GitHub URL Input (Only Option)**
-- GitHub repository URL (e.g., `https://github.com/Nomoos/PrismQ.MyModule.git` or `Nomoos/PrismQ.MyModule`)
-- Module description (optional)
-
-The script automatically:
-- Parses the GitHub URL to extract owner and repository name
-- Derives the module path from the repository name (e.g., `PrismQ.IdeaInspiration.Sources` → `src/IdeaInspiration/src/Sources`)
-- Copies the complete RepositoryTemplate structure (if available)
+The script will:
+- Accept module name or GitHub URL (command-line or interactive prompt)
+- Auto-detect owner from URL (defaults to "Nomoos" for module names)
+- Derive module path from repository name (e.g., `PrismQ.IdeaInspiration.Sources` → `src/IdeaInspiration/src/Sources`)
+- Use sensible defaults (branch: main, visibility: public)
 
 The script then:
 1. Creates the module directory structure (with nested paths if needed)
@@ -81,21 +86,30 @@ The script then:
 **Example 1: Interactive mode (Windows)**
 ```batch
 scripts\add-module.bat
-# GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule.git
-# Description: My new module for PrismQ
+# Prompts: Enter module name or GitHub URL: https://github.com/Nomoos/PrismQ.MyNewModule
 ```
 
-**Example 2: Command-line mode (any platform)**
-```bash
-# Using GitHub URL
-python scripts/add_module.py --github-url "Nomoos/PrismQ.MyModule" --description "My module"
-```
-
-**Example 3: Nested module**
+**Example 2: With command-line argument (Windows)**
 ```batch
-scripts\add-module.bat
-# GitHub URL: Nomoos/PrismQ.IdeaInspiration.Classification
-# Description: Classify idea inspirations
+# Using module name
+scripts\add-module.bat PrismQ.MyModule
+
+# Using GitHub URL
+scripts\add-module.bat https://github.com/Nomoos/PrismQ.MyModule
+```
+
+**Example 3: Using new CLI directly (any platform)**
+```bash
+# Using module name
+python -m scripts.add_module.add_module PrismQ.MyModule
+
+# Using GitHub URL
+python -m scripts.add_module.add_module https://github.com/Nomoos/PrismQ.MyModule
+```
+
+**Example 4: Nested module**
+```batch
+scripts\add-module.bat PrismQ.IdeaInspiration.Classification
 ```
 Result: 
 - Creates `src/IdeaInspiration/src/Classification/` with complete template structure
