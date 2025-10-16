@@ -79,5 +79,5 @@ For comprehensive documentation on module creation and synchronization, see:
 3. Push to module repository using subtree push
 
 ```bash
-git subtree push --prefix=src/ModuleName modulename-remote main
+git subtree push --prefix=mod/ModuleName modulename-remote main
 ```

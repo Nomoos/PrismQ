@@ -14,7 +14,7 @@ ModuleName/
 │   ├── wip/          # Work in progress
 │   └── done/         # Completed issues
 ├── scripts/          # Module utility scripts
-├── src/              # Module source code (can contain nested modules)
+├── mod/              # Module source code (can contain nested modules)
 └── tests/            # Module tests
 ```
 
@@ -31,9 +31,9 @@ ModuleName/
 
 Nested modules follow a dot notation based on their path:
 
-- `src/RepositoryTemplate` → `PrismQ.RepositoryTemplate`
-- `src/IdeaInspiration/src/Sources` → `PrismQ.IdeaInspiration.Sources`
-- `src/IdeaInspiration/src/Sources/src/Content/src/Shorts/src/YouTubeShortsSource` → `PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeShortsSource`
+- `mod/RepositoryTemplate` → `PrismQ.RepositoryTemplate`
+- `mod/IdeaInspiration/mod/Sources` → `PrismQ.IdeaInspiration.Sources`
+- `mod/IdeaInspiration/mod/Sources/mod/Content/mod/Shorts/mod/YouTubeShortsSource` → `PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeShortsSource`
 
 ## Module Principles
 

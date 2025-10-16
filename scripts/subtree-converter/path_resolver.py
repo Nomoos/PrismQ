@@ -53,7 +53,7 @@ class PathResolver:
 
     @staticmethod
     def normalize_path_in_module(rel_path: Path, parts: list[str]) -> Path:
-        """Normalize path within a module by removing leading 'src/' if present.
+        """Normalize path within a module by removing leading 'mod/' if present.
 
         Args:
             rel_path: Relative path within module
@@ -62,8 +62,8 @@ class PathResolver:
         Returns:
             Normalized path
         """
-        if parts and parts[0].lower() == "src":
+        if parts and parts[0].lower() == "mod":
             if len(parts) > 1:
                 return Path(*parts[1:])
-            return Path("src")
+            return Path("mod")
         return rel_path

@@ -55,7 +55,7 @@ python3 generate_tree.py
 ```
 
 This will:
-1. Scan the repository for modules (based on `src/` directories)
+1. Scan the repository for modules (based on `mod/` directories)
 2. Generate `repository-tree-data.json` with the hierarchy
 3. Generate `repository-tree.html` with embedded data
 4. Display module statistics
@@ -68,4 +68,4 @@ The tree uses PrismQ's dot notation:
 - `PrismQ.IdeaInspiration.Sources.Content`
 - `PrismQ.IdeaInspiration.Sources.Content.Shorts`
 
-Each level represents a nested `src/` directory in the repository structure.
+Each level represents a nested `mod/` directory in the repository structure.

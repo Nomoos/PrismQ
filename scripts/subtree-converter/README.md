@@ -92,9 +92,9 @@ converter = SubtreeConverter(scanner, subtree_mgr, git_ops, path_resolver)
 
 # Run conversion
 prismq_root = path_resolver.find_prismq_root()
-src_root = prismq_root / "src"
-converter.convert_nested_to_subtrees(prismq_root, src_root)
-converter.convert_modules_to_subtrees(prismq_root, src_root)
+mod_root = prismq_root / "mod"
+converter.convert_nested_to_subtrees(prismq_root, mod_root)
+converter.convert_modules_to_subtrees(prismq_root, mod_root)
 ```
 
 ## Requirements
@@ -109,7 +109,7 @@ converter.convert_modules_to_subtrees(prismq_root, src_root)
 
 For each nested git repository found within a module:
 
-1. Scan the src directory tree for `.git` folders
+1. Scan the mod directory tree for `.git` folders
 2. Identify repositories that are not module roots
 3. Get the remote URL and default branch
 4. Backup the existing directory
@@ -120,10 +120,10 @@ For each nested git repository found within a module:
 
 For each module root repository:
 
-1. Identify module root directories (first level under src/)
+1. Identify module root directories (first level under mod/)
 2. Get the remote URL and default branch
 3. Backup the existing directory
-4. Add as subtree to PrismQ root (without src/ prefix)
+4. Add as subtree to PrismQ root (without mod/ prefix)
 5. Clean up backup on success, restore on failure
 
 ## Error Handling

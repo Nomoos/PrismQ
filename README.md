@@ -26,8 +26,8 @@ python scripts/sync_modules.py            # Cross-platform
 
 ## 📦 Modules
 
-- **[RepositoryTemplate](src/RepositoryTemplate/README.md)** - Template module structure
-- **[IdeaInspiration](src/IdeaInspiration/README.md)** - Idea generation and inspiration
+- **[RepositoryTemplate](mod/RepositoryTemplate/README.md)** - Template module structure
+- **[IdeaInspiration](mod/IdeaInspiration/README.md)** - Idea generation and inspiration
 
 See [docs/repository-tree.html](docs/repository-tree.html) for the complete module hierarchy.
 
