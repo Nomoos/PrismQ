@@ -12,7 +12,7 @@ set "PYTHON_SCRIPT=%SCRIPT_DIR%repo-builder\repo_builder.py"
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%\Scripts\activate.bat" (
     echo Error: Virtual environment not found
-    echo Please run setup_env.bat first to create the virtual environment
+    echo Please run repo-builder\setup_env.bat first to create the virtual environment
     exit /b 1
 )
 
