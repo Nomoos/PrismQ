@@ -7,6 +7,7 @@ A Python CLI tool that validates GitHub CLI authentication and derives the full 
 1. **GitHub CLI Validation**: Automatically checks if GitHub CLI (`gh`) is installed and authenticated
 2. **Module Chain Derivation**: Derives the full module hierarchy from deepest module to root
 3. **Flexible Input**: Accepts both dotted module names and GitHub URLs
+4. **Interactive Mode**: Prompts for input when no command-line argument is provided, repeating until valid input is given or the script is terminated
 
 ## Prerequisites
 
@@ -44,6 +45,8 @@ A Python CLI tool that validates GitHub CLI authentication and derives the full 
 
 ```batch
 run.bat <module_name_or_url>
+# Or run without arguments for interactive mode
+run.bat
 ```
 
 ### Direct Python execution
@@ -53,9 +56,26 @@ run.bat <module_name_or_url>
 .venv\Scripts\activate.bat  # Windows
 source .venv/bin/activate   # Linux/Mac
 
-# Run the script
+# Run the script with command-line argument
 python repo_builder.py <module_name_or_url>
+
+# Or run without arguments for interactive mode
+python repo_builder.py
 ```
+
+### Interactive Mode
+
+If you run the script without any arguments, it will enter interactive mode and prompt you for input:
+
+```bash
+python repo_builder.py
+```
+
+The script will:
+- Display usage instructions and examples
+- Prompt you to enter a module name or URL
+- Repeat the prompt if you provide empty input
+- Continue until you provide valid input or press Ctrl+C to exit
 
 ## Examples
 
@@ -70,6 +90,10 @@ run.bat PrismQ.IdeaInspiration
 
 # Deeply nested module
 run.bat PrismQ.IdeaInspiration.SubModule
+
+# Interactive mode
+python repo_builder.py
+# Then enter: PrismQ.IdeaInspiration.SubModule
 ```
 
 ### Using GitHub URLs
@@ -80,6 +104,10 @@ run.bat https://github.com/Nomoos/PrismQ.IdeaInspiration
 
 # SSH URL
 run.bat git@github.com:Nomoos/PrismQ.IdeaInspiration.git
+
+# Interactive mode with URL
+python repo_builder.py
+# Then enter: https://github.com/Nomoos/PrismQ.IdeaInspiration
 ```
 
 ## Output
