@@ -23,6 +23,7 @@ def repository_exists(repo_name: str) -> bool:
             ["gh", "repo", "view", full_name],
             capture_output=True,
             text=True,
+            encoding='utf-8',
             check=False
         )
         return result.returncode == 0
@@ -86,6 +87,7 @@ def create_git_chain(chain: List[str], workspace: Path) -> None:
                         ["git", "-C", str(repo_path), "pull"],
                         capture_output=True,
                         text=True,
+                        encoding='utf-8',
                         check=True
                     )
                     print(f"Repository {repo_name} updated successfully.")
@@ -107,6 +109,7 @@ def create_git_chain(chain: List[str], workspace: Path) -> None:
                         ],
                         capture_output=True,
                         text=True,
+                        encoding='utf-8',
                         check=True
                     )
                     print(f"Repository {repo_name} cloned successfully.")
@@ -127,6 +130,7 @@ def create_git_chain(chain: List[str], workspace: Path) -> None:
                     ],
                     capture_output=True,
                     text=True,
+                    encoding='utf-8',
                     check=True
                 )
                 print(f"Repository {repo_name} created successfully from template.")

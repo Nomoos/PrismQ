@@ -58,7 +58,8 @@ class SubprocessCommandRunner:
             cwd=cwd,
             check=check,
             capture_output=capture_output,
-            text=True
+            text=True,
+            encoding='utf-8'
         )
         logger.debug(f"Command completed with exit code: {result.returncode}")
         return result
