@@ -194,7 +194,7 @@ The repository builder has been modularized for better maintainability. The code
 - **`__main__.py`**: Entry point when running as a module with `python -m`
 - **`repo_builder.py`**: Backward compatibility wrapper that re-exports all functions
 
-All modules support both relative imports (when used as a package) and direct imports (when used as standalone scripts) for maximum flexibility.
+All modules use a try/except pattern internally to support both relative imports (when used as a package) and absolute imports (when used as standalone scripts from the directory).
 
 ### Running Tests
 
@@ -230,10 +230,11 @@ python repo_builder.py invalid..name
 
 ### Using as a Library
 
-The repository builder can be imported and used programmatically:
+The repository builder can be imported and used programmatically when running from the `repo-builder` directory or when the directory is in your Python path:
 
 ```python
 # Import specific functions
+# Note: Run this from the repo-builder directory or ensure it's in PYTHONPATH
 from repo_builder import (
     parse_github_url, 
     derive_module_chain,

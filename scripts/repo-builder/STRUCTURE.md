@@ -62,20 +62,35 @@ Backward compatibility wrapper that re-exports all functions, allowing the scrip
 
 ## Import Flexibility
 
-All modules support both relative and absolute imports:
+All modules support both relative and absolute imports internally through try/except blocks:
 
 ```python
-# Works as a package
-from .exceptions import RepoBuilderError
-
-# Works as standalone scripts
-from exceptions import RepoBuilderError
+# In the module code itself, this pattern is used:
+try:
+    from .exceptions import RepoBuilderError  # Relative import (package context)
+except ImportError:
+    from exceptions import RepoBuilderError   # Absolute import (standalone context)
 ```
 
-This allows the code to be used in multiple ways:
-1. As a standalone script: `python repo_builder.py`
-2. As a module: `python -m repo_builder`
-3. As a library: `from repo_builder import parse_github_url`
+This internal implementation allows the code to be used in multiple ways:
+
+1. **As a standalone script** (from the directory):
+   ```bash
+   python repo_builder.py PrismQ.IdeaInspiration
+   ```
+
+2. **As a module** (if properly installed or in PYTHONPATH):
+   ```bash
+   python -m repo_builder PrismQ.IdeaInspiration
+   ```
+
+3. **As a library** (when imported in other Python code):
+   ```python
+   # Requires the repo-builder directory to be in PYTHONPATH
+   # or installed as a package
+   from repo_builder import parse_github_url
+   module_name = parse_github_url("https://github.com/Nomoos/PrismQ.IdeaInspiration")
+   ```
 
 ## Benefits of Modularization
 
