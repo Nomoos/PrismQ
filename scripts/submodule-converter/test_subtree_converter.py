@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for subtree converter modules."""
+"""Tests for submodule converter modules."""
 
 import shutil
 from pathlib import Path
@@ -17,7 +17,7 @@ try:
     from .git_operations import GitOperationsImpl
     from .path_resolver import PathResolver
     from .repository_scanner import RepositoryScanner
-    from .subtree_manager import SubtreeManager
+    from .submodule_manager import SubmoduleManager
 except ImportError:
     # Fallback for direct execution
     from backup_manager import BackupManager
@@ -29,7 +29,7 @@ except ImportError:
     from git_operations import GitOperationsImpl
     from path_resolver import PathResolver
     from repository_scanner import RepositoryScanner
-    from subtree_manager import SubtreeManager
+    from submodule_manager import SubmoduleManager
 
 
 class TestCommandRunner:
@@ -255,74 +255,69 @@ class TestRepositoryScanner:
         assert any(r.module_name == "Module2" for r in module_repos)
 
 
-class TestSubtreeManager:
-    """Test suite for subtree manager."""
+class TestSubmoduleManager:
+    """Test suite for submodule manager."""
 
-    def test_add_subtree_success(self, tmp_path):
-        """Test successful subtree addition without backup."""
+    def test_add_submodule_success(self, tmp_path):
+        """Test successful submodule addition without backup."""
         git_ops = MagicMock()
         backup_mgr = MagicMock()
         backup_mgr.create_backup.return_value = None
         path_resolver = PathResolver()
 
-        subtree_mgr = SubtreeManager(git_ops, backup_mgr, path_resolver)
+        submodule_mgr = SubmoduleManager(git_ops, backup_mgr, path_resolver)
 
-        subtree_mgr.add_subtree(
+        submodule_mgr.add_submodule(
             tmp_path,
             "prefix",
             "https://github.com/test/repo.git",
             "main",
-            "remote_name",
         )
 
-        git_ops.ensure_remote.assert_called_once()
-        git_ops.subtree_add.assert_called_once()
+        git_ops.submodule_add.assert_called_once()
         backup_mgr.create_backup.assert_called_once()
         # cleanup_backup is not called when no backup was created
         backup_mgr.cleanup_backup.assert_not_called()
 
-    def test_add_subtree_success_with_backup(self, tmp_path):
-        """Test successful subtree addition with backup cleanup."""
+    def test_add_submodule_success_with_backup(self, tmp_path):
+        """Test successful submodule addition with backup cleanup."""
         git_ops = MagicMock()
         backup_path = tmp_path / "backup"
         backup_mgr = MagicMock()
         backup_mgr.create_backup.return_value = backup_path
         path_resolver = PathResolver()
 
-        subtree_mgr = SubtreeManager(git_ops, backup_mgr, path_resolver)
+        submodule_mgr = SubmoduleManager(git_ops, backup_mgr, path_resolver)
 
-        subtree_mgr.add_subtree(
+        submodule_mgr.add_submodule(
             tmp_path,
             "prefix",
             "https://github.com/test/repo.git",
             "main",
-            "remote_name",
         )
 
-        git_ops.ensure_remote.assert_called_once()
-        git_ops.subtree_add.assert_called_once()
+        git_ops.submodule_add.assert_called_once()
         backup_mgr.create_backup.assert_called_once()
         backup_mgr.cleanup_backup.assert_called_once_with(backup_path)
 
-    def test_add_subtree_with_backup_restore_on_failure(self, tmp_path):
-        """Test subtree addition restores backup on failure."""
+    def test_add_submodule_with_backup_restore_on_failure(self, tmp_path):
+        """Test submodule addition restores backup on failure."""
         git_ops = MagicMock()
-        git_ops.subtree_add.side_effect = CommandExecutionError("Failed")
+        git_ops.submodule_add.side_effect = CommandExecutionError("Failed")
 
         backup_path = tmp_path / "backup"
         backup_mgr = MagicMock()
         backup_mgr.create_backup.return_value = backup_path
 
         path_resolver = PathResolver()
-        subtree_mgr = SubtreeManager(git_ops, backup_mgr, path_resolver)
+        submodule_mgr = SubmoduleManager(git_ops, backup_mgr, path_resolver)
 
         with pytest.raises(CommandExecutionError):
-            subtree_mgr.add_subtree(
+            submodule_mgr.add_submodule(
                 tmp_path,
                 "prefix",
                 "https://github.com/test/repo.git",
                 "main",
-                "remote_name",
             )
 
         backup_mgr.restore_backup.assert_called_once()
