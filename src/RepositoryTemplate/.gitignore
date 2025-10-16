@@ -20,6 +20,9 @@ wheels/
 .installed.cfg
 *.egg
 
+# Documentation builds
+docs/sphinx/build/
+
 # Virtual environments
 venv/
 ENV/

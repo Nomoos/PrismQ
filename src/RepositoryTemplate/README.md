@@ -29,20 +29,14 @@ PrismQ.RepositoryTemplate/
 │   ├── ISSUE_TEMPLATE/        # Issue templates
 │   ├── copilot-instructions.md # Copilot development guidelines
 │   └── PULL_REQUEST_TEMPLATE.md
-├── docs/                       # Documentation
-│   ├── CONTRIBUTING.md        # Contribution guidelines
-│   └── README.md              # Documentation overview
+├── docs/                       # Sphinx API documentation (project docs should be added here)
 ├── issues/                     # Issue tracking
 │   ├── new/                   # New issues
 │   ├── wip/                   # Work in progress
-│   ├── done/                  # Completed issues
-│   ├── KNOWN_ISSUES.md        # Known issues list
-│   ├── ROADMAP.md             # Project roadmap
-│   └── README.md              # Issue tracking guide
+│   └── done/                  # Completed issues
 ├── scripts/                    # Utility scripts
 │   ├── setup.bat              # Windows setup script
-│   ├── quickstart.bat         # Windows quick start
-│   └── README.md              # Scripts documentation
+│   └── quickstart.bat         # Windows quick start
 ├── src/                        # Source code
 │   ├── __init__.py            # Package initialization
 │   ├── main.py                # Main entry point
@@ -112,7 +106,25 @@ PrismQ.RepositoryTemplate/
 - **scripts/** - Add utility scripts for common tasks
 - **issues/** - Track issues and roadmap items
 
-### Running Tests
+### Development Workflow
+
+The template includes utility scripts for common development tasks:
+
+```batch
+# Format code (PEP 8 compliance)
+scripts\format.bat
+
+# Run linting and type checking
+scripts\lint.bat
+
+# Run tests with coverage
+scripts\test.bat
+
+# Generate API documentation
+scripts\docs.bat
+```
+
+Alternatively, activate the virtual environment and use commands directly:
 
 ```batch
 # Activate virtual environment first (Windows)
@@ -123,21 +135,18 @@ pytest
 
 # Run tests with coverage
 pytest --cov=src --cov-report=html
+
+# Build documentation
+cd docs\sphinx
+sphinx-build -b html source build\html
 ```
-
-## 📚 Documentation
-
-- **[Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
-- **[PEP Standards](docs/PEP_STANDARDS.md)** - Python Enhancement Proposals we follow
-- **[SOLID Principles](docs/SOLID_PRINCIPLES.md)** - Design principles for maintainable code
-- **[AI Coding Guidelines](docs/AI_CODING_GUIDELINES.md)** - Best practices for AI-assisted development
-- **[Documentation Overview](docs/README.md)** - Documentation structure and guidelines
-- **[Known Issues](issues/KNOWN_ISSUES.md)** - Current known issues
-- **[Roadmap](issues/ROADMAP.md)** - Future development plans
 
 ## 🤝 Contributing
 
-This is a proprietary template repository. For contribution guidelines, see [CONTRIBUTING.md](docs/CONTRIBUTING.md).
+This is a proprietary template repository. When using this template for your project:
+1. Add a CONTRIBUTING.md file in the docs/ directory with your project's contribution guidelines
+2. Define coding standards, testing requirements, and review processes
+3. Update this section with a link to your CONTRIBUTING.md file
 
 ## 📋 Features
 
@@ -147,13 +156,16 @@ This is a proprietary template repository. For contribution guidelines, see [CON
 - ✅ PEP-compliant configuration (PEP 517/518/621/660)
 - ✅ Type checking with MyPy (PEP 484/526/544/561)
 - ✅ Code quality with Ruff (PEP 8/257)
+- ✅ UTF-8 encoding standard (`.gitattributes` and `.editorconfig`)
 - ✅ SOLID principles documentation and guidelines
 - ✅ AI-assisted coding best practices (GitHub Copilot guidelines)
 - ✅ Configuration management with environment variables
-- ✅ Test framework setup (pytest)
+- ✅ **Comprehensive logging system** with module identification and environment detection
+- ✅ Test framework setup (pytest with coverage)
+- ✅ Documentation system with Sphinx (auto-generated API docs)
 - ✅ Comprehensive documentation structure
 - ✅ Issue tracking system
-- ✅ Setup and quickstart scripts
+- ✅ Development scripts (setup, lint, format, test, docs)
 - ✅ GitHub templates (issues, PRs)
 - ✅ Copilot development guidelines
 - ✅ Optimized for Windows + RTX 5090
@@ -165,6 +177,33 @@ This is a proprietary template repository. For contribution guidelines, see [CON
 - ⬜ Comprehensive tests
 - ⬜ Detailed documentation
 - ⬜ Usage examples
+
+## 📊 Logging Features
+
+The template includes a comprehensive logging system designed for better reporting and easier recognition of where the application is running and which module is being used.
+
+### Key Logging Features
+
+- **Module Identification**: Automatically logs module name, version, and location at startup
+- **Environment Detection**: Logs OS, Python version, architecture, and hardware information
+- **Hardware Awareness**: Optional detailed CPU, RAM, and GPU information (with psutil)
+- **Dual Output**: Supports both console and file logging simultaneously
+- **Structured Format**: Includes timestamp, module name, log level, file location, and line number
+- **Flexible Configuration**: Control log level and file output via environment variables
+- **Production Ready**: Easy to switch between development and production logging modes
+
+### Example Output
+
+```
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:109] - Module Information:
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:110] -   Name: PrismQ.MyModule
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:111] -   Version: 1.0.0
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:116] -   Operating System: Windows 11
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:119] -   Processor: AMD Ryzen 9 7950X
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:148] -   CPU: 16 physical cores, 32 logical cores
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:155] -   RAM: 64.00 GB total
+2025-10-16 16:08:11 - PrismQ.MyModule - INFO - [logging_config.py:171] -   GPU: NVIDIA GeForce RTX 5090, 32768 MiB
+```
 
 ## 🔧 Configuration
 
@@ -202,6 +241,27 @@ The `PYTHON_EXECUTABLE` setting allows you to specify which Python interpreter t
 
 The setup script (`scripts/setup.bat`) will automatically use this configuration when creating the virtual environment.
 
+### UTF-8 Encoding Standard
+
+This repository enforces UTF-8 encoding as the standard across all text files for maximum cross-platform compatibility. This is configured through:
+
+- **`.gitattributes`**: Ensures Git handles text files with UTF-8 encoding and proper line endings
+  - Linux/Mac files (`.py`, `.sh`, etc.): UTF-8 with LF line endings
+  - Windows files (`.bat`, `.cmd`, `.ps1`): UTF-8 with CRLF line endings
+  - Binary files are explicitly marked to prevent encoding issues
+
+- **`.editorconfig`**: Ensures all editors and IDEs use UTF-8 encoding
+  - Supported by Visual Studio Code, PyCharm, IntelliJ IDEA, Sublime Text, and many others
+  - Automatically applies settings when you open the project
+
+**Benefits:**
+- ✅ Consistent encoding across all platforms (Windows, Linux, Mac)
+- ✅ Proper handling of Unicode characters and emoji
+- ✅ Prevents encoding-related bugs in version control
+- ✅ Industry standard for Git, GitHub, and modern web applications
+
+No additional configuration is needed - the files are automatically applied by Git and modern editors.
+
 ## 🚨 Hardware Requirements
 
 This template is designed for high-performance AI workloads:
@@ -224,10 +284,7 @@ This repository is proprietary software. See [LICENSE](LICENSE) file for details
 
 ## 💬 Support
 
-For questions, issues, or feature requests:
-1. Check [Known Issues](issues/KNOWN_ISSUES.md)
-2. Review [Documentation](docs/)
-3. Open a new issue using the appropriate template
+For questions, issues, or feature requests, open a new issue using the appropriate template.
 
 ## 🎨 Template Usage
 

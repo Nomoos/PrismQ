@@ -1,17 +1,16 @@
 """Main entry point for the PrismQ module."""
 
-import logging
+from pathlib import Path
 
-from dotenv import load_dotenv
+from src.logging_config import get_module_logger
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+# Initialize module logger with startup information
+logger = get_module_logger(
+    module_name="PrismQ.RepositoryTemplate",
+    module_version="0.1.0",
+    module_path=str(Path(__file__).parent.parent),
+    log_startup=True,
 )
-logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -19,13 +18,18 @@ def main() -> None:
 
     This is a template implementation. Replace with your module logic.
     """
-    logger.info("PrismQ Module Template - Starting")
-    logger.info("Target: Windows, NVIDIA RTX 5090, AMD Ryzen, 64GB RAM")
+    logger.info("Starting module execution")
 
     # TODO: Implement your module logic here
+    logger.info("Performing module operations...")
+    logger.debug("This is a debug message (only shown if LOG_LEVEL=DEBUG)")
 
-    logger.info("PrismQ Module Template - Complete")
+    logger.info("Module execution completed successfully")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.exception("Module execution failed with error: %s", e)
+        raise

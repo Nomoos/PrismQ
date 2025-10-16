@@ -25,6 +25,13 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",  # ReadTheDocs theme
+]
+logging = [
+    "psutil>=5.9.0",  # For detailed hardware information in logs
+]
 
 [tool.setuptools]
 packages = ["src"]
