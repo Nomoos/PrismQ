@@ -6,7 +6,7 @@ setlocal enabledelayedexpansion
 
 echo.
 echo ========================================================
-echo   PrismQ Submodule Converter - Environment Setup
+echo      PrismQ Submodule Converter - Environment Setup
 echo ========================================================
 echo.
 
@@ -69,7 +69,7 @@ if exist "%SCRIPT_DIR%requirements.txt" (
     )
 ) else (
     echo Note: requirements.txt not found
-    echo This script uses only Python standard library
+    echo No external dependencies to install
 )
 
 echo.
