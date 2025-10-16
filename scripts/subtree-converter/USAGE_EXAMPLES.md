@@ -20,7 +20,7 @@ python scripts/subtree-converter/cli.py
 
 ```
 PrismQ root : /path/to/PrismQ
-SRC root    : /path/to/PrismQ/src
+MOD root    : /path/to/PrismQ/mod
 
 === Step 1: Nested repos -> subtree in MODULE ROOT ===
 [INFO] Backing up existing path: /path/to/module/nested -> /path/to/module/nested.pre_subtree.20231016_123456
@@ -65,14 +65,14 @@ subtree_mgr = SubtreeManager(git_ops, backup_mgr, path_resolver)
 
 # Find PrismQ root
 prismq_root = path_resolver.find_prismq_root()
-src_root = prismq_root / "src"
+mod_root = prismq_root / "mod"
 
 # Create converter
 converter = SubtreeConverter(scanner, subtree_mgr, git_ops, path_resolver)
 
 # Run conversion
-converter.convert_nested_to_subtrees(src_root)
-converter.convert_modules_to_subtrees(prismq_root, src_root)
+converter.convert_nested_to_subtrees(mod_root)
+converter.convert_modules_to_subtrees(prismq_root, mod_root)
 ```
 
 ### Custom Command Runner
@@ -150,17 +150,17 @@ resolver = PathResolver()
 scanner = RepositoryScanner()
 
 prismq_root = resolver.find_prismq_root()
-src_root = prismq_root / "src"
+mod_root = prismq_root / "mod"
 
 # Get nested repos
-nested_repos = scanner.find_nested_repositories(src_root)
+nested_repos = scanner.find_nested_repositories(mod_root)
 for repo in nested_repos:
     print(f"Nested: {repo.path}")
     print(f"  Module: {repo.module_name}")
     print(f"  Relative path: {repo.relative_in_module}")
 
 # Get module roots
-module_repos = scanner.find_module_roots(src_root)
+module_repos = scanner.find_module_roots(mod_root)
 for repo in module_repos:
     print(f"Module: {repo.module_name} at {repo.path}")
 ```
@@ -233,7 +233,7 @@ from exceptions import (
 )
 
 try:
-    converter.convert_nested_to_subtrees(src_root)
+    converter.convert_nested_to_subtrees(mod_root)
 except CommandExecutionError as e:
     print(f"Git command failed: {e}")
 except RepositoryNotFoundError as e:
@@ -297,10 +297,10 @@ cd /path/to/PrismQ
 python -m scripts.subtree-converter
 ```
 
-**Issue**: "Source directory not found"
+**Issue**: "Module directory not found"
 ```bash
-# Solution: Ensure src/ directory exists
-mkdir -p src
+# Solution: Ensure mod/ directory exists
+mkdir -p mod
 ```
 
 **Issue**: Command execution fails
