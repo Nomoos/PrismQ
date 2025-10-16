@@ -7,6 +7,7 @@ chain from deepest to root, given a PrismQ dotted name or GitHub URL.
 
 Usage:
     python repo_builder.py <module_name_or_url>
+    python repo_builder.py  # Interactive mode - prompts for input
     
 Examples:
     python repo_builder.py PrismQ.IdeaInspiration.SubModule
@@ -174,16 +175,46 @@ def display_module_chain(chain: List[str]) -> None:
     print("=" * 50)
 
 
+def get_module_input_interactive() -> str:
+    """
+    Prompt user for module name or URL in interactive mode.
+    
+    Returns:
+        Module name or URL provided by user
+        
+    Raises:
+        KeyboardInterrupt: If user terminates the script with Ctrl+C
+    """
+    print("\nUsage: python repo_builder.py <module_name_or_url>")
+    print("\nExamples:")
+    print("  python repo_builder.py PrismQ.IdeaInspiration.SubModule")
+    print("  python repo_builder.py https://github.com/Nomoos/PrismQ.IdeaInspiration")
+    print("\n" + "=" * 50)
+    
+    while True:
+        try:
+            module_input = input("\n📝 Enter module name or URL (Ctrl+C to exit): ").strip()
+            if module_input:
+                return module_input
+            else:
+                print("⚠️  Input cannot be empty. Please try again.")
+        except EOFError:
+            # Handle end of input (e.g., when input is piped)
+            print("\n\n❌ No input provided")
+            sys.exit(1)
+
+
 def main():
     """Main entry point for the CLI tool."""
-    if len(sys.argv) != 2:
-        print("Usage: python repo_builder.py <module_name_or_url>")
-        print("\nExamples:")
-        print("  python repo_builder.py PrismQ.IdeaInspiration.SubModule")
-        print("  python repo_builder.py https://github.com/Nomoos/PrismQ.IdeaInspiration")
-        sys.exit(1)
-    
-    module_input = sys.argv[1]
+    # Get module input from command line or interactive mode
+    if len(sys.argv) >= 2:
+        module_input = sys.argv[1]
+    else:
+        try:
+            module_input = get_module_input_interactive()
+        except KeyboardInterrupt:
+            print("\n\n👋 Terminated by user")
+            sys.exit(0)
     
     try:
         print(f"\n🚀 PrismQ Nested Repository Builder & Checker")
