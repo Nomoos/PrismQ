@@ -65,15 +65,15 @@ class TestPathResolver:
         assert PathResolver.sanitize_remote_name("normal-name") == "normal-name"
         assert PathResolver.sanitize_remote_name("name@with.dots") == "name_with_dots"
 
-    def test_normalize_path_removes_leading_src(self):
-        """Test that leading 'src/' is removed from paths."""
+    def test_normalize_path_removes_leading_mod(self):
+        """Test that leading 'mod/' is removed from paths."""
         result = PathResolver.normalize_path_in_module(
-            Path("src/Sources"), ["src", "Sources"]
+            Path("mod/Sources"), ["mod", "Sources"]
         )
         assert result == Path("Sources")
 
     def test_normalize_path_keeps_other_paths(self):
-        """Test that non-src paths are kept as-is."""
+        """Test that non-mod paths are kept as-is."""
         result = PathResolver.normalize_path_in_module(
             Path("Content/Data"), ["Content", "Data"]
         )
@@ -217,9 +217,9 @@ class TestRepositoryScanner:
 
     def test_find_nested_repositories(self, tmp_path):
         """Test finding nested repositories."""
-        # Create structure: src/Module/.git and src/Module/Nested/.git
-        src = tmp_path / "src"
-        module = src / "Module"
+        # Create structure: mod/Module/.git and mod/Module/Nested/.git
+        mod = tmp_path / "mod"
+        module = mod / "Module"
         nested = module / "Nested"
 
         module.mkdir(parents=True)
@@ -228,7 +228,7 @@ class TestRepositoryScanner:
         (nested / ".git").mkdir()
 
         scanner = RepositoryScanner()
-        nested_repos = scanner.find_nested_repositories(src)
+        nested_repos = scanner.find_nested_repositories(mod)
 
         # Should find only the nested one, not the module root
         assert len(nested_repos) == 1
@@ -237,10 +237,10 @@ class TestRepositoryScanner:
 
     def test_find_module_roots(self, tmp_path):
         """Test finding module root repositories."""
-        # Create structure: src/Module1/.git and src/Module2/.git
-        src = tmp_path / "src"
-        module1 = src / "Module1"
-        module2 = src / "Module2"
+        # Create structure: mod/Module1/.git and mod/Module2/.git
+        mod = tmp_path / "mod"
+        module1 = mod / "Module1"
+        module2 = mod / "Module2"
 
         module1.mkdir(parents=True)
         module2.mkdir(parents=True)
@@ -248,7 +248,7 @@ class TestRepositoryScanner:
         (module2 / ".git").mkdir()
 
         scanner = RepositoryScanner()
-        module_repos = scanner.find_module_roots(src)
+        module_repos = scanner.find_module_roots(mod)
 
         assert len(module_repos) == 2
         assert any(r.module_name == "Module1" for r in module_repos)

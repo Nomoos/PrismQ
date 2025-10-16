@@ -6,41 +6,13 @@
     "children": [
       {
         "name": "PrismQ.IdeaInspiration",
-        "path": "PrismQ/src/IdeaInspiration",
+        "path": "PrismQ/mod/IdeaInspiration",
         "is_dir": true,
-        "children": [
-          {
-            "name": "PrismQ.IdeaInspiration.Sources",
-            "path": "IdeaInspiration/src/Sources",
-            "is_dir": true,
-            "children": [
-              {
-                "name": "PrismQ.IdeaInspiration.Sources.Content",
-                "path": "Sources/src/Content",
-                "is_dir": true,
-                "children": [
-                  {
-                    "name": "PrismQ.IdeaInspiration.Sources.Content.Shorts",
-                    "path": "Content/src/Shorts",
-                    "is_dir": true,
-                    "children": [
-                      {
-                        "name": "PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTubeShortsSource",
-                        "path": "Shorts/src/YouTubeShortsSource",
-                        "is_dir": true,
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        "children": []
       },
       {
         "name": "PrismQ.RepositoryTemplate",
-        "path": "PrismQ/src/RepositoryTemplate",
+        "path": "PrismQ/mod/RepositoryTemplate",
         "is_dir": true,
         "children": []
       }

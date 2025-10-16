@@ -45,15 +45,15 @@ class SubtreeConverter:
         self._git_ops = git_ops
         self._path_resolver = path_resolver
 
-    def convert_nested_to_subtrees(self, src_root: Path) -> None:
+    def convert_nested_to_subtrees(self, mod_root: Path) -> None:
         """Convert nested repositories to subtrees within module roots.
 
         Args:
-            src_root: Root of src directory
+            mod_root: Root of mod directory
         """
         print("\n=== Step 1: Nested repos -> subtree in MODULE ROOT ===")
 
-        nested_repos = self._scanner.find_nested_repositories(src_root)
+        nested_repos = self._scanner.find_nested_repositories(mod_root)
 
         for repo in nested_repos:
             url = self._git_ops.get_remote_url(repo.path)
@@ -63,7 +63,7 @@ class SubtreeConverter:
 
             branch = self._git_ops.get_default_branch(repo.path)
 
-            # Normalize path - remove leading "src/" if present
+            # Normalize path - remove leading "mod/" if present
             parts = Path(repo.relative_in_module).parts
             rel_in_module = self._path_resolver.normalize_path_in_module(
                 Path(repo.relative_in_module), list(parts)
@@ -85,16 +85,16 @@ class SubtreeConverter:
                 print(f"[FAIL] Could not add subtree {rel_in_module} to {repo.module_root}")
                 continue
 
-    def convert_modules_to_subtrees(self, prismq_root: Path, src_root: Path) -> None:
+    def convert_modules_to_subtrees(self, prismq_root: Path, mod_root: Path) -> None:
         """Convert module roots to subtrees in PrismQ root.
 
         Args:
             prismq_root: Root of PrismQ repository
-            src_root: Root of src directory
+            mod_root: Root of mod directory
         """
         print("\n=== Step 2: Module ROOTS -> subtree in PrismQ under <Module> ===")
 
-        module_repos = self._scanner.find_module_roots(src_root)
+        module_repos = self._scanner.find_module_roots(mod_root)
 
         for repo in module_repos:
             url = self._git_ops.get_remote_url(repo.path)
@@ -104,7 +104,7 @@ class SubtreeConverter:
 
             branch = self._git_ops.get_default_branch(repo.path)
 
-            # Prefix is just module name without "src/"
+            # Prefix is just module name without "mod/"
             rel_in_prismq = repo.module_name
 
             remote_name = self._path_resolver.sanitize_remote_name(
@@ -140,17 +140,17 @@ def main() -> None:
         if not (prismq_root / ".git").is_dir():
             raise RepositoryNotFoundError("PrismQ root is not a git repository.")
 
-        src_root = prismq_root / "src"
-        if not src_root.is_dir():
-            raise RepositoryNotFoundError(f"Source directory not found: {src_root}")
+        mod_root = prismq_root / "mod"
+        if not mod_root.is_dir():
+            raise RepositoryNotFoundError(f"Module directory not found: {mod_root}")
 
         print(f"PrismQ root : {prismq_root}")
-        print(f"SRC root    : {src_root}\n")
+        print(f"MOD root    : {mod_root}\n")
 
         # Create converter and run conversion
         converter = SubtreeConverter(scanner, subtree_mgr, git_ops, path_resolver)
-        converter.convert_nested_to_subtrees(src_root)
-        converter.convert_modules_to_subtrees(prismq_root, src_root)
+        converter.convert_nested_to_subtrees(mod_root)
+        converter.convert_modules_to_subtrees(prismq_root, mod_root)
 
         print("\nDone. Commit changes (squash commits from subtree).")
         print("To update later:")

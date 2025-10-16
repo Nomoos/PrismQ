@@ -67,6 +67,7 @@ Always apply SOLID design principles (see `docs/SOLID_PRINCIPLES.md`):
 7. Move issue to `issues/done/`
 
 ### Code Organization
+- **mod/** - Submodules (nested PrismQ modules)
 - **src/** - Main source code
 - **tests/** - Unit and integration tests
 - **docs/** - Documentation

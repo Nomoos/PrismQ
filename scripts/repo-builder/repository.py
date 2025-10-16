@@ -45,8 +45,8 @@ def get_repository_path(repo_name: str, workspace: Path) -> Path:
 
     Rules:
     - 'PrismQ' -> WORKSPACE
-    - 'PrismQ.Segment' -> WORKSPACE/src/Segment
-    - 'PrismQ.A.B' -> WORKSPACE/src/A/src/B
+    - 'PrismQ.Segment' -> WORKSPACE/mod/Segment
+    - 'PrismQ.A.B' -> WORKSPACE/mod/A/mod/B
     - etc.
     """
     if repo_name == "PrismQ":
@@ -58,9 +58,9 @@ def get_repository_path(repo_name: str, workspace: Path) -> Path:
 
     # start with root = WORKSPACE
     path = workspace
-    # for každou část za "PrismQ" přidej src/<Segment>
+    # for každou část za "PrismQ" přidej mod/<Segment>
     for segment in parts[1:]:
-        path = path / "src" / segment
+        path = path / "mod" / segment
 
     return path
 

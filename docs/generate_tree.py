@@ -14,11 +14,11 @@ from datetime import datetime
 
 def find_modules(directory, parent_module='PrismQ'):
     """
-    Find all modules in the repository based on src/ directory structure.
+    Find all modules in the repository based on mod/ directory structure.
     
     Modules follow the pattern:
-    - src/ModuleName -> PrismQ.ModuleName
-    - src/ModuleName/src/SubModule -> PrismQ.ModuleName.SubModule
+    - mod/ModuleName -> PrismQ.ModuleName
+    - mod/ModuleName/mod/SubModule -> PrismQ.ModuleName.SubModule
     
     Args:
         directory: Directory to scan for modules
@@ -30,28 +30,28 @@ def find_modules(directory, parent_module='PrismQ'):
     modules = []
     
     try:
-        src_path = Path(directory)
-        if not src_path.exists():
+        mod_path = Path(directory)
+        if not mod_path.exists():
             return modules
         
-        # Get all immediate subdirectories in src/
-        subdirs = sorted([d for d in src_path.iterdir() if d.is_dir() and not d.name.startswith('.')])
+        # Get all immediate subdirectories in mod/
+        subdirs = sorted([d for d in mod_path.iterdir() if d.is_dir() and not d.name.startswith('.')])
         
         for subdir in subdirs:
             module_name = f"{parent_module}.{subdir.name}"
             
             module_data = {
                 'name': module_name,
-                'path': str(subdir.relative_to(src_path.parent.parent)),
+                'path': str(subdir.relative_to(mod_path.parent.parent)),
                 'is_dir': True,
                 'children': []
             }
             
-            # Check if this module has sub-modules (src/ subdirectory)
-            nested_src = subdir / 'src'
-            if nested_src.exists() and nested_src.is_dir():
+            # Check if this module has sub-modules (mod/ subdirectory)
+            nested_mod = subdir / 'mod'
+            if nested_mod.exists() and nested_mod.is_dir():
                 # Recursively find sub-modules
-                module_data['children'] = find_modules(nested_src, module_name)
+                module_data['children'] = find_modules(nested_mod, module_name)
             
             modules.append(module_data)
     
@@ -75,7 +75,7 @@ def generate_tree_data(repo_root):
         'name': 'PrismQ',
         'path': '',
         'is_dir': True,
-        'children': find_modules(Path(repo_root) / 'src', 'PrismQ')
+        'children': find_modules(Path(repo_root) / 'mod', 'PrismQ')
     }
     
     return [root_module]
