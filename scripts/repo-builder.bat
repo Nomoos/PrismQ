@@ -6,8 +6,8 @@ setlocal
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
-set "VENV_DIR=%SCRIPT_DIR%.venv"
-set "PYTHON_SCRIPT=%SCRIPT_DIR%repo_builder.py"
+set "VENV_DIR=%SCRIPT_DIR%repo-builder\.venv"
+set "PYTHON_SCRIPT=%SCRIPT_DIR%repo-builder\repo_builder.py"
 
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%\Scripts\activate.bat" (
