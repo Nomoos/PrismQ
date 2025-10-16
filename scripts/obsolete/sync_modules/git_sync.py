@@ -106,6 +106,7 @@ def sync_module(module: Dict[str, str], repo_root: Path, repo: Repo) -> bool:
             cwd=repo_root,
             capture_output=True,
             text=True,
+            encoding='utf-8',
             check=True
         )
         click.echo(f"[OK] Successfully synced {module_path}")

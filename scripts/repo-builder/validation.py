@@ -27,6 +27,7 @@ def validate_github_cli() -> bool:
             ["gh", "--version"],
             capture_output=True,
             text=True,
+            encoding='utf-8',
             check=False
         )
         if result.returncode != 0:
@@ -40,6 +41,7 @@ def validate_github_cli() -> bool:
             ["gh", "auth", "status"],
             capture_output=True,
             text=True,
+            encoding='utf-8',
             check=False
         )
         if result.returncode != 0:

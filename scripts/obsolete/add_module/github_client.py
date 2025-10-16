@@ -22,6 +22,7 @@ def get_github_client() -> Github:
             ["gh", "auth", "token"],
             capture_output=True,
             text=True,
+            encoding='utf-8',
             check=True
         )
         token = result.stdout.strip()
