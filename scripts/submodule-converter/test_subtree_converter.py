@@ -188,7 +188,7 @@ class TestGitOperations:
         assert branch == "develop"
 
     def test_get_default_branch_ultimate_fallback(self):
-        """Test getting default branch with ultimate fallback to master."""
+        """Test getting default branch with ultimate fallback to main."""
         runner = MagicMock()
         runner.run.side_effect = [
             CommandResult(1, "", ""),  # symbolic-ref fails
@@ -198,7 +198,7 @@ class TestGitOperations:
 
         branch = git_ops.get_default_branch(Path("/repo"))
 
-        assert branch == "master"
+        assert branch == "main"
 
     def test_ensure_remote_adds_new_remote(self):
         """Test ensuring remote adds it when missing."""
@@ -363,7 +363,7 @@ class TestSubmoduleConverter:
         submodule_mgr = MagicMock()
         git_ops = MagicMock()
         git_ops.get_remote_url.return_value = "https://github.com/test/repo.git"
-        git_ops.get_default_branch.return_value = "master"
+        git_ops.get_default_branch.return_value = "main"
         
         path_resolver = PathResolver()
         
@@ -380,5 +380,5 @@ class TestSubmoduleConverter:
             prismq_root,
             "mod/TestModule",
             "https://github.com/test/repo.git",
-            "master",
+            "main",
         )

@@ -129,7 +129,7 @@ class GitOperationsImpl:
                 return branch
 
         # Default fallback
-        return "master"
+        return "main"
 
     def ensure_remote(self, repo_path: Path, name: str, url: str) -> None:
         """Ensure remote exists with correct URL.
