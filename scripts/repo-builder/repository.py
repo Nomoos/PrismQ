@@ -65,6 +65,41 @@ def get_repository_path(repo_name: str, workspace: Path) -> Path:
     return path
 
 
+def add_repository_collaborator(repo_name: str, username: str, permission: str = "push") -> bool:
+    """
+    Add a collaborator to a GitHub repository.
+
+    Args:
+        repo_name: Repository name (e.g., 'PrismQ.MyModule')
+        username: GitHub username to add as collaborator
+        permission: Permission level ('pull', 'push', 'admin', 'maintain', 'triage')
+
+    Returns:
+        True if collaborator was added successfully, False otherwise.
+    """
+    full_name = f"Nomoos/{repo_name}"
+    try:
+        # Use GitHub API to add collaborator
+        result = subprocess.run(
+            [
+                "gh", "api",
+                f"/repos/{full_name}/collaborators/{username}",
+                "-X", "PUT",
+                "-f", f"permission={permission}"
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to add collaborator {username} to {repo_name}. Error: {e.stderr}")
+        return False
+    except FileNotFoundError:
+        raise RuntimeError("GitHub CLI (gh) not installed or not on PATH")
+
+
 def create_git_chain(chain: List[str], workspace: Path) -> None:
     """
     Create or update a chain of repositories.
@@ -134,6 +169,12 @@ def create_git_chain(chain: List[str], workspace: Path) -> None:
                     check=True
                 )
                 print(f"Repository {repo_name} created successfully from template.")
+                
+                # Add PrismQDev as collaborator
+                print(f"Adding PrismQDev as collaborator to {repo_name}...")
+                if add_repository_collaborator(repo_name, "PrismQDev"):
+                    print(f"PrismQDev added as collaborator to {repo_name}.")
+                
             except subprocess.CalledProcessError as e:
                 print(f"Failed to create repository {repo_name}. Error: {e.stderr}")
                 continue

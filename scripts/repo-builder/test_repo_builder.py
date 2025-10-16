@@ -2,10 +2,13 @@
 """Tests for repo_builder.py"""
 
 import pytest
+from unittest.mock import patch, MagicMock
+import subprocess
 from repo_builder import (
     parse_github_url,
     derive_module_chain,
     ModuleParseError,
+    add_repository_collaborator,
 )
 
 
@@ -160,3 +163,63 @@ class TestInputNormalization:
         chain = derive_module_chain(url)
         assert len(chain) == 2
         assert chain[-1] == "PrismQ.IdeaInspiration"
+
+
+class TestAddRepositoryCollaborator:
+    """Test suite for add_repository_collaborator function."""
+    
+    @patch('subprocess.run')
+    def test_add_collaborator_success(self, mock_run):
+        """Test successful addition of a collaborator."""
+        mock_run.return_value = MagicMock(returncode=0)
+        
+        result = add_repository_collaborator("PrismQ.TestRepo", "TestUser")
+        
+        assert result is True
+        mock_run.assert_called_once()
+        call_args = mock_run.call_args[0][0]
+        assert call_args[0] == "gh"
+        assert call_args[1] == "api"
+        assert "/repos/Nomoos/PrismQ.TestRepo/collaborators/TestUser" in call_args[2]
+        assert "-X" in call_args
+        assert "PUT" in call_args
+    
+    @patch('subprocess.run')
+    def test_add_collaborator_with_custom_permission(self, mock_run):
+        """Test adding a collaborator with custom permission."""
+        mock_run.return_value = MagicMock(returncode=0)
+        
+        result = add_repository_collaborator("PrismQ.TestRepo", "TestUser", "admin")
+        
+        assert result is True
+        call_args = mock_run.call_args[0][0]
+        assert "-f" in call_args
+        assert "permission=admin" in call_args
+    
+    @patch('subprocess.run')
+    def test_add_collaborator_default_permission_is_push(self, mock_run):
+        """Test that default permission is 'push'."""
+        mock_run.return_value = MagicMock(returncode=0)
+        
+        result = add_repository_collaborator("PrismQ.TestRepo", "TestUser")
+        
+        assert result is True
+        call_args = mock_run.call_args[0][0]
+        assert "permission=push" in call_args
+    
+    @patch('subprocess.run')
+    def test_add_collaborator_failure(self, mock_run):
+        """Test handling of failed collaborator addition."""
+        mock_run.side_effect = subprocess.CalledProcessError(1, 'gh', stderr="Error message")
+        
+        result = add_repository_collaborator("PrismQ.TestRepo", "TestUser")
+        
+        assert result is False
+    
+    @patch('subprocess.run')
+    def test_add_collaborator_gh_not_found(self, mock_run):
+        """Test handling of missing GitHub CLI."""
+        mock_run.side_effect = FileNotFoundError()
+        
+        with pytest.raises(RuntimeError, match="GitHub CLI"):
+            add_repository_collaborator("PrismQ.TestRepo", "TestUser")
