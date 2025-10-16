@@ -1,6 +1,6 @@
 # PrismQ Submodule Converter
 
-A modular tool for converting nested git repositories to git submodules, following SOLID principles with proper separation of concerns.
+A modular tool for converting nested git repositories to git submodules, following SOLID principles with proper separation of concerns. **Now supports fully recursive nested module hierarchies!**
 
 ## Features
 
@@ -9,9 +9,32 @@ A modular tool for converting nested git repositories to git submodules, followi
 - **Type Safety**: Full type hints for all functions and classes
 - **Error Handling**: Comprehensive exception hierarchy for different error types
 - **Backup & Recovery**: Automatic backup before operations with rollback on failure
+- **Recursive Conversion**: Handles arbitrarily deep nested module hierarchies
 - **Two-Phase Conversion**: 
   1. Convert nested repos to submodules in module roots
-  2. Convert module roots to submodules in PrismQ root
+  2. Convert module roots to submodules in their parent context (depth-first)
+
+## Recursive Module Hierarchy Support
+
+The converter now fully supports recursive nested module structures like:
+
+```
+PrismQ/
+  mod/
+    IdeaInspiration/.git              <- Top-level module (depth 0)
+      mod/
+        Classification/.git            <- Nested module (depth 1)
+          SomeRepo/.git                <- Nested repo (not a module)
+          mod/
+            DeepModule/.git            <- Deeply nested module (depth 2)
+        DataCollection/.git            <- Another nested module (depth 1)
+```
+
+Processing order (deepest first):
+1. DeepModule → submodule in Classification/mod/
+2. Classification → submodule in IdeaInspiration/mod/
+3. DataCollection → submodule in IdeaInspiration/mod/
+4. IdeaInspiration → submodule in PrismQ/mod/
 
 ## Architecture
 
@@ -107,24 +130,50 @@ converter.convert_modules_to_submodules(prismq_root, mod_root)
 
 ### Phase 1: Nested Repositories
 
-For each nested git repository found within a module:
+For each nested git repository found within a module (not including module roots):
 
 1. Scan the mod directory tree for `.git` folders
-2. Identify repositories that are not module roots
+2. Identify repositories that are not module roots (not directly under mod/)
 3. Get the remote URL and default branch
-4. Backup the existing directory
-5. Add as submodule to the module root
-6. Clean up backup on success, restore on failure
+4. Determine the immediate parent module
+5. Backup the existing directory
+6. Add as submodule to the parent module
+7. Clean up backup on success, restore on failure
 
-### Phase 2: Module Roots
+### Phase 2: Module Roots (Recursive)
 
-For each module root repository:
+For each module root repository, processed in depth-first order (deepest first):
 
-1. Identify module root directories (first level under mod/)
-2. Get the remote URL and default branch
-3. Backup the existing directory
-4. Add as submodule to PrismQ root (without mod/ prefix)
-5. Clean up backup on success, restore on failure
+1. Scan for all module root directories (directly under any mod/ directory)
+2. Calculate nesting depth by counting "mod" directories in path
+3. Sort by depth (deepest first) to ensure inner modules are processed before outer ones
+4. For each module root:
+   - Get the remote URL and default branch
+   - Identify parent module (if nested) or use PrismQ root (if top-level)
+   - Backup the existing directory
+   - Add as submodule to parent context with mod/ prefix
+   - Clean up backup on success, restore on failure
+
+### Example Processing Order
+
+Given structure:
+```
+mod/
+  IdeaInspiration/.git (depth 0)
+    mod/
+      Classification/.git (depth 1)
+        mod/
+          Analysis/.git (depth 2)
+      DataCollection/.git (depth 1)
+```
+
+Processing order:
+1. **Step 1**: Any nested repos (non-modules) within Analysis, Classification, DataCollection, IdeaInspiration
+2. **Step 2**: Module roots in depth-first order:
+   - Analysis (depth 2) → submodule in Classification/mod/
+   - Classification (depth 1) → submodule in IdeaInspiration/mod/
+   - DataCollection (depth 1) → submodule in IdeaInspiration/mod/
+   - IdeaInspiration (depth 0) → submodule in PrismQ/mod/
 
 ## Error Handling
 

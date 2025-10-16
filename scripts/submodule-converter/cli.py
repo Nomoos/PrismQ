@@ -81,13 +81,16 @@ class SubmoduleConverter:
                 continue
 
     def convert_modules_to_submodules(self, prismq_root: Path, mod_root: Path) -> None:
-        """Convert module roots to submodules in PrismQ root.
+        """Convert module roots to submodules in their parent context.
+
+        This handles both top-level modules (under PrismQ/mod/) and nested modules
+        (under Module/mod/). Processes deepest modules first.
 
         Args:
             prismq_root: Root of PrismQ repository
             mod_root: Root of mod directory
         """
-        print("\n=== Step 2: Module ROOTS -> submodule in PrismQ under <Module> ===")
+        print("\n=== Step 2: Module ROOTS -> submodule in parent context ===")
 
         module_repos = self._scanner.find_module_roots(mod_root)
 
@@ -99,18 +102,25 @@ class SubmoduleConverter:
 
             branch = self._git_ops.get_default_branch(repo.path)
 
-            # Path is module name with "mod/" prefix
-            rel_in_prismq = f"mod/{repo.module_name}"
+            # Determine the parent repository and relative path
+            if repo.parent_module is None:
+                # Top-level module: add to PrismQ root
+                parent_repo = prismq_root
+                rel_in_parent = f"mod/{repo.module_name}"
+            else:
+                # Nested module: add to parent module
+                parent_repo = repo.parent_module
+                rel_in_parent = f"mod/{repo.module_name}"
 
             try:
                 self._submodule_mgr.add_submodule(
-                    prismq_root,
-                    rel_in_prismq,
+                    parent_repo,
+                    rel_in_parent,
                     url,
                     branch,
                 )
             except SubtreeConverterError:
-                print(f"[FAIL] Could not add submodule {rel_in_prismq} to PrismQ")
+                print(f"[FAIL] Could not add submodule {rel_in_parent} to {parent_repo}")
                 continue
 
 
