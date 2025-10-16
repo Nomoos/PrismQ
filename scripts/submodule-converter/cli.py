@@ -99,8 +99,8 @@ class SubmoduleConverter:
 
             branch = self._git_ops.get_default_branch(repo.path)
 
-            # Path is just module name without "mod/"
-            rel_in_prismq = repo.module_name
+            # Path is module name with "mod/" prefix
+            rel_in_prismq = f"mod/{repo.module_name}"
 
             try:
                 self._submodule_mgr.add_submodule(

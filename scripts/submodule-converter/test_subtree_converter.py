@@ -9,6 +9,7 @@ import pytest
 
 try:
     from .backup_manager import BackupManager
+    from .cli import SubmoduleConverter
     from .command_runner import CommandResult, SubprocessCommandRunner
     from .exceptions import (
         CommandExecutionError,
@@ -21,6 +22,7 @@ try:
 except ImportError:
     # Fallback for direct execution
     from backup_manager import BackupManager
+    from cli import SubmoduleConverter
     from command_runner import CommandResult, SubprocessCommandRunner
     from exceptions import (
         CommandExecutionError,
@@ -185,6 +187,19 @@ class TestGitOperations:
 
         assert branch == "develop"
 
+    def test_get_default_branch_ultimate_fallback(self):
+        """Test getting default branch with ultimate fallback to master."""
+        runner = MagicMock()
+        runner.run.side_effect = [
+            CommandResult(1, "", ""),  # symbolic-ref fails
+            CommandResult(1, "", ""),  # rev-parse fails
+        ]
+        git_ops = GitOperationsImpl(runner)
+
+        branch = git_ops.get_default_branch(Path("/repo"))
+
+        assert branch == "master"
+
     def test_ensure_remote_adds_new_remote(self):
         """Test ensuring remote adds it when missing."""
         runner = MagicMock()
@@ -331,3 +346,39 @@ class TestCommandResult:
         assert CommandResult(0).success
         assert not CommandResult(1).success
         assert not CommandResult(-1).success
+
+
+class TestSubmoduleConverter:
+    """Test suite for SubmoduleConverter."""
+
+    def test_convert_modules_uses_mod_prefix(self, tmp_path):
+        """Test that module roots are added with mod/ prefix."""
+        # Setup mocks
+        scanner = MagicMock()
+        module_repo = MagicMock()
+        module_repo.module_name = "TestModule"
+        module_repo.path = tmp_path / "mod" / "TestModule"
+        scanner.find_module_roots.return_value = [module_repo]
+        
+        submodule_mgr = MagicMock()
+        git_ops = MagicMock()
+        git_ops.get_remote_url.return_value = "https://github.com/test/repo.git"
+        git_ops.get_default_branch.return_value = "master"
+        
+        path_resolver = PathResolver()
+        
+        # Create converter
+        converter = SubmoduleConverter(scanner, submodule_mgr, git_ops, path_resolver)
+        
+        # Convert modules
+        prismq_root = tmp_path
+        mod_root = tmp_path / "mod"
+        converter.convert_modules_to_submodules(prismq_root, mod_root)
+        
+        # Verify submodule was added with "mod/TestModule" path
+        submodule_mgr.add_submodule.assert_called_once_with(
+            prismq_root,
+            "mod/TestModule",
+            "https://github.com/test/repo.git",
+            "master",
+        )
