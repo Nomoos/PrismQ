@@ -285,6 +285,7 @@ class TestRepositoryScanner:
         assert len(nested_repos) == 1
         assert nested_repos[0].module_name == "Module"
         assert nested_repos[0].path == nested
+        assert nested_repos[0].depth == 0  # No nested mod/ directories
 
     def test_find_module_roots(self, tmp_path):
         """Test finding module root repositories."""
@@ -304,6 +305,100 @@ class TestRepositoryScanner:
         assert len(module_repos) == 2
         assert any(r.module_name == "Module1" for r in module_repos)
         assert any(r.module_name == "Module2" for r in module_repos)
+        # Both should be top-level (depth 0, no parent_module)
+        assert all(r.depth == 0 for r in module_repos)
+        assert all(r.parent_module is None for r in module_repos)
+
+    def test_find_nested_module_hierarchy(self, tmp_path):
+        """Test finding deeply nested module hierarchy.
+        
+        Structure:
+        mod/
+          IdeaInspiration/.git          <- module root, depth 0
+            mod/
+              Classification/.git       <- nested module root, depth 1
+                mod/
+                  DeepModule/.git       <- deeply nested module root, depth 2
+        """
+        mod = tmp_path / "mod"
+        idea = mod / "IdeaInspiration"
+        idea_mod = idea / "mod"
+        classification = idea_mod / "Classification"
+        classification_mod = classification / "mod"
+        deep = classification_mod / "DeepModule"
+
+        # Create directories
+        idea.mkdir(parents=True)
+        (idea / ".git").mkdir()
+        idea_mod.mkdir()
+        classification.mkdir(parents=True)
+        (classification / ".git").mkdir()
+        classification_mod.mkdir()
+        deep.mkdir(parents=True)
+        (deep / ".git").mkdir()
+
+        scanner = RepositoryScanner()
+        module_repos = scanner.find_module_roots(mod)
+
+        # Should find all three module roots
+        assert len(module_repos) == 3
+        
+        # Check they're sorted by depth (deepest first)
+        assert module_repos[0].depth == 2  # DeepModule
+        assert module_repos[1].depth == 1  # Classification
+        assert module_repos[2].depth == 0  # IdeaInspiration
+        
+        # Verify the deepest module
+        deep_module = module_repos[0]
+        assert deep_module.module_name == "DeepModule"
+        assert deep_module.path == deep
+        assert deep_module.parent_module == classification
+        
+        # Verify the middle module
+        middle_module = module_repos[1]
+        assert middle_module.module_name == "Classification"
+        assert middle_module.path == classification
+        assert middle_module.parent_module == idea
+        
+        # Verify the top-level module
+        top_module = module_repos[2]
+        assert top_module.module_name == "IdeaInspiration"
+        assert top_module.path == idea
+        assert top_module.parent_module is None
+
+    def test_find_nested_repos_in_hierarchy(self, tmp_path):
+        """Test finding nested repos within a hierarchical module structure.
+        
+        Structure:
+        mod/
+          IdeaInspiration/.git          <- module root
+            mod/
+              Classification/.git       <- nested module root
+                SomeRepo/.git           <- nested repo (not a module)
+        """
+        mod = tmp_path / "mod"
+        idea = mod / "IdeaInspiration"
+        idea_mod = idea / "mod"
+        classification = idea_mod / "Classification"
+        some_repo = classification / "SomeRepo"
+
+        # Create directories
+        idea.mkdir(parents=True)
+        (idea / ".git").mkdir()
+        idea_mod.mkdir()
+        classification.mkdir(parents=True)
+        (classification / ".git").mkdir()
+        some_repo.mkdir(parents=True)
+        (some_repo / ".git").mkdir()
+
+        scanner = RepositoryScanner()
+        nested_repos = scanner.find_nested_repositories(mod)
+
+        # Should find the nested repo (SomeRepo) but not the module roots
+        assert len(nested_repos) == 1
+        assert nested_repos[0].path == some_repo
+        assert nested_repos[0].module_root == classification
+        assert nested_repos[0].module_name == "Classification"
 
 
 class TestSubmoduleManager:
@@ -416,6 +511,7 @@ class TestSubmoduleConverter:
         module_repo = MagicMock()
         module_repo.module_name = "TestModule"
         module_repo.path = tmp_path / "mod" / "TestModule"
+        module_repo.parent_module = None  # Top-level module
         scanner.find_module_roots.return_value = [module_repo]
         
         submodule_mgr = MagicMock()
@@ -440,3 +536,52 @@ class TestSubmoduleConverter:
             "https://github.com/test/repo.git",
             "main",
         )
+
+    def test_convert_nested_modules_in_depth_order(self, tmp_path):
+        """Test that nested modules are converted in correct order (deepest first)."""
+        # Setup mocks
+        scanner = MagicMock()
+        
+        # Create mock repos: IdeaInspiration (depth 0) and Classification (depth 1)
+        idea_repo = MagicMock()
+        idea_repo.module_name = "IdeaInspiration"
+        idea_repo.path = tmp_path / "mod" / "IdeaInspiration"
+        idea_repo.parent_module = None
+        idea_repo.depth = 0
+        
+        classification_repo = MagicMock()
+        classification_repo.module_name = "Classification"
+        classification_repo.path = tmp_path / "mod" / "IdeaInspiration" / "mod" / "Classification"
+        classification_repo.parent_module = idea_repo.path
+        classification_repo.depth = 1
+        
+        # Scanner returns them in depth order (deepest first)
+        scanner.find_module_roots.return_value = [classification_repo, idea_repo]
+        
+        submodule_mgr = MagicMock()
+        git_ops = MagicMock()
+        git_ops.get_remote_url.return_value = "https://github.com/test/repo.git"
+        git_ops.get_default_branch.return_value = "main"
+        
+        path_resolver = PathResolver()
+        
+        # Create converter
+        converter = SubmoduleConverter(scanner, submodule_mgr, git_ops, path_resolver)
+        
+        # Convert modules
+        prismq_root = tmp_path
+        mod_root = tmp_path / "mod"
+        converter.convert_modules_to_submodules(prismq_root, mod_root)
+        
+        # Verify both submodules were added
+        assert submodule_mgr.add_submodule.call_count == 2
+        
+        # First call should be for Classification (deeper, added to IdeaInspiration)
+        first_call = submodule_mgr.add_submodule.call_args_list[0]
+        assert first_call[0][0] == classification_repo.parent_module  # Parent is IdeaInspiration
+        assert first_call[0][1] == "mod/Classification"
+        
+        # Second call should be for IdeaInspiration (top-level, added to PrismQ)
+        second_call = submodule_mgr.add_submodule.call_args_list[1]
+        assert second_call[0][0] == prismq_root
+        assert second_call[0][1] == "mod/IdeaInspiration"
