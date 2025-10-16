@@ -63,11 +63,8 @@ class SubmoduleConverter:
 
             branch = self._git_ops.get_default_branch(repo.path)
 
-            # Normalize path - remove leading "mod/" if present
-            parts = Path(repo.relative_in_module).parts
-            rel_in_module = self._path_resolver.normalize_path_in_module(
-                Path(repo.relative_in_module), list(parts)
-            )
+            # Use the relative path as-is, preserving mod/ directory structure
+            rel_in_module = repo.relative_in_module
 
             try:
                 self._submodule_mgr.add_submodule(
