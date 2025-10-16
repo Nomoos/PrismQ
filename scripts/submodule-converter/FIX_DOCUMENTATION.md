@@ -38,8 +38,8 @@ git_ops.path_exists_in_index(repo_path, "mod/IdeaInspiration")
 Removes all entries at the specified path from the git index without deleting physical files.
 
 ```python
-git_ops.remove_from_index(repo_path, "mod/IdeaInspiration")
-# Executes: git rm -r --cached --ignore-unmatch mod/IdeaInspiration
+git_ops.remove_from_index(repo_path, "path/to/target")
+# Executes: git rm -r --cached --ignore-unmatch path/to/target
 ```
 
 ### Updated `SubmoduleManager.add_submodule()`
