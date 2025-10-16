@@ -63,6 +63,27 @@ class GitOperations(Protocol):
         """
         ...
 
+    def path_exists_in_index(self, repo_path: Path, path: str) -> bool:
+        """Check if a path exists in the git index.
+
+        Args:
+            repo_path: Path to git repository
+            path: Path to check in the index
+
+        Returns:
+            True if path exists in the index, False otherwise
+        """
+        ...
+
+    def remove_from_index(self, repo_path: Path, path: str) -> None:
+        """Remove a path from the git index.
+
+        Args:
+            repo_path: Path to git repository
+            path: Path to remove from the index
+        """
+        ...
+
 
 class GitOperationsImpl:
     """Concrete implementation of git operations."""
@@ -180,6 +201,37 @@ class GitOperationsImpl:
         """
         self._runner.run(
             ["git", "submodule", "add", "-b", branch, url, path],
+            cwd=repo_path,
+            check=True,
+        )
+
+    def path_exists_in_index(self, repo_path: Path, path: str) -> bool:
+        """Check if a path exists in the git index.
+
+        Args:
+            repo_path: Path to git repository
+            path: Path to check in the index
+
+        Returns:
+            True if path exists in the index, False otherwise
+        """
+        result = self._runner.run(
+            ["git", "ls-files", "--", path],
+            cwd=repo_path,
+            check=False,
+            capture=True,
+        )
+        return result.success and bool(result.stdout.strip())
+
+    def remove_from_index(self, repo_path: Path, path: str) -> None:
+        """Remove a path from the git index.
+
+        Args:
+            repo_path: Path to git repository
+            path: Path to remove from the index
+        """
+        self._runner.run(
+            ["git", "rm", "-r", "--cached", "--ignore-unmatch", path],
             cwd=repo_path,
             check=True,
         )

@@ -226,6 +226,42 @@ class TestGitOperations:
 
         assert runner.run.call_count == 2
 
+    def test_path_exists_in_index_returns_true(self):
+        """Test checking if path exists in index returns True."""
+        runner = MagicMock()
+        runner.run.return_value = CommandResult(0, "mod/IdeaInspiration/file.txt", "")
+        git_ops = GitOperationsImpl(runner)
+
+        exists = git_ops.path_exists_in_index(Path("/repo"), "mod/IdeaInspiration")
+
+        assert exists is True
+        runner.run.assert_called_once()
+
+    def test_path_exists_in_index_returns_false(self):
+        """Test checking if path exists in index returns False."""
+        runner = MagicMock()
+        runner.run.return_value = CommandResult(0, "", "")
+        git_ops = GitOperationsImpl(runner)
+
+        exists = git_ops.path_exists_in_index(Path("/repo"), "mod/NonExistent")
+
+        assert exists is False
+
+    def test_remove_from_index(self):
+        """Test removing path from git index."""
+        runner = MagicMock()
+        runner.run.return_value = CommandResult(0, "", "")
+        git_ops = GitOperationsImpl(runner)
+
+        git_ops.remove_from_index(Path("/repo"), "mod/IdeaInspiration")
+
+        runner.run.assert_called_once()
+        call_args = runner.run.call_args
+        assert "git" in call_args[0][0]
+        assert "rm" in call_args[0][0]
+        assert "--cached" in call_args[0][0]
+        assert "mod/IdeaInspiration" in call_args[0][0]
+
 
 class TestRepositoryScanner:
     """Test suite for repository scanner."""
@@ -318,6 +354,7 @@ class TestSubmoduleManager:
     def test_add_submodule_with_backup_restore_on_failure(self, tmp_path):
         """Test submodule addition restores backup on failure."""
         git_ops = MagicMock()
+        git_ops.path_exists_in_index.return_value = False
         git_ops.submodule_add.side_effect = CommandExecutionError("Failed")
 
         backup_path = tmp_path / "backup"
@@ -336,6 +373,27 @@ class TestSubmoduleManager:
             )
 
         backup_mgr.restore_backup.assert_called_once()
+
+    def test_add_submodule_removes_index_entries_when_present(self, tmp_path):
+        """Test submodule addition removes index entries when they exist."""
+        git_ops = MagicMock()
+        git_ops.path_exists_in_index.return_value = True
+        backup_mgr = MagicMock()
+        backup_mgr.create_backup.return_value = None
+        path_resolver = PathResolver()
+
+        submodule_mgr = SubmoduleManager(git_ops, backup_mgr, path_resolver)
+
+        submodule_mgr.add_submodule(
+            tmp_path,
+            "mod/IdeaInspiration",
+            "https://github.com/test/repo.git",
+            "main",
+        )
+
+        git_ops.path_exists_in_index.assert_called_once_with(tmp_path, "mod/IdeaInspiration")
+        git_ops.remove_from_index.assert_called_once_with(tmp_path, "mod/IdeaInspiration")
+        git_ops.submodule_add.assert_called_once()
 
 
 class TestCommandResult:

@@ -58,6 +58,11 @@ class SubmoduleManager:
         backup = self._backup_mgr.create_backup(target)
 
         try:
+            # Check if path exists in index and remove it if needed
+            if self._git_ops.path_exists_in_index(superproj, path_rel):
+                print(f"[INFO] Removing existing index entries for: {path_rel}")
+                self._git_ops.remove_from_index(superproj, path_rel)
+
             print(
                 f"[DO] git -C {superproj} submodule add "
                 f'-b {branch} {remote_url} "{path_rel}"'
