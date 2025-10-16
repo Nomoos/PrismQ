@@ -46,6 +46,27 @@ python scripts/sync_modules.py
 scripts\sync-modules.bat --recursive
 ```
 
+### Repository Builder & Checker
+
+Validate GitHub CLI and derive module hierarchy:
+
+```bash
+# Windows - Setup environment (first time only)
+scripts\repo-builder\setup_env.bat
+
+# Run with module name
+scripts\repo-builder\run.bat PrismQ.IdeaInspiration
+
+# Run with GitHub URL
+scripts\repo-builder\run.bat https://github.com/Nomoos/PrismQ.IdeaInspiration
+
+# Cross-platform
+cd scripts/repo-builder
+python repo_builder.py <module_name_or_url>
+```
+
+See [scripts/repo-builder/README.md](scripts/repo-builder/README.md) for detailed documentation.
+
 ## 🧪 Testing
 
 ### Test Batch Scripts
