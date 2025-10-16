@@ -39,7 +39,7 @@ from exceptions import (
 from validation import validate_github_cli
 from parsing import parse_github_url, derive_module_chain
 from display import display_module_chain
-from repository import repository_exists, get_repository_path, create_git_chain
+from repository import repository_exists, get_repository_path, create_git_chain, add_repository_collaborator
 from cli import get_module_input_interactive, run_git_creation, main
 
 # This allows the script to be run directly with: python repo_builder.py
