@@ -180,6 +180,22 @@ The tool provides clear error messages for common issues:
 
 ## Development
 
+### Project Structure
+
+The repository builder has been modularized for better maintainability. The code is split into the following modules:
+
+- **`exceptions.py`**: Custom exception classes (`RepoBuilderError`, `GitHubCLIError`, `ModuleParseError`)
+- **`validation.py`**: GitHub CLI validation functions
+- **`parsing.py`**: URL and module name parsing logic
+- **`display.py`**: Output formatting and display functions
+- **`repository.py`**: Repository operations (exists check, path mapping, git operations)
+- **`cli.py`**: CLI interface and main entry point functions
+- **`__init__.py`**: Package initialization with exports for importing as a package
+- **`__main__.py`**: Entry point when running as a module with `python -m`
+- **`repo_builder.py`**: Backward compatibility wrapper that re-exports all functions
+
+All modules support both relative imports (when used as a package) and direct imports (when used as standalone scripts) for maximum flexibility.
+
 ### Running Tests
 
 ```bash
@@ -211,3 +227,36 @@ python repo_builder.py https://github.com/Nomoos/PrismQ.IdeaInspiration
 # Test error handling
 python repo_builder.py invalid..name
 ```
+
+### Using as a Library
+
+The repository builder can be imported and used programmatically:
+
+```python
+# Import specific functions
+from repo_builder import (
+    parse_github_url, 
+    derive_module_chain,
+    validate_github_cli,
+    ModuleParseError
+)
+
+# Parse a GitHub URL
+try:
+    module_name = parse_github_url("https://github.com/Nomoos/PrismQ.IdeaInspiration")
+    print(f"Module name: {module_name}")  # PrismQ.IdeaInspiration
+except ModuleParseError as e:
+    print(f"Error: {e}")
+
+# Derive module chain
+chain = derive_module_chain("PrismQ.IdeaInspiration.SubModule")
+print(chain)  # ['PrismQ', 'PrismQ.IdeaInspiration', 'PrismQ.IdeaInspiration.SubModule']
+
+# Validate GitHub CLI
+try:
+    validate_github_cli()
+    print("GitHub CLI is authenticated")
+except GitHubCLIError as e:
+    print(f"Error: {e}")
+```
+
