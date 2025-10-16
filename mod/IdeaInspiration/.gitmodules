@@ -1,8 +1,0 @@
-[submodule "src/Sources"]
-	path = src/Sources
-	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.git
-	branch = main
-[submodule "src/Sources.pre_subtree.20251016_205521"]
-	path = src/Sources.pre_subtree.20251016_205521
-	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-	branch = main
