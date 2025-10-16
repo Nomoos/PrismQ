@@ -33,7 +33,16 @@ See [docs/repository-tree.html](docs/repository-tree.html) for the complete modu
 
 ## 🔧 Scripts
 
-See [scripts/README.md](scripts/README.md) for detailed script documentation.
+### Available Scripts
+
+- **submodule-converter.bat** - Convert nested repositories to git submodules
+  - See [scripts/submodule-converter/README.md](scripts/submodule-converter/README.md) for details
+  - Preserves mod/ directory structure for nested modules
+  - Example: `scripts\submodule-converter.bat` (Windows) or use the Python module directly
+
+- **add-repo.bat** - Add a new repository to the PrismQ ecosystem
+
+For detailed documentation on each script, see the respective README files in the scripts directory.
 
 ## 📖 Additional Resources
 

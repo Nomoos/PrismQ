@@ -67,6 +67,27 @@ python repo_builder.py <module_name_or_url>
 
 See [scripts/repo-builder/README.md](scripts/repo-builder/README.md) for detailed documentation.
 
+### Submodule Converter
+
+Convert nested git repositories to git submodules with proper directory structure:
+
+```bash
+# Windows
+scripts\submodule-converter.bat
+
+# Cross-platform
+cd scripts/submodule-converter
+python cli.py
+```
+
+**What it does:**
+- Converts nested repositories to submodules in their parent modules
+- Preserves mod/ directory structure (e.g., `IdeaInspiration/mod/Classification`)
+- Processes modules in depth-first order (deepest first)
+- Automatically backs up and restores on failure
+
+See [scripts/submodule-converter/README.md](scripts/submodule-converter/README.md) for detailed documentation.
+
 ## 🧪 Testing
 
 ### Test Batch Scripts
@@ -108,4 +129,5 @@ scripts\sync-modules.bat src\RepositoryTemplate
 - [README.md](README.md) - Project overview
 - [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md) - Architecture details
 - [docs/MODULE_MANAGEMENT.md](docs/MODULE_MANAGEMENT.md) - Module creation and sync
-- [scripts/README.md](scripts/README.md) - Comprehensive script documentation
+- [scripts/submodule-converter/README.md](scripts/submodule-converter/README.md) - Submodule converter documentation
+- [scripts/repo-builder/README.md](scripts/repo-builder/README.md) - Repository builder documentation
