@@ -3,6 +3,7 @@
 # Python virtual environment
 scripts/.venv/
 scripts/repo-builder/.venv/
+scripts/submodule-converter/.venv/
 __pycache__/
 *.pyc
 *.pyo

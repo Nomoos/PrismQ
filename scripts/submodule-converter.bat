@@ -1,6 +1,6 @@
 @echo off
-REM PrismQ Repository Builder - Run Script
-REM Activates virtual environment and runs the repo_builder.py script
+REM PrismQ Submodule Converter - Run Script
+REM Activates virtual environment and runs the cli.py script
 
 setlocal
 
@@ -8,16 +8,50 @@ REM Get script directory
 set "SCRIPT_DIR=%~dp0"
 set "VENV_DIR=%SCRIPT_DIR%submodule-converter\.venv"
 set "PYTHON_SCRIPT=%SCRIPT_DIR%submodule-converter\cli.py"
+set "SETUP_SCRIPT=%SCRIPT_DIR%submodule-converter\setup_env.bat"
 
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%\Scripts\activate.bat" (
-    echo Error: Virtual environment not found
-    echo Please run submodule-converter\setup_env.bat first to create the virtual environment
-    exit /b 1
+    echo Virtual environment not found. Creating it now...
+    echo.
+    
+    REM Check if setup script exists
+    if not exist "%SETUP_SCRIPT%" (
+        echo Error: Setup script not found at: %SETUP_SCRIPT%
+        echo Cannot create virtual environment automatically
+        exit /b 1
+    )
+    
+    REM Run setup script to create virtual environment
+    call "%SETUP_SCRIPT%"
+    if errorlevel 1 (
+        echo.
+        echo Error: Failed to create virtual environment
+        echo Please check the error messages above
+        exit /b 1
+    )
+    
+    echo.
+    echo Virtual environment created successfully
+    echo.
 )
 
 REM Activate virtual environment
 call "%VENV_DIR%\Scripts\activate.bat"
+if errorlevel 1 (
+    echo Error: Failed to activate virtual environment
+    echo Virtual environment path: %VENV_DIR%
+    echo Please ensure the virtual environment was created correctly
+    exit /b 1
+)
+
+REM Check if Python script exists
+if not exist "%PYTHON_SCRIPT%" (
+    echo Error: Python script not found at: %PYTHON_SCRIPT%
+    echo Please ensure the submodule-converter is installed correctly
+    deactivate
+    exit /b 1
+)
 
 REM Run the Python script with all arguments passed to this batch file
 python "%PYTHON_SCRIPT%" %*
