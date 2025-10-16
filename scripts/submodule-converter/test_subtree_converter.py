@@ -504,6 +504,48 @@ class TestCommandResult:
 class TestSubmoduleConverter:
     """Test suite for SubmoduleConverter."""
 
+    def test_convert_nested_repos_preserves_mod_prefix(self, tmp_path):
+        """Test that nested repositories preserve mod/ directory structure.
+        
+        This tests the fix for the bug where Classification should be added at
+        PrismQ/mod/IdeaInspiration/mod/Classification, not at
+        PrismQ/mod/IdeaInspiration/Classification.
+        """
+        # Setup mocks
+        scanner = MagicMock()
+        
+        # Create mock nested repo: IdeaInspiration/mod/Classification
+        nested_repo = MagicMock()
+        nested_repo.path = tmp_path / "mod" / "IdeaInspiration" / "mod" / "Classification"
+        nested_repo.module_root = tmp_path / "mod" / "IdeaInspiration"
+        nested_repo.module_name = "IdeaInspiration"
+        nested_repo.relative_in_module = "mod/Classification"
+        nested_repo.depth = 1
+        
+        scanner.find_nested_repositories.return_value = [nested_repo]
+        
+        submodule_mgr = MagicMock()
+        git_ops = MagicMock()
+        git_ops.get_remote_url.return_value = "https://github.com/test/Classification.git"
+        git_ops.get_default_branch.return_value = "main"
+        
+        path_resolver = PathResolver()
+        
+        # Create converter
+        converter = SubmoduleConverter(scanner, submodule_mgr, git_ops, path_resolver)
+        
+        # Convert nested repos
+        mod_root = tmp_path / "mod"
+        converter.convert_nested_to_submodules(mod_root)
+        
+        # Verify submodule was added with "mod/Classification" path (preserving mod/ prefix)
+        submodule_mgr.add_submodule.assert_called_once_with(
+            tmp_path / "mod" / "IdeaInspiration",
+            "mod/Classification",
+            "https://github.com/test/Classification.git",
+            "main",
+        )
+
     def test_convert_modules_uses_mod_prefix(self, tmp_path):
         """Test that module roots are added with mod/ prefix."""
         # Setup mocks

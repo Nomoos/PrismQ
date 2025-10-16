@@ -97,3 +97,95 @@ submodule_mgr.add_submodule(
 - **Safe**: Preserves physical files via backup mechanism
 - **Minimal**: Only removes index entries when necessary
 - **Tested**: Comprehensive test coverage ensures reliability
+
+---
+
+# Fix: Preserve mod/ Directory Structure for Nested Repositories
+
+## Problem
+
+When converting nested repositories to submodules, the script was incorrectly removing the "mod/" prefix from the path. For example, a repository at `PrismQ/mod/IdeaInspiration/mod/Classification` would be added as a submodule at `PrismQ/mod/IdeaInspiration/Classification` instead of the correct path `PrismQ/mod/IdeaInspiration/mod/Classification`.
+
+## Expected Behavior
+
+For a nested module structure like:
+```
+PrismQ/
+  mod/
+    IdeaInspiration/.git
+      mod/
+        Classification/.git
+```
+
+The Classification module should be added as a submodule at:
+- **Correct**: `IdeaInspiration/mod/Classification`
+- **Incorrect** (old behavior): `IdeaInspiration/Classification`
+
+## Root Cause
+
+In `cli.py`, the `convert_nested_to_submodules` method was calling `normalize_path_in_module()` which removed the leading "mod/" prefix from nested repository paths. This was incorrect because nested repositories should preserve their "mod/" directory structure.
+
+The problematic code was:
+```python
+parts = Path(repo.relative_in_module).parts
+rel_in_module = self._path_resolver.normalize_path_in_module(
+    Path(repo.relative_in_module), list(parts)
+)
+```
+
+## Solution
+
+The fix removes the unnecessary path normalization for nested repositories. The path should be used as-is from the repository scanner, which correctly identifies the relative path within the module including the "mod/" prefix.
+
+Updated code in `cli.py`:
+```python
+# Use the relative path as-is, preserving mod/ directory structure
+rel_in_module = repo.relative_in_module
+```
+
+## Implementation
+
+The change was made in the `SubmoduleConverter.convert_nested_to_submodules()` method:
+
+**Before:**
+```python
+# Normalize path - remove leading "mod/" if present
+parts = Path(repo.relative_in_module).parts
+rel_in_module = self._path_resolver.normalize_path_in_module(
+    Path(repo.relative_in_module), list(parts)
+)
+```
+
+**After:**
+```python
+# Use the relative path as-is, preserving mod/ directory structure
+rel_in_module = repo.relative_in_module
+```
+
+## Testing
+
+A new test was added to verify the fix:
+
+```python
+def test_convert_nested_repos_preserves_mod_prefix(self, tmp_path):
+    """Test that nested repositories preserve mod/ directory structure.
+    
+    This tests the fix for the bug where Classification should be added at
+    PrismQ/mod/IdeaInspiration/mod/Classification, not at
+    PrismQ/mod/IdeaInspiration/Classification.
+    """
+```
+
+The test verifies that when adding a nested repository at `IdeaInspiration/mod/Classification`, the submodule is added with the path "mod/Classification" (preserving the mod/ prefix).
+
+## Impact
+
+- Nested repositories now maintain the correct directory structure
+- Module hierarchies work correctly with arbitrary nesting depth
+- No impact on existing functionality - all existing tests pass
+
+## Benefits
+
+- **Correct Structure**: Nested modules are placed in the correct mod/ subdirectories
+- **Consistency**: All modules follow the same organizational pattern
+- **Recursive Support**: Properly supports arbitrarily deep module hierarchies
