@@ -108,6 +108,7 @@ EOF
 ### 3. Verify Configuration
 Run the sync script to verify your module is discovered:
 
+**Windows:**
 ```batch
 scripts\sync-modules.bat --list
 ```
@@ -115,6 +116,7 @@ scripts\sync-modules.bat --list
 You should see your module listed with its auto-generated remote name.
 
 ### 4. Sync the Module
+**Windows:**
 ```batch
 scripts\sync-modules.bat src\YourModule
 ```
@@ -185,14 +187,11 @@ If you're migrating from the old `REMOTE.md` format:
    }
    ```
 
-2. **Remove `REMOTE.md`** (optional, but recommended):
-   ```bash
-   rm src/YourModule/REMOTE.md
-   ```
+2. **Remove `REMOTE.md`** (optional, but recommended)
 
 3. **Test the configuration**:
-   ```bash
-   ./scripts/sync-modules.sh --list
+   ```batch
+   scripts\sync-modules.bat --list
    ```
 
 The remote name will be auto-generated from the URL, which may differ from your old manual remote name. This is expected behavior.

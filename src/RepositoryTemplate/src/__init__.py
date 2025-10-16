@@ -1,4 +1,4 @@
-"""PrismQ Module Package
+"""PrismQ Module Package.
 
 This is a template for creating PrismQ modules for AI-powered content generation.
 

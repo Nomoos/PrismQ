@@ -63,11 +63,13 @@ PrismQ.RepositoryTemplate/
 ### Prerequisites
 
 - Python 3.10 or higher
-- Windows OS
+- Windows OS (required)
 - NVIDIA RTX 5090 with latest drivers
 - 64GB RAM
 
 ### Installation
+
+#### Windows
 
 1. Clone this template repository:
    ```batch
@@ -113,7 +115,7 @@ PrismQ.RepositoryTemplate/
 ### Running Tests
 
 ```batch
-# Activate virtual environment first
+# Activate virtual environment first (Windows)
 venv\Scripts\activate
 
 # Run tests
@@ -126,6 +128,9 @@ pytest --cov=src --cov-report=html
 ## 📚 Documentation
 
 - **[Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
+- **[PEP Standards](docs/PEP_STANDARDS.md)** - Python Enhancement Proposals we follow
+- **[SOLID Principles](docs/SOLID_PRINCIPLES.md)** - Design principles for maintainable code
+- **[AI Coding Guidelines](docs/AI_CODING_GUIDELINES.md)** - Best practices for AI-assisted development
 - **[Documentation Overview](docs/README.md)** - Documentation structure and guidelines
 - **[Known Issues](issues/KNOWN_ISSUES.md)** - Current known issues
 - **[Roadmap](issues/ROADMAP.md)** - Future development plans
@@ -139,9 +144,14 @@ This is a proprietary template repository. For contribution guidelines, see [CON
 ### Included in Template
 
 - ✅ Python project structure with best practices
+- ✅ PEP-compliant configuration (PEP 517/518/621/660)
+- ✅ Type checking with MyPy (PEP 484/526/544/561)
+- ✅ Code quality with Ruff (PEP 8/257)
+- ✅ SOLID principles documentation and guidelines
+- ✅ AI-assisted coding best practices (GitHub Copilot guidelines)
 - ✅ Configuration management with environment variables
 - ✅ Test framework setup (pytest)
-- ✅ Documentation structure
+- ✅ Comprehensive documentation structure
 - ✅ Issue tracking system
 - ✅ Setup and quickstart scripts
 - ✅ GitHub templates (issues, PRs)
@@ -187,9 +197,10 @@ The `PYTHON_EXECUTABLE` setting allows you to specify which Python interpreter t
 - Using specific Python installations with custom configurations
 
 **Examples:**
-- Windows: `PYTHON_EXECUTABLE=python` or `PYTHON_EXECUTABLE=C:\Python310\python.exe`
+- `PYTHON_EXECUTABLE=python` (default)
+- `PYTHON_EXECUTABLE=C:\Python310\python.exe` (specific installation)
 
-The setup scripts will automatically use this configuration when creating the virtual environment.
+The setup script (`scripts/setup.bat`) will automatically use this configuration when creating the virtual environment.
 
 ## 🚨 Hardware Requirements
 

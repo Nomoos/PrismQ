@@ -4,9 +4,24 @@ This directory contains documentation for the PrismQ module.
 
 ## Contents
 
-- **CONTRIBUTING.md** - Guidelines for contributing to the project
+### Core Documentation
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Guidelines for contributing to the project
+- **[PEP_STANDARDS.md](PEP_STANDARDS.md)** - Python Enhancement Proposals we follow
+- **[SOLID_PRINCIPLES.md](SOLID_PRINCIPLES.md)** - Design principles for maintainable code
+- **[AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)** - Best practices for AI-assisted development
+- **[MODULE_CONFIGURATION.md](MODULE_CONFIGURATION.md)** - Module configuration guide
 - **README.md** - This file
-- Other documentation files specific to your module
+
+### Documentation by Topic
+
+#### Code Quality & Standards
+- **PEP_STANDARDS.md** - Python Enhancement Proposals (PEP 8, 257, 484, etc.)
+- **SOLID_PRINCIPLES.md** - SOLID design principles with Python examples
+- **AI_CODING_GUIDELINES.md** - Guidelines for using GitHub Copilot effectively
+
+#### Development Workflow
+- **CONTRIBUTING.md** - How to contribute, coding standards, testing
+- **MODULE_CONFIGURATION.md** - Configuration management and environment setup
 
 ## Documentation Structure
 
@@ -21,7 +36,7 @@ Organize your documentation by topic:
 ## Target Platform
 
 This module is designed for:
-- **Operating System**: Windows
+- **Operating System**: Windows (required)
 - **GPU**: NVIDIA RTX 5090
 - **CPU**: AMD Ryzen processor
 - **RAM**: 64GB

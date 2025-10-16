@@ -23,6 +23,20 @@ All code should be optimized for:
 - Write comprehensive docstrings using Google style
 - Keep functions focused and under 50 lines when possible
 
+### SOLID Principles
+Always apply SOLID design principles (see `docs/SOLID_PRINCIPLES.md`):
+- **Single Responsibility**: Each class should have one reason to change
+- **Open/Closed**: Open for extension, closed for modification  
+- **Liskov Substitution**: Subtypes must be substitutable for their base types
+- **Interface Segregation**: Use focused, minimal interfaces (Python Protocols)
+- **Dependency Inversion**: Depend on abstractions (Protocols), inject dependencies
+
+### Additional Design Principles
+- **DRY (Don't Repeat Yourself)**: Eliminate code duplication
+- **KISS (Keep It Simple)**: Favor simplicity over complexity
+- **YAGNI (You Aren't Gonna Need It)**: Only implement what's needed now
+- **Composition Over Inheritance**: Prefer object composition to class inheritance
+
 ### Performance Considerations
 - Optimize for GPU utilization on RTX 5090
 - Consider memory constraints (32GB VRAM, 64GB RAM)
@@ -84,8 +98,12 @@ When working with AI models:
 ## Questions to Ask
 
 Before implementing features, consider:
+- Does this follow SOLID principles (single responsibility, dependency inversion, etc.)?
 - Does this leverage the RTX 5090 efficiently?
 - Is this compatible with the PrismQ ecosystem?
 - Have I included proper error handling?
 - Are there edge cases to consider?
 - Is the code documented and tested?
+- Can this be simplified (KISS principle)?
+- Am I implementing only what's needed (YAGNI)?
+- Have I eliminated code duplication (DRY)?
