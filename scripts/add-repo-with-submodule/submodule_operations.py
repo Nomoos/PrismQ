@@ -149,8 +149,9 @@ def log_submodule_directory_state(parent_path: Path, relative_path: str) -> None
         print(f"      Is directory: {submodule_path.is_dir()}")
         if submodule_path.is_dir():
             try:
-                contents = list(submodule_path.iterdir())
-                print(f"      Contents: {len(contents)} items")
+                # Count items efficiently without creating a full list
+                item_count = sum(1 for _ in submodule_path.iterdir())
+                print(f"      Contents: {item_count} items")
             except Exception as e:
                 print(f"      Failed to list contents: {e}")
     print(f"      .git/modules entry exists: {modules_path.exists()}")
