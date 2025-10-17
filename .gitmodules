@@ -6,3 +6,35 @@
 	path = mod/RepositoryTemplate
 	url = https://github.com/Nomoos/PrismQ.RepositoryTemplate.git
 	branch = main
+[submodule "mod/IdeaInspiration.pre_subtree.20251016_223835"]
+	path = mod/IdeaInspiration.pre_subtree.20251016_223835
+	url = https://github.com/Nomoos/PrismQ.git
+	branch = main
+[submodule "mod/RepositoryTemplate.pre_subtree.20251016_223836"]
+	path = mod/RepositoryTemplate.pre_subtree.20251016_223836
+	url = https://github.com/Nomoos/PrismQ.git
+	branch = main
+[submodule "mod/Classification"]
+	path = mod/Classification
+	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Classification.git
+	branch = main
+[submodule "mod/Model"]
+	path = mod/Model
+	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Model.git
+	branch = main
+[submodule "mod/Scoring"]
+	path = mod/Scoring
+	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Scoring.git
+	branch = main
+[submodule "mod/Sources"]
+	path = mod/Sources
+	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.git
+	branch = main
+[submodule "mod/IdeaInspiration.pre_subtree.20251016_223835.pre_subtree.20251016_224503"]
+	path = mod/IdeaInspiration.pre_subtree.20251016_223835.pre_subtree.20251016_224503
+	url = https://github.com/Nomoos/PrismQ.git
+	branch = main
+[submodule "mod/RepositoryTemplate.pre_subtree.20251016_223836.pre_subtree.20251016_224505"]
+	path = mod/RepositoryTemplate.pre_subtree.20251016_223836.pre_subtree.20251016_224505
+	url = https://github.com/Nomoos/PrismQ.git
+	branch = main
