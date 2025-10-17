@@ -130,7 +130,8 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
             # Commit changes
             commit_submodule_changes(
                 parent_path=parent_path,
-                module_name=module_name
+                module_name=module_name,
+                relative_path=relative_path
             )
             print(f"   ✅ Committed to parent")
             

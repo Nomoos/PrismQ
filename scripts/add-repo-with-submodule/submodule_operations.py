@@ -94,6 +94,7 @@ def add_git_submodule(
 def commit_submodule_changes(
     parent_path: Path,
     module_name: str,
+    relative_path: Optional[str] = None,
     message: Optional[str] = None
 ) -> bool:
     """Commit .gitmodules and submodule changes to parent repository.
@@ -101,6 +102,7 @@ def commit_submodule_changes(
     Args:
         parent_path: Path to parent repository
         module_name: Name of the module being added
+        relative_path: Relative path of the submodule (optional, calculated from module_name if not provided)
         message: Custom commit message (optional)
 
     Returns:
@@ -112,6 +114,13 @@ def commit_submodule_changes(
     if message is None:
         message = f"Add {module_name} as submodule"
 
+    # Calculate relative_path if not provided
+    if relative_path is None:
+        parts = module_name.split('.')
+        if len(parts) > 1:
+            last_segment = parts[-1]
+            relative_path = f"mod/{last_segment}"
+
     try:
         # Stage .gitmodules and submodule directory
         subprocess.run(
@@ -121,6 +130,16 @@ def commit_submodule_changes(
             encoding='utf-8',
             check=True
         )
+
+        # Stage the submodule directory if relative_path is provided
+        if relative_path:
+            subprocess.run(
+                ["git", "-C", str(parent_path), "add", relative_path],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                check=True
+            )
 
         # Commit changes
         subprocess.run(
