@@ -5,14 +5,13 @@ import importlib.util
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 try:
     from .exceptions import SubmoduleAddError, SubmoduleCommitError
 except ImportError:
     # When running as script, load our local exceptions module
     import sys
-    
+
     # Check if already loaded by another module to ensure we use the same exception classes
     if "submodule_exceptions" in sys.modules:
         exceptions_module = sys.modules["submodule_exceptions"]
@@ -22,9 +21,139 @@ except ImportError:
         exceptions_module = importlib.util.module_from_spec(spec)
         sys.modules["submodule_exceptions"] = exceptions_module
         spec.loader.exec_module(exceptions_module)
-    
+
     SubmoduleAddError = exceptions_module.SubmoduleAddError
     SubmoduleCommitError = exceptions_module.SubmoduleCommitError
+
+
+def log_git_status(parent_path: Path, context: str) -> None:
+    """Log current git repository status for debugging.
+
+    Args:
+        parent_path: Path to parent repository
+        context: Context message for the log
+    """
+    print(f"   🔍 Git Status ({context}):")
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(parent_path), "status", "--short"],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        status_output = result.stdout.strip()
+        if status_output:
+            for line in status_output.split('\n'):
+                print(f"      {line}")
+        else:
+            print("      (clean working tree)")
+    except Exception as e:
+        print(f"      Failed to get status: {e}")
+
+
+def log_submodule_index_state(parent_path: Path, relative_path: str) -> None:
+    """Log git index state for a submodule path.
+
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+    """
+    print(f"   🔍 Index state for '{relative_path}':")
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(parent_path), "ls-files", "--stage", relative_path],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        index_output = result.stdout.strip()
+        if index_output:
+            print(f"      {index_output}")
+        else:
+            print("      (not in index)")
+    except Exception as e:
+        print(f"      Failed to check index: {e}")
+
+
+def log_gitmodules_config(parent_path: Path, relative_path: str) -> None:
+    """Log .gitmodules configuration for a submodule.
+
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+    """
+    print(f"   🔍 .gitmodules config for '{relative_path}':")
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(parent_path), "config", "--file", ".gitmodules", "--get-regexp", f"submodule.{relative_path}.*"],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        config_output = result.stdout.strip()
+        if config_output:
+            for line in config_output.split('\n'):
+                print(f"      {line}")
+        else:
+            print("      (no configuration found)")
+    except subprocess.CalledProcessError:
+        print("      (no configuration found)")
+    except Exception as e:
+        print(f"      Failed to check config: {e}")
+
+
+def log_submodule_git_config(parent_path: Path, relative_path: str) -> None:
+    """Log git config for a submodule.
+
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+    """
+    print(f"   🔍 Git config for 'submodule.{relative_path}':")
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(parent_path), "config", "--get-regexp", f"submodule.{relative_path}.*"],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        config_output = result.stdout.strip()
+        if config_output:
+            for line in config_output.split('\n'):
+                print(f"      {line}")
+        else:
+            print("      (no configuration found)")
+    except subprocess.CalledProcessError:
+        print("      (no configuration found)")
+    except Exception as e:
+        print(f"      Failed to check config: {e}")
+
+
+def log_submodule_directory_state(parent_path: Path, relative_path: str) -> None:
+    """Log filesystem state of submodule directory.
+
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+    """
+    submodule_path = parent_path / relative_path
+    modules_path = parent_path / ".git" / "modules" / relative_path
+
+    print("   🔍 Filesystem state:")
+    print(f"      Submodule directory exists: {submodule_path.exists()}")
+    if submodule_path.exists():
+        print(f"      Is directory: {submodule_path.is_dir()}")
+        if submodule_path.is_dir():
+            try:
+                contents = list(submodule_path.iterdir())
+                print(f"      Contents: {len(contents)} items")
+            except Exception as e:
+                print(f"      Failed to list contents: {e}")
+    print(f"      .git/modules entry exists: {modules_path.exists()}")
 
 
 def add_git_submodule(
@@ -66,6 +195,12 @@ def add_git_submodule(
         print("   ⚠️  Submodule exists with different URL or incomplete state")
         print(f"      Existing: {existing_url or 'not in .gitmodules'}")
         print(f"      Expected: {repo_url}")
+
+        # Log detailed state before removal
+        log_submodule_index_state(parent_path, relative_path)
+        log_gitmodules_config(parent_path, relative_path)
+        log_submodule_directory_state(parent_path, relative_path)
+
         print("   🔄 Removing old submodule...")
 
         try:
@@ -73,6 +208,10 @@ def add_git_submodule(
             print("   ✅ Old submodule removed")
         except SubmoduleAddError as e:
             print(f"   ⚠️  Warning during removal: {e}")
+            # Log state after failed removal
+            log_submodule_index_state(parent_path, relative_path)
+            log_gitmodules_config(parent_path, relative_path)
+            log_submodule_directory_state(parent_path, relative_path)
 
     # Add the submodule
     try:
@@ -92,6 +231,14 @@ def add_git_submodule(
         )
         return True
     except subprocess.CalledProcessError as e:
+        # Log detailed state on error
+        print("   ❌ Failed to add submodule")
+        print(f"   Error output: {e.stderr}")
+        log_git_status(parent_path, "after failed add")
+        log_submodule_index_state(parent_path, relative_path)
+        log_gitmodules_config(parent_path, relative_path)
+        log_submodule_directory_state(parent_path, relative_path)
+
         raise SubmoduleAddError(
             f"Failed to add submodule {repo_url} at {relative_path}: {e.stderr}"
         ) from e
@@ -102,7 +249,7 @@ def add_git_submodule(
 def commit_submodule_changes(
     parent_path: Path,
     module_name: str,
-    message: Optional[str] = None
+    message: str | None = None
 ) -> bool:
     """Commit .gitmodules and submodule changes to parent repository.
 
@@ -125,24 +272,36 @@ def commit_submodule_changes(
     if message is None:
         message = f"Add {module_name} as submodule"
 
+    # Log git status before committing
+    log_git_status(parent_path, "before commit")
+
     try:
         # Commit all staged changes (git submodule add already stages both .gitmodules and the submodule entry)
         # Note: We don't use 'git add' on the submodule path as this would treat it as an embedded repository
         # instead of a proper submodule, causing Git warnings.
-        subprocess.run(
+        result = subprocess.run(
             ["git", "-C", str(parent_path), "commit", "-m", message],
             capture_output=True,
             text=True,
             encoding='utf-8',
             check=True
         )
+        print(f"   🔍 Commit output: {result.stdout.strip()}")
         return True
     except subprocess.CalledProcessError as e:
         # If nothing to commit, that's okay
         # This covers both "nothing to commit" (clean tree) and "nothing added to commit" (untracked files present)
         git_output = (e.stdout or '') + (e.stderr or '')
         if "nothing to commit" in git_output or "nothing added to commit" in git_output:
+            print("   ℹ️  Nothing to commit (already committed or clean tree)")
             return True
+
+        # Log detailed state on error
+        print("   ❌ Failed to commit")
+        print(f"   Error output: {e.stderr}")
+        print(f"   Stdout: {e.stdout}")
+        log_git_status(parent_path, "after failed commit")
+
         raise SubmoduleCommitError(
             f"Failed to commit submodule changes: {e.stderr}"
         ) from e
@@ -198,7 +357,7 @@ def is_git_repository(path: Path) -> bool:
     return (path / ".git").exists()
 
 
-def get_submodule_url(parent_path: Path, relative_path: str) -> Optional[str]:
+def get_submodule_url(parent_path: Path, relative_path: str) -> str | None:
     """Get the URL of an existing submodule.
 
     Args:
@@ -269,9 +428,16 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
     Raises:
         SubmoduleAddError: If removal fails
     """
+    print("   🔍 Starting submodule removal process...")
+    log_submodule_index_state(parent_path, relative_path)
+    log_gitmodules_config(parent_path, relative_path)
+    log_submodule_git_config(parent_path, relative_path)
+    log_submodule_directory_state(parent_path, relative_path)
+
     try:
         # Step 1: Deinitialize the submodule
-        subprocess.run(
+        print("   📍 Step 1: Deinitializing submodule...")
+        result = subprocess.run(
             [
                 "git", "-C", str(parent_path),
                 "submodule", "deinit", "-f", relative_path
@@ -281,9 +447,14 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
             encoding='utf-8',
             check=False  # May fail if not initialized, that's ok
         )
+        if result.returncode == 0:
+            print("   ✅ Deinitialize succeeded")
+        else:
+            print(f"   ⚠️  Deinitialize failed (may not have been initialized): {result.stderr.strip()}")
 
         # Step 2: Remove from git index and working tree
-        subprocess.run(
+        print("   📍 Step 2: Removing from git index and working tree...")
+        result = subprocess.run(
             [
                 "git", "-C", str(parent_path),
                 "rm", "-f", relative_path
@@ -293,9 +464,11 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
             encoding='utf-8',
             check=True
         )
+        print(f"   ✅ Removed from git index: {result.stdout.strip()}")
 
         # Step 3: Remove submodule config from .gitmodules
-        subprocess.run(
+        print("   📍 Step 3: Removing from .gitmodules...")
+        result = subprocess.run(
             [
                 "git", "-C", str(parent_path),
                 "config", "--file", ".gitmodules",
@@ -306,9 +479,14 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
             encoding='utf-8',
             check=False  # May fail if already removed, that's ok
         )
+        if result.returncode == 0:
+            print("   ✅ Removed from .gitmodules")
+        else:
+            print(f"   ⚠️  .gitmodules removal skipped (may not exist): {result.stderr.strip()}")
 
         # Step 4: Remove submodule-specific git config
-        subprocess.run(
+        print("   📍 Step 4: Removing from git config...")
+        result = subprocess.run(
             [
                 "git", "-C", str(parent_path),
                 "config", "--remove-section", f"submodule.{relative_path}"
@@ -318,20 +496,46 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
             encoding='utf-8',
             check=False  # May fail if doesn't exist, that's ok
         )
+        if result.returncode == 0:
+            print("   ✅ Removed from git config")
+        else:
+            print(f"   ⚠️  Git config removal skipped (may not exist): {result.stderr.strip()}")
 
         # Step 5: Remove .git/modules/<path> directory
+        print("   📍 Step 5: Removing .git/modules directory...")
         modules_path = parent_path / ".git" / "modules" / relative_path
         if modules_path.exists():
             shutil.rmtree(modules_path)
+            print(f"   ✅ Removed .git/modules/{relative_path}")
+        else:
+            print(f"   ⚠️  .git/modules/{relative_path} does not exist, skipping")
+
+        # Log final state
+        print("   🔍 Final state after removal:")
+        log_submodule_index_state(parent_path, relative_path)
+        log_gitmodules_config(parent_path, relative_path)
+        log_submodule_directory_state(parent_path, relative_path)
 
         return True
     except subprocess.CalledProcessError as e:
+        print("   ❌ Removal failed at step")
+        print(f"   Error output: {e.stderr}")
+        log_git_status(parent_path, "after failed removal")
+        log_submodule_index_state(parent_path, relative_path)
+        log_gitmodules_config(parent_path, relative_path)
+        log_submodule_directory_state(parent_path, relative_path)
+
         raise SubmoduleAddError(
             f"Failed to remove submodule {relative_path}: {e.stderr}"
         ) from e
     except FileNotFoundError as e:
         raise SubmoduleAddError("Git not installed or not on PATH") from e
     except Exception as e:
+        print(f"   ❌ Unexpected error during removal: {str(e)}")
+        log_git_status(parent_path, "after unexpected error")
+        log_submodule_index_state(parent_path, relative_path)
+        log_submodule_directory_state(parent_path, relative_path)
+
         raise SubmoduleAddError(
             f"Failed to remove submodule {relative_path}: {str(e)}"
         ) from e
