@@ -11,10 +11,18 @@ try:
     from .exceptions import SubmoduleAddError, SubmoduleCommitError
 except ImportError:
     # When running as script, load our local exceptions module
-    exceptions_path = Path(__file__).parent / "exceptions.py"
-    spec = importlib.util.spec_from_file_location("submodule_exceptions", exceptions_path)
-    exceptions_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(exceptions_module)
+    import sys
+    
+    # Check if already loaded by another module to ensure we use the same exception classes
+    if "submodule_exceptions" in sys.modules:
+        exceptions_module = sys.modules["submodule_exceptions"]
+    else:
+        exceptions_path = Path(__file__).parent / "exceptions.py"
+        spec = importlib.util.spec_from_file_location("submodule_exceptions", exceptions_path)
+        exceptions_module = importlib.util.module_from_spec(spec)
+        sys.modules["submodule_exceptions"] = exceptions_module
+        spec.loader.exec_module(exceptions_module)
+    
     SubmoduleAddError = exceptions_module.SubmoduleAddError
     SubmoduleCommitError = exceptions_module.SubmoduleCommitError
 
