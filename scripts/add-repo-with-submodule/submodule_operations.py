@@ -287,16 +287,24 @@ def commit_submodule_changes(
             check=True
         )
         
-        # Look for lines like " M mod/Submodule" (modified content) or "MM mod/Submodule" (new commits)
-        # These indicate the submodule has changes that need to be staged
+        # Look for lines like " M mod/Submodule" (modified in working tree)
+        # or "M  mod/Submodule" (modified in index) or "MM mod/Submodule" (both)
+        # Git status --short format: XY filename where X=index, Y=working tree
+        # For submodules: " M" (modified content), "M " (new commits staged), "MM" (both)
         status_lines = status_result.stdout.strip().split('\n') if status_result.stdout.strip() else []
         needs_staging = False
         for line in status_lines:
-            # Check if line indicates modified submodule content or new commits
-            # Patterns: " M path", "MM path", or "M  path" where path contains the submodule
-            if line and (' M ' in line or 'MM ' in line or 'M  ' in line):
-                needs_staging = True
-                break
+            # Check if line indicates modified or unstaged changes
+            # Check first two characters for status codes
+            if len(line) >= 2:
+                status_code = line[:2]
+                # ' M' = modified in working tree (not staged)
+                # 'M ' = modified in index but also modified in working tree
+                # 'MM' = modified in both
+                # We want to stage if there's any ' M' or 'M ' pattern
+                if ' M' in status_code or 'M ' in status_code or 'MM' in status_code:
+                    needs_staging = True
+                    break
         
         if needs_staging:
             print(f"   📍 Staging submodule changes...")
