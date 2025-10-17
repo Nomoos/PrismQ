@@ -15,15 +15,15 @@ set "SCRIPT_DIR=%~dp0"
 set "VENV_DIR=%SCRIPT_DIR%.venv"
 
 REM Check if Python is installed
-python --version >nul 2>&1
+py -3.9 --version >nul 2>&1
 if errorlevel 1 (
-    echo Error: Python is not installed or not in PATH
-    echo Please install Python 3.8 or higher from https://www.python.org/
+    echo Error: Python 3.9 is not installed or not available via py launcher
+    echo Please install Python 3.9 or higher from https://www.python.org/
     exit /b 1
 )
 
 REM Display Python version
-for /f "tokens=*" %%i in ('python --version') do set PYTHON_VERSION=%%i
+for /f "tokens=*" %%i in ('py -3.9 --version') do set PYTHON_VERSION=%%i
 echo Found: %PYTHON_VERSION%
 
 REM Check if virtual environment already exists
@@ -42,7 +42,7 @@ if exist "%VENV_DIR%" (
 REM Create virtual environment
 echo.
 echo Creating Python virtual environment...
-python -m venv "%VENV_DIR%"
+py -3.9 -m venv "%VENV_DIR%"
 if errorlevel 1 (
     echo Error: Failed to create virtual environment
     exit /b 1
@@ -56,7 +56,7 @@ echo Installing Python dependencies...
 call "%VENV_DIR%\Scripts\activate.bat"
 
 REM Upgrade pip
-python -m pip install --upgrade pip >nul 2>&1
+py -3.9 -m pip install --upgrade pip >nul 2>&1
 
 REM Install dependencies from requirements.txt
 if exist "%SCRIPT_DIR%requirements.txt" (
