@@ -217,7 +217,7 @@ Default configuration:
 
 ## Limitations
 
-- Automatically pushes changes to remote (commits are immediately visible)
+- Automatically pushes changes without user review (changes are immediately visible and cannot be easily undone)
 - Does not auto-initialize submodules (user must run `git submodule update --init`)
 - Requires parent repository to exist as git repo
 - No rollback capability (Option 3 feature)
