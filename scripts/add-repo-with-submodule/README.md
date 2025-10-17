@@ -1,24 +1,25 @@
-# Add Repository with Submodule
+# Add Repository (Create/Clone Only)
 
-A Python CLI tool that creates GitHub repositories and automatically registers them as git submodules. This tool extends the functionality of `repo-builder` by adding submodule registration after repository creation.
+A Python CLI tool that creates and clones GitHub repositories. This tool uses `repo-builder` functionality to create/clone repository chains.
+
+**Note:** This script has been refactored to ONLY create/clone repositories. Use the `git-utils` scripts for submodule management:
+- `map-submodules` - Register repositories as submodules
+- `check-submodules` - Validate submodule mappings
+- `git-commit-all` - Commit all changes
+- `git-push-all` - Push all repositories
 
 ## Features
 
 - **Repository Creation**: Uses repo-builder to create/clone GitHub repositories
-- **Submodule Registration**: Automatically adds repositories as git submodules
-- **Chain Processing**: Handles entire module hierarchy from root to deepest
-- **Auto-Commit**: Commits .gitmodules changes to parent repositories
-- **Auto-Push**: Automatically pushes changes to remote repository
+- **Chain Processing**: Handles entire module hierarchy
 - **Same Interface**: Compatible with repo-builder input format
+- **Focused Responsibility**: Only creates/clones, doesn't modify .gitmodules
 
 ## What It Does
 
 1. Creates GitHub repositories (via repo-builder)
 2. Clones repositories locally (via repo-builder)
-3. **Registers each repository as a git submodule in its parent** ⭐
-4. **Commits changes to parent .gitmodules** ⭐
-5. **Pushes changes to remote repository** ⭐
-6. Provides next steps for the user
+3. **That's it!** Use `map-submodules` for submodule registration
 
 ## Prerequisites
 
@@ -78,9 +79,12 @@ python -m add_repo_with_submodule PrismQ.IdeaInspiration.Sources
 
 **What happens:**
 1. Creates/clones `PrismQ`
-2. Creates/clones `PrismQ.IdeaInspiration` → submodule in `PrismQ`
-3. Creates/clones `PrismQ.IdeaInspiration.Sources` → submodule in `PrismQ.IdeaInspiration`
-4. Commits changes to both `PrismQ` and `PrismQ.IdeaInspiration`
+2. Creates/clones `PrismQ.IdeaInspiration`
+3. Creates/clones `PrismQ.IdeaInspiration.Sources`
+4. **Registers submodules from deepest to shallowest:**
+   - First: `PrismQ.IdeaInspiration.Sources` → submodule in `PrismQ.IdeaInspiration`
+   - Then: `PrismQ.IdeaInspiration` → submodule in `PrismQ`
+5. Commits and pushes changes to each parent repository
 
 ### Example 3: Deep Nesting
 
@@ -173,12 +177,18 @@ create_git_chain(chain, workspace)
 
 ### 3. Add as Submodules (new functionality)
 ```python
-for module in chain[1:]:  # Skip PrismQ root
+# Process from deepest to shallowest to avoid "modified content" errors
+for module in reversed(chain[1:]):  # Skip PrismQ root, process in reverse
     parent = get_parent_module(module)
     add_git_submodule(parent_path, repo_url, relative_path)
     commit_submodule_changes(parent_path, module)
     push_submodule_changes(parent_path)
 ```
+
+**Why reverse order?** Processing from deepest to shallowest ensures that:
+- Child submodules are fully committed before parents try to register them
+- No "modified content" errors in parent repositories
+- Cleaner git status during automated submodule registration
 
 ## Architecture
 

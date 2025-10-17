@@ -99,7 +99,9 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
     print("=" * 50)
     
     # Skip PrismQ root (first in chain)
-    for module_name in chain[1:]:
+    # Process in reverse order (deepest to shallowest) to avoid "modified content" errors
+    # This ensures child submodules are committed before parent tries to register them
+    for module_name in reversed(chain[1:]):
         parent_name = get_parent_module(module_name)
         parent_path = get_repository_path(parent_name, workspace)
         
@@ -159,13 +161,16 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
 
 def main(module_input: str) -> None:
     """
-    Main workflow for creating repositories and adding as submodules.
+    Main workflow for creating/cloning repositories only.
+    
+    Note: This script now ONLY creates/clones repositories.
+    Use map-submodules to register them as submodules afterwards.
     
     Args:
         module_input: Module name or GitHub URL
     """
     try:
-        print("\n🚀 Add Repository with Submodule")
+        print("\n🚀 Add Repository (Create/Clone Only)")
         print("=" * 50)
         
         # Step 1: Validate GitHub CLI
@@ -185,16 +190,13 @@ def main(module_input: str) -> None:
         print(f"\n📦 Creating/cloning repositories...")
         create_git_chain(chain, workspace)
         
-        # Step 5: Add as submodules
-        add_chain_as_submodules(chain, workspace)
-        
         print("\n" + "=" * 50)
-        print("✅ All operations complete!")
+        print("✅ Repository creation complete!")
         print("\n💡 Next steps:")
-        print("   • Review changes with: git status")
-        print("   • Changes have been pushed to remote")
-        print("   • Initialize submodules in other clones with:")
-        print("     git submodule update --init --recursive")
+        print("   • Run 'map-submodules' to register repositories as submodules")
+        print("   • Run 'check-submodules' to verify submodule configuration")
+        print("   • Run 'git-commit-all' to commit changes")
+        print("   • Run 'git-push-all' to push to remote")
         
     except Exception as e:
         print(f"\n❌ Error: {e}", file=sys.stderr)
