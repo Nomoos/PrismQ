@@ -83,7 +83,7 @@ def commit_submodule_changes(
         SubmoduleCommitError: If commit fails
     """
     if message is None:
-        message = f"add module {module_name}"
+        message = f"Add {module_name} as submodule"
     
     try:
         # Stage .gitmodules and submodule directory
