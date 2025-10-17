@@ -22,13 +22,19 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM Start from the folder where this script lives
-set "ROOT=%~dp0"
-echo Starting recursive pull from: %ROOT%
+REM Determine repo root (start from repository root, not script directory)
+for /f "delims=" %%R in ('git rev-parse --show-toplevel 2^>NUL') do set REPO_ROOT=%%R
+if not defined REPO_ROOT (
+  echo [ERROR] This directory is not inside a Git repository.
+  pause
+  exit /b 1
+)
+
+echo Starting recursive pull from: %REPO_ROOT%
 echo.
 
 REM Find every folder named "mod" (any depth), then pull if it has a .git dir
-for /f "delims=" %%D in ('dir "%ROOT%" /b /s /ad ^| findstr /r /c:"\\mod$"') do (
+for /f "delims=" %%D in ('dir "%REPO_ROOT%" /b /s /ad ^| findstr /r /c:"\\mod$"') do (
     if exist "%%D\.git" (
         echo ==============================================
         echo Repo: %%D

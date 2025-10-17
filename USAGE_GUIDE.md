@@ -106,7 +106,7 @@ scripts\git_pull_all.bat
 
 **Example output:**
 ```
-Starting recursive pull from: C:\path\to\PrismQ\scripts\
+Starting recursive pull from: C:\path\to\PrismQ
 ==============================================
 Repo: C:\path\to\PrismQ\mod
 Fetching...
