@@ -5,6 +5,7 @@ import importlib.util
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 try:
     from .exceptions import SubmoduleAddError, SubmoduleCommitError
@@ -93,7 +94,7 @@ def add_git_submodule(
 def commit_submodule_changes(
     parent_path: Path,
     module_name: str,
-    message: str | None = None
+    message: Optional[str] = None
 ) -> bool:
     """Commit .gitmodules and submodule changes to parent repository.
 
@@ -189,7 +190,7 @@ def is_git_repository(path: Path) -> bool:
     return (path / ".git").exists()
 
 
-def get_submodule_url(parent_path: Path, relative_path: str) -> str | None:
+def get_submodule_url(parent_path: Path, relative_path: str) -> Optional[str]:
     """Get the URL of an existing submodule.
 
     Args:
