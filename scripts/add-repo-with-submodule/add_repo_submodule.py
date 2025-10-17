@@ -28,15 +28,17 @@ except ImportError:
     # When running as script, import directly with unique names to avoid conflicts
     import importlib.util
     
-    # Load our local exceptions module
+    # Load our local exceptions module and register it in sys.modules
+    # This ensures submodule_operations will use the same exception classes
     exceptions_path = Path(__file__).parent / "exceptions.py"
     spec = importlib.util.spec_from_file_location("submodule_exceptions", exceptions_path)
     exceptions_module = importlib.util.module_from_spec(spec)
+    sys.modules["submodule_exceptions"] = exceptions_module  # Register for shared use
     spec.loader.exec_module(exceptions_module)
     SubmoduleError = exceptions_module.SubmoduleError
     ParentNotFoundError = exceptions_module.ParentNotFoundError
     
-    # Load submodule_operations normally
+    # Load submodule_operations normally - it will now use our registered exceptions module
     from submodule_operations import (
         add_git_submodule,
         commit_submodule_changes,
@@ -103,9 +105,9 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
         
         # Check if parent is a git repository
         if not is_git_repository(parent_path):
-            raise ParentNotFoundError(
-                f"Parent repository not found or not a git repo: {parent_path}"
-            )
+            print(f"   ⚠️  Warning: Parent repository not found or not a git repo: {parent_path}")
+            print(f"   Skipping {module_name}...")
+            continue
         
         # Get relative path for submodule
         relative_path = get_relative_path(module_name)
@@ -126,23 +128,32 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
                 branch="main"
             )
             print(f"   ✅ Added as submodule")
-            
+        except SubmoduleError as e:
+            print(f"   ⚠️  Warning during add: {e}")
+            print(f"   Continuing with next submodule...")
+            continue
+        
+        try:
             # Commit changes
             commit_submodule_changes(
                 parent_path=parent_path,
                 module_name=module_name
             )
             print(f"   ✅ Committed to parent")
-            
+        except SubmoduleError as e:
+            print(f"   ⚠️  Warning during commit: {e}")
+            print(f"   Continuing with next submodule...")
+            continue
+        
+        try:
             # Push changes
             push_submodule_changes(
                 parent_path=parent_path
             )
             print(f"   ✅ Pushed to remote")
-            
         except SubmoduleError as e:
-            print(f"   ⚠️  Warning: {e}")
-            print(f"   (Submodule may already exist)")
+            print(f"   ⚠️  Warning during push: {e}")
+            print(f"   Continuing with next submodule...")
             continue
 
 
