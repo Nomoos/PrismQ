@@ -99,7 +99,9 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
     print("=" * 50)
     
     # Skip PrismQ root (first in chain)
-    for module_name in chain[1:]:
+    # Process in reverse order (deepest to shallowest) to avoid "modified content" errors
+    # This ensures child submodules are committed before parent tries to register them
+    for module_name in reversed(chain[1:]):
         parent_name = get_parent_module(module_name)
         parent_path = get_repository_path(parent_name, workspace)
         

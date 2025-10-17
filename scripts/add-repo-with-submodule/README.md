@@ -6,7 +6,7 @@ A Python CLI tool that creates GitHub repositories and automatically registers t
 
 - **Repository Creation**: Uses repo-builder to create/clone GitHub repositories
 - **Submodule Registration**: Automatically adds repositories as git submodules
-- **Chain Processing**: Handles entire module hierarchy from root to deepest
+- **Chain Processing**: Handles entire module hierarchy, processing from deepest to shallowest
 - **Auto-Commit**: Commits .gitmodules changes to parent repositories
 - **Auto-Push**: Automatically pushes changes to remote repository
 - **Same Interface**: Compatible with repo-builder input format
@@ -78,9 +78,12 @@ python -m add_repo_with_submodule PrismQ.IdeaInspiration.Sources
 
 **What happens:**
 1. Creates/clones `PrismQ`
-2. Creates/clones `PrismQ.IdeaInspiration` → submodule in `PrismQ`
-3. Creates/clones `PrismQ.IdeaInspiration.Sources` → submodule in `PrismQ.IdeaInspiration`
-4. Commits changes to both `PrismQ` and `PrismQ.IdeaInspiration`
+2. Creates/clones `PrismQ.IdeaInspiration`
+3. Creates/clones `PrismQ.IdeaInspiration.Sources`
+4. **Registers submodules from deepest to shallowest:**
+   - First: `PrismQ.IdeaInspiration.Sources` → submodule in `PrismQ.IdeaInspiration`
+   - Then: `PrismQ.IdeaInspiration` → submodule in `PrismQ`
+5. Commits and pushes changes to each parent repository
 
 ### Example 3: Deep Nesting
 
@@ -173,12 +176,18 @@ create_git_chain(chain, workspace)
 
 ### 3. Add as Submodules (new functionality)
 ```python
-for module in chain[1:]:  # Skip PrismQ root
+# Process from deepest to shallowest to avoid "modified content" errors
+for module in reversed(chain[1:]):  # Skip PrismQ root, process in reverse
     parent = get_parent_module(module)
     add_git_submodule(parent_path, repo_url, relative_path)
     commit_submodule_changes(parent_path, module)
     push_submodule_changes(parent_path)
 ```
+
+**Why reverse order?** Processing from deepest to shallowest ensures that:
+- Child submodules are fully committed before parents try to register them
+- No "modified content" errors in parent repositories
+- Cleaner git status during automated submodule registration
 
 ## Architecture
 
