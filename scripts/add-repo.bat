@@ -1,14 +1,14 @@
 @echo off
-REM PrismQ Repository Builder - Run Script
-REM Activates virtual environment and runs the repo_builder.py script
+REM PrismQ Add Repository with Submodule - Run Script
+REM Activates virtual environment and runs the add-repo-with-submodule script
 
 setlocal
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
-set "VENV_DIR=%SCRIPT_DIR%repo-builder\.venv"
-set "PYTHON_SCRIPT=%SCRIPT_DIR%repo-builder\repo_builder.py"
-set "SETUP_SCRIPT=%SCRIPT_DIR%repo-builder\setup_env.bat"
+set "VENV_DIR=%SCRIPT_DIR%add-repo-with-submodule\.venv"
+set "PYTHON_SCRIPT=%SCRIPT_DIR%add-repo-with-submodule\cli.py"
+set "SETUP_SCRIPT=%SCRIPT_DIR%add-repo-with-submodule\setup_env.bat"
 
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%\Scripts\activate.bat" (
@@ -48,7 +48,7 @@ if errorlevel 1 (
 REM Check if Python script exists
 if not exist "%PYTHON_SCRIPT%" (
     echo Error: Python script not found at: %PYTHON_SCRIPT%
-    echo Please ensure the repo-builder is installed correctly
+    echo Please ensure the add-repo-with-submodule is installed correctly
     deactivate
     exit /b 1
 )

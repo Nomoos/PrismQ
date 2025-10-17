@@ -40,9 +40,9 @@ See [docs/repository-tree.html](docs/repository-tree.html) for the complete modu
   - Preserves mod/ directory structure for nested modules
   - Example: `scripts\submodule-converter.bat` (Windows) or use the Python module directly
 
-- **add-repo.bat** - Repository builder and validator
-  - Wrapper for the repo-builder tool
-  - See [scripts/repo-builder/README.md](scripts/repo-builder/README.md) for details
+- **add-repo.bat** - Repository builder with submodule support
+  - Wrapper for the add-repo-with-submodule tool
+  - See [scripts/add-repo-with-submodule/README.md](scripts/add-repo-with-submodule/README.md) for details
   - Example: `scripts\add-repo.bat PrismQ.ModuleName`
 
 For detailed documentation on each script, see the respective README files in the scripts directory.
