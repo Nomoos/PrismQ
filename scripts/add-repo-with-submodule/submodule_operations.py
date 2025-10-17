@@ -301,8 +301,7 @@ def commit_submodule_changes(
                 # ' M' = modified in working tree (not staged)
                 # 'M ' = modified in index but also modified in working tree
                 # 'MM' = modified in both
-                # Use exact equality to avoid false matches
-                if status_code == ' M' or status_code == 'M ' or status_code == 'MM':
+                if status_code in {' M', 'M ', 'MM'}:
                     needs_staging = True
                     break
         
