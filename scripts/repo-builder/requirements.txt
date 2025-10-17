@@ -1,5 +1,0 @@
-# PrismQ Repository Builder Python Dependencies
-# Required for repo_builder.py script
-
-# No external dependencies required - uses only Python standard library
-# The script relies on GitHub CLI (gh) being installed on the system

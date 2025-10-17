@@ -1,8 +1,0 @@
-[submodule "mod/IdeaInspiration"]
-	path = mod/IdeaInspiration
-	url = https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-	branch = main
-[submodule "mod/RepositoryTemplate"]
-	path = mod/RepositoryTemplate
-	url = https://github.com/Nomoos/PrismQ.RepositoryTemplate.git
-	branch = main
