@@ -1,24 +1,25 @@
-# Add Repository with Submodule
+# Add Repository (Create/Clone Only)
 
-A Python CLI tool that creates GitHub repositories and automatically registers them as git submodules. This tool extends the functionality of `repo-builder` by adding submodule registration after repository creation.
+A Python CLI tool that creates and clones GitHub repositories. This tool uses `repo-builder` functionality to create/clone repository chains.
+
+**Note:** This script has been refactored to ONLY create/clone repositories. Use the `git-utils` scripts for submodule management:
+- `map-submodules` - Register repositories as submodules
+- `check-submodules` - Validate submodule mappings
+- `git-commit-all` - Commit all changes
+- `git-push-all` - Push all repositories
 
 ## Features
 
 - **Repository Creation**: Uses repo-builder to create/clone GitHub repositories
-- **Submodule Registration**: Automatically adds repositories as git submodules
-- **Chain Processing**: Handles entire module hierarchy, processing from deepest to shallowest
-- **Auto-Commit**: Commits .gitmodules changes to parent repositories
-- **Auto-Push**: Automatically pushes changes to remote repository
+- **Chain Processing**: Handles entire module hierarchy
 - **Same Interface**: Compatible with repo-builder input format
+- **Focused Responsibility**: Only creates/clones, doesn't modify .gitmodules
 
 ## What It Does
 
 1. Creates GitHub repositories (via repo-builder)
 2. Clones repositories locally (via repo-builder)
-3. **Registers each repository as a git submodule in its parent** ⭐
-4. **Commits changes to parent .gitmodules** ⭐
-5. **Pushes changes to remote repository** ⭐
-6. Provides next steps for the user
+3. **That's it!** Use `map-submodules` for submodule registration
 
 ## Prerequisites
 
