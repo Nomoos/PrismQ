@@ -98,9 +98,14 @@ def commit_submodule_changes(
 ) -> bool:
     """Commit .gitmodules and submodule changes to parent repository.
 
+    Note: git submodule add already stages both .gitmodules and the submodule entry
+    (as a gitlink), so we just commit those staged changes. We don't use 'git add'
+    on the submodule path as this would treat it as an embedded repository instead
+    of a proper submodule, causing Git warnings.
+
     Args:
         parent_path: Path to parent repository
-        module_name: Name of the module being added
+        module_name: Name of the module being added (e.g., 'PrismQ.IdeaInspiration')
         message: Custom commit message (optional)
 
     Returns:
@@ -113,16 +118,9 @@ def commit_submodule_changes(
         message = f"Add {module_name} as submodule"
 
     try:
-        # Stage .gitmodules and submodule directory
-        subprocess.run(
-            ["git", "-C", str(parent_path), "add", ".gitmodules"],
-            capture_output=True,
-            text=True,
-            encoding='utf-8',
-            check=True
-        )
-
-        # Commit changes
+        # Commit all staged changes (git submodule add already stages both .gitmodules and the submodule entry)
+        # Note: We don't use 'git add' on the submodule path as this would treat it as an embedded repository
+        # instead of a proper submodule, causing Git warnings.
         subprocess.run(
             ["git", "-C", str(parent_path), "commit", "-m", message],
             capture_output=True,
