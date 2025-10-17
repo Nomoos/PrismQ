@@ -277,9 +277,42 @@ def commit_submodule_changes(
     log_git_status(parent_path, "before commit")
 
     try:
+        # First, check if there are any modified or new commits in the submodule
+        # In such cases, we need to stage the submodule explicitly
+        status_result = subprocess.run(
+            ["git", "-C", str(parent_path), "status", "--short"],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        
+        # Look for lines like " M mod/Submodule" (modified content) or "MM mod/Submodule" (new commits)
+        # These indicate the submodule has changes that need to be staged
+        status_lines = status_result.stdout.strip().split('\n') if status_result.stdout.strip() else []
+        needs_staging = False
+        for line in status_lines:
+            # Check if line indicates modified submodule content or new commits
+            # Patterns: " M path", "MM path", or "M  path" where path contains the submodule
+            if line and (' M ' in line or 'MM ' in line or 'M  ' in line):
+                needs_staging = True
+                break
+        
+        if needs_staging:
+            print(f"   📍 Staging submodule changes...")
+            # Stage all changes including .gitmodules and the submodule gitlink
+            subprocess.run(
+                ["git", "-C", str(parent_path), "add", "-A"],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                check=True
+            )
+            print("   ✅ Changes staged")
+        
         # Commit all staged changes (git submodule add already stages both .gitmodules and the submodule entry)
-        # Note: We don't use 'git add' on the submodule path as this would treat it as an embedded repository
-        # instead of a proper submodule, causing Git warnings.
+        # Note: For new submodules, git submodule add stages them automatically
+        # For existing submodules with changes, we stage them above
         result = subprocess.run(
             ["git", "-C", str(parent_path), "commit", "-m", message],
             capture_output=True,
@@ -455,10 +488,12 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
 
         # Step 2: Remove from git index and working tree
         print("   📍 Step 2: Removing from git index and working tree...")
+        # Use --cached to remove from index without requiring .gitmodules configuration
+        # This is necessary when a gitlink exists in the index but is not properly registered
         result = subprocess.run(
             [
                 "git", "-C", str(parent_path),
-                "rm", "-f", relative_path
+                "rm", "--cached", "-r", relative_path
             ],
             capture_output=True,
             text=True,
@@ -466,6 +501,13 @@ def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
             check=True
         )
         print(f"   ✅ Removed from git index: {result.stdout.strip()}")
+        
+        # Also remove from working directory if it exists
+        submodule_path = parent_path / relative_path
+        if submodule_path.exists():
+            print(f"   📍 Removing from working directory: {relative_path}")
+            shutil.rmtree(submodule_path)
+            print("   ✅ Removed from working directory")
 
         # Step 3: Remove submodule config from .gitmodules
         print("   📍 Step 3: Removing from .gitmodules...")
