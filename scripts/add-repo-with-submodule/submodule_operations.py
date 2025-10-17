@@ -101,8 +101,11 @@ def commit_submodule_changes(
 
     Args:
         parent_path: Path to parent repository
-        module_name: Name of the module being added
-        relative_path: Relative path of the submodule (optional, calculated from module_name if not provided)
+        module_name: Name of the module being added (e.g., 'PrismQ.IdeaInspiration')
+        relative_path: Relative path of the submodule (e.g., 'mod/IdeaInspiration').
+                      If not provided, calculated from module_name by taking the last
+                      segment and prefixing with 'mod/'. If module_name has no dots,
+                      relative_path will be None and only .gitmodules will be staged.
         message: Custom commit message (optional)
 
     Returns:
