@@ -21,6 +21,7 @@ try:
     from .submodule_operations import (
         add_git_submodule,
         commit_submodule_changes,
+        push_submodule_changes,
         is_git_repository
     )
 except ImportError:
@@ -39,6 +40,7 @@ except ImportError:
     from submodule_operations import (
         add_git_submodule,
         commit_submodule_changes,
+        push_submodule_changes,
         is_git_repository
     )
 
@@ -132,6 +134,12 @@ def add_chain_as_submodules(chain: List[str], workspace: Path) -> None:
             )
             print(f"   ✅ Committed to parent")
             
+            # Push changes
+            push_submodule_changes(
+                parent_path=parent_path
+            )
+            print(f"   ✅ Pushed to remote")
+            
         except SubmoduleError as e:
             print(f"   ⚠️  Warning: {e}")
             print(f"   (Submodule may already exist)")
@@ -173,7 +181,7 @@ def main(module_input: str) -> None:
         print("✅ All operations complete!")
         print("\n💡 Next steps:")
         print("   • Review changes with: git status")
-        print("   • Push changes with: git push")
+        print("   • Changes have been pushed to remote")
         print("   • Initialize submodules in other clones with:")
         print("     git submodule update --init --recursive")
         

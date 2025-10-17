@@ -8,6 +8,7 @@ A Python CLI tool that creates GitHub repositories and automatically registers t
 - **Submodule Registration**: Automatically adds repositories as git submodules
 - **Chain Processing**: Handles entire module hierarchy from root to deepest
 - **Auto-Commit**: Commits .gitmodules changes to parent repositories
+- **Auto-Push**: Automatically pushes changes to remote repository
 - **Same Interface**: Compatible with repo-builder input format
 
 ## What It Does
@@ -16,7 +17,8 @@ A Python CLI tool that creates GitHub repositories and automatically registers t
 2. Clones repositories locally (via repo-builder)
 3. **Registers each repository as a git submodule in its parent** ⭐
 4. **Commits changes to parent .gitmodules** ⭐
-5. Provides next steps for the user
+5. **Pushes changes to remote repository** ⭐
+6. Provides next steps for the user
 
 ## Prerequisites
 
@@ -124,19 +126,21 @@ Repository PrismQ.IdeaInspiration.NewModule created successfully.
    Path: mod/IdeaInspiration
    ✅ Added as submodule
    ✅ Committed to parent
+   ✅ Pushed to remote
 
 🔗 Adding PrismQ.IdeaInspiration.NewModule as submodule in PrismQ.IdeaInspiration...
    URL: https://github.com/Nomoos/PrismQ.IdeaInspiration.NewModule.git
    Path: mod/NewModule
    ✅ Added as submodule
    ✅ Committed to parent
+   ✅ Pushed to remote
 
 ==================================================
 ✅ All operations complete!
 
 💡 Next steps:
    • Review changes with: git status
-   • Push changes with: git push
+   • Changes have been pushed to remote
    • Initialize submodules in other clones with:
      git submodule update --init --recursive
 ```
@@ -150,6 +154,7 @@ Repository PrismQ.IdeaInspiration.NewModule created successfully.
 | Registers as submodules | ❌ No | ✅ Yes |
 | Updates .gitmodules | ❌ No | ✅ Yes |
 | Commits to parent | ❌ No | ✅ Yes |
+| Pushes to remote | ❌ No | ✅ Yes |
 | Parent tracks child | ❌ No | ✅ Yes |
 
 ## How It Works
@@ -172,6 +177,7 @@ for module in chain[1:]:  # Skip PrismQ root
     parent = get_parent_module(module)
     add_git_submodule(parent_path, repo_url, relative_path)
     commit_submodule_changes(parent_path, module)
+    push_submodule_changes(parent_path)
 ```
 
 ## Architecture
@@ -207,11 +213,11 @@ Example:
 Default configuration:
 - **Branch tracking**: `main`
 - **Auto-commit**: Yes (commits to parent after adding submodule)
-- **Auto-push**: No (user must push manually)
+- **Auto-push**: Yes (automatically pushes changes to remote)
 
 ## Limitations
 
-- Does not auto-push changes (user must review and push)
+- Automatically pushes changes without user review (changes are immediately visible and cannot be easily undone)
 - Does not auto-initialize submodules (user must run `git submodule update --init`)
 - Requires parent repository to exist as git repo
 - No rollback capability (Option 3 feature)
