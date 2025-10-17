@@ -130,9 +130,10 @@ def commit_submodule_changes(
         )
         return True
     except subprocess.CalledProcessError as e:
-        # If nothing to commit, that's okay (covers both "nothing to commit" and "nothing added to commit")
-        if ("nothing to commit" in e.stdout or "nothing to commit" in e.stderr or
-            "nothing added to commit" in e.stdout or "nothing added to commit" in e.stderr):
+        # If nothing to commit, that's okay
+        # This covers both "nothing to commit" (clean tree) and "nothing added to commit" (untracked files present)
+        git_output = e.stdout + e.stderr
+        if "nothing to commit" in git_output or "nothing added to commit" in git_output:
             return True
         raise SubmoduleCommitError(
             f"Failed to commit submodule changes: {e.stderr}"
