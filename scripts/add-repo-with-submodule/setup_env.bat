@@ -69,7 +69,7 @@ if exist "%SCRIPT_DIR%requirements.txt" (
     )
 ) else (
     echo Note: requirements.txt not found or empty
-    echo This script uses only Python standard library
+    echo This script uses Python standard library + repo-builder
 )
 
 echo.
