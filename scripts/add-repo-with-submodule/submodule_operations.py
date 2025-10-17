@@ -83,7 +83,7 @@ def commit_submodule_changes(
         SubmoduleCommitError: If commit fails
     """
     if message is None:
-        message = f"Add {module_name} as submodule"
+        message = f"add module {module_name}"
     
     try:
         # Stage .gitmodules and submodule directory
@@ -110,6 +110,43 @@ def commit_submodule_changes(
             return True
         raise SubmoduleCommitError(
             f"Failed to commit submodule changes: {e.stderr}"
+        )
+    except FileNotFoundError:
+        raise SubmoduleCommitError("Git not installed or not on PATH")
+
+
+def push_submodule_changes(
+    parent_path: Path,
+    remote: str = "origin",
+    branch: str = "main"
+) -> bool:
+    """
+    Push committed changes to remote repository.
+    
+    Args:
+        parent_path: Path to parent repository
+        remote: Remote name (default: 'origin')
+        branch: Branch name (default: 'main')
+        
+    Returns:
+        True if successful
+        
+    Raises:
+        SubmoduleCommitError: If push fails
+    """
+    try:
+        # Push changes to remote
+        result = subprocess.run(
+            ["git", "-C", str(parent_path), "push", remote, branch],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        raise SubmoduleCommitError(
+            f"Failed to push changes to {remote}/{branch}: {e.stderr}"
         )
     except FileNotFoundError:
         raise SubmoduleCommitError("Git not installed or not on PATH")
