@@ -21,4 +21,10 @@ dist/
 htmlcov/
 .hypothesis/
 
+# IDE settings
 .idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~

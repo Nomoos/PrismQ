@@ -30,7 +30,41 @@ REM Check if virtual environment already exists
 if exist "%VENV_DIR%" (
     echo.
     echo Virtual environment already exists at: %VENV_DIR%
-    set /p RECREATE="Do you want to recreate it? (y/n): "
+    
+    REM Validate if venv is still functional
+    echo Validating virtual environment...
+    
+    REM Check if Python executable exists in venv
+    if not exist "%VENV_DIR%\Scripts\python.exe" (
+        echo Virtual environment is invalid (missing Python executable^)
+        echo Recreating virtual environment...
+        rmdir /s /q "%VENV_DIR%"
+        goto :create_venv
+    )
+    
+    REM Try to run Python in the venv to check if it works
+    "%VENV_DIR%\Scripts\python.exe" --version >nul 2>&1
+    if errorlevel 1 (
+        echo Virtual environment is broken (Python not working^)
+        echo Recreating virtual environment...
+        rmdir /s /q "%VENV_DIR%"
+        goto :create_venv
+    )
+    
+    REM Check if venv Python version matches system Python
+    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set SYSTEM_PY_VER=%%i
+    for /f "tokens=2" %%i in ('"%VENV_DIR%\Scripts\python.exe" --version 2^>^&1') do set VENV_PY_VER=%%i
+    
+    if not "%SYSTEM_PY_VER%"=="%VENV_PY_VER%" (
+        echo Virtual environment Python version mismatch
+        echo System: %SYSTEM_PY_VER%, Venv: %VENV_PY_VER%
+        echo Recreating virtual environment...
+        rmdir /s /q "%VENV_DIR%"
+        goto :create_venv
+    )
+    
+    echo Virtual environment is valid
+    set /p RECREATE="Do you want to recreate it anyway? (y/n): "
     if /i not "!RECREATE!"=="y" (
         echo Using existing virtual environment
         goto :activate_env
@@ -38,6 +72,8 @@ if exist "%VENV_DIR%" (
     echo Removing existing virtual environment...
     rmdir /s /q "%VENV_DIR%"
 )
+
+:create_venv
 
 REM Create virtual environment
 echo.
