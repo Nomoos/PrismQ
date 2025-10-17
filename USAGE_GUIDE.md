@@ -88,6 +88,32 @@ python cli.py
 
 See [scripts/submodule-converter/README.md](scripts/submodule-converter/README.md) for detailed documentation.
 
+### Pull All Repositories
+
+Recursively pull all git repositories in mod directories:
+
+```bash
+# Windows
+scripts\git_pull_all.bat
+```
+
+**What it does:**
+- Recursively finds all directories named "mod" at any depth
+- Checks each for git repositories (.git file or directory)
+- Performs `git fetch --all --prune` and `git pull --ff-only` on each
+- Supports nested structures: `mod/`, `mod/*/mod`, `mod/*/mod/*/mod`, etc.
+- Uses fast-forward only pulls for safety (won't create merge commits)
+
+**Example output:**
+```
+Starting recursive pull from: C:\path\to\PrismQ\scripts\
+==============================================
+Repo: C:\path\to\PrismQ\mod
+Fetching...
+Pulling...
+Done.
+```
+
 ## 🧪 Testing
 
 ### Test Batch Scripts
