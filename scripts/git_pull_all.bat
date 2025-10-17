@@ -1,13 +1,18 @@
 @echo off
 setlocal ENABLEDELAYEDEXPANSION
 
-REM === Git Pull All (with submodules to latest remote commits) ===
+REM === Git Pull All (Recursive mod/ directories) ===
 REM This script:
-REM  1) Jumps to the repo root (even if run from a subfolder)
-REM  2) Fetches & pulls the main repo
-REM  3) Syncs submodule URLs
-REM  4) Fetches in every submodule
-REM  5) Updates submodules to the latest commits on their configured remote branches
+REM  1) Recursively finds all directories named "mod" at any depth
+REM  2) Checks if each "mod" directory contains a .git subdirectory
+REM  3) Performs git fetch and pull (fast-forward only) for each repository
+REM
+REM Structure support:
+REM   mod/
+REM   mod/*/mod
+REM   mod/*/mod/*/mod
+REM   mod/*/mod/*/mod/*/mod
+REM   (and so on, recursively)
 
 REM Ensure Git is installed
 where git >NUL 2>&1
@@ -17,7 +22,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM Determine repo root
+REM Determine repo root (start from repository root, not script directory)
 for /f "delims=" %%R in ('git rev-parse --show-toplevel 2^>NUL') do set REPO_ROOT=%%R
 if not defined REPO_ROOT (
   echo [ERROR] This directory is not inside a Git repository.
@@ -25,37 +30,38 @@ if not defined REPO_ROOT (
   exit /b 1
 )
 
-pushd "%REPO_ROOT%"
-echo === Repository: %REPO_ROOT% ===
-
+echo Starting recursive pull from: %REPO_ROOT%
 echo.
-echo --- Fetching all remotes (main repo) ---
-git fetch --all --prune
-if errorlevel 1 (
-  echo [WARN] Fetch failed in main repo.
+
+REM Find every folder named "mod" (any depth), then pull if it has a .git dir
+for /f "delims=" %%D in ('dir "%REPO_ROOT%" /b /s /ad ^| findstr /r /c:"\\mod$"') do (
+    if exist "%%D\.git" (
+        echo ==============================================
+        echo Repo: %%D
+        pushd "%%D" >nul
+
+        REM Ensure it's a git repo and we can run commands
+        git rev-parse --is-inside-work-tree >nul 2>&1
+        if errorlevel 1 (
+            echo Not a valid git work tree, skipping.
+        ) else (
+            REM Prune stale remotes, then pull fast-forward only
+            git fetch --all --prune
+            if errorlevel 1 (
+                echo Fetch failed, skipping pull.
+            ) else (
+                git pull --ff-only
+            )
+        )
+        popd >nul
+    ) else (
+        REM It's a "mod" folder but not a repo
+        REM echo Skipping %%D (no .git directory)
+        rem (silent skip; uncomment the line above to see skipped folders)
+    )
 )
 
 echo.
-echo --- Pulling main repo (rebase) ---
-git pull --rebase
-if errorlevel 1 (
-  echo [WARN] Pull (rebase) failed in main repo. Trying plain pull...
-  git pull
-)
-
-echo.
-echo --- Syncing submodule URLs ---
-git submodule sync --recursive
-
-echo.
-echo --- Fetching inside each submodule (recursive) ---
-git submodule foreach --recursive "git fetch --all --prune || echo [WARN] Fetch failed in submodule: $name"
-
-echo.
-echo --- Initializing and updating submodules to latest remote branches ---
-git submodule update --init --recursive --remote
-
-echo.
-echo === Done ===
-popd
+echo Done.
+endlocal
 pause
