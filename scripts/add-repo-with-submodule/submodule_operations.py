@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Git submodule operations."""
 
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -27,6 +28,11 @@ def add_git_submodule(
     """
     Add repository as git submodule.
     
+    Checks if submodule already exists:
+    - If exists with correct URL: skips adding (returns True)
+    - If exists with wrong URL: removes old one and adds new one
+    - If doesn't exist: adds normally
+    
     Args:
         parent_path: Path to parent repository
         repo_url: URL of repository to add as submodule
@@ -39,6 +45,30 @@ def add_git_submodule(
     Raises:
         SubmoduleAddError: If git submodule add fails
     """
+    # Check if submodule already exists
+    existing_url = get_submodule_url(parent_path, relative_path)
+    exists_in_index = submodule_exists_in_index(parent_path, relative_path)
+    
+    if existing_url or exists_in_index:
+        # Submodule exists - check if URL is correct
+        if existing_url == repo_url:
+            # Correct URL, nothing to do
+            print(f"   ℹ️  Submodule already exists with correct URL")
+            return True
+        else:
+            # Wrong URL or partial state - remove and re-add
+            print(f"   ⚠️  Submodule exists with different URL or incomplete state")
+            print(f"      Existing: {existing_url or 'not in .gitmodules'}")
+            print(f"      Expected: {repo_url}")
+            print(f"   🔄 Removing old submodule...")
+            
+            try:
+                remove_git_submodule(parent_path, relative_path)
+                print(f"   ✅ Old submodule removed")
+            except SubmoduleAddError as e:
+                print(f"   ⚠️  Warning during removal: {e}")
+    
+    # Add the submodule
     try:
         # Run git submodule add
         result = subprocess.run(
@@ -163,3 +193,145 @@ def is_git_repository(path: Path) -> bool:
         True if path is a git repository
     """
     return (path / ".git").exists()
+
+
+def get_submodule_url(parent_path: Path, relative_path: str) -> Optional[str]:
+    """
+    Get the URL of an existing submodule.
+    
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+        
+    Returns:
+        Submodule URL if it exists, None otherwise
+    """
+    try:
+        result = subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "config", "--file", ".gitmodules",
+                "--get", f"submodule.{relative_path}.url"
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return None
+    except FileNotFoundError:
+        return None
+
+
+def submodule_exists_in_index(parent_path: Path, relative_path: str) -> bool:
+    """
+    Check if submodule exists in git index.
+    
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule
+        
+    Returns:
+        True if submodule exists in index
+    """
+    try:
+        result = subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "ls-files", "--stage", relative_path
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        # Check if output contains a git link (mode 160000)
+        return "160000" in result.stdout
+    except subprocess.CalledProcessError:
+        return False
+    except FileNotFoundError:
+        return False
+
+
+def remove_git_submodule(parent_path: Path, relative_path: str) -> bool:
+    """
+    Remove an existing git submodule.
+    
+    Args:
+        parent_path: Path to parent repository
+        relative_path: Relative path of the submodule to remove
+        
+    Returns:
+        True if successful
+        
+    Raises:
+        SubmoduleAddError: If removal fails
+    """
+    try:
+        # Step 1: Deinitialize the submodule
+        subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "submodule", "deinit", "-f", relative_path
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=False  # May fail if not initialized, that's ok
+        )
+        
+        # Step 2: Remove from git index and working tree
+        subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "rm", "-f", relative_path
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=True
+        )
+        
+        # Step 3: Remove submodule config from .gitmodules
+        subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "config", "--file", ".gitmodules",
+                "--remove-section", f"submodule.{relative_path}"
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=False  # May fail if already removed, that's ok
+        )
+        
+        # Step 4: Remove submodule-specific git config
+        subprocess.run(
+            [
+                "git", "-C", str(parent_path),
+                "config", "--remove-section", f"submodule.{relative_path}"
+            ],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            check=False  # May fail if doesn't exist, that's ok
+        )
+        
+        # Step 5: Remove .git/modules/<path> directory
+        modules_path = parent_path / ".git" / "modules" / relative_path
+        if modules_path.exists():
+            shutil.rmtree(modules_path)
+        
+        return True
+    except subprocess.CalledProcessError as e:
+        raise SubmoduleAddError(
+            f"Failed to remove submodule {relative_path}: {e.stderr}"
+        )
+    except FileNotFoundError:
+        raise SubmoduleAddError("Git not installed or not on PATH")
+    except Exception as e:
+        raise SubmoduleAddError(
+            f"Failed to remove submodule {relative_path}: {str(e)}"
+        )
