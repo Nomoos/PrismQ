@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prismq-idea-classification"
+version = "2.1.0"
+description = "Platform-agnostic content classification with generalized text analysis"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Proprietary"}
+authors = [
+    {name = "PrismQ Team", email = "dev@prismq.io"}
+]
+keywords = ["prismq", "classification", "content-analysis", "story-detection", "category-classification", "short-form-video", "nlp"]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+"Bug Reports" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification/issues"
+"Source" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification"
+"Documentation" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification/docs"
+
+[tool.setuptools]
+packages = ["prismq", "prismq.idea", "prismq.idea.classification"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=prismq --cov-report=html --cov-report=term"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
