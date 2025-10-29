@@ -8,11 +8,6 @@
     url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Community.git
     branch = main
 
-[submodule "mod/Content"]
-    path = mod/Content
-    url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Content.git
-    branch = main
-
 [submodule "mod/Creative"]
     path = mod/Creative
     url = https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Creative.git

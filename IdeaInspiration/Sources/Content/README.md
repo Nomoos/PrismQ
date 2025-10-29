@@ -1,62 +1,33 @@
-# Business/Domain Modules (`mod/`)
+# Content Sources
 
-This directory contains business logic and domain-specific modules for the PrismQ application.
+Rich, fully-formed content sources for inspiration and analysis.
+
+## Overview
+
+Content sources provide direct examples of successful content across various formats and platforms. These sources represent completed, published content that audiences engage with.
+
+## Subcategories
+
+### Shorts
+Short-form vertical video content from platforms optimized for mobile viewing and quick consumption.
+
+### Streams
+Live streaming platforms and their highlights, particularly gaming and entertainment content.
+
+### Forums
+Community discussion platforms where topics are debated and trends emerge organically.
+
+### Articles
+Long-form written content from blogs, publications, and online media.
+
+### Podcasts
+Audio content from major podcast platforms covering various topics and formats.
 
 ## Purpose
 
-The `mod/` directory is designed to hold higher-level modules that implement:
-- Business logic and domain models
-- Use case implementations
-- Domain-specific workflows
-- Application-specific modules
-
-## Separation of Concerns
-
-The repository follows a clear separation:
-
-- **`src/`** - Core Python package implementation
-  - Configuration management (`config.py`)
-  - Logging infrastructure (`logging_config.py`)
-  - Core utilities and infrastructure code
-  - Package initialization and common functionality
-
-- **`mod/`** - Business/domain modules (this directory)
-  - Domain-specific implementations
-  - Business logic modules
-  - Higher-level application components
-  - Use case orchestration
-
-## Structure
-
-Each module in this directory should be self-contained and follow these guidelines:
-
-```
-mod/
-├── README.md                 # This file
-├── ModuleExample/           # Example domain module
-│   ├── __init__.py
-│   └── ... (module files)
-└── YourModule/              # Your domain modules
-    ├── __init__.py
-    └── ... (module files)
-```
-
-## Guidelines
-
-When creating new modules:
-
-1. **Single Responsibility**: Each module should focus on a specific domain or business concern
-2. **Dependency Injection**: Depend on `src/` infrastructure via interfaces/protocols
-3. **Testing**: Add corresponding tests in `tests/mod/YourModule/`
-4. **Documentation**: Document the module's purpose, inputs, and outputs
-5. **SOLID Principles**: Follow SOLID design principles (see `.github/copilot-instructions.md`)
-
-## Examples
-
-The `ModuleExample/` directory serves as a template for creating new business modules. Feel free to rename or replace it with your actual domain modules.
-
-## Related Documentation
-
-- Main README: `/README.md`
-- Contributing Guidelines: `/doc/CONTRIBUTING.md`
-- Copilot Instructions: `/.github/copilot-instructions.md`
+Content sources help identify:
+- Successful content formats
+- Engaging topics and themes
+- Audience preferences
+- Content gaps and opportunities
+- Viral content patterns
