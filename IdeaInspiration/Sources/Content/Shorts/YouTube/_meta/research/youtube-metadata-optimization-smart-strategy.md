@@ -95,7 +95,7 @@ The SMART Strategy provides a timeline-based approach to metadata optimization:
   - **Evergreen SEO**: Seasonal keyword opportunities
 
 **Long-Term Strategies:**
-- Periodic content refreshes for evergreen videos (e.g., update "2024" to "2025" in title)
+- Periodic content refreshes for evergreen videos (e.g., update year in title to current year)
 - Add the video to new, relevant playlists as your channel grows
 - Update descriptions with links to newer, related content
 - Monitor for sudden traffic spikes that might indicate renewed interest
