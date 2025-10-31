@@ -17,12 +17,13 @@ The model is used by:
 
 The model provides a unified structure for representing content ideas from various sources (text, video, audio) with factory methods for easy creation from different content types.
 
-**Note:** `PrismQ.Idea.Model` maintains an M:N (many-to-many) relationship with this model, as multiple `IdeaInspiration` instances can be blended together to create new `Idea` objects for scripts, content generation, and other creative purposes.
+**Note:** `PrismQ.Idea.Model` maintains an M:N (many-to-many) relationship with this model, as multiple `IdeaInspiration` instances can be blended together to create new `Idea` objects for scripts, content generation, and other creative purposes. See the [Blending Multiple IdeaInspiration Objects](#blending-multiple-ideainspiration-objects) section for examples and strategies.
 
 ## Features
 
 - 🎯 **Unified Data Model** - Single structure for text, video, and audio content
 - 🏭 **Factory Methods** - Easy creation from different sources (text, YouTube, Reddit, etc.)
+- 🔀 **Blending Support** - Combine multiple inspirations by topic, trend, or platform
 - 📦 **Serialization** - Convert to/from dictionaries for storage and transmission
 - 💾 **Database Setup** - Automated script to create and configure SQLite database
 - 🔌 **Zero Dependencies** - Pure Python with no external requirements
@@ -37,6 +38,12 @@ The model provides a unified structure for representing content ideas from vario
 
 Run the setup script to create the database in your working directory:
 
+**PowerShell (Recommended):**
+```powershell
+.\setup_db.ps1
+```
+
+**Batch (Legacy):**
 ```batch
 setup_db.bat
 ```
@@ -48,6 +55,8 @@ This script will:
 - Create `db.s3db` in your configured working directory
 - Create the `IdeaInspiration` table with the complete data model
 - Never ask for current directory - uses remembered working directory from `.env`
+
+**Why PowerShell?** PowerShell scripts provide better error handling, colored output, and are more AI-friendly (GitHub Copilot/ChatGPT). If you get an execution policy error, run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 
 #### Linux/macOS (CI/Testing)
 
@@ -447,6 +456,129 @@ conn.commit()
 conn.close()
 ```
 
+## Architecture: IdeaInspiration Collection Layer
+
+The IdeaInspiration model serves as the **collection layer** in the PrismQ content generation pipeline:
+
+```
+┌─────────────────────────────────┐
+│  Sources (This Repository)      │
+│  YouTube, TikTok, Lyrics, etc.  │
+└────────────┬────────────────────┘
+             │
+             │ Collect & Transform
+             ▼
+┌─────────────────────────────────┐
+│  IdeaInspiration Objects        │  ← This Repository's Output
+│  (This Model)                   │
+│  - Unified format               │
+│  - Queryable database           │
+└────────────┬────────────────────┘
+             │
+             │ Query & Retrieve
+             ▼
+┌─────────────────────────────────┐
+│  PrismQ.Idea.Extractor          │  ← Blending/Mixing Happens Here
+│  (Separate Module)              │
+│  - Blend multiple IdeaInspiration│
+│  - Add trending signals         │
+│  - Create story concepts        │
+└────────────┬────────────────────┘
+             │
+             │ Story Concepts
+             ▼
+┌─────────────────────────────────┐
+│  PrismQ.Idea.Model              │  ← Content Generation
+│  (Separate Module)              │
+│  - Generate scripts             │
+│  - Create videos                │
+└─────────────────────────────────┘
+```
+
+### Role of This Repository
+
+**Input**: Platform-specific data from various Sources  
+**Processing**: Transform to unified IdeaInspiration format  
+**Output**: Queryable IdeaInspiration objects  
+
+**What This Repository Does:**
+- ✅ Collect content from sources (YouTube, lyrics, trends)
+- ✅ Transform to IdeaInspiration model
+- ✅ Store in queryable database
+- ✅ Provide search/filter capabilities
+
+**What This Repository Does NOT Do:**
+- ❌ Blend multiple IdeaInspiration together (→ PrismQ.Idea.Extractor)
+- ❌ Generate story scripts (→ PrismQ.Idea.Model)
+- ❌ Create video content (→ PrismQ.Idea.Model)
+
+### Querying IdeaInspiration for Downstream Use
+
+The primary interface for downstream modules (like PrismQ.Idea.Extractor) is **querying**:
+
+```python
+from idea_inspiration_db import IdeaInspirationDatabase
+
+db = IdeaInspirationDatabase("db.s3db")
+
+# Query by keywords
+true_crime_ideas = db.filter(keywords=["true_crime"])
+
+# Query by platform
+youtube_ideas = db.filter(metadata_contains={'platform': 'youtube'})
+
+# Query recent content
+recent_ideas = db.filter(days_back=7)
+
+# Query by score threshold
+high_quality = db.filter(min_score=80)
+
+# Combine filters
+trending_shorts = db.filter(
+    keywords=["mystery"],
+    metadata_contains={'platform': 'youtube', 'is_short': 'true'},
+    min_score=70,
+    days_back=7
+)
+```
+
+These queries provide IdeaInspiration objects that **PrismQ.Idea.Extractor** can then blend, mix, and transform into story concepts.
+
+### Example Workflow
+
+```python
+# 1. Collect (This Repository)
+from sources.youtube import YouTubeTrendingPlugin
+
+plugin = YouTubeTrendingPlugin(config)
+shorts = plugin.scrape_by_keyword("true crime", top_n=20)
+# Returns: List[IdeaInspiration]
+
+# Save to database
+db = IdeaInspirationDatabase("db.s3db")
+for idea in shorts:
+    db.insert(idea)
+
+# 2. Query (This Repository provides)
+true_crime_inspirations = db.filter(keywords=["true_crime"])
+
+# 3. Blend (PrismQ.Idea.Extractor - Separate Module)
+# from prismq.idea.extractor import IdeaExtractor
+# extractor = IdeaExtractor()
+# story_concept = extractor.blend(true_crime_inspirations, strategy="topic")
+
+# 4. Generate (PrismQ.Idea.Model - Separate Module)
+# from prismq.idea.model import ScriptGenerator
+# generator = ScriptGenerator()
+# script = generator.create_script(story_concept)
+```
+
+### Related Documentation
+
+For information on blending multiple IdeaInspiration objects:
+- See **[Model Extension Research](_meta/docs/MODEL_EXTENSION_RESEARCH.md)** - Architecture and blending strategies
+- See **PrismQ.Idea.Extractor** documentation (separate repository) - Implementation of blending logic
+
 ## Development
 
 ### Setup Development Environment
@@ -559,6 +691,7 @@ PrismQ.IdeaInspiration.Model/
 
 ## Version History
 
+- **v0.2.0** - Added blending patterns and comprehensive model extension research
 - **v0.1.1** - SQLite/S3DB compatibility with `Dict[str, str]` metadata, comprehensive examples
 - **v0.1.0** - Initial release with core IdeaInspiration model
 
@@ -570,9 +703,14 @@ This repository is proprietary software. All Rights Reserved - Copyright (c) 202
 
 - **[PrismQ.IdeaInspiration.Scoring](https://github.com/Nomoos/PrismQ.IdeaInspiration.Scoring)** - Scoring engine for content evaluation
 - **[PrismQ.IdeaInspiration.Classification](https://github.com/Nomoos/PrismQ.IdeaInspiration.Classification)** - Content classification system
-- **PrismQ.IdeaInspiration.Builder** - Builder for creating models from sources
+- **PrismQ.IdeaInspiration.Builder** - Builder for creating models from sources (see [Issue #503](https://github.com/Nomoos/PrismQ.IdeaInspiration/issues/503))
 - **PrismQ.IdeaInspiration.Sources** - Content source integrations
 - **PrismQ.Idea.Model** - Content generation model (has M:N relation with this model - multiple IdeaInspirations can be blended into a new Idea for scripts, content generation, etc.)
+
+## Research & Documentation
+
+- **[Model Extension Research](_meta/docs/MODEL_EXTENSION_RESEARCH.md)** - Comprehensive research on extending the model with new entity types (Source, Content, Signal, Category, Collection) and advanced blending strategies
+- **[Database Integration Summary](_meta/docs/DATABASE_INTEGRATION_SUMMARY.md)** - Dual-save architecture implementation details
 
 ## Support
 

@@ -11,9 +11,8 @@ from src.core.config import Config
 def temp_env_file():
     """Create a temporary .env file for testing."""
     with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
-        f.write("DATABASE_PATH=test.db\n")
+        f.write("DATABASE_URL=sqlite:///test.db\n")
         f.write("YOUTUBE_API_KEY=test_key\n")
-        f.write("YOUTUBE_MAX_RESULTS=25\n")
         env_path = f.name
     
     yield env_path
@@ -42,7 +41,8 @@ def test_config_from_env_file(temp_env_file):
     assert config.database_path.endswith("test.db")
     assert Path(config.database_path).is_absolute()
     assert config.youtube_api_key == "test_key"
-    assert config.youtube_max_results == 25
+    # youtube_max_results is now a runtime parameter, not from env
+    assert config.youtube_max_results == 50  # Default value from Config.DEFAULT_YOUTUBE_MAX_RESULTS
 
 
 def test_config_defaults():
@@ -50,7 +50,7 @@ def test_config_defaults():
     # Clear environment variables to test defaults
     import os
     env_backup = {}
-    env_vars = ['DATABASE_PATH', 'YOUTUBE_MAX_RESULTS', 'WORKING_DIRECTORY']
+    env_vars = ['DATABASE_URL', 'WORKING_DIRECTORY']
     for var in env_vars:
         if var in os.environ:
             env_backup[var] = os.environ[var]
@@ -65,7 +65,11 @@ def test_config_defaults():
             # Database path should now be absolute (relative to working directory)
             assert config.database_path.endswith("db.s3db")
             assert Path(config.database_path).is_absolute()
+            # Runtime parameter defaults are class constants, not from env
             assert config.youtube_max_results == 50
+            assert config.youtube_channel_max_shorts == 10
+            assert config.youtube_trending_max_shorts == 10
+            assert config.youtube_keyword_max_shorts == 10
     finally:
         # Restore environment variables
         for var, value in env_backup.items():
@@ -78,7 +82,7 @@ def test_working_directory_stored(temp_dir):
     
     # Clear environment to avoid pollution
     env_backup = {}
-    env_vars = ['DATABASE_PATH', 'YOUTUBE_MAX_RESULTS', 'WORKING_DIRECTORY']
+    env_vars = ['DATABASE_URL', 'WORKING_DIRECTORY']
     for var in env_vars:
         if var in os.environ:
             env_backup[var] = os.environ[var]
@@ -227,7 +231,7 @@ def test_config_non_interactive_mode(temp_dir):
     
     # Clear environment to avoid pollution
     env_backup = {}
-    env_vars = ['DATABASE_PATH', 'YOUTUBE_MAX_RESULTS', 'WORKING_DIRECTORY']
+    env_vars = ['DATABASE_URL', 'WORKING_DIRECTORY']
     for var in env_vars:
         if var in os.environ:
             env_backup[var] = os.environ[var]
@@ -241,6 +245,7 @@ def test_config_non_interactive_mode(temp_dir):
         # Database path should now be absolute (relative to working directory)
         assert config.database_path.endswith("db.s3db")
         assert Path(config.database_path).is_absolute()
+        # Runtime parameters use class defaults, not from env
         assert config.youtube_max_results == 50
     finally:
         # Restore environment variables
@@ -254,8 +259,8 @@ def test_existing_env_values_preserved(temp_dir):
     
     # Create .env with some values
     with open(env_path, 'w') as f:
-        f.write("DATABASE_PATH=custom.db\n")
-        f.write("YOUTUBE_MAX_RESULTS=100\n")
+        f.write("DATABASE_URL=sqlite:///custom.db\n")
+        f.write("YOUTUBE_API_KEY=custom_key\n")
     
     # Create config
     config = Config(str(env_path), interactive=False)
@@ -264,11 +269,12 @@ def test_existing_env_values_preserved(temp_dir):
     # Database path should now be absolute (relative to working directory)
     assert config.database_path.endswith("custom.db")
     assert Path(config.database_path).is_absolute()
-    assert config.youtube_max_results == 100
+    assert config.youtube_api_key == "custom_key"
+    # Runtime parameters always use class defaults, not from env
+    assert config.youtube_max_results == 50
     
     # Check that working directory was added
     with open(env_path, 'r') as f:
         content = f.read()
         assert "WORKING_DIRECTORY=" in content
-        assert "DATABASE_PATH=custom.db" in content
-        assert "YOUTUBE_MAX_RESULTS=100" in content
+        assert "DATABASE_URL=sqlite:///custom.db" in content

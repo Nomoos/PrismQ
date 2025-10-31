@@ -1,9 +1,9 @@
 """Run models for PrismQ Web Client."""
 
 from datetime import datetime
-from typing import Optional, Dict, Any, List, Literal
+from typing import Optional, Dict, Any, List, Literal, Type
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class RunStatus(str, Enum):
@@ -24,6 +24,36 @@ class RunCreate(BaseModel):
         description="Module parameters",
     )
     save_config: bool = Field(True, description="Whether to save configuration")
+
+    @field_validator("parameters")
+    @classmethod
+    def validate_parameters(cls: Type["RunCreate"], v: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate parameters dictionary.
+        
+        Args:
+            v: Parameters dictionary
+            
+        Returns:
+            Validated parameters
+            
+        Raises:
+            ValueError: If validation fails
+        """
+        if not isinstance(v, dict):
+            raise ValueError("Parameters must be a dictionary")
+        if len(v) > 100:
+            raise ValueError("Too many parameters (maximum 100 allowed)")
+        
+        # Check for forbidden parameter names
+        forbidden_keys = ["__internal__", "__system__", "__private__"]
+        for key in v.keys():
+            if key in forbidden_keys:
+                raise ValueError(f"Cannot use forbidden parameter name: {key}")
+            if not isinstance(key, str):
+                raise ValueError("Parameter keys must be strings")
+        
+        return v
 
 
 class Run(BaseModel):

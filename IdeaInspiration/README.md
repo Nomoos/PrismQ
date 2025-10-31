@@ -48,10 +48,40 @@ This ecosystem provides tools for:
    cd PrismQ.IdeaInspiration
    ```
 
-2. Set up the module you want to work with:
+2. Set up virtual environments (recommended):
    ```bash
-   cd Classification  # or ConfigLoad, Model, Scoring, Sources
-   # Follow module-specific setup instructions
+   # Linux/macOS/WSL
+   ./_meta/_scripts/setup_all_envs.sh
+   
+   # Windows PowerShell
+   .\_meta\_scripts\setup_all_envs.ps1
+   ```
+   
+   This creates isolated virtual environments for each project. See [Virtual Environment Guide](./_meta/docs/VIRTUAL_ENV_PER_PROJECT.md) for details.
+
+3. (Optional) Install direnv for automatic environment activation:
+   ```bash
+   # See detailed guide: ./_meta/docs/DIRENV_SETUP.md
+   
+   # Install direnv (Ubuntu/Debian)
+   sudo apt install direnv
+   
+   # Configure shell (~/.bashrc)
+   eval "$(direnv hook bash)"
+   
+   # Allow each project (one-time)
+   cd Classification && direnv allow
+   ```
+   
+   With direnv, environments activate automatically when you `cd` into a project!
+
+4. Work on a specific module:
+   ```bash
+   cd Classification
+   # If using direnv: environment activates automatically!
+   # Otherwise: source venv/bin/activate  (Linux/macOS/WSL)
+   #           .\venv\Scripts\Activate.ps1  (Windows PowerShell)
+   # Follow module-specific development instructions
    ```
 
 ## 💻 Target Platform

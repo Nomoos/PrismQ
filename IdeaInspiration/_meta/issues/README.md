@@ -49,10 +49,6 @@ Each EPIC folder in `new/` contains:
 - **PARALLELIZATION_MATRIX.md** - At-a-glance parallel work assignments
 - **PROGRESS_CHECKLIST.md** - Track your implementation progress
 
-### Review Documents
-- **ISSUE_REVIEW_2025-10-30.md** - Review of all issues (no duplicates found)
-- **WIP_STATUS_REVIEW_2025-10-30.md** - Review of WIP directory status
-
 ## Issue Workflow
 
 1. **New Issues** - Create a new file in the appropriate EPIC folder within `new/` directory
@@ -61,7 +57,7 @@ Each EPIC folder in `new/` contains:
    - For other phases → corresponding Phase folder
 2. **Backlog** - Move to `backlog/` for items that are not currently planned but may be worked on later
 3. **Work In Progress** - Move to `wip/` when work begins
-4. **Completed** - Move to `done/` when finished
+4. **Completed** - Move to `done/` when finished (implemented)
 
 ### EPIC Organization
 

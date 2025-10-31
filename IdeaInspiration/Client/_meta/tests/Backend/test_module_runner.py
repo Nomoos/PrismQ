@@ -10,6 +10,7 @@ from src.core.module_runner import ModuleRunner
 from src.core.output_capture import OutputCapture
 from src.core.process_manager import ProcessManager
 from src.core.run_registry import RunRegistry
+from src.core.exceptions import ResourceLimitException
 from src.models.run import Run, RunStatus
 
 
@@ -124,7 +125,7 @@ async def test_max_concurrent_runs_limit(module_runner):
         module_runner.registry.update_run(run)
     
     # Attempt to create a third run should fail
-    with pytest.raises(RuntimeError, match="Max concurrent runs"):
+    with pytest.raises(ResourceLimitException, match="Max concurrent runs"):
         await module_runner.execute_module(
             module_id="module_3",
             module_name="Module 3",

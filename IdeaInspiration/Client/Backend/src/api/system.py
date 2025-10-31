@@ -11,8 +11,8 @@ from ..models.system import (
     SystemResources,
 )
 from ..models.run import RunStatus
-from ..core import get_module_runner, ModuleRunner
-from .modules import MOCK_MODULES
+from ..core import get_module_runner, get_resource_manager, ModuleRunner, ResourceManager
+from ..utils.module_loader import get_module_loader
 
 router = APIRouter()
 
@@ -33,23 +33,29 @@ async def health_check(runner: ModuleRunner = Depends(get_module_runner)):
     """
     active_runs = len(runner.registry.get_active_runs())
     uptime = int(time.time() - START_TIME)
+    loader = get_module_loader()
+    modules = loader.get_all_modules()
     
     return HealthResponse(
         status="healthy",
         version="1.0.0",
         uptime_seconds=uptime,
         active_runs=active_runs,
-        total_modules=len(MOCK_MODULES),
+        total_modules=len(modules),
     )
 
 
 @router.get("/system/stats", response_model=SystemStats)
-async def system_stats(runner: ModuleRunner = Depends(get_module_runner)):
+async def system_stats(
+    runner: ModuleRunner = Depends(get_module_runner),
+    resource_manager: ResourceManager = Depends(get_resource_manager)
+):
     """
     System statistics and metrics.
     
     Args:
         runner: Module runner service (injected)
+        resource_manager: Resource manager service (injected)
     
     Returns:
         SystemStats: System statistics
@@ -69,8 +75,10 @@ async def system_stats(runner: ModuleRunner = Depends(get_module_runner)):
     )
     
     # Calculate module statistics
-    active_modules = len([m for m in MOCK_MODULES if m.status == "active"])
-    total_modules = len(MOCK_MODULES)
+    loader = get_module_loader()
+    modules = loader.get_all_modules()
+    active_modules = len([m for m in modules if m.status == "active"])
+    total_modules = len(modules)
     idle_modules = total_modules - active_modules
     
     module_stats = ModuleStats(
@@ -79,11 +87,12 @@ async def system_stats(runner: ModuleRunner = Depends(get_module_runner)):
         idle=idle_modules,
     )
     
-    # Mock system resources (in real implementation, would use psutil)
+    # Get real system resources from ResourceManager
+    stats = resource_manager.get_system_stats()
     system_resources = SystemResources(
-        cpu_percent=15.5,
-        memory_percent=42.3,
-        disk_free_gb=512.5,
+        cpu_percent=stats["cpu_percent"],
+        memory_percent=stats["memory_used_percent"],
+        disk_free_gb=0.0,  # Not tracked yet
     )
     
     return SystemStats(

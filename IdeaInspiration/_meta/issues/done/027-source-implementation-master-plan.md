@@ -326,13 +326,13 @@ For faster delivery, implement multiple sources in parallel:
 ### Source Implementation Issues
 - **#021** - Signals Category Implementation (parent category issue)
 - **#124** - Complete Remaining Signals Sources (tracking epic)
-- **#113-#123** - Individual signal source implementations:
-  - #113: TikTokHashtagSource
-  - #114: GoogleNewsSource
-  - #115: TikTokSoundsSource
-  - #116: InstagramHashtagSource
-  - #117: NewsApiSource
-  - #118: InstagramAudioTrendsSource
+- **#119-#123, #125-#130** - Individual signal source implementations:
+  - #125: TikTokHashtagSource
+  - #126: GoogleNewsSource
+  - #127: TikTokSoundsSource
+  - #128: InstagramHashtagSource
+  - #129: NewsApiSource
+  - #130: InstagramAudioTrendsSource
   - #119: MemeTrackerSource
   - #120: KnowYourMemeSource
   - #121: SocialChallengeSource
@@ -360,20 +360,20 @@ Varies by source - see individual issues for details
 
 ### Immediate Actions
 1. **Complete Signals Category** - See Issue #124 (Epic)
-   - Track: 12 remaining signal sources (Issues #113-#123)
+   - Track: 12 remaining signal sources (Issues #119-#123, #125-#130)
    - Template: `Sources/Signals/IMPLEMENTATION_GUIDE.md`
    - Reference: `Sources/Signals/Trends/GoogleTrends/`
    - Scaffolding: `scripts/generate_signal_sources.py`
    
 2. **High Priority Signals Sources** (3-4 weeks)
-   - #113: TikTokHashtagSource
-   - #114: GoogleNewsSource
-   - #115: TikTokSoundsSource
+   - #125: TikTokHashtagSource
+   - #126: GoogleNewsSource
+   - #127: TikTokSoundsSource
 
 3. **Medium Priority Signals Sources** (3-4 weeks)
-   - #116: InstagramHashtagSource
-   - #117: NewsApiSource
-   - #118: InstagramAudioTrendsSource
+   - #128: InstagramHashtagSource
+   - #129: NewsApiSource
+   - #130: InstagramAudioTrendsSource
 
 4. **Lower Priority Signals Sources** (5-6 weeks)
    - #119: MemeTrackerSource
@@ -385,7 +385,7 @@ Varies by source - see individual issues for details
 ### Implementation Resources
 - **Scaffolding Generator**: `python scripts/generate_signal_sources.py`
 - **Tracking Epic**: Issue #124 - Complete Remaining Signals Sources
-- **Individual Issues**: #113-#123 (one per source)
+- **Individual Issues**: #119-#123, #125-#130 (one per source)
 
 ### Future Integration Work
 - Issue #001: Unified Pipeline Integration

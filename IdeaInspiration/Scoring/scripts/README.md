@@ -2,30 +2,60 @@
 
 This directory contains utility scripts for the PrismQ module.
 
+## Why PowerShell?
+
+For Windows users, **PowerShell scripts (.ps1) are recommended** over batch scripts (.bat) because:
+
+1. **Better Error Handling**: PowerShell provides structured error handling with try/catch blocks
+2. **Colored Output**: Enhanced readability with color-coded status messages
+3. **Modern Windows Standard**: PowerShell is the modern scripting standard for Windows
+4. **AI Assistant Friendly**: Better structured syntax for GitHub Copilot and ChatGPT to understand and modify
+5. **More Powerful**: Advanced features like object manipulation and better string handling
+
+### Enabling PowerShell Scripts
+
+If you get an error about script execution being disabled, run this once:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+This allows locally created scripts to run while still protecting against untrusted remote scripts.
+
 ## Available Scripts
 
 ### Setup Scripts
 
-- **setup.bat** - Windows setup script (primary)
-- **setup.sh** - Linux setup script (development only)
+**Windows (PowerShell - Recommended):**
+```powershell
+.\scripts\setup.ps1
+```
 
-### Quick Start Scripts
-
-- **quickstart.bat** - Quick start for Windows (primary)
-- **quickstart.sh** - Quick start for Linux (development only)
-
-## Usage
-
-### Windows
-
-Run the setup script to install dependencies:
+**Windows (Batch - Legacy):**
 ```batch
 scripts\setup.bat
 ```
 
-Run the quick start script to test the module:
+**Linux (development only):**
+```bash
+bash scripts/setup.sh
+```
+
+### Quick Start Scripts
+
+**Windows (PowerShell - Recommended):**
+```powershell
+.\scripts\quickstart.ps1
+```
+
+**Windows (Batch - Legacy):**
 ```batch
 scripts\quickstart.bat
+```
+
+**Linux (development only):**
+```bash
+bash scripts/quickstart.sh
 ```
 
 ## Target Platform
@@ -41,7 +71,8 @@ These scripts are optimized for:
 ## Creating New Scripts
 
 When adding new scripts:
-1. Create Windows batch files (.bat) as the primary implementation
-2. Add clear comments explaining what the script does
-3. Include error handling
-4. Update this README
+1. Create PowerShell scripts (.ps1) as the primary implementation (recommended)
+2. Create Windows batch files (.bat) for compatibility
+3. Add clear comments explaining what the script does
+4. Include error handling and colored output (PowerShell)
+5. Update this README

@@ -10,6 +10,14 @@ from .core.metrics import UniversalMetrics
 from .core.event_processor import EventProcessor
 from .plugins.calendar_holidays_plugin import CalendarHolidaysPlugin
 
+# Import central IdeaInspiration database and model from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration import IdeaInspiration
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
+
 
 @click.group()
 @click.version_option(version='1.0.0')
@@ -36,8 +44,10 @@ def scrape(env_file, country, year, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
+        # Initialize databases (source-specific AND central)
         db = Database(config.database_path, interactive=not no_interactive)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize holidays plugin
         holidays_plugin = CalendarHolidaysPlugin(config)
@@ -48,7 +58,8 @@ def scrape(env_file, country, year, no_interactive):
         
         # Scrape holidays
         total_scraped = 0
-        total_saved = 0
+        total_saved_source = 0
+        total_saved_central = 0
         
         click.echo(f"Scraping holidays for {country_code} in {year_val}...")
         
@@ -65,8 +76,8 @@ def scrape(env_file, country, year, no_interactive):
                 # Calculate universal metrics
                 universal_metrics = UniversalMetrics.from_holiday(holiday_data)
                 
-                # Save to database
-                success = db.insert_event(
+                # Save to source-specific database (events table)
+                source_saved = db.insert_event(
                     source=event_signal['source'],
                     source_id=event_signal['source_id'],
                     name=event_signal['event']['name'],
@@ -84,8 +95,44 @@ def scrape(env_file, country, year, no_interactive):
                     universal_metrics=universal_metrics.to_dict()
                 )
                 
-                if success:
-                    total_saved += 1
+                if source_saved:
+                    total_saved_source += 1
+                
+                # Convert event to IdeaInspiration for central database (DUAL-SAVE)
+                # Provide meaningful content beyond just the title
+                event_description = (
+                    f"{event_signal['event']['name']} is a {event_signal['event']['type']} "
+                    f"observed in {country_code} on {event_signal['event']['date']}. "
+                    f"Scope: {event_signal['significance']['scope']}, "
+                    f"Importance: {event_signal['significance']['importance']}. "
+                    f"Content window: {event_signal['content_window']['pre_event_days']} days before "
+                    f"to {event_signal['content_window']['post_event_days']} days after."
+                )
+                
+                idea = IdeaInspiration.from_text(
+                    title=event_signal['event']['name'],
+                    description=f"{event_signal['event']['type']} event in {country_code}",
+                    text_content=event_description,  # Meaningful content with event details
+                    keywords=[event_signal['event']['type'], country_code, 'holiday'],
+                    metadata={
+                        'event_type': event_signal['event']['type'],
+                        'date': event_signal['event']['date'],
+                        'country': country_code,
+                        'scope': event_signal['significance']['scope'],
+                        'importance': event_signal['significance']['importance'],
+                        **event_signal['metadata']
+                    },
+                    source_id=event_signal['source_id'],
+                    source_url=None,
+                    source_created_by='calendar_holidays',
+                    source_created_at=event_signal['event']['date'],
+                    score=int(universal_metrics.overall_score * 10),  # Convert to 0-100 scale
+                    category='event'
+                )
+                
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
             
         except Exception as e:
             click.echo(f"Error scraping holidays: {e}", err=True)
@@ -94,8 +141,10 @@ def scrape(env_file, country, year, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total holidays found: {total_scraped}")
-        click.echo(f"Total holidays saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Saved to source database: {total_saved_source}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Source database: {config.database_path}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

@@ -7,7 +7,23 @@ from dotenv import load_dotenv, set_key
 
 
 class Config:
-    """Manages application configuration from environment variables."""
+    """Manages application configuration from environment variables.
+    
+    This class handles two types of configuration:
+    1. Environment variables: API keys, database URLs, etc. (loaded from .env)
+    2. Runtime parameter defaults: Execution-specific values (defined as class constants)
+    
+    Runtime parameters (DEFAULT_*) provide fallback values when CLI arguments are not specified.
+    For example, the CLI --top argument overrides these defaults at runtime.
+    """
+    
+    # Runtime parameter defaults (not environment variables)
+    # These provide fallback values when CLI arguments (e.g., --top) are not specified.
+    # The CLI layer is responsible for passing these or user-provided values to plugins.
+    DEFAULT_YOUTUBE_MAX_RESULTS = 50
+    DEFAULT_YOUTUBE_CHANNEL_MAX_SHORTS = 10
+    DEFAULT_YOUTUBE_TRENDING_MAX_SHORTS = 10
+    DEFAULT_YOUTUBE_KEYWORD_MAX_SHORTS = 10
 
     def __init__(self, env_file: Optional[str] = None, interactive: bool = True):
         """Initialize configuration.
@@ -174,14 +190,6 @@ class Config:
             required=False
         )
         
-        youtube_max_results = self._get_or_prompt(
-            "YOUTUBE_MAX_RESULTS",
-            "Maximum results for YouTube API",
-            "50",
-            required=False
-        )
-        self.youtube_max_results = int(youtube_max_results) if youtube_max_results else 50
-        
         # YouTube Channel configuration (for channel-based scraping with yt-dlp)
         self.youtube_channel_url = self._get_or_prompt(
             "YOUTUBE_CHANNEL_URL",
@@ -190,28 +198,10 @@ class Config:
             required=False
         )
         
-        youtube_channel_max_shorts = self._get_or_prompt(
-            "YOUTUBE_CHANNEL_MAX_SHORTS",
-            "Maximum shorts to scrape from channel",
-            "10",
-            required=False
-        )
-        self.youtube_channel_max_shorts = int(youtube_channel_max_shorts) if youtube_channel_max_shorts else 10
-        
-        # YouTube Trending configuration (for trending scraping with yt-dlp)
-        youtube_trending_max_shorts = self._get_or_prompt(
-            "YOUTUBE_TRENDING_MAX_SHORTS",
-            "Maximum shorts to scrape from trending",
-            "10",
-            required=False
-        )
-        self.youtube_trending_max_shorts = int(youtube_trending_max_shorts) if youtube_trending_max_shorts else 10
-        
-        # YouTube Keyword configuration (for keyword search with yt-dlp)
-        youtube_keyword_max_shorts = self._get_or_prompt(
-            "YOUTUBE_KEYWORD_MAX_SHORTS",
-            "Maximum shorts to scrape by keyword",
-            "10",
-            required=False
-        )
-        self.youtube_keyword_max_shorts = int(youtube_keyword_max_shorts) if youtube_keyword_max_shorts else 10
+        # Runtime parameters - set from class defaults
+        # These provide fallback values when CLI arguments (--top) are not specified
+        # The CLI layer handles passing either these defaults or user-provided values to plugins
+        self.youtube_max_results = self.DEFAULT_YOUTUBE_MAX_RESULTS
+        self.youtube_channel_max_shorts = self.DEFAULT_YOUTUBE_CHANNEL_MAX_SHORTS
+        self.youtube_trending_max_shorts = self.DEFAULT_YOUTUBE_TRENDING_MAX_SHORTS
+        self.youtube_keyword_max_shorts = self.DEFAULT_YOUTUBE_KEYWORD_MAX_SHORTS

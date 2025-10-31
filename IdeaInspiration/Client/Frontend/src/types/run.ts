@@ -29,14 +29,17 @@ export interface LogEntry {
  * Module run information
  */
 export interface Run {
-  id: string
-  run_id?: string
+  id?: string  // For backward compatibility
+  run_id: string
   module_id: string
   module_name: string
   status: RunStatus
   parameters: Record<string, any>
-  start_time: string
-  end_time?: string
+  created_at: string
+  started_at?: string
+  completed_at?: string
+  start_time?: string  // Deprecated, use started_at
+  end_time?: string    // Deprecated, use completed_at
   duration_seconds?: number
   progress_percent?: number
   items_processed?: number

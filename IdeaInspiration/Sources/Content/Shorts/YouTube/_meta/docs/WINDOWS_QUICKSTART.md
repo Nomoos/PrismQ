@@ -36,7 +36,7 @@ cd C:\path\to\PrismQ.IdeaCollector
 ### 3. Run the Setup Script
 
 ```cmd
-scripts\setup.bat
+_meta\_scripts\setup_module.bat
 ```
 
 This will:

@@ -176,7 +176,6 @@ Developer #4+: Any Signals Source
 3. **ROADMAP.md** - Overall project roadmap
 
 ### Reference
-- **WEB_CLIENT_SUMMARY.md** - Web client overview
 - **027-source-implementation-master-plan.md** - Source implementation guide
 - **.github/copilot-instructions.md** - Coding standards
 
