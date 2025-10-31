@@ -6,9 +6,15 @@
         <div class="stats">
           <span class="stat-item">{{ modules.length }} Modules</span>
           <span class="stat-item" v-if="activeRuns > 0">{{ activeRuns }} Running</span>
+          <router-link to="/runs" class="stat-link">View Run History</router-link>
         </div>
       </div>
     </header>
+
+    <!-- Active Runs Section -->
+    <div v-if="!loading && !error" class="mb-6">
+      <ActiveRuns @runs-updated="updateActiveRunsCount" />
+    </div>
 
     <!-- Search and Filters -->
     <div class="filters" v-if="!loading && !error">
@@ -66,6 +72,7 @@
 import { ref, computed, onMounted } from 'vue'
 import ModuleCard from '@/components/ModuleCard.vue'
 import ModuleLaunchModal from '@/components/ModuleLaunchModal.vue'
+import ActiveRuns from '@/components/ActiveRuns.vue'
 import { moduleService } from '@/services/modules'
 import type { Module } from '@/types/module'
 
@@ -140,12 +147,15 @@ async function handleLaunch(parameters: Record<string, any>, saveConfig: boolean
     )
     console.log('Run started:', run)
     alert(`Module "${selectedModule.value.name}" launched successfully! Run ID: ${run.id}`)
-    activeRuns.value++
     closeLaunchModal()
   } catch (err: any) {
     console.error('Error starting run:', err)
     alert(`Failed to start module: ${err.message}`)
   }
+}
+
+function updateActiveRunsCount(count: number) {
+  activeRuns.value = count
 }
 
 onMounted(() => {
@@ -168,6 +178,10 @@ onMounted(() => {
 
 .stat-item {
   @apply px-3 py-1 bg-gray-100 rounded-full;
+}
+
+.stat-link {
+  @apply px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full transition-colors;
 }
 
 .filters {

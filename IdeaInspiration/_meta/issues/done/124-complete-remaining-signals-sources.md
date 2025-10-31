@@ -38,34 +38,34 @@ All sub-issues have been completed and moved to `_meta/issues/done/`:
 
 ### High Priority (Completed)
 
-**Issue #113** - TikTokHashtagSource (Signals/Hashtags) ✅
+**Issue #125** - TikTokHashtagSource (Signals/Hashtags) ✅
 - Status: Done
 - Priority: High
 - Description: Trending hashtags on TikTok
 
-**Issue #114** - GoogleNewsSource (Signals/News) ✅
+**Issue #126** - GoogleNewsSource (Signals/News) ✅
 - Status: Done
 - Priority: High
 - Description: News articles from Google News
 
-**Issue #115** - TikTokSoundsSource (Signals/Sounds) ✅
+**Issue #127** - TikTokSoundsSource (Signals/Sounds) ✅
 - Status: Done
 - Priority: High
 - Description: Trending audio on TikTok
 
 ### Medium Priority (Completed)
 
-**Issue #116** - InstagramHashtagSource (Signals/Hashtags) ✅
+**Issue #128** - InstagramHashtagSource (Signals/Hashtags) ✅
 - Status: Done
 - Priority: Medium
 - Description: Trending hashtags on Instagram
 
-**Issue #117** - NewsApiSource (Signals/News) ✅
+**Issue #129** - NewsApiSource (Signals/News) ✅
 - Status: Done
 - Priority: Medium
 - Description: News articles from NewsAPI (with API key support)
 
-**Issue #118** - InstagramAudioTrendsSource (Signals/Sounds) ✅
+**Issue #130** - InstagramAudioTrendsSource (Signals/Sounds) ✅
 - Status: Done
 - Priority: Medium
 - Description: Audio trends on Instagram Reels
@@ -127,14 +127,14 @@ All sources follow SOLID principles with:
 ## Implementation Timeline
 
 ### ✅ Phase 1: High Priority (Completed)
-- ✅ Week 1: Issue #113 (TikTokHashtag)
-- ✅ Week 2: Issue #114 (GoogleNews)
-- ✅ Week 3: Issue #115 (TikTokSounds)
+- ✅ Week 1: Issue #125 (TikTokHashtag)
+- ✅ Week 2: Issue #126 (GoogleNews)
+- ✅ Week 3: Issue #127 (TikTokSounds)
 
 ### ✅ Phase 2: Medium Priority (Completed)
-- ✅ Week 5: Issue #116 (InstagramHashtag)
-- ✅ Week 6: Issue #117 (NewsApi)
-- ✅ Week 7: Issue #118 (InstagramAudioTrends)
+- ✅ Week 5: Issue #128 (InstagramHashtag)
+- ✅ Week 6: Issue #129 (NewsApi)
+- ✅ Week 7: Issue #130 (InstagramAudioTrends)
 
 ### ✅ Phase 3: Lower Priority (Completed)
 - ✅ Week 9-10: Issue #119 (MemeTracker)
@@ -212,10 +212,10 @@ Source/
 This epic can be distributed among multiple developers:
 
 **Developer 1 (High Priority)**
-- #113, #114, #115
+- #125, #126, #127
 
 **Developer 2 (Medium Priority)**
-- #116, #117, #118
+- #128, #129, #130
 
 **Developer 3 (Lower Priority - Memes/Challenges)**
 - #119, #120, #121
@@ -229,7 +229,7 @@ Or completed sequentially by a single developer over 12-15 weeks.
 
 - **#027** - Source Implementation Master Plan (parent epic)
 - **#021** - Signals Category Implementation (parent category issue)
-- **#113-#123** - Individual source implementation issues
+- **#119-#123, #125-#130** - Individual source implementation issues
 
 ## Notes
 

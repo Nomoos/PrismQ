@@ -40,8 +40,12 @@ PrismQ.RepositoryTemplate/
 │   ├── ROADMAP.md             # Project roadmap
 │   └── README.md              # Issue tracking guide
 ├── scripts/                    # Utility scripts
-│   ├── setup.bat              # Windows setup script
-│   ├── quickstart.bat         # Windows quick start
+│   ├── setup.ps1              # Windows setup script (PowerShell - Recommended)
+│   ├── setup.bat              # Windows setup script (Batch - Legacy)
+│   ├── quickstart.ps1         # Windows quick start (PowerShell - Recommended)
+│   ├── quickstart.bat         # Windows quick start (Batch - Legacy)
+│   ├── test.ps1               # Windows test script (PowerShell - Recommended)
+│   ├── test.bat               # Windows test script (Batch - Legacy)
 │   └── README.md              # Scripts documentation
 ├── src/                        # Source code
 │   ├── __init__.py            # Package initialization
@@ -78,8 +82,14 @@ PrismQ.RepositoryTemplate/
    ```
 
 2. Run setup script:
+   **PowerShell (Recommended):**
+   ```powershell
+   .\_meta\scripts\setup.ps1
+   ```
+   
+   **Batch (Legacy):**
    ```batch
-   scripts\setup.bat
+   _meta\scripts\setup.bat
    ```
 
 3. Configure environment:
@@ -89,8 +99,14 @@ PrismQ.RepositoryTemplate/
    ```
 
 4. Run the module:
+   **PowerShell (Recommended):**
+   ```powershell
+   .\_meta\scripts\quickstart.ps1
+   ```
+   
+   **Batch (Legacy):**
    ```batch
-   scripts\quickstart.bat
+   _meta\scripts\quickstart.bat
    ```
 
 ## 🛠️ Development

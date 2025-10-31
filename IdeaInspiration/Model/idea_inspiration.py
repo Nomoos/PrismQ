@@ -44,9 +44,13 @@ class IdeaInspiration:
         keywords: List of relevant keywords or tags
         source_type: Type of content source (text/video/audio)
         metadata: Additional source-specific metadata (string key-value pairs for
-                  SQLite compatibility)
+                  SQLite compatibility). Used for platform-specific metrics,
+                  audience geography, and custom fields.
         source_id: Optional unique identifier from the source platform
         source_url: Optional URL to the original content
+        source_platform: Optional platform identifier (e.g., "youtube", "google_trends",
+                        "tiktok"). Provides dedicated field for platform to avoid
+                        duplication and enable efficient filtering.
         source_created_by: Optional creator/author of the source content
         source_created_at: Optional creation timestamp of the source content
         score: Optional numerical score value for the content
@@ -64,7 +68,8 @@ class IdeaInspiration:
         ...     description="Learn Python basics",
         ...     content="Python is a high-level programming language...",
         ...     keywords=["python", "programming", "tutorial"],
-        ...     source_type=ContentType.TEXT
+        ...     source_type=ContentType.TEXT,
+        ...     source_platform="youtube"
         ... )
     """
 
@@ -76,6 +81,7 @@ class IdeaInspiration:
     metadata: Dict[str, str] = field(default_factory=dict)
     source_id: Optional[str] = None
     source_url: Optional[str] = None
+    source_platform: Optional[str] = None
     source_created_by: Optional[str] = None
     source_created_at: Optional[str] = None
     score: Optional[int] = None

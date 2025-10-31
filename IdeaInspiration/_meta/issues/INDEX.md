@@ -77,8 +77,6 @@
 | **ROADMAP.md** | Overall project roadmap (all phases) |
 | **KNOWN_ISSUES.md** | Known bugs and limitations |
 | **README.md** | Issue tracking workflow |
-| **ISSUE_REVIEW_2025-10-30.md** | Review confirming no duplicates |
-| **WIP_STATUS_REVIEW_2025-10-30.md** | WIP directory status review |
 
 ---
 

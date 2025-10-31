@@ -17,7 +17,9 @@ from ..core import (
     get_module_runner,
     get_output_capture,
     get_process_manager,
+    ResourceLimitException,
 )
+from ..core.exceptions import RunNotFoundException
 from ..models.run import (
     LogEntry,
     LogResponse,
@@ -59,26 +61,15 @@ async def create_run(
     # Get module info to validate it exists
     module = await get_module(module_id)
     
-    # Execute module
-    try:
-        run = await runner.execute_module(
-            module_id=module_id,
-            module_name=module.name,
-            script_path=Path(module.script_path),
-            parameters=run_create.parameters,
-            save_config=run_create.save_config
-        )
-        return run
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+    # Execute module - exceptions will be caught by global exception handler
+    run = await runner.execute_module(
+        module_id=module_id,
+        module_name=module.name,
+        script_path=Path(module.script_path),
+        parameters=run_create.parameters,
+        save_config=run_create.save_config
+    )
+    return run
 
 
 @router.get("/runs", response_model=RunListResponse)
@@ -141,13 +132,13 @@ async def get_run(
         Run: Run details
         
     Raises:
-        HTTPException: If run not found
+        RunNotFoundException: If run not found
     """
     run = runner.get_run_status(run_id)
     if not run:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Run not found",
+        raise RunNotFoundException(
+            f"Run '{run_id}' not found",
+            run_id=run_id
         )
     return run
 
@@ -168,13 +159,13 @@ async def cancel_run(
         Run: Cancelled run details
         
     Raises:
-        HTTPException: If run not found or cannot be cancelled
+        RunNotFoundException: If run not found or cannot be cancelled
     """
     run = runner.get_run_status(run_id)
     if not run:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Run not found",
+        raise RunNotFoundException(
+            f"Run '{run_id}' not found",
+            run_id=run_id
         )
     
     if run.status in [RunStatus.COMPLETED, RunStatus.FAILED, RunStatus.CANCELLED]:

@@ -107,10 +107,10 @@ Verified existing setup scripts already handle:
 - ✅ User prompts for API keys
 
 Scripts verified:
-- `scripts/setup.bat` (Windows)
-- `scripts/setup.sh` (Linux/Mac)
-- `scripts/quickstart.bat` (Windows)
-- `scripts/quickstart.sh` (Linux/Mac)
+- `_meta/_scripts/setup_module.bat` (Windows)
+- `_meta/_scripts/setup_module.sh` (Linux - testing only)
+- `_meta/_scripts/run_module.bat` (Windows)
+- `_meta/_scripts/run_module.sh` (Linux - testing only)
 
 ### 7. Testing
 

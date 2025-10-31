@@ -6,6 +6,7 @@ from fastapi import status
 
 from src.main import app
 from src.core import get_module_runner
+from src.core.exceptions import ResourceLimitException
 
 
 @pytest.fixture(autouse=True)
@@ -150,7 +151,7 @@ async def test_concurrent_module_run_conflict():
         runner.registry.update_run(run1)
 
         # Try to create second run - should fail due to limit
-        with pytest.raises(RuntimeError, match="Max concurrent runs"):
+        with pytest.raises(ResourceLimitException, match="Max concurrent runs"):
             await runner.execute_module(
                 module_id="test2",
                 module_name="Test 2",

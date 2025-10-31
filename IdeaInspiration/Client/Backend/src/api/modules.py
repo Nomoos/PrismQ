@@ -12,43 +12,10 @@ from ..models.module import (
     ModuleConfigUpdate,
 )
 from ..core import get_config_storage, ConfigStorage
+from ..core.exceptions import ModuleNotFoundException, ValidationException
+from ..utils.module_loader import get_module_loader
 
 router = APIRouter()
-
-
-# Mock data for initial implementation
-MOCK_MODULES: List[Module] = [
-    Module(
-        id="youtube-shorts",
-        name="YouTube Shorts Source",
-        description="Collect trending YouTube Shorts",
-        category="Content/Shorts",
-        version="1.0.0",
-        script_path="../../Sources/Content/Shorts/YouTubeShorts/src/main.py",
-        parameters=[
-            ModuleParameter(
-                name="max_results",
-                type="number",
-                default=50,
-                min=1,
-                max=1000,
-                required=True,
-                description="Maximum number of shorts to collect",
-            ),
-            ModuleParameter(
-                name="trending_category",
-                type="select",
-                options=["All", "Gaming", "Music", "Entertainment"],
-                default="All",
-                required=False,
-                description="Category to filter by",
-            ),
-        ],
-        tags=["content", "youtube", "shorts"],
-        status="active",
-        enabled=True,
-    ),
-]
 
 
 def _validate_parameters(module: Module, parameters: dict) -> List[str]:
@@ -109,9 +76,11 @@ async def list_modules():
     Returns:
         ModuleListResponse: List of available modules
     """
+    loader = get_module_loader()
+    modules = loader.get_all_modules()
     return ModuleListResponse(
-        modules=MOCK_MODULES,
-        total=len(MOCK_MODULES),
+        modules=modules,
+        total=len(modules),
     )
 
 
@@ -129,14 +98,16 @@ async def get_module(module_id: str):
     Raises:
         HTTPException: If module not found
     """
-    for module in MOCK_MODULES:
-        if module.id == module_id:
-            return module
+    loader = get_module_loader()
+    module = loader.get_module(module_id)
     
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Module not found",
-    )
+    if module is None:
+        raise ModuleNotFoundException(
+            f"Module '{module_id}' not found",
+            module_id=module_id
+        )
+    
+    return module
 
 
 @router.get("/modules/{module_id}/config", response_model=ModuleConfig)

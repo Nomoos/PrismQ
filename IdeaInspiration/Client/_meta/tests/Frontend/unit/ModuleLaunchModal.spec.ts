@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import ModuleLaunchModal from '@/components/ModuleLaunchModal.vue'
 import type { Module } from '@/types/module'
 
@@ -15,6 +16,11 @@ vi.mock('@/services/modules', () => ({
 }))
 
 describe('ModuleLaunchModal Component', () => {
+  beforeEach(() => {
+    // Create a fresh pinia instance for each test
+    setActivePinia(createPinia())
+  })
+
   const mockModule: Module = {
     id: 'test-module',
     name: 'Test Module',
@@ -187,6 +193,13 @@ describe('ModuleLaunchModal Component', () => {
     })
 
     await flushPromises()
+
+    // Fill in required fields to pass validation
+    const maxResultsInput = wrapper.find('input[id="max_results"]')
+    await maxResultsInput.setValue(50)
+    
+    const apiKeyInput = wrapper.find('input[id="api_key"]')
+    await apiKeyInput.setValue('test-api-key')
 
     const form = wrapper.find('form')
     await form.trigger('submit.prevent')

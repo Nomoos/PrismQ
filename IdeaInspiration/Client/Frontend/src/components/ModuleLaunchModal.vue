@@ -25,6 +25,7 @@
             type="text"
             :required="param.required"
             :placeholder="String(param.default || '')"
+            :class="{ 'input-error': errors[param.name] }"
           />
           
           <!-- Password input -->
@@ -35,6 +36,7 @@
             type="password"
             :required="param.required"
             :placeholder="String(param.default || '')"
+            :class="{ 'input-error': errors[param.name] }"
           />
           
           <!-- Number input -->
@@ -46,6 +48,7 @@
             :min="param.min"
             :max="param.max"
             :required="param.required"
+            :class="{ 'input-error': errors[param.name] }"
           />
           
           <!-- Select dropdown -->
@@ -54,6 +57,7 @@
             :id="param.name"
             v-model="formData[param.name]"
             :required="param.required"
+            :class="{ 'input-error': errors[param.name] }"
           >
             <option 
               v-for="option in param.options" 
@@ -71,6 +75,11 @@
               v-model="formData[param.name]"
               type="checkbox"
             />
+          </div>
+          
+          <!-- Error message -->
+          <div v-if="errors[param.name]" class="error-message">
+            {{ errors[param.name] }}
           </div>
         </div>
         
@@ -109,6 +118,7 @@
 import { ref, onMounted } from 'vue'
 import type { Module } from '@/types/module'
 import { moduleService } from '@/services/modules'
+import { useNotificationStore } from '@/stores/notifications'
 
 const props = defineProps<{
   module: Module
@@ -122,6 +132,8 @@ const emit = defineEmits<{
 const formData = ref<Record<string, any>>({})
 const saveConfig = ref(true)
 const isSubmitting = ref(false)
+const errors = ref<Record<string, string>>({})
+const notifications = useNotificationStore()
 
 onMounted(async () => {
   // Load saved configuration
@@ -136,7 +148,58 @@ onMounted(async () => {
   })
 })
 
+/**
+ * Validate form data against parameter definitions.
+ * 
+ * @returns true if valid, false otherwise
+ */
+function validateForm(): boolean {
+  errors.value = {}
+  
+  for (const param of props.module.parameters) {
+    const value = formData.value[param.name]
+    
+    // Required check
+    if (param.required && (value === undefined || value === '' || value === null)) {
+      errors.value[param.name] = `${param.description || param.name} is required`
+      continue
+    }
+    
+    // Skip further validation if value is empty and not required
+    if (value === undefined || value === '' || value === null) {
+      continue
+    }
+    
+    // Type-specific validation
+    if (param.type === 'number') {
+      const num = Number(value)
+      if (isNaN(num)) {
+        errors.value[param.name] = 'Must be a number'
+      } else if (param.min !== undefined && num < param.min) {
+        errors.value[param.name] = `Must be at least ${param.min}`
+      } else if (param.max !== undefined && num > param.max) {
+        errors.value[param.name] = `Must be at most ${param.max}`
+      }
+    } else if (param.type === 'select' && param.options) {
+      if (!param.options.includes(value)) {
+        errors.value[param.name] = `Must be one of: ${param.options.join(', ')}`
+      }
+    }
+  }
+  
+  return Object.keys(errors.value).length === 0
+}
+
 async function handleSubmit() {
+  // Validate form
+  if (!validateForm()) {
+    notifications.error({
+      title: 'Validation Error',
+      message: 'Please fix the errors in the form before submitting.',
+    })
+    return
+  }
+  
   isSubmitting.value = true
   try {
     emit('launch', formData.value, saveConfig.value)
@@ -154,6 +217,14 @@ async function resetToDefaults() {
     formData.value = {}
     props.module.parameters.forEach(param => {
       formData.value[param.name] = param.default
+    })
+    
+    // Clear errors
+    errors.value = {}
+    
+    notifications.success({
+      title: 'Configuration Reset',
+      message: 'Configuration has been reset to defaults.',
     })
   } catch (error) {
     console.error('Failed to reset configuration:', error)
@@ -203,6 +274,14 @@ async function resetToDefaults() {
 .form-field input[type="number"],
 .form-field select {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
+}
+
+.input-error {
+  @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+}
+
+.error-message {
+  @apply text-sm text-red-600 mt-1;
 }
 
 .checkbox-wrapper {

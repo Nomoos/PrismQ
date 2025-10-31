@@ -6,6 +6,7 @@ This folder contains comprehensive documentation for PrismQ.IdeaInspiration.Sour
 
 ### User Guides
 - **[Configuration Guide](CONFIGURATION.md)**: Comprehensive guide to configuration management and working directories
+- **[Testing Guide](TESTING_GUIDE.md)**: How to test the module with example URLs and channels
 - **[Windows Quickstart Guide](WINDOWS_QUICKSTART.md)**: Step-by-step setup for Windows users
 - **[Main README](../README.md)**: General documentation and usage guide
 
@@ -23,7 +24,9 @@ This folder contains comprehensive documentation for PrismQ.IdeaInspiration.Sour
 
 ### For Users
 - [Installation Instructions](../README.md#installation)
+- [Quick Test](../README.md#quick-test)
 - [Configuration Guide](CONFIGURATION.md): Working directories, .env management, and settings
+- [Testing Guide](TESTING_GUIDE.md): Testing with example channels and URLs
 - [CLI Usage](../README.md#usage)
 - [Troubleshooting](WINDOWS_QUICKSTART.md#troubleshooting)
 

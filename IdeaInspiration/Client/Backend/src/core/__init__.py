@@ -6,12 +6,23 @@ from pathlib import Path
 from .module_runner import ModuleRunner
 from .output_capture import OutputCapture
 from .process_manager import ProcessManager, ProcessResult
+from .resource_manager import ResourceManager
 from .run_registry import RunRegistry
 from .config import settings
+from .exceptions import (
+    WebClientException,
+    ModuleNotFoundException,
+    ModuleExecutionException,
+    ResourceLimitException,
+    ValidationException,
+    RunNotFoundException,
+    ConfigurationException,
+)
 
 # Global singletons for dependency injection
 _config_storage: ConfigStorage = None
 _process_manager: ProcessManager = None
+_resource_manager: ResourceManager = None
 _run_registry: RunRegistry = None
 _module_runner: ModuleRunner = None
 _output_capture: OutputCapture = None
@@ -51,6 +62,14 @@ def get_output_capture() -> OutputCapture:
     return _output_capture
 
 
+def get_resource_manager() -> ResourceManager:
+    """Get or create the global ResourceManager instance."""
+    global _resource_manager
+    if _resource_manager is None:
+        _resource_manager = ResourceManager()
+    return _resource_manager
+
+
 def get_module_runner() -> ModuleRunner:
     """Get or create the global ModuleRunner instance."""
     global _module_runner
@@ -59,16 +78,18 @@ def get_module_runner() -> ModuleRunner:
             registry=get_run_registry(),
             process_manager=get_process_manager(),
             config_storage=get_config_storage(),
-            output_capture=get_output_capture()
+            output_capture=get_output_capture(),
+            resource_manager=get_resource_manager()
         )
     return _module_runner
 
 
 def reset_singletons():
     """Reset all singleton instances. For testing only."""
-    global _config_storage, _process_manager, _run_registry, _module_runner, _output_capture
+    global _config_storage, _process_manager, _resource_manager, _run_registry, _module_runner, _output_capture
     _config_storage = None
     _process_manager = None
+    _resource_manager = None
     _run_registry = None
     _module_runner = None
     _output_capture = None
@@ -80,11 +101,20 @@ __all__ = [
     "OutputCapture",
     "ProcessManager",
     "ProcessResult",
+    "ResourceManager",
     "RunRegistry",
     "get_config_storage",
     "get_module_runner",
     "get_output_capture",
     "get_process_manager",
+    "get_resource_manager",
     "get_run_registry",
     "reset_singletons",
+    "WebClientException",
+    "ModuleNotFoundException",
+    "ModuleExecutionException",
+    "ResourceLimitException",
+    "ValidationException",
+    "RunNotFoundException",
+    "ConfigurationException",
 ]

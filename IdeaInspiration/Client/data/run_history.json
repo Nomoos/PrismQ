@@ -1,10 +1,10 @@
 {
-  "run_20251031_055631_youtube-shorts_c3f46446": {
-    "run_id": "run_20251031_055631_youtube-shorts_c3f46446",
+  "run_20251031_131746_youtube-shorts_4ff81920": {
+    "run_id": "run_20251031_131746_youtube-shorts_4ff81920",
     "module_id": "youtube-shorts",
     "module_name": "YouTube Shorts Source",
     "status": "queued",
-    "created_at": "2025-10-31T05:56:31.982552Z",
+    "created_at": "2025-10-31T13:17:46.722753Z",
     "started_at": null,
     "completed_at": null,
     "duration_seconds": null,
@@ -17,14 +17,14 @@
       "max_results": 50
     }
   },
-  "run_20251031_055631_youtube-shorts_07076ddb": {
-    "run_id": "run_20251031_055631_youtube-shorts_07076ddb",
+  "run_20251031_131747_youtube-shorts_56738ae8": {
+    "run_id": "run_20251031_131747_youtube-shorts_56738ae8",
     "module_id": "youtube-shorts",
     "module_name": "YouTube Shorts Source",
-    "status": "cancelled",
-    "created_at": "2025-10-31T05:56:31.966710Z",
+    "status": "queued",
+    "created_at": "2025-10-31T13:17:48.018129Z",
     "started_at": null,
-    "completed_at": "2025-10-31T05:56:31.967547Z",
+    "completed_at": null,
     "duration_seconds": null,
     "progress_percent": null,
     "items_processed": null,
@@ -33,6 +33,74 @@
     "error_message": null,
     "parameters": {
       "max_results": 50
+    }
+  },
+  "run_20251031_131746_youtube-shorts_82e5e0b8": {
+    "run_id": "run_20251031_131746_youtube-shorts_82e5e0b8",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "queued",
+    "created_at": "2025-10-31T13:17:46.172448Z",
+    "started_at": null,
+    "completed_at": null,
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": null,
+    "parameters": {
+      "max_results": 50
+    }
+  },
+  "run_20251031_131749_youtube-shorts_ba228b47": {
+    "run_id": "run_20251031_131749_youtube-shorts_ba228b47",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "failed",
+    "created_at": "2025-10-31T13:17:49.944928Z",
+    "started_at": null,
+    "completed_at": "2025-10-31T13:17:50.047079Z",
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": "Module script not found: ../../Sources/Content/Shorts/YouTubeShorts/src/main.py",
+    "parameters": {}
+  },
+  "run_20251031_131750_youtube-shorts_510e76a4": {
+    "run_id": "run_20251031_131750_youtube-shorts_510e76a4",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "failed",
+    "created_at": "2025-10-31T13:17:50.172136Z",
+    "started_at": null,
+    "completed_at": "2025-10-31T13:17:50.275488Z",
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": "Module script not found: ../../Sources/Content/Shorts/YouTubeShorts/src/main.py",
+    "parameters": {}
+  },
+  "run_20251031_131750_youtube-shorts_4eccab2f": {
+    "run_id": "run_20251031_131750_youtube-shorts_4eccab2f",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "failed",
+    "created_at": "2025-10-31T13:17:50.385484Z",
+    "started_at": null,
+    "completed_at": "2025-10-31T13:17:50.487745Z",
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": "Module script not found: ../../Sources/Content/Shorts/YouTubeShorts/src/main.py",
+    "parameters": {
+      "max_results": 25
     }
   }
 }

@@ -117,7 +117,25 @@ cp .env.example .env
 # (YouTube API key, database path, etc.)
 
 # Run a scrape command
-python -m src.cli scrape-channel --channel-url "https://youtube.com/@channel"
+python -m src.cli scrape-channel --channel "https://youtube.com/@channel"
+```
+
+### Quick Test
+
+To quickly test the module with example data:
+
+```bash
+# Use the test configuration
+cp .env.test.example .env.test
+
+# Test scraping from SnappyStories_1 channel (5 shorts)
+python -m src.cli scrape-channel --env-file .env.test --top 5
+
+# View collected data
+python -m src.cli list --env-file .env.test
+
+# Clean up test database
+python -m src.cli clear --env-file .env.test
 ```
 
 ## Usage
@@ -129,7 +147,10 @@ python -m src.cli scrape-channel --channel-url "https://youtube.com/@channel"
 python -m src.cli scrape
 
 # Channel-based scraping (recommended)
-python -m src.cli scrape-channel --channel-url "https://youtube.com/@channel"
+python -m src.cli scrape-channel --channel "https://youtube.com/@channel"
+
+# Example with test channel
+python -m src.cli scrape-channel --channel "@SnappyStories_1" --top 5
 
 # Trending page scraping
 python -m src.cli scrape-trending --max-results 50
@@ -201,6 +222,7 @@ See [_meta/docs/CONFIGURATION.md](_meta/docs/CONFIGURATION.md) for detailed conf
 
 ## Documentation
 
+- **[Testing Guide](_meta/docs/TESTING_GUIDE.md)** - Testing with example channels and URLs
 - **[Configuration Guide](_meta/docs/CONFIGURATION.md)** - Working directories, .env management
 - **[Metrics Documentation](_meta/docs/METRICS.md)** - Universal metrics system
 - **[YouTube Data Model](_meta/docs/YTB_DATA_MODEL.md)** - Complete database schema

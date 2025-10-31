@@ -11,9 +11,14 @@ from ..models.run import Run, RunStatus
 from .output_capture import OutputCapture
 from .process_manager import ProcessManager
 from .run_registry import RunRegistry
+from .exceptions import (
+    ModuleExecutionException,
+    ResourceLimitException,
+)
 
 if TYPE_CHECKING:
     from .config_storage import ConfigStorage
+    from .resource_manager import ResourceManager
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +47,7 @@ class ModuleRunner:
         process_manager: ProcessManager,
         config_storage: Optional["ConfigStorage"] = None,
         output_capture: Optional[OutputCapture] = None,
+        resource_manager: Optional["ResourceManager"] = None,
         max_concurrent_runs: int = 10
     ):
         """
@@ -52,12 +58,14 @@ class ModuleRunner:
             process_manager: Process manager for subprocess execution
             config_storage: Optional configuration storage for saving parameters
             output_capture: Optional output capture service for log streaming
+            resource_manager: Optional resource manager for system resource checks
             max_concurrent_runs: Maximum number of concurrent runs allowed
         """
         self.registry = registry
         self.process_manager = process_manager
         self.config_storage = config_storage
         self.output_capture = output_capture
+        self.resource_manager = resource_manager
         self.max_concurrent_runs = max_concurrent_runs
     
     async def execute_module(
@@ -97,9 +105,19 @@ class ModuleRunner:
         
         # Check concurrent run limit
         if len(self.registry.get_active_runs()) >= self.max_concurrent_runs:
-            raise RuntimeError(
-                f"Max concurrent runs ({self.max_concurrent_runs}) exceeded"
+            raise ResourceLimitException(
+                f"Max concurrent runs ({self.max_concurrent_runs}) exceeded",
+                resource_type="concurrent_runs"
             )
+        
+        # Check system resources if resource manager is available
+        if self.resource_manager:
+            resources_available, reason = self.resource_manager.check_resources_available()
+            if not resources_available:
+                raise ResourceLimitException(
+                    f"Insufficient system resources: {reason}",
+                    resource_type="system"
+                )
         
         # Create run record
         run = Run(
@@ -134,6 +152,13 @@ class ModuleRunner:
             # Small delay to allow API response to return before starting execution
             # This prevents race conditions in tests and gives time for status checks
             await asyncio.sleep(0.1)
+            
+            # Validate script exists
+            if not script_path.exists():
+                raise ModuleExecutionException(
+                    f"Module script not found: {script_path}",
+                    run_id=run.run_id
+                )
             
             # Update status to running
             run.status = RunStatus.RUNNING
@@ -188,11 +213,31 @@ class ModuleRunner:
             run.status = RunStatus.CANCELLED
             run.completed_at = datetime.now(timezone.utc)
             logger.info(f"Run {run.run_id} was cancelled")
+        except FileNotFoundError as e:
+            run.status = RunStatus.FAILED
+            run.error_message = f"File not found: {e.filename or str(e)}"
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(f"File not found in run {run.run_id}: {e}")
+        except PermissionError as e:
+            run.status = RunStatus.FAILED
+            run.error_message = "Permission denied executing module"
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(f"Permission error in run {run.run_id}: {e}")
+        except asyncio.TimeoutError:
+            run.status = RunStatus.FAILED
+            run.error_message = "Module execution timed out"
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(f"Timeout in run {run.run_id}")
+        except ModuleExecutionException as e:
+            run.status = RunStatus.FAILED
+            run.error_message = e.message
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(f"Module execution error in run {run.run_id}: {e.message}")
         except Exception as e:
             run.status = RunStatus.FAILED
-            run.error_message = str(e)
+            run.error_message = f"Unexpected error: {str(e)}"
             run.completed_at = datetime.now(timezone.utc)
-            logger.error(f"Run {run.run_id} failed with exception: {e}")
+            logger.error(f"Run {run.run_id} failed with exception: {e}", exc_info=True)
         finally:
             self.registry.update_run(run)
             self.output_capture.cleanup_run(run.run_id)

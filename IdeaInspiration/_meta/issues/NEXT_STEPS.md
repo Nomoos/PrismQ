@@ -595,7 +595,6 @@ Pipeline (Future):
 ### Documentation
 - **Main Roadmap**: `_meta/issues/ROADMAP.md`
 - **Known Issues**: `_meta/issues/KNOWN_ISSUES.md`
-- **Web Client Summary**: `_meta/issues/new/WEB_CLIENT_SUMMARY.md`
 - **Source Master Plan**: `_meta/issues/done/027-source-implementation-master-plan.md`
 - **Issue Template**: `_meta/issues/README.md`
 
@@ -610,7 +609,7 @@ Pipeline (Future):
 - **New Issues**: `_meta/issues/new/` (Issues #104-#112)
 - **Backlog**: `_meta/issues/backlog/` (Issues #001-#010)
 - **In Progress**: `_meta/issues/wip/` (Currently empty - move issues here)
-- **Completed**: `_meta/issues/done/` (Issues #101-#103, #011-#027, #113-#124)
+- **Completed**: `_meta/issues/done/` (Issues #101-#103, #011-#027, #104-#107, #113-#124, #125-#130)
 
 ---
 

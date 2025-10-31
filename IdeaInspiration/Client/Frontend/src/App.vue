@@ -10,11 +10,12 @@
         <router-view />
       </div>
     </main>
+    <NotificationToast />
   </div>
 </template>
 
 <script setup lang="ts">
-// Main App component
+import NotificationToast from '@/components/NotificationToast.vue'
 </script>
 
 <style scoped>
