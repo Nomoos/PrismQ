@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TextClassificationResult with detailed scoring information
 
 #### Documentation
-- New comprehensive guide: `docs/GENERALIZED_CLASSIFICATION.md`
+- New comprehensive guide: `_meta/doc/GENERALIZED_CLASSIFICATION.md`
   - Architecture overview
   - Usage examples for all patterns
   - Use cases (YouTube Shorts, podcasts, batch processing)
@@ -94,4 +94,4 @@ Potential additions being researched:
 
 ---
 
-For more details, see the [documentation](docs/GENERALIZED_CLASSIFICATION.md) or run `python example_generalized.py`.
+For more details, see the [documentation](_meta/doc/GENERALIZED_CLASSIFICATION.md) or run `python example_generalized.py`.

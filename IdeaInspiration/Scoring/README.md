@@ -28,16 +28,17 @@ PrismQ.IdeaInspiration.Scoring/
 │   ├── ISSUE_TEMPLATE/        # Issue templates
 │   ├── copilot-instructions.md # Copilot development guidelines
 │   └── PULL_REQUEST_TEMPLATE.md
-├── docs/                       # Documentation
-│   ├── CONTRIBUTING.md        # Contribution guidelines
-│   └── README.md              # Documentation overview
-├── issues/                     # Issue tracking
-│   ├── new/                   # New issues
-│   ├── wip/                   # Work in progress
-│   ├── done/                  # Completed issues
-│   ├── KNOWN_ISSUES.md        # Known issues list
-│   ├── ROADMAP.md             # Project roadmap
-│   └── README.md              # Issue tracking guide
+├── _meta/                       # Project metadata
+│   ├── doc/                   # Documentation
+│   │   ├── CONTRIBUTING.md   # Contribution guidelines
+│   │   └── README.md         # Documentation overview
+│   └── issues/                # Issue tracking
+│       ├── new/              # New issues
+│       ├── wip/              # Work in progress
+│       ├── done/             # Completed issues
+│       ├── KNOWN_ISSUES.md   # Known issues list
+│       ├── ROADMAP.md        # Project roadmap
+│       └── README.md         # Issue tracking guide
 ├── scripts/                    # Utility scripts
 │   ├── setup.bat              # Windows setup script
 │   ├── setup.sh               # Linux setup script (development only)
@@ -397,8 +398,8 @@ This repository is proprietary software. See [LICENSE](LICENSE) file for details
 ## 💬 Support
 
 For questions, issues, or feature requests:
-1. Check [Known Issues](issues/KNOWN_ISSUES.md)
-2. Review [Documentation](docs/)
+1. Check [Known Issues](_meta/issues/KNOWN_ISSUES.md)
+2. Review [Documentation](_meta/doc/)
 3. Open a new issue using the appropriate template
 
 ---

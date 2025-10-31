@@ -32,7 +32,7 @@ test = [
 [project.urls]
 "Bug Reports" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification/issues"
 "Source" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification"
-"Documentation" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification/docs"
+"Documentation" = "https://github.com/PrismQDev/PrismQ.IdeaInspiration.Classification/tree/main/_meta/doc"
 
 [tool.setuptools]
 packages = ["prismq", "prismq.idea", "prismq.idea.classification"]

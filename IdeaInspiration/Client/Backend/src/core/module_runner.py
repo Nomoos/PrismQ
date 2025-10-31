@@ -1,0 +1,277 @@
+"""Core module runner service."""
+
+import asyncio
+import logging
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, Optional, TYPE_CHECKING
+
+from ..models.run import Run, RunStatus
+from .output_capture import OutputCapture
+from .process_manager import ProcessManager
+from .run_registry import RunRegistry
+
+if TYPE_CHECKING:
+    from .config_storage import ConfigStorage
+
+logger = logging.getLogger(__name__)
+
+
+class ModuleRunner:
+    """
+    Core service for executing PrismQ modules asynchronously.
+    
+    Responsibilities:
+    - Launch module scripts with parameters
+    - Track run lifecycle (queued -> running -> completed/failed)
+    - Manage concurrent executions
+    - Capture and store output logs
+    
+    This class follows SOLID principles:
+    - Single Responsibility: Orchestrates module execution lifecycle
+    - Open/Closed: Can be extended with hooks for monitoring/notifications
+    - Liskov Substitution: Interface could be abstracted for different runners
+    - Interface Segregation: Provides minimal, focused methods
+    - Dependency Inversion: Depends on abstractions (ProcessManager, RunRegistry)
+    """
+    
+    def __init__(
+        self,
+        registry: RunRegistry,
+        process_manager: ProcessManager,
+        config_storage: Optional["ConfigStorage"] = None,
+        output_capture: Optional[OutputCapture] = None,
+        max_concurrent_runs: int = 10
+    ):
+        """
+        Initialize module runner.
+        
+        Args:
+            registry: Run registry for state management
+            process_manager: Process manager for subprocess execution
+            config_storage: Optional configuration storage for saving parameters
+            output_capture: Optional output capture service for log streaming
+            max_concurrent_runs: Maximum number of concurrent runs allowed
+        """
+        self.registry = registry
+        self.process_manager = process_manager
+        self.config_storage = config_storage
+        self.output_capture = output_capture
+        self.max_concurrent_runs = max_concurrent_runs
+    
+    async def execute_module(
+        self,
+        module_id: str,
+        module_name: str,
+        script_path: Path,
+        parameters: Dict,
+        run_id: Optional[str] = None,
+        save_config: bool = True
+    ) -> Run:
+        """
+        Execute a PrismQ module asynchronously.
+        
+        Args:
+            module_id: Unique module identifier
+            module_name: Human-readable module name
+            script_path: Path to the module's main.py
+            parameters: Dictionary of module parameters
+            run_id: Optional custom run ID
+            save_config: Whether to save parameters to config storage
+            
+        Returns:
+            Run object with status and metadata
+            
+        Raises:
+            ValueError: If module is invalid
+            RuntimeError: If max concurrent runs exceeded
+        """
+        # Save configuration if requested and storage is available
+        if save_config and self.config_storage:
+            self.config_storage.save_config(module_id, parameters)
+        
+        # Generate run ID if not provided
+        if not run_id:
+            run_id = self._generate_run_id(module_id)
+        
+        # Check concurrent run limit
+        if len(self.registry.get_active_runs()) >= self.max_concurrent_runs:
+            raise RuntimeError(
+                f"Max concurrent runs ({self.max_concurrent_runs}) exceeded"
+            )
+        
+        # Create run record
+        run = Run(
+            run_id=run_id,
+            module_id=module_id,
+            module_name=module_name,
+            status=RunStatus.QUEUED,
+            created_at=datetime.now(timezone.utc),
+            parameters=parameters
+        )
+        
+        # Register the run
+        self.registry.add_run(run)
+        
+        # Start execution asynchronously (fire and forget)
+        asyncio.create_task(self._execute_async(run, script_path, parameters))
+        
+        return run
+    
+    async def _execute_async(self, run: Run, script_path: Path, parameters: Dict):
+        """
+        Internal async execution handler.
+        
+        This method handles the full lifecycle of a module run.
+        
+        Args:
+            run: Run object to update
+            script_path: Path to module script
+            parameters: Module parameters
+        """
+        try:
+            # Small delay to allow API response to return before starting execution
+            # This prevents race conditions in tests and gives time for status checks
+            await asyncio.sleep(0.1)
+            
+            # Update status to running
+            run.status = RunStatus.RUNNING
+            run.started_at = datetime.now(timezone.utc)
+            self.registry.update_run(run)
+            
+            # Build command
+            command = self._build_command(script_path, parameters)
+            
+            # Create subprocess with piped stdout/stderr
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=script_path.parent
+            )
+            
+            # Start output capture
+            stdout_task, stderr_task = await self.output_capture.start_capture(
+                run_id=run.run_id,
+                stdout_stream=process.stdout,
+                stderr_stream=process.stderr
+            )
+            
+            # Wait for process completion
+            exit_code = await process.wait()
+            
+            # Wait for output capture to complete
+            await stdout_task
+            await stderr_task
+            
+            # Update run with results
+            run.status = RunStatus.COMPLETED if exit_code == 0 else RunStatus.FAILED
+            run.completed_at = datetime.now(timezone.utc)
+            run.exit_code = exit_code
+            run.duration_seconds = int(
+                (run.completed_at - run.started_at).total_seconds()
+            )
+            
+            # Set error message if failed
+            if exit_code != 0:
+                # Get last few error lines from captured logs
+                logs = self.output_capture.get_logs(run.run_id, tail=10)
+                error_lines = [
+                    log.message for log in logs
+                    if log.stream == "stderr" or log.level == "ERROR"
+                ]
+                if error_lines:
+                    run.error_message = "\n".join(error_lines[-5:])[:500]
+                
+        except asyncio.CancelledError:
+            run.status = RunStatus.CANCELLED
+            run.completed_at = datetime.now(timezone.utc)
+            logger.info(f"Run {run.run_id} was cancelled")
+        except Exception as e:
+            run.status = RunStatus.FAILED
+            run.error_message = str(e)
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(f"Run {run.run_id} failed with exception: {e}")
+        finally:
+            self.registry.update_run(run)
+            self.output_capture.cleanup_run(run.run_id)
+    
+    def _build_command(self, script_path: Path, parameters: Dict) -> list[str]:
+        """
+        Build command line arguments from parameters.
+        
+        Args:
+            script_path: Path to the script
+            parameters: Parameter dictionary
+            
+        Returns:
+            Command as list of strings
+        """
+        command = ["python", str(script_path)]
+        
+        # Add parameters as command-line arguments
+        for key, value in parameters.items():
+            command.append(f"--{key}")
+            command.append(str(value))
+        
+        return command
+    
+    def _generate_run_id(self, module_id: str) -> str:
+        """
+        Generate unique run ID.
+        
+        Format: run_YYYYMMDD_HHMMSS_<module_id>_<unique_id>
+        
+        Args:
+            module_id: Module identifier
+            
+        Returns:
+            Unique run ID string
+        """
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        unique_id = str(uuid.uuid4())[:8]
+        return f"run_{timestamp}_{module_id}_{unique_id}"
+    
+    async def cancel_run(self, run_id: str) -> bool:
+        """
+        Cancel a running module execution.
+        
+        Args:
+            run_id: Run identifier
+            
+        Returns:
+            True if run was cancelled, False if not found or already completed
+        """
+        run = self.registry.get_run(run_id)
+        if not run:
+            return False
+        
+        if run.status not in [RunStatus.QUEUED, RunStatus.RUNNING]:
+            return False
+        
+        # Cancel the process
+        await self.process_manager.cancel_process(run_id)
+        
+        # Update run status
+        run.status = RunStatus.CANCELLED
+        run.completed_at = datetime.now(timezone.utc)
+        if run.started_at:
+            run.duration_seconds = int(
+                (run.completed_at - run.started_at).total_seconds()
+            )
+        self.registry.update_run(run)
+        
+        return True
+    
+    def get_run_status(self, run_id: str) -> Optional[Run]:
+        """
+        Get current status of a run.
+        
+        Args:
+            run_id: Run identifier
+            
+        Returns:
+            Run object if found, None otherwise
+        """
+        return self.registry.get_run(run_id)

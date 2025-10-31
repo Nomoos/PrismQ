@@ -11,6 +11,11 @@ Project-level documentation that applies to the entire repository, including:
 - Contributing guidelines
 - Design principles
 
+## Documentation Files
+
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, module organization patterns, and design decisions
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+
 ## Structure
 
 Documentation files should be organized by topic. Common documentation includes:
@@ -22,4 +27,4 @@ Documentation files should be organized by topic. Common documentation includes:
 
 ## Note
 
-Individual modules (Classification, Scoring, Sources, etc.) may have their own `docs/` folders for module-specific documentation. This directory is for repository-level documentation.
+Individual modules (Classification, Scoring, Sources, etc.) may have their own `docs/` or `_meta/docs/` folders for module-specific documentation. This directory is for repository-level documentation.

@@ -10,7 +10,7 @@ sys.path.insert(0, str(parent_dir.parent))  # For ConfigLoad
 sys.path.insert(0, str(parent_dir))  # For mod
 
 from ConfigLoad import Config, get_module_logger
-from mod.scoring import ScoringEngine
+from src.scoring import ScoringEngine
 from src.models import ScoreBreakdown
 
 # Mock IdeaInspiration class for demonstration

@@ -1,0 +1,38 @@
+{
+  "run_20251031_055631_youtube-shorts_c3f46446": {
+    "run_id": "run_20251031_055631_youtube-shorts_c3f46446",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "queued",
+    "created_at": "2025-10-31T05:56:31.982552Z",
+    "started_at": null,
+    "completed_at": null,
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": null,
+    "parameters": {
+      "max_results": 50
+    }
+  },
+  "run_20251031_055631_youtube-shorts_07076ddb": {
+    "run_id": "run_20251031_055631_youtube-shorts_07076ddb",
+    "module_id": "youtube-shorts",
+    "module_name": "YouTube Shorts Source",
+    "status": "cancelled",
+    "created_at": "2025-10-31T05:56:31.966710Z",
+    "started_at": null,
+    "completed_at": "2025-10-31T05:56:31.967547Z",
+    "duration_seconds": null,
+    "progress_percent": null,
+    "items_processed": null,
+    "items_total": null,
+    "exit_code": null,
+    "error_message": null,
+    "parameters": {
+      "max_results": 50
+    }
+  }
+}

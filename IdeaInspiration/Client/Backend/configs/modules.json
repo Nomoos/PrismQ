@@ -1,0 +1,29 @@
+{
+  "modules": [
+    {
+      "id": "youtube-shorts",
+      "name": "YouTube Shorts Source",
+      "description": "Collect trending YouTube Shorts",
+      "category": "Content/Shorts",
+      "script_path": "../../Sources/Content/Shorts/YouTubeShorts/src/main.py",
+      "parameters": [
+        {
+          "name": "max_results",
+          "type": "number",
+          "default": 50,
+          "description": "Maximum number of shorts to collect",
+          "required": true
+        },
+        {
+          "name": "trending_category",
+          "type": "select",
+          "options": ["All", "Gaming", "Music", "Entertainment"],
+          "default": "All",
+          "description": "Category to filter by",
+          "required": false
+        }
+      ],
+      "enabled": true
+    }
+  ]
+}

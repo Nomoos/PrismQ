@@ -12,7 +12,7 @@ Target Platform:
     - RAM: 64GB
 
 Usage:
-    from mod.scoring import ScoringEngine
+    from src.scoring import ScoringEngine
     from src.models import ScoreBreakdown
     
     engine = ScoringEngine()
@@ -23,7 +23,7 @@ Usage:
 __version__ = "0.1.0"
 __author__ = "PrismQ"
 
-from mod.scoring import ScoringEngine
+from src.scoring import ScoringEngine
 from src.models import ScoreBreakdown
 
 __all__ = ['ScoringEngine', 'ScoreBreakdown']

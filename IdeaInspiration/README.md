@@ -92,10 +92,16 @@ All modules are optimized for:
 
 ## 📚 Documentation
 
+### Architecture & Design
+- **[System Architecture](./_meta/docs/ARCHITECTURE.md)** - Complete system architecture with diagrams
+- **[Web Client Architecture](./Client/docs/ARCHITECTURE.md)** - Detailed Client architecture
+- **[Scoring Module Architecture](./Scoring/_meta/doc/ARCHITECTURE.md)** - Scoring module details
+- **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project
+
+### Planning & Development
 - **[Project Roadmap](./_meta/issues/ROADMAP.md)** - Future development plans
 - **[Known Issues](./_meta/issues/KNOWN_ISSUES.md)** - Current limitations and bugs
 - **[Research](./_meta/research/)** - Experimental work and investigations
-- **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project
 
 ## 🔗 Related Projects
 

@@ -5,7 +5,7 @@ This script demonstrates the new IdeaInspiration model, Extract and Builder patt
 and the TextClassifier for generalized content classification across text, video, and audio.
 """
 
-from prismq.idea.classification import (
+from src.classification import (
     IdeaInspiration,
     IdeaInspirationExtractor,
     IdeaInspirationBuilder,
@@ -40,7 +40,7 @@ def main():
     print(f"Title: {text_inspiration.title}")
     print(f"Source Type: {text_inspiration.source_type}")
     print(f"Keywords: {text_inspiration.keywords}")
-    print(f"Has Content: {text_inspiration.has_content}")
+    print(f"Has Content: {bool(text_inspiration.content)}")
     print()
     
     print("🎥 EXAMPLE 2: Extract from Video with Subtitles")

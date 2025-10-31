@@ -5,7 +5,7 @@ This script demonstrates how to use both the CategoryClassifier and StoryDetecto
 to classify short-form video content.
 """
 
-from prismq.idea.classification import (
+from src.classification import (
     CategoryClassifier,
     StoryDetector,
     PrimaryCategory
