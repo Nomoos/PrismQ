@@ -260,7 +260,6 @@ The chain is broken at the final step.
 - `Client/Backend/configs/modules.json` - Module configuration
 - `Client/Backend/src/api/` - API endpoints
 - `Client/Frontend/src/views/` - UI views
-- `Client/CLIENT_STATUS_REPORT.md` - Previous status report
 
 ### Database
 - `Model/idea_inspiration.py` - Core data model

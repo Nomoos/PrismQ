@@ -326,7 +326,7 @@ sequenceDiagram
   - Readability analysis
   - Sentiment analysis
   - Engagement metrics calculation
-- **Documentation**: [Scoring Architecture](../../Scoring/_meta/doc/ARCHITECTURE.md)
+- **Documentation**: [Scoring Architecture](../../Scoring/_meta/docs/ARCHITECTURE.md)
 
 ## Documentation Standards
 
@@ -358,7 +358,7 @@ All modules are optimized for:
 
 - [Contributing Guidelines](./CONTRIBUTING.md)
 - [Web Client Architecture](../../Client/docs/ARCHITECTURE.md) - Detailed Client architecture
-- [Scoring Module Architecture](../../Scoring/_meta/doc/ARCHITECTURE.md) - Scoring module details
+- [Scoring Module Architecture](../../Scoring/_meta/docs/ARCHITECTURE.md) - Scoring module details
 - Main README: `/README.md`
 
 ## Technology Stack

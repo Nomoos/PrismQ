@@ -56,10 +56,7 @@ All issues (#101-#112) have been successfully completed and moved to the done di
 - Issues #101-#107: Moved to `_meta/issues/done/`
 - Issues #108-#112: Moved to `_meta/issues/done/Phase_0_Web_Client_Control_Panel/`
 
-For detailed completion summaries, see:
-- `Client/docs/ISSUE_111_COMPLETION_SUMMARY.md` - Testing & Optimization
-- `Client/ISSUE_112_COMPLETION_SUMMARY.md` - Documentation
-- `Client/docs/ISSUES_111_112_FINAL_SUMMARY.md` - Final Summary
+For detailed completion summaries, see Phase 0 completion summary in `_meta/issues/PHASE_0_COMPLETION_SUMMARY.md`.
 
 ## Related Documentation
 

@@ -24,7 +24,7 @@ fi
 # Run example
 echo "Running classification example..."
 echo ""
-python example.py
+python _meta/examples/example.py
 
 echo ""
 echo "======================================"

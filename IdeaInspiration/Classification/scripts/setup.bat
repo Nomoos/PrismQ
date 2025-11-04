@@ -77,7 +77,7 @@ echo To activate the environment in the future, run:
 echo   venv\Scripts\activate.bat
 echo.
 echo To run the example:
-echo   python example.py
+echo   python _meta/examples/example.py
 echo.
 echo To run tests:
 echo   pytest

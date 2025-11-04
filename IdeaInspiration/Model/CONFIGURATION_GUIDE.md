@@ -233,10 +233,10 @@ Test coverage includes:
 
 ## Examples
 
-See `example_config_usage.py` for a complete working example:
+See `_meta/examples/example_config_usage.py` for a complete working example:
 
 ```bash
-python example_config_usage.py
+python _meta/examples/example_config_usage.py
 ```
 
 This example demonstrates:
@@ -301,7 +301,7 @@ Each module can maintain its own configuration while sharing the working directo
 
 For questions or issues with the configuration manager:
 1. Check this guide first
-2. Review the example script (`example_config_usage.py`)
+2. Review the example script (`_meta/examples/example_config_usage.py`)
 3. Check the test files for usage patterns
 4. Open an issue on GitHub
 

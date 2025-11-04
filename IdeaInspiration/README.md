@@ -1,164 +1,64 @@
 # PrismQ.IdeaInspiration
 
-**Central hub for AI-powered content idea collection, classification, scoring, and processing**
+Central hub for AI-powered content idea collection, classification, scoring, and processing.
 
-## Overview
+## ✨ Highlights
 
-PrismQ.IdeaInspiration is a comprehensive ecosystem for discovering, evaluating, and managing content ideas from various sources. This repository contains multiple specialized modules that work together to power the PrismQ content generation pipeline.
-
-## 🎯 Purpose
-
-This ecosystem provides tools for:
-- **Collecting** ideas from diverse content sources (YouTube, Reddit, articles, etc.)
-- **Classifying** content into categories and detecting story potential
-- **Scoring** content based on engagement metrics and quality indicators
-- **Modeling** unified data structures for cross-platform content
-
-### ✅ Repository Purpose
-
-The repository fulfills all its stated requirements:
-
-1. ✅ **Data collection from various sources and unification into unified format** - 24 source modules implemented
-2. ✅ **Export to database table** - SQLite database with full CRUD operations
-3. ✅ **Evaluation of suitability for YouTube short story video creation** - Comprehensive 0-100 scoring system
-4. ✅ **Categorization into categories according to settings and subcategories according to AI discretion** - 8 primary categories + AI-powered subcategorization
-
-## 📦 Modules
-
-### Core Components
-
-| Module | Purpose | Documentation |
-|--------|---------|---------------|
-| **[Client](./Client/)** | Web control panel for running modules<br>**Quick Start (Windows)**: `_meta\_scripts\run_both.bat` | [README](./Client/README.md) • [Setup](./Client/docs/SETUP.md) • [Node.js Install](./Client/docs/NODEJS_INSTALLATION.md) |
-| **[Classification](./Classification/)** | Content categorization and story detection | [README](./Classification/README.md) |
-| **[ConfigLoad](./ConfigLoad/)** | Centralized configuration management | [README](./ConfigLoad/README.md) |
-| **[Model](./Model/)** | Core IdeaInspiration data model | [README](./Model/README.md) |
-| **[Scoring](./Scoring/)** | Content scoring and evaluation engine | [README](./Scoring/README.md) |
-| **[Sources](./Sources/)** | Content source integrations and taxonomy | [README](./Sources/README.md) |
-
-### Supporting Directories
-
-| Directory | Purpose |
-|-----------|---------|
-| **[_meta](./_meta/)** | Project-level documentation, issues, and research |
+- **24 source integrations** - YouTube, Reddit, Google Trends, TikTok, and more
+- **8-category classification** - Automated content categorization with story detection
+- **0-100 scoring system** - Comprehensive engagement and quality evaluation
+- **Unified data model** - IdeaInspiration structure for cross-platform content
+- **Web control panel** - Run and monitor modules via localhost interface
+- **Optimized for RTX 5090** - GPU-accelerated processing on Windows
 
 ## 🚀 Quick Start
 
-### For Users
+```bash
+# Clone repository
+git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
+cd PrismQ.IdeaInspiration
 
-1. Choose the module you need (Classification, Scoring, etc.)
-2. Navigate to its directory
-3. Follow the module-specific README for installation and usage
+# Setup virtual environments
+.\_meta\_scripts\setup_all_envs.ps1  # Windows
+./_meta/_scripts/setup_all_envs.sh   # Linux/macOS
 
-### For Developers
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-   cd PrismQ.IdeaInspiration
-   ```
-
-2. Set up virtual environments (recommended):
-   ```bash
-   # Linux/macOS/WSL
-   ./_meta/_scripts/setup_all_envs.sh
-   
-   # Windows PowerShell
-   .\_meta\_scripts\setup_all_envs.ps1
-   ```
-   
-   This creates isolated virtual environments for each project. See [Virtual Environment Guide](./_meta/docs/VIRTUAL_ENV_PER_PROJECT.md) for details.
-
-3. (Optional) Install direnv for automatic environment activation:
-   ```bash
-   # See detailed guide: ./_meta/docs/DIRENV_SETUP.md
-   
-   # Install direnv (Ubuntu/Debian)
-   sudo apt install direnv
-   
-   # Configure shell (~/.bashrc)
-   eval "$(direnv hook bash)"
-   
-   # Allow each project (one-time)
-   cd Classification && direnv allow
-   ```
-   
-   With direnv, environments activate automatically when you `cd` into a project!
-
-4. Work on a specific module:
-   ```bash
-   cd Classification
-   # If using direnv: environment activates automatically!
-   # Otherwise: source venv/bin/activate  (Linux/macOS/WSL)
-   #           .\venv\Scripts\Activate.ps1  (Windows PowerShell)
-   # Follow module-specific development instructions
-   ```
-
-## 💻 Target Platform
-
-All modules are optimized for:
-- **Operating System**: Windows
-- **GPU**: NVIDIA RTX 5090 (32GB VRAM)
-- **CPU**: AMD Ryzen processor
-- **RAM**: 64GB DDR5
-
-## 📊 Module Integration
-
-```
-┌─────────────────────────────────────────────────┐
-│              PrismQ.IdeaInspiration             │
-└─────────────────────────────────────────────────┘
-                      │
-        ┌─────────────┼─────────────┐
-        │             │             │
-    ┌───▼───┐    ┌───▼────┐   ┌───▼──────┐
-    │Sources│───▶│  Model │◀──│ConfigLoad│
-    └───┬───┘    └───┬────┘   └──────────┘
-        │            │
-        │      ┌─────┴──────┐
-        │      │            │
-    ┌───▼──────▼─┐   ┌─────▼────────┐
-    │Classification│   │   Scoring    │
-    └──────────────┘   └──────────────┘
+# Start web client (Windows quick launcher)
+_meta\_scripts\run_both.bat
 ```
 
-### Typical Workflow
+## 📦 Modules
 
-1. **Sources** → Collect content from various platforms
-2. **Model** → Transform into unified IdeaInspiration structure
-3. **Classification** → Categorize and detect story potential
-4. **Scoring** → Evaluate quality and engagement metrics
-5. **ConfigLoad** → Manage configuration across all modules
+| Module | Purpose |
+|--------|---------|
+| **[Client](./Client/)** | Web control panel for running modules |
+| **[Classification](./Classification/)** | Content categorization and story detection |
+| **[ConfigLoad](./ConfigLoad/)** | Centralized configuration management |
+| **[Model](./Model/)** | Core IdeaInspiration data model |
+| **[Scoring](./Scoring/)** | Content scoring and evaluation engine |
+| **[Sources](./Sources/)** | Content source integrations (24 sources) |
 
 ## 📚 Documentation
 
 ### Architecture & Design
 - **[System Architecture](./_meta/docs/ARCHITECTURE.md)** - Complete system architecture with diagrams
 - **[Web Client Architecture](./Client/docs/ARCHITECTURE.md)** - Detailed Client architecture
-- **[Scoring Module Architecture](./Scoring/_meta/doc/ARCHITECTURE.md)** - Scoring module details
+- **[Scoring Module Architecture](./Scoring/_meta/docs/ARCHITECTURE.md)** - Scoring module details
+- **[Python Packaging Standard](./_meta/docs/PYTHON_PACKAGING_STANDARD.md)** - Standardized configuration
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project
 
 ### Planning & Development
 - **[Project Roadmap](./_meta/issues/ROADMAP.md)** - Future development plans
 - **[Known Issues](./_meta/issues/KNOWN_ISSUES.md)** - Current limitations and bugs
 - **[Research](./_meta/research/)** - Experimental work and investigations
+- **[Setup Guide](./_meta/docs/SETUP.md)** - Installation and environment setup
+- **[Documentation Index](./_meta/docs/README.md)** - Complete documentation overview
 
-## 🔗 Related Projects
+## 🔗 Related
 
-- **[PrismQ.IdeaCollector](https://github.com/Nomoos/PrismQ.IdeaCollector)** - CLI tool for idea collection
-- **[StoryGenerator](https://github.com/Nomoos/StoryGenerator)** - Automated story and video generation
-- **[PrismQ.RepositoryTemplate](https://github.com/Nomoos/PrismQ.RepositoryTemplate)** - Base template for PrismQ modules
+- [PrismQ.IdeaCollector](https://github.com/Nomoos/PrismQ.IdeaCollector) - CLI tool for idea collection
+- [StoryGenerator](https://github.com/Nomoos/StoryGenerator) - Automated story and video generation
+- [PrismQ.RepositoryTemplate](https://github.com/Nomoos/PrismQ.RepositoryTemplate) - Base template for PrismQ modules
 
 ## 📄 License
 
-This repository is proprietary software. All Rights Reserved - Copyright (c) 2025 PrismQ
-
-## 💬 Support
-
-- **Issues**: Use the [GitHub issue tracker](https://github.com/Nomoos/PrismQ.IdeaInspiration/issues)
-- **Documentation**: Check individual module READMEs
-- **Project Tracking**: See [_meta/issues](./_meta/issues/) for planning and roadmap
-
----
-
-**Part of the PrismQ Ecosystem** - AI-powered content generation platform
+Proprietary - All Rights Reserved - Copyright (c) 2025 PrismQ

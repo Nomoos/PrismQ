@@ -121,8 +121,7 @@ npm test
 1. ✅ Update dependency versions in config files (DONE)
 2. 🔄 Install updated dependencies (run commands above)
 3. ✅ Run tests to verify no breaking changes
-4. 📝 Document in CLIENT_STATUS_REPORT.md
-5. 🔄 Consider dev dependency updates when vitest 4.x is stable
+4. 🔄 Consider dev dependency updates when vitest 4.x is stable
 
 ## References
 

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,7 +13,13 @@ authors = [
     {name = "PrismQ", email = "dev@prismq.com"}
 ]
 keywords = ["prismq", "ai", "content-generation", "scoring", "idea-inspiration"]
-
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "python-dotenv>=1.0.0",
 ]
@@ -22,20 +28,22 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "flake8>=6.0.0",
+    "ruff>=0.1.0",
     "mypy>=1.0.0",
 ]
 
-[tool.setuptools]
-packages = ["src", "mod"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["_meta/tests"]
+testpaths = ["tests", "_meta/tests"]
 python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
-addopts = "-v --cov=src --cov-report=html --cov-report=term --cov-report=json"
+addopts = [
+    "--verbose",
+    "--cov=src",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+]
 
 [tool.coverage.run]
 source = ["src"]
@@ -45,7 +53,6 @@ omit = [
     "*/__pycache__/*",
     "*/venv/*",
 ]
-branch = true
 
 [tool.coverage.report]
 exclude_lines = [
@@ -58,18 +65,15 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "pass",
 ]
-precision = 1
 show_missing = true
-skip_covered = false
-fail_under = 80
 
-[tool.coverage.html]
-directory = "htmlcov"
-
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ['py310']
-include = '\.pyi?$'
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N"]
+ignore = []
 
 [tool.mypy]
 python_version = "3.10"

@@ -108,7 +108,7 @@ mypy prismq/
 
 3. **Write tests**: All new features must have tests
 
-4. **Update documentation**: Keep READMEs and docstrings current
+4. **Update documentation**: Keep READMEs and docstrings current (see [Documentation Guidelines](#documentation-guidelines))
 
 5. **Test thoroughly**: Run the full test suite
    ```bash
@@ -181,6 +181,64 @@ def test_text_classifier_empty_input():
     with pytest.raises(ValueError):
         classifier.classify_text("")
 ```
+
+## Documentation Guidelines
+
+### README Standards
+
+All README files in the PrismQ ecosystem must follow the **navigation hub** pattern. See [README_STANDARDS.md](./README_STANDARDS.md) for complete guidelines.
+
+**README files should:**
+- ✅ Provide a brief 1-2 sentence overview
+- ✅ List 3-5 key highlights as bullet points
+- ✅ Include minimal quick start (1-2 commands)
+- ✅ Link to detailed documentation in `docs/` directory
+- ✅ Link to related modules and resources
+
+**README files should NOT:**
+- ❌ Contain detailed installation instructions
+- ❌ Include comprehensive usage guides
+- ❌ Duplicate content from `docs/` files
+- ❌ Explain architecture in detail
+
+**Template:** Use the standard template at `_meta/docs/templates/README_TEMPLATE.md`
+
+### Documentation Organization
+
+**Module-level documentation** should be organized as:
+```
+Module/
+├── README.md                    # Navigation hub (see README_STANDARDS.md)
+├── docs/                        # User-facing documentation
+│   ├── SETUP.md                # Installation and configuration
+│   ├── USER_GUIDE.md           # Complete usage guide
+│   ├── API.md                  # API reference (if applicable)
+│   └── ARCHITECTURE.md         # Architecture (if complex)
+└── _meta/docs/                 # Internal/development documentation
+    ├── CONTRIBUTING.md         # Module-specific contributing guide
+    └── [research/notes]        # Additional technical docs
+```
+
+### Updating Documentation
+
+When making changes:
+
+1. **Single Source of Truth**: Each piece of information should exist in exactly ONE place
+2. **README Changes**: Update only links and highlights, never detailed content
+3. **Detailed Changes**: Update appropriate docs/ files, not README
+4. **Link Validation**: Ensure all links work after updates
+5. **Consistency**: Follow the same structure across all modules
+
+### Migration Checklist for New Modules
+
+When adding a new module:
+
+- [ ] Use README template from `_meta/docs/templates/README_TEMPLATE.md`
+- [ ] Create `docs/` directory with SETUP.md, USER_GUIDE.md
+- [ ] Ensure README only contains navigation (no detailed content)
+- [ ] Add API.md if module has public API
+- [ ] Link to related modules
+- [ ] Verify all links work
 
 ## Submitting Changes
 

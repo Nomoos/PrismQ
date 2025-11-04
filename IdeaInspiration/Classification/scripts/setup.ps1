@@ -112,7 +112,7 @@ Write-Host "To activate the environment in the future, run:" -ForegroundColor Cy
 Write-Host "  .\venv\Scripts\Activate.ps1" -ForegroundColor White
 Write-Host ""
 Write-Host "To run the example:" -ForegroundColor Cyan
-Write-Host "  python example.py" -ForegroundColor White
+Write-Host "  python _meta/examples/example.py" -ForegroundColor White
 Write-Host ""
 Write-Host "To run tests:" -ForegroundColor Cyan
 Write-Host "  pytest" -ForegroundColor White

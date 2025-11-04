@@ -51,7 +51,7 @@ bash scripts/setup.sh
 
 Quick start script to run the example:
 - Activates virtual environment
-- Runs example.py demonstration
+- Runs _meta/examples/example.py demonstration
 
 **Windows (PowerShell - Recommended):**
 ```powershell
@@ -160,7 +160,7 @@ pip install -e ".[dev]"
 pytest
 
 # Run example
-python example.py
+python _meta/examples/example.py
 ```
 
 ## Platform Notes

@@ -31,7 +31,7 @@ if ($LASTEXITCODE -ne 0) {
 # Run example
 Write-Host "Running classification example..." -ForegroundColor Yellow
 Write-Host ""
-python example.py
+python _meta/examples/example.py
 
 Write-Host ""
 Write-Host "======================================" -ForegroundColor Green

@@ -30,10 +30,17 @@ The [INDEX.md](INDEX.md) document is your master guide. It will direct you to th
   - **Phase_2_Performance_Scale/** - Performance optimization issues
   - **Phase_3_Analytics_Insights/** - Analytics and reporting issues
   - **Phase_4_Advanced_Features/** - Advanced feature issues
-  - **Infrastructure_DevOps/** - Development tooling and infrastructure (#113-#118)
+  - **Infrastructure_DevOps/** - Development tooling and infrastructure (#200+)
 - **backlog/** - Backlog items not currently planned for active work
 - **wip/** - Issues currently being worked on (Work In Progress)
-- **done/** - Completed issues and features
+- **done/** - Recently completed issues, organized by year
+  - **2024/** - Issues completed in 2024
+  - **2025/** - Recent issues completed in 2025
+  - *Note: Old completed issues are removed from the repository but remain accessible in git history*
+- **templates/** - Issue templates for creating new issues
+  - **feature_issue.md** - Template for feature requests
+  - **bug_issue.md** - Template for bug reports
+  - **infrastructure_issue.md** - Template for infrastructure/DevOps issues
 
 Each EPIC folder in `new/` contains:
 - A `README.md` describing the phase objectives and success criteria
@@ -51,13 +58,37 @@ Each EPIC folder in `new/` contains:
 
 ## Issue Workflow
 
-1. **New Issues** - Create a new file in the appropriate EPIC folder within `new/` directory
+### Creating New Issues
+
+1. **Choose a Template** - Start with one of the templates in `templates/`:
+   - `feature_issue.md` for new features
+   - `bug_issue.md` for bug reports
+   - `infrastructure_issue.md` for infrastructure/DevOps work
+
+2. **Create New Issue** - Copy the appropriate template to the relevant EPIC folder within `new/` directory:
    - For Web Client issues → `new/Phase_0_Web_Client_Control_Panel/`
    - For Infrastructure/DevOps → `new/Infrastructure_DevOps/`
    - For other phases → corresponding Phase folder
+
+3. **File Naming** - Use format: `NNN-descriptive-name.md` (e.g., `204-clean-up-issues-directory.md`)
+
+### Issue Lifecycle
+
+1. **New Issues** - Issues start in `new/` organized by category/phase
 2. **Backlog** - Move to `backlog/` for items that are not currently planned but may be worked on later
-3. **Work In Progress** - Move to `wip/` when work begins
-4. **Completed** - Move to `done/` when finished (implemented)
+3. **Work In Progress** - Move to `wip/` when work begins on an issue
+4. **Completed** - Move to `done/YYYY/` (year subdirectory) when finished
+   - Use `done/2025/` for current year
+   - Group related issues in subdirectories as needed if there are many related issues
+   - Remove old issues periodically (they remain in git history for reference)
+
+### Archiving
+
+- **Summary Documents** - Move to `_meta/docs/archive/summaries/`
+- **Planning Documents** - Move to `_meta/docs/archive/planning/`
+- **Old Completed Issues** - Remove from repository (accessible in git history for reference)
+  - Keep only recent completed issues in `done/YYYY/`
+  - Old issues can be referenced using git history: `git show <commit>:path/to/file.md`
 
 ### EPIC Organization
 
@@ -72,19 +103,36 @@ Issues are organized into EPICs based on the project roadmap:
 ## File Naming
 
 Use descriptive names for issue files:
-- `001-feature-name.md`
-- `002-bug-description.md`
-- `003-enhancement-name.md`
+- `NNN-feature-name.md` (e.g., `204-clean-up-issues-directory.md`)
+- `NNN-bug-description.md`
+- `NNN-enhancement-name.md`
 
-## Template
+Where NNN is the issue number (can be sequential or use GitHub issue numbers).
 
-Each issue file should include:
+## Issue Templates
+
+Issue templates are available in the `templates/` directory:
+
+### Feature Issue Template (`templates/feature_issue.md`)
+Use for new features, enhancements, or capabilities to add to the project.
+
+### Bug Issue Template (`templates/bug_issue.md`)
+Use for bug reports with reproduction steps and expected vs actual behavior.
+
+### Infrastructure Issue Template (`templates/infrastructure_issue.md`)
+Use for DevOps, tooling, build system, CI/CD, and infrastructure improvements.
+
+### Template Fields
+
+Each template includes:
 - **Title** - Clear, descriptive title
+- **Status** - New, WIP, Done, Blocked
+- **Priority** - Critical, High, Medium, Low
+- **Category** - Feature, Bug, Infrastructure_DevOps, etc.
 - **Description** - Detailed description of the issue
-- **Type** - Bug, Feature, Enhancement, etc.
-- **Priority** - High, Medium, Low
-- **Status** - New, In Progress, Done
-- **Assignee** - Who is working on it
+- **Acceptance Criteria** - Checklist of requirements
+- **Estimated Effort** - Time estimate
+- **Dependencies** - Related issues or requirements
 - **Target Platform** - Windows, NVIDIA RTX 5090, AMD Ryzen, 64GB RAM
 
 ## Integration

@@ -274,4 +274,4 @@ Last updated: October 2025
 - Problem Statement: See issue describing taxonomy requirements
 - Implementation: `prismq/idea/classification/category_classifier.py`
 - Tests: `tests/test_category_classifier.py`
-- Example: `example.py`
+- Example: `_meta/examples/example.py`
