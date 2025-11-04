@@ -97,6 +97,7 @@ class YouTubePlugin(SourcePlugin):
                     metadata=metadata,
                     source_id=video['id'],
                     source_url=f"https://www.youtube.com/watch?v={video['id']}",
+                    source_platform="youtube",
                     source_created_by=snippet.get('channelTitle', ''),
                     source_created_at=snippet.get('publishedAt', '')
                 )

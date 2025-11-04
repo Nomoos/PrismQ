@@ -5,7 +5,7 @@ This plugin scrapes Instagram Reels from specific creator profiles.
 
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class InstagramCreatorPlugin(SourcePlugin):
@@ -78,7 +78,7 @@ class InstagramCreatorPlugin(SourcePlugin):
         
         return self._loader
     
-    def scrape_creator(self, username: str, max_reels: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape_creator(self, username: str, max_reels: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape reels from creator profile.
         
         Args:
@@ -86,7 +86,7 @@ class InstagramCreatorPlugin(SourcePlugin):
             max_reels: Maximum number of reels to scrape
             
         Returns:
-            List of reel dictionaries
+            List of IdeaInspiration objects
         """
         if max_reels is None:
             max_reels = getattr(self.config, 'instagram_creator_max_reels', 50)
@@ -111,16 +111,18 @@ class InstagramCreatorPlugin(SourcePlugin):
                 if self._is_reel(post):
                     reel_data = self._extract_reel_metadata(post)
                     if reel_data:
-                        reels.append(reel_data)
-                        count += 1
-                        print(f"  Scraped reel {count}/{max_reels}: {reel_data['source_id']}")
+                        idea = self.transform_reel_to_idea(reel_data)
+                        if idea:
+                            reels.append(idea)
+                            count += 1
+                            print(f"  Scraped reel {count}/{max_reels}: {idea.source_id}")
         
         except Exception as e:
             print(f"Error scraping creator @{username}: {e}")
         
         return reels
     
-    def scrape(self, username: Optional[str] = None, max_reels: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, username: Optional[str] = None, max_reels: Optional[int] = None) -> List[IdeaInspiration]:
         """Main scrape method.
         
         Args:
@@ -128,7 +130,7 @@ class InstagramCreatorPlugin(SourcePlugin):
             max_reels: Maximum number of reels
             
         Returns:
-            List of reel dictionaries
+            List of IdeaInspiration objects
         """
         if not username:
             raise ValueError("Username is required for creator scraping")
@@ -211,4 +213,51 @@ class InstagramCreatorPlugin(SourcePlugin):
             
         except Exception as e:
             print(f"Error extracting reel metadata: {e}")
+            return None
+    
+    def transform_reel_to_idea(self, reel_data: Dict[str, Any]) -> Optional[IdeaInspiration]:
+        """Transform reel data dictionary to IdeaInspiration object.
+        
+        Args:
+            reel_data: Reel data dictionary
+            
+        Returns:
+            IdeaInspiration object or None
+        """
+        try:
+            # Extract metrics and move to metadata
+            metrics = reel_data.get('metrics', {})
+            creator = reel_data.get('creator', {})
+            reel_info = reel_data.get('reel', {})
+            
+            # Build metadata dict with all metrics and additional info
+            metadata = {
+                'plays': str(metrics.get('plays', 0)),
+                'likes': str(metrics.get('likes', 0)),
+                'comments': str(metrics.get('comments', 0)),
+                'saves': str(metrics.get('saves', 0)),
+                'shares': str(metrics.get('shares', 0)),
+                'creator_username': creator.get('username', ''),
+                'creator_followers': str(creator.get('followers', 0)),
+                'creator_verified': str(creator.get('verified', False)),
+                'duration': str(reel_info.get('duration', 0)),
+                'audio': reel_info.get('audio', ''),
+                'location': reel_info.get('location', '') if reel_info.get('location') else '',
+            }
+            
+            # Create IdeaInspiration using from_video factory method
+            return IdeaInspiration.from_video(
+                title=reel_data.get('title', ''),
+                description=reel_data.get('description', ''),
+                subtitle_text='',  # Instagram doesn't provide subtitles via API
+                keywords=reel_data.get('tags', []),
+                metadata=metadata,
+                source_id=reel_data.get('source_id'),
+                source_url=f"https://www.instagram.com/reel/{reel_data.get('source_id', '')}" if reel_data.get('source_id') else None,
+                source_platform='instagram_reels',
+                source_created_by=creator.get('username'),
+                source_created_at=reel_data.get('upload_date'),
+            )
+        except Exception as e:
+            print(f"Error transforming reel to IdeaInspiration: {e}")
             return None

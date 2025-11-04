@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class MemeTrackerPlugin(SignalPlugin):
@@ -19,7 +19,7 @@ class MemeTrackerPlugin(SignalPlugin):
         """Get the name of this source."""
         return "meme_tracker"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape meme signals from various platforms.
         
@@ -29,9 +29,9 @@ class MemeTrackerPlugin(SignalPlugin):
                 - platform: Specific platform to track (reddit, twitter, etc.)
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
-        signals = []
+        ideas = []
         max_results = getattr(self.config, 'max_results', None) or \
                      getattr(self.config, 'meme_tracker_max_results', 25)
         limit = kwargs.get('limit', max_results)
@@ -47,7 +47,7 @@ class MemeTrackerPlugin(SignalPlugin):
             import traceback
             traceback.print_exc()
         
-        return signals
+        return ideas
     
     def _get_sample_memes(self, limit: int, platform: str) -> List[Dict[str, Any]]:
         """Get sample meme data for testing/stub mode."""
@@ -68,49 +68,48 @@ class MemeTrackerPlugin(SignalPlugin):
         if platform != 'all':
             sample_memes = [m for m in sample_memes if m['platform'] == platform]
         
-        signals = []
+        ideas = []
         for meme_data in sample_memes[:limit]:
-            signal = self._create_signal(meme_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(meme_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, meme_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Create a signal dictionary from meme data."""
+    def _create_idea_inspiration(self, meme_data: Dict[str, Any]) -> IdeaInspiration:
+        """Create an IdeaInspiration object from meme data."""
         meme_title = meme_data.get('title', 'Unknown Meme')
         virality = meme_data.get('virality_score', 5.0)
         platform = meme_data.get('platform', 'unknown')
         category = meme_data.get('category', 'general')
         
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        meme_slug = ''.join(c if c.isalnum() else '_' for c in meme_title.lower())[:30]
-        source_id = f"{meme_slug}_{timestamp}"
-        
         velocity = self._calculate_velocity(virality)
         
-        return {
-            'source_id': source_id,
+        # Format tags
+        tags = self.format_tags(['meme', 'viral', platform, category])
+        
+        # Build metadata with platform-specific data
+        metadata = {
+            'virality_score': str(virality),
+            'velocity': str(velocity),
+            'platform': platform,
+            'category': category,
             'signal_type': 'meme',
-            'name': meme_title,
-            'description': f'Trending meme: {meme_title}',
-            'tags': ['meme', 'viral', platform, category],
-            'metrics': {
-                'volume': int(virality * 100000),
-                'velocity': velocity,
-                'acceleration': round(velocity / 5, 2),
-                'geographic_spread': ['global']
-            },
-            'temporal': {
-                'first_seen': datetime.now(timezone.utc).isoformat() + 'Z',
-                'peak_time': None,
-                'current_status': self._determine_status(velocity)
-            },
-            'extra': {
-                'platform': platform,
-                'category': category,
-                'virality_score': virality
-            }
+            'current_status': self._determine_status(velocity)
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=meme_title,
+            description=f'Trending meme: {meme_title}',
+            text_content=f'Viral meme from {platform}: {meme_title}',
+            keywords=tags,
+            source_platform="meme_tracker",  # Platform identifier
+            metadata=metadata,
+            source_id=f"meme_tracker_{meme_title.lower().replace(' ', '_')}",
+            source_url=f"https://knowyourmeme.com/search?q={meme_title.replace(' ', '+')}"
+        )
+        
+        return idea
     
     def _calculate_velocity(self, virality_score: float) -> float:
         """Calculate meme velocity based on virality score."""

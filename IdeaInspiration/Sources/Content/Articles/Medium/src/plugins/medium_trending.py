@@ -7,8 +7,8 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class MediumTrendingPlugin(SourcePlugin):
@@ -38,14 +38,14 @@ class MediumTrendingPlugin(SourcePlugin):
         """
         return "medium_trending"
     
-    def scrape(self, top_n: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, top_n: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape trending articles from Medium.
         
         Args:
             top_n: Number of articles to scrape (optional, uses config if not provided)
         
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -77,7 +77,8 @@ class MediumTrendingPlugin(SourcePlugin):
                 
                 article_data = self._scrape_article(article_url)
                 if article_data:
-                    ideas.append(article_data)
+                    idea = self._transform_article_to_idea(article_data)
+                    ideas.append(idea)
             
             print(f"Successfully scraped {len(ideas)} trending articles")
             
@@ -220,3 +221,49 @@ class MediumTrendingPlugin(SourcePlugin):
         except Exception as e:
             print(f"Unexpected error scraping article {article_url}: {e}")
             return None
+    
+    def _transform_article_to_idea(self, article_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform Medium article data to IdeaInspiration object.
+        
+        Args:
+            article_data: Article data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = article_data.get('title', 'Untitled')
+        description = article_data.get('description', '')
+        tags_str = article_data.get('tags', '')
+        tags_list = [t.strip() for t in tags_str.split(',') if t.strip()] if isinstance(tags_str, str) else tags_str
+        tags = self.format_tags(['medium', 'article', 'trending'] + tags_list)
+        
+        # Extract metrics and move to metadata as strings
+        metrics = article_data.get('metrics', {})
+        author_data = article_data.get('author', {})
+        metadata = {
+            'article_id': article_data.get('source_id', ''),
+            'author_username': author_data.get('username', 'Unknown'),
+            'author_followers': str(author_data.get('followers', '')),
+            'claps': str(metrics.get('claps', 0)),
+            'responses': str(metrics.get('responses', 0)),
+            'reading_time_min': str(metrics.get('reading_time_min', 0)),
+            'views': str(metrics.get('views', 0)),
+            'publish_date': article_data.get('publish_date', ''),
+            'source': 'medium_trending',
+        }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=article_data.get('article_content', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=article_data.get('source_id', ''),
+            source_url=article_data.get('article_url', ''),
+            source_platform="medium",
+            source_created_by=author_data.get('username', 'Unknown'),
+            source_created_at=article_data.get('publish_date', '')
+        )
+        
+        return idea

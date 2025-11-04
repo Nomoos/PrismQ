@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class GeoLocalTrendsPlugin(SignalPlugin):
@@ -19,7 +19,7 @@ class GeoLocalTrendsPlugin(SignalPlugin):
         """Get the name of this source."""
         return "geo_local_trends"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape location-based trend signals.
         
@@ -29,9 +29,9 @@ class GeoLocalTrendsPlugin(SignalPlugin):
                 - location: Specific location/region (e.g., 'US', 'UK', 'Tokyo')
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
-        signals = []
+        ideas = []
         max_results = getattr(self.config, 'max_results', None) or \
                      getattr(self.config, 'geo_local_trends_max_results', 25)
         limit = kwargs.get('limit', max_results)
@@ -47,7 +47,7 @@ class GeoLocalTrendsPlugin(SignalPlugin):
             import traceback
             traceback.print_exc()
         
-        return signals
+        return ideas
     
     def _get_sample_geo_trends(self, limit: int = 10, location: str = 'global') -> List[Dict[str, Any]]:
         """
@@ -58,7 +58,7 @@ class GeoLocalTrendsPlugin(SignalPlugin):
             location: Location filter
             
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         trends = [
             {
@@ -162,12 +162,12 @@ class GeoLocalTrendsPlugin(SignalPlugin):
         trends = trends[:limit]
         
         # Convert to signals
-        signals = []
+        ideas = []
         for trend in trends:
-            signal = self._create_signal(trend)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(trend)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
     def _create_signal(self, trend: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -177,7 +177,7 @@ class GeoLocalTrendsPlugin(SignalPlugin):
             trend: Raw trend data
             
         Returns:
-            Signal dictionary
+            IdeaInspiration object
         """
         timestamp = datetime.now(timezone.utc).isoformat()
         

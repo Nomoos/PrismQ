@@ -79,6 +79,14 @@ Once running, access the interactive API documentation:
 
 ```
 Backend/
+├── _meta/                    # Module metadata
+│   ├── doc/                  # Backend-specific documentation
+│   ├── issues/               # Backend-specific issues
+│   └── tests/                # Test suite
+│       ├── test_api.py
+│       ├── test_module_runner.py
+│       └── integration/
+├── scripts/                  # Development scripts
 ├── src/                      # Source code
 │   ├── main.py              # FastAPI app entry point
 │   ├── api/                 # API route handlers
@@ -99,15 +107,13 @@ Backend/
 ├── configs/                 # Configuration files
 │   ├── modules.json         # Module definitions
 │   └── parameters/          # Saved parameters
-├── data/                    # Runtime data
-│   └── run_history.json     # Run history
-├── logs/                    # Application logs
-├── tests/                   # Test suite
-├── docs/                    # Backend-specific docs
 ├── requirements.txt         # Dependencies
+├── pyproject.toml          # Project configuration
 ├── .env.example            # Environment template
 └── README.md               # This file
 ```
+
+**Note**: Runtime data like `run_history.json` is stored at `../data/` (Client level) for persistence across Backend restarts.
 
 ## Configuration
 
@@ -173,13 +179,13 @@ Run tests with pytest:
 
 ```bash
 # All tests
-pytest tests/ -v
+pytest _meta/tests/ -v
 
 # Specific test file
-pytest tests/test_api/test_modules.py -v
+pytest _meta/tests/test_api.py -v
 
 # With coverage
-pytest tests/ --cov=src --cov-report=html
+pytest _meta/tests/ --cov=src --cov-report=html
 ```
 
 ## Development
@@ -189,7 +195,7 @@ pytest tests/ --cov=src --cov-report=html
 1. **Define Pydantic model** in `src/models/`
 2. **Create route handler** in `src/api/`
 3. **Register router** in `src/main.py`
-4. **Add tests** in `tests/test_api/`
+4. **Add tests** in `_meta/tests/`
 
 See [../docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md) for detailed development guide.
 
@@ -253,9 +259,7 @@ See [../docs/TROUBLESHOOTING.md](../docs/TROUBLESHOOTING.md) for more help.
 
 ### Backend-Specific Documentation
 
-- [API Reference](API_REFERENCE.md) - REST API endpoints
-- [Log Streaming Guide](LOG_STREAMING_GUIDE.md) - Real-time log streaming
-- [Configuration Persistence](docs/CONFIGURATION_PERSISTENCE.md) - Config management
+- [Configuration Persistence](_meta/doc/CONFIGURATION_PERSISTENCE.md) - Config management
 
 ## License
 

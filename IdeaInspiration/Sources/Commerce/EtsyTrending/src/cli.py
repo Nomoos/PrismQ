@@ -4,10 +4,14 @@ import click
 import sys
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CommerceMetrics
-from .core.commerce_processor import CommerceProcessor
 from .plugins.etsy_trending import EtsyTrendingPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -37,8 +41,9 @@ def scrape(env_file, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize Etsy plugin
         try:
@@ -49,7 +54,7 @@ def scrape(env_file, no_interactive):
         
         # Scrape from Etsy
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
         click.echo("Scraping Etsy trending products...")
         click.echo(f"Categories: {', '.join(config.etsy_categories)}")
@@ -57,40 +62,19 @@ def scrape(env_file, no_interactive):
         click.echo("")
         
         try:
-            products = etsy_plugin.scrape()
-            total_scraped = len(products)
-            click.echo(f"Found {len(products)} products")
+            # Scrape products - returns List[IdeaInspiration]
+            ideas = etsy_plugin.scrape()
+            total_scraped = len(ideas)
+            click.echo(f"Found {len(ideas)} products")
             
-            # Process and save each product
-            for product in products:
-                # Create commerce metrics
-                metrics = CommerceMetrics.from_etsy(product)
-                
-                # Extract tags
-                tags = product.get('tags', '')
-                if not tags:
-                    tags = CommerceProcessor.extract_tags_from_product(product)
-                
-                # Save to database
-                success = db.insert_product(
-                    source=etsy_plugin.get_source_name(),
-                    source_id=product.get('listing_id', ''),
-                    title=product.get('title', ''),
-                    brand=product.get('shop_name', ''),
-                    category=product.get('category', ''),
-                    price=product.get('price'),
-                    currency=product.get('currency', 'USD'),
-                    description=product.get('description'),
-                    tags=tags,
-                    score=metrics.consumer_interest or 0.0,
-                    score_dictionary=metrics.to_dict()
-                )
-                
-                if success:
-                    total_saved += 1
-                    click.echo(f"  ✓ Saved: {product.get('title', '')[:60]}")
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
                 else:
-                    click.echo(f"  ↻ Updated: {product.get('title', '')[:60]}")
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
             
         except Exception as e:
             click.echo(f"Error scraping Etsy: {e}", err=True)
@@ -99,8 +83,8 @@ def scrape(env_file, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total products found: {total_scraped}")
-        click.echo(f"Total products saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -123,35 +107,35 @@ def list(env_file, limit, category, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Open database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Open central database
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Get products
-        if category:
-            products = db.get_products_by_category(category, limit=limit)
-        else:
-            products = db.get_all_products(limit=limit)
+        # Get products - filter by source_platform
+        ideas = central_db.get_all(
+            limit=limit,
+            source_platform="etsy_trending",
+            category=category
+        )
         
-        if not products:
+        if not ideas:
             click.echo("No products found.")
             return
         
         # Display products
         click.echo(f"\n{'='*80}")
-        click.echo(f"Collected Products ({len(products)} total)")
+        click.echo(f"Collected Products ({len(ideas)} total)")
         click.echo(f"{'='*80}\n")
         
-        for i, product in enumerate(products, 1):
-            click.echo(f"{i}. [{product['category']}] {product['title']}")
-            click.echo(f"   Listing ID: {product['source_id']}")
-            if product['brand']:
-                click.echo(f"   Shop: {product['brand']}")
-            if product['price']:
-                click.echo(f"   Price: ${product['price']} {product['currency']}")
-            if product['score']:
-                click.echo(f"   Score: {product['score']:.2f}")
-            if product['tags']:
-                click.echo(f"   Tags: {product['tags']}")
+        for i, idea in enumerate(ideas, 1):
+            click.echo(f"{i}. [{idea.metadata.get('category', 'N/A')}] {idea.title}")
+            click.echo(f"   Listing ID: {idea.source_id}")
+            if idea.metadata.get('shop_name'):
+                click.echo(f"   Shop: {idea.metadata.get('shop_name')}")
+            if idea.metadata.get('price'):
+                click.echo(f"   Price: ${idea.metadata.get('price')} {idea.metadata.get('currency', 'USD')}")
+            if idea.keywords:
+                click.echo(f"   Tags: {', '.join(idea.keywords)}")
             click.echo()
         
     except Exception as e:
@@ -170,41 +154,36 @@ def stats(env_file, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Open database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Open central database
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Get statistics
-        statistics = db.get_statistics()
+        # Get all Etsy trending ideas
+        ideas = central_db.get_all(source_platform="etsy_trending")
         
-        if statistics['total'] == 0:
+        if not ideas:
             click.echo("No products collected yet.")
             return
         
-        # Build output as a string first to avoid Click dict iteration bug
-        output_lines = []
-        output_lines.append("\n" + "=" * 50)
-        output_lines.append("Product Collection Statistics")
-        output_lines.append("=" * 50 + "\n")
-        output_lines.append(f"Total Products: {statistics['total']}\n")
+        # Calculate statistics
+        total = len(ideas)
+        by_category = {}
         
-        if statistics.get('by_source'):
-            output_lines.append("Products by Source:")
-            for source, count in sorted(statistics['by_source'].items()):
-                percentage = (count / statistics['total']) * 100
-                output_lines.append(f"  {source}: {count} ({percentage:.1f}%)")
-            output_lines.append("")
+        for idea in ideas:
+            category = idea.metadata.get('category', 'Unknown')
+            by_category[category] = by_category.get(category, 0) + 1
         
-        if statistics.get('by_category'):
-            output_lines.append("Top Categories:")
-            # Convert to list before iterating to avoid Click bug
-            cat_list = [(k, v) for k, v in statistics['by_category'].items()]
-            for category, count in cat_list[:10]:
-                percentage = (count / statistics['total']) * 100
-                output_lines.append(f"  {category}: {count} ({percentage:.1f}%)")
-            output_lines.append("")
+        # Display statistics
+        click.echo(f"\n{'='*50}")
+        click.echo(f"Product Collection Statistics")
+        click.echo(f"{'='*50}\n")
+        click.echo(f"Total Products: {total}\n")
         
-        # Output everything at once
-        click.echo("\n".join(output_lines))
+        click.echo(f"Top Categories:")
+        for category, count in sorted(by_category.items(), key=lambda x: x[1], reverse=True)[:10]:
+            percentage = (count / total) * 100
+            click.echo(f"  {category}: {count} ({percentage:.1f}%)")
+        click.echo()
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -216,20 +195,24 @@ def stats(env_file, no_interactive):
               help='Path to .env file')
 @click.option('--no-interactive', is_flag=True, 
               help='Disable interactive prompts for missing configuration')
-@click.confirmation_option(prompt='Are you sure you want to clear all products?')
+@click.confirmation_option(prompt='Are you sure you want to clear all Etsy trending products?')
 def clear(env_file, no_interactive):
-    """Clear all products from the database."""
+    """Clear Etsy trending products from the central database.
+    
+    Note: This only removes products from this source, not the entire database.
+    """
     try:
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Delete database file
-        db_path = Path(config.database_path)
-        if db_path.exists():
-            db_path.unlink()
-            click.echo(f"Database cleared: {config.database_path}")
-        else:
-            click.echo("Database does not exist.")
+        # Open central database
+        central_db_path = get_central_database_path()
+        
+        # Note: IdeaInspirationDatabase doesn't have a delete by platform method yet
+        # For now, just inform the user to use the central database tools
+        click.echo("To clear Etsy trending products, use the central IdeaInspiration database tools.")
+        click.echo(f"Central database: {central_db_path}")
+        click.echo("This ensures data consistency across all sources.")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

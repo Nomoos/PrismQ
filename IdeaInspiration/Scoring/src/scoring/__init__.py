@@ -243,21 +243,25 @@ class ScoringEngine:
         
         This method acts as a classifier/enrichment layer that provides detailed
         scoring breakdown for various aspects of the content. It accepts any object
-        with title, description, text_content, and metadata attributes.
+        with title, description, text_content (or content), and metadata attributes.
         
         Args:
             idea_inspiration: IdeaInspiration object (from PrismQ.IdeaCollector or similar)
-                            Must have: title, description, text_content, metadata attributes
+                            Must have: title, description, text_content/content, metadata attributes
             
         Returns:
             ScoreBreakdown object with detailed scoring for each aspect
         """
-        from src.models import ScoreBreakdown
+        try:
+            from src.models import ScoreBreakdown
+        except ImportError:
+            from models import ScoreBreakdown
         
         # Extract content attributes
         title = getattr(idea_inspiration, 'title', '')
         description = getattr(idea_inspiration, 'description', '')
-        text_content = getattr(idea_inspiration, 'text_content', '')
+        # Support both text_content and content attributes
+        text_content = getattr(idea_inspiration, 'text_content', '') or getattr(idea_inspiration, 'content', '')
         metadata = getattr(idea_inspiration, 'metadata', {})
         
         # Get text quality scores
@@ -334,6 +338,20 @@ class ScoringEngine:
             similarity_score=0.0,  # Placeholder for future similarity scoring
             score_details=score_details
         )
+    
+    def score_idea_inspiration_batch(self, idea_inspirations: List) -> List['ScoreBreakdown']:
+        """Enrich multiple IdeaInspiration objects with comprehensive scoring.
+        
+        This method processes a list of IdeaInspiration objects and returns
+        detailed scoring breakdown for each one.
+        
+        Args:
+            idea_inspirations: List of IdeaInspiration objects
+            
+        Returns:
+            List of ScoreBreakdown objects with detailed scoring for each input
+        """
+        return [self.score_idea_inspiration(idea) for idea in idea_inspirations]
     
     def score_text_content(self, title: str, description: str, 
                           text_content: str) -> Dict[str, Any]:

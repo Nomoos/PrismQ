@@ -1,13 +1,59 @@
 # Create virtual environments for all PrismQ projects
 # Part of Issue #115: Per-Project Virtual Environments
+# Auto-discovers all modules using shared discovery library
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$Projects = @("Classification", "ConfigLoad", "Model", "Scoring", "Sources", "Client\Backend")
+$DiscoveryScript = Join-Path $RepoRoot "_meta\scripts\discover_modules.py"
+
+Write-Host "🔍 Discovering modules with requirements.txt..." -ForegroundColor Cyan
+Write-Host ""
+
+# Check if discovery script exists
+if (-not (Test-Path $DiscoveryScript)) {
+    Write-Host "❌ Discovery script not found at $DiscoveryScript" -ForegroundColor Red
+    exit 1
+}
+
+# Use shared discovery library to find modules for environment setup
+$Projects = @()
+try {
+    $Projects = python $DiscoveryScript --filter env-setup --format names | Where-Object { $_ -ne "" }
+} catch {
+    Write-Host "❌ Failed to run discovery script" -ForegroundColor Red
+    exit 1
+}
+
+if ($Projects.Count -eq 0) {
+    Write-Host "⚠️  No modules with requirements.txt found" -ForegroundColor Yellow
+    exit 0
+}
+
+Write-Host "Found $($Projects.Count) module(s):" -ForegroundColor Green
+foreach ($project in $Projects) {
+    Write-Host "  - $project" -ForegroundColor White
+}
+Write-Host ""
 
 Write-Host "🚀 Setting up virtual environments for all PrismQ projects..." -ForegroundColor Cyan
 Write-Host "Repository root: $RepoRoot"
+Write-Host ""
+
+# Check Python availability
+Write-Host "Checking Python availability..." -ForegroundColor Yellow
+try {
+    $PythonVersion = python --version 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        throw "Python not found"
+    }
+    Write-Host "✅ Python found: $($PythonVersion.Trim())" -ForegroundColor Green
+} catch {
+    Write-Host "❌ ERROR: Python is not installed or not in PATH" -ForegroundColor Red
+    Write-Host "   Please install Python 3.8+ and ensure it's in PATH" -ForegroundColor Yellow
+    Write-Host "   Download from: https://www.python.org/downloads/" -ForegroundColor Cyan
+    exit 1
+}
 Write-Host ""
 
 foreach ($project in $Projects) {
@@ -50,6 +96,10 @@ foreach ($project in $Projects) {
     if (Test-Path $requirementsPath) {
         Write-Host "   📥 Installing requirements from requirements.txt..." -ForegroundColor Cyan
         pip install --quiet -r $requirementsPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "   ❌ Failed to install requirements for $project" -ForegroundColor Red
+            Write-Host "   If using Python 3.14+, try recreating with: py -3.12 -m venv $venvPath" -ForegroundColor Yellow
+        }
     } else {
         Write-Host "   ℹ️  No requirements.txt found, skipping package installation" -ForegroundColor Yellow
     }

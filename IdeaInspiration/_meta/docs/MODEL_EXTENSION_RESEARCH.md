@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This document provides comprehensive research on extending the PrismQ.IdeaInspiration.Model to better support collecting content inspirations from various sources. Based on analysis of the current dual-save architecture (PR #69) and industry best practices, we examine how Sources can be optimally transformed into IdeaInspiration objects, which are then consumed by downstream modules like **PrismQ.Idea.Model** for story generation.
+This document provides comprehensive research on extending the PrismQ.IdeaInspiration.Model to better support collecting content inspirations from various sources. Based on analysis of the single database architecture (migrated November 2025) and industry best practices, we examine how Sources can be optimally transformed into IdeaInspiration objects, which are then consumed by downstream modules like **PrismQ.Idea.Model** for story generation.
 
 ## Architecture Context
 
@@ -35,7 +35,7 @@ The current `IdeaInspiration` model serves as a unified output format from all S
 #### Current Implementation Analysis
 
 **What Works Well:**
-- ✅ Dual-save architecture preserves platform-specific details
+- ✅ Single database architecture with `source_platform` field for source identification
 - ✅ `IdeaInspiration` provides unified output format for all Sources
 - ✅ Factory methods (`from_text`, `from_video`, `from_audio`) abstract content types
 - ✅ Minimal friction for Source modules to save data
@@ -353,9 +353,8 @@ def scrape(self) -> List[IdeaInspiration]:
         )
         ideas.append(idea)
     
-    # Dual-save (same as other sources)
+    # Save to central database (single DB pattern)
     for idea in ideas:
-        source_db.insert_trend(idea)
         central_db.insert(idea)
     
     return ideas
@@ -580,7 +579,8 @@ extractor.blend(
 2. **Use Single DB Approach** ✅
    - Store all data in central IdeaInspiration database
    - Platform-specific metrics in `metadata` dict
-   - Simpler architecture, no dual-save complexity
+   - Use `source_platform` field for source identification
+   - Simpler architecture, single database
    - Easier to maintain and query
 
 3. **Use IdeaInspiration Universally** ✅

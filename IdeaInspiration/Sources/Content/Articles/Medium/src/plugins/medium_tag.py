@@ -7,7 +7,7 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 from .medium_trending import MediumTrendingPlugin
 
 
@@ -33,7 +33,7 @@ class MediumTagPlugin(SourcePlugin):
         """
         return "medium_tag"
     
-    def scrape(self, tag: Optional[str] = None, top_n: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, tag: Optional[str] = None, top_n: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape articles by tag from Medium.
         
         Args:

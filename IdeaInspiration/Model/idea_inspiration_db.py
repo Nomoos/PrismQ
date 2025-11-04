@@ -68,6 +68,7 @@ class IdeaInspirationDatabase:
                 metadata TEXT,
                 source_id TEXT,
                 source_url TEXT,
+                source_platform TEXT,
                 source_created_by TEXT,
                 source_created_at TEXT,
                 score INTEGER,
@@ -79,6 +80,27 @@ class IdeaInspirationDatabase:
             )
         """)
         
+        # Migrate existing databases by adding source_platform column if it doesn't exist
+        try:
+            cursor.execute("PRAGMA table_info(IdeaInspiration)")
+            columns = [column[1] for column in cursor.fetchall()]
+            if 'source_platform' not in columns:
+                cursor.execute("""
+                    ALTER TABLE IdeaInspiration 
+                    ADD COLUMN source_platform TEXT
+                """)
+        except sqlite3.OperationalError as e:
+            # Ignore if column already exists from a concurrent migration
+            # or if table doesn't exist yet (will be created below)
+            error_msg = str(e).lower()
+            if 'duplicate column' not in error_msg and 'no such table' not in error_msg:
+                # Log unexpected operational errors but don't fail
+                # Schema creation below will handle most cases
+                print(f"Warning during migration: {e}")
+        except Exception as e:
+            # Log unexpected errors but don't fail initialization
+            print(f"Warning during schema migration: {e}")
+        
         # Create index on source_id for faster lookups
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_source_id 
@@ -89,6 +111,12 @@ class IdeaInspirationDatabase:
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_source_type 
             ON IdeaInspiration(source_type)
+        """)
+        
+        # Create index on source_platform for filtering
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_source_platform 
+            ON IdeaInspiration(source_platform)
         """)
         
         # Create index on category for filtering
@@ -138,11 +166,11 @@ class IdeaInspirationDatabase:
                 cursor.execute("""
                     INSERT INTO IdeaInspiration (
                         title, description, content, keywords, source_type,
-                        metadata, source_id, source_url, source_created_by,
-                        source_created_at, score, category, subcategory_relevance,
-                        contextual_category_scores
+                        metadata, source_id, source_url, source_platform,
+                        source_created_by, source_created_at, score, category, 
+                        subcategory_relevance, contextual_category_scores
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     data['title'],
                     data['description'],
@@ -152,6 +180,7 @@ class IdeaInspirationDatabase:
                     metadata_json,
                     data['source_id'],
                     data['source_url'],
+                    data['source_platform'],
                     data['source_created_by'],
                     data['source_created_at'],
                     data['score'],
@@ -194,11 +223,11 @@ class IdeaInspirationDatabase:
                     cursor.execute("""
                         INSERT INTO IdeaInspiration (
                             title, description, content, keywords, source_type,
-                            metadata, source_id, source_url, source_created_by,
-                            source_created_at, score, category, subcategory_relevance,
-                            contextual_category_scores
+                            metadata, source_id, source_url, source_platform,
+                            source_created_by, source_created_at, score, category, 
+                            subcategory_relevance, contextual_category_scores
                         )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
                         data['title'],
                         data['description'],
@@ -208,6 +237,7 @@ class IdeaInspirationDatabase:
                         metadata_json,
                         data['source_id'],
                         data['source_url'],
+                        data['source_platform'],
                         data['source_created_by'],
                         data['source_created_at'],
                         data['score'],
@@ -276,6 +306,7 @@ class IdeaInspirationDatabase:
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         source_type: Optional[str] = None,
+        source_platform: Optional[str] = None,
         category: Optional[str] = None
     ) -> List[IdeaInspiration]:
         """Retrieve IdeaInspiration records with optional filtering.
@@ -284,6 +315,7 @@ class IdeaInspirationDatabase:
             limit: Maximum number of records to return
             offset: Number of records to skip
             source_type: Filter by source type (text, video, audio)
+            source_platform: Filter by source platform (e.g., "youtube", "google_trends")
             category: Filter by category
             
         Returns:
@@ -300,6 +332,10 @@ class IdeaInspirationDatabase:
             if source_type:
                 query += " AND source_type = ?"
                 params.append(source_type)
+            
+            if source_platform:
+                query += " AND source_platform = ?"
+                params.append(source_platform)
             
             if category:
                 query += " AND category = ?"
@@ -323,12 +359,14 @@ class IdeaInspirationDatabase:
     def count(
         self,
         source_type: Optional[str] = None,
+        source_platform: Optional[str] = None,
         category: Optional[str] = None
     ) -> int:
         """Count IdeaInspiration records with optional filtering.
         
         Args:
             source_type: Filter by source type
+            source_platform: Filter by source platform
             category: Filter by category
             
         Returns:
@@ -343,6 +381,10 @@ class IdeaInspirationDatabase:
             if source_type:
                 query += " AND source_type = ?"
                 params.append(source_type)
+            
+            if source_platform:
+                query += " AND source_platform = ?"
+                params.append(source_platform)
             
             if category:
                 query += " AND category = ?"
@@ -376,6 +418,7 @@ class IdeaInspirationDatabase:
             'metadata': metadata,
             'source_id': row['source_id'],
             'source_url': row['source_url'],
+            'source_platform': row.get('source_platform'),
             'source_created_by': row['source_created_by'],
             'source_created_at': row['source_created_at'],
             'score': row['score'],

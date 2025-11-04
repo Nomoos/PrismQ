@@ -2,8 +2,8 @@
 
 import holidays
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
-from . import SourcePlugin
+from datetime import datetime, timedelta, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class CalendarHolidaysPlugin(SourcePlugin):
@@ -30,7 +30,7 @@ class CalendarHolidaysPlugin(SourcePlugin):
         country: Optional[str] = None,
         year: Optional[int] = None,
         years: Optional[List[int]] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[IdeaInspiration]:
         """Scrape holidays from Python holidays library.
         
         Args:
@@ -39,7 +39,7 @@ class CalendarHolidaysPlugin(SourcePlugin):
             years: List of years to get holidays for
             
         Returns:
-            List of holiday dictionaries
+            List of IdeaInspiration objects
         """
         events = []
         
@@ -74,7 +74,9 @@ class CalendarHolidaysPlugin(SourcePlugin):
                         'description': f"{name} - {country} holiday"
                     }
                     
-                    events.append(holiday_data)
+                    # Transform to IdeaInspiration
+                    idea = self._transform_event_to_idea(holiday_data)
+                    events.append(idea)
         
         except (KeyError, AttributeError) as e:
             print(f"Error fetching holidays for country '{country}': Invalid country code or API error")
@@ -185,3 +187,48 @@ class CalendarHolidaysPlugin(SourcePlugin):
         mult = importance_mult.get(importance, 0.3)
         
         return int(base_pop * mult)
+    
+    def _transform_event_to_idea(self, event_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform event data to IdeaInspiration object.
+        
+        Args:
+            event_data: Event data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        name = event_data.get('name', 'Unknown Event')
+        country = event_data.get('country', 'Unknown')
+        tags = self.format_tags(['holiday', 'event', country, event_data.get('scope', ''), event_data.get('importance', '')])
+        
+        # Build metadata with string values
+        metadata = {
+            'event_id': event_data.get('id', ''),
+            'event_type': event_data.get('type', 'holiday'),
+            'country': country,
+            'date': event_data.get('date', ''),
+            'recurring': str(event_data.get('recurring', False)),
+            'recurrence_pattern': event_data.get('recurrence_pattern', ''),
+            'scope': event_data.get('scope', 'national'),
+            'importance': event_data.get('importance', 'moderate'),
+            'audience_size_estimate': str(event_data.get('audience_size_estimate', 0)),
+        }
+        
+        # Build description
+        description = event_data.get('description', f"{name} in {country}")
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=name,
+            description=description,
+            text_content=f"{name} is a {event_data.get('scope', 'national')} holiday in {country}, observed on {event_data.get('date', '')}",
+            keywords=tags,
+            metadata=metadata,
+            source_id=event_data.get('id', ''),
+            source_url='',  # No URL for calendar holidays
+            source_platform="calendar_holidays",
+            source_created_by="Python holidays library",
+            source_created_at=event_data.get('date', '')
+        )
+        
+        return idea

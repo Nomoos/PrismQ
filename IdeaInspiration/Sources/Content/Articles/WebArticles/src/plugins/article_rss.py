@@ -6,8 +6,8 @@ then uses ArticleUrlPlugin to extract full content from each URL.
 
 import hashlib
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class ArticleRssPlugin(SourcePlugin):
@@ -49,7 +49,7 @@ class ArticleRssPlugin(SourcePlugin):
         except ImportError:
             return False
     
-    def scrape(self, feed_urls: Optional[List[str]] = None, max_articles: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, feed_urls: Optional[List[str]] = None, max_articles: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape articles from RSS/Atom feeds.
         
         Args:
@@ -57,7 +57,7 @@ class ArticleRssPlugin(SourcePlugin):
             max_articles: Maximum articles to scrape per feed (uses config if not provided)
         
         Returns:
-            List of article dictionaries
+            List of IdeaInspiration objects
         """
         if not feed_urls:
             print("No feed URLs provided")
@@ -80,7 +80,7 @@ class ArticleRssPlugin(SourcePlugin):
         
         return all_articles
     
-    def _parse_feed(self, feed_url: str, max_articles: int) -> List[Dict[str, Any]]:
+    def _parse_feed(self, feed_url: str, max_articles: int) -> List[IdeaInspiration]:
         """Parse RSS/Atom feed and extract articles.
         
         Args:
@@ -88,7 +88,7 @@ class ArticleRssPlugin(SourcePlugin):
             max_articles: Maximum articles to extract
             
         Returns:
-            List of article dictionaries
+            List of IdeaInspiration objects
         """
         import feedparser
         
@@ -105,7 +105,8 @@ class ArticleRssPlugin(SourcePlugin):
             try:
                 article_data = self._process_entry(entry, feed)
                 if article_data:
-                    articles.append(article_data)
+                    idea = self._transform_article_to_idea(article_data)
+                    articles.append(idea)
             except Exception as e:
                 print(f"      ✗ Error processing entry: {e}")
         
@@ -277,3 +278,53 @@ class ArticleRssPlugin(SourcePlugin):
             return parsed.netloc
         except Exception:
             return ""
+    
+    def _transform_article_to_idea(self, article_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform article data to IdeaInspiration object.
+        
+        Args:
+            article_data: Article data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = article_data.get('title', 'Untitled')
+        description = article_data.get('description', '')
+        
+        # Extract tags
+        tags = article_data.get('tags', [])
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.split(',') if t.strip()]
+        tags = self.format_tags(['web_articles', 'article', 'rss'] + tags)
+        
+        # Extract metrics and move to metadata as strings
+        metrics = article_data.get('metrics', {})
+        author_data = article_data.get('author', {})
+        source_info = article_data.get('source_info', {})
+        content_data = article_data.get('content', {})
+        
+        metadata = {
+            'article_id': article_data.get('source_id', ''),
+            'author_name': str(author_data.get('name', '')),
+            'word_count': str(metrics.get('word_count', 0)),
+            'reading_time_min': str(metrics.get('reading_time_min', 0)),
+            'domain': str(source_info.get('domain', '')),
+            'publication': str(source_info.get('publication', '')),
+            'source': article_data.get('source', 'web_article_rss'),
+        }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=content_data.get('text', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=article_data.get('source_id', ''),
+            source_url=article_data.get('url', ''),
+            source_platform="web_articles",
+            source_created_by=author_data.get('name', ''),
+            source_created_at=article_data.get('published_at', '')
+        )
+        
+        return idea

@@ -2,11 +2,16 @@
 
 import click
 import sys
+from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.sentiment_analyzer import SentimentAnalyzer
-from .core.community_processor import CommunityProcessor
 from .plugins.stackexchange_plugin import StackExchangePlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -26,9 +31,10 @@ def scrape(env_file, sites, tags, max_questions, no_interactive):
     """Scrape questions from StackExchange sites."""
     try:
         config = Config(env_file, interactive=not no_interactive)
-        db = Database(config.database_url, interactive=not no_interactive)
-        sentiment_analyzer = SentimentAnalyzer()
-        processor = CommunityProcessor(sentiment_analyzer)
+        
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         plugin = StackExchangePlugin(config)
         
@@ -41,40 +47,31 @@ def scrape(env_file, sites, tags, max_questions, no_interactive):
         click.echo(f"Tags: {tag_list or config.filter_tags}")
         click.echo("")
         
-        raw_questions = plugin.scrape(
+        # Scrape questions - returns List[IdeaInspiration]
+        ideas = plugin.scrape(
             sites=site_list,
             tags=tag_list,
             max_questions=max_questions
         )
         
-        total_scraped = len(raw_questions)
-        total_saved = 0
+        total_scraped = len(ideas)
+        total_saved_central = 0
         
         click.echo(f"\nFound {total_scraped} questions")
         
-        for question_data in raw_questions:
-            signal = processor.process_question(
-                text=question_data['text'],
-                title=question_data['title'],
-                author=question_data['author'],
-                source=question_data['source'],
-                source_id=question_data['source_id'],
-                platform=question_data['platform'],
-                upvotes=question_data['upvotes'],
-                answers=question_data['answers'],
-                views=question_data['views'],
-                timestamp=question_data['timestamp'],
-                tags=question_data['tags'],
-                category=question_data.get('category')
-            )
-            
-            if db.insert_signal(signal):
-                total_saved += 1
+        # Save each IdeaInspiration to central database (single DB)
+        for idea in ideas:
+            central_saved = central_db.insert(idea)
+            if central_saved:
+                total_saved_central += 1
+                click.echo(f"  ✓ Saved: {idea.title[:60]}")
+            else:
+                click.echo(f"  ↻ Updated: {idea.title[:60]}")
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total questions found: {total_scraped}")
-        click.echo(f"Total questions saved: {total_saved}")
-        click.echo(f"Database: {config.database_url}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

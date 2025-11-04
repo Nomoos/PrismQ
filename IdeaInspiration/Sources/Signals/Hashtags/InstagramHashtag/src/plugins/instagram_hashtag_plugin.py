@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class InstagramHashtagPlugin(SignalPlugin):
@@ -34,7 +34,7 @@ class InstagramHashtagPlugin(SignalPlugin):
         """Get the name of this source."""
         return "instagram_hashtag"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape hashtag signals from Instagram.
         
@@ -44,7 +44,7 @@ class InstagramHashtagPlugin(SignalPlugin):
                 - hashtags: List of specific hashtags to track
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         signals = []
         max_results = getattr(self.config, 'max_results', None) or \
@@ -113,48 +113,47 @@ class InstagramHashtagPlugin(SignalPlugin):
             {'name': 'motivation', 'post_count': 450000000, 'engagement_rate': 5.3},
         ]
         
-        signals = []
+        ideas = []
         for hashtag_data in sample_hashtags[:limit]:
-            signal = self._create_signal(hashtag_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(hashtag_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, hashtag_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Create a signal dictionary from hashtag data."""
+    def _create_idea_inspiration(self, hashtag_data: Dict[str, Any]) -> IdeaInspiration:
+        """Create an IdeaInspiration object from hashtag data."""
         hashtag_name = hashtag_data.get('name', 'unknown')
         post_count = hashtag_data.get('post_count', 0)
         engagement_rate = hashtag_data.get('engagement_rate', 0.0)
         
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        source_id = f"{hashtag_name}_{timestamp}"
-        
         velocity = self._calculate_velocity(post_count, engagement_rate)
-        acceleration = self._calculate_acceleration(velocity)
         
-        return {
-            'source_id': source_id,
+        # Format tags
+        tags = self.format_tags(['instagram', 'hashtag', 'social', hashtag_name])
+        
+        # Build metadata with platform-specific data
+        metadata = {
+            'post_count': str(post_count),
+            'engagement_rate': str(engagement_rate),
+            'velocity': str(velocity),
             'signal_type': 'hashtag',
-            'name': f'#{hashtag_name}',
-            'description': f'Instagram hashtag: #{hashtag_name}',
-            'tags': ['instagram', 'hashtag', 'social'],
-            'metrics': {
-                'volume': post_count,
-                'velocity': velocity,
-                'acceleration': acceleration,
-                'geographic_spread': ['global'],
-                'engagement_rate': engagement_rate
-            },
-            'temporal': {
-                'first_seen': datetime.now(timezone.utc).isoformat() + 'Z',
-                'peak_time': None,
-                'current_status': self._determine_status(velocity)
-            },
-            'extra': {
-                'platform': 'instagram',
-                'hashtag_type': 'trending'
-            }
+            'hashtag_type': 'trending',
+            'current_status': self._determine_status(velocity)
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=f'#{hashtag_name}',
+            description=f'Instagram hashtag: #{hashtag_name}',
+            text_content=f'Instagram trending hashtag #{hashtag_name}',
+            keywords=tags,
+            source_platform="instagram_hashtag",  # Platform identifier
+            metadata=metadata,
+            source_id=f"instagram_hashtag_{hashtag_name}",
+            source_url=f"https://www.instagram.com/explore/tags/{hashtag_name}/"
+        )
+        
+        return idea
     
     def _calculate_velocity(self, post_count: int, engagement_rate: float) -> float:
         """Calculate hashtag velocity."""

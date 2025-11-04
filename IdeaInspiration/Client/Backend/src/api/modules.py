@@ -11,7 +11,8 @@ from ..models.module import (
     ModuleConfig,
     ModuleConfigUpdate,
 )
-from ..core import get_config_storage, ConfigStorage
+from ..models.run import RunStatus
+from ..core import get_config_storage, ConfigStorage, get_module_runner, ModuleRunner
 from ..core.exceptions import ModuleNotFoundException, ValidationException
 from ..utils.module_loader import get_module_loader
 
@@ -69,15 +70,30 @@ def _validate_parameters(module: Module, parameters: dict) -> List[str]:
 
 
 @router.get("/modules", response_model=ModuleListResponse)
-async def list_modules():
+async def list_modules(runner: ModuleRunner = Depends(get_module_runner)):
     """
-    Get list of all available PrismQ modules.
+    Get list of all available PrismQ modules with runtime statistics.
     
     Returns:
-        ModuleListResponse: List of available modules
+        ModuleListResponse: List of available modules enriched with run stats
     """
     loader = get_module_loader()
     modules = loader.get_all_modules()
+    
+    # Enrich modules with runtime statistics
+    for module in modules:
+        runs = runner.registry.get_runs_by_module(module.id)
+        
+        if runs:
+            # Calculate statistics
+            module.total_runs = len(runs)
+            completed_runs = [r for r in runs if r.status == RunStatus.COMPLETED]
+            module.success_rate = (len(completed_runs) / len(runs) * 100) if runs else 0.0
+            
+            # Find most recent run
+            sorted_runs = sorted(runs, key=lambda r: r.created_at, reverse=True)
+            module.last_run = sorted_runs[0].created_at if sorted_runs else None
+    
     return ModuleListResponse(
         modules=modules,
         total=len(modules),

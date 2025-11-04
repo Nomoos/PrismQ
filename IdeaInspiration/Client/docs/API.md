@@ -704,6 +704,27 @@ Visit **http://localhost:8000/redoc** for:
 - Search functionality
 - Export to OpenAPI spec
 
+### Postman Collection
+
+For comprehensive API testing with Postman:
+
+**Collection File**: `PrismQ_Web_Client.postman_collection.json` (in Client directory)
+
+**Features**:
+- All 13 API endpoints included
+- Example requests and responses
+- Error scenario examples
+- Pre-configured variables
+- Ready-to-use collection
+
+**Quick Import**:
+1. Open Postman
+2. Click **Import**
+3. Select `PrismQ_Web_Client.postman_collection.json`
+4. Start testing!
+
+See the [Postman Collection Guide](POSTMAN_COLLECTION.md) for detailed usage instructions.
+
 ## Rate Limiting
 
 Currently, there is no rate limiting. For production use, consider:

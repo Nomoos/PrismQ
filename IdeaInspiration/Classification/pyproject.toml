@@ -38,11 +38,40 @@ test = [
 packages = ["prismq", "prismq.idea", "prismq.idea.classification"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["_meta/tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "-v --cov=prismq --cov-report=html --cov-report=term"
+addopts = "-v --cov=prismq --cov-report=html --cov-report=term --cov-report=json"
+
+[tool.coverage.run]
+source = ["prismq"]
+omit = [
+    "*/tests/*",
+    "*/_meta/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "pass",
+]
+precision = 1
+show_missing = true
+skip_covered = false
+fail_under = 80
+
+[tool.coverage.html]
+directory = "htmlcov"
 
 [tool.black]
 line-length = 100

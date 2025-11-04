@@ -4,7 +4,8 @@ import time
 import requests
 from typing import List, Dict, Any
 from bs4 import BeautifulSoup
-from . import CommercePlugin
+from datetime import datetime, timezone
+from . import CommercePlugin, IdeaInspiration
 
 
 class AmazonBestsellersPlugin(CommercePlugin):
@@ -41,7 +42,7 @@ class AmazonBestsellersPlugin(CommercePlugin):
         """
         return "amazon_bestsellers"
 
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Scrape bestsellers from Amazon.
         
         Note: This is a simplified implementation for demonstration.
@@ -49,7 +50,7 @@ class AmazonBestsellersPlugin(CommercePlugin):
         or respect Amazon's robots.txt and Terms of Service.
         
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         products = []
         
@@ -69,14 +70,14 @@ class AmazonBestsellersPlugin(CommercePlugin):
         
         return products
 
-    def _scrape_category(self, category: str) -> List[Dict[str, Any]]:
+    def _scrape_category(self, category: str) -> List[IdeaInspiration]:
         """Scrape products from a specific category.
         
         Args:
             category: Category name
             
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         products = []
         
@@ -90,8 +91,9 @@ class AmazonBestsellersPlugin(CommercePlugin):
         # Real implementation would make HTTP requests to Amazon's API or bestseller pages
         
         for i in range(min(5, self.max_products)):  # Limit to 5 products per category for demo
-            product = self._create_mock_product(category, i)
-            products.append(product)
+            product_data = self._create_mock_product(category, i)
+            idea = self._transform_product_to_idea(product_data, category, i + 1)
+            products.append(idea)
         
         return products
 
@@ -135,7 +137,67 @@ class AmazonBestsellersPlugin(CommercePlugin):
             }
         }
 
-    def scrape_with_api(self, api_key: str, api_secret: str) -> List[Dict[str, Any]]:
+    def _transform_product_to_idea(self, product_data: Dict[str, Any], category: str, rank: int) -> IdeaInspiration:
+        """Transform Amazon product data to IdeaInspiration object.
+        
+        Args:
+            product_data: Product data dictionary
+            category: Category name
+            rank: Product rank in category
+            
+        Returns:
+            IdeaInspiration object
+        """
+        brand = product_data.get('brand', 'Unknown Brand')
+        title = product_data.get('title', 'Unknown Product')
+        tags = self.format_tags(['amazon', 'bestseller', category, brand])
+        
+        # Build metadata with string values - move metrics here
+        metadata = {
+            'asin': product_data.get('asin', ''),
+            'brand': brand,
+            'category': category,
+            'category_rank': str(rank),
+            'price': str(product_data.get('price', 0.0)),
+            'currency': product_data.get('currency', 'USD'),
+            'original_price': str(product_data.get('original_price', 0.0)),
+            'sales_rank': str(product_data.get('sales_rank', 0)),
+            'rating': str(product_data.get('rating', 0.0)),
+            'review_count': str(product_data.get('review_count', 0)),
+            'review_velocity': str(product_data.get('review_velocity', 0.0)),
+            'rank_change_24h': str(product_data.get('rank_change_24h', 0)),
+            'seller_name': product_data.get('seller_name', ''),
+            'seller_rating': str(product_data.get('seller_rating', 0.0)),
+            'seller_feedback_count': str(product_data.get('seller_feedback_count', 0)),
+            'in_stock': str(product_data.get('in_stock', False)),
+            'has_prime': str(product_data.get('has_prime', False)),
+            'bestseller_badge': str(product_data.get('bestseller_badge', False)),
+            'amazon_choice': str(product_data.get('amazon_choice', False)),
+            'first_available': product_data.get('first_available', ''),
+            'review_momentum': product_data.get('review_momentum', ''),
+            'fulfillment': product_data.get('platform_specific', {}).get('fulfillment', ''),
+        }
+        
+        # Build description
+        description = f"{title} by {brand} - Rank #{rank} in {category}"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=product_data.get('description', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=product_data.get('asin', ''),
+            source_url=product_data.get('platform_specific', {}).get('url', ''),
+            source_platform="amazon_bestsellers",
+            source_created_by=brand,
+            source_created_at=product_data.get('first_available', '')
+        )
+        
+        return idea
+
+    def scrape_with_api(self, api_key: str, api_secret: str) -> List[IdeaInspiration]:
         """Scrape using Amazon Product Advertising API.
         
         This is a placeholder for future API integration.
@@ -146,7 +208,7 @@ class AmazonBestsellersPlugin(CommercePlugin):
             api_secret: API secret key
             
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         # TODO: Implement using amazon-paapi or boto3
         # This requires approval from Amazon Associates program

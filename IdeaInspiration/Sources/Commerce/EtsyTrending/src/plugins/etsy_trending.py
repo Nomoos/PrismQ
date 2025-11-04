@@ -3,7 +3,8 @@
 import time
 import requests
 from typing import List, Dict, Any
-from . import CommercePlugin
+from datetime import datetime, timezone
+from . import CommercePlugin, IdeaInspiration
 
 
 class EtsyTrendingPlugin(CommercePlugin):
@@ -35,14 +36,14 @@ class EtsyTrendingPlugin(CommercePlugin):
         """
         return "etsy_trending"
 
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Scrape trending products from Etsy.
         
         Note: This is a simplified implementation using mock data.
         In production, you should use Etsy Open API v3.
         
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         products = []
         
@@ -66,14 +67,14 @@ class EtsyTrendingPlugin(CommercePlugin):
         
         return products
 
-    def _scrape_category(self, category: str) -> List[Dict[str, Any]]:
+    def _scrape_category(self, category: str) -> List[IdeaInspiration]:
         """Scrape products from a specific category.
         
         Args:
             category: Category name
             
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         products = []
         
@@ -83,8 +84,9 @@ class EtsyTrendingPlugin(CommercePlugin):
         
         # For demonstration, create mock products
         for i in range(min(5, self.max_listings)):  # Limit to 5 products per category for demo
-            product = self._create_mock_product(category, i)
-            products.append(product)
+            product_data = self._create_mock_product(category, i)
+            idea = self._transform_product_to_idea(product_data, category, i + 1)
+            products.append(idea)
         
         return products
 
@@ -138,7 +140,70 @@ class EtsyTrendingPlugin(CommercePlugin):
             }
         }
 
-    def scrape_with_api(self, api_key: str) -> List[Dict[str, Any]]:
+    def _transform_product_to_idea(self, product_data: Dict[str, Any], category: str, rank: int) -> IdeaInspiration:
+        """Transform Etsy product data to IdeaInspiration object.
+        
+        Args:
+            product_data: Product data dictionary
+            category: Category name
+            rank: Product rank in category
+            
+        Returns:
+            IdeaInspiration object
+        """
+        shop_name = product_data.get('shop_name', 'Unknown Shop')
+        title = product_data.get('title', 'Unknown Product')
+        tags = self.format_tags(['etsy', 'trending', category, shop_name, product_data.get('product_type', '')])
+        
+        # Build metadata with string values - move metrics here
+        metadata = {
+            'listing_id': product_data.get('listing_id', ''),
+            'shop_name': shop_name,
+            'category': category,
+            'category_rank': str(rank),
+            'price': str(product_data.get('price', 0.0)),
+            'currency': product_data.get('currency', 'USD'),
+            'original_price': str(product_data.get('original_price', 0.0)),
+            'rating': str(product_data.get('rating', 0.0)),
+            'review_count': str(product_data.get('review_count', 0)),
+            'shop_rating': str(product_data.get('shop_rating', 0.0)),
+            'shop_sales_count': str(product_data.get('shop_sales_count', 0)),
+            'in_stock': str(product_data.get('in_stock', False)),
+            'is_bestseller': str(product_data.get('is_bestseller', False)),
+            'product_type': product_data.get('product_type', ''),
+            'materials': product_data.get('materials', ''),
+            'first_available': product_data.get('first_available', ''),
+            'is_handmade': str(product_data.get('platform_specific', {}).get('is_handmade', False)),
+            'is_vintage': str(product_data.get('platform_specific', {}).get('is_vintage', False)),
+            'is_supply': str(product_data.get('platform_specific', {}).get('is_supply', False)),
+            'who_made': product_data.get('platform_specific', {}).get('who_made', ''),
+            'when_made': product_data.get('platform_specific', {}).get('when_made', ''),
+            'processing_min': str(product_data.get('platform_specific', {}).get('processing_min', 0)),
+            'processing_max': str(product_data.get('platform_specific', {}).get('processing_max', 0)),
+            'favorers': str(product_data.get('platform_specific', {}).get('favorers', 0)),
+            'views': str(product_data.get('platform_specific', {}).get('views', 0)),
+        }
+        
+        # Build description
+        description = f"{title} from {shop_name} - Rank #{rank} in {category}"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=product_data.get('description', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=product_data.get('listing_id', ''),
+            source_url=product_data.get('platform_specific', {}).get('url', ''),
+            source_platform="etsy_trending",
+            source_created_by=shop_name,
+            source_created_at=product_data.get('first_available', '')
+        )
+        
+        return idea
+
+    def scrape_with_api(self, api_key: str) -> List[IdeaInspiration]:
         """Scrape using Etsy Open API v3.
         
         This is a placeholder for future API integration.
@@ -148,7 +213,7 @@ class EtsyTrendingPlugin(CommercePlugin):
             api_key: Etsy API key
             
         Returns:
-            List of product dictionaries
+            List of IdeaInspiration objects
         """
         # TODO: Implement using Etsy Open API v3
         # API documentation: https://developers.etsy.com/documentation/

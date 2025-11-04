@@ -5,17 +5,121 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import UniversalMetrics
 from .plugins.youtube_plugin import YouTubePlugin
 from .plugins.youtube_channel_plugin import YouTubeChannelPlugin
 from .plugins.youtube_trending_plugin import YouTubeTrendingPlugin
-from .core import db_utils
-from .core.idea_processor import IdeaProcessor
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[6] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
+
+
+# Default command for webclient integration
+@click.command()
+@click.option('--mode', type=click.Choice(['trending', 'channel', 'keyword']), 
+              default='trending', help='Scraping mode')
+@click.option('--channel_url', type=str, default='', 
+              help='YouTube channel URL, handle, or ID (for channel mode)')
+@click.option('--query', type=str, default='', 
+              help='Search keyword or phrase (for keyword mode)')
+@click.option('--max_results', type=int, default=50, 
+              help='Maximum number of shorts to collect')
+@click.option('--category', type=str, default='All', 
+              help='Content category filter (for trending mode)')
+@click.option('--env-file', '-e', type=click.Path(), 
+              help='Path to .env file')
+@click.option('--no-interactive', is_flag=True, 
+              help='Disable interactive prompts for missing configuration')
+def run_webclient(mode, channel_url, query, max_results, category, env_file, no_interactive):
+    """Execute YouTube Shorts scraper based on selected mode (webclient entry point).
+    
+    This command is used by the webclient. It routes to the appropriate scraper
+    based on the mode parameter.
+    
+    Modes:
+    - trending: Collect trending YouTube Shorts
+    - channel: Collect Shorts from a specific channel
+    - keyword: Search for Shorts by keyword
+    """
+    try:
+        # Load configuration
+        config = Config(env_file, interactive=not no_interactive)
+        
+        # Route to appropriate scraper based on mode
+        if mode == 'trending':
+            click.echo(f"Scraping trending YouTube Shorts (max: {max_results})...")
+            
+            try:
+                plugin = YouTubeTrendingPlugin(config)
+            except ValueError as e:
+                click.echo(f"Error: {e}", err=True)
+                sys.exit(1)
+            
+            ideas = plugin.scrape(top_n=max_results)
+            
+        elif mode == 'channel':
+            if not channel_url:
+                click.echo("Error: --channel_url is required for channel mode", err=True)
+                sys.exit(1)
+            
+            click.echo(f"Scraping YouTube channel: {channel_url} (max: {max_results})...")
+            
+            try:
+                plugin = YouTubeChannelPlugin(config)
+            except ValueError as e:
+                click.echo(f"Error: {e}", err=True)
+                sys.exit(1)
+            
+            ideas = plugin.scrape(channel_url=channel_url, top_n=max_results)
+            
+        elif mode == 'keyword':
+            if not query:
+                click.echo("Error: --query is required for keyword mode", err=True)
+                sys.exit(1)
+            
+            click.echo(f"⚠️  Keyword search mode is not yet fully implemented.", err=True)
+            click.echo(f"   Showing trending results instead of search results for: '{query}'", err=True)
+            click.echo(f"   This feature will be available in a future update.\n", err=True)
+            
+            try:
+                plugin = YouTubeTrendingPlugin(config)
+            except ValueError as e:
+                click.echo(f"Error: {e}", err=True)
+                sys.exit(1)
+            
+            ideas = plugin.scrape(top_n=max_results)
+        
+        # Initialize central database
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
+        
+        # Save ideas to database
+        total_saved = 0
+        click.echo(f"\nFound {len(ideas)} ideas")
+        
+        for idea in ideas:
+            success = central_db.insert(idea)
+            if success:
+                total_saved += 1
+                click.echo(f"✓ Saved: {idea.title[:60]}...")
+        
+        click.echo(f"\nScraping complete!")
+        click.echo(f"Total ideas found: {len(ideas)}")
+        click.echo(f"Total ideas saved: {total_saved}")
+        click.echo(f"Database: {central_db_path}")
+        
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 
 @click.group()
-@click.version_option(version='1.0.0')
+@click.version_option(version='2.0.0')
 def main():
     """PrismQ YouTube Shorts Source - Gather idea inspirations from YouTube Shorts."""
     pass
@@ -43,11 +147,13 @@ def scrape(env_file, no_interactive):
         click.echo("   - scrape-keyword: Search by keywords", err=True)
         click.echo("   Benefits: No API limits, richer metadata, subtitles", err=True)
         click.echo("", err=True)
+        
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize YouTube plugin
         try:
@@ -67,35 +173,27 @@ def scrape(env_file, no_interactive):
             total_scraped = len(ideas)
             click.echo(f"Found {len(ideas)} ideas from YouTube Shorts")
             
-            # Process and save each idea
+            # Save each IdeaInspiration to central database (single DB)
             for idea in ideas:
-                # Convert platform metrics to universal metrics
-                universal_metrics = UniversalMetrics.from_youtube(idea['metrics'])
-                
-                # Save to database with universal metrics
-                success = db.insert_idea(
-                    source='youtube',
-                    source_id=idea['source_id'],
-                    title=idea['title'],
-                    description=idea['description'],
-                    tags=idea['tags'],
-                    score=universal_metrics.engagement_rate or 0.0,  # Use engagement rate as score
-                    score_dictionary=universal_metrics.to_dict()
-                )
-                
+                success = central_db.insert(idea)
                 if success:
                     total_saved += 1
+                    click.echo(f"✓ Saved: {idea.title[:60]}...")
             
         except Exception as e:
             click.echo(f"Error scraping YouTube Shorts: {e}", err=True)
+            import traceback
+            traceback.print_exc()
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total ideas found: {total_scraped}")
         click.echo(f"Total ideas saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
@@ -570,4 +668,10 @@ def clear(env_file, no_interactive):
 
 
 if __name__ == '__main__':
-    main()
+    # Check if any arguments are provided
+    # If arguments look like webclient params (--mode, --channel_url, etc.), use run_webclient
+    # Otherwise, use the main group for subcommands
+    if any(arg in sys.argv for arg in ['--mode', '--channel_url', '--query', '--max_results']):
+        run_webclient()
+    else:
+        main()

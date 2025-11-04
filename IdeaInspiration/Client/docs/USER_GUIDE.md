@@ -402,6 +402,32 @@ To remove a saved configuration:
 
 ### Workflow 1: Collecting YouTube Shorts
 
+```mermaid
+flowchart TD
+    Start([Open Web Client]) --> Dashboard[View Dashboard]
+    Dashboard --> Find[Find YouTube Shorts Module]
+    Find --> Launch[Click Launch Button]
+    Launch --> Config[Configure Parameters]
+    Config --> SetMax[Set max_results: 100]
+    SetMax --> SetCat[Set trending_category: Gaming]
+    SetCat --> Save{Save Config?}
+    Save -->|Yes| CheckSave[Check 'Remember parameters']
+    Save -->|No| ClickLaunch[Click Launch]
+    CheckSave --> ClickLaunch
+    ClickLaunch --> Redirect[Redirect to Run Details]
+    Redirect --> Monitor[Monitor Real-time Logs]
+    Monitor --> Wait{Run Complete?}
+    Wait -->|No| Monitor
+    Wait -->|Yes| Download[Download Results]
+    Download --> End([Complete])
+    
+    style Start fill:#e1f5ff
+    style End fill:#e1ffe1
+    style Monitor fill:#fff4e1
+```
+
+**Steps**:
+
 1. Open dashboard
 2. Find "YouTube Shorts Source" module
 3. Click "Launch"
@@ -414,6 +440,47 @@ To remove a saved configuration:
 8. Download results when complete
 
 ### Workflow 2: Running Multiple Collectors
+
+```mermaid
+flowchart TD
+    Start([Start Multi-Run Workflow]) --> D1[Open Dashboard in Tab 1]
+    
+    D1 --> L1[Launch YouTube Shorts]
+    L1 --> NewTab1[Open New Tab]
+    
+    NewTab1 --> D2[Dashboard in Tab 2]
+    D2 --> L2[Launch TikTok Trends]
+    L2 --> NewTab2[Open New Tab]
+    
+    NewTab2 --> D3[Dashboard in Tab 3]
+    D3 --> L3[Launch Reddit Posts]
+    
+    L1 --> M1[Monitor YouTube in Tab 1]
+    L2 --> M2[Monitor TikTok in Tab 2]
+    L3 --> M3[Monitor Reddit in Tab 3]
+    
+    M1 --> C1{Complete?}
+    M2 --> C2{Complete?}
+    M3 --> C3{Complete?}
+    
+    C1 -->|Yes| Done1[YouTube Complete]
+    C2 -->|Yes| Done2[TikTok Complete]
+    C3 -->|Yes| Done3[Reddit Complete]
+    
+    Done1 --> Check[Check All Complete?]
+    Done2 --> Check
+    Done3 --> Check
+    
+    Check --> End([All Runs Complete])
+    
+    style Start fill:#e1f5ff
+    style End fill:#e1ffe1
+    style M1 fill:#fff4e1
+    style M2 fill:#fff4e1
+    style M3 fill:#fff4e1
+```
+
+**Steps**:
 
 1. Launch YouTube Shorts collector
 2. Return to dashboard (new tab or browser back)
@@ -432,6 +499,41 @@ The web client doesn't have built-in scheduling, but you can:
 4. Or use external scheduler (cron, Task Scheduler) with CLI
 
 ### Workflow 4: Troubleshooting Failed Runs
+
+```mermaid
+flowchart TD
+    Start([Notice Failed Run]) --> History[Go to Run History]
+    History --> Click[Click Failed Run]
+    Click --> Details[View Run Details]
+    Details --> Logs[Review Error Logs]
+    Logs --> Identify{Identify Issue}
+    
+    Identify -->|Parameter Error| CheckParams[Check Parameters Used]
+    Identify -->|Connection Error| CheckConn[Check Network/API Keys]
+    Identify -->|Timeout| CheckTime[Check Timeout Settings]
+    Identify -->|Other| CheckDocs[Check Documentation]
+    
+    CheckParams --> Adjust[Adjust Parameters]
+    CheckConn --> Fix[Fix Connection Issue]
+    CheckTime --> Increase[Increase Timeout]
+    CheckDocs --> Research[Research Solution]
+    
+    Adjust --> Retry[Launch with New Config]
+    Fix --> Retry
+    Increase --> Retry
+    Research --> Retry
+    
+    Retry --> Monitor[Monitor New Run]
+    Monitor --> Success{Success?}
+    Success -->|Yes| End([Complete])
+    Success -->|No| Details
+    
+    style Start fill:#ffe1e1
+    style End fill:#e1ffe1
+    style Monitor fill:#fff4e1
+```
+
+**Steps**:
 
 1. Find failed run in history
 2. Click to view details

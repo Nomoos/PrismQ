@@ -625,3 +625,81 @@ class TestIdeaInspirationNewFields:
         restored = IdeaInspiration.from_dict(data)
         assert restored.source_created_by == original.source_created_by
         assert restored.source_created_at == original.source_created_at
+
+
+class TestIdeaInspirationSourcePlatform:
+    """Test source_platform field functionality."""
+
+    def test_create_with_source_platform(self):
+        """Test creating IdeaInspiration with source_platform."""
+        idea = IdeaInspiration(
+            title="Test Article",
+            description="Test Description",
+            source_platform="youtube"
+        )
+        assert idea.source_platform == "youtube"
+
+    def test_default_source_platform_is_none(self):
+        """Test that source_platform defaults to None."""
+        idea = IdeaInspiration(title="Test")
+        assert idea.source_platform is None
+
+    def test_from_text_with_source_platform(self):
+        """Test from_text factory method with source_platform."""
+        idea = IdeaInspiration.from_text(
+            title="News Article",
+            text_content="Article content",
+            source_platform="news_api"
+        )
+        assert idea.source_platform == "news_api"
+        assert idea.source_type == ContentType.TEXT
+
+    def test_from_video_with_source_platform(self):
+        """Test from_video factory method with source_platform."""
+        idea = IdeaInspiration.from_video(
+            title="Video Title",
+            subtitle_text="Subtitles",
+            source_platform="tiktok"
+        )
+        assert idea.source_platform == "tiktok"
+        assert idea.source_type == ContentType.VIDEO
+
+    def test_from_audio_with_source_platform(self):
+        """Test from_audio factory method with source_platform."""
+        idea = IdeaInspiration.from_audio(
+            title="Podcast Episode",
+            transcription="Transcription",
+            source_platform="spotify"
+        )
+        assert idea.source_platform == "spotify"
+        assert idea.source_type == ContentType.AUDIO
+
+    def test_serialization_with_source_platform(self):
+        """Test serialization includes source_platform."""
+        idea = IdeaInspiration(
+            title="Test",
+            source_platform="google_trends"
+        )
+        data = idea.to_dict()
+        assert "source_platform" in data
+        assert data["source_platform"] == "google_trends"
+
+    def test_deserialization_with_source_platform(self):
+        """Test deserialization handles source_platform."""
+        data = {
+            "title": "Test",
+            "source_platform": "instagram"
+        }
+        idea = IdeaInspiration.from_dict(data)
+        assert idea.source_platform == "instagram"
+
+    def test_round_trip_with_source_platform(self):
+        """Test round-trip serialization with source_platform."""
+        original = IdeaInspiration(
+            title="Test Article",
+            description="Description",
+            source_platform="reddit"
+        )
+        data = original.to_dict()
+        restored = IdeaInspiration.from_dict(data)
+        assert restored.source_platform == original.source_platform

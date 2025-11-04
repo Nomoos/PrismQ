@@ -2,7 +2,94 @@
 
 Utility scripts for repository maintenance and development automation.
 
+## Quick Start
+
+**New to PrismQ Web Client?** See the **[Quick Start Guide](QUICK_START.md)** for easy setup instructions.
+
 ## Available Scripts
+
+### PrismQ Web Client Launchers (Windows)
+
+#### run_backend.bat
+
+**Purpose:** Start the FastAPI Backend server for the PrismQ Web Client
+
+**Description:**
+Launches the Backend server in development mode with auto-reload enabled. Automatically activates the Python virtual environment and starts uvicorn.
+
+**Usage:**
+```cmd
+_meta\_scripts\run_backend.bat
+```
+
+**Features:**
+- Automatically activates virtual environment
+- Checks for required dependencies
+- Starts server on http://localhost:8000
+- Enables auto-reload for development
+- Provides helpful error messages
+
+**Requirements:**
+- Python 3.10+
+- Virtual environment at `Client/Backend/venv/`
+- Dependencies installed from `Client/Backend/requirements.txt`
+
+---
+
+#### run_frontend.bat
+
+**Purpose:** Start the Vue 3 Frontend development server
+
+**Description:**
+Launches the Frontend development server with hot module replacement. Automatically installs npm dependencies if needed.
+
+**Usage:**
+```cmd
+_meta\_scripts\run_frontend.bat
+```
+
+**Features:**
+- Checks for Node.js installation
+- Automatically installs npm dependencies if needed
+- Starts server on http://localhost:5173
+- Enables hot module replacement
+- Provides helpful error messages
+
+**Requirements:**
+- Node.js 18+ (24.11.0+ recommended)
+- npm 8+
+
+---
+
+#### run_both.bat
+
+**Purpose:** Start both Backend and Frontend servers simultaneously and open in browser
+
+**Description:**
+Launches both the Backend and Frontend servers in separate console windows, waits for them to start, and automatically opens the Frontend application in your default web browser. This is the easiest way to start the full PrismQ Web Client for development.
+
+**Usage:**
+```cmd
+_meta\_scripts\run_both.bat
+```
+
+**Features:**
+- Opens two separate console windows (one for Backend, one for Frontend)
+- Starts Backend first, then Frontend
+- Waits for servers to fully start (10 seconds)
+- Automatically opens http://localhost:5173 in your default browser
+- Shows both server URLs
+- Both servers can be stopped by closing their respective console windows
+
+**What Gets Started:**
+- Backend server: http://localhost:8000
+- Frontend server: http://localhost:5173
+- Browser opens automatically to the Frontend
+
+**Requirements:**
+- All requirements from `run_backend.bat` and `run_frontend.bat`
+
+---
 
 ### check_wip_issues.py
 

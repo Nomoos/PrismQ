@@ -1,20 +1,20 @@
 # PrismQ.IdeaInspiration.Sources
 
-A comprehensive, modular library for collecting and managing various types of content sources for the PrismQ idea generation ecosystem. Each source module implements a **dual-save architecture** that maintains both domain-specific data and contributes to a unified central database.
+A comprehensive, modular library for collecting and managing various types of content sources for the PrismQ idea generation ecosystem. Each source module uses a **single database architecture** that stores all data in a unified central database.
 
 ## Overview
 
 This library provides specialized source modules for collecting inspiration from diverse platforms and data sources. Each source:
 - Implements a plugin-based architecture for data collection
 - Returns standardized `IdeaInspiration` domain objects
-- Saves to both source-specific tables (detailed metadata) AND a central database (unified queries)
+- Saves to a single central database with `source_platform` field for identification
 - Follows SOLID principles for clean, maintainable code
 
-## Architecture: Dual-Save Pattern
+## Architecture: Single Database Pattern
 
 ### Database Strategy
 
-Each source implements a **dual-save pattern** for optimal data management:
+All sources use a **single database pattern** for simplified data management:
 
 ```
 ┌────────────────────────┐
@@ -26,23 +26,25 @@ Each source implements a **dual-save pattern** for optimal data management:
 ┌────────────────────────┐
 │  IdeaInspiration       │
 │  (Domain Object)       │
-└───────┬───────┬────────┘
-        │       │
-        │       │
-   ┌────▼──┐ ┌─▼─────────┐
-   │ Source│ │  Central  │
-   │ DB    │ │  DB       │
-   │       │ │           │
-   │Detail │ │ Unified   │
-   │Metadata│ │ Queries   │
-   └───────┘ └───────────┘
+│  source_platform="genius"
+└───────────┬────────────┘
+            │
+            ▼
+   ┌────────────────────┐
+   │   Central DB       │
+   │                    │
+   │  - All sources     │
+   │  - Unified queries │
+   │  - Platform field  │
+   └────────────────────┘
 ```
 
 **Benefits:**
-1. **Domain-Specific Storage**: Preserve platform-specific metadata (e.g., YouTube view counts, Genius pageviews)
+1. **Simplified Architecture**: Single database to maintain and backup
 2. **Unified Access**: Query all sources together via central `IdeaInspiration` table
-3. **Analytics**: Cross-source analysis and comparison
-4. **Flexibility**: Sources evolve independently without breaking unified interface
+3. **Platform Identification**: Use `source_platform` field to filter by source (e.g., "youtube", "google_trends", "genius")
+4. **Metadata Storage**: Platform-specific data preserved in `metadata` dictionary field
+5. **No Data Duplication**: Single source of truth for all content ideas
 
 ### Source Module Structure
 
@@ -69,28 +71,36 @@ SourceName/
 
 ### ✅ Implemented Sources
 
-Sources with dual-save architecture in place:
+All sources now use the single database architecture:
 
-| Category | Source | Status | Database Tables |
-|----------|--------|--------|-----------------|
-| **Creative** | LyricSnippets | ✅ Dual-Save | `lyric_snippets` + `IdeaInspiration` |
-| **Signals** | GoogleTrends | ✅ Dual-Save | `signals` + `IdeaInspiration` |
-| **Events** | CalendarHolidays | ✅ Dual-Save | `events` + `IdeaInspiration` |
+| Category | Source | Status | Platform ID |
+|----------|--------|--------|-------------|
+| **Creative** | LyricSnippets | ✅ Migrated | `lyric_snippets` |
+| **Creative** | ScriptBeats | ✅ Migrated | `script_beats` |
+| **Creative** | VisualMoodboard | ✅ Migrated | `visual_moodboard` |
+| **Signals** | GoogleTrends | ✅ Migrated | `google_trends` |
+| **Signals** | NewsApi | ✅ Migrated | `news_api` |
+| **Signals** | TikTokHashtag | ✅ Migrated | `tiktok_hashtag` |
+| **Signals** | InstagramHashtag | ✅ Migrated | `instagram_hashtag` |
+| **Signals** | MemeTracker | ✅ Migrated | `meme_tracker` |
+| **Signals** | SocialChallenge | ✅ Migrated | `social_challenge` |
+| **Signals** | GeoLocalTrends | ✅ Migrated | `geo_local_trends` |
+| **Signals** | TikTokSounds | ✅ Migrated | `tiktok_sounds` |
+| **Signals** | InstagramAudioTrends | ✅ Migrated | `instagram_audio_trends` |
+| **Events** | CalendarHolidays | ✅ Migrated | `calendar_holidays` |
+| **Events** | SportsHighlights | ✅ Migrated | `sports_highlights` |
+| **Events** | EntertainmentReleases | ✅ Migrated | `entertainment_releases` |
+| **Commerce** | AmazonBestsellers | ✅ Migrated | `amazon_bestsellers` |
+| **Commerce** | AppStoreTopCharts | ✅ Migrated | `app_store_top_charts` |
+| **Commerce** | EtsyTrending | ✅ Migrated | `etsy_trending` |
+| **Community** | QASource | ✅ Migrated | `qa_source` |
+| **Community** | PromptBoxSource | ✅ Migrated | `prompt_box` |
+| **Community** | CommentMiningSource | ✅ Migrated | `comment_mining` |
+| **Community** | UserFeedbackSource | ✅ Migrated | `user_feedback` |
+| **Internal** | CSVImport | ✅ Migrated | `csv_import` |
+| **Internal** | ManualBacklog | ✅ Migrated | `manual_backlog` |
 
-### 🚧 Implementation In Progress
-
-Sources ready for dual-save migration:
-
-| Category | Source | Priority | Notes |
-|----------|--------|----------|-------|
-| **Creative** | ScriptBeats | High | Narrative structure data |
-| **Creative** | VisualMoodboard | High | Visual inspiration data |
-| **Events** | SportsHighlights | Medium | Sports event data |
-| **Events** | EntertainmentReleases | Medium | Movie/music release data |
-| **Signals** | NewsApi | Medium | News signal data |
-| **Signals** | GoogleNews | Medium | News trend data |
-| **Signals** | SocialChallenge | Medium | Viral challenge data |
-| **Signals** | GeoLocalTrends | Low | Location-based trends |
+**Migration Completed**: November 1, 2025 (24/24 sources)
 
 ## Complete Source Taxonomy
 
@@ -153,7 +163,7 @@ Sources/
     ├── ManualBacklog/        # Manual entries
     └── CSVImport/            # CSV imports
 
-Legend: ✅ Dual-save implemented | 🚧 Ready for migration | ⚪ Planned
+Legend: ✅ Single DB (all sources migrated as of Nov 1, 2025)
 ```
 
 ## Quick Start
@@ -175,15 +185,15 @@ cp .env.example .env
 python -m src.cli scrape --query "trending songs" --max-results 10
 ```
 
-### Implementing Dual-Save in a New Source
+### Creating a New Source
 
-See the **Migration Guide** section below for step-by-step instructions.
+All new sources should follow the single database pattern. See examples in existing source modules.
 
 ## Key Concepts
 
 ### IdeaInspiration Domain Model
 
-All sources return `IdeaInspiration` objects from the Model module:
+All sources return `IdeaInspiration` objects from the Model module with `source_platform` field:
 
 ```python
 from idea_inspiration import IdeaInspiration
@@ -197,62 +207,68 @@ idea = IdeaInspiration.from_text(
     metadata={"platform_specific": "data"},
     source_id="unique-id",
     source_url="https://...",
-    source_created_by="Creator Name"
+    source_created_by="Creator Name",
+    source_platform="your_platform_id"  # e.g., "genius", "youtube", "google_trends"
 )
 
 # Also available:
-# IdeaInspiration.from_video(...)
-# IdeaInspiration.from_audio(...)
+# IdeaInspiration.from_video(..., source_platform="youtube")
+# IdeaInspiration.from_audio(..., source_platform="spotify")
 ```
 
-### Dual-Save Implementation
+### Single Database Implementation
 
-Each source saves data twice:
+All sources now save data to a single central database:
 
-1. **Source-Specific Database**: Detailed platform metadata
-   ```python
-   db.insert_resource(
-       source='genius',
-       source_id=idea.source_id,
-       title=idea.title,
-       content=idea.content,
-       pageviews=metadata['pageviews'],  # Platform-specific
-       # ... other source-specific fields
-   )
-   ```
+```python
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
-2. **Central Database**: Normalized IdeaInspiration
-   ```python
-   central_db.insert(idea)  # Unified access across all sources
-   ```
+# Initialize central database
+central_db = IdeaInspirationDatabase(get_central_database_path())
+
+# Save IdeaInspiration with source_platform
+for idea in ideas:
+    central_db.insert(idea)  # Platform identified by source_platform field
+```
+
+### Querying by Source
+
+```python
+# Query specific source
+youtube_ideas = db.get_all(source_platform="youtube")
+trends = db.get_all(source_platform="google_trends")
+
+# Count by platform
+youtube_count = db.count(source_platform="youtube")
+```
 
 ### Benefits by Category
 
 **Creative Sources** (Lyrics, Scripts, Visuals)
-- Store platform-specific metrics (pageviews, engagement)
+- Platform-specific metrics stored in `metadata` field
 - Unified creative inspiration queries
 - Cross-source creative analytics
 
 **Signal Sources** (Trends, News, Challenges)
-- Store temporal data (trend velocity, peaks)
+- Temporal data in `metadata` (trend velocity, peaks)
 - Unified trend analysis across platforms
 - Early signal detection
 
 **Event Sources** (Holidays, Sports, Entertainment)
-- Store event-specific data (dates, recurrence patterns)
+- Event-specific data in `metadata` (dates, recurrence patterns)
 - Unified event calendar
 - Content opportunity planning
 
 **Content Sources** (Videos, Articles, Podcasts)
-- Store engagement metrics (views, likes, comments)
+- Engagement metrics in `metadata` (views, likes, comments)
 - Unified content discovery
 - Performance benchmarking
 
-## Migration Guide
+## Implementation Guide
 
-### Adding Dual-Save to an Existing Source
+### Creating a Source with Single Database
 
-Follow these steps to migrate a source to the dual-save pattern:
+All sources use the single database pattern:
 
 **Step 1: Import Central Database**
 ```python
@@ -268,28 +284,18 @@ if str(model_path) not in sys.path:
 from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 ```
 
-**Step 2: Initialize Both Databases**
+**Step 2: Initialize Central Database**
 ```python
-# Initialize source-specific database
-db = Database(config.database_path, interactive=not no_interactive)
-
-# Initialize central database
+# Initialize central database only
 central_db_path = get_central_database_path()
 central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
 ```
 
-**Step 3: Implement Dual-Save**
+**Step 3: Save to Single Database**
 ```python
 for idea in ideas:
-    # Save to source-specific database
-    source_saved = db.insert_resource(
-        source='your_source',
-        source_id=idea.source_id,
-        # ... source-specific fields
-    )
-    
-    # Save to central database
-    central_saved = central_db.insert(idea)
+    # Save to central database with source_platform field
+    central_db.insert(idea)
 ```
 
 **Step 4: Update CLI Output**
@@ -298,6 +304,13 @@ click.echo(f"\nScraping complete!")
 click.echo(f"Saved to source database: {total_saved_source}")
 click.echo(f"Saved to central database: {total_saved_central}")
 click.echo(f"Source database: {config.database_path}")
+click.echo(f"Central database: {central_db_path}")
+```
+
+**Step 4: Update CLI Output**
+```python
+click.echo(f"\nScraping complete!")
+click.echo(f"Saved to central database: {total_saved}")
 click.echo(f"Central database: {central_db_path}")
 ```
 
@@ -311,31 +324,32 @@ See implemented examples:
 Each source should include:
 
 1. **Unit Tests**: Test plugin logic independently
-2. **Integration Tests**: Test dual-save functionality
-3. **Database Tests**: Verify both databases receive data
+2. **Integration Tests**: Test database save functionality
+3. **Query Tests**: Verify source_platform filtering
 
 ```python
 # Example integration test
-def test_dual_save():
-    source_db = SourceDatabase(":memory:")
+def test_single_db_save():
     central_db = IdeaInspirationDatabase(":memory:")
     
     ideas = plugin.scrape()
     
     for idea in ideas:
-        source_db.insert_resource(...)
         central_db.insert(idea)
     
-    # Verify both databases
-    assert source_db.count() == len(ideas)
+    # Verify database
     assert central_db.count() == len(ideas)
+    
+    # Verify platform filtering
+    platform_ideas = central_db.get_all(source_platform="your_platform")
+    assert len(platform_ideas) == len(ideas)
 ```
 
 ## Documentation
 
 ### Core Documentation
-- **[DATABASE_INTEGRATION.md](../_meta/docs/DATABASE_INTEGRATION.md)**: Complete dual-save architecture guide
-- **[DATABASE_INTEGRATION_SUMMARY.md](../_meta/docs/DATABASE_INTEGRATION_SUMMARY.md)**: Executive summary
+- **[SINGLE_DB_MIGRATION_COMPLETE.md](../_meta/docs/SINGLE_DB_MIGRATION_COMPLETE.md)**: Migration completion summary
+- **[SINGLE_DB_IMPLEMENTATION_SUMMARY.md](../_meta/docs/SINGLE_DB_IMPLEMENTATION_SUMMARY.md)**: Implementation details
 
 ### Strategic Planning
 Future enhancements documented in `_meta/issues/backlog/`:
@@ -399,8 +413,8 @@ Best practices:
    ```bash
    mkdir -p Sources/CategoryName/SourceName/{src/{core,plugins},tests}
    ```
-3. **Implement plugin** that returns `IdeaInspiration` objects
-4. **Add CLI** with dual-save pattern
+3. **Implement plugin** that returns `IdeaInspiration` objects with `source_platform` field
+4. **Add CLI** using single database pattern
 5. **Write tests** (unit + integration)
 6. **Document** in source-specific README
 
@@ -414,8 +428,8 @@ Best practices:
 
 ### Pull Request Checklist
 
-- [ ] Plugin returns `IdeaInspiration` objects
-- [ ] Dual-save implemented (source DB + central DB)
+- [ ] Plugin returns `IdeaInspiration` objects with `source_platform` field
+- [ ] Single database implementation (central DB only)
 - [ ] Tests pass (unit + integration)
 - [ ] Documentation updated
 - [ ] Example usage provided
@@ -423,30 +437,25 @@ Best practices:
 
 ## Roadmap
 
-### Phase 1: Foundation (Current)
-- ✅ Dual-save architecture implemented
-- ✅ 3 reference implementations (LyricSnippets, GoogleTrends, CalendarHolidays)
-- ✅ Comprehensive documentation
+### ✅ Phase 1: Single Database Migration (Completed November 2025)
+- ✅ Single database architecture implemented
+- ✅ All 24 sources migrated successfully
+- ✅ Comprehensive documentation and migration guides
+- ✅ Testing and validation complete
 
-### Phase 2: Source Migration (Q4 2025)
-- Migrate remaining Creative sources (2)
-- Migrate remaining Signal sources (6+)
-- Migrate remaining Event sources (2)
-- Add Commerce sources (3)
-
-### Phase 3: Content Sources (Q1 2026)
+### Phase 2: Content Sources (Q1 2026)
 - YouTube Shorts integration
 - TikTok API integration
 - Reddit data collection
 - Article scraping (Medium, web)
 
-### Phase 4: Advanced Features (Q2 2026)
+### Phase 3: Advanced Features (Q2 2026)
 - Repository Pattern (Issue #500)
 - Unit of Work Pattern (Issue #501)
 - Builder Module (Issue #503)
 - SQLAlchemy ORM Layer (Issue #502)
 
-### Phase 5: Analytics & ML (Q3 2026)
+### Phase 4: Analytics & ML (Q3 2026)
 - Extended schema with Classification/Scoring tables (Issue #504)
 - Cross-source analytics
 - ML-based trend detection
@@ -464,6 +473,6 @@ All Rights Reserved - Part of the PrismQ Ecosystem
 
 ---
 
-**Status**: ✅ Production Ready (Dual-Save Architecture)
-**Version**: 1.0.0
-**Last Updated**: October 2025
+**Status**: ✅ Production Ready (Single Database Architecture)
+**Version**: 2.0.0
+**Last Updated**: November 2025

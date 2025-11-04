@@ -1,13 +1,10 @@
 """Main module exports for TikTokHashtagSource."""
 
-from .core import Config, Database, UniversalMetrics, SignalProcessor
+from .core import Config
 from .plugins.tik_tok_hashtag_plugin import TikTokHashtagPlugin
 
 __all__ = [
     "Config",
-    "Database",
-    "UniversalMetrics",
-    "SignalProcessor",
     "TikTokHashtagPlugin",
 ]
 

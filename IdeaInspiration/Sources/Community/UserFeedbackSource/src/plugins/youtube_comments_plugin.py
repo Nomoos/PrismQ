@@ -1,8 +1,8 @@
 """YouTube comments plugin for scraping own channel feedback."""
 
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from . import CommunitySourcePlugin
+from datetime import datetime, timezone
+from . import CommunitySourcePlugin, IdeaInspiration
 
 
 class YouTubeCommentsPlugin(CommunitySourcePlugin):
@@ -48,7 +48,7 @@ class YouTubeCommentsPlugin(CommunitySourcePlugin):
         channel_id: Optional[str] = None,
         max_videos: int = 10,
         max_comments_per_video: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[IdeaInspiration]:
         """Scrape comments from YouTube channel.
         
         Args:
@@ -57,7 +57,7 @@ class YouTubeCommentsPlugin(CommunitySourcePlugin):
             max_comments_per_video: Maximum comments per video (uses config if not provided)
             
         Returns:
-            List of community signal dictionaries
+            List of IdeaInspiration objects
         """
         # Use config values if not provided
         if channel_id is None:
@@ -84,13 +84,14 @@ class YouTubeCommentsPlugin(CommunitySourcePlugin):
         for i, video_id in enumerate(video_ids, 1):
             print(f"  [{i}/{len(video_ids)}] Fetching comments for video: {video_id}")
             
-            comments = self._get_video_comments(video_id, max_comments_per_video)
+            comments_data = self._get_video_comments(video_id, max_comments_per_video)
             
-            for comment_data in comments:
-                # Convert to community signal format (already done in _get_video_comments)
-                signals.append(comment_data)
+            for comment_data in comments_data:
+                # Transform to IdeaInspiration
+                idea = self._transform_comment_to_idea(comment_data)
+                signals.append(idea)
             
-            print(f"    Found {len(comments)} comments")
+            print(f"    Found {len(comments_data)} comments")
         
         return signals
     
@@ -183,3 +184,48 @@ class YouTubeCommentsPlugin(CommunitySourcePlugin):
             print(f"Error fetching comments for video {video_id}: {e}")
         
         return comments
+    
+    def _transform_comment_to_idea(self, comment_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform YouTube comment data to IdeaInspiration object.
+        
+        Args:
+            comment_data: Comment data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        author = comment_data.get('author', 'Unknown')
+        text = comment_data.get('text', '')
+        video_id = comment_data.get('parent_content', '')
+        tags = self.format_tags(['youtube', 'comment', 'feedback', 'user_feedback'])
+        
+        # Build metadata with string values
+        metadata = {
+            'comment_id': comment_data.get('source_id', ''),
+            'author': author,
+            'platform': 'youtube',
+            'video_id': video_id,
+            'upvotes': str(comment_data.get('upvotes', 0)),
+            'replies': str(comment_data.get('replies', 0)),
+            'timestamp': comment_data.get('timestamp', ''),
+            'comment_type': 'user_feedback',
+        }
+        
+        # Build description
+        description = f"YouTube comment by {author} on video {video_id}"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=f"Comment by {author}",
+            description=description,
+            text_content=text,
+            keywords=tags,
+            metadata=metadata,
+            source_id=comment_data.get('source_id', ''),
+            source_url=f"https://www.youtube.com/watch?v={video_id}",
+            source_platform="user_feedback",
+            source_created_by=author,
+            source_created_at=comment_data.get('timestamp', '')
+        )
+        
+        return idea

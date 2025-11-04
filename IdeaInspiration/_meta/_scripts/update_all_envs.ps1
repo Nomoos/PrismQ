@@ -1,10 +1,26 @@
 # Update all virtual environments with latest dependencies
 # Part of Issue #115: Per-Project Virtual Environments
+# Auto-discovers all modules using shared discovery library
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$Projects = @("Classification", "ConfigLoad", "Model", "Scoring", "Sources", "Client\Backend")
+$DiscoveryScript = Join-Path $RepoRoot "_meta\scripts\discover_modules.py"
+
+# Check if discovery script exists
+if (-not (Test-Path $DiscoveryScript)) {
+    Write-Host "❌ Discovery script not found at $DiscoveryScript" -ForegroundColor Red
+    exit 1
+}
+
+# Use shared discovery library to find modules for environment setup
+$Projects = @()
+try {
+    $Projects = python $DiscoveryScript --filter env-setup --format names | Where-Object { $_ -ne "" }
+} catch {
+    Write-Host "❌ Failed to run discovery script" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "🔄 Updating virtual environments for all PrismQ projects..." -ForegroundColor Cyan
 Write-Host ""

@@ -1,7 +1,8 @@
 """Manual Entry plugin for manual idea backlog management."""
 
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 from ..core.idea_manager import IdeaManager
 
 
@@ -32,7 +33,7 @@ class ManualEntryPlugin(SourcePlugin):
         """
         return "manual_backlog"
     
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Scrape ideas from manual entry (not applicable).
         
         This method is not used for manual entry source as ideas are

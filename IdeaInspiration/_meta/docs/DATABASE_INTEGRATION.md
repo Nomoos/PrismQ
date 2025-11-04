@@ -1,8 +1,25 @@
 # Database Integration Architecture
 
-## Overview
+> **⚠️ DEPRECATED DOCUMENT**
+> 
+> This document describes the old **dual-save architecture** which has been **replaced** by the single database pattern.
+> 
+> **Migration completed**: November 1, 2025
+> 
+> **See current documentation**:
+> - [SINGLE_DB_MIGRATION_COMPLETE.md](./SINGLE_DB_MIGRATION_COMPLETE.md) - Migration summary
+> - [SINGLE_DB_IMPLEMENTATION_SUMMARY.md](./SINGLE_DB_IMPLEMENTATION_SUMMARY.md) - Current architecture
+> - [SINGLE_DB_MIGRATION_GUIDE.md](./SINGLE_DB_MIGRATION_GUIDE.md) - Migration guide
+>
+> This document is kept for historical reference only.
 
-The PrismQ.IdeaInspiration ecosystem uses a **dual-save architecture** for database persistence. This design allows each Source module to maintain detailed domain-specific data while also contributing to a unified central database for cross-source queries.
+---
+
+## Overview (Historical)
+
+The PrismQ.IdeaInspiration ecosystem previously used a **dual-save architecture** for database persistence. This design allowed each Source module to maintain detailed domain-specific data while also contributing to a unified central database for cross-source queries.
+
+**Note**: This architecture has been replaced with a single database approach using the `source_platform` field.
 
 ## Architecture Principles
 

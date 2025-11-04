@@ -5,8 +5,14 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
 from .plugins.csv_import_plugin import CSVImportPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -37,8 +43,9 @@ def import_file(file_path, env_file, no_interactive, batch_id):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize plugin
         plugin = CSVImportPlugin(config)
@@ -51,19 +58,15 @@ def import_file(file_path, env_file, no_interactive, batch_id):
             click.echo("No ideas to import.", err=True)
             sys.exit(1)
         
-        # Save to database
+        # Save to central database
         click.echo(f"\nSaving {len(ideas)} ideas to database...")
-        saved_count = db.save_ideas(ideas)
+        saved_count = 0
+        for idea in ideas:
+            if central_db.insert(idea):
+                saved_count += 1
         
         click.echo(f"\n✓ Successfully imported {saved_count} ideas!")
-        
-        # Show statistics
-        stats = db.get_stats()
-        click.echo("\nDatabase Statistics:")
-        click.echo(f"  Total ideas: {stats['total']}")
-        click.echo(f"  By status: {stats['by_status']}")
-        click.echo(f"  By category: {stats['by_category']}")
-        click.echo(f"  By priority: {stats['by_priority']}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

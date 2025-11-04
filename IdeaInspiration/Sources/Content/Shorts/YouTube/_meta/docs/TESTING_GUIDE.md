@@ -10,7 +10,8 @@ For testing and validation, we provide a set of example URLs from the **SnappySt
 |------|-----|---------|
 | **Channel** | `https://www.youtube.com/@SnappyStories_1` | Base channel URL for scraping |
 | **Channel Shorts** | `https://www.youtube.com/@SnappyStories_1/shorts` | Direct link to channel's Shorts section |
-| **Example Short** | `https://www.youtube.com/shorts/FpSdooOrmsU` | Single short for testing individual video scraping |
+| **Example Short #1** | `https://www.youtube.com/shorts/FpSdooOrmsU` | Single short for testing individual video scraping |
+| **Example Short #2** | `https://youtube.com/shorts/3o0o5DTwTYU` | Additional test video with query parameters |
 | **Channel Handle** | `@SnappyStories_1` | Alternative handle format |
 
 ## Quick Start Testing
@@ -196,7 +197,7 @@ rm test_db.s3db
 
 ### Testing Individual Short
 
-To test metadata extraction for the specific example short:
+To test metadata extraction for the specific example shorts:
 
 ```python
 from src.plugins.youtube_channel_plugin import YouTubeChannelPlugin
@@ -205,7 +206,7 @@ from src.core.config import Config
 config = Config('.env.test')
 plugin = YouTubeChannelPlugin(config)
 
-# Extract metadata for specific video
+# Extract metadata for specific video (Example #1)
 video_id = "FpSdooOrmsU"  # From https://www.youtube.com/shorts/FpSdooOrmsU
 metadata = plugin._extract_video_metadata(video_id)
 
@@ -213,6 +214,15 @@ if metadata:
     print(f"Title: {metadata['title']}")
     print(f"Duration: {metadata['duration']}s")
     print(f"Views: {metadata['view_count']}")
+
+# Extract metadata for another test video (Example #2)
+video_id_2 = "3o0o5DTwTYU"  # From https://youtube.com/shorts/3o0o5DTwTYU
+metadata_2 = plugin._extract_video_metadata(video_id_2)
+
+if metadata_2:
+    print(f"Title: {metadata_2['title']}")
+    print(f"Duration: {metadata_2['duration']}s")
+    print(f"Views: {metadata_2['view_count']}")
 ```
 
 ### Testing with Custom Parameters

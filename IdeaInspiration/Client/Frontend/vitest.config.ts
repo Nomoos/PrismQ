@@ -23,14 +23,15 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: ['../_meta/tests/Frontend/**/*.spec.ts'],
+    include: ['_meta/tests/unit/**/*.spec.ts'],
+    exclude: ['_meta/tests/e2e/**/*'],
     root: frontendDir,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
-        '../_meta/tests/',
+        '_meta/tests/',
         '*.config.{js,ts}',
         'dist/'
       ]

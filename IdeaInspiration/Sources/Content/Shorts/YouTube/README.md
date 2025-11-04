@@ -222,8 +222,12 @@ See [_meta/docs/CONFIGURATION.md](_meta/docs/CONFIGURATION.md) for detailed conf
 
 ## Documentation
 
+- **[Quick Reference Card](_meta/docs/QUICK_REFERENCE.md)** - Fast command reference (Czech/English)
+- **[Manual Testing Procedure](_meta/docs/MANUAL_TESTING_PROCEDURE.md)** - Complete step-by-step manual testing guide (Czech/English)
 - **[Testing Guide](_meta/docs/TESTING_GUIDE.md)** - Testing with example channels and URLs
 - **[Configuration Guide](_meta/docs/CONFIGURATION.md)** - Working directories, .env management
+- **[Inspiration Sources](_meta/docs/INSPIRATION_SOURCES.md)** - Curated YouTube channels for content ideas
+- **[Channel Scraping](_meta/docs/CHANNEL_SCRAPING.md)** - Advanced channel scraping features
 - **[Metrics Documentation](_meta/docs/METRICS.md)** - Universal metrics system
 - **[YouTube Data Model](_meta/docs/YTB_DATA_MODEL.md)** - Complete database schema
 - **[Data Collection Guide](_meta/docs/DATA_COLLECTION_GUIDE.md)** - What data we collect

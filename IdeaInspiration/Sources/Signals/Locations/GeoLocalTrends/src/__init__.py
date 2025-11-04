@@ -1,14 +1,11 @@
-"""Main module exports for GoogleTrendsSource."""
+"""Main module exports for GeoLocalTrendsSource."""
 
-from .core import Config, Database, UniversalMetrics, SignalProcessor
-from .plugins.google_trends_plugin import GoogleTrendsPlugin
+from .core import Config
+from .plugins.geo_local_trends_plugin import GeoLocalTrendsPlugin
 
 __all__ = [
     "Config",
-    "Database",
-    "UniversalMetrics",
-    "SignalProcessor",
-    "GoogleTrendsPlugin",
+    "GeoLocalTrendsPlugin",
 ]
 
 __version__ = "1.0.0"

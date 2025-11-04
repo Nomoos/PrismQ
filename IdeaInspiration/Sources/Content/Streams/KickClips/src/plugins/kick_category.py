@@ -6,7 +6,7 @@ This plugin scrapes clips from specific Kick.com categories using the unofficial
 import time
 import cloudscraper
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class KickCategoryPlugin(SourcePlugin):
@@ -39,7 +39,7 @@ class KickCategoryPlugin(SourcePlugin):
         """
         return "kick_category"
     
-    def scrape(self, max_clips: Optional[int] = None, category_slug: Optional[str] = None) -> List[Dict[str, Any]]:
+    def scrape(self, max_clips: Optional[int] = None, category_slug: Optional[str] = None) -> List[IdeaInspiration]:
         """Scrape clips from a specific category.
         
         Args:
@@ -47,7 +47,7 @@ class KickCategoryPlugin(SourcePlugin):
             category_slug: Category slug to scrape (uses instance value if not provided)
             
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         if max_clips is None:
             max_clips = getattr(self.config, 'kick_category_max_clips', 50)
@@ -80,7 +80,7 @@ class KickCategoryPlugin(SourcePlugin):
                 if len(ideas) >= max_clips:
                     break
                 
-                idea = self._clip_to_idea(clip, category_slug)
+                idea = self.transform_clip_to_idea(clip, category_slug)
                 if idea:
                     ideas.append(idea)
             
@@ -141,15 +141,27 @@ class KickCategoryPlugin(SourcePlugin):
         
         return []
     
-    def _clip_to_idea(self, clip: Dict[str, Any], category_slug: str) -> Optional[Dict[str, Any]]:
-        """Convert Kick clip data to idea format.
+    def _clip_to_idea(self, clip: Dict[str, Any], category_slug: str) -> Optional[IdeaInspiration]:
+        """Convert Kick clip data to IdeaInspiration object.
         
         Args:
             clip: Clip data from API
             category_slug: Category slug
             
         Returns:
-            Idea dictionary or None if invalid
+            IdeaInspiration object or None if invalid
+        """
+        return self.transform_clip_to_idea(clip, category_slug)
+    
+    def transform_clip_to_idea(self, clip: Dict[str, Any], category_slug: str) -> Optional[IdeaInspiration]:
+        """Transform Kick clip data to IdeaInspiration object.
+        
+        Args:
+            clip: Clip data from API
+            category_slug: Category slug
+            
+        Returns:
+            IdeaInspiration object or None
         """
         try:
             # Extract clip ID
@@ -162,6 +174,7 @@ class KickCategoryPlugin(SourcePlugin):
             
             # Build description
             description_parts = [f"Category: {category_slug}"]
+            channel_name = ''
             if clip.get('channel'):
                 channel_name = clip['channel'].get('username') if isinstance(clip['channel'], dict) else clip['channel']
                 description_parts.append(f"Streamer: {channel_name}")
@@ -171,48 +184,48 @@ class KickCategoryPlugin(SourcePlugin):
             # Extract tags
             tags = [category_slug]
             if clip.get('channel'):
-                channel_name = clip['channel'].get('username') if isinstance(clip['channel'], dict) else clip['channel']
                 if channel_name:
                     tags.append(channel_name)
             
-            # Extract metrics
-            metrics = {
-                'views': clip.get('views', 0),
-                'likes': clip.get('likes', 0),
-                'comments': 0,
-                'shares': 0,
-                'reactions': clip.get('likes', 0),
-                'duration': clip.get('duration', 0),
-                'created_at': clip.get('created_at', ''),
-                'streamer_followers': 0,
-                'streamer_verified': False,
-            }
-            
             # Extract streamer info
+            streamer_followers = 0
+            streamer_verified = False
             if clip.get('channel'):
                 channel = clip['channel']
                 if isinstance(channel, dict):
-                    metrics['streamer_followers'] = channel.get('followers_count', 0)
-                    metrics['streamer_verified'] = channel.get('verified', False)
+                    streamer_followers = channel.get('followers_count', 0)
+                    streamer_verified = channel.get('verified', False)
+                    if not channel_name:
+                        channel_name = channel.get('username', '')
             
-            # Build idea dictionary
-            idea = {
-                'source_id': str(clip_id),
-                'title': title,
-                'description': description,
-                'tags': self.format_tags(tags),
-                'metrics': metrics,
-                'category': {'name': category_slug, 'id': category_slug},
-                'streamer': clip.get('channel'),
-                'clip': {
-                    'duration': clip.get('duration', 0),
-                    'language': clip.get('language', 'en'),
-                    'created_at': clip.get('created_at', ''),
-                }
+            # Build metadata dict with all metrics
+            metadata = {
+                'views': str(clip.get('views', 0)),
+                'likes': str(clip.get('likes', 0)),
+                'comments': '0',
+                'shares': '0',
+                'reactions': str(clip.get('likes', 0)),
+                'duration': str(clip.get('duration', 0)),
+                'created_at': clip.get('created_at', ''),
+                'streamer_followers': str(streamer_followers),
+                'streamer_verified': str(streamer_verified),
+                'language': clip.get('language', 'en'),
+                'category_slug': category_slug,
             }
             
-            return idea
-            
+            # Create IdeaInspiration using from_video factory method
+            return IdeaInspiration.from_video(
+                title=title,
+                description=description,
+                subtitle_text='',  # Kick doesn't provide subtitles via basic API
+                keywords=self.format_tags(tags),
+                metadata=metadata,
+                source_id=str(clip_id),
+                source_url=clip.get('url') or clip.get('clip_url'),
+                source_platform='kick',
+                source_created_by=channel_name,
+                source_created_at=clip.get('created_at'),
+            )
         except Exception as e:
-            print(f"  Error converting clip to idea: {e}")
+            print(f"Error transforming clip to IdeaInspiration: {e}")
             return None

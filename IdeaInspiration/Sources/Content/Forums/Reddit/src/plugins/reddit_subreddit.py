@@ -2,7 +2,7 @@
 
 import praw
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class RedditSubredditPlugin(SourcePlugin):
@@ -49,7 +49,7 @@ class RedditSubredditPlugin(SourcePlugin):
         return "reddit_subreddit"
     
     def scrape(self, subreddit: str = "all", limit: Optional[int] = None, 
-               sort: str = "hot", time_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+               sort: str = "hot", time_filter: Optional[str] = None) -> List[IdeaInspiration]:
         """Scrape posts from a specific subreddit.
         
         This is the base scrape() method that implements the SourcePlugin interface.
@@ -69,7 +69,7 @@ class RedditSubredditPlugin(SourcePlugin):
         return self.scrape_by_sort(subreddit=subreddit, limit=limit, sort=sort)
     
     def scrape_by_sort(self, subreddit: str, limit: Optional[int] = None, 
-                       sort: str = "hot") -> List[Dict[str, Any]]:
+                       sort: str = "hot") -> List[IdeaInspiration]:
         """Scrape posts from a specific subreddit with given sort method.
         
         Args:
@@ -78,7 +78,7 @@ class RedditSubredditPlugin(SourcePlugin):
             sort: Sort method - 'hot', 'new', 'top', 'rising'
             
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -108,6 +108,7 @@ class RedditSubredditPlugin(SourcePlugin):
             for post in posts:
                 idea = self._post_to_idea(post)
                 if idea:
+                    idea = self._transform_post_to_idea(idea)
                     ideas.append(idea)
                     print(f"  ✓ {post.title[:60]}... (score: {post.score})")
         
@@ -117,7 +118,7 @@ class RedditSubredditPlugin(SourcePlugin):
         return ideas
     
     def scrape_top(self, subreddit: str, time_filter: str = "day", 
-                   limit: Optional[int] = None) -> List[Dict[str, Any]]:
+                   limit: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape top posts from subreddit.
         
         Args:
@@ -126,7 +127,7 @@ class RedditSubredditPlugin(SourcePlugin):
             limit: Maximum number of posts
             
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -142,6 +143,7 @@ class RedditSubredditPlugin(SourcePlugin):
             for post in posts:
                 idea = self._post_to_idea(post)
                 if idea:
+                    idea = self._transform_post_to_idea(idea)
                     ideas.append(idea)
                     print(f"  ✓ {post.title[:60]}... (score: {post.score})")
         
@@ -210,3 +212,62 @@ class RedditSubredditPlugin(SourcePlugin):
         except Exception as e:
             print(f"  ✗ Error converting post: {e}")
             return None
+    
+    def _transform_post_to_idea(self, post_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform Reddit post data to IdeaInspiration object.
+        
+        Args:
+            post_data: Post data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = post_data.get('title', 'Untitled')
+        description = post_data.get('description', '')
+        tags = post_data.get('tags', [])
+        
+        # Extract metrics and move to metadata as strings
+        metrics = post_data.get('metrics', {})
+        author_data = metrics.get('author', {})
+        subreddit_data = metrics.get('subreddit', {})
+        content_data = metrics.get('content', {})
+        
+        metadata = {
+            'post_id': post_data.get('source_id', ''),
+            'score': str(metrics.get('score', 0)),
+            'upvote_ratio': str(metrics.get('upvote_ratio', 0)),
+            'num_comments': str(metrics.get('num_comments', 0)),
+            'ups': str(metrics.get('ups', 0)),
+            'total_awards_received': str(metrics.get('total_awards_received', 0)),
+            'num_views': str(metrics.get('num_views', 0)),
+            'created_utc': str(metrics.get('created_utc', '')),
+            'author_name': str(author_data.get('name', '')),
+            'author_link_karma': str(author_data.get('link_karma', 0)),
+            'author_comment_karma': str(author_data.get('comment_karma', 0)),
+            'subreddit_name': str(subreddit_data.get('name', '')),
+            'subreddit_subscribers': str(subreddit_data.get('subscribers', 0)),
+            'subreddit_type': str(subreddit_data.get('type', 'public')),
+            'content_type': str(content_data.get('type', 'text')),
+            'content_domain': str(content_data.get('domain', '')),
+            'source': 'reddit_subreddit',
+        }
+        
+        # Add content URL if it's a link post
+        if content_data.get('url'):
+            metadata['content_url'] = str(content_data['url'])
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=description,
+            keywords=tags,
+            metadata=metadata,
+            source_id=post_data.get('source_id', ''),
+            source_url=f"https://reddit.com/r/{subreddit_data.get('name', 'all')}/comments/{post_data.get('source_id', '')}",
+            source_platform="reddit",
+            source_created_by=author_data.get('name', ''),
+            source_created_at=str(metrics.get('created_utc', ''))
+        )
+        
+        return idea

@@ -4,10 +4,14 @@ import click
 import sys
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CommerceMetrics
-from .core.commerce_processor import CommerceProcessor
 from .plugins.amazon_bestsellers import AmazonBestsellersPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -37,8 +41,9 @@ def scrape(env_file, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize Amazon plugin
         try:
@@ -49,7 +54,7 @@ def scrape(env_file, no_interactive):
         
         # Scrape from Amazon
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
         click.echo("Scraping Amazon bestsellers...")
         click.echo(f"Categories: {', '.join(config.amazon_categories)}")
@@ -57,41 +62,19 @@ def scrape(env_file, no_interactive):
         click.echo("")
         
         try:
-            products = amazon_plugin.scrape()
-            total_scraped = len(products)
-            click.echo(f"Found {len(products)} products")
+            # Scrape products - returns List[IdeaInspiration]
+            ideas = amazon_plugin.scrape()
+            total_scraped = len(ideas)
+            click.echo(f"Found {len(ideas)} products")
             
-            # Process and save each product
-            for product in products:
-                # Transform to unified format
-                unified = CommerceProcessor.process_amazon_product(product)
-                
-                # Create commerce metrics
-                metrics = CommerceMetrics.from_amazon(product)
-                
-                # Extract tags
-                tags = CommerceProcessor.extract_tags_from_product(product)
-                
-                # Save to database
-                success = db.insert_product(
-                    source=unified['source'],
-                    source_id=unified['source_id'],
-                    title=unified['product']['name'],
-                    brand=unified['product'].get('brand'),
-                    category=unified['product'].get('category'),
-                    price=unified['product'].get('price'),
-                    currency=unified['product'].get('currency', 'USD'),
-                    description=product.get('description'),
-                    tags=tags,
-                    score=metrics.consumer_interest or 0.0,
-                    score_dictionary=metrics.to_dict()
-                )
-                
-                if success:
-                    total_saved += 1
-                    click.echo(f"  ✓ Saved: {unified['product']['name'][:60]}")
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
                 else:
-                    click.echo(f"  ↻ Updated: {unified['product']['name'][:60]}")
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
             
         except Exception as e:
             click.echo(f"Error scraping Amazon: {e}", err=True)
@@ -100,8 +83,8 @@ def scrape(env_file, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total products found: {total_scraped}")
-        click.echo(f"Total products saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -121,76 +104,43 @@ def scrape(env_file, no_interactive):
 def list(env_file, limit, category, no_interactive):
     """List collected products."""
     try:
-        # Load configuration
+        # Load configuration  
         config = Config(env_file, interactive=not no_interactive)
         
-        # Open database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Open central database
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Get products
-        if category:
-            products = db.get_products_by_category(category, limit=limit)
-        else:
-            products = db.get_all_products(limit=limit)
+        # Get products - filter by source_platform
+        ideas = central_db.get_all(
+            limit=limit,
+            source_platform="amazon_bestsellers",
+            category=category
+        )
         
-        if not products:
+        if not ideas:
             click.echo("No products found.")
             return
         
         # Display products
         click.echo(f"\n{'='*80}")
-        click.echo(f"Collected Products ({len(products)} total)")
+        click.echo(f"Collected Products ({len(ideas)} total)")
         click.echo(f"{'='*80}\n")
         
-        for i, product in enumerate(products, 1):
-            click.echo(f"{i}. [{product['category']}] {product['title']}")
-            click.echo(f"   ASIN: {product['source_id']}")
-            if product['brand']:
-                click.echo(f"   Brand: {product['brand']}")
-            if product['price']:
-                click.echo(f"   Price: ${product['price']} {product['currency']}")
-            if product['score']:
-                click.echo(f"   Score: {product['score']:.2f}")
-            if product['tags']:
-                click.echo(f"   Tags: {product['tags']}")
+        for i, idea in enumerate(ideas, 1):
+            click.echo(f"{i}. [{idea.metadata.get('category', 'N/A')}] {idea.title}")
+            click.echo(f"   ASIN: {idea.source_id}")
+            if idea.metadata.get('brand'):
+                click.echo(f"   Brand: {idea.metadata.get('brand')}")
+            if idea.metadata.get('price'):
+                click.echo(f"   Price: ${idea.metadata.get('price')} {idea.metadata.get('currency', 'USD')}")
+            if idea.keywords:
+                click.echo(f"   Tags: {', '.join(idea.keywords)}")
             click.echo()
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
-
-
-def _display_statistics(statistics):
-    """Helper function to display statistics."""
-    if statistics['total'] == 0:
-        click.echo("No products collected yet.")
-        return
-    
-    # Build output as a string first to avoid Click dict iteration bug
-    output_lines = []
-    output_lines.append("\n" + "=" * 50)
-    output_lines.append("Product Collection Statistics")
-    output_lines.append("=" * 50 + "\n")
-    output_lines.append(f"Total Products: {statistics['total']}\n")
-    
-    if statistics.get('by_source'):
-        output_lines.append("Products by Source:")
-        for source, count in sorted(statistics['by_source'].items()):
-            percentage = (count / statistics['total']) * 100
-            output_lines.append(f"  {source}: {count} ({percentage:.1f}%)")
-        output_lines.append("")
-    
-    if statistics.get('by_category'):
-        output_lines.append("Top Categories:")
-        # Convert to list before iterating to avoid Click bug
-        cat_list = [(k, v) for k, v in statistics['by_category'].items()]
-        for category, count in cat_list[:10]:
-            percentage = (count / statistics['total']) * 100
-            output_lines.append(f"  {category}: {count} ({percentage:.1f}%)")
-        output_lines.append("")
-    
-    # Output everything at once
-    click.echo("\n".join(output_lines))
 
 
 @main.command()
@@ -204,12 +154,36 @@ def stats(env_file, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Open database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Open central database
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Get statistics and display
-        statistics = db.get_statistics()
-        _display_statistics(statistics)
+        # Get all Amazon bestseller ideas
+        ideas = central_db.get_all(source_platform="amazon_bestsellers")
+        
+        if not ideas:
+            click.echo("No products collected yet.")
+            return
+        
+        # Calculate statistics
+        total = len(ideas)
+        by_category = {}
+        
+        for idea in ideas:
+            category = idea.metadata.get('category', 'Unknown')
+            by_category[category] = by_category.get(category, 0) + 1
+        
+        # Display statistics
+        click.echo(f"\n{'='*50}")
+        click.echo(f"Product Collection Statistics")
+        click.echo(f"{'='*50}\n")
+        click.echo(f"Total Products: {total}\n")
+        
+        click.echo(f"Top Categories:")
+        for category, count in sorted(by_category.items(), key=lambda x: x[1], reverse=True)[:10]:
+            percentage = (count / total) * 100
+            click.echo(f"  {category}: {count} ({percentage:.1f}%)")
+        click.echo()
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -221,20 +195,24 @@ def stats(env_file, no_interactive):
               help='Path to .env file')
 @click.option('--no-interactive', is_flag=True, 
               help='Disable interactive prompts for missing configuration')
-@click.confirmation_option(prompt='Are you sure you want to clear all products?')
+@click.confirmation_option(prompt='Are you sure you want to clear all Amazon bestseller products?')
 def clear(env_file, no_interactive):
-    """Clear all products from the database."""
+    """Clear Amazon bestseller products from the central database.
+    
+    Note: This only removes products from this source, not the entire database.
+    """
     try:
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Delete database file
-        db_path = Path(config.database_path)
-        if db_path.exists():
-            db_path.unlink()
-            click.echo(f"Database cleared: {config.database_path}")
-        else:
-            click.echo("Database does not exist.")
+        # Open central database
+        central_db_path = get_central_database_path()
+        
+        # Note: IdeaInspirationDatabase doesn't have a delete by platform method yet
+        # For now, just inform the user to use the central database tools
+        click.echo("To clear Amazon bestseller products, use the central IdeaInspiration database tools.")
+        click.echo(f"Central database: {central_db_path}")
+        click.echo("This ensures data consistency across all sources.")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

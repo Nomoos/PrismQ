@@ -93,6 +93,13 @@ if (Test-Path "requirements.txt") {
         Write-Host "✅ Dependencies installed successfully." -ForegroundColor Green
     } else {
         Write-Host "❌ ERROR: Failed to install dependencies" -ForegroundColor Red
+        Write-Host "" -ForegroundColor Red
+        Write-Host "   If you're using Python 3.14+, some dependencies may lack prebuilt wheels." -ForegroundColor Yellow
+        Write-Host "   Try using Python 3.12 instead:" -ForegroundColor Yellow
+        Write-Host "   1. Delete the venv folder: Remove-Item -Recurse -Force venv" -ForegroundColor Cyan
+        Write-Host "   2. Create venv with Python 3.12: py -3.12 -m venv venv" -ForegroundColor Cyan
+        Write-Host "   3. Run this script again" -ForegroundColor Cyan
+        Write-Host "" -ForegroundColor Red
         Read-Host "Press Enter to exit"
         exit 1
     }

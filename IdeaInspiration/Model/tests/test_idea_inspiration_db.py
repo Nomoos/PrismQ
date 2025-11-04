@@ -3,6 +3,7 @@
 import pytest
 import tempfile
 import os
+import sqlite3
 from pathlib import Path
 
 from idea_inspiration import IdeaInspiration, ContentType
@@ -363,3 +364,107 @@ class TestGetCentralDatabasePath:
         """Test that path ends with .s3db extension."""
         path = get_central_database_path()
         assert path.endswith('.s3db') or path.endswith('.db')
+
+
+class TestSourcePlatformSupport:
+    """Test source_platform field support in database."""
+
+    def test_insert_with_source_platform(self, db, temp_db):
+        """Test inserting IdeaInspiration with source_platform."""
+        idea = IdeaInspiration.from_text(
+            title="YouTube Video",
+            text_content="Video transcript",
+            source_platform="youtube",
+            source_id="vid-123"
+        )
+        
+        record_id = db.insert(idea)
+        assert record_id is not None
+        
+        # Verify stored correctly
+        retrieved = db.get_by_id(record_id)
+        assert retrieved is not None
+        assert retrieved.source_platform == "youtube"
+
+    def test_retrieve_by_source_platform(self, db):
+        """Test filtering by source_platform."""
+        # Insert multiple ideas with different platforms
+        youtube_idea = IdeaInspiration.from_text(
+            title="YouTube Video",
+            source_platform="youtube",
+            source_id="yt-1"
+        )
+        
+        tiktok_idea = IdeaInspiration.from_text(
+            title="TikTok Video",
+            source_platform="tiktok",
+            source_id="tt-1"
+        )
+        
+        db.insert(youtube_idea)
+        db.insert(tiktok_idea)
+        
+        # Filter by platform
+        youtube_results = db.get_all(source_platform="youtube")
+        assert len(youtube_results) == 1
+        assert youtube_results[0].source_platform == "youtube"
+        
+        tiktok_results = db.get_all(source_platform="tiktok")
+        assert len(tiktok_results) == 1
+        assert tiktok_results[0].source_platform == "tiktok"
+
+    def test_count_by_source_platform(self, db):
+        """Test counting by source_platform."""
+        # Insert ideas with different platforms
+        for i in range(3):
+            db.insert(IdeaInspiration.from_text(
+                title=f"YouTube {i}",
+                source_platform="youtube",
+                source_id=f"yt-{i}"
+            ))
+        
+        for i in range(2):
+            db.insert(IdeaInspiration.from_text(
+                title=f"TikTok {i}",
+                source_platform="tiktok",
+                source_id=f"tt-{i}"
+            ))
+        
+        youtube_count = db.count(source_platform="youtube")
+        tiktok_count = db.count(source_platform="tiktok")
+        
+        assert youtube_count == 3
+        assert tiktok_count == 2
+
+    def test_insert_batch_with_source_platform(self, db):
+        """Test batch insert with source_platform."""
+        ideas = [
+            IdeaInspiration.from_text(
+                title=f"Video {i}",
+                source_platform="youtube",
+                source_id=f"vid-{i}"
+            )
+            for i in range(5)
+        ]
+        
+        inserted_count = db.insert_batch(ideas)
+        assert inserted_count == 5
+        
+        # Verify all stored with correct platform
+        results = db.get_all(source_platform="youtube")
+        assert len(results) == 5
+        assert all(r.source_platform == "youtube" for r in results)
+
+    def test_source_platform_index_exists(self, db, temp_db):
+        """Test that index on source_platform was created."""
+        conn = sqlite3.connect(temp_db)
+        cursor = conn.cursor()
+        
+        # Check for index
+        cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='index' AND name='idx_source_platform'
+        """)
+        
+        assert cursor.fetchone() is not None
+        conn.close()

@@ -1,14 +1,11 @@
-"""Main module exports for GoogleTrendsSource."""
+"""Main module exports for SocialChallengeSource."""
 
-from .core import Config, Database, UniversalMetrics, SignalProcessor
-from .plugins.google_trends_plugin import GoogleTrendsPlugin
+from .core import Config
+from .plugins.social_challenge_plugin import SocialChallengePlugin
 
 __all__ = [
     "Config",
-    "Database",
-    "UniversalMetrics",
-    "SignalProcessor",
-    "GoogleTrendsPlugin",
+    "SocialChallengePlugin",
 ]
 
 __version__ = "1.0.0"

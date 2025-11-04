@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class NewsApiPlugin(SignalPlugin):
@@ -42,7 +42,7 @@ class NewsApiPlugin(SignalPlugin):
         """Get the name of this source."""
         return "news_api"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape news signals from NewsAPI.
         
@@ -54,7 +54,7 @@ class NewsApiPlugin(SignalPlugin):
                 - language: Language code
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         signals = []
         max_results = getattr(self.config, 'max_results', None) or \
@@ -85,7 +85,7 @@ class NewsApiPlugin(SignalPlugin):
         
         return signals
     
-    def _get_top_headlines(self, limit: int, language: str) -> List[Dict[str, Any]]:
+    def _get_top_headlines(self, limit: int, language: str) -> List[IdeaInspiration]:
         """Fetch top headlines."""
         signals = []
         try:
@@ -95,7 +95,7 @@ class NewsApiPlugin(SignalPlugin):
             print(f"Error fetching top headlines: {e}")
         return signals
     
-    def _search_news(self, query: str, limit: int, language: str) -> List[Dict[str, Any]]:
+    def _search_news(self, query: str, limit: int, language: str) -> List[IdeaInspiration]:
         """Search for news by query."""
         signals = []
         try:
@@ -105,7 +105,7 @@ class NewsApiPlugin(SignalPlugin):
             print(f"Error searching news: {e}")
         return signals
     
-    def _get_category_news(self, category: str, limit: int, language: str) -> List[Dict[str, Any]]:
+    def _get_category_news(self, category: str, limit: int, language: str) -> List[IdeaInspiration]:
         """Get news for a specific category."""
         signals = []
         try:
@@ -115,7 +115,7 @@ class NewsApiPlugin(SignalPlugin):
             print(f"Error fetching category news: {e}")
         return signals
     
-    def _get_sample_news(self, limit: int) -> List[Dict[str, Any]]:
+    def _get_sample_news(self, limit: int) -> List[IdeaInspiration]:
         """Get sample news data for testing/stub mode."""
         sample_news = [
             {
@@ -160,15 +160,15 @@ class NewsApiPlugin(SignalPlugin):
             },
         ]
         
-        signals = []
+        ideas = []
         for news_data in sample_news[:limit]:
-            signal = self._create_signal(news_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(news_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, news_item: Dict[str, Any]) -> Dict[str, Any]:
-        """Create a signal dictionary from news item data."""
+    def _create_idea_inspiration(self, news_item: Dict[str, Any]) -> IdeaInspiration:
+        """Create an IdeaInspiration object from news item data."""
         title = news_item.get('title', 'Unknown')
         description = news_item.get('description', '')
         source = news_item.get('source', {})
@@ -177,32 +177,30 @@ class NewsApiPlugin(SignalPlugin):
         published_at = news_item.get('publishedAt', datetime.now(timezone.utc).isoformat() + 'Z')
         author = news_item.get('author', 'Unknown')
         
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        title_slug = ''.join(c if c.isalnum() else '_' for c in title.lower())[:30]
-        source_id = f"{title_slug}_{timestamp}"
+        # Format tags
+        tags = self.format_tags(['newsapi', 'news', 'article', source_name.lower()])
         
-        return {
-            'source_id': source_id,
+        # Build metadata with platform-specific data
+        metadata = {
+            'news_source': source_name,
+            'author': author,
+            'published_at': published_at,
             'signal_type': 'news',
-            'name': title,
-            'description': description[:500] if description else '',
-            'tags': ['newsapi', 'news', 'article'],
-            'metrics': {
-                'volume': 100,
-                'velocity': 0.0,
-                'acceleration': 0.0,
-                'geographic_spread': ['global']
-            },
-            'temporal': {
-                'first_seen': published_at,
-                'peak_time': None,
-                'current_status': 'active'
-            },
-            'extra': {
-                'platform': 'newsapi',
-                'source': source_name,
-                'url': url,
-                'author': author
-            }
+            'volume': '100',
+            'current_status': 'active'
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description[:500] if description else '',
+            text_content=f"{title}\n\n{description}",
+            keywords=tags,
+            source_platform="news_api",  # Platform identifier
+            metadata=metadata,
+            source_id=url,
+            source_url=url
+        )
+        
+        return idea
 

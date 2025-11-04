@@ -5,10 +5,16 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CreativeMetrics
 from .plugins.unsplash_plugin import UnsplashPlugin
 from .plugins.manual_import_plugin import ManualImportPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
+
 
 
 @click.group()

@@ -10,8 +10,10 @@ The frontend provides an intuitive web interface for discovering, configuring, a
 
 ### Prerequisites
 
-- Node.js 18 or higher
+- Node.js 18 or higher (24.11.0+ recommended) - **[Installation Guide](../docs/NODEJS_INSTALLATION.md)**
 - npm 8 or higher
+
+> **Don't have Node.js?** See the **[Node.js Installation Guide](../docs/NODEJS_INSTALLATION.md)** for step-by-step instructions.
 
 ### Installation
 
@@ -80,6 +82,13 @@ Output will be in `dist/` directory.
 
 ```
 Frontend/
+├── _meta/                   # Module metadata
+│   ├── doc/                 # Frontend-specific documentation
+│   ├── issues/              # Frontend-specific issues
+│   └── tests/               # Test suite
+│       ├── unit/            # Unit tests
+│       └── e2e/             # E2E tests
+├── scripts/                 # Development scripts
 ├── src/                     # Source code
 │   ├── main.ts             # Application entry point
 │   ├── App.vue             # Root component
@@ -106,7 +115,6 @@ Frontend/
 │   └── assets/             # Static assets
 │       └── main.css        # Global styles
 ├── public/                 # Public static files
-├── tests/                  # Test suite
 ├── index.html             # HTML template
 ├── package.json           # Dependencies
 ├── vite.config.ts         # Vite configuration
@@ -199,7 +207,7 @@ onMounted(() => {
 
 1. **Create component file** in `src/components/`
 2. **Define TypeScript types** in `src/types/`
-3. **Add tests** in `tests/unit/components/`
+3. **Add tests** in `_meta/tests/unit/`
 4. **Import and use** in views or other components
 
 See [../docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md) for detailed development guide.
@@ -248,7 +256,7 @@ npm test -- ModuleCard.spec.ts
 ### Writing Tests
 
 ```typescript
-// tests/unit/components/ModuleCard.spec.ts
+// _meta/tests/unit/ModuleCard.spec.ts
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ModuleCard from '@/components/ModuleCard.vue';

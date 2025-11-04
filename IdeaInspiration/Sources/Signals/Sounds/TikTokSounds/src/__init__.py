@@ -1,13 +1,10 @@
 """Main module exports for TikTokSoundsSource."""
 
-from .core import Config, Database, UniversalMetrics, SignalProcessor
+from .core import Config
 from .plugins.tik_tok_sounds_plugin import TikTokSoundsPlugin
 
 __all__ = [
     "Config",
-    "Database",
-    "UniversalMetrics",
-    "SignalProcessor",
     "TikTokSoundsPlugin",
 ]
 

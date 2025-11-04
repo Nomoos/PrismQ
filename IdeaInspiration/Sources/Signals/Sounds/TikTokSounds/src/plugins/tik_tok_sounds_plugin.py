@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class TikTokSoundsPlugin(SignalPlugin):
@@ -34,7 +34,7 @@ class TikTokSoundsPlugin(SignalPlugin):
         """Get the name of this source."""
         return "tiktok_sounds"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape sound signals from TikTok.
         
@@ -44,9 +44,9 @@ class TikTokSoundsPlugin(SignalPlugin):
                 - sounds: List of specific sounds to track (optional)
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
-        signals = []
+        ideas = []
         max_results = getattr(self.config, 'max_results', None) or \
                      getattr(self.config, 'tik_tok_sounds_max_results', 25)
         limit = kwargs.get('limit', max_results)
@@ -55,40 +55,40 @@ class TikTokSoundsPlugin(SignalPlugin):
         try:
             if self.api is None:
                 print("Running in stub mode - returning sample sound data")
-                signals = self._get_sample_sounds(limit)
+                ideas = self._get_sample_sounds(limit)
             else:
                 if specific_sounds:
                     for sound in specific_sounds[:limit]:
-                        signal = self._fetch_sound_data(sound)
-                        if signal:
-                            signals.append(signal)
+                        idea = self._fetch_sound_data(sound)
+                        if idea:
+                            ideas.append(idea)
                             time.sleep(self.config.retry_delay_seconds)
                 else:
-                    signals = self._fetch_trending_sounds(limit)
+                    ideas = self._fetch_trending_sounds(limit)
             
-            print(f"Successfully scraped {len(signals)} sound signals from TikTok")
+            print(f"Successfully scraped {len(ideas)} sound signals from TikTok")
             
         except Exception as e:
             print(f"Error scraping TikTok sounds: {e}")
             import traceback
             traceback.print_exc()
         
-        return signals
+        return ideas
     
-    def _fetch_trending_sounds(self, limit: int) -> List[Dict[str, Any]]:
+    def _fetch_trending_sounds(self, limit: int) -> List[IdeaInspiration]:
         """Fetch trending sounds from TikTok."""
-        signals = []
+        ideas = []
         try:
             print("Fetching trending sounds from TikTok...")
-            signals = self._get_sample_sounds(limit)
+            ideas = self._get_sample_sounds(limit)
         except Exception as e:
             print(f"Error fetching trending sounds: {e}")
-        return signals
+        return ideas
     
-    def _fetch_sound_data(self, sound: str) -> Optional[Dict[str, Any]]:
+    def _fetch_sound_data(self, sound: str) -> Optional[IdeaInspiration]:
         """Fetch data for a specific sound."""
         try:
-            return self._create_signal({
+            return self._create_idea_inspiration({
                 'title': sound,
                 'usage_count': 100000,
                 'duration': 15,
@@ -98,7 +98,7 @@ class TikTokSoundsPlugin(SignalPlugin):
             print(f"Error fetching sound '{sound}': {e}")
             return None
     
-    def _get_sample_sounds(self, limit: int) -> List[Dict[str, Any]]:
+    def _get_sample_sounds(self, limit: int) -> List[IdeaInspiration]:
         """Get sample sound data for testing/stub mode."""
         sample_sounds = [
             {'title': 'Viral Dance Beat 2024', 'usage_count': 5000000, 'duration': 15, 'artist': 'DJ Trends'},
@@ -113,51 +113,49 @@ class TikTokSoundsPlugin(SignalPlugin):
             {'title': 'Motivational Anthem', 'usage_count': 1200000, 'duration': 28, 'artist': 'Inspiration Inc'},
         ]
         
-        signals = []
+        ideas = []
         for sound_data in sample_sounds[:limit]:
-            signal = self._create_signal(sound_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(sound_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, sound_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Create a signal dictionary from sound data."""
+    def _create_idea_inspiration(self, sound_data: Dict[str, Any]) -> IdeaInspiration:
+        """Create an IdeaInspiration object from sound data."""
         sound_title = sound_data.get('title', 'Unknown')
         usage_count = sound_data.get('usage_count', 0)
         duration = sound_data.get('duration', 15)
         artist = sound_data.get('artist', 'Unknown Artist')
         
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        sound_slug = ''.join(c if c.isalnum() else '_' for c in sound_title.lower())[:30]
-        source_id = f"{sound_slug}_{timestamp}"
-        
         velocity = self._calculate_velocity(usage_count)
-        acceleration = self._calculate_acceleration(velocity)
         
-        return {
-            'source_id': source_id,
+        # Format tags
+        tags = self.format_tags(['tiktok', 'sound', 'audio', 'music', 'trending'])
+        
+        # Build metadata with platform-specific data
+        metadata = {
+            'usage_count': str(usage_count),
+            'velocity': str(velocity),
+            'duration_seconds': str(duration),
+            'artist': artist,
             'signal_type': 'sound',
-            'name': sound_title,
-            'description': f'Trending audio on TikTok: {sound_title}',
-            'tags': ['tiktok', 'sound', 'audio', 'music'],
-            'metrics': {
-                'volume': usage_count,
-                'velocity': velocity,
-                'acceleration': acceleration,
-                'geographic_spread': ['global']
-            },
-            'temporal': {
-                'first_seen': datetime.now(timezone.utc).isoformat() + 'Z',
-                'peak_time': None,
-                'current_status': self._determine_status(velocity)
-            },
-            'extra': {
-                'platform': 'tiktok',
-                'sound_type': 'trending',
-                'duration_seconds': duration,
-                'artist': artist
-            }
+            'sound_type': 'trending',
+            'current_status': self._determine_status(velocity)
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=sound_title,
+            description=f'Trending audio on TikTok by {artist}: {sound_title}',
+            text_content=f'TikTok trending sound: {sound_title} ({duration}s)',
+            keywords=tags,
+            source_platform="tiktok_sounds",  # Platform identifier
+            metadata=metadata,
+            source_id=f"tiktok_sounds_{sound_title.lower().replace(' ', '_')}",
+            source_url=f"https://www.tiktok.com/music/{sound_title.replace(' ', '-')}"
+        )
+        
+        return idea
     
     def _calculate_velocity(self, usage_count: int) -> float:
         """Calculate sound velocity (growth rate)."""

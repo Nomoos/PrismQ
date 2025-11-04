@@ -1,7 +1,7 @@
 """Template plugin for built-in story structure templates."""
 
 from typing import List, Dict, Any
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class TemplatePlugin(SourcePlugin):
@@ -127,34 +127,34 @@ class TemplatePlugin(SourcePlugin):
         """
         return "template"
 
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Get all built-in templates.
         
         Returns:
-            List of template dictionaries
+            List of IdeaInspiration objects
         """
-        resources = []
+        ideas = []
         
         for template_id, template_data in self.TEMPLATES.items():
-            resource = self._template_to_resource(template_id, template_data)
-            resources.append(resource)
+            idea = self._template_to_idea_inspiration(template_id, template_data)
+            ideas.append(idea)
         
-        return resources
+        return ideas
 
-    def get_template(self, template_id: str) -> Dict[str, Any]:
+    def get_template(self, template_id: str) -> IdeaInspiration:
         """Get a specific template by ID.
         
         Args:
             template_id: Template identifier (e.g., 'save_the_cat', 'heros_journey')
             
         Returns:
-            Template resource dictionary or None
+            IdeaInspiration object or None
         """
         if template_id not in self.TEMPLATES:
             return None
         
         template_data = self.TEMPLATES[template_id]
-        return self._template_to_resource(template_id, template_data)
+        return self._template_to_idea_inspiration(template_id, template_data)
 
     def list_templates(self) -> List[Dict[str, str]]:
         """List all available templates.
@@ -174,15 +174,15 @@ class TemplatePlugin(SourcePlugin):
         
         return templates
 
-    def _template_to_resource(self, template_id: str, template_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert template data to resource format.
+    def _template_to_idea_inspiration(self, template_id: str, template_data: Dict[str, Any]) -> IdeaInspiration:
+        """Convert template data to IdeaInspiration.
         
         Args:
             template_id: Template identifier
             template_data: Template data dictionary
             
         Returns:
-            Resource dictionary
+            IdeaInspiration object
         """
         # Build content from beats
         content_lines = [template_data['title'], "", "Story Beats:", ""]
@@ -194,26 +194,34 @@ class TemplatePlugin(SourcePlugin):
         # Build tags
         tags = ['narrative', 'structure', 'template', template_data['structure_type']]
         tags.extend(template_data['genres'])
+        tags.extend(template_data['themes'])
         
-        resource = {
-            'source_id': f"template_{template_id}",
-            'title': template_data['title'],
-            'content': content,
-            'tags': ','.join(tags),
-            'metrics': {
-                'template_id': template_id,
-                'title': template_data['title'],
-                'beat_count': len(template_data['beats']),
-                'structure_type': template_data['structure_type'],
-                'genres': template_data['genres'],
-                'themes': template_data['themes'],
-                'type': 'narrative',
-                'format': 'text',
-                # Built-in templates are highly versatile
-                'emotional_impact': 7.0,
-                'versatility': 9.5,
-                'inspiration_value': 9.0
-            }
+        # Build metadata with string values for SQLite compatibility
+        metadata = {
+            'template_id': template_id,
+            'beat_count': str(len(template_data['beats'])),
+            'structure_type': template_data['structure_type'],
+            'genres': ','.join(template_data['genres']),
+            'themes': ','.join(template_data['themes']),
+            'type': 'narrative',
+            'format': 'text',
+            'emotional_impact': '7.0',
+            'versatility': '9.5',
+            'inspiration_value': '9.0'
         }
         
-        return resource
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=template_data['title'],
+            description=f"{template_data['structure_type']} story structure with {len(template_data['beats'])} beats",
+            text_content=content,
+            keywords=tags,
+            metadata=metadata,
+            source_id=f"template_{template_id}",
+            source_url=None,
+            source_platform="script_beats",
+            source_created_by="script_beats_templates",
+            source_created_at=None
+        )
+        
+        return idea

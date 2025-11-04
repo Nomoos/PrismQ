@@ -7,7 +7,7 @@ providing game-based discovery of trending content.
 import requests
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class TwitchGamePlugin(SourcePlugin):
@@ -95,7 +95,7 @@ class TwitchGamePlugin(SourcePlugin):
         return response.json()
     
     def scrape(self, game_name: Optional[str] = None, top_n: Optional[int] = None,
-               started_at: Optional[str] = None, ended_at: Optional[str] = None) -> List[Dict[str, Any]]:
+               started_at: Optional[str] = None, ended_at: Optional[str] = None) -> List[IdeaInspiration]:
         """Scrape clips from a specific game.
         
         Args:
@@ -105,7 +105,7 @@ class TwitchGamePlugin(SourcePlugin):
             ended_at: End date for clip range (RFC3339 format)
         
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -151,7 +151,7 @@ class TwitchGamePlugin(SourcePlugin):
         for i, clip in enumerate(clips, 1):
             print(f"  [{i}/{len(clips)}] Processing: {clip.get('title', 'Untitled')}")
             
-            idea = self._convert_clip_to_idea(clip)
+            idea = self.transform_clip_to_idea(clip)
             if idea:
                 ideas.append(idea)
         
@@ -208,14 +208,25 @@ class TwitchGamePlugin(SourcePlugin):
             print(f"Error fetching clips: {e}")
             return []
     
-    def _convert_clip_to_idea(self, clip: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Convert Twitch clip data to idea format.
+    def _convert_clip_to_idea(self, clip: Dict[str, Any]) -> Optional[IdeaInspiration]:
+        """Convert Twitch clip data to IdeaInspiration object.
         
         Args:
             clip: Clip data from Twitch API
             
         Returns:
-            Idea dictionary or None if conversion fails
+            IdeaInspiration object or None if conversion fails
+        """
+        return self.transform_clip_to_idea(clip)
+    
+    def transform_clip_to_idea(self, clip: Dict[str, Any]) -> Optional[IdeaInspiration]:
+        """Transform Twitch clip data to IdeaInspiration object.
+        
+        Args:
+            clip: Clip data from Twitch API
+            
+        Returns:
+            IdeaInspiration object or None
         """
         try:
             # Extract basic information
@@ -243,29 +254,35 @@ class TwitchGamePlugin(SourcePlugin):
             if creator_name:
                 description += f", clipped by {creator_name}"
             
-            # Build metrics dictionary
-            metrics = {
-                'view_count': clip.get('view_count', 0),
-                'duration': clip.get('duration', 0),
+            # Build metadata dict with all metrics
+            metadata = {
+                'view_count': str(clip.get('view_count', 0)),
+                'duration': str(clip.get('duration', 0)),
                 'created_at': clip.get('created_at', ''),
-                'broadcaster_name': broadcaster_name,
-                'game_name': game_name,
+                'broadcaster_name': broadcaster_name or '',
+                'creator_name': creator_name or '',
+                'game_name': game_name or '',
                 'language': clip.get('language', 'en'),
             }
             
             # Add VOD offset if available
             vod_offset = clip.get('vod_offset')
             if vod_offset is not None:
-                metrics['vod_offset'] = vod_offset
+                metadata['vod_offset'] = str(vod_offset)
             
-            return {
-                'source_id': clip_id,
-                'title': title,
-                'description': description,
-                'tags': self.format_tags(tags),
-                'metrics': metrics,
-                'raw_data': clip  # Store raw clip data for reference
-            }
+            # Create IdeaInspiration using from_video factory method
+            return IdeaInspiration.from_video(
+                title=title,
+                description=description,
+                subtitle_text='',  # Twitch doesn't provide subtitles via basic API
+                keywords=self.format_tags(tags),
+                metadata=metadata,
+                source_id=clip_id,
+                source_url=clip.get('url'),
+                source_platform='twitch',
+                source_created_by=broadcaster_name,
+                source_created_at=clip.get('created_at'),
+            )
         except Exception as e:
-            print(f"Error converting clip to idea: {e}")
+            print(f"Error transforming clip to IdeaInspiration: {e}")
             return None

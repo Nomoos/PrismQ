@@ -1,7 +1,8 @@
 """Unsplash API plugin for scraping visual inspiration."""
 
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class UnsplashPlugin(SourcePlugin):
@@ -36,7 +37,7 @@ class UnsplashPlugin(SourcePlugin):
         """
         return "unsplash"
 
-    def scrape(self, query: Optional[str] = None, max_results: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, query: Optional[str] = None, max_results: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape visual resources from Unsplash.
         
         Args:
@@ -44,9 +45,9 @@ class UnsplashPlugin(SourcePlugin):
             max_results: Maximum number of results (default: from config)
             
         Returns:
-            List of visual resource dictionaries
+            List of IdeaInspiration objects
         """
-        resources = []
+        ideas = []
         
         try:
             max_results = max_results or self.config.unsplash_max_results
@@ -62,14 +63,16 @@ class UnsplashPlugin(SourcePlugin):
             
             for photo in photo_list[:max_results]:
                 try:
-                    resource = {
+                    photo_data = {
                         'source_id': photo.id,
                         'title': photo.description or photo.alt_description or f"Photo by {photo.user.name}",
                         'url': photo.urls.regular,
                         'tags': self._extract_tags(photo),
-                        'metrics': self._build_metrics(photo)
+                        'metrics': self._build_metrics(photo),
+                        'photo': photo  # Keep for transformation
                     }
-                    resources.append(resource)
+                    idea = self._transform_photo_to_idea(photo_data, query)
+                    ideas.append(idea)
                     
                 except Exception as e:
                     print(f"Error processing photo {getattr(photo, 'id', 'unknown')}: {e}")
@@ -78,7 +81,7 @@ class UnsplashPlugin(SourcePlugin):
         except Exception as e:
             print(f"Error scraping Unsplash: {e}")
         
-        return resources
+        return ideas
 
     def _extract_tags(self, photo) -> str:
         """Extract tags from Unsplash photo.
@@ -203,3 +206,58 @@ class UnsplashPlugin(SourcePlugin):
             print(f"Error getting random photos: {e}")
         
         return resources
+    
+    def _transform_photo_to_idea(self, photo_data: Dict[str, Any], query: Optional[str] = None) -> IdeaInspiration:
+        """Transform Unsplash photo data to IdeaInspiration object.
+        
+        Args:
+            photo_data: Photo data dictionary
+            query: Optional search query used
+            
+        Returns:
+            IdeaInspiration object
+        """
+        photo = photo_data.get('photo')
+        title = photo_data.get('title', 'Untitled Photo')
+        tags_str = photo_data.get('tags', '')
+        tags_list = [t.strip() for t in tags_str.split(',') if t.strip()] if tags_str else []
+        tags = self.format_tags(['unsplash', 'visual', 'photo'] + tags_list + ([query] if query else []))
+        
+        # Extract metrics and move to metadata as strings
+        metrics = photo_data.get('metrics', {})
+        metadata = {
+            'photo_id': photo_data.get('source_id', ''),
+            'photographer': getattr(photo.user, 'name', 'Unknown') if photo else 'Unknown',
+            'photographer_username': getattr(photo.user, 'username', '') if photo else '',
+            'image_url': photo_data.get('url', ''),
+            'downloads': str(metrics.get('downloads', 0)),
+            'likes': str(metrics.get('likes', 0)),
+            'views': str(metrics.get('views', 0)),
+            'engagement_score': str(metrics.get('engagement_score', 0)),
+            'color': getattr(photo, 'color', '#000000') if photo else '#000000',
+            'width': str(getattr(photo, 'width', 0)) if photo else '0',
+            'height': str(getattr(photo, 'height', 0)) if photo else '0',
+            'query': query or '',
+        }
+        
+        # Build description
+        photographer = metadata.get('photographer', 'Unknown')
+        description = f"Photo by {photographer} on Unsplash"
+        if query:
+            description += f" (search: {query})"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=getattr(photo, 'description', '') or getattr(photo, 'alt_description', '') if photo else '',
+            keywords=tags,
+            metadata=metadata,
+            source_id=photo_data.get('source_id', ''),
+            source_url=getattr(photo.links, 'html', '') if photo and hasattr(photo, 'links') else '',
+            source_platform="visual_moodboard",
+            source_created_by=photographer,
+            source_created_at=getattr(photo, 'created_at', '') if photo else ''
+        )
+        
+        return idea

@@ -111,6 +111,7 @@ class GeniusPlugin(SourcePlugin):
                         metadata=metadata,
                         source_id=str(song_id),
                         source_url=result.get('url', ''),
+                        source_platform="genius",
                         source_created_by=artist_name,
                         source_created_at=''  # Genius API doesn't provide release date in search
                     )

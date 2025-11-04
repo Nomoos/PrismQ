@@ -2,7 +2,7 @@
 
 import praw
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class RedditTrendingPlugin(SourcePlugin):
@@ -52,7 +52,7 @@ class RedditTrendingPlugin(SourcePlugin):
         return "reddit_trending"
     
     def scrape(self, subreddit: str = "all", limit: Optional[int] = None, 
-               popular: bool = False) -> List[Dict[str, Any]]:
+               popular: bool = False) -> List[IdeaInspiration]:
         """Scrape trending posts from specified subreddit.
         
         This is the base scrape() method that implements the SourcePlugin interface.
@@ -96,6 +96,8 @@ class RedditTrendingPlugin(SourcePlugin):
                 # Convert post to idea format
                 idea = self._post_to_idea(post)
                 if idea:
+                    idea = self._transform_post_to_idea(idea)
+
                     ideas.append(idea)
                     print(f"  ✓ {post.title[:60]}... (score: {post.score})")
         
@@ -177,3 +179,62 @@ class RedditTrendingPlugin(SourcePlugin):
         except Exception as e:
             print(f"  ✗ Error converting post: {e}")
             return None
+    
+    def _transform_post_to_idea(self, post_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform Reddit post data to IdeaInspiration object.
+        
+        Args:
+            post_data: Post data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = post_data.get('title', 'Untitled')
+        description = post_data.get('description', '')
+        tags = post_data.get('tags', [])
+        
+        # Extract metrics and move to metadata as strings
+        metrics = post_data.get('metrics', {})
+        author_data = metrics.get('author', {})
+        subreddit_data = metrics.get('subreddit', {})
+        content_data = metrics.get('content', {})
+        
+        metadata = {
+            'post_id': post_data.get('source_id', ''),
+            'score': str(metrics.get('score', 0)),
+            'upvote_ratio': str(metrics.get('upvote_ratio', 0)),
+            'num_comments': str(metrics.get('num_comments', 0)),
+            'ups': str(metrics.get('ups', 0)),
+            'total_awards_received': str(metrics.get('total_awards_received', 0)),
+            'num_views': str(metrics.get('num_views', 0)),
+            'created_utc': str(metrics.get('created_utc', '')),
+            'author_name': str(author_data.get('name', '')),
+            'author_link_karma': str(author_data.get('link_karma', 0)),
+            'author_comment_karma': str(author_data.get('comment_karma', 0)),
+            'subreddit_name': str(subreddit_data.get('name', '')),
+            'subreddit_subscribers': str(subreddit_data.get('subscribers', 0)),
+            'subreddit_type': str(subreddit_data.get('type', 'public')),
+            'content_type': str(content_data.get('type', 'text')),
+            'content_domain': str(content_data.get('domain', '')),
+            'source': 'reddit_trending',
+        }
+        
+        # Add content URL if it's a link post
+        if content_data.get('url'):
+            metadata['content_url'] = str(content_data['url'])
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=description,  # For Reddit, description is the post text
+            keywords=tags,
+            metadata=metadata,
+            source_id=post_data.get('source_id', ''),
+            source_url=f"https://reddit.com/r/{subreddit_data.get('name', 'all')}/comments/{post_data.get('source_id', '')}",
+            source_platform="reddit",
+            source_created_by=author_data.get('name', ''),
+            source_created_at=str(metrics.get('created_utc', ''))
+        )
+        
+        return idea

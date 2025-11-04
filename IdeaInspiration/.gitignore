@@ -62,3 +62,4 @@ htmlcov/
 Client/Backend/data/run_history.json
 Client/Backend/data/logs/
 Client/Backend/configs/parameters/
+data/

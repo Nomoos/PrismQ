@@ -1,8 +1,25 @@
 # Database Integration Implementation - Summary
 
-## Overview
+> **⚠️ DEPRECATED DOCUMENT**
+> 
+> This document describes the old **dual-save architecture** implementation which has been **replaced** by the single database pattern.
+> 
+> **Migration completed**: November 1, 2025
+> 
+> **See current documentation**:
+> - [SINGLE_DB_MIGRATION_COMPLETE.md](./SINGLE_DB_MIGRATION_COMPLETE.md) - Migration completion summary
+> - [SINGLE_DB_IMPLEMENTATION_SUMMARY.md](./SINGLE_DB_IMPLEMENTATION_SUMMARY.md) - Current single database architecture
+> - [SINGLE_DB_MIGRATION_GUIDE.md](./SINGLE_DB_MIGRATION_GUIDE.md) - Migration guide
+>
+> This document is kept for historical reference only.
 
-Successfully implemented a dual-save database architecture for Source modules in the PrismQ.IdeaInspiration ecosystem, ensuring all leaf submodules save output to both source-specific tables and a central IdeaInspiration database.
+---
+
+## Overview (Historical)
+
+Previously implemented a dual-save database architecture for Source modules in the PrismQ.IdeaInspiration ecosystem, ensuring all leaf submodules saved output to both source-specific tables and a central IdeaInspiration database.
+
+**Note**: This architecture has been replaced. All sources now save only to the central database with `source_platform` field for identification.
 
 ## Problem Statement
 

@@ -710,7 +710,7 @@ This repository is proprietary software. All Rights Reserved - Copyright (c) 202
 ## Research & Documentation
 
 - **[Model Extension Research](_meta/docs/MODEL_EXTENSION_RESEARCH.md)** - Comprehensive research on extending the model with new entity types (Source, Content, Signal, Category, Collection) and advanced blending strategies
-- **[Database Integration Summary](_meta/docs/DATABASE_INTEGRATION_SUMMARY.md)** - Dual-save architecture implementation details
+- **[Single Database Migration](_meta/docs/SINGLE_DB_MIGRATION_COMPLETE.md)** - Single database architecture implementation and migration completion
 
 ## Support
 

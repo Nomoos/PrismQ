@@ -5,7 +5,7 @@ This plugin scrapes podcasts from specific categories using iTunes Search API.
 
 import requests
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class AppleCategoryPlugin(SourcePlugin):
@@ -34,7 +34,7 @@ class AppleCategoryPlugin(SourcePlugin):
         """
         return "apple_podcasts_category"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """Scrape podcasts from a specific category.
         
         Keyword Args:
@@ -52,7 +52,7 @@ class AppleCategoryPlugin(SourcePlugin):
         
         return self.scrape_category(category=category, top_n=top_n)
     
-    def scrape_category(self, category: str, top_n: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape_category(self, category: str, top_n: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape podcasts from a specific category.
         
         Args:
@@ -60,7 +60,7 @@ class AppleCategoryPlugin(SourcePlugin):
             top_n: Number of shows to scrape (default: config value)
         
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -93,6 +93,7 @@ class AppleCategoryPlugin(SourcePlugin):
             for episode in episodes:
                 idea = self._episode_to_idea(episode, podcast)
                 if idea:
+                    idea = self._transform_episode_to_idea(idea)
                     ideas.append(idea)
         
         print(f"Total episodes scraped: {len(ideas)}")
@@ -211,3 +212,65 @@ class AppleCategoryPlugin(SourcePlugin):
             'tags': tags,
             'metrics': metrics
         }
+    
+    def _transform_episode_to_idea(self, episode_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform Apple Podcasts episode data to IdeaInspiration object.
+        
+        Args:
+            episode_data: Episode data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = episode_data.get('title', 'Untitled Episode')
+        description = episode_data.get('description', '')
+        tags = episode_data.get('tags', [])
+        
+        # Extract metrics and move to metadata as strings
+        metrics = episode_data.get('metrics', {})
+        show_data = metrics.get('show', {})
+        platform_specific = metrics.get('platform_specific', {})
+        
+        metadata = {
+            'episode_id': episode_data.get('source_id', ''),
+            'rating': str(metrics.get('rating', '')),
+            'rating_count': str(metrics.get('rating_count', '')),
+            'duration_ms': str(metrics.get('duration_ms', 0)),
+            'release_date': str(metrics.get('release_date', '')),
+            'show_name': str(show_data.get('name', '')),
+            'show_artist': str(show_data.get('artist', '')),
+            'show_rating': str(show_data.get('rating', '')),
+            'country': str(metrics.get('country', '')),
+            'track_id': str(platform_specific.get('track_id', '')),
+            'collection_id': str(platform_specific.get('collection_id', '')),
+            'artist_id': str(platform_specific.get('artist_id', '')),
+            'source': episode_data.get('source', 'apple_podcasts'),
+        }
+        
+        # Add optional fields
+        if platform_specific.get('feed_url'):
+            metadata['feed_url'] = str(platform_specific['feed_url'])
+        if platform_specific.get('artwork_url'):
+            metadata['artwork_url'] = str(platform_specific['artwork_url'])
+        
+        # Add genres
+        genres = metrics.get('genres', [])
+        if isinstance(genres, list):
+            for idx, genre in enumerate(genres[:3]):  # Limit to 3 genres
+                metadata[f'genre_{idx+1}'] = str(genre)
+        
+        # Create IdeaInspiration using from_audio factory method
+        idea = IdeaInspiration.from_audio(
+            title=title,
+            description=description,
+            transcription='',  # Transcription would need to be added separately
+            keywords=tags,
+            metadata=metadata,
+            source_id=episode_data.get('source_id', ''),
+            source_url=f"https://podcasts.apple.com/podcast/id{platform_specific.get('collection_id', '')}",
+            source_platform="apple_podcasts",
+            source_created_by=show_data.get('artist', ''),
+            source_created_at=str(metrics.get('release_date', ''))
+        )
+        
+        return idea

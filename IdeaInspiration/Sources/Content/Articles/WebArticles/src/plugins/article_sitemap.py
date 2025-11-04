@@ -6,8 +6,8 @@ ArticleUrlPlugin to extract full content from each URL.
 
 import hashlib
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class ArticleSitemapPlugin(SourcePlugin):
@@ -33,7 +33,7 @@ class ArticleSitemapPlugin(SourcePlugin):
         """
         return "web_article_sitemap"
     
-    def scrape(self, sitemap_urls: Optional[List[str]] = None, max_articles: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, sitemap_urls: Optional[List[str]] = None, max_articles: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape articles from XML sitemaps.
         
         Args:
@@ -41,7 +41,7 @@ class ArticleSitemapPlugin(SourcePlugin):
             max_articles: Maximum articles to scrape per sitemap (uses config if not provided)
         
         Returns:
-            List of article dictionaries
+            List of IdeaInspiration objects
         """
         if not sitemap_urls:
             print("No sitemap URLs provided")

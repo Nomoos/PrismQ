@@ -5,8 +5,6 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import UniversalMetrics
 from .plugins.google_trends_plugin import GoogleTrendsPlugin
 
 # Import central IdeaInspiration database from Model module
@@ -45,8 +43,7 @@ def scrape(env_file, keywords, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize databases (source-specific AND central)
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
         central_db_path = get_central_database_path()
         central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
@@ -60,7 +57,6 @@ def scrape(env_file, keywords, no_interactive):
         
         # Scrape from Google Trends
         total_scraped = 0
-        total_saved_source = 0
         total_saved_central = 0
         
         click.echo("Scraping from Google Trends...")
@@ -79,38 +75,8 @@ def scrape(env_file, keywords, no_interactive):
             total_scraped = len(ideas)
             click.echo(f"Found {len(ideas)} signals from Google Trends")
             
-            # Process and save each IdeaInspiration
+            # Save each IdeaInspiration to central database (single DB)
             for idea in ideas:
-                # Extract signal-specific data from metadata
-                signal_type = idea.metadata.get('signal_type', 'trend')
-                temporal = idea.metadata.get('temporal', {})
-                metrics = idea.metadata.get('metrics', {})
-                
-                # Create universal metrics for source-specific database
-                universal_metrics = UniversalMetrics(
-                    reach_score=5.0,  # Default, could be computed from metadata
-                    velocity_score=5.0,
-                    freshness_score=5.0,
-                    relevance_score=5.0
-                )
-                
-                # Save to source-specific database (signals table)
-                source_saved = db.insert_signal(
-                    source='google_trends',
-                    source_id=idea.source_id,
-                    signal_type=signal_type,
-                    name=idea.title,
-                    description=idea.description,
-                    tags=','.join(idea.keywords),
-                    metrics=metrics,
-                    temporal=temporal,
-                    universal_metrics=universal_metrics.to_dict()
-                )
-                
-                if source_saved:
-                    total_saved_source += 1
-                
-                # Save to central IdeaInspiration database (DUAL-SAVE)
                 central_saved = central_db.insert(idea)
                 if central_saved:
                     total_saved_central += 1
@@ -122,9 +88,7 @@ def scrape(env_file, keywords, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total signals found: {total_scraped}")
-        click.echo(f"Saved to source database: {total_saved_source}")
         click.echo(f"Saved to central database: {total_saved_central}")
-        click.echo(f"Source database: {config.database_path}")
         click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:

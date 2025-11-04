@@ -128,6 +128,7 @@ class IdeaInspiration:
             metadata=data.get("metadata", {}),
             source_id=data.get("source_id"),
             source_url=data.get("source_url"),
+            source_platform=data.get("source_platform"),
             source_created_by=data.get("source_created_by"),
             source_created_at=data.get("source_created_at"),
             score=data.get("score"),
@@ -146,6 +147,7 @@ class IdeaInspiration:
         metadata: Optional[Dict[str, str]] = None,
         source_id: Optional[str] = None,
         source_url: Optional[str] = None,
+        source_platform: Optional[str] = None,
         source_created_by: Optional[str] = None,
         source_created_at: Optional[str] = None,
         score: Optional[int] = None,
@@ -163,6 +165,7 @@ class IdeaInspiration:
             metadata: Additional metadata (string key-value pairs for SQLite compatibility)
             source_id: Optional source identifier
             source_url: Optional source URL
+            source_platform: Optional platform identifier (e.g., "youtube", "google_trends")
             source_created_by: Optional creator/author of the source content
             source_created_at: Optional creation timestamp of the source content
             score: Optional numerical score value
@@ -182,6 +185,7 @@ class IdeaInspiration:
             metadata=metadata or {},
             source_id=source_id,
             source_url=source_url,
+            source_platform=source_platform,
             source_created_by=source_created_by,
             source_created_at=source_created_at,
             score=score,
@@ -200,6 +204,7 @@ class IdeaInspiration:
         metadata: Optional[Dict[str, str]] = None,
         source_id: Optional[str] = None,
         source_url: Optional[str] = None,
+        source_platform: Optional[str] = None,
         source_created_by: Optional[str] = None,
         source_created_at: Optional[str] = None,
         score: Optional[int] = None,
@@ -218,6 +223,7 @@ class IdeaInspiration:
                       (string key-value pairs, e.g., views="1000", likes="50")
             source_id: Optional video identifier
             source_url: Optional video URL
+            source_platform: Optional platform identifier (e.g., "youtube", "tiktok")
             source_created_by: Optional creator/author of the source content
             source_created_at: Optional creation timestamp of the source content
             score: Optional numerical score value
@@ -237,6 +243,7 @@ class IdeaInspiration:
             metadata=metadata or {},
             source_id=source_id,
             source_url=source_url,
+            source_platform=source_platform,
             source_created_by=source_created_by,
             source_created_at=source_created_at,
             score=score,
@@ -255,6 +262,7 @@ class IdeaInspiration:
         metadata: Optional[Dict[str, str]] = None,
         source_id: Optional[str] = None,
         source_url: Optional[str] = None,
+        source_platform: Optional[str] = None,
         source_created_by: Optional[str] = None,
         source_created_at: Optional[str] = None,
         score: Optional[int] = None,
@@ -273,6 +281,7 @@ class IdeaInspiration:
                       (string key-value pairs, e.g., duration="3600", format="mp3")
             source_id: Optional audio identifier
             source_url: Optional audio URL
+            source_platform: Optional platform identifier (e.g., "spotify", "podcast")
             source_created_by: Optional creator/author of the source content
             source_created_at: Optional creation timestamp of the source content
             score: Optional numerical score value
@@ -292,6 +301,7 @@ class IdeaInspiration:
             metadata=metadata or {},
             source_id=source_id,
             source_url=source_url,
+            source_platform=source_platform,
             source_created_by=source_created_by,
             source_created_at=source_created_at,
             score=score,

@@ -5,8 +5,6 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CreativeMetrics
 from .plugins.genius_plugin import GeniusPlugin
 from .plugins.manual_import_plugin import ManualImportPlugin
 
@@ -43,8 +41,7 @@ def scrape(env_file, query, max_results, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize databases (source-specific AND central)
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
         central_db_path = get_central_database_path()
         central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
@@ -61,7 +58,6 @@ def scrape(env_file, query, max_results, no_interactive):
         
         # Scrape from Genius
         total_scraped = 0
-        total_saved_source = 0
         total_saved_central = 0
         
         search_query = query or "trending songs"
@@ -77,36 +73,8 @@ def scrape(env_file, query, max_results, no_interactive):
             total_scraped = len(ideas)
             click.echo(f"Found {len(ideas)} lyric snippets")
             
-            # Process and save each IdeaInspiration
+            # Save each IdeaInspiration to central database (single DB)
             for idea in ideas:
-                # Create a simple creative metrics (default for now)
-                # Could be enhanced to extract from metadata if needed
-                creative_metrics = CreativeMetrics(
-                    content_type='lyrics',
-                    content_format='text',
-                    platform='genius',
-                    source_url=idea.source_url,
-                    creator=idea.source_created_by,
-                    work_title=idea.title,
-                    popularity_score=5.0,  # Default
-                    inspiration_value=5.0  # Default
-                )
-                
-                # Save to source-specific database (lyric_snippets table)
-                source_saved = db.insert_resource(
-                    source='genius',
-                    source_id=idea.source_id,
-                    title=idea.title,
-                    content=idea.content,
-                    tags=','.join(idea.keywords),
-                    score=creative_metrics.inspiration_value or 0.0,
-                    score_dictionary=creative_metrics.to_dict()
-                )
-                
-                if source_saved:
-                    total_saved_source += 1
-                
-                # Save to central IdeaInspiration database (DUAL-SAVE)
                 central_saved = central_db.insert(idea)
                 if central_saved:
                     total_saved_central += 1
@@ -119,9 +87,7 @@ def scrape(env_file, query, max_results, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total snippets found: {total_scraped}")
-        click.echo(f"Saved to source database: {total_saved_source}")
         click.echo(f"Saved to central database: {total_saved_central}")
-        click.echo(f"Source database: {config.database_path}")
         click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:

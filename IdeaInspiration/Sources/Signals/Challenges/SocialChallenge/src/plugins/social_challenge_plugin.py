@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class SocialChallengePlugin(SignalPlugin):
@@ -19,7 +19,7 @@ class SocialChallengePlugin(SignalPlugin):
         """Get the name of this source."""
         return "social_challenge"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape challenge signals from various platforms.
         
@@ -29,9 +29,9 @@ class SocialChallengePlugin(SignalPlugin):
                 - platform: Specific platform to track (tiktok, instagram, etc.)
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
-        signals = []
+        ideas = []
         max_results = getattr(self.config, 'max_results', None) or \
                      getattr(self.config, 'social_challenge_max_results', 25)
         limit = kwargs.get('limit', max_results)
@@ -47,7 +47,7 @@ class SocialChallengePlugin(SignalPlugin):
             import traceback
             traceback.print_exc()
         
-        return signals
+        return ideas
     
     def _get_sample_challenges(self, limit: int = 10, platform: str = 'all') -> List[Dict[str, Any]]:
         """
@@ -58,7 +58,7 @@ class SocialChallengePlugin(SignalPlugin):
             platform: Platform filter
             
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         challenges = [
             {
@@ -161,12 +161,12 @@ class SocialChallengePlugin(SignalPlugin):
         challenges = challenges[:limit]
         
         # Convert to signals
-        signals = []
+        ideas = []
         for challenge in challenges:
-            signal = self._create_signal(challenge)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(challenge)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
     def _create_signal(self, challenge: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -176,7 +176,7 @@ class SocialChallengePlugin(SignalPlugin):
             challenge: Raw challenge data
             
         Returns:
-            Signal dictionary
+            IdeaInspiration object
         """
         timestamp = datetime.now(timezone.utc).isoformat()
         

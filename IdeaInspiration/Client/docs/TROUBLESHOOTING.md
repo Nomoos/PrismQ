@@ -160,6 +160,48 @@ tasklist | findstr python
 
 ## Frontend Issues
 
+### Node.js and npm Issues
+
+#### Error: "npm is not recognized" or "node is not recognized"
+
+**Symptom:**
+```
+npm : The term 'npm' is not recognized as the name of a cmdlet, function, script file, or operable program.
+node : The term 'node' is not recognized...
+```
+
+**Cause:** Node.js is not installed or not in system PATH.
+
+**Solution:**
+See the **[Node.js Installation Guide](NODEJS_INSTALLATION.md)** for complete step-by-step installation instructions for Windows, Linux, and macOS.
+
+Quick fixes:
+1. **Restart your terminal/PowerShell** - PATH is only updated in new sessions
+2. **Verify Node.js is installed**: Check `C:\Program Files\nodejs\` (Windows)
+3. **Add to PATH manually** (Windows):
+   - Win + R → `sysdm.cpl` → Advanced → Environment Variables
+   - Edit "Path" → Add `C:\Program Files\nodejs\`
+   - Restart terminal
+4. **Reinstall Node.js** with "Add to PATH" option checked
+
+#### Error: Wrong Node.js version
+
+**Symptom:**
+```
+error: unsupported engine "node@16.0.0"
+```
+
+**Cause:** Node.js version is too old (minimum 18.0, recommended 20.11.0+).
+
+**Solution:**
+Update to Node.js 20.11.0 or higher. See **[Node.js Installation Guide](NODEJS_INSTALLATION.md)**.
+
+Using NVM:
+```bash
+nvm install 20.11.0
+nvm use 20.11.0
+```
+
 ### Frontend Won't Start
 
 #### Error: "Cannot find module 'vue'" or similar

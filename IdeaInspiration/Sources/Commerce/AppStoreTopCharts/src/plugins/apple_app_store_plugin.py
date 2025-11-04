@@ -214,6 +214,7 @@ class AppleAppStorePlugin(CommercePlugin):
                     metadata=metadata,
                     source_id=app_info.get('id', ''),
                     source_url=app_info.get('url', ''),
+                    source_platform="app_store_top_charts",
                     source_created_by=developer,
                     source_created_at=app_info.get('releaseDate', '')
                 )

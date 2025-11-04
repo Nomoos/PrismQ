@@ -7,7 +7,7 @@ a specific podcast show.
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class SpotifyShowPlugin(SourcePlugin):
@@ -52,7 +52,7 @@ class SpotifyShowPlugin(SourcePlugin):
         )
         return spotipy.Spotify(client_credentials_manager=client_credentials_manager)
     
-    def scrape(self, show_id: str, top_n: Optional[int] = None, market: str = "US") -> List[Dict[str, Any]]:
+    def scrape(self, show_id: str, top_n: Optional[int] = None, market: str = "US") -> List[IdeaInspiration]:
         """Scrape episodes from a specific podcast show.
         
         Args:
@@ -61,7 +61,7 @@ class SpotifyShowPlugin(SourcePlugin):
             market: Market/region code (default: "US")
         
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -100,6 +100,7 @@ class SpotifyShowPlugin(SourcePlugin):
                     
                     idea = self._episode_to_idea(episode)
                     if idea:
+                        idea = self._transform_episode_to_idea(idea)
                         ideas.append(idea)
         
         except Exception as e:
@@ -154,3 +155,50 @@ class SpotifyShowPlugin(SourcePlugin):
         except Exception as e:
             print(f"Error converting episode to idea: {e}")
             return None
+    
+    def _transform_episode_to_idea(self, episode_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform Spotify episode data to IdeaInspiration object.
+        
+        Args:
+            episode_data: Episode data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = episode_data.get('title', 'Untitled Episode')
+        description = episode_data.get('description', '')
+        tags = episode_data.get('tags', [])
+        
+        # Extract metrics and move to metadata as strings
+        metrics = episode_data.get('metrics', {})
+        show_data = episode_data.get('show', {})
+        universal_metrics = episode_data.get('universal_metrics', {})
+        
+        metadata = {
+            'episode_id': episode_data.get('source_id', ''),
+            'duration_ms': str(metrics.get('duration_ms', 0)),
+            'release_date': str(metrics.get('release_date', '')),
+            'language': str(metrics.get('language', '')),
+            'explicit': str(metrics.get('explicit', False)),
+            'show_name': str(show_data.get('name', '')),
+            'show_publisher': str(show_data.get('publisher', '')),
+            'show_total_episodes': str(show_data.get('total_episodes', 0)),
+            'engagement_estimate': str(universal_metrics.get('engagement_estimate', 5.0)),
+            'source': episode_data.get('source', 'spotify_podcasts'),
+        }
+        
+        # Create IdeaInspiration using from_audio factory method
+        idea = IdeaInspiration.from_audio(
+            title=title,
+            description=description,
+            transcription='',  # Transcription would need to be added separately
+            keywords=tags,
+            metadata=metadata,
+            source_id=episode_data.get('source_id', ''),
+            source_url=f"https://open.spotify.com/episode/{episode_data.get('source_id', '')}",
+            source_platform="spotify_podcasts",
+            source_created_by=show_data.get('publisher', ''),
+            source_created_at=str(metrics.get('release_date', ''))
+        )
+        
+        return idea

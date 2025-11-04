@@ -20,7 +20,7 @@ if (-not (Test-Path "venv")) {
     Write-Host ""
     Write-Host "Or manually:" -ForegroundColor Yellow
     Write-Host "  1. Navigate to: Sources\Content\Shorts\YouTube" -ForegroundColor Gray
-    Write-Host "  2. Create venv: python -m venv venv" -ForegroundColor Gray
+    Write-Host "  2. Create venv: py -3.12 -m venv venv" -ForegroundColor Gray
     Write-Host "  3. Activate venv: .\venv\Scripts\Activate.ps1" -ForegroundColor Gray
     Write-Host "  4. Install deps: pip install -r requirements.txt" -ForegroundColor Gray
     Write-Host ""

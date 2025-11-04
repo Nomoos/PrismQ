@@ -9,13 +9,15 @@
 
 ## Overview
 
-PrismQ.IdeaInspiration uses **per-project virtual environments** for full isolation. Each project (Classification, ConfigLoad, Model, Scoring, Sources, Client/Backend) has its own independent Python virtual environment.
+PrismQ.IdeaInspiration uses **per-project virtual environments** for full isolation. Each project with a `requirements.txt` file automatically gets its own independent Python virtual environment (e.g., Classification, ConfigLoad, Model, Scoring, Sources, Client/Backend).
 
 This approach was chosen in [Issue #113](../issues/done/113-venv-strategy-decision.md) because:
 - Each project will have AI dependencies with different framework versions
 - Projects need to evolve independently without version conflicts
 - Disk space and switching overhead are acceptable trade-offs for isolation
 - Aligns with production best practices
+
+**Shared Discovery Core**: All environment management scripts use a **centralized module discovery library** ([`_meta/scripts/discover_modules.py`](./MODULE_DISCOVERY.md)) that provides a single source of truth for what modules exist. This ensures consistency across all tools and eliminates duplicate discovery logic.
 
 ---
 
@@ -89,12 +91,19 @@ PrismQ.IdeaInspiration/
 
 ## Management Scripts
 
+All management scripts use the **shared discovery library** ([`discover_modules.py`](./MODULE_DISCOVERY.md)) for consistent module detection.
+
 ### setup_all_envs
 
-Creates virtual environments for all projects.
+Creates virtual environments for all projects with `requirements.txt` files.
 
 **Features:**
-- Creates `venv/` in each project directory
+- **Uses shared discovery core** (`_meta/scripts/discover_modules.py`)
+- Auto-discovers modules by finding `requirements.txt` files
+- Searches at depth 1-3 to find all modules (including nested like Client/Backend)
+- Excludes system directories (_meta, .git, venv, node_modules)
+- Filters out nested modules (keeps parent if both parent and child have requirements.txt)
+- Creates `venv/` in each discovered project directory
 - Upgrades pip, setuptools, and wheel
 - Installs dependencies from `requirements.txt`
 - Skips if venv already exists (idempotent)
@@ -113,6 +122,8 @@ Creates virtual environments for all projects.
 Updates all virtual environments with latest dependencies.
 
 **Features:**
+- **Uses shared discovery core** (`_meta/scripts/discover_modules.py`)
+- Auto-discovers all modules with `requirements.txt`
 - Upgrades pip in each environment
 - Upgrades all packages from `requirements.txt`
 - Reports failures for troubleshooting
@@ -131,6 +142,8 @@ Updates all virtual environments with latest dependencies.
 Removes all virtual environments (with confirmation).
 
 **Features:**
+- **Uses shared discovery core** (`_meta/scripts/discover_modules.py`)
+- Auto-discovers all modules with virtual environments
 - Deletes all `venv/` directories
 - Prompts for confirmation before deletion
 - Useful for starting fresh
@@ -142,6 +155,26 @@ Removes all virtual environments (with confirmation).
 
 # Windows PowerShell
 .\_meta\_scripts\clean_all_envs.ps1
+```
+
+### test_all_envs
+
+Runs tests for all projects in their respective environments.
+
+**Features:**
+- **Uses shared discovery core** (`_meta/scripts/discover_modules.py`)
+- Auto-discovers all modules with `requirements.txt`
+- Activates each project's venv
+- Runs pytest if available
+- Provides summary of passed/failed/skipped projects
+
+**Usage:**
+```bash
+# Linux/macOS/WSL
+./_meta/_scripts/test_all_envs.sh
+
+# Windows PowerShell
+.\_meta\_scripts\test_all_envs.ps1
 ```
 
 ### activate_env
@@ -484,6 +517,70 @@ transformers>=4.30.0  # For BERT models
 pytest>=7.0.0
 black>=23.0.0
 ```
+
+---
+
+## Adding New Modules
+
+### Automatic Discovery
+
+The environment management scripts **automatically discover** new modules! Simply create a module with a `requirements.txt` file and the scripts will find it.
+
+**Steps to add a new module:**
+
+1. **Create the module directory** with a `requirements.txt` file:
+   ```bash
+   # Example: Adding a new "Analytics" module
+   mkdir Analytics
+   cd Analytics
+   
+   # Create requirements.txt
+   cat > requirements.txt << EOF
+   # Core dependencies
+   python-dotenv>=1.0.0
+   pandas>=2.0.0
+   numpy>=1.24.0
+   
+   # Development dependencies
+   pytest>=7.0.0
+   EOF
+   ```
+
+2. **Run setup_all_envs** - it will automatically discover and set up the new module:
+   ```bash
+   # The script will find "Analytics" automatically
+   ../_meta/_scripts/setup_all_envs.sh
+   ```
+
+3. **The module is ready to use:**
+   ```bash
+   cd Analytics
+   source venv/bin/activate
+   # Start working!
+   ```
+
+### Auto-Discovery Rules
+
+Modules are discovered by:
+- Searching for `requirements.txt` files at depth 1-3 from repository root
+- Excluding system directories: `_meta`, `.git`, `.idea`, `venv`, `node_modules`
+- Filtering out nested modules (if both parent and child have `requirements.txt`, only parent is kept)
+
+**Examples:**
+- ✅ `Classification/requirements.txt` → Discovered as "Classification"
+- ✅ `Client/Backend/requirements.txt` → Discovered as "Client/Backend"
+- ✅ `NewModule/requirements.txt` → Discovered as "NewModule"
+- ❌ `Sources/Content/requirements.txt` → Skipped (Sources has requirements.txt, so it's the module)
+- ❌ `_meta/tests/requirements.txt` → Skipped (in excluded directory)
+
+### No Manual Configuration Needed!
+
+Unlike the old approach, you don't need to:
+- ❌ Edit the scripts to add module names
+- ❌ Manually maintain a list of modules
+- ❌ Update multiple script files
+
+Just create the module with `requirements.txt` and run the scripts!
 
 ---
 

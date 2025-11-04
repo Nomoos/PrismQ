@@ -6,8 +6,8 @@ with fallback to newspaper3k for comprehensive metadata extraction.
 
 import hashlib
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-from . import SourcePlugin
+from datetime import datetime, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class ArticleUrlPlugin(SourcePlugin):
@@ -55,14 +55,14 @@ class ArticleUrlPlugin(SourcePlugin):
                 "Install with: pip install trafilatura newspaper3k"
             )
     
-    def scrape(self, urls: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    def scrape(self, urls: Optional[List[str]] = None) -> List[IdeaInspiration]:
         """Scrape articles from URLs.
         
         Args:
             urls: List of article URLs to scrape
         
         Returns:
-            List of article dictionaries
+            List of IdeaInspiration objects
         """
         if not urls:
             print("No URLs provided")
@@ -76,7 +76,8 @@ class ArticleUrlPlugin(SourcePlugin):
             try:
                 article_data = self._extract_article(url)
                 if article_data:
-                    articles.append(article_data)
+                    idea = self._transform_article_to_idea(article_data)
+                    articles.append(idea)
                 else:
                     print(f"    ✗ Failed to extract content")
             except Exception as e:
@@ -260,3 +261,57 @@ class ArticleUrlPlugin(SourcePlugin):
             return parsed.netloc
         except Exception:
             return ""
+    
+    def _transform_article_to_idea(self, article_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform article data to IdeaInspiration object.
+        
+        Args:
+            article_data: Article data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = article_data.get('title', 'Untitled')
+        description = article_data.get('description', '')
+        
+        # Extract tags
+        tags = article_data.get('tags', [])
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.split(',') if t.strip()]
+        tags = self.format_tags(['web_articles', 'article'] + tags)
+        
+        # Extract metrics and move to metadata as strings
+        metrics = article_data.get('metrics', {})
+        author_data = article_data.get('author', {})
+        source_info = article_data.get('source_info', {})
+        content_data = article_data.get('content', {})
+        
+        metadata = {
+            'article_id': article_data.get('source_id', ''),
+            'author_name': str(author_data.get('name', '')),
+            'word_count': str(metrics.get('word_count', 0)),
+            'reading_time_min': str(metrics.get('reading_time_min', 0)),
+            'domain': str(source_info.get('domain', '')),
+            'publication': str(source_info.get('publication', '')),
+            'source': article_data.get('source', 'web_article'),
+        }
+        
+        # Add optional metadata if present
+        if content_data.get('top_image'):
+            metadata['top_image'] = str(content_data['top_image'])
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=content_data.get('text', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=article_data.get('source_id', ''),
+            source_url=article_data.get('url', ''),
+            source_platform="web_articles",
+            source_created_by=author_data.get('name', ''),
+            source_created_at=article_data.get('published_at', '')
+        )
+        
+        return idea

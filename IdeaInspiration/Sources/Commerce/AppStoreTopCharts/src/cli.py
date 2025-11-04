@@ -4,11 +4,15 @@ import click
 import sys
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CommerceMetrics
-from .core.commerce_processor import CommerceProcessor
 from .plugins.google_play_plugin import GooglePlayPlugin
 from .plugins.apple_app_store_plugin import AppleAppStorePlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -35,43 +39,28 @@ def scrape(env_file, platform, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
         # Scrape Google Play
         if platform in ['google', 'both']:
             click.echo("\n=== Google Play Store ===")
             try:
                 google_plugin = GooglePlayPlugin(config)
-                apps = google_plugin.scrape()
-                total_scraped += len(apps)
+                ideas = google_plugin.scrape()
+                total_scraped += len(ideas)
                 
-                for app in apps:
-                    metrics = CommerceMetrics.from_app_store(app)
-                    tags = CommerceProcessor.extract_tags_from_product(app)
-                    
-                    success = db.insert_product(
-                        source=google_plugin.get_source_name(),
-                        source_id=app.get('app_id', ''),
-                        title=app.get('title', ''),
-                        brand=app.get('developer', ''),
-                        category=app.get('category', ''),
-                        price=app.get('price'),
-                        currency=app.get('currency', 'USD'),
-                        description=app.get('description'),
-                        tags=tags,
-                        score=metrics.consumer_interest or 0.0,
-                        score_dictionary=metrics.to_dict()
-                    )
-                    
-                    if success:
-                        total_saved += 1
-                        click.echo(f"  ✓ Saved: {app.get('title', '')[:60]}")
+                for idea in ideas:
+                    central_saved = central_db.insert(idea)
+                    if central_saved:
+                        total_saved_central += 1
+                        click.echo(f"  ✓ Saved: {idea.title[:60]}")
                     else:
-                        click.echo(f"  ↻ Updated: {app.get('title', '')[:60]}")
+                        click.echo(f"  ↻ Updated: {idea.title[:60]}")
                         
             except ValueError as e:
                 click.echo(f"Google Play scraping skipped: {e}", err=True)
@@ -83,32 +72,16 @@ def scrape(env_file, platform, no_interactive):
             click.echo("\n=== Apple App Store ===")
             try:
                 apple_plugin = AppleAppStorePlugin(config)
-                apps = apple_plugin.scrape()
-                total_scraped += len(apps)
+                ideas = apple_plugin.scrape()
+                total_scraped += len(ideas)
                 
-                for app in apps:
-                    metrics = CommerceMetrics.from_app_store(app)
-                    tags = CommerceProcessor.extract_tags_from_product(app)
-                    
-                    success = db.insert_product(
-                        source=apple_plugin.get_source_name(),
-                        source_id=app.get('app_id', ''),
-                        title=app.get('title', ''),
-                        brand=app.get('developer', ''),
-                        category=app.get('category', ''),
-                        price=app.get('price'),
-                        currency=app.get('currency', 'USD'),
-                        description=app.get('description'),
-                        tags=tags,
-                        score=metrics.consumer_interest or 0.0,
-                        score_dictionary=metrics.to_dict()
-                    )
-                    
-                    if success:
-                        total_saved += 1
-                        click.echo(f"  ✓ Saved: {app.get('title', '')[:60]}")
+                for idea in ideas:
+                    central_saved = central_db.insert(idea)
+                    if central_saved:
+                        total_saved_central += 1
+                        click.echo(f"  ✓ Saved: {idea.title[:60]}")
                     else:
-                        click.echo(f"  ↻ Updated: {app.get('title', '')[:60]}")
+                        click.echo(f"  ↻ Updated: {idea.title[:60]}")
                         
             except ValueError as e:
                 click.echo(f"Apple App Store scraping skipped: {e}", err=True)
@@ -118,8 +91,8 @@ def scrape(env_file, platform, no_interactive):
         click.echo(f"\n{'='*50}")
         click.echo(f"Scraping complete!")
         click.echo(f"Total apps found: {total_scraped}")
-        click.echo(f"Total apps saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

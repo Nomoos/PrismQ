@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class InstagramAudioTrendsPlugin(SignalPlugin):
@@ -34,7 +34,7 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
         """Get the name of this source."""
         return "instagram_audio_trends"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape audio trend signals from Instagram.
         
@@ -44,9 +44,9 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
                 - sounds: List of specific sounds to track
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
-        signals = []
+        ideas = []
         max_results = getattr(self.config, 'max_results', None) or \
                      getattr(self.config, 'instagram_audio_trends_max_results', 25)
         limit = kwargs.get('limit', max_results)
@@ -60,8 +60,8 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
                 if specific_sounds:
                     for sound in specific_sounds[:limit]:
                         signal = self._fetch_sound_data(sound)
-                        if signal:
-                            signals.append(signal)
+                        if idea:
+                            ideas.append(idea)
                             time.sleep(self.config.retry_delay_seconds)
                 else:
                     signals = self._fetch_trending_audio(limit)
@@ -73,19 +73,19 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
             import traceback
             traceback.print_exc()
         
-        return signals
+        return ideas
     
-    def _fetch_trending_audio(self, limit: int) -> List[Dict[str, Any]]:
+    def _fetch_trending_audio(self, limit: int) -> List[IdeaInspiration]:
         """Fetch trending audio from Instagram."""
-        signals = []
+        ideas = []
         try:
             print("Fetching trending audio from Instagram...")
             signals = self._get_sample_audio_trends(limit)
         except Exception as e:
             print(f"Error fetching trending audio: {e}")
-        return signals
+        return ideas
     
-    def _fetch_sound_data(self, sound: str) -> Optional[Dict[str, Any]]:
+    def _fetch_sound_data(self, sound: str) -> Optional[IdeaInspiration]:
         """Fetch data for a specific sound."""
         try:
             return self._create_signal({
@@ -98,7 +98,7 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
             print(f"Error fetching sound '{sound}': {e}")
             return None
     
-    def _get_sample_audio_trends(self, limit: int) -> List[Dict[str, Any]]:
+    def _get_sample_audio_trends(self, limit: int) -> List[IdeaInspiration]:
         """Get sample audio trend data for testing/stub mode."""
         sample_sounds = [
             {'title': 'Trending Reels Audio 2024', 'usage_count': 3500000, 'duration': 18, 'artist': 'Viral Music'},
@@ -113,51 +113,49 @@ class InstagramAudioTrendsPlugin(SignalPlugin):
             {'title': 'Trending Meme Audio', 'usage_count': 1000000, 'duration': 10, 'artist': 'Viral Memes'},
         ]
         
-        signals = []
+        ideas = []
         for sound_data in sample_sounds[:limit]:
-            signal = self._create_signal(sound_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(sound_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, sound_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Create a signal dictionary from sound data."""
+    def _create_idea_inspiration(self, sound_data: Dict[str, Any]) -> IdeaInspiration:
+        """Create an IdeaInspiration object from sound data."""
         sound_title = sound_data.get('title', 'Unknown')
         usage_count = sound_data.get('usage_count', 0)
         duration = sound_data.get('duration', 15)
         artist = sound_data.get('artist', 'Unknown Artist')
         
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        sound_slug = ''.join(c if c.isalnum() else '_' for c in sound_title.lower())[:30]
-        source_id = f"{sound_slug}_{timestamp}"
-        
         velocity = self._calculate_velocity(usage_count)
-        acceleration = self._calculate_acceleration(velocity)
         
-        return {
-            'source_id': source_id,
+        # Format tags
+        tags = self.format_tags(['instagram', 'audio', 'reels', 'music', 'trending'])
+        
+        # Build metadata with platform-specific data
+        metadata = {
+            'usage_count': str(usage_count),
+            'velocity': str(velocity),
+            'duration_seconds': str(duration),
+            'artist': artist,
             'signal_type': 'audio',
-            'name': sound_title,
-            'description': f'Trending audio on Instagram Reels: {sound_title}',
-            'tags': ['instagram', 'audio', 'reels', 'music'],
-            'metrics': {
-                'volume': usage_count,
-                'velocity': velocity,
-                'acceleration': acceleration,
-                'geographic_spread': ['global']
-            },
-            'temporal': {
-                'first_seen': datetime.now(timezone.utc).isoformat() + 'Z',
-                'peak_time': None,
-                'current_status': self._determine_status(velocity)
-            },
-            'extra': {
-                'platform': 'instagram',
-                'audio_type': 'trending',
-                'duration_seconds': duration,
-                'artist': artist
-            }
+            'audio_type': 'trending',
+            'current_status': self._determine_status(velocity)
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=sound_title,
+            description=f'Trending audio on Instagram Reels: {sound_title}',
+            text_content=f'Instagram Reels trending audio: {sound_title} by {artist} ({duration}s)',
+            keywords=tags,
+            source_platform="instagram_audio_trends",  # Platform identifier
+            metadata=metadata,
+            source_id=f"instagram_audio_{sound_title.lower().replace(' ', '_')}",
+            source_url=f"https://www.instagram.com/reels/audio/{sound_title.replace(' ', '-')}"
+        )
+        
+        return idea
     
     def _calculate_velocity(self, usage_count: int) -> float:
         """Calculate audio velocity (growth rate)."""

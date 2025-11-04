@@ -24,6 +24,10 @@ class TestSnappyStoriesIntegration:
     TEST_SHORT_ID = "FpSdooOrmsU"
     TEST_CHANNEL_HANDLE = "@SnappyStories_1"
     
+    # Additional test videos for validation
+    TEST_SHORT_URL_2 = "https://youtube.com/shorts/3o0o5DTwTYU"
+    TEST_SHORT_ID_2 = "3o0o5DTwTYU"
+    
     def test_channel_url_normalization(self):
         """Test that various channel URL formats are normalized correctly."""
         config = Mock()
@@ -158,6 +162,16 @@ class TestShortValidation:
         video_id = short_url.split('/')[-1]
         
         assert video_id == "FpSdooOrmsU"
+        assert len(video_id) == 11  # Standard YouTube video ID length
+    
+    def test_short_video_id_extraction_with_query_params(self):
+        """Test extracting video ID from shorts URL with query parameters."""
+        # Test URL with tracking parameter (si)
+        short_url = "https://youtube.com/shorts/3o0o5DTwTYU?si=bCQi0Jjlb8ssVWEV"
+        # Extract video ID by splitting and removing query parameters
+        video_id = short_url.split('/')[-1].split('?')[0]
+        
+        assert video_id == "3o0o5DTwTYU"
         assert len(video_id) == 11  # Standard YouTube video ID length
     
     def test_shorts_duration_constraint(self):

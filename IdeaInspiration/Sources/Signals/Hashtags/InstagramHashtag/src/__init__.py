@@ -1,13 +1,10 @@
 """Main module exports for InstagramHashtagSource."""
 
-from .core import Config, Database, UniversalMetrics, SignalProcessor
+from .core import Config
 from .plugins.instagram_hashtag_plugin import InstagramHashtagPlugin
 
 __all__ = [
     "Config",
-    "Database",
-    "UniversalMetrics",
-    "SignalProcessor",
     "InstagramHashtagPlugin",
 ]
 

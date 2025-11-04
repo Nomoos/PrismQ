@@ -1,11 +1,24 @@
 #!/bin/bash
 # Run tests for all projects in their respective environments
 # Part of Issue #115: Per-Project Virtual Environments
+# Auto-discovers all modules using shared discovery library
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PROJECTS=("Classification" "ConfigLoad" "Model" "Scoring" "Sources" "Client/Backend")
+DISCOVERY_SCRIPT="$REPO_ROOT/_meta/scripts/discover_modules.py"
+
+# Use shared discovery library to find modules for environment setup
+declare -a PROJECTS=()
+if [ ! -f "$DISCOVERY_SCRIPT" ]; then
+    echo "❌ Discovery script not found at $DISCOVERY_SCRIPT"
+    exit 1
+fi
+
+# Read module names from discovery script
+while IFS= read -r project_name; do
+    PROJECTS+=("$project_name")
+done < <(python3 "$DISCOVERY_SCRIPT" --filter env-setup --format names)
 
 echo "🧪 Running tests for all PrismQ projects..."
 echo ""

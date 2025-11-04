@@ -4,6 +4,19 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
 
+# Import IdeaInspiration model from the Model directory
+import sys
+from pathlib import Path
+
+# Add Model directory to path to import IdeaInspiration
+model_path = Path(__file__).resolve().parents[6] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration import IdeaInspiration
+
+
+
 class SourcePlugin(ABC):
     """Base class for calendar/holiday source plugins."""
 
@@ -25,7 +38,7 @@ class SourcePlugin(ABC):
         pass
 
     @abstractmethod
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """Scrape events from the source.
         
         Args:

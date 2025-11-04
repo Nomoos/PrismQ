@@ -5,11 +5,14 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import CommunityMetrics
-from .core.sentiment_analyzer import SentimentAnalyzer
-from .core.community_processor import CommunityProcessor
 from .plugins.youtube_comments_plugin import YouTubeCommentsPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -39,12 +42,9 @@ def scrape(env_file, channel_id, max_videos, max_comments, no_interactive):
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_url, interactive=not no_interactive)
-        
-        # Initialize sentiment analyzer and processor
-        sentiment_analyzer = SentimentAnalyzer()
-        processor = CommunityProcessor(sentiment_analyzer)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         # Initialize YouTube plugin
         try:
@@ -55,7 +55,7 @@ def scrape(env_file, channel_id, max_videos, max_comments, no_interactive):
         
         # Scrape comments
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
         # Determine parameters
         channel = channel_id if channel_id else config.youtube_channel_id
@@ -71,36 +71,23 @@ def scrape(env_file, channel_id, max_videos, max_comments, no_interactive):
         click.echo("")
         
         try:
-            # Scrape raw comment data
-            raw_comments = youtube_plugin.scrape(
+            # Scrape comments - returns List[IdeaInspiration]
+            ideas = youtube_plugin.scrape(
                 channel_id=channel,
                 max_videos=max_videos,
                 max_comments_per_video=max_comments_value
             )
-            total_scraped = len(raw_comments)
-            click.echo(f"\nFound {len(raw_comments)} comments from channel")
+            total_scraped = len(ideas)
+            click.echo(f"\nFound {len(ideas)} comments from channel")
             
-            # Process and save each comment
-            for comment_data in raw_comments:
-                # Process comment into unified format
-                signal = processor.process_comment(
-                    text=comment_data['text'],
-                    author=comment_data['author'],
-                    source=comment_data['source'],
-                    source_id=comment_data['source_id'],
-                    platform=comment_data['platform'],
-                    parent_content=comment_data.get('parent_content'),
-                    upvotes=comment_data.get('upvotes', 0),
-                    replies=comment_data.get('replies', 0),
-                    timestamp=comment_data.get('timestamp'),
-                    category=comment_data.get('category')
-                )
-                
-                # Save to database
-                success = db.insert_signal(signal)
-                
-                if success:
-                    total_saved += 1
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
+                else:
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
             
         except Exception as e:
             click.echo(f"Error scraping YouTube comments: {e}", err=True)
@@ -109,8 +96,8 @@ def scrape(env_file, channel_id, max_videos, max_comments, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total comments found: {total_scraped}")
-        click.echo(f"Total comments saved: {total_saved}")
-        click.echo(f"Database: {config.database_url}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

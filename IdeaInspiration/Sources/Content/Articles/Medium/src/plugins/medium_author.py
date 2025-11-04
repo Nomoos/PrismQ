@@ -7,7 +7,7 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 from .medium_trending import MediumTrendingPlugin
 
 
@@ -33,7 +33,7 @@ class MediumAuthorPlugin(SourcePlugin):
         """
         return "medium_author"
     
-    def scrape(self, author: Optional[str] = None, top_n: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, author: Optional[str] = None, top_n: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape articles by author from Medium.
         
         Args:
@@ -86,7 +86,9 @@ class MediumAuthorPlugin(SourcePlugin):
                     # Ensure author is set
                     if not article_data.get('author', {}).get('username'):
                         article_data['author'] = {'username': author.lstrip('@'), 'followers': None}
-                    ideas.append(article_data)
+                    idea = self._transform_article_to_idea(article_data)
+
+                    ideas.append(idea)
             
             print(f"Successfully scraped {len(ideas)} articles from author '{author}'")
             

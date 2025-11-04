@@ -100,6 +100,7 @@ class GoogleTrendsPlugin(SignalPlugin):
                     metadata=metadata,
                     source_id=f"{query}_{self.config.google_trends_region}_{datetime.now(timezone.utc).strftime('%Y%m%d%H')}",
                     source_url=f"https://trends.google.com/trends/explore?q={query}&geo={self.config.google_trends_region}",
+                    source_platform="google_trends",
                     source_created_by="Google Trends",
                     source_created_at=datetime.now(timezone.utc).isoformat() + 'Z'
                 )
@@ -182,6 +183,7 @@ class GoogleTrendsPlugin(SignalPlugin):
                         metadata=metadata,
                         source_id=f"{keyword}_{self.config.google_trends_region}_{datetime.now(timezone.utc).strftime('%Y%m%d%H')}",
                         source_url=f"https://trends.google.com/trends/explore?q={keyword}&geo={self.config.google_trends_region}",
+                        source_platform="google_trends",
                         source_created_by="Google Trends",
                         source_created_at=datetime.now(timezone.utc).isoformat() + 'Z'
                     )

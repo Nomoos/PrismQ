@@ -4,6 +4,19 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
 
+# Import IdeaInspiration model from the Model directory
+import sys
+from pathlib import Path
+
+# Add Model directory to path to import IdeaInspiration
+model_path = Path(__file__).resolve().parents[6] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration import IdeaInspiration
+
+
+
 class SourcePlugin(ABC):
     """Abstract base class for Instagram Reels scraper plugins.
     
@@ -20,38 +33,24 @@ class SourcePlugin(ABC):
         self.config = config
 
     @abstractmethod
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """Scrape reels from Instagram.
         
         Returns:
-            List of reel dictionaries with keys:
-                - source_id: Unique identifier (reel ID)
-                - title: Reel caption
-                - description: Full caption with hashtags
-                - tags: Tags or hashtags
-                - metrics: Dictionary of metrics for scoring
+            List of IdeaInspiration objects
         """
         pass
 
-    @abstractmethod
-    def get_source_name(self) -> str:
-        """Get the name of this source.
-        
-        Returns:
-            Source name (e.g., 'instagram_reels_explore')
-        """
-        pass
-
-    def format_tags(self, tags: List[str]) -> str:
-        """Format a list of tags into a comma-separated string.
+    def format_tags(self, tags: List[str]) -> List[str]:
+        """Format a list of tags by stripping whitespace.
         
         Args:
             tags: List of tag strings
             
         Returns:
-            Comma-separated tag string
+            List of cleaned tag strings
         """
-        return ",".join(tag.strip() for tag in tags if tag.strip())
+        return [tag.strip() for tag in tags if tag.strip()]
 
 
 # Export the base class

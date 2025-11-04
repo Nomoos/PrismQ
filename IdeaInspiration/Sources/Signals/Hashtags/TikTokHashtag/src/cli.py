@@ -5,99 +5,98 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import UniversalMetrics
 from .plugins.tik_tok_hashtag_plugin import TikTokHashtagPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[6] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
 @click.version_option(version='1.0.0')
 def main():
-    """Google Trends Source - Gather signal inspirations from Google Trends."""
+    """TikTok Hashtag Source - Gather signal inspirations from TikTok hashtags."""
     pass
 
 
 @main.command()
 @click.option('--env-file', '-e', type=click.Path(), 
               help='Path to .env file')
-@click.option('--keywords', '-k', multiple=True,
-              help='Additional keywords to track (can be specified multiple times)')
+@click.option('--hashtags', '-h', multiple=True,
+              help='Specific hashtags to track (can be specified multiple times)')
 @click.option('--no-interactive', is_flag=True, 
               help='Disable interactive prompts for missing configuration')
-def scrape(env_file, keywords, no_interactive):
-    """Scrape trending queries from Google Trends.
+def scrape(env_file, hashtags, no_interactive):
+    """Scrape trending hashtags from TikTok.
     
-    This command scrapes current trending searches from Google Trends
-    and optionally tracks specific keywords.
+    This command scrapes trending hashtags from TikTok
+    and optionally tracks specific hashtags.
     
     Examples:
         python -m src.cli scrape
-        python -m src.cli scrape --keywords "AI" --keywords "machine learning"
+        python -m src.cli scrape --hashtags "fyp" --hashtags "viral"
     """
     try:
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Initialize Google Trends plugin
+        # Initialize TikTok Hashtag plugin
         try:
-            trends_plugin = TikTokHashtagPlugin(config)
+            hashtag_plugin = TikTokHashtagPlugin(config)
         except Exception as e:
-            click.echo(f"Error initializing Google Trends: {e}", err=True)
-            click.echo("\nInstall pytrends with: pip install pytrends", err=True)
+            click.echo(f"Error initializing TikTok Hashtag plugin: {e}", err=True)
+            click.echo("\nInstall TikTokApi with: pip install TikTokApi", err=True)
             sys.exit(1)
         
-        # Scrape from Google Trends
+        # Scrape from TikTok
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
-        click.echo("Scraping from Google Trends...")
-        click.echo(f"Region: {config.tik_tok_hashtag_region}")
-        click.echo(f"Timeframe: {config.tik_tok_hashtag_timeframe}")
-        if keywords:
-            click.echo(f"Keywords: {', '.join(keywords)}")
+        click.echo("Scraping from TikTok...")
+        if hashtags:
+            click.echo(f"Hashtags: {', '.join(hashtags)}")
         click.echo()
         
         try:
-            # Convert keywords tuple to list
-            keyword_list = list(keywords) if keywords else None
+            # Convert hashtags tuple to list
+            hashtag_list = list(hashtags) if hashtags else None
             
-            # Scrape signals
-            signals = trends_plugin.scrape(keywords=keyword_list)
-            total_scraped = len(signals)
-            click.echo(f"Found {len(signals)} signals from Google Trends")
+            # Scrape hashtags - returns List[IdeaInspiration]
+            ideas = hashtag_plugin.scrape(hashtags=hashtag_list)
+            total_scraped = len(ideas)
+            click.echo(f"Found {len(ideas)} hashtag signals")
             
-            # Process and save each signal
-            for signal in signals:
-                # Convert platform metrics to universal metrics
-                universal_metrics = UniversalMetrics.from_tik_tok_hashtag(signal['metrics'])
-                
-                # Save to database with universal metrics
-                success = db.insert_signal(
-                    source='tik_tok_hashtag',
-                    source_id=signal['source_id'],
-                    signal_type=signal['signal_type'],
-                    name=signal['name'],
-                    description=signal['description'],
-                    tags=','.join(signal['tags']),
-                    metrics=signal['metrics'],
-                    temporal=signal['temporal'],
-                    universal_metrics=universal_metrics.to_dict()
-                )
-                
-                if success:
-                    total_saved += 1
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
+                else:
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
             
         except Exception as e:
-            click.echo(f"Error scraping Google Trends: {e}", err=True)
+            click.echo(f"Error scraping TikTok hashtags: {e}", err=True)
             import traceback
             traceback.print_exc()
         
         click.echo(f"\nScraping complete!")
-        click.echo(f"Total signals found: {total_scraped}")
-        click.echo(f"Total signals saved: {total_saved}")
+        click.echo(f"Total hashtags found: {total_scraped}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
+        
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
         click.echo(f"Database: {config.database_path}")
         
     except Exception as e:

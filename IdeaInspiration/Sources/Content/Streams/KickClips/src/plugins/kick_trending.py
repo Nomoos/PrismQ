@@ -7,7 +7,7 @@ import time
 import cloudscraper
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class KickTrendingPlugin(SourcePlugin):
@@ -38,14 +38,14 @@ class KickTrendingPlugin(SourcePlugin):
         """
         return "kick_trending"
     
-    def scrape(self, max_clips: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, max_clips: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape trending clips from Kick.
         
         Args:
             max_clips: Maximum number of clips to scrape (uses config if not provided)
             
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         if max_clips is None:
             max_clips = getattr(self.config, 'kick_trending_max_clips', 50)
@@ -71,7 +71,7 @@ class KickTrendingPlugin(SourcePlugin):
                 if len(ideas) >= max_clips:
                     break
                 
-                idea = self._clip_to_idea(clip)
+                idea = self.transform_clip_to_idea(clip)
                 if idea:
                     ideas.append(idea)
             
@@ -130,14 +130,25 @@ class KickTrendingPlugin(SourcePlugin):
         
         return []
     
-    def _clip_to_idea(self, clip: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Convert Kick clip data to idea format.
+    def _clip_to_idea(self, clip: Dict[str, Any]) -> Optional[IdeaInspiration]:
+        """Convert Kick clip data to IdeaInspiration object.
         
         Args:
             clip: Clip data from API
             
         Returns:
-            Idea dictionary or None if invalid
+            IdeaInspiration object or None if invalid
+        """
+        return self.transform_clip_to_idea(clip)
+    
+    def transform_clip_to_idea(self, clip: Dict[str, Any]) -> Optional[IdeaInspiration]:
+        """Transform Kick clip data to IdeaInspiration object.
+        
+        Args:
+            clip: Clip data from API
+            
+        Returns:
+            IdeaInspiration object or None
         """
         try:
             # Extract clip ID
@@ -172,44 +183,44 @@ class KickTrendingPlugin(SourcePlugin):
                 if channel_name:
                     tags.append(channel_name)
             
-            # Extract metrics
-            metrics = {
-                'views': clip.get('views', 0),
-                'likes': clip.get('likes', 0),
-                'comments': 0,  # Not typically available in clip data
-                'shares': 0,
-                'reactions': clip.get('likes', 0),  # Use likes as reactions
-                'duration': clip.get('duration', 0),
-                'created_at': clip.get('created_at', ''),
-                'streamer_followers': 0,
-                'streamer_verified': False,
-            }
-            
-            # Extract streamer info if available
+            # Extract streamer info
+            streamer_followers = 0
+            streamer_verified = False
+            channel_name = ''
             if clip.get('channel'):
                 channel = clip['channel']
                 if isinstance(channel, dict):
-                    metrics['streamer_followers'] = channel.get('followers_count', 0)
-                    metrics['streamer_verified'] = channel.get('verified', False)
+                    streamer_followers = channel.get('followers_count', 0)
+                    streamer_verified = channel.get('verified', False)
+                    channel_name = channel.get('username', '')
             
-            # Build idea dictionary
-            idea = {
-                'source_id': str(clip_id),
-                'title': title,
-                'description': description,
-                'tags': self.format_tags(tags),
-                'metrics': metrics,
-                'category': clip.get('category'),
-                'streamer': clip.get('channel'),
-                'clip': {
-                    'duration': clip.get('duration', 0),
-                    'language': clip.get('language', 'en'),
-                    'created_at': clip.get('created_at', ''),
-                }
+            # Build metadata dict with all metrics
+            metadata = {
+                'views': str(clip.get('views', 0)),
+                'likes': str(clip.get('likes', 0)),
+                'comments': '0',
+                'shares': '0',
+                'reactions': str(clip.get('likes', 0)),
+                'duration': str(clip.get('duration', 0)),
+                'created_at': clip.get('created_at', ''),
+                'streamer_followers': str(streamer_followers),
+                'streamer_verified': str(streamer_verified),
+                'language': clip.get('language', 'en'),
             }
             
-            return idea
-            
+            # Create IdeaInspiration using from_video factory method
+            return IdeaInspiration.from_video(
+                title=title,
+                description=description,
+                subtitle_text='',  # Kick doesn't provide subtitles via basic API
+                keywords=self.format_tags(tags),
+                metadata=metadata,
+                source_id=str(clip_id),
+                source_url=clip.get('url') or clip.get('clip_url'),
+                source_platform='kick',
+                source_created_by=channel_name,
+                source_created_at=clip.get('created_at'),
+            )
         except Exception as e:
-            print(f"  Error converting clip to idea: {e}")
+            print(f"Error transforming clip to IdeaInspiration: {e}")
             return None

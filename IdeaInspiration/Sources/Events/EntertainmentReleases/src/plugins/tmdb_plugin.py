@@ -2,8 +2,8 @@
 
 import requests
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
-from . import SourcePlugin
+from datetime import datetime, timedelta, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class TMDBPlugin(SourcePlugin):
@@ -27,9 +27,9 @@ class TMDBPlugin(SourcePlugin):
         region: Optional[str] = None,
         upcoming: bool = True,
         max_releases: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[IdeaInspiration]:
         """Scrape entertainment releases from TMDB."""
-        releases = []
+        ideas = []
         
         if max_releases is None:
             max_releases = getattr(self.config, 'max_releases', 50)
@@ -40,14 +40,20 @@ class TMDBPlugin(SourcePlugin):
         if region is None:
             region = getattr(self.config, 'default_region', 'US')
         
+        releases_data = []
         if upcoming and media_type == 'movie':
             movie_releases = self._get_upcoming_movies(region, max_releases)
-            releases.extend(movie_releases)
+            releases_data.extend(movie_releases)
         elif media_type == 'tv':
             tv_releases = self._get_popular_tv(max_releases)
-            releases.extend(tv_releases)
+            releases_data.extend(tv_releases)
         
-        return releases[:max_releases]
+        # Transform to IdeaInspiration objects
+        for release_data in releases_data[:max_releases]:
+            idea = self._transform_release_to_idea(release_data)
+            ideas.append(idea)
+        
+        return ideas
     
     def _get_upcoming_movies(self, region: str, limit: int = 50) -> List[Dict[str, Any]]:
         """Get upcoming movie releases."""
@@ -194,3 +200,52 @@ class TMDBPlugin(SourcePlugin):
         mult = importance_mult.get(importance, 1.0)
         
         return int(base * mult)
+    
+    def _transform_release_to_idea(self, release_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform entertainment release data to IdeaInspiration object.
+        
+        Args:
+            release_data: Release data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        name = release_data.get('name', 'Unknown Release')
+        media_type = release_data.get('media_type', 'movie')
+        tags = self.format_tags(['entertainment', 'release', media_type, release_data.get('importance', ''), release_data.get('scope', '')])
+        
+        # Build metadata with string values - move all metrics here
+        metadata = {
+            'release_id': release_data.get('id', ''),
+            'media_type': media_type,
+            'release_date': release_data.get('date', ''),
+            'scope': release_data.get('scope', 'worldwide'),
+            'importance': release_data.get('importance', 'moderate'),
+            'genre_ids': str(release_data.get('genre', [])),
+            'rating': str(release_data.get('rating', 0)),
+            'popularity': str(release_data.get('popularity', 0)),
+            'overview': release_data.get('overview', ''),
+            'poster_path': release_data.get('poster_path', ''),
+            'backdrop_path': release_data.get('backdrop_path', ''),
+            'franchise': str(release_data.get('franchise', False)),
+            'audience_size_estimate': str(release_data.get('audience_size_estimate', 0)),
+        }
+        
+        # Build description
+        description = f"{name} - {media_type} release on {release_data.get('date', 'TBD')}"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=name,
+            description=description,
+            text_content=release_data.get('overview', ''),
+            keywords=tags,
+            metadata=metadata,
+            source_id=release_data.get('id', ''),
+            source_url=f"https://www.themoviedb.org/{media_type}/{release_data.get('id', '')}",
+            source_platform="entertainment_releases",
+            source_created_by="TMDB",
+            source_created_at=release_data.get('date', '')
+        )
+        
+        return idea

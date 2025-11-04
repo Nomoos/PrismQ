@@ -1,10 +1,26 @@
 # Run tests for all projects in their respective environments
 # Part of Issue #115: Per-Project Virtual Environments
+# Auto-discovers all modules using shared discovery library
 
 $ErrorActionPreference = "Stop"
 
 $REPO_ROOT = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$PROJECTS = @("Classification", "ConfigLoad", "Model", "Scoring", "Sources", "Client/Backend")
+$DiscoveryScript = Join-Path $REPO_ROOT "_meta\scripts\discover_modules.py"
+
+# Check if discovery script exists
+if (-not (Test-Path $DiscoveryScript)) {
+    Write-Host "❌ Discovery script not found at $DiscoveryScript" -ForegroundColor Red
+    exit 1
+}
+
+# Use shared discovery library to find modules for environment setup
+$PROJECTS = @()
+try {
+    $PROJECTS = python $DiscoveryScript --filter env-setup --format names | Where-Object { $_ -ne "" }
+} catch {
+    Write-Host "❌ Failed to run discovery script" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "🧪 Running tests for all PrismQ projects..." -ForegroundColor Cyan
 Write-Host ""

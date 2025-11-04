@@ -1,6 +1,7 @@
 """System health and statistics API endpoints."""
 
 import time
+from typing import Optional
 from fastapi import APIRouter, Depends
 
 from ..models.system import (
@@ -18,6 +19,11 @@ router = APIRouter()
 
 # Track server start time
 START_TIME = time.time()
+
+# Cache for system stats (reduces expensive psutil calls)
+_stats_cache: Optional[SystemStats] = None
+_stats_cache_time: float = 0
+STATS_CACHE_TTL = 2.0  # Cache for 2 seconds
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -53,6 +59,8 @@ async def system_stats(
     """
     System statistics and metrics.
     
+    Cached for STATS_CACHE_TTL seconds to improve performance.
+    
     Args:
         runner: Module runner service (injected)
         resource_manager: Resource manager service (injected)
@@ -60,6 +68,13 @@ async def system_stats(
     Returns:
         SystemStats: System statistics
     """
+    global _stats_cache, _stats_cache_time
+    
+    # Return cached stats if still valid
+    current_time = time.time()
+    if _stats_cache is not None and (current_time - _stats_cache_time) < STATS_CACHE_TTL:
+        return _stats_cache
+    
     # Calculate run statistics
     all_runs = runner.registry.get_recent_runs(limit=10000)
     total_runs = len(all_runs)
@@ -95,8 +110,14 @@ async def system_stats(
         disk_free_gb=0.0,  # Not tracked yet
     )
     
-    return SystemStats(
+    result = SystemStats(
         runs=run_stats,
         modules=module_stats,
         system=system_resources,
     )
+    
+    # Update cache
+    _stats_cache = result
+    _stats_cache_time = current_time
+    
+    return result

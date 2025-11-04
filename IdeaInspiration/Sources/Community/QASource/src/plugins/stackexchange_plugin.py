@@ -146,6 +146,7 @@ class StackExchangePlugin(CommunitySourcePlugin):
                     metadata=metadata,
                     source_id=str(item.get('question_id', '')),
                     source_url=item.get('link', ''),
+                    source_platform="qa_source",
                     source_created_by=author,
                     source_created_at=timestamp
                 )

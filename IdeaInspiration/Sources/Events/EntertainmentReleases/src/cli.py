@@ -4,10 +4,14 @@ import click
 import sys
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import UniversalMetrics
-from .core.event_processor import EventProcessor
 from .plugins.tmdb_plugin import TMDBPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[5] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
@@ -27,7 +31,10 @@ def scrape(env_file, media_type, region, max, no_interactive):
     """Scrape entertainment releases from TMDB."""
     try:
         config = Config(env_file, interactive=not no_interactive)
-        db = Database(config.database_path, interactive=not no_interactive)
+        
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
         try:
             tmdb_plugin = TMDBPlugin(config)
@@ -37,45 +44,30 @@ def scrape(env_file, media_type, region, max, no_interactive):
             sys.exit(1)
         
         total_scraped = 0
-        total_saved = 0
+        total_saved_central = 0
         
         media = media_type if media_type else config.default_media_type
         click.echo(f"Scraping {media} releases from TMDB...")
         
         try:
-            releases_data = tmdb_plugin.scrape(
+            # Scrape releases - returns List[IdeaInspiration]
+            ideas = tmdb_plugin.scrape(
                 media_type=media,
                 region=region,
                 upcoming=True,
                 max_releases=max
             )
-            total_scraped = len(releases_data)
-            click.echo(f"Found {len(releases_data)} releases")
+            total_scraped = len(ideas)
+            click.echo(f"Found {len(ideas)} releases")
             
-            for release_data in releases_data:
-                event_signal = EventProcessor.process_release(release_data)
-                universal_metrics = UniversalMetrics.from_entertainment_release(release_data)
-                
-                success = db.insert_event(
-                    source=event_signal['source'],
-                    source_id=event_signal['source_id'],
-                    name=event_signal['event']['name'],
-                    event_type=event_signal['event']['type'],
-                    date=event_signal['event']['date'],
-                    recurring=event_signal['event']['recurring'],
-                    recurrence_pattern=event_signal['event']['recurrence_pattern'],
-                    scope=event_signal['significance']['scope'],
-                    importance=event_signal['significance']['importance'],
-                    audience_size_estimate=event_signal['significance']['audience_size_estimate'],
-                    pre_event_days=event_signal['content_window']['pre_event_days'],
-                    post_event_days=event_signal['content_window']['post_event_days'],
-                    peak_day=event_signal['content_window']['peak_day'],
-                    metadata=event_signal['metadata'],
-                    universal_metrics=universal_metrics.to_dict()
-                )
-                
-                if success:
-                    total_saved += 1
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
+                else:
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
             
         except Exception as e:
             click.echo(f"Error scraping releases: {e}", err=True)
@@ -84,8 +76,8 @@ def scrape(env_file, media_type, region, max, no_interactive):
         
         click.echo(f"\nScraping complete!")
         click.echo(f"Total releases found: {total_scraped}")
-        click.echo(f"Total releases saved: {total_saved}")
-        click.echo(f"Database: {config.database_path}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
         
     except Exception as e:
         click.echo(f"Error: {e}", err=True)

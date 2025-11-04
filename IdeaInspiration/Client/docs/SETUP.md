@@ -2,6 +2,8 @@
 
 Complete installation and configuration guide for the PrismQ Web Client.
 
+> **📋 Need to install Node.js?** See the **[Node.js Installation Guide](NODEJS_INSTALLATION.md)** for detailed instructions on installing Node.js 20.11.0 or higher on Windows, Linux, or macOS.
+
 ## Table of Contents
 
 - [System Requirements](#system-requirements)
@@ -36,7 +38,7 @@ Complete installation and configuration guide for the PrismQ Web Client.
 
 **Required Software:**
 - **Python**: 3.10 or higher
-- **Node.js**: 18.0 or higher
+- **Node.js**: 18.0 or higher (24.11.0+ recommended) - **[Installation Guide](NODEJS_INSTALLATION.md)**
 - **npm**: 8.0 or higher (comes with Node.js)
 - **Git**: 2.30 or higher
 
@@ -46,6 +48,8 @@ Complete installation and configuration guide for the PrismQ Web Client.
 - Edge 90+
 
 ## Installation
+
+> **⚠️ Don't have Node.js installed?** Follow the **[Node.js Installation Guide](NODEJS_INSTALLATION.md)** first before proceeding.
 
 ### Step 1: Clone the Repository
 
@@ -416,6 +420,13 @@ pip install -r requirements.txt
 ```
 
 #### Frontend Won't Start
+
+**Error: "npm is not recognized" or "node is not recognized"**
+
+Node.js is not installed or not in PATH.
+
+**Solution:**
+See the **[Node.js Installation Guide](NODEJS_INSTALLATION.md)** for complete installation and troubleshooting steps.
 
 **Error: "Cannot find module 'vue'"**
 

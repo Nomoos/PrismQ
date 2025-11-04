@@ -7,7 +7,7 @@ This is a placeholder implementation. Full implementation would include:
 """
 
 from typing import List, Dict, Any
-from . import CommunitySourcePlugin
+from . import CommunitySourcePlugin, IdeaInspiration
 
 
 class MultiPlatformCommentPlugin(CommunitySourcePlugin):
@@ -21,7 +21,7 @@ class MultiPlatformCommentPlugin(CommunitySourcePlugin):
         """Get the name of this source."""
         return "comment_mining"
     
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Scrape comments from configured platforms.
         
         NOTE: This is a placeholder. Full implementation would:
@@ -31,7 +31,7 @@ class MultiPlatformCommentPlugin(CommunitySourcePlugin):
         4. Aggregate and deduplicate across platforms
         
         Returns:
-            List of comment dictionaries
+            List of IdeaInspiration objects
         """
         print("CommentMiningSource: Placeholder implementation")
         print("Full implementation would scrape from:")

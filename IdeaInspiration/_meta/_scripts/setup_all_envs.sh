@@ -1,11 +1,38 @@
 #!/bin/bash
 # Create virtual environments for all PrismQ projects
 # Part of Issue #115: Per-Project Virtual Environments
+# Auto-discovers all modules using shared discovery library
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PROJECTS=("Classification" "ConfigLoad" "Model" "Scoring" "Sources" "Client/Backend")
+DISCOVERY_SCRIPT="$REPO_ROOT/_meta/scripts/discover_modules.py"
+
+echo "🔍 Discovering modules with requirements.txt..."
+echo ""
+
+# Use shared discovery library to find modules for environment setup
+declare -a PROJECTS=()
+if [ ! -f "$DISCOVERY_SCRIPT" ]; then
+    echo "❌ Discovery script not found at $DISCOVERY_SCRIPT"
+    exit 1
+fi
+
+# Read module names from discovery script
+while IFS= read -r project_name; do
+    PROJECTS+=("$project_name")
+done < <(python3 "$DISCOVERY_SCRIPT" --filter env-setup --format names)
+
+if [ ${#PROJECTS[@]} -eq 0 ]; then
+    echo "⚠️  No modules with requirements.txt found"
+    exit 0
+fi
+
+echo "Found ${#PROJECTS[@]} module(s):"
+for project in "${PROJECTS[@]}"; do
+    echo "  - $project"
+done
+echo ""
 
 echo "🚀 Setting up virtual environments for all PrismQ projects..."
 echo "Repository root: $REPO_ROOT"

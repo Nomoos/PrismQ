@@ -3,7 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import time
-from . import SignalPlugin
+from . import SignalPlugin, IdeaInspiration
 
 
 class TikTokHashtagPlugin(SignalPlugin):
@@ -39,7 +39,7 @@ class TikTokHashtagPlugin(SignalPlugin):
         """Get the name of this source."""
         return "tiktok_hashtag"
     
-    def scrape(self, **kwargs) -> List[Dict[str, Any]]:
+    def scrape(self, **kwargs) -> List[IdeaInspiration]:
         """
         Scrape hashtag signals from TikTok.
         
@@ -49,7 +49,7 @@ class TikTokHashtagPlugin(SignalPlugin):
                 - hashtags: List of specific hashtags to track (optional)
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         signals = []
         # Try different config attribute names for compatibility
@@ -85,7 +85,7 @@ class TikTokHashtagPlugin(SignalPlugin):
         
         return signals
     
-    def _fetch_trending_hashtags(self, limit: int) -> List[Dict[str, Any]]:
+    def _fetch_trending_hashtags(self, limit: int) -> List[IdeaInspiration]:
         """
         Fetch trending hashtags from TikTok.
         
@@ -93,7 +93,7 @@ class TikTokHashtagPlugin(SignalPlugin):
             limit: Maximum number of hashtags to fetch
         
         Returns:
-            List of signal dictionaries
+            List of IdeaInspiration objects
         """
         signals = []
         
@@ -112,7 +112,7 @@ class TikTokHashtagPlugin(SignalPlugin):
         
         return signals
     
-    def _fetch_hashtag_data(self, hashtag: str) -> Optional[Dict[str, Any]]:
+    def _fetch_hashtag_data(self, hashtag: str) -> Optional[IdeaInspiration]:
         """
         Fetch data for a specific hashtag.
         
@@ -120,7 +120,7 @@ class TikTokHashtagPlugin(SignalPlugin):
             hashtag: Hashtag name (with or without #)
         
         Returns:
-            Signal dictionary or None if error
+            IdeaInspiration object or None if error
         """
         try:
             # Remove # if present
@@ -130,7 +130,7 @@ class TikTokHashtagPlugin(SignalPlugin):
             # hashtag_data = self.api.hashtag(name=clean_hashtag).info()
             
             # For now, create sample data
-            return self._create_signal({
+            return self._create_idea_inspiration({
                 'name': clean_hashtag,
                 'view_count': 1000000,
                 'video_count': 5000,
@@ -141,7 +141,7 @@ class TikTokHashtagPlugin(SignalPlugin):
             print(f"Error fetching hashtag '{hashtag}': {e}")
             return None
     
-    def _get_sample_hashtags(self, limit: int) -> List[Dict[str, Any]]:
+    def _get_sample_hashtags(self, limit: int) -> List[IdeaInspiration]:
         """
         Get sample hashtag data for testing/stub mode.
         
@@ -149,7 +149,7 @@ class TikTokHashtagPlugin(SignalPlugin):
             limit: Number of sample hashtags to generate
         
         Returns:
-            List of sample signal dictionaries
+            List of IdeaInspiration objects
         """
         sample_hashtags = [
             {'name': 'fyp', 'view_count': 500000000, 'video_count': 2000000, 'description': 'For You Page'},
@@ -164,61 +164,57 @@ class TikTokHashtagPlugin(SignalPlugin):
             {'name': 'travel', 'view_count': 80000000, 'video_count': 400000, 'description': 'Travel content'},
         ]
         
-        signals = []
+        ideas = []
         for hashtag_data in sample_hashtags[:limit]:
-            signal = self._create_signal(hashtag_data)
-            signals.append(signal)
+            idea = self._create_idea_inspiration(hashtag_data)
+            ideas.append(idea)
         
-        return signals
+        return ideas
     
-    def _create_signal(self, hashtag_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _create_idea_inspiration(self, hashtag_data: Dict[str, Any]) -> IdeaInspiration:
         """
-        Create a signal dictionary from hashtag data.
+        Create an IdeaInspiration object from hashtag data.
         
         Args:
             hashtag_data: Raw hashtag data from TikTok
         
         Returns:
-            Signal dictionary in unified format
+            IdeaInspiration object
         """
         hashtag_name = hashtag_data.get('name', 'unknown')
         view_count = hashtag_data.get('view_count', 0)
         video_count = hashtag_data.get('video_count', 0)
+        description = hashtag_data.get('description', f'TikTok hashtag: #{hashtag_name}')
         
-        # Generate unique source_id
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d%H')
-        source_id = f"{hashtag_name}_{timestamp}"
-        
-        # Calculate velocity (growth rate) - placeholder calculation
-        # In production, this would compare with historical data
+        # Calculate velocity (growth rate)
         velocity = self._calculate_velocity(view_count, video_count)
         
-        # Calculate acceleration - placeholder
-        acceleration = self._calculate_acceleration(velocity)
+        # Format tags
+        tags = self.format_tags(['tiktok', 'hashtag', 'viral', hashtag_name])
         
-        return {
-            'source_id': source_id,
+        # Build metadata with platform-specific data
+        metadata = {
+            'view_count': str(view_count),
+            'video_count': str(video_count),
+            'velocity': str(velocity),
             'signal_type': 'hashtag',
-            'name': f'#{hashtag_name}',
-            'description': hashtag_data.get('description', f'TikTok hashtag: #{hashtag_name}'),
-            'tags': ['tiktok', 'hashtag', 'viral'],
-            'metrics': {
-                'volume': view_count,
-                'velocity': velocity,
-                'acceleration': acceleration,
-                'geographic_spread': ['global'],  # TikTok is global
-                'video_count': video_count
-            },
-            'temporal': {
-                'first_seen': datetime.now(timezone.utc).isoformat() + 'Z',
-                'peak_time': None,
-                'current_status': self._determine_status(velocity)
-            },
-            'extra': {
-                'platform': 'tiktok',
-                'hashtag_type': 'trending'
-            }
+            'hashtag_type': 'trending',
+            'current_status': self._determine_status(velocity)
         }
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=f'#{hashtag_name}',
+            description=description,
+            text_content=f'TikTok hashtag #{hashtag_name}: {description}',
+            keywords=tags,
+            source_platform="tiktok_hashtag",  # Platform identifier
+            metadata=metadata,
+            source_id=f"tiktok_hashtag_{hashtag_name}",
+            source_url=f"https://www.tiktok.com/tag/{hashtag_name}"
+        )
+        
+        return idea
     
     def _calculate_velocity(self, view_count: int, video_count: int) -> float:
         """

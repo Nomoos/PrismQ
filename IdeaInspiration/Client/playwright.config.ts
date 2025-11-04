@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test'
  * See https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: '../_meta/tests/Frontend/e2e',
+  testDir: './Frontend/_meta/tests/e2e',
   
   // Maximum time one test can run for
   timeout: 30 * 1000,
@@ -19,7 +19,7 @@ export default defineConfig({
   
   // Reporter configuration
   reporter: [
-    ['html', { outputFolder: '../_meta/tests/Frontend/e2e-results' }],
+    ['html', { outputFolder: './Frontend/_meta/tests/e2e-results' }],
     ['list']
   ],
   

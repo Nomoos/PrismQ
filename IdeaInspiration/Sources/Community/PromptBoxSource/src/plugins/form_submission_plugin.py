@@ -10,7 +10,7 @@ This is a placeholder implementation. Full implementation would include:
 from typing import List, Dict, Any
 from datetime import datetime
 from pathlib import Path
-from . import CommunitySourcePlugin
+from . import CommunitySourcePlugin, IdeaInspiration
 
 
 class FormSubmissionPlugin(CommunitySourcePlugin):
@@ -25,7 +25,7 @@ class FormSubmissionPlugin(CommunitySourcePlugin):
         """Get the name of this source."""
         return "prompt_box"
     
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> List[IdeaInspiration]:
         """Collect user-submitted prompts.
         
         NOTE: This is a placeholder. Full implementation would:
@@ -36,7 +36,7 @@ class FormSubmissionPlugin(CommunitySourcePlugin):
         5. Include voting/ranking mechanisms
         
         Returns:
-            List of prompt/submission dictionaries
+            List of IdeaInspiration objects
         """
         print("PromptBoxSource: Placeholder implementation")
         print("Full implementation would collect submissions from:")

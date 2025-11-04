@@ -5,49 +5,95 @@ import sys
 import json
 from pathlib import Path
 from .core.config import Config
-from .core.database import Database
-from .core.metrics import UniversalMetrics
 from .plugins.tik_tok_sounds_plugin import TikTokSoundsPlugin
+
+# Import central IdeaInspiration database from Model module
+model_path = Path(__file__).resolve().parents[6] / 'Model'
+if str(model_path) not in sys.path:
+    sys.path.insert(0, str(model_path))
+
+from idea_inspiration_db import IdeaInspirationDatabase, get_central_database_path
 
 
 @click.group()
 @click.version_option(version='1.0.0')
 def main():
-    """Google Trends Source - Gather signal inspirations from Google Trends."""
+    """TikTok Sounds Source - Gather signal inspirations from trending TikTok sounds."""
     pass
 
 
-@main.command()
+@click.command()
 @click.option('--env-file', '-e', type=click.Path(), 
               help='Path to .env file')
-@click.option('--keywords', '-k', multiple=True,
-              help='Additional keywords to track (can be specified multiple times)')
+@click.option('--limit', '-l', type=int,
+              help='Maximum number of results')
 @click.option('--no-interactive', is_flag=True, 
               help='Disable interactive prompts for missing configuration')
-def scrape(env_file, keywords, no_interactive):
-    """Scrape trending queries from Google Trends.
-    
-    This command scrapes current trending searches from Google Trends
-    and optionally tracks specific keywords.
+def scrape(env_file, limit, no_interactive):
+    """Scrape trending sounds from TikTok.
     
     Examples:
         python -m src.cli scrape
-        python -m src.cli scrape --keywords "AI" --keywords "machine learning"
+        python -m src.cli scrape --limit 20
     """
     try:
         # Load configuration
         config = Config(env_file, interactive=not no_interactive)
         
-        # Initialize database
-        db = Database(config.database_path, interactive=not no_interactive)
+        # Initialize central database only (single DB approach)
+        central_db_path = get_central_database_path()
+        central_db = IdeaInspirationDatabase(central_db_path, interactive=not no_interactive)
         
-        # Initialize Google Trends plugin
+        # Initialize TikTok Sounds plugin
         try:
-            trends_plugin = TikTokSoundsPlugin(config)
+            sounds_plugin = TikTokSoundsPlugin(config)
         except Exception as e:
-            click.echo(f"Error initializing Google Trends: {e}", err=True)
-            click.echo("\nInstall pytrends with: pip install pytrends", err=True)
+            click.echo(f"Error initializing TikTok Sounds plugin: {e}", err=True)
             sys.exit(1)
+        
+        # Scrape from TikTok
+        total_scraped = 0
+        total_saved_central = 0
+        
+        click.echo("Scraping trending sounds from TikTok...")
+        click.echo()
+        
+        try:
+            # Scrape sounds - returns List[IdeaInspiration]
+            ideas = sounds_plugin.scrape(limit=limit) if limit else sounds_plugin.scrape()
+            total_scraped = len(ideas)
+            click.echo(f"Found {len(ideas)} trending sounds")
+            
+            # Save each IdeaInspiration to central database (single DB)
+            for idea in ideas:
+                central_saved = central_db.insert(idea)
+                if central_saved:
+                    total_saved_central += 1
+                    click.echo(f"  ✓ Saved: {idea.title[:60]}")
+                else:
+                    click.echo(f"  ↻ Updated: {idea.title[:60]}")
+            
+        except Exception as e:
+            click.echo(f"Error scraping TikTok sounds: {e}", err=True)
+            import traceback
+            traceback.print_exc()
+        
+        click.echo(f"\nScraping complete!")
+        click.echo(f"Total sounds found: {total_scraped}")
+        click.echo(f"Saved to central database: {total_saved_central}")
+        click.echo(f"Central database: {central_db_path}")
+        
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
+main.add_command(scrape)
+
+if __name__ == '__main__':
+    main()
         
         # Scrape from Google Trends
         total_scraped = 0

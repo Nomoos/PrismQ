@@ -2,8 +2,8 @@
 
 import requests
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
-from . import SourcePlugin
+from datetime import datetime, timedelta, timezone
+from . import SourcePlugin, IdeaInspiration
 
 
 class TheSportsDBPlugin(SourcePlugin):
@@ -36,7 +36,7 @@ class TheSportsDBPlugin(SourcePlugin):
         date: Optional[str] = None,
         next_events: bool = True,
         max_events: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[IdeaInspiration]:
         """Scrape sports events from TheSportsDB.
         
         Args:
@@ -47,9 +47,10 @@ class TheSportsDBPlugin(SourcePlugin):
             max_events: Maximum number of events to return
             
         Returns:
-            List of event dictionaries
+            List of IdeaInspiration objects
         """
-        events = []
+        ideas = []
+        events_data = []
         
         # Use config values if not provided
         if max_events is None:
@@ -65,15 +66,15 @@ class TheSportsDBPlugin(SourcePlugin):
         if league_id and next_events:
             # Get next events for league
             league_events = self._get_next_league_events(league_id, max_events)
-            events.extend(league_events)
+            events_data.extend(league_events)
         elif league_id and season:
             # Get season events
             season_events = self._get_season_events(league_id, season, max_events)
-            events.extend(season_events)
+            events_data.extend(season_events)
         elif date:
             # Get events on specific date
             date_events = self._get_events_by_date(date, max_events)
-            events.extend(date_events)
+            events_data.extend(date_events)
         else:
             # Default: Get next events for multiple popular leagues
             popular_leagues = self._get_popular_leagues()
@@ -81,9 +82,14 @@ class TheSportsDBPlugin(SourcePlugin):
                 lid = self._get_league_id(league_name)
                 if lid:
                     league_events = self._get_next_league_events(lid, max_events // 5)
-                    events.extend(league_events)
+                    events_data.extend(league_events)
         
-        return events[:max_events]
+        # Transform to IdeaInspiration objects
+        for event_data in events_data[:max_events]:
+            idea = self._transform_event_to_idea(event_data)
+            ideas.append(idea)
+        
+        return ideas
     
     def _get_league_id(self, league_name: str) -> Optional[str]:
         """Get league ID from league name.
@@ -336,3 +342,55 @@ class TheSportsDBPlugin(SourcePlugin):
             mult *= 2
         
         return int(base * mult)
+    
+    def _transform_event_to_idea(self, event_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform sports event data to IdeaInspiration object.
+        
+        Args:
+            event_data: Event data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        event_name = event_data.get('name', 'Unknown Event')
+        sport = event_data.get('sport', 'Unknown Sport')
+        league = event_data.get('league', 'Unknown League')
+        tags = self.format_tags(['sports', 'event', sport, league, event_data.get('importance', '')])
+        
+        # Build metadata with string values - move all metrics here
+        metadata = {
+            'event_id': event_data.get('id', ''),
+            'sport': sport,
+            'league': league,
+            'event_date': event_data.get('date', ''),
+            'venue': event_data.get('venue', ''),
+            'home_team': event_data.get('home_team', ''),
+            'away_team': event_data.get('away_team', ''),
+            'scope': event_data.get('scope', 'national'),
+            'importance': event_data.get('importance', 'regular'),
+            'season': event_data.get('season', ''),
+            'round': event_data.get('round', ''),
+            'viewership_estimate': str(event_data.get('viewership_estimate', 0)),
+            'thumbnail': event_data.get('thumbnail', ''),
+        }
+        
+        # Build description
+        home = event_data.get('home_team', 'Team A')
+        away = event_data.get('away_team', 'Team B')
+        description = f"{home} vs {away} - {league} on {event_data.get('date', 'TBD')}"
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=event_name,
+            description=description,
+            text_content=f"{event_name} at {event_data.get('venue', 'TBD')}",
+            keywords=tags,
+            metadata=metadata,
+            source_id=event_data.get('id', ''),
+            source_url='',  # TheSportsDB doesn't provide direct URLs
+            source_platform="sports_highlights",
+            source_created_by="TheSportsDB",
+            source_created_at=event_data.get('date', '')
+        )
+        
+        return idea

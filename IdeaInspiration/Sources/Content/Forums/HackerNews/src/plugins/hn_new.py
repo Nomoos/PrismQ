@@ -3,7 +3,7 @@
 import requests
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
-from . import SourcePlugin
+from . import SourcePlugin, IdeaInspiration
 
 
 class HNNewPlugin(SourcePlugin):
@@ -101,7 +101,7 @@ class HNNewPlugin(SourcePlugin):
             'metrics': item  # Store full item data for metrics calculation
         }
     
-    def scrape(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape(self, limit: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape new stories from HackerNews.
         
         Args:
@@ -112,14 +112,14 @@ class HNNewPlugin(SourcePlugin):
         """
         return self.scrape_newstories(limit=limit)
     
-    def scrape_newstories(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    def scrape_newstories(self, limit: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape new stories from HackerNews.
         
         Args:
             limit: Maximum number of stories to scrape (uses config if not provided)
             
         Returns:
-            List of idea dictionaries
+            List of IdeaInspiration objects
         """
         ideas = []
         
@@ -143,6 +143,7 @@ class HNNewPlugin(SourcePlugin):
                 if item:
                     idea = self._item_to_idea(item)
                     if idea:
+                        idea = self._transform_story_to_idea(idea)
                         ideas.append(idea)
                         score = item.get('score', 0) if item.get('score') else 0
                         print(f"  ✓ {item.get('title', '')[:60]}... (score: {score})")
@@ -153,3 +154,49 @@ class HNNewPlugin(SourcePlugin):
             print(f"Error fetching new stories: {e}")
         
         return ideas
+    
+    def _transform_story_to_idea(self, story_data: Dict[str, Any]) -> IdeaInspiration:
+        """Transform HackerNews story data to IdeaInspiration object.
+        
+        Args:
+            story_data: Story data dictionary
+            
+        Returns:
+            IdeaInspiration object
+        """
+        title = story_data.get('title', 'Untitled')
+        description = story_data.get('description', '')
+        tags = story_data.get('tags', [])
+        
+        # Extract metrics from the full item data and move to metadata as strings
+        metrics = story_data.get('metrics', {})
+        
+        metadata = {
+            'story_id': story_data.get('source_id', ''),
+            'score': str(metrics.get('score', 0)),
+            'descendants': str(metrics.get('descendants', 0)),
+            'by': str(metrics.get('by', '')),
+            'time': str(metrics.get('time', '')),
+            'type': str(metrics.get('type', 'story')),
+            'source': 'hackernews_new',
+        }
+        
+        # Add URL if present
+        if metrics.get('url'):
+            metadata['story_url'] = str(metrics['url'])
+        
+        # Create IdeaInspiration using from_text factory method
+        idea = IdeaInspiration.from_text(
+            title=title,
+            description=description,
+            text_content=description,
+            keywords=tags,
+            metadata=metadata,
+            source_id=story_data.get('source_id', ''),
+            source_url=f"https://news.ycombinator.com/item?id={story_data.get('source_id', '')}",
+            source_platform="hackernews",
+            source_created_by=str(metrics.get('by', '')),
+            source_created_at=str(metrics.get('time', ''))
+        )
+        
+        return idea
