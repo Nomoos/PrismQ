@@ -17,6 +17,14 @@ Use this space for:
 - Document findings and conclusions
 - Link to relevant issues when applicable
 
+## Current Research
+
+- **[YouTube Metadata Optimization: SMART Strategy](./youtube-metadata-optimization-smart-strategy.md)** (2025-10-31)
+  - Timeline-based approach to video metadata optimization
+  - Analysis of YouTube's algorithm behavior and testing phases
+  - Guidelines for different channel sizes and content types
+  - Integration strategies with PrismQ workflow
+
 ## Examples
 
 - `youtube-api-alternatives/` - Research on alternative YouTube APIs
