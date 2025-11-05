@@ -246,7 +246,7 @@ async function handleLaunch(parameters: Record<string, any>, saveConfig: boolean
       saveConfig
     )
     console.log('Run started:', run)
-    alert(`Module "${selectedModule.value.name}" launched successfully! Run ID: ${run.id}`)
+    alert(`Module "${selectedModule.value.name}" launched successfully! Run ID: ${run.run_id}`)
     closeLaunchModal()
     
     // Reload modules to update statistics

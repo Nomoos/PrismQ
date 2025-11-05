@@ -7,7 +7,7 @@ name = "prismq-idea-model"
 version = "0.2.0"
 description = "Core IdeaInspiration model for PrismQ content processing"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 license = {text = "Proprietary"}
 authors = [
     {name = "PrismQ", email = "dev@prismq.com"}
@@ -19,8 +19,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
 ]
@@ -43,7 +41,7 @@ Issues = "https://github.com/Nomoos/PrismQ.IdeaInspiration.Model/issues"
 py-modules = ["idea_inspiration", "config_manager", "idea_inspiration_db"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "_meta/tests"]
 python_files = ["test_*.py"]
 addopts = [
     "--verbose",
@@ -54,7 +52,7 @@ addopts = [
 
 [tool.coverage.run]
 source = ["."]
-omit = ["*/tests/*", "*/__pycache__/*", "*/venv/*"]
+omit = ["*/tests/*", "*/_meta/tests/*", "*/__pycache__/*", "*/venv/*"]
 
 [tool.coverage.report]
 exclude_lines = [

@@ -388,6 +388,50 @@ Windows: Ensure Python is in PATH and `.py` files are associated with Python.
 3. **Process spawning issue:**
    - Check backend logs: `Backend/logs/app.log`
    - Restart backend server
+
+#### Error: "NotImplementedError" on Windows (Subprocess Creation Failed)
+
+**Symptom:**
+```
+NotImplementedError
+  File "asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+```
+
+**Cause:** On Windows, the default asyncio event loop doesn't support subprocess operations. The backend needs to use `ProactorEventLoop` for subprocess support.
+
+**Solution:**
+
+Use the custom uvicorn runner that sets the correct event loop policy:
+
+```bash
+cd Client/Backend
+python -m src.uvicorn_runner
+```
+
+Or use the development scripts (already updated):
+```powershell
+# Windows PowerShell
+Client\_meta\_scripts\run_dev.ps1
+```
+
+**Verification:**
+Run the event loop test to confirm the fix:
+```bash
+cd Client/Backend
+python src/test_event_loop.py
+```
+
+Expected output:
+```
+Platform: win32
+Event loop policy: WindowsProactorEventLoopPolicy
+✅ PASS: Windows event loop policy is correctly set
+✅ PASS: Subprocess created successfully
+```
+
+For more details, see: `Backend/_meta/doc/WINDOWS_SUBPROCESS_FIX.md`
+
    - Check system resource limits
 
 ### Logs Don't Stream

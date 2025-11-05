@@ -4,11 +4,16 @@
       "id": "classification",
       "name": "Content Classification",
       "description": "Classify content into categories and detect story potential. Processes list of IdeaInspiration objects and returns same list with category and subcategory_relevance filled.",
-      "category": "Processing",
+      "category": "Classification",
       "version": "2.1.0",
       "script_path": "../../Classification/src/cli.py",
       "parameters": [],
-      "tags": ["classification", "processing", "categories", "story-detection"],
+      "tags": [
+        "classification",
+        "processing",
+        "categories",
+        "story-detection"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -16,11 +21,16 @@
       "id": "scoring",
       "name": "Content Scoring",
       "description": "Score content quality and engagement metrics. Processes list of IdeaInspiration objects and returns same list with score filled.",
-      "category": "Processing",
+      "category": "Scoring",
       "version": "1.0.0",
       "script_path": "../../Scoring/src/cli.py",
       "parameters": [],
-      "tags": ["scoring", "processing", "quality", "engagement"],
+      "tags": [
+        "scoring",
+        "processing",
+        "quality",
+        "engagement"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -28,7 +38,7 @@
       "id": "lyric-snippets",
       "name": "Lyric Snippets Source",
       "description": "Gather creative inspiration from song lyrics via Genius API",
-      "category": "Creative",
+      "category": "Sources/Creative",
       "version": "1.0.0",
       "script_path": "../../Sources/Creative/LyricSnippets/src/cli.py",
       "parameters": [
@@ -49,7 +59,11 @@
           "required": false
         }
       ],
-      "tags": ["creative", "lyrics", "music"],
+      "tags": [
+        "creative",
+        "lyrics",
+        "music"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -57,20 +71,31 @@
       "id": "script-beats",
       "name": "Script Beats Source",
       "description": "Collect narrative structure templates and story beats",
-      "category": "Creative",
+      "category": "Sources/Creative",
       "version": "1.0.0",
       "script_path": "../../Sources/Creative/ScriptBeats/src/cli.py",
       "parameters": [
         {
           "name": "genre",
           "type": "select",
-          "options": ["All", "Drama", "Comedy", "Thriller", "Romance", "Horror"],
+          "options": [
+            "All",
+            "Drama",
+            "Comedy",
+            "Thriller",
+            "Romance",
+            "Horror"
+          ],
           "default": "All",
           "description": "Genre for script beats",
           "required": false
         }
       ],
-      "tags": ["creative", "scripts", "storytelling"],
+      "tags": [
+        "creative",
+        "scripts",
+        "storytelling"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -78,7 +103,7 @@
       "id": "visual-moodboard",
       "name": "Visual Moodboard Source",
       "description": "Gather visual aesthetics and style inspiration",
-      "category": "Creative",
+      "category": "Sources/Creative",
       "version": "1.0.0",
       "script_path": "../../Sources/Creative/VisualMoodboard/src/cli.py",
       "parameters": [
@@ -90,7 +115,11 @@
           "required": true
         }
       ],
-      "tags": ["creative", "visual", "aesthetics"],
+      "tags": [
+        "creative",
+        "visual",
+        "aesthetics"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -98,7 +127,7 @@
       "id": "google-trends",
       "name": "Google Trends Source",
       "description": "Track trending search topics and emerging interests",
-      "category": "Signals/Trends",
+      "category": "Sources/Signals/Trends",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Trends/GoogleTrends/src/cli.py",
       "parameters": [
@@ -112,13 +141,25 @@
         {
           "name": "timeframe",
           "type": "select",
-          "options": ["now 1-H", "now 4-H", "now 1-d", "now 7-d", "today 1-m", "today 3-m", "today 12-m"],
+          "options": [
+            "now 1-H",
+            "now 4-H",
+            "now 1-d",
+            "now 7-d",
+            "today 1-m",
+            "today 3-m",
+            "today 12-m"
+          ],
           "default": "now 7-d",
           "description": "Timeframe for trend data",
           "required": false
         }
       ],
-      "tags": ["signals", "trends", "google"],
+      "tags": [
+        "signals",
+        "trends",
+        "google"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -126,7 +167,7 @@
       "id": "trends-file",
       "name": "Trends File Source",
       "description": "Import trending topics from file",
-      "category": "Signals/Trends",
+      "category": "Sources/Signals/Trends",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Trends/TrendsFile/src/cli.py",
       "parameters": [
@@ -138,7 +179,11 @@
           "required": true
         }
       ],
-      "tags": ["signals", "trends", "import"],
+      "tags": [
+        "signals",
+        "trends",
+        "import"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -146,14 +191,22 @@
       "id": "calendar-holidays",
       "name": "Calendar Holidays Source",
       "description": "Collect holidays and observances for content planning",
-      "category": "Events",
+      "category": "Sources/Events",
       "version": "1.0.0",
       "script_path": "../../Sources/Events/CalendarHolidays/src/cli.py",
       "parameters": [
         {
           "name": "country",
           "type": "select",
-          "options": ["US", "UK", "CA", "AU", "DE", "FR", "ES"],
+          "options": [
+            "US",
+            "UK",
+            "CA",
+            "AU",
+            "DE",
+            "FR",
+            "ES"
+          ],
           "default": "US",
           "description": "Country for holidays",
           "required": false
@@ -168,7 +221,11 @@
           "required": false
         }
       ],
-      "tags": ["events", "holidays", "calendar"],
+      "tags": [
+        "events",
+        "holidays",
+        "calendar"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -176,20 +233,31 @@
       "id": "sports-highlights",
       "name": "Sports Highlights Source",
       "description": "Track major sports events and highlights",
-      "category": "Events",
+      "category": "Sources/Events",
       "version": "1.0.0",
       "script_path": "../../Sources/Events/SportsHighlights/src/cli.py",
       "parameters": [
         {
           "name": "sport",
           "type": "select",
-          "options": ["All", "Football", "Basketball", "Baseball", "Soccer", "Hockey"],
+          "options": [
+            "All",
+            "Football",
+            "Basketball",
+            "Baseball",
+            "Soccer",
+            "Hockey"
+          ],
           "default": "All",
           "description": "Sport category",
           "required": false
         }
       ],
-      "tags": ["events", "sports", "highlights"],
+      "tags": [
+        "events",
+        "sports",
+        "highlights"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -197,20 +265,30 @@
       "id": "entertainment-releases",
       "name": "Entertainment Releases Source",
       "description": "Track movie, music, and entertainment releases",
-      "category": "Events",
+      "category": "Sources/Events",
       "version": "1.0.0",
       "script_path": "../../Sources/Events/EntertainmentReleases/src/cli.py",
       "parameters": [
         {
           "name": "type",
           "type": "select",
-          "options": ["All", "Movies", "Music", "TV Shows", "Games"],
+          "options": [
+            "All",
+            "Movies",
+            "Music",
+            "TV Shows",
+            "Games"
+          ],
           "default": "All",
           "description": "Entertainment type",
           "required": false
         }
       ],
-      "tags": ["events", "entertainment", "releases"],
+      "tags": [
+        "events",
+        "entertainment",
+        "releases"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -218,14 +296,21 @@
       "id": "google-news",
       "name": "Google News Source",
       "description": "Aggregate news articles and trending stories",
-      "category": "Signals/News",
+      "category": "Sources/Signals/News",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/News/GoogleNews/src/cli.py",
       "parameters": [
         {
           "name": "topic",
           "type": "select",
-          "options": ["Top Stories", "Technology", "Entertainment", "Business", "Sports", "Science"],
+          "options": [
+            "Top Stories",
+            "Technology",
+            "Entertainment",
+            "Business",
+            "Sports",
+            "Science"
+          ],
           "default": "Top Stories",
           "description": "News topic category",
           "required": false
@@ -240,7 +325,11 @@
           "required": false
         }
       ],
-      "tags": ["signals", "news", "articles"],
+      "tags": [
+        "signals",
+        "news",
+        "articles"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -248,7 +337,7 @@
       "id": "news-api",
       "name": "NewsAPI Source",
       "description": "Collect news from NewsAPI.org service",
-      "category": "Signals/News",
+      "category": "Sources/Signals/News",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/News/NewsApi/src/cli.py",
       "parameters": [
@@ -269,7 +358,11 @@
           "required": false
         }
       ],
-      "tags": ["signals", "news", "api"],
+      "tags": [
+        "signals",
+        "news",
+        "api"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -277,20 +370,30 @@
       "id": "social-challenge",
       "name": "Social Challenge Tracker",
       "description": "Track viral challenges and trending social activities",
-      "category": "Signals/Challenges",
+      "category": "Sources/Signals/Challenges",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Challenges/SocialChallenge/src/cli.py",
       "parameters": [
         {
           "name": "platform",
           "type": "select",
-          "options": ["TikTok", "Instagram", "YouTube", "All"],
+          "options": [
+            "TikTok",
+            "Instagram",
+            "YouTube",
+            "All"
+          ],
           "default": "All",
           "description": "Social media platform",
           "required": false
         }
       ],
-      "tags": ["signals", "challenges", "viral", "social-media"],
+      "tags": [
+        "signals",
+        "challenges",
+        "viral",
+        "social-media"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -298,7 +401,7 @@
       "id": "tiktok-hashtag",
       "name": "TikTok Hashtag Tracker",
       "description": "Track trending TikTok hashtags and topics",
-      "category": "Signals/Hashtags",
+      "category": "Sources/Signals/Hashtags",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Hashtags/TikTokHashtag/src/cli.py",
       "parameters": [
@@ -310,7 +413,12 @@
           "required": true
         }
       ],
-      "tags": ["signals", "hashtags", "tiktok", "trends"],
+      "tags": [
+        "signals",
+        "hashtags",
+        "tiktok",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -318,7 +426,7 @@
       "id": "instagram-hashtag",
       "name": "Instagram Hashtag Tracker",
       "description": "Track trending Instagram hashtags and topics",
-      "category": "Signals/Hashtags",
+      "category": "Sources/Signals/Hashtags",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Hashtags/InstagramHashtag/src/cli.py",
       "parameters": [
@@ -330,7 +438,12 @@
           "required": true
         }
       ],
-      "tags": ["signals", "hashtags", "instagram", "trends"],
+      "tags": [
+        "signals",
+        "hashtags",
+        "instagram",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -338,7 +451,7 @@
       "id": "geo-local-trends",
       "name": "Geo Local Trends Source",
       "description": "Track location-based trending topics and interests",
-      "category": "Signals/Locations",
+      "category": "Sources/Signals/Locations",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Locations/GeoLocalTrends/src/cli.py",
       "parameters": [
@@ -350,7 +463,12 @@
           "required": true
         }
       ],
-      "tags": ["signals", "geo", "local", "trends"],
+      "tags": [
+        "signals",
+        "geo",
+        "local",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -358,7 +476,7 @@
       "id": "know-your-meme",
       "name": "Know Your Meme Source",
       "description": "Track trending memes and internet culture",
-      "category": "Signals/Memes",
+      "category": "Sources/Signals/Memes",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Memes/KnowYourMeme/src/cli.py",
       "parameters": [
@@ -372,7 +490,12 @@
           "required": false
         }
       ],
-      "tags": ["signals", "memes", "viral", "culture"],
+      "tags": [
+        "signals",
+        "memes",
+        "viral",
+        "culture"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -380,20 +503,31 @@
       "id": "meme-tracker",
       "name": "Meme Tracker Source",
       "description": "Monitor emerging and trending memes across platforms",
-      "category": "Signals/Memes",
+      "category": "Sources/Signals/Memes",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Memes/MemeTracker/src/cli.py",
       "parameters": [
         {
           "name": "platform",
           "type": "select",
-          "options": ["All", "Reddit", "Twitter", "TikTok", "Instagram"],
+          "options": [
+            "All",
+            "Reddit",
+            "Twitter",
+            "TikTok",
+            "Instagram"
+          ],
           "default": "All",
           "description": "Platform to track",
           "required": false
         }
       ],
-      "tags": ["signals", "memes", "tracking", "viral"],
+      "tags": [
+        "signals",
+        "memes",
+        "tracking",
+        "viral"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -401,7 +535,7 @@
       "id": "tiktok-sounds",
       "name": "TikTok Sounds Tracker",
       "description": "Track trending TikTok audio and sounds",
-      "category": "Signals/Sounds",
+      "category": "Sources/Signals/Sounds",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Sounds/TikTokSounds/src/cli.py",
       "parameters": [
@@ -415,7 +549,12 @@
           "required": false
         }
       ],
-      "tags": ["signals", "audio", "tiktok", "sounds"],
+      "tags": [
+        "signals",
+        "audio",
+        "tiktok",
+        "sounds"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -423,7 +562,7 @@
       "id": "instagram-audio-trends",
       "name": "Instagram Audio Trends",
       "description": "Track trending Instagram Reels audio",
-      "category": "Signals/Sounds",
+      "category": "Sources/Signals/Sounds",
       "version": "1.0.0",
       "script_path": "../../Sources/Signals/Sounds/InstagramAudioTrends/src/cli.py",
       "parameters": [
@@ -437,7 +576,12 @@
           "required": false
         }
       ],
-      "tags": ["signals", "audio", "instagram", "reels"],
+      "tags": [
+        "signals",
+        "audio",
+        "instagram",
+        "reels"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -445,31 +589,53 @@
       "id": "youtube-shorts",
       "name": "YouTube Shorts Source",
       "description": "Collect YouTube Shorts content from trending, specific channels, or keyword searches",
-      "category": "Content/Shorts",
+      "category": "Sources/Content/Shorts",
       "version": "2.0.0",
       "script_path": "../../Sources/Content/Shorts/YouTube/src/cli.py",
       "parameters": [
         {
           "name": "mode",
           "type": "select",
-          "options": ["trending", "channel", "keyword"],
+          "options": [
+            "trending",
+            "channel",
+            "keyword"
+          ],
           "default": "trending",
-          "description": "Scraping mode: trending (popular shorts), channel (specific channel), or keyword (search)",
+          "label": "Scraping Mode",
+          "description": "Choose how to collect YouTube Shorts",
           "required": true
         },
         {
           "name": "channel_url",
           "type": "text",
           "default": "",
-          "description": "YouTube channel URL, handle (@username), or ID (required for channel mode)",
-          "required": false
+          "label": "Channel URL",
+          "description": "YouTube channel URL, handle (@username), or ID",
+          "placeholder": "https://www.youtube.com/@channelname",
+          "required": false,
+          "conditional_display": {
+            "field": "mode",
+            "value": "channel"
+          },
+          "validation": {
+            "pattern": "^(https?://)?(www\\.)?youtube\\.com/([@\\w-]+|channel/[\\w-]+)|@[\\w-]+|UC[\\w-]+$",
+            "message": "Must be a valid YouTube channel URL, handle, or ID"
+          }
         },
         {
           "name": "query",
           "type": "text",
           "default": "",
-          "description": "Search keyword or phrase (required for keyword mode)",
-          "required": false
+          "label": "Search Query",
+          "description": "Keyword or phrase to search for",
+          "placeholder": "startup ideas",
+          "required": false,
+          "conditional_display": {
+            "field": "mode",
+            "value": "keyword"
+          },
+          "warning": "⚠️ Keyword search is in development. Currently shows trending results. (Issue #300)"
         },
         {
           "name": "max_results",
@@ -477,19 +643,38 @@
           "default": 50,
           "min": 1,
           "max": 100,
-          "description": "Maximum number of shorts to collect",
+          "label": "Maximum Results",
+          "description": "Number of Shorts to collect",
           "required": false
         },
         {
           "name": "category",
           "type": "select",
-          "options": ["All", "Gaming", "Music", "Entertainment", "Education"],
+          "options": [
+            "All",
+            "Gaming",
+            "Music",
+            "Entertainment",
+            "Education"
+          ],
           "default": "All",
-          "description": "Content category filter (for trending mode)",
-          "required": false
+          "label": "Category Filter",
+          "description": "Filter trending Shorts by category",
+          "required": false,
+          "conditional_display": {
+            "field": "mode",
+            "value": "trending"
+          }
         }
       ],
-      "tags": ["content", "shorts", "youtube", "video", "channel", "trending"],
+      "tags": [
+        "content",
+        "shorts",
+        "youtube",
+        "video",
+        "channel",
+        "trending"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -497,7 +682,7 @@
       "id": "tiktok-videos",
       "name": "TikTok Videos Source",
       "description": "Collect trending TikTok videos",
-      "category": "Content/Shorts",
+      "category": "Sources/Content/Shorts",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Shorts/TikTok/src/cli.py",
       "parameters": [
@@ -511,7 +696,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "shorts", "tiktok", "video"],
+      "tags": [
+        "content",
+        "shorts",
+        "tiktok",
+        "video"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -519,7 +709,7 @@
       "id": "instagram-reels",
       "name": "Instagram Reels Source",
       "description": "Collect trending Instagram Reels",
-      "category": "Content/Shorts",
+      "category": "Sources/Content/Shorts",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Shorts/InstagramReels/src/cli.py",
       "parameters": [
@@ -533,7 +723,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "shorts", "instagram", "reels"],
+      "tags": [
+        "content",
+        "shorts",
+        "instagram",
+        "reels"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -541,7 +736,7 @@
       "id": "twitch-clips",
       "name": "Twitch Clips Source",
       "description": "Collect popular Twitch clips and highlights",
-      "category": "Content/Shorts",
+      "category": "Sources/Content/Shorts",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Shorts/TwitchClips/src/cli.py",
       "parameters": [
@@ -562,7 +757,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "clips", "twitch", "gaming"],
+      "tags": [
+        "content",
+        "clips",
+        "twitch",
+        "gaming"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -570,7 +770,7 @@
       "id": "kick-clips",
       "name": "Kick Clips Source",
       "description": "Collect trending clips from Kick streaming platform",
-      "category": "Content/Streams",
+      "category": "Sources/Content/Streams",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Streams/KickClips/src/cli.py",
       "parameters": [
@@ -584,7 +784,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "streams", "kick", "clips"],
+      "tags": [
+        "content",
+        "streams",
+        "kick",
+        "clips"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -592,7 +797,7 @@
       "id": "reddit-posts",
       "name": "Reddit Posts Source",
       "description": "Collect popular Reddit posts and discussions",
-      "category": "Content/Forums",
+      "category": "Sources/Content/Forums",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Forums/Reddit/src/cli.py",
       "parameters": [
@@ -615,13 +820,23 @@
         {
           "name": "sort",
           "type": "select",
-          "options": ["hot", "new", "top", "rising"],
+          "options": [
+            "hot",
+            "new",
+            "top",
+            "rising"
+          ],
           "default": "hot",
           "description": "Sort order",
           "required": false
         }
       ],
-      "tags": ["content", "forums", "reddit", "discussions"],
+      "tags": [
+        "content",
+        "forums",
+        "reddit",
+        "discussions"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -629,7 +844,7 @@
       "id": "hacker-news",
       "name": "Hacker News Source",
       "description": "Collect top stories from Hacker News",
-      "category": "Content/Forums",
+      "category": "Sources/Content/Forums",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Forums/HackerNews/src/cli.py",
       "parameters": [
@@ -645,13 +860,24 @@
         {
           "name": "type",
           "type": "select",
-          "options": ["top", "best", "new", "ask", "show"],
+          "options": [
+            "top",
+            "best",
+            "new",
+            "ask",
+            "show"
+          ],
           "default": "top",
           "description": "Story type",
           "required": false
         }
       ],
-      "tags": ["content", "forums", "hackernews", "tech"],
+      "tags": [
+        "content",
+        "forums",
+        "hackernews",
+        "tech"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -659,7 +885,7 @@
       "id": "medium-articles",
       "name": "Medium Articles Source",
       "description": "Collect popular Medium articles and stories",
-      "category": "Content/Articles",
+      "category": "Sources/Content/Articles",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Articles/Medium/src/cli.py",
       "parameters": [
@@ -680,7 +906,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "articles", "medium", "blogging"],
+      "tags": [
+        "content",
+        "articles",
+        "medium",
+        "blogging"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -688,7 +919,7 @@
       "id": "web-articles",
       "name": "Web Articles Source",
       "description": "Scrape and collect articles from web URLs",
-      "category": "Content/Articles",
+      "category": "Sources/Content/Articles",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Articles/WebArticles/src/cli.py",
       "parameters": [
@@ -700,7 +931,12 @@
           "required": true
         }
       ],
-      "tags": ["content", "articles", "web", "scraping"],
+      "tags": [
+        "content",
+        "articles",
+        "web",
+        "scraping"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -708,14 +944,21 @@
       "id": "apple-podcasts",
       "name": "Apple Podcasts Source",
       "description": "Collect trending Apple Podcasts episodes",
-      "category": "Content/Podcasts",
+      "category": "Sources/Content/Podcasts",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Podcasts/ApplePodcasts/src/cli.py",
       "parameters": [
         {
           "name": "category",
           "type": "select",
-          "options": ["All", "Technology", "Business", "Comedy", "News", "Education"],
+          "options": [
+            "All",
+            "Technology",
+            "Business",
+            "Comedy",
+            "News",
+            "Education"
+          ],
           "default": "All",
           "description": "Podcast category",
           "required": false
@@ -730,7 +973,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "podcasts", "apple", "audio"],
+      "tags": [
+        "content",
+        "podcasts",
+        "apple",
+        "audio"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -738,7 +986,7 @@
       "id": "spotify-podcasts",
       "name": "Spotify Podcasts Source",
       "description": "Collect trending Spotify podcast episodes",
-      "category": "Content/Podcasts",
+      "category": "Sources/Content/Podcasts",
       "version": "1.0.0",
       "script_path": "../../Sources/Content/Podcasts/SpotifyPodcasts/src/cli.py",
       "parameters": [
@@ -759,7 +1007,12 @@
           "required": false
         }
       ],
-      "tags": ["content", "podcasts", "spotify", "audio"],
+      "tags": [
+        "content",
+        "podcasts",
+        "spotify",
+        "audio"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -767,14 +1020,21 @@
       "id": "amazon-bestsellers",
       "name": "Amazon Bestsellers Source",
       "description": "Track Amazon bestselling products and trends",
-      "category": "Commerce",
+      "category": "Sources/Commerce",
       "version": "1.0.0",
       "script_path": "../../Sources/Commerce/AmazonBestsellers/src/cli.py",
       "parameters": [
         {
           "name": "category",
           "type": "select",
-          "options": ["All", "Books", "Electronics", "Home", "Fashion", "Toys"],
+          "options": [
+            "All",
+            "Books",
+            "Electronics",
+            "Home",
+            "Fashion",
+            "Toys"
+          ],
           "default": "All",
           "description": "Product category",
           "required": false
@@ -789,7 +1049,12 @@
           "required": false
         }
       ],
-      "tags": ["commerce", "amazon", "products", "trends"],
+      "tags": [
+        "commerce",
+        "amazon",
+        "products",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -797,7 +1062,7 @@
       "id": "etsy-trending",
       "name": "Etsy Trending Source",
       "description": "Track trending products and searches on Etsy",
-      "category": "Commerce",
+      "category": "Sources/Commerce",
       "version": "1.0.0",
       "script_path": "../../Sources/Commerce/EtsyTrending/src/cli.py",
       "parameters": [
@@ -818,7 +1083,12 @@
           "required": false
         }
       ],
-      "tags": ["commerce", "etsy", "handmade", "trends"],
+      "tags": [
+        "commerce",
+        "etsy",
+        "handmade",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -826,14 +1096,18 @@
       "id": "app-store-charts",
       "name": "App Store Top Charts Source",
       "description": "Track top apps and games from app stores",
-      "category": "Commerce",
+      "category": "Sources/Commerce",
       "version": "1.0.0",
       "script_path": "../../Sources/Commerce/AppStoreTopCharts/src/cli.py",
       "parameters": [
         {
           "name": "store",
           "type": "select",
-          "options": ["iOS", "Android", "Both"],
+          "options": [
+            "iOS",
+            "Android",
+            "Both"
+          ],
           "default": "Both",
           "description": "App store platform",
           "required": false
@@ -841,13 +1115,24 @@
         {
           "name": "category",
           "type": "select",
-          "options": ["All", "Games", "Social", "Entertainment", "Productivity"],
+          "options": [
+            "All",
+            "Games",
+            "Social",
+            "Entertainment",
+            "Productivity"
+          ],
           "default": "All",
           "description": "App category",
           "required": false
         }
       ],
-      "tags": ["commerce", "apps", "mobile", "trends"],
+      "tags": [
+        "commerce",
+        "apps",
+        "mobile",
+        "trends"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -855,14 +1140,19 @@
       "id": "comment-mining",
       "name": "Comment Mining Source",
       "description": "Mine insights from platform comments and discussions",
-      "category": "Community",
+      "category": "Sources/Community",
       "version": "1.0.0",
       "script_path": "../../Sources/Community/CommentMiningSource/src/cli.py",
       "parameters": [
         {
           "name": "platform",
           "type": "select",
-          "options": ["YouTube", "Reddit", "TikTok", "Instagram"],
+          "options": [
+            "YouTube",
+            "Reddit",
+            "TikTok",
+            "Instagram"
+          ],
           "default": "YouTube",
           "description": "Platform to mine comments from",
           "required": true
@@ -875,7 +1165,12 @@
           "required": true
         }
       ],
-      "tags": ["community", "comments", "mining", "sentiment"],
+      "tags": [
+        "community",
+        "comments",
+        "mining",
+        "sentiment"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -883,20 +1178,30 @@
       "id": "user-feedback",
       "name": "User Feedback Source",
       "description": "Collect and analyze user feedback and requests",
-      "category": "Community",
+      "category": "Sources/Community",
       "version": "1.0.0",
       "script_path": "../../Sources/Community/UserFeedbackSource/src/cli.py",
       "parameters": [
         {
           "name": "source",
           "type": "select",
-          "options": ["Email", "Survey", "Social Media", "All"],
+          "options": [
+            "Email",
+            "Survey",
+            "Social Media",
+            "All"
+          ],
           "default": "All",
           "description": "Feedback source",
           "required": false
         }
       ],
-      "tags": ["community", "feedback", "users", "requests"],
+      "tags": [
+        "community",
+        "feedback",
+        "users",
+        "requests"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -904,14 +1209,19 @@
       "id": "qa-source",
       "name": "Q&A Platforms Source",
       "description": "Collect questions and answers from Q&A platforms",
-      "category": "Community",
+      "category": "Sources/Community",
       "version": "1.0.0",
       "script_path": "../../Sources/Community/QASource/src/cli.py",
       "parameters": [
         {
           "name": "platform",
           "type": "select",
-          "options": ["Quora", "Stack Overflow", "Reddit AMA", "All"],
+          "options": [
+            "Quora",
+            "Stack Overflow",
+            "Reddit AMA",
+            "All"
+          ],
           "default": "All",
           "description": "Q&A platform",
           "required": false
@@ -924,7 +1234,12 @@
           "required": true
         }
       ],
-      "tags": ["community", "qa", "questions", "answers"],
+      "tags": [
+        "community",
+        "qa",
+        "questions",
+        "answers"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -932,7 +1247,7 @@
       "id": "prompt-box",
       "name": "Prompt Box Source",
       "description": "Collect user-submitted content prompts and ideas",
-      "category": "Community",
+      "category": "Sources/Community",
       "version": "1.0.0",
       "script_path": "../../Sources/Community/PromptBoxSource/src/cli.py",
       "parameters": [
@@ -946,7 +1261,12 @@
           "required": false
         }
       ],
-      "tags": ["community", "prompts", "ideas", "submissions"],
+      "tags": [
+        "community",
+        "prompts",
+        "ideas",
+        "submissions"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -954,7 +1274,7 @@
       "id": "manual-backlog",
       "name": "Manual Backlog",
       "description": "Add manual entries to idea backlog",
-      "category": "Internal",
+      "category": "Sources/Internal",
       "version": "1.0.0",
       "script_path": "../../Sources/Internal/ManualBacklog/src/cli.py",
       "parameters": [
@@ -973,7 +1293,11 @@
           "required": false
         }
       ],
-      "tags": ["internal", "manual", "backlog"],
+      "tags": [
+        "internal",
+        "manual",
+        "backlog"
+      ],
       "status": "active",
       "enabled": true
     },
@@ -981,7 +1305,7 @@
       "id": "csv-import",
       "name": "CSV Import",
       "description": "Import ideas from CSV file",
-      "category": "Internal",
+      "category": "Sources/Internal",
       "version": "1.0.0",
       "script_path": "../../Sources/Internal/CSVImport/src/cli.py",
       "parameters": [
@@ -993,7 +1317,11 @@
           "required": true
         }
       ],
-      "tags": ["internal", "import", "csv"],
+      "tags": [
+        "internal",
+        "import",
+        "csv"
+      ],
       "status": "active",
       "enabled": true
     }

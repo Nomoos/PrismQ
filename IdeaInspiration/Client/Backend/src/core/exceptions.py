@@ -110,3 +110,22 @@ class ConfigurationException(WebClientException):
         """
         self.config_key = config_key
         super().__init__(message, error_code="CONFIGURATION_ERROR")
+
+
+class SubprocessPolicyException(WebClientException):
+    """Windows event loop policy not configured for subprocess execution.
+    
+    This exception is raised when attempting to use asyncio subprocess operations
+    on Windows without WindowsProactorEventLoopPolicy set.
+    """
+
+    def __init__(self, message: str, current_policy: str = None):
+        """
+        Initialize exception.
+        
+        Args:
+            message: Error message
+            current_policy: Name of the current event loop policy
+        """
+        self.current_policy = current_policy
+        super().__init__(message, error_code="SUBPROCESS_POLICY_ERROR")

@@ -147,5 +147,5 @@ Write-Host ""
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host ""
 
-# Run uvicorn with auto-reload
-uvicorn src.main:app --reload --host 127.0.0.1 --port 8000
+# Run uvicorn with auto-reload using custom runner for Windows subprocess support
+python -m src.uvicorn_runner

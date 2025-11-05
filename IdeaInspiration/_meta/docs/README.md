@@ -19,6 +19,10 @@ Documentation is organized into the following categories:
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, module organization patterns, and design decisions
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+- **[PYTHON_PACKAGING_STANDARD.md](./PYTHON_PACKAGING_STANDARD.md)** - Python packaging and configuration standards
+- **[PYTHON_VERSION_DECISION.md](./PYTHON_VERSION_DECISION.md)** - Python 3.10 version requirement and rationale
+- **[PYTHON_LAUNCHER_GUIDE.md](./PYTHON_LAUNCHER_GUIDE.md)** - How to use `py` launcher for version management
+- **[SETUP.md](./SETUP.md)** - Development environment setup guide
 - **[LOGGING_BEST_PRACTICES.md](./LOGGING_BEST_PRACTICES.md)** - Logging standards and best practices
 - **[BATCH_PROCESSING.md](./BATCH_PROCESSING.md)** - Batch processing patterns and guidelines
 - **[MODULE_DISCOVERY.md](./MODULE_DISCOVERY.md)** - Module discovery and dynamic loading

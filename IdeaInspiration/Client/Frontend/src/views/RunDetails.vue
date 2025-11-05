@@ -1,18 +1,38 @@
 <template>
   <div class="run-details">
     <div v-if="loading" class="loading-container">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      <p class="mt-4 text-gray-600">Loading run details...</p>
+      <div class="loading-card">
+        <div class="loading-header">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <h3 class="loading-title">Loading Run Details</h3>
+        </div>
+        <div class="action-log">
+          <div class="action-log-header">Action Log:</div>
+          <div class="action-log-entries">
+            <div v-for="(entry, index) in actionLog" :key="index" class="log-entry">
+              {{ entry }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div v-else-if="error" class="error-container">
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        <p class="font-bold">Error loading run</p>
-        <p class="text-sm">{{ error }}</p>
+      <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <div class="error-content">
+          <h3 class="error-title">Failed to Load Run Details</h3>
+          <p class="error-message">{{ error }}</p>
+          <div class="error-actions">
+            <button @click="loadRun" class="btn-retry">
+              🔄 Retry
+            </button>
+            <button @click="$router.push('/runs')" class="btn-back">
+              ← Back to History
+            </button>
+          </div>
+        </div>
       </div>
-      <button @click="$router.push('/')" class="mt-4 btn-primary">
-        Back to Dashboard
-      </button>
     </div>
     
     <div v-else-if="run">
@@ -104,6 +124,12 @@ const activeTab = ref<'logs' | 'parameters' | 'results'>('logs')
 const pollInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+const actionLog = ref<string[]>([])
+
+function addLogEntry(message: string) {
+  const timestamp = new Date().toLocaleTimeString()
+  actionLog.value.push(`[${timestamp}] ${message}`)
+}
 
 const canCancel = computed(() => 
   run.value?.status === 'queued' || run.value?.status === 'running'
@@ -122,19 +148,67 @@ async function loadRun() {
   try {
     loading.value = true
     error.value = null
+    actionLog.value = [] // Clear previous logs
+    
+    addLogEntry(`Starting to load run: ${runId}`)
+    addLogEntry('Sending API request to backend...')
+    
+    const startTime = Date.now()
     run.value = await runService.getRun(runId)
+    const duration = Date.now() - startTime
+    
+    addLogEntry(`✓ Received run data in ${duration}ms`)
+    addLogEntry(`Run status: ${run.value.status}`)
     
     // Calculate duration if not provided
     if (run.value && !run.value.duration_seconds && run.value.start_time) {
+      addLogEntry('Calculating run duration...')
       const start = new Date(run.value.start_time).getTime()
       const end = run.value.end_time ? new Date(run.value.end_time).getTime() : Date.now()
       run.value.duration_seconds = Math.floor((end - start) / 1000)
+      addLogEntry(`✓ Duration calculated: ${run.value.duration_seconds}s`)
     }
+    
+    addLogEntry('✓ Run details loaded successfully')
   } catch (err: any) {
-    error.value = err.message || 'Failed to load run details'
+    addLogEntry('✗ Error occurred while loading run')
+    
+    // Provide more descriptive error messages
+    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+      addLogEntry('✗ Request timeout (30 seconds)')
+      addLogEntry('Backend may be slow or unresponsive')
+      error.value = 'Request timed out after 30 seconds. The backend may be slow or unresponsive.'
+    } else if (err.response) {
+      // Server responded with error
+      const status = err.response.status
+      addLogEntry(`Server responded with status: ${status}`)
+      
+      if (status === 404) {
+        error.value = `Run "${runId}" not found. It may have been deleted or never existed.`
+        addLogEntry('Error: Run not found (404)')
+      } else if (status === 500) {
+        error.value = 'Server error occurred while loading run details. Please try again later.'
+        addLogEntry('Error: Server error (500)')
+      } else {
+        error.value = err.response.data?.detail || err.message || 'Failed to load run details'
+        addLogEntry(`Error: ${error.value}`)
+      }
+    } else if (err.request) {
+      // Request made but no response
+      addLogEntry('✗ No response from backend server')
+      addLogEntry('Backend may not be running or network issue')
+      error.value = 'Cannot connect to backend server. Please ensure it is running at the configured URL.'
+    } else {
+      // Something else happened
+      addLogEntry(`✗ Unexpected error: ${err.message}`)
+      error.value = err.message || 'An unexpected error occurred while loading run details'
+    }
     console.error('Error loading run:', err)
   } finally {
     loading.value = false
+    if (loading.value === false && actionLog.value.length > 0) {
+      addLogEntry('Loading process completed')
+    }
   }
 }
 
@@ -182,9 +256,76 @@ function formatDuration(seconds: number | undefined): string {
   @apply max-w-7xl mx-auto px-4 py-6;
 }
 
-.loading-container,
+.loading-container {
+  @apply flex justify-center py-8;
+}
+
+.loading-card {
+  @apply bg-white border-2 border-blue-300 rounded-lg p-6 max-w-2xl w-full shadow-lg;
+}
+
+.loading-header {
+  @apply flex items-center gap-4 mb-4 pb-4 border-b border-gray-200;
+}
+
+.loading-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.action-log {
+  @apply mt-4;
+}
+
+.action-log-header {
+  @apply text-sm font-semibold text-gray-700 mb-2;
+}
+
+.action-log-entries {
+  @apply bg-gray-50 border border-gray-200 rounded p-4 max-h-64 overflow-y-auto font-mono text-xs;
+}
+
+.log-entry {
+  @apply text-gray-700 py-1;
+}
+
+.log-entry:last-child {
+  @apply font-semibold;
+}
+
 .error-container {
-  @apply text-center py-12;
+  @apply flex justify-center py-8;
+}
+
+.error-card {
+  @apply bg-red-50 border-2 border-red-300 rounded-lg p-6 max-w-md shadow-lg flex gap-4;
+}
+
+.error-icon {
+  @apply text-4xl flex-shrink-0;
+}
+
+.error-content {
+  @apply flex-1;
+}
+
+.error-title {
+  @apply text-lg font-bold text-red-900 mb-2;
+}
+
+.error-message {
+  @apply text-sm text-red-700 mb-4;
+}
+
+.error-actions {
+  @apply flex gap-2;
+}
+
+.btn-retry {
+  @apply px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium;
+}
+
+.btn-back {
+  @apply px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors text-sm font-medium;
 }
 
 .run-header {

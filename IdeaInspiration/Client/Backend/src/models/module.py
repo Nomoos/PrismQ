@@ -5,6 +5,20 @@ from typing import List, Optional, Any, Literal, Dict
 from pydantic import BaseModel, Field
 
 
+class ConditionalDisplay(BaseModel):
+    """Conditional display rule for parameters."""
+    
+    field: str = Field(..., description="Field name to check")
+    value: str | int | bool = Field(..., description="Value that triggers display")
+
+
+class ValidationRule(BaseModel):
+    """Validation rule for parameters."""
+    
+    pattern: Optional[str] = Field(None, description="Regex pattern for validation")
+    message: Optional[str] = Field(None, description="Error message if validation fails")
+
+
 class ModuleParameter(BaseModel):
     """Module parameter definition."""
     
@@ -18,6 +32,15 @@ class ModuleParameter(BaseModel):
     description: str = Field("", description="Parameter description")
     min: Optional[int] = Field(None, description="Minimum value for number type")
     max: Optional[int] = Field(None, description="Maximum value for number type")
+    placeholder: Optional[str] = Field(None, description="Placeholder text for input fields")
+    label: Optional[str] = Field(None, description="Human-readable label for the parameter")
+    conditional_display: Optional[ConditionalDisplay] = Field(
+        None, description="Conditional display rule based on another parameter"
+    )
+    validation: Optional[ValidationRule] = Field(
+        None, description="Additional validation rules"
+    )
+    warning: Optional[str] = Field(None, description="Warning message to display for this parameter")
 
 
 class Module(BaseModel):

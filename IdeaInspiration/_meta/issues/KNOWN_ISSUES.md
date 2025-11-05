@@ -4,6 +4,22 @@ This document tracks known issues across the PrismQ.IdeaInspiration ecosystem.
 
 ## Current Issues
 
+### Windows Subprocess Execution
+
+**Issue**: Windows subprocess NotImplementedError with asyncio
+- **Severity**: ✅ RESOLVED (as of commit 3b818c7)
+- **Module**: Client/Backend
+- **Description**: Windows users experienced `NotImplementedError` when running modules due to asyncio event loop policy issues. The default `SelectorEventLoop` on Windows doesn't support subprocess operations, requiring `WindowsProactorEventLoopPolicy`.
+- **Affected Modules**: ALL modules (YouTube, reddit-posts, hacker-news, etc.)
+- **Solution**: SubprocessWrapper now auto-detects Windows and uses THREADED mode by default, which works regardless of server startup method or event loop policy.
+- **Status**: ✅ RESOLVED
+- **References**: 
+  - Issue #304: Windows Subprocess Deployment Fix
+  - Issue #305: YouTube Module Verification
+  - Issue #306: Complete Resolution Index
+- **Verification**: All modules verified to use centralized SubprocessWrapper (Issue #305)
+- **Impact**: Zero - fix is transparent to users and modules
+
 ### Configuration Management
 
 **Issue**: Multiple .env file locations across modules
@@ -161,4 +177,4 @@ Add any other context about the problem here
 
 ---
 
-**Last Updated**: 2025-10-29
+**Last Updated**: 2025-11-04

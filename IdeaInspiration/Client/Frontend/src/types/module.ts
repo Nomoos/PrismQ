@@ -1,4 +1,20 @@
 /**
+ * Conditional display rule for parameters
+ */
+export interface ConditionalDisplay {
+  field: string
+  value: string | number | boolean
+}
+
+/**
+ * Validation rule for parameters
+ */
+export interface ValidationRule {
+  pattern?: string
+  message?: string
+}
+
+/**
  * Module parameter definition
  */
 export interface ModuleParameter {
@@ -10,6 +26,11 @@ export interface ModuleParameter {
   required: boolean
   min?: number
   max?: number
+  placeholder?: string
+  label?: string
+  conditional_display?: ConditionalDisplay
+  validation?: ValidationRule
+  warning?: string
 }
 
 /**

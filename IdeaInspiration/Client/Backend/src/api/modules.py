@@ -1,5 +1,6 @@
 """Module API endpoints."""
 
+import re
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -22,6 +23,7 @@ router = APIRouter()
 def _validate_parameters(module: Module, parameters: dict) -> List[str]:
     """
     Validate parameters against module parameter definitions.
+    Supports mode-aware conditional validation.
     
     Args:
         module: Module with parameter definitions
@@ -35,15 +37,32 @@ def _validate_parameters(module: Module, parameters: dict) -> List[str]:
     for param_def in module.parameters:
         param_name = param_def.name
         
-        # Check required parameters
+        # Check if parameter should be displayed based on conditional_display
+        is_visible = True
+        if param_def.conditional_display:
+            condition_field = param_def.conditional_display.field
+            condition_value = param_def.conditional_display.value
+            actual_value = parameters.get(condition_field)
+            is_visible = (actual_value == condition_value)
+        
+        # Only validate visible parameters
+        if not is_visible:
+            continue
+        
+        # Check required parameters (only if visible)
         if param_def.required and param_name not in parameters:
-            errors.append(f"{param_name} is required")
+            label = param_def.label or param_def.description or param_name
+            errors.append(f"{label} is required")
             continue
         
         if param_name not in parameters:
             continue
         
         value = parameters[param_name]
+        
+        # Skip validation for empty optional parameters
+        if not param_def.required and (value is None or value == ""):
+            continue
         
         # Type validation
         if param_def.type == "number":
@@ -65,6 +84,11 @@ def _validate_parameters(module: Module, parameters: dict) -> List[str]:
         elif param_def.type == "text" or param_def.type == "password":
             if not isinstance(value, str):
                 errors.append(f"{param_name} must be a string")
+            # Apply regex validation if specified
+            elif param_def.validation and param_def.validation.pattern:
+                if not re.match(param_def.validation.pattern, value):
+                    error_msg = param_def.validation.message or f"{param_name} format is invalid"
+                    errors.append(error_msg)
     
     return errors
 

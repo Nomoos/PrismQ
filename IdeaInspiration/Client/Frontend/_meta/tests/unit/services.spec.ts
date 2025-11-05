@@ -135,12 +135,12 @@ describe('Module Service', () => {
 
   it('should launch module', async () => {
     const mockRun: Run = {
-      id: 'run-123',
+      run_id: 'run-123',
       module_id: 'test-module',
       module_name: 'Test Module',
       status: 'queued',
       parameters: { max_results: 50 },
-      start_time: new Date().toISOString()
+      created_at: new Date().toISOString()
     }
 
     mockPost.mockResolvedValueOnce({
@@ -149,7 +149,7 @@ describe('Module Service', () => {
 
     const run = await moduleService.launchModule('test-module', { max_results: 50 }, true)
 
-    expect(run.id).toBe('run-123')
+    expect(run.run_id).toBe('run-123')
     expect(run.status).toBe('queued')
     expect(mockPost).toHaveBeenCalledWith('/api/modules/test-module/run', {
       parameters: { max_results: 50 },
@@ -182,12 +182,12 @@ describe('Run Service', () => {
   it('should list runs', async () => {
     const mockRuns: Run[] = [
       {
-        id: 'run-123',
+        run_id: 'run-123',
         module_id: 'test-module',
         module_name: 'Test Module',
         status: 'running',
         parameters: { max_results: 50 },
-        start_time: '2025-01-01T00:00:00Z'
+        created_at: '2025-01-01T00:00:00Z'
       }
     ]
 
@@ -201,7 +201,7 @@ describe('Run Service', () => {
     const runs = await runService.listRuns()
 
     expect(runs).toHaveLength(1)
-    expect(runs[0].id).toBe('run-123')
+    expect(runs[0].run_id).toBe('run-123')
     expect(mockGet).toHaveBeenCalledWith('/api/runs', { params: undefined })
   })
 
@@ -232,13 +232,14 @@ describe('Run Service', () => {
 
   it('should get a specific run', async () => {
     const mockRun: Run = {
-      id: 'run-123',
+      run_id: 'run-123',
       module_id: 'test-module',
       module_name: 'Test Module',
       status: 'completed',
       parameters: { max_results: 50 },
-      start_time: '2025-01-01T00:00:00Z',
-      end_time: '2025-01-01T00:05:00Z',
+      created_at: '2025-01-01T00:00:00Z',
+      started_at: '2025-01-01T00:00:00Z',
+      completed_at: '2025-01-01T00:05:00Z',
       duration_seconds: 300,
       progress_percent: 100
     }
@@ -251,7 +252,7 @@ describe('Run Service', () => {
 
     const run = await runService.getRun('run-123')
 
-    expect(run.id).toBe('run-123')
+    expect(run.run_id).toBe('run-123')
     expect(run.status).toBe('completed')
     expect(mockGet).toHaveBeenCalledWith('/api/runs/run-123')
   })
@@ -312,12 +313,12 @@ describe('Run Service', () => {
 
   it('should create a new run', async () => {
     const mockRun: Run = {
-      id: 'run-456',
+      run_id: 'run-456',
       module_id: 'test-module',
       module_name: 'Test Module',
       status: 'queued',
       parameters: { max_results: 100 },
-      start_time: '2025-01-01T00:00:00Z'
+      created_at: '2025-01-01T00:00:00Z'
     }
 
     mockPost.mockResolvedValueOnce({
@@ -331,7 +332,7 @@ describe('Run Service', () => {
       parameters: { max_results: 100 }
     })
 
-    expect(run.id).toBe('run-456')
+    expect(run.run_id).toBe('run-456')
     expect(run.status).toBe('queued')
     expect(mockPost).toHaveBeenCalledWith('/api/runs', {
       module_id: 'test-module',

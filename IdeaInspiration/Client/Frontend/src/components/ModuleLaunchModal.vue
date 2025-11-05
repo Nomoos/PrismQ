@@ -10,11 +10,14 @@
         <div 
           v-for="param in module.parameters" 
           :key="param.name"
+          v-if="isParameterVisible(param)"
           class="form-field"
+          :class="{ 'field-transition': hasConditionalDisplay(param) }"
         >
           <label :for="param.name">
-            {{ param.description || param.name }}
-            <span v-if="param.required" class="required">*</span>
+            {{ param.label || param.description || param.name }}
+            <span v-if="isParameterRequired(param)" class="required">*</span>
+            <span v-if="param.description && param.label" class="help-icon" :title="param.description">ⓘ</span>
           </label>
           
           <!-- Text input -->
@@ -23,9 +26,9 @@
             :id="param.name"
             v-model="formData[param.name]"
             type="text"
-            :required="param.required"
-            :placeholder="String(param.default || '')"
-            :class="{ 'input-error': errors[param.name] }"
+            :required="isParameterRequired(param)"
+            :placeholder="param.placeholder || String(param.default || '')"
+            :class="{ 'input-error': errors[param.name], 'input-valid': isFieldValid(param) }"
           />
           
           <!-- Password input -->
@@ -34,8 +37,8 @@
             :id="param.name"
             v-model="formData[param.name]"
             type="password"
-            :required="param.required"
-            :placeholder="String(param.default || '')"
+            :required="isParameterRequired(param)"
+            :placeholder="param.placeholder || String(param.default || '')"
             :class="{ 'input-error': errors[param.name] }"
           />
           
@@ -47,24 +50,30 @@
             type="number"
             :min="param.min"
             :max="param.max"
-            :required="param.required"
+            :required="isParameterRequired(param)"
+            :placeholder="param.placeholder"
             :class="{ 'input-error': errors[param.name] }"
           />
           
           <!-- Select dropdown -->
+          <!-- Note: Mode change handler is applied to all select elements.
+               Currently, conditional_display only uses 'mode' field which is a select.
+               If future parameters use conditional_display with other field types,
+               the handler should be applied to those types as well. -->
           <select 
             v-else-if="param.type === 'select'"
             :id="param.name"
             v-model="formData[param.name]"
-            :required="param.required"
+            :required="isParameterRequired(param)"
             :class="{ 'input-error': errors[param.name] }"
+            @change="handleModeChange(param)"
           >
             <option 
               v-for="option in param.options" 
               :key="option"
               :value="option"
             >
-              {{ option }}
+              {{ getModeIcon(param.name, option) }} {{ option }}
             </option>
           </select>
           
@@ -77,9 +86,19 @@
             />
           </div>
           
+          <!-- Validation indicator -->
+          <div v-if="isFieldValid(param) && formData[param.name]" class="validation-indicator success">
+            ✓ Valid
+          </div>
+          
           <!-- Error message -->
           <div v-if="errors[param.name]" class="error-message">
             {{ errors[param.name] }}
+          </div>
+          
+          <!-- Warning message -->
+          <div v-if="param.warning" class="warning-message">
+            {{ param.warning }}
           </div>
         </div>
         
@@ -104,7 +123,7 @@
             <button type="button" @click="$emit('close')" class="btn-secondary">
               Cancel
             </button>
-            <button type="submit" class="btn-primary" :disabled="isSubmitting">
+            <button type="submit" class="btn-primary" :disabled="isSubmitting || !isFormValid">
               {{ isSubmitting ? 'Launching...' : 'Launch' }}
             </button>
           </div>
@@ -115,8 +134,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import type { Module } from '@/types/module'
+import { ref, onMounted, computed } from 'vue'
+import type { Module, ModuleParameter } from '@/types/module'
 import { moduleService } from '@/services/modules'
 import { useNotificationStore } from '@/stores/notifications'
 
@@ -149,6 +168,135 @@ onMounted(async () => {
 })
 
 /**
+ * Check if a parameter should be visible based on conditional_display rules.
+ */
+function isParameterVisible(param: ModuleParameter): boolean {
+  if (!param.conditional_display) {
+    return true
+  }
+  
+  const conditionField = param.conditional_display.field
+  const conditionValue = param.conditional_display.value
+  const actualValue = formData.value[conditionField]
+  
+  return actualValue === conditionValue
+}
+
+/**
+ * Check if a parameter has conditional display rules.
+ */
+function hasConditionalDisplay(param: ModuleParameter): boolean {
+  return param.conditional_display !== undefined && param.conditional_display !== null
+}
+
+/**
+ * Check if a parameter is required (considering conditional display).
+ */
+function isParameterRequired(param: ModuleParameter): boolean {
+  if (!param.required) {
+    return false
+  }
+  
+  // Only required if visible
+  return isParameterVisible(param)
+}
+
+/**
+ * Get icon for mode selection options.
+ */
+function getModeIcon(paramName: string, option: string): string {
+  if (paramName !== 'mode') {
+    return ''
+  }
+  
+  const icons: Record<string, string> = {
+    'trending': '📈',
+    'channel': '👤',
+    'keyword': '🔍'
+  }
+  
+  return icons[option] || ''
+}
+
+/**
+ * Handle mode change - clear dependent fields.
+ */
+function handleModeChange(param: ModuleParameter) {
+  if (param.name === 'mode') {
+    // Clear fields that depend on mode
+    props.module.parameters.forEach(p => {
+      if (p.conditional_display && p.conditional_display.field === 'mode') {
+        // Clear the field if it's no longer visible
+        if (!isParameterVisible(p)) {
+          formData.value[p.name] = p.default || ''
+          delete errors.value[p.name]
+        }
+      }
+    })
+  }
+}
+
+/**
+ * Check if a field is valid.
+ */
+function isFieldValid(param: ModuleParameter): boolean {
+  if (!isParameterVisible(param)) {
+    return true
+  }
+  
+  const value = formData.value[param.name]
+  
+  // Empty optional fields are valid
+  if (!param.required && (value === undefined || value === '' || value === null)) {
+    return true
+  }
+  
+  // Required field must have value
+  if (param.required && (value === undefined || value === '' || value === null)) {
+    return false
+  }
+  
+  // Check validation pattern
+  if (param.validation && param.validation.pattern && value) {
+    const regex = new RegExp(param.validation.pattern)
+    return regex.test(String(value))
+  }
+  
+  return true
+}
+
+/**
+ * Compute overall form validity.
+ */
+const isFormValid = computed(() => {
+  for (const param of props.module.parameters) {
+    // Check visibility once
+    const visible = isParameterVisible(param)
+    
+    if (!visible) {
+      continue
+    }
+    
+    const value = formData.value[param.name]
+    
+    // Check required fields
+    if (param.required && (value === undefined || value === '' || value === null)) {
+      return false
+    }
+    
+    // Check validation pattern
+    if (param.validation && param.validation.pattern && value) {
+      const regex = new RegExp(param.validation.pattern)
+      if (!regex.test(String(value))) {
+        return false
+      }
+    }
+  }
+  
+  return true
+})
+
+/**
  * Validate form data against parameter definitions.
  * 
  * @returns true if valid, false otherwise
@@ -157,11 +305,17 @@ function validateForm(): boolean {
   errors.value = {}
   
   for (const param of props.module.parameters) {
+    // Skip invisible parameters
+    if (!isParameterVisible(param)) {
+      continue
+    }
+    
     const value = formData.value[param.name]
+    const label = param.label || param.description || param.name
     
     // Required check
     if (param.required && (value === undefined || value === '' || value === null)) {
-      errors.value[param.name] = `${param.description || param.name} is required`
+      errors.value[param.name] = `${label} is required`
       continue
     }
     
@@ -184,6 +338,12 @@ function validateForm(): boolean {
       if (!param.options.includes(value)) {
         errors.value[param.name] = `Must be one of: ${param.options.join(', ')}`
       }
+    } else if (param.type === 'text' && param.validation && param.validation.pattern) {
+      // Regex validation
+      const regex = new RegExp(param.validation.pattern)
+      if (!regex.test(String(value))) {
+        errors.value[param.name] = param.validation.message || `${label} format is invalid`
+      }
     }
   }
   
@@ -202,7 +362,19 @@ async function handleSubmit() {
   
   isSubmitting.value = true
   try {
-    emit('launch', formData.value, saveConfig.value)
+    // Clean parameters - only send visible parameters
+    const cleanedParams: Record<string, any> = {}
+    for (const param of props.module.parameters) {
+      if (isParameterVisible(param)) {
+        const value = formData.value[param.name]
+        // Only include non-empty values or required fields
+        if (value !== undefined && value !== '' && value !== null) {
+          cleanedParams[param.name] = value
+        }
+      }
+    }
+    
+    emit('launch', cleanedParams, saveConfig.value)
   } finally {
     isSubmitting.value = false
   }
@@ -261,6 +433,10 @@ async function resetToDefaults() {
   @apply space-y-2;
 }
 
+.field-transition {
+  transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
 .form-field label {
   @apply block text-sm font-medium text-gray-700;
 }
@@ -269,19 +445,41 @@ async function resetToDefaults() {
   @apply text-red-500 ml-1;
 }
 
+.form-field .help-icon {
+  @apply text-gray-400 ml-1 cursor-help;
+  font-size: 0.9rem;
+}
+
 .form-field input[type="text"],
 .form-field input[type="password"],
 .form-field input[type="number"],
 .form-field select {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
+  transition: border-color 0.2s ease-in-out;
 }
 
 .input-error {
   @apply border-red-500 focus:ring-red-500 focus:border-red-500;
 }
 
+.input-valid {
+  @apply border-green-500 focus:ring-green-500 focus:border-green-500;
+}
+
+.validation-indicator {
+  @apply text-sm mt-1 flex items-center gap-1;
+}
+
+.validation-indicator.success {
+  @apply text-green-600;
+}
+
 .error-message {
   @apply text-sm text-red-600 mt-1;
+}
+
+.warning-message {
+  @apply text-sm text-amber-600 mt-1 bg-amber-50 border border-amber-200 rounded p-2;
 }
 
 .checkbox-wrapper {

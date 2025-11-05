@@ -49,11 +49,16 @@ _meta\_scripts\run_frontend.bat
 Before running for the first time:
 
 ### Backend Requirements
-1. **Python 3.10+** installed
-2. **Virtual environment** created at `Client\Backend\venv\`
-3. **Dependencies** installed from `Client\Backend\requirements.txt`
+1. **Python 3.10+** installed and in PATH
+   - The script will automatically create the virtual environment
+   - Dependencies will be installed automatically
 
-**First-time setup:**
+**First-time setup is now automatic!** Just run the script and it will:
+- Create the virtual environment at `Client\Backend\venv\`
+- Install all dependencies from `Client\Backend\requirements.txt`
+
+**Manual setup (optional):**
+If you prefer to set up manually:
 ```cmd
 cd Client\Backend
 python -m venv venv
@@ -65,11 +70,8 @@ pip install -r requirements.txt
 1. **Node.js 18+** (24.11.0+ recommended)
 2. **Dependencies** will be installed automatically if missing
 
-**First-time setup (if needed):**
-```cmd
-cd Client\Frontend
-npm install
-```
+**First-time setup (automatic):**
+The script will install npm dependencies automatically if needed.
 
 ## 🆘 Troubleshooting
 
@@ -77,8 +79,15 @@ npm install
 - Make sure you're running the script from the repository root
 - The script should be at `_meta\_scripts\run_both.bat`
 
-### Script Says "Virtual environment not found"
-- You need to create the Backend virtual environment first (see Prerequisites above)
+### Script Says "Python is not installed"
+- Install Python 3.10 or higher from https://www.python.org/downloads/
+- Make sure to check "Add Python to PATH" during installation
+- Restart your terminal/command prompt after installation
+
+### Script Says "Virtual environment exists but appears broken"
+- The script will automatically recreate the virtual environment
+- This can happen if Python was reinstalled at a different location
+- Just run the script again and it will fix itself
 
 ### Script Says "Node.js is not installed"
 - Install Node.js from https://nodejs.org/

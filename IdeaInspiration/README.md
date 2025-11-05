@@ -2,6 +2,51 @@
 
 Central hub for AI-powered content idea collection, classification, scoring, and processing.
 
+**Primary Platform**: Windows 10/11 with NVIDIA RTX 5090
+
+## 🖥️ Platform & Requirements
+
+### Primary Platform
+- **OS**: Windows 10/11 (Primary)
+- **GPU**: NVIDIA RTX 5090 (Ada Lovelace, 32GB VRAM)
+- **CPU**: AMD Ryzen processor
+- **RAM**: 64GB DDR5
+- **Python**: 3.10.x (Required)
+
+### Cross-Platform Support
+- Linux and macOS are supported for development and testing
+- Production deployment optimized for Windows
+
+## ⚠️ Python Version Requirement
+
+**IMPORTANT: This project requires Python 3.10.x (NOT 3.11 or 3.12)**
+
+- **Required Version**: Python 3.10.x (recommended: 3.10.11)
+- **Download**: [python-3.10.11-amd64.exe](https://www.python.org/downloads/release/python-31011/)
+- **Reason**: DaVinci Resolve compatibility + Client module dependencies
+- **Do NOT use**: Python 3.11+ will cause compatibility issues
+
+### Windows Python Launcher (`py`) - Recommended
+
+For better version management on Windows, use the **Python Launcher (`py`)**:
+
+```powershell
+# Check Python 3.10 is available
+py -3.10 --version
+
+# Use py to run scripts and create virtual environments
+py -3.10 -m venv venv
+py -3.10 -m pip install -e .
+```
+
+The `py` launcher allows you to:
+- ✅ Have multiple Python versions installed simultaneously
+- ✅ Explicitly specify Python 3.10 with `py -3.10`
+- ✅ Keep other Python versions (3.11, 3.12) for other projects
+- ✅ Better compatibility with future Python versions
+
+All modules are configured with `requires-python = ">=3.10,<3.11"` to ensure compatibility.
+
 ## ✨ Highlights
 
 - **24 source integrations** - YouTube, Reddit, Google Trends, TikTok, and more
@@ -9,11 +54,11 @@ Central hub for AI-powered content idea collection, classification, scoring, and
 - **0-100 scoring system** - Comprehensive engagement and quality evaluation
 - **Unified data model** - IdeaInspiration structure for cross-platform content
 - **Web control panel** - Run and monitor modules via localhost interface
-- **Optimized for RTX 5090** - GPU-accelerated processing on Windows
+- **Optimized for Windows RTX 5090** - GPU-accelerated processing with proper async support
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Windows)
 
-```bash
+```powershell
 # Clone repository
 git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
 cd PrismQ.IdeaInspiration

@@ -89,15 +89,15 @@ describe('Module Types', () => {
 describe('Run Types', () => {
   it('should create a valid Run object', () => {
     const run: Run = {
-      id: 'run-123',
+      run_id: 'run-123',
       module_id: 'test-module',
       module_name: 'Test Module',
       status: 'queued' as RunStatus,
       parameters: { max_results: 50 },
-      start_time: new Date().toISOString()
+      created_at: new Date().toISOString()
     }
 
-    expect(run.id).toBe('run-123')
+    expect(run.run_id).toBe('run-123')
     expect(run.status).toBe('queued')
     expect(run.parameters.max_results).toBe(50)
   })
@@ -107,12 +107,12 @@ describe('Run Types', () => {
     
     statuses.forEach(status => {
       const run: Run = {
-        id: 'test',
+        run_id: 'test',
         module_id: 'test',
         module_name: 'Test',
         status,
         parameters: {},
-        start_time: new Date().toISOString()
+        created_at: new Date().toISOString()
       }
       expect(run.status).toBe(status)
     })
@@ -120,18 +120,20 @@ describe('Run Types', () => {
 
   it('should handle optional Run fields', () => {
     const run: Run = {
-      id: 'run-123',
+      run_id: 'run-123',
       module_id: 'test-module',
       module_name: 'Test Module',
       status: 'completed',
       parameters: {},
-      start_time: new Date().toISOString(),
-      end_time: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      started_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
       exit_code: 0,
       error_message: undefined
     }
 
-    expect(run.end_time).toBeDefined()
+    expect(run.started_at).toBeDefined()
+    expect(run.completed_at).toBeDefined()
     expect(run.exit_code).toBe(0)
   })
 })

@@ -2,6 +2,8 @@
 
 import asyncio
 import logging
+import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,9 +13,11 @@ from ..models.run import Run, RunStatus
 from .output_capture import OutputCapture
 from .process_manager import ProcessManager
 from .run_registry import RunRegistry
+from .subprocess_wrapper import SubprocessWrapper, RunMode
 from .exceptions import (
     ModuleExecutionException,
     ResourceLimitException,
+    SubprocessPolicyException,
 )
 
 if TYPE_CHECKING:
@@ -48,7 +52,8 @@ class ModuleRunner:
         config_storage: Optional["ConfigStorage"] = None,
         output_capture: Optional[OutputCapture] = None,
         resource_manager: Optional["ResourceManager"] = None,
-        max_concurrent_runs: int = 10
+        max_concurrent_runs: int = 10,
+        run_mode: Optional[RunMode] = None
     ):
         """
         Initialize module runner.
@@ -60,6 +65,7 @@ class ModuleRunner:
             output_capture: Optional output capture service for log streaming
             resource_manager: Optional resource manager for system resource checks
             max_concurrent_runs: Maximum number of concurrent runs allowed
+            run_mode: Subprocess execution mode (auto-detected if None)
         """
         self.registry = registry
         self.process_manager = process_manager
@@ -67,6 +73,34 @@ class ModuleRunner:
         self.output_capture = output_capture
         self.resource_manager = resource_manager
         self.max_concurrent_runs = max_concurrent_runs
+        
+        # Initialize subprocess wrapper with run mode
+        # Check environment variable for override
+        env_mode = os.environ.get('PRISMQ_RUN_MODE')
+        if env_mode:
+            try:
+                run_mode = RunMode(env_mode.lower())
+                logger.info(f"Using run mode from environment: {run_mode}")
+            except ValueError:
+                logger.warning(f"Invalid PRISMQ_RUN_MODE '{env_mode}', using auto-detection")
+        
+        self.subprocess_wrapper = SubprocessWrapper(mode=run_mode)
+        logger.info(f"ModuleRunner initialized with subprocess mode: {self.subprocess_wrapper.mode}")
+        
+        # Add diagnostic logging for event loop policy (Windows deployment validation)
+        policy = asyncio.get_event_loop_policy()
+        logger.info(f"Event loop policy: {type(policy).__name__}")
+        
+        if sys.platform == 'win32':
+            if not isinstance(policy, asyncio.WindowsProactorEventLoopPolicy):
+                logger.error("=" * 70)
+                logger.error("CRITICAL: Wrong event loop policy on Windows!")
+                logger.error(f"Current policy: {type(policy).__name__}")
+                logger.error("Expected: WindowsProactorEventLoopPolicy")
+                logger.error("=" * 70)
+                logger.error("Start server with: python -m src.uvicorn_runner")
+                logger.error("Or set environment variable: PRISMQ_RUN_MODE=threaded")
+                logger.error("=" * 70)
     
     async def execute_module(
         self,
@@ -168,8 +202,9 @@ class ModuleRunner:
             # Build command
             command = self._build_command(script_path, parameters)
             
-            # Create subprocess with piped stdout/stderr
-            process = await asyncio.create_subprocess_exec(
+            # Create subprocess using wrapper (cross-platform)
+            logger.debug(f"Creating subprocess with mode {self.subprocess_wrapper.mode}")
+            process, stdout_reader, stderr_reader = await self.subprocess_wrapper.create_subprocess(
                 *command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -179,8 +214,8 @@ class ModuleRunner:
             # Start output capture
             stdout_task, stderr_task = await self.output_capture.start_capture(
                 run_id=run.run_id,
-                stdout_stream=process.stdout,
-                stderr_stream=process.stderr
+                stdout_stream=stdout_reader,
+                stderr_stream=stderr_reader
             )
             
             # Wait for process completion
@@ -213,6 +248,32 @@ class ModuleRunner:
             run.status = RunStatus.CANCELLED
             run.completed_at = datetime.now(timezone.utc)
             logger.info(f"Run {run.run_id} was cancelled")
+        except SubprocessPolicyException as e:
+            # Windows event loop policy not configured for subprocess execution
+            run.status = RunStatus.FAILED
+            run.error_message = (
+                "Windows event loop not configured for subprocess execution. "
+                "Restart server with: python -m src.uvicorn_runner"
+            )
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(
+                f"SubprocessPolicyException in run {run.run_id}: {e.message}. "
+                f"Current policy: {e.current_policy}. "
+                f"Restart server with: python -m src.uvicorn_runner"
+            )
+        except NotImplementedError as e:
+            run.status = RunStatus.FAILED
+            run.error_message = (
+                "Subprocess creation not supported on this platform. "
+                "On Windows, use THREADED mode or set ProactorEventLoopPolicy. "
+                "Set PRISMQ_RUN_MODE=threaded environment variable."
+            )
+            run.completed_at = datetime.now(timezone.utc)
+            logger.error(
+                f"NotImplementedError in run {run.run_id}: {e}. "
+                f"Current subprocess mode: {self.subprocess_wrapper.mode}. "
+                f"Try setting PRISMQ_RUN_MODE=threaded"
+            )
         except FileNotFoundError as e:
             run.status = RunStatus.FAILED
             run.error_message = f"File not found: {e.filename or str(e)}"

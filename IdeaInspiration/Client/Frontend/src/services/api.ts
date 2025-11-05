@@ -6,6 +6,7 @@ import { useNotificationStore } from '@/stores/notifications'
  */
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  timeout: 30000, // 30 second timeout to prevent infinite loading
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,7 +21,13 @@ api.interceptors.response.use(
     // Get notification store (safe to call here as it's not during setup)
     const notifications = useNotificationStore()
 
-    if (error.response) {
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      // Request timeout
+      notifications.error({
+        title: 'Request Timeout',
+        message: 'The request took too long to complete. Please try again.',
+      })
+    } else if (error.response) {
       // Server responded with error
       const data = error.response.data as any
       const message = data.detail || 'An error occurred'

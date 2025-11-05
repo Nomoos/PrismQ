@@ -493,6 +493,170 @@ The architecture follows SOLID design principles throughout:
 - Standard stdout/stderr capture
 - Easy process management
 
+### Windows Subprocess Handling (CRITICAL) 🪟
+
+**Platform**: Windows 10/11 (Primary deployment target)
+
+#### The Windows Event Loop Issue
+
+On Windows, subprocess execution requires special handling due to asyncio event loop limitations:
+
+**Problem**: 
+The default `SelectorEventLoop` on Windows **does NOT support** subprocess operations (`asyncio.create_subprocess_shell()`). Attempting to spawn subprocesses results in:
+
+```python
+NotImplementedError: Subprocess transport not supported on Windows with SelectorEventLoop
+```
+
+**Solution**: 
+Use `ProactorEventLoop` which provides full subprocess support on Windows.
+
+#### Implementation
+
+The backend MUST be started using `uvicorn_runner.py`, which sets the correct event loop policy:
+
+**File**: `Client/Backend/src/uvicorn_runner.py`
+
+```python
+#!/usr/bin/env python
+"""
+Uvicorn runner with Windows ProactorEventLoop support.
+CRITICAL: Always use this script to start the backend on Windows.
+"""
+import sys
+import asyncio
+
+if sys.platform == "win32":
+    # Set ProactorEventLoop policy for subprocess support on Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    print("✓ Windows ProactorEventLoop policy set for subprocess support")
+
+# Start Uvicorn
+import uvicorn
+from main import app
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=False  # Reload not compatible with ProactorEventLoop
+    )
+```
+
+#### Usage (Windows)
+
+**✓ CORRECT** - Always use on Windows:
+```powershell
+cd Client\Backend
+py -3.10 -m src.uvicorn_runner
+```
+
+**✗ WRONG** - Will fail with NotImplementedError:
+```powershell
+uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+#### Windows Subprocess Creation
+
+**File**: `Client/Backend/src/core/subprocess_wrapper.py`
+
+```python
+async def spawn_subprocess(command: str, cwd: str, env: dict):
+    """
+    Spawn subprocess with Windows compatibility.
+    
+    Note: Requires ProactorEventLoop on Windows (set in uvicorn_runner.py)
+    """
+    # On Windows, use shell=True for command execution
+    # Path handling for Windows (backslashes)
+    from pathlib import Path
+    working_dir = Path(cwd).resolve()  # Windows absolute path
+    
+    # Create subprocess (requires ProactorEventLoop on Windows)
+    process = await asyncio.create_subprocess_shell(
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        cwd=str(working_dir),  # Windows path string
+        env=env
+    )
+    
+    return process
+```
+
+#### Output Capture (Windows Encoding)
+
+Windows may use different text encodings (Windows-1252 vs UTF-8). Handle gracefully:
+
+```python
+async def stream_output(stream, run_id):
+    """Stream subprocess output with Windows encoding handling"""
+    while True:
+        line = await stream.readline()
+        if not line:
+            break
+        
+        # Try UTF-8 first, fallback to Windows-1252
+        try:
+            text = line.decode('utf-8')
+        except UnicodeDecodeError:
+            text = line.decode('windows-1252', errors='ignore')
+        
+        # Store and stream log
+        run_registry.add_log(run_id, text)
+```
+
+#### Windows Path Handling
+
+Always use `pathlib.Path` for cross-platform compatibility:
+
+```python
+from pathlib import Path
+
+# Module working directory (Windows backslashes handled automatically)
+module_dir = Path("Sources/Content/Shorts/YouTube")
+abs_path = module_dir.resolve()  # C:\Users\...\Sources\Content\Shorts\YouTube
+
+# Database path
+db_path = Path.cwd() / "youtube_shorts.db"
+```
+
+#### Verification
+
+To verify ProactorEventLoop is active:
+
+```python
+# In Python REPL (after starting backend)
+import asyncio
+import sys
+
+if sys.platform == "win32":
+    policy = asyncio.get_event_loop_policy()
+    print(f"Event loop policy: {policy}")
+    # Should print: WindowsProactorEventLoopPolicy
+    
+    loop = asyncio.get_event_loop()
+    print(f"Event loop type: {type(loop)}")
+    # Should print: ProactorEventLoop
+```
+
+#### Related Documentation
+
+- **[YouTube Module Execution Flow](../../Sources/Content/Shorts/YouTube/docs/EXECUTION_FLOW.md)** - Complete Windows execution flow
+- **[YouTube Module Known Issues](../../Sources/Content/Shorts/YouTube/docs/KNOWN_ISSUES.md)** - Windows-specific issues
+- **[YouTube Module Troubleshooting](../../Sources/Content/Shorts/YouTube/docs/TROUBLESHOOTING.md)** - Windows debugging
+
+#### Key Takeaways
+
+1. ✅ Always use `uvicorn_runner.py` on Windows
+2. ✅ ProactorEventLoop required for subprocess support
+3. ✅ Handle Windows-1252 encoding for subprocess output
+4. ✅ Use `pathlib.Path` for Windows path handling
+5. ⚠️ Don't use `uvicorn` directly on Windows
+6. ⚠️ `--reload` may not work with ProactorEventLoop
+
 ## Security Considerations
 
 ### Current Security Features

@@ -206,6 +206,63 @@ class OutputCapture:
                     f"SSE queue full for run {run_id}, dropping message"
                 )
     
+    async def append_line(
+        self,
+        run_id: str,
+        line: str,
+        stream: str = 'stdout'
+    ) -> None:
+        """
+        Append a single line to the output capture buffer and broadcast to subscribers.
+        
+        This method is used by execution patterns for real-time output streaming.
+        It creates the necessary buffers and files if they don't exist yet.
+        
+        Args:
+            run_id: Run identifier
+            line: Line of output to append (will be stripped of trailing whitespace)
+            stream: Stream type ('stdout' or 'stderr')
+            
+        Example:
+            >>> output_capture = OutputCapture(log_dir=Path("logs"))
+            >>> await output_capture.append_line("run-123", "Processing item 1\\n")
+            >>> await output_capture.append_line("run-123", "Error occurred\\n", stream='stderr')
+        """
+        # Strip trailing whitespace
+        line_str = line.rstrip()
+        
+        # Initialize buffer if this is the first line for this run
+        if run_id not in self.log_buffers:
+            self.log_buffers[run_id] = deque(maxlen=self.max_buffer_size)
+            self.sse_subscribers[run_id] = []
+            log_file = self.log_dir / f"{run_id}.log"
+            self.log_files[run_id] = log_file
+        
+        # Parse log level from line
+        level = self._parse_log_level(line_str, stream)
+        
+        # Create log entry
+        entry = LogEntry(
+            timestamp=datetime.now(timezone.utc),
+            level=level,
+            message=line_str,
+            stream=stream
+        )
+        
+        # Add to buffer (automatically removes oldest if full)
+        self.log_buffers[run_id].append(entry)
+        
+        # Write to file
+        log_file = self.log_files[run_id]
+        async with aiofiles.open(log_file, mode='a') as f:
+            await f.write(
+                f"[{entry.timestamp.isoformat()}] [{entry.level}] [{stream}] {line_str}\n"
+            )
+            await f.flush()
+        
+        # Broadcast to SSE subscribers
+        await self._broadcast_to_subscribers(run_id, entry)
+    
     def get_logs(
         self,
         run_id: str,

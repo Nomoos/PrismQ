@@ -1,6 +1,8 @@
 """FastAPI application entry point for PrismQ Web Client Backend."""
 
+import asyncio
 import logging
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import AsyncGenerator
@@ -12,10 +14,22 @@ from fastapi.responses import JSONResponse
 from .core.config import settings
 from .core.logger import setup_logging
 from .core.exceptions import WebClientException
+from .core.resource_pool import initialize_resource_pool, cleanup_resource_pool
+from .core.periodic_tasks import PeriodicTaskManager
+from .core.maintenance import MAINTENANCE_TASKS
 from .api import modules, runs, system
+
+# Configure event loop policy for Windows
+# On Windows, the default SelectorEventLoop doesn't support subprocess operations
+# We need to use ProactorEventLoop instead
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 # Set up logging
 logger = setup_logging()
+
+# Initialize periodic task manager (global instance)
+periodic_task_manager = PeriodicTaskManager()
 
 
 @asynccontextmanager
@@ -26,10 +40,50 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(f"Version: {app.version}")
     logger.info(f"Environment: {'Development' if settings.DEBUG else 'Production'}")
     
+    # Validate Windows event loop policy
+    if sys.platform == 'win32':
+        policy = asyncio.get_event_loop_policy()
+        if not isinstance(policy, asyncio.WindowsProactorEventLoopPolicy):
+            logger.error("=" * 70)
+            logger.error("SERVER STARTED WITH WRONG EVENT LOOP POLICY!")
+            logger.error("Module execution will fail with NotImplementedError")
+            logger.error("=" * 70)
+            logger.error("Please restart using: python -m src.uvicorn_runner")
+            logger.error("=" * 70)
+    
+    # Initialize global resource pool
+    initialize_resource_pool(max_workers=settings.MAX_CONCURRENT_RUNS)
+    logger.info("Resource pool initialized")
+    # Register and start periodic maintenance tasks
+    logger.info("Registering periodic maintenance tasks...")
+    for task_config in MAINTENANCE_TASKS:
+        try:
+            periodic_task_manager.register_task(
+                name=task_config["name"],
+                interval=task_config["interval"],
+                task_func=task_config["func"],
+                **task_config.get("kwargs", {})
+            )
+            logger.info(f"  - {task_config['name']}: {task_config['description']}")
+        except Exception as e:
+            logger.error(f"Failed to register task {task_config['name']}: {e}")
+    
+    # Start all periodic tasks
+    periodic_task_manager.start_all()
+    logger.info("Periodic tasks started")
+    
     yield
     
     # Shutdown
     logger.info("Shutting down PrismQ Web Client Backend...")
+    
+    # Cleanup global resource pool
+    cleanup_resource_pool()
+    logger.info("Resource pool cleaned up")
+    # Stop all periodic tasks
+    logger.info("Stopping periodic tasks...")
+    await periodic_task_manager.stop_all(timeout=10.0)
+    logger.info("Periodic tasks stopped")
 
 
 # Create FastAPI application

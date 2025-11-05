@@ -38,34 +38,36 @@
       <!-- Divider -->
       <div class="sidebar-divider"></div>
 
-      <!-- Categories -->
+      <!-- Categories Tree -->
       <div class="sidebar-section">
         <h4 class="section-title">Categories</h4>
-        <button
-          v-for="category in categories"
-          :key="category.name"
-          @click="$emit('filter-change', 'category', category.name)"
-          :class="['filter-button', 'category-button', { 
-            active: currentFilter === 'category' && selectedCategory === category.name 
-          }]"
-        >
-          <span class="filter-label">{{ category.name }}</span>
-          <span class="filter-count">{{ category.count }}</span>
-        </button>
+        <CategoryTreeNode
+          v-for="category in categoryTree"
+          :key="category.fullName"
+          :node="category"
+          :level="0"
+          :expanded-categories="expandedCategories"
+          :current-filter="currentFilter"
+          :selected-category="selectedCategory"
+          @toggle="toggleCategory"
+          @select="(fullName) => $emit('filter-change', 'category', fullName)"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
+import CategoryTreeNode from './CategoryTreeNode.vue'
+import type { CategoryTreeNode as CategoryTreeNodeType } from '@/types/category'
 
 interface Category {
   name: string
   count: number
 }
 
-defineProps<{
+const props = defineProps<{
   currentFilter: string
   selectedCategory?: string
   totalModules: number
@@ -77,6 +79,75 @@ defineProps<{
 defineEmits<{
   (e: 'filter-change', filter: string, category?: string): void
 }>()
+const expandedCategories = ref<Set<string>>(new Set())
+
+// Build hierarchical tree from flat category list (supports multi-level nesting)
+const categoryTree = computed(() => {
+  const root: CategoryTreeNodeType[] = []
+  const nodeMap = new Map<string, CategoryTreeNodeType>()
+
+  // Sort categories to ensure proper hierarchy
+  const sortedCategories = [...props.categories].sort((a, b) => 
+    a.name.localeCompare(b.name)
+  )
+
+  // Helper function to get or create node at path
+  function getOrCreateNode(path: string[]): CategoryTreeNodeType {
+    const fullPath = path.join('/')
+    
+    if (nodeMap.has(fullPath)) {
+      return nodeMap.get(fullPath)!
+    }
+    
+    const name = path[path.length - 1]
+    const node: CategoryTreeNodeType = {
+      name,
+      fullName: fullPath,
+      count: 0,
+      children: []
+    }
+    
+    nodeMap.set(fullPath, node)
+    
+    if (path.length === 1) {
+      // Top-level node
+      root.push(node)
+    } else {
+      // Nested node - add to parent
+      const parentPath = path.slice(0, -1)
+      const parent = getOrCreateNode(parentPath)
+      parent.children.push(node)
+    }
+    
+    return node
+  }
+
+  // Build tree from categories
+  sortedCategories.forEach(category => {
+    const parts = category.name.split('/')
+    const node = getOrCreateNode(parts)
+    node.count = category.count
+    
+    // Update all ancestor counts
+    for (let i = parts.length - 1; i >= 1; i--) {
+      const ancestorPath = parts.slice(0, i).join('/')
+      const ancestor = nodeMap.get(ancestorPath)
+      if (ancestor) {
+        ancestor.count += category.count
+      }
+    }
+  })
+
+  return root.sort((a, b) => a.name.localeCompare(b.name))
+})
+
+function toggleCategory(categoryFullName: string) {
+  if (expandedCategories.value.has(categoryFullName)) {
+    expandedCategories.value.delete(categoryFullName)
+  } else {
+    expandedCategories.value.add(categoryFullName)
+  }
+}
 </script>
 
 <style scoped>
@@ -131,9 +202,5 @@ defineEmits<{
 
 .section-title {
   @apply text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2;
-}
-
-.category-button {
-  @apply pl-6;
 }
 </style>

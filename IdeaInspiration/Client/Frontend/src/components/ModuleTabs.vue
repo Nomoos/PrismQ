@@ -16,8 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-
 interface Tab {
   id: string
   label: string

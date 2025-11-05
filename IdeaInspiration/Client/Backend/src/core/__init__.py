@@ -8,6 +8,8 @@ from .output_capture import OutputCapture
 from .process_manager import ProcessManager, ProcessResult
 from .resource_manager import ResourceManager
 from .run_registry import RunRegistry
+from .task_manager import BackgroundTaskManager
+from .task_orchestrator import TaskOrchestrator, PatternAdvisor, TaskPattern
 from .config import settings
 from .exceptions import (
     WebClientException,
@@ -17,6 +19,13 @@ from .exceptions import (
     ValidationException,
     RunNotFoundException,
     ConfigurationException,
+)
+from .resource_pool import (
+    ResourcePool,
+    get_resource_pool,
+    initialize_resource_pool,
+    initialize_resource_pool_async,
+    cleanup_resource_pool,
 )
 
 # Global singletons for dependency injection
@@ -96,19 +105,28 @@ def reset_singletons():
 
 
 __all__ = [
+    "BackgroundTaskManager",
     "ConfigStorage",
     "ModuleRunner",
     "OutputCapture",
+    "PatternAdvisor",
     "ProcessManager",
     "ProcessResult",
     "ResourceManager",
+    "ResourcePool",
     "RunRegistry",
+    "TaskOrchestrator",
+    "TaskPattern",
     "get_config_storage",
     "get_module_runner",
     "get_output_capture",
     "get_process_manager",
     "get_resource_manager",
+    "get_resource_pool",
     "get_run_registry",
+    "initialize_resource_pool",
+    "initialize_resource_pool_async",
+    "cleanup_resource_pool",
     "reset_singletons",
     "WebClientException",
     "ModuleNotFoundException",

@@ -32,17 +32,38 @@
     </div>
     
     <div v-else-if="error" class="error-container">
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        <p class="font-bold">Error loading runs</p>
-        <p class="text-sm">{{ error }}</p>
+      <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <div class="error-content">
+          <h3 class="error-title">Failed to Load Run History</h3>
+          <p class="error-message">{{ error }}</p>
+          <div class="error-actions">
+            <button @click="loadRuns" class="btn-retry">
+              🔄 Retry
+            </button>
+            <button @click="error = null" class="btn-dismiss">
+              ✕ Dismiss
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     
     <div v-else>
       <div v-if="runs.length === 0" class="empty-state">
-        <p class="text-gray-600">
-          {{ statusFilter || moduleFilter ? 'No runs match your filters' : 'No runs found' }}
+        <div class="empty-icon">📭</div>
+        <h3 class="empty-title">
+          {{ statusFilter || moduleFilter ? 'No Matching Runs' : 'No Run History' }}
+        </h3>
+        <p class="empty-message">
+          {{ statusFilter || moduleFilter 
+            ? 'Try adjusting your filters or refresh to see if new runs are available.' 
+            : 'Run a module from the Dashboard to see it here.' 
+          }}
         </p>
+        <button v-if="statusFilter || moduleFilter" @click="clearFilters" class="btn-clear-filters">
+          Clear Filters
+        </button>
       </div>
       
       <div v-else class="table-container">
@@ -190,7 +211,24 @@ async function loadRuns() {
     // Load reasonable number of recent runs - user can paginate through more
     runs.value = await runService.listRuns({ limit: 100 })
   } catch (err: any) {
-    error.value = err.message || 'Failed to load runs'
+    // Provide more descriptive error messages
+    if (err.response) {
+      // Server responded with error
+      const status = err.response.status
+      if (status === 404) {
+        error.value = 'Run history endpoint not found. Please ensure the backend server is running.'
+      } else if (status === 500) {
+        error.value = 'Server error occurred while loading runs. Please try again later.'
+      } else {
+        error.value = err.response.data?.detail || err.message || 'Failed to load runs'
+      }
+    } else if (err.request) {
+      // Request made but no response
+      error.value = 'Cannot connect to backend server. Please ensure it is running at the configured URL.'
+    } else {
+      // Something else happened
+      error.value = err.message || 'An unexpected error occurred while loading runs'
+    }
     console.error('Error loading runs:', err)
   } finally {
     loading.value = false
@@ -242,6 +280,11 @@ function formatDuration(seconds: number | undefined): string {
   const secs = Math.floor(seconds % 60)
   return `${mins}m ${secs}s`
 }
+
+function clearFilters() {
+  statusFilter.value = ''
+  moduleFilter.value = ''
+}
 </script>
 
 <style scoped>
@@ -270,9 +313,60 @@ function formatDuration(seconds: number | undefined): string {
 }
 
 .loading-container,
-.error-container,
 .empty-state {
   @apply text-center py-12;
+}
+
+.empty-icon {
+  @apply text-6xl mb-4;
+}
+
+.empty-title {
+  @apply text-xl font-semibold text-gray-800 mb-2;
+}
+
+.empty-message {
+  @apply text-gray-600 mb-6 max-w-md mx-auto;
+}
+
+.btn-clear-filters {
+  @apply px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium;
+}
+
+.error-container {
+  @apply flex justify-center py-8;
+}
+
+.error-card {
+  @apply bg-red-50 border-2 border-red-300 rounded-lg p-6 max-w-md shadow-lg flex gap-4;
+}
+
+.error-icon {
+  @apply text-4xl flex-shrink-0;
+}
+
+.error-content {
+  @apply flex-1;
+}
+
+.error-title {
+  @apply text-lg font-bold text-red-900 mb-2;
+}
+
+.error-message {
+  @apply text-sm text-red-700 mb-4;
+}
+
+.error-actions {
+  @apply flex gap-2;
+}
+
+.btn-retry {
+  @apply px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium;
+}
+
+.btn-dismiss {
+  @apply px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors text-sm font-medium;
 }
 
 .table-container {

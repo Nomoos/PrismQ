@@ -14,5 +14,5 @@ if [ -d "venv" ]; then
     source venv/bin/activate
 fi
 
-# Run uvicorn with auto-reload
-uvicorn src.main:app --reload --host 127.0.0.1 --port 8000
+# Run uvicorn with auto-reload using custom runner
+python -m src.uvicorn_runner
