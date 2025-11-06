@@ -10,7 +10,7 @@ Medium
 Feature - Best Practices Implementation
 
 ## Worker
-Worker 4 - Backend Development
+Worker 04 - Backend Development
 
 ## Description
 
@@ -84,7 +84,7 @@ class BackgroundTaskManager:
 - `Client/Backend/src/core/task_manager.py` - New BackgroundTaskManager class
 - `Client/Backend/src/core/run_registry.py` - Enhance status update methods
 - `Client/Backend/_meta/tests/test_task_manager.py` - Tests
-- `Client/Backend/docs/TASK_MANAGEMENT.md` - Task management guide
+- `Client/Backend/_meta/docs/TASK_MANAGEMENT.md` - Task management guide
 
 ### Dependencies
 
@@ -171,7 +171,7 @@ This pattern provides a cleaner interface for the existing module running infras
    - All tests use pytest with asyncio support
    - Proper fixtures for registry and task manager setup
 
-3. **Complete Documentation** (`Client/Backend/docs/TASK_MANAGEMENT.md`)
+3. **Complete Documentation** (`Client/Backend/_meta/docs/TASK_MANAGEMENT.md`)
    - 694 lines of comprehensive documentation
    - Sections include:
      - Overview and key features
@@ -214,12 +214,12 @@ This pattern provides a cleaner interface for the existing module running infras
 
 - `Client/Backend/src/core/task_manager.py` (295 lines)
 - `Client/Backend/_meta/tests/test_task_manager.py` (621 lines)
-- `Client/Backend/docs/TASK_MANAGEMENT.md` (694 lines)
+- `Client/Backend/_meta/docs/TASK_MANAGEMENT.md` (694 lines)
 
 ### Files Modified
 
 - `Client/Backend/README.md` (added doc reference)
-- `Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md` (added cross-reference)
+- `Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md` (added cross-reference)
 
 ### Testing Status
 

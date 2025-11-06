@@ -106,7 +106,7 @@ All modules are optimized for:
 
 Each module has its own setup requirements. Refer to the module-specific documentation:
 
-- **[Client Setup](../Client/docs/SETUP.md)** - Web control panel setup
+- **[Client Setup](../Client/_meta/docs/SETUP.md)** - Web control panel setup
 - **[Classification Setup](../Classification/README.md)** - Content classification setup
 - **[Scoring Setup](../Scoring/README.md)** - Scoring engine setup
 - **[Sources Setup](../Sources/README.md)** - Source integrations setup

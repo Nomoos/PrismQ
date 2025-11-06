@@ -37,9 +37,9 @@ python -m src.uvicorn_runner
 
 | Issue | Worker | Type | Effort | Status |
 |-------|--------|------|--------|--------|
-| [#304](Worker5/304-windows-subprocess-deployment-fix.md) | Worker 5 | Deployment | 1-2 days | Ready |
-| [#305](Worker6/305-verify-youtube-windows-subprocess-issue.md) | Worker 6 | Testing | 2-4 hours | Ready |
-| [#303](Worker4/303-comprehensive-windows-subprocess-testing.md) | Worker 4 | Testing | 3-5 days | Future |
+| [#304](Worker05/304-windows-subprocess-deployment-fix.md) | Worker 05 | Deployment | 1-2 days | Ready |
+| [#305](Worker06/305-verify-youtube-windows-subprocess-issue.md) | Worker 06 | Testing | 2-4 hours | Ready |
+| [#303](Worker04/303-comprehensive-windows-subprocess-testing.md) | Worker 04 | Testing | 3-5 days | Future |
 
 ---
 
@@ -235,10 +235,10 @@ except RuntimeError as e:
 ### In This Repository
 
 - [WINDOWS_SUBPROCESS_QUICK_FIX.md](../WINDOWS_SUBPROCESS_QUICK_FIX.md) - Immediate user guide
-- [Issue #304](Worker5/304-windows-subprocess-deployment-fix.md) - Deployment solution
-- [Issue #305](Worker6/305-verify-youtube-windows-subprocess-issue.md) - Testing task
-- [Issue #303](Worker4/303-comprehensive-windows-subprocess-testing.md) - Future testing
-- [Issue #300](Worker1/300-implement-youtube-keyword-search.md) - May be affected
+- [Issue #304](Worker05/304-windows-subprocess-deployment-fix.md) - Deployment solution
+- [Issue #305](Worker06/305-verify-youtube-windows-subprocess-issue.md) - Testing task
+- [Issue #303](Worker04/303-comprehensive-windows-subprocess-testing.md) - Future testing
+- [Issue #300](Worker01/300-implement-youtube-keyword-search.md) - May be affected
 
 ### Code Files
 
@@ -340,7 +340,7 @@ A: Yes! `PRISMQ_RUN_MODE=threaded` still works and will override auto-detection.
 
 ## Next Steps
 
-### For Worker 5 (Deployment)
+### For Worker 05 (Deployment)
 
 **Start Issue #304**:
 1. Create Windows startup scripts (`.bat` and `.ps1`)
@@ -351,7 +351,7 @@ A: Yes! `PRISMQ_RUN_MODE=threaded` still works and will override auto-detection.
 
 **Estimated**: 1-2 days
 
-### For Worker 6 (Testing)
+### For Worker 06 (Testing)
 
 **Start Issue #305**:
 1. Test YouTube module on Windows
@@ -362,7 +362,7 @@ A: Yes! `PRISMQ_RUN_MODE=threaded` still works and will override auto-detection.
 
 **Estimated**: 2-4 hours
 
-### For Worker 4 (Future)
+### For Worker 04 (Future)
 
 **Plan Issue #303**:
 1. Design comprehensive test suite

@@ -4,7 +4,7 @@
 **Type**: Documentation  
 **Module**: Sources/Content/Shorts/YouTube + Client  
 **Estimated**: 3-5 days  
-**Assigned To**: Worker 2 - Documentation/Technical Writing  
+**Assigned To**: Worker 02 - Documentation/Technical Writing  
 **Dependencies**: None
 
 ---
@@ -37,7 +37,7 @@ The YouTube Shorts Source module has a complex execution flow involving the web 
 ### Existing Documentation
 
 - Basic README in `Sources/Content/Shorts/YouTube/README.md`
-- Web Client architecture in `Client/docs/ARCHITECTURE.md`
+- Web Client architecture in `Client/_meta/docs/ARCHITECTURE.md`
 - General system architecture in `_meta/docs/ARCHITECTURE.md`
 
 None of these documents fully explain the end-to-end module execution flow.
@@ -89,7 +89,7 @@ None of these documents fully explain the end-to-end module execution flow.
 ### Phase 1: Flow Documentation (2 days)
 
 1. **Create Module Execution Flow Document**
-   - [ ] Create `Sources/Content/Shorts/YouTube/docs/EXECUTION_FLOW.md`
+   - [ ] Create `Sources/Content/Shorts/YouTube/_meta/docs/EXECUTION_FLOW.md`
    - [ ] Document step-by-step launch process
    - [ ] Add sequence diagram (using Mermaid or ASCII art)
    - [ ] Explain parameter passing and validation
@@ -97,7 +97,7 @@ None of these documents fully explain the end-to-end module execution flow.
    - [ ] Explain status updates and completion handling
 
 2. **Web Client Integration Documentation**
-   - [ ] Update `Client/docs/ARCHITECTURE.md` with module execution details
+   - [ ] Update `Client/_meta/docs/ARCHITECTURE.md` with module execution details
    - [ ] Document ModuleRunner implementation
    - [ ] Explain SubprocessWrapper and run modes
    - [ ] Document Windows event loop requirements
@@ -106,7 +106,7 @@ None of these documents fully explain the end-to-end module execution flow.
 ### Phase 2: Architecture Documentation (1.5 days)
 
 1. **Document Key Components**
-   - [ ] Create `Sources/Content/Shorts/YouTube/docs/ARCHITECTURE.md`
+   - [ ] Create `Sources/Content/Shorts/YouTube/_meta/docs/ARCHITECTURE.md`
    - [ ] Document plugin architecture (Trending, Channel, Keyword)
    - [ ] Explain configuration management
    - [ ] Document database integration
@@ -121,7 +121,7 @@ None of these documents fully explain the end-to-end module execution flow.
 ### Phase 3: Known Issues and Limitations (1 day)
 
 1. **Create Known Issues Document**
-   - [ ] Create `Sources/Content/Shorts/YouTube/docs/KNOWN_ISSUES.md`
+   - [ ] Create `Sources/Content/Shorts/YouTube/_meta/docs/KNOWN_ISSUES.md`
    - [ ] Document keyword search limitation (reference Issue #300)
    - [ ] Explain Windows subprocess requirements
    - [ ] Document rate limiting considerations
@@ -135,7 +135,7 @@ None of these documents fully explain the end-to-end module execution flow.
 ### Phase 4: Troubleshooting Guide (0.5 day)
 
 1. **Create Troubleshooting Guide**
-   - [ ] Create `Sources/Content/Shorts/YouTube/docs/TROUBLESHOOTING.md`
+   - [ ] Create `Sources/Content/Shorts/YouTube/_meta/docs/TROUBLESHOOTING.md`
    - [ ] Document common error messages and fixes
    - [ ] Add Windows-specific troubleshooting
    - [ ] Explain how to debug failing runs
@@ -305,7 +305,7 @@ Check .env file has required variables.
 - [ ] KNOWN_ISSUES.md created listing all known limitations
 - [ ] TROUBLESHOOTING.md created with common issues and solutions
 - [ ] Main README updated with links to new documentation
-- [ ] Client/docs/ARCHITECTURE.md updated with module execution details
+- [ ] Client/_meta/docs/ARCHITECTURE.md updated with module execution details
 - [ ] All diagrams are clear and accurate
 - [ ] Documentation reviewed for clarity and completeness
 
@@ -405,7 +405,7 @@ Plugin
 
 ### Existing Documentation
 
-- **Client Architecture**: `Client/docs/ARCHITECTURE.md`
+- **Client Architecture**: `Client/_meta/docs/ARCHITECTURE.md`
 - **System Architecture**: `_meta/docs/ARCHITECTURE.md`
 - **Module README**: `Sources/Content/Shorts/YouTube/README.md`
 

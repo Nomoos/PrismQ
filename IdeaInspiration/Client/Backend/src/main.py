@@ -17,7 +17,7 @@ from .core.exceptions import WebClientException
 from .core.resource_pool import initialize_resource_pool, cleanup_resource_pool
 from .core.periodic_tasks import PeriodicTaskManager
 from .core.maintenance import MAINTENANCE_TASKS
-from .api import modules, runs, system
+from .api import modules, runs, system, queue
 
 # Configure event loop policy for Windows
 # On Windows, the default SelectorEventLoop doesn't support subprocess operations
@@ -173,6 +173,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 app.include_router(modules.router, prefix="/api", tags=["Modules"])
 app.include_router(runs.router, prefix="/api", tags=["Runs"])
 app.include_router(system.router, prefix="/api", tags=["System"])
+app.include_router(queue.router, prefix="/api", tags=["Queue"])
 
 
 # Root endpoint

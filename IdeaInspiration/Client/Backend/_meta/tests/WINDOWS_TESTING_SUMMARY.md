@@ -200,7 +200,7 @@ _meta/issues/
 
 ## Documentation
 
-- [WINDOWS_TESTING.md](../Client/Backend/docs/WINDOWS_TESTING.md) - Complete testing guide
+- [WINDOWS_TESTING.md](../Client/Backend/_meta/docs/WINDOWS_TESTING.md) - Complete testing guide
 - [README.md](../Client/Backend/README.md) - Updated with testing section
 - [Issue #303](../303-comprehensive-windows-subprocess-testing.md) - Original issue
 

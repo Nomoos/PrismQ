@@ -121,7 +121,7 @@ if valid_iso8601_format: accept
 ## Documentation
 
 ### Created
-1. `Client/Backend/docs/RUN_MODES.md` - Comprehensive run modes guide
+1. `Client/Backend/_meta/docs/RUN_MODES.md` - Comprehensive run modes guide
 2. `Sources/Content/Shorts/YouTube/docs/SHORTS_DETECTION.md` - Detection strategy
 
 ### Updated
@@ -264,6 +264,6 @@ The implementation is:
 
 ## Related Links
 
-- [RUN_MODES.md](../Client/Backend/docs/RUN_MODES.md)
+- [RUN_MODES.md](../Client/Backend/_meta/docs/RUN_MODES.md)
 - [SHORTS_DETECTION.md](../Sources/Content/Shorts/YouTube/docs/SHORTS_DETECTION.md)
 - [GitHub Issue](https://github.com/Nomoos/PrismQ.IdeaInspiration/issues/XXX)

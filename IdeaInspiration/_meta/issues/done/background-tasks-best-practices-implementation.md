@@ -42,7 +42,7 @@ The Client Backend has experienced historical issues with asyncio subprocess ope
 
 ### 2. Documentation Created ✅
 
-**Main Deliverable**: `Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md`
+**Main Deliverable**: `Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md`
 
 **Contents** (1,175 lines):
 
@@ -188,7 +188,7 @@ The Client Backend has experienced historical issues with asyncio subprocess ope
 ## Files Changed
 
 ### New Files
-1. `Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md` (1,175 lines)
+1. `Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md` (1,175 lines)
 2. `Client/Backend/_meta/tests/test_best_practices_examples.py` (360 lines)
 
 ### Modified Files
@@ -235,15 +235,15 @@ Total: 20/20 tests passed in 0.72s
 ### For Developers
 
 **Implementing a new background task**:
-1. Read the [Core Principles](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#core-principles) section
-2. Choose appropriate pattern from [Subprocess Execution Patterns](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#subprocess-execution-patterns)
-3. Follow the [Quick Reference Checklist](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#quick-reference)
-4. Review [Common Anti-Patterns](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#common-anti-patterns) to avoid
+1. Read the [Core Principles](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#core-principles) section
+2. Choose appropriate pattern from [Subprocess Execution Patterns](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#subprocess-execution-patterns)
+3. Follow the [Quick Reference Checklist](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#quick-reference)
+4. Review [Common Anti-Patterns](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#common-anti-patterns) to avoid
 
 **Troubleshooting async issues**:
-1. Check [Troubleshooting](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#troubleshooting) section
-2. Review [Historical Context](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#historical-context) for similar issues
-3. Consult [Error Handling](../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#error-handling) patterns
+1. Check [Troubleshooting](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#troubleshooting) section
+2. Review [Historical Context](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#historical-context) for similar issues
+3. Consult [Error Handling](../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md#error-handling) patterns
 
 ### For Code Reviewers
 
@@ -297,8 +297,8 @@ Total: 20/20 tests passed in 0.72s
 
 ### Related Documentation
 
-- [Subprocess Execution Modes](../Client/Backend/docs/RUN_MODES.md)
-- [Windows Testing Guide](../Client/Backend/docs/WINDOWS_TESTING.md)
+- [Subprocess Execution Modes](../Client/Backend/_meta/docs/RUN_MODES.md)
+- [Windows Testing Guide](../Client/Backend/_meta/docs/WINDOWS_TESTING.md)
 - [Logging Best Practices](/_meta/docs/LOGGING_BEST_PRACTICES.md)
 - [SOLID Principles](/_meta/docs/SOLID_PRINCIPLES.md)
 

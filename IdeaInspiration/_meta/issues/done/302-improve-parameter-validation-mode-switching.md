@@ -4,7 +4,7 @@
 **Type**: Enhancement  
 **Module**: Client/Backend + Client/Frontend  
 **Estimated**: 1 week  
-**Assigned To**: Worker 3 - Full Stack Development  
+**Assigned To**: Worker 03 - Full Stack Development  
 **Dependencies**: None
 
 ---

@@ -10,7 +10,7 @@ High
 Feature - Best Practices Implementation
 
 ## Worker
-Worker 2 - Backend Development
+Worker 02 - Backend Development
 
 ## Description
 
@@ -88,7 +88,7 @@ async def execute_long_running_task(
 - `Client/Backend/src/core/execution_patterns.py` - Add long-running pattern
 - `Client/Backend/src/core/output_capture.py` - Enhance streaming support
 - `Client/Backend/_meta/tests/test_long_running_patterns.py` - Tests
-- `Client/Backend/docs/STREAMING_GUIDE.md` - Streaming documentation
+- `Client/Backend/_meta/docs/STREAMING_GUIDE.md` - Streaming documentation
 
 ### Dependencies
 

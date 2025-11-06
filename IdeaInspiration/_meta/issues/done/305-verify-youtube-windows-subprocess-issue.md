@@ -4,7 +4,7 @@
 **Type**: Bug Verification / Testing  
 **Module**: Sources/Content/Shorts/YouTube  
 **Estimated**: 2-4 hours  
-**Assigned To**: Worker 6 - QA/Testing  
+**Assigned To**: Worker 06 - QA/Testing  
 **Dependencies**: Issue #304  
 **Status**: ✅ COMPLETE  
 **Completed**: 2025-11-04
@@ -24,10 +24,10 @@
 
 **Deliverables**:
 1. ✅ Verification script: `Client/Backend/_meta/tests/verify_subprocess_fix.py`
-2. ✅ Test report: `_meta/issues/new/Worker6/test-report-youtube-windows.md`
+2. ✅ Test report: `_meta/issues/new/Worker06/test-report-youtube-windows.md`
 3. ✅ Updated KNOWN_ISSUES.md with resolution status
 
-**See**: `_meta/issues/new/Worker6/test-report-youtube-windows.md` for full details.
+**See**: `_meta/issues/new/Worker06/test-report-youtube-windows.md` for full details.
 
 ---
 
@@ -187,13 +187,13 @@ python -m src.uvicorn_runner
 
 1. **Create Test Report**
    
-   Create `_meta/issues/new/Worker6/test-report-youtube-windows.md`:
+   Create `_meta/issues/new/Worker06/test-report-youtube-windows.md`:
    
    ```markdown
    # YouTube Module Windows Subprocess Test Report
    
    **Date**: 2025-11-04  
-   **Tester**: Worker 6  
+   **Tester**: Worker 06  
    **Environment**: Windows 11, Python 3.10
    
    ## Summary

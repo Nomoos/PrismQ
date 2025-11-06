@@ -48,8 +48,8 @@ README files across the repository contain a mix of navigation, detailed content
 - Multiple modules listed in root README vs module READMEs
 
 **Module Level** (e.g., Client):
-- Client/README.md vs Client/docs/SETUP.md
-- Client/README.md vs Client/docs/USER_GUIDE.md
+- Client/README.md vs Client/_meta/docs/SETUP.md
+- Client/README.md vs Client/_meta/docs/USER_GUIDE.md
 - Backend/README.md vs Backend/docs/ARCHITECTURE.md
 
 ## Proposed Solution

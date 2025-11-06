@@ -27,8 +27,8 @@ python -c "from idea_inspiration import IdeaInspiration; print('OK')"
 
 ## 📚 Documentation
 
-- **[Setup Guide](./docs/SETUP.md)** - Database setup and installation
-- **[User Guide](./docs/USER_GUIDE.md)** - Complete usage examples and features
+- **[Setup Guide](./_meta/docs/SETUP.md)** - Database setup and installation
+- **[User Guide](./_meta/docs/USER_GUIDE.md)** - Complete usage examples and features
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - Development guidelines
 
 ## 🔗 Related

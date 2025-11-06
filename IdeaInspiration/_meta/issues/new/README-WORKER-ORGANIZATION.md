@@ -14,57 +14,57 @@ This directory contains issues organized into worker-specific folders to enable 
 
 ## Worker Assignments
 
-### Worker 1 - Backend/Source Development
+### Worker 01 - Backend/Source Development
 **Focus**: Source module feature implementation  
 **Skills**: Python, yt-dlp, API integration, data scraping  
 
 **Assigned Issues:**
-- [#300 - Implement YouTube Shorts Keyword Search Mode](./Worker1/300-implement-youtube-keyword-search.md)
+- [#300 - Implement YouTube Shorts Keyword Search Mode](./Worker01/300-implement-youtube-keyword-search.md)
 
 **Estimated Time**: 1-2 weeks
 
 ---
 
-### Worker 2 - Documentation/Technical Writing
+### Worker 02 - Documentation/Technical Writing
 **Focus**: Comprehensive documentation and architecture  
 **Skills**: Technical writing, architecture diagrams, documentation tools  
 
 **Assigned Issues:**
-- [#301 - Document YouTube Shorts Module Flow and Architecture](./Worker2/301-document-module-flow-architecture.md)
+- [#301 - Document YouTube Shorts Module Flow and Architecture](./Worker02/301-document-module-flow-architecture.md)
 
 **Estimated Time**: 3-5 days
 
 ---
 
-### Worker 3 - Full Stack Development
+### Worker 03 - Full Stack Development
 **Focus**: Web client UI/UX and backend integration  
 **Skills**: Vue.js, Python, API design, form validation  
 
 **Assigned Issues:**
-- [#302 - Improve Module Parameter Validation and Mode Switching](./Worker3/302-improve-parameter-validation-mode-switching.md)
+- [#302 - Improve Module Parameter Validation and Mode Switching](./Worker03/302-improve-parameter-validation-mode-switching.md)
 
 **Estimated Time**: 1 week
 
 ---
 
-### Worker 4 - QA/Testing
+### Worker 04 - QA/Testing
 **Focus**: Test automation and CI/CD  
 **Skills**: pytest, integration testing, GitHub Actions, Windows testing  
 
 **Assigned Issues:**
-- [#303 - Add Comprehensive Testing for Windows Subprocess Execution](./Worker4/303-comprehensive-windows-subprocess-testing.md)
+- [#303 - Add Comprehensive Testing for Windows Subprocess Execution](./Worker04/303-comprehensive-windows-subprocess-testing.md)
 
 **Estimated Time**: 3-5 days
 
 ---
 
-### Worker 5 - Reserved
+### Worker 05 - Reserved
 **Status**: Available for future issues  
 **Current**: Empty
 
 ---
 
-### Worker 6 - Reserved
+### Worker 06 - Reserved
 **Status**: Available for future issues  
 **Current**: Empty
 
@@ -78,10 +78,10 @@ All four current issues (300-303) can be developed **completely in parallel** wi
 
 | Issue | Worker | Module | Code Areas | Conflicts? |
 |-------|--------|--------|------------|-----------|
-| #300 | Worker 1 | YouTube Source | `Sources/Content/Shorts/YouTube/src/plugins/` | ❌ No |
-| #301 | Worker 2 | Documentation | `Sources/Content/Shorts/YouTube/docs/`, `Client/docs/` | ❌ No |
-| #302 | Worker 3 | Web Client | `Client/Frontend/src/components/`, `Client/Backend/src/api/` | ❌ No |
-| #303 | Worker 4 | Testing | `Client/Backend/tests/`, `.github/workflows/` | ❌ No |
+| #300 | Worker 01 | YouTube Source | `Sources/Content/Shorts/YouTube/src/plugins/` | ❌ No |
+| #301 | Worker 02 | Documentation | `Sources/Content/Shorts/YouTube/docs/`, `Client/_meta/docs/` | ❌ No |
+| #302 | Worker 03 | Web Client | `Client/Frontend/src/components/`, `Client/Backend/src/api/` | ❌ No |
+| #303 | Worker 04 | Testing | `Client/Backend/tests/`, `.github/workflows/` | ❌ No |
 
 **Result**: All 4 workers can start immediately with **zero coordination overhead**.
 
@@ -174,7 +174,7 @@ Total: 1-2 weeks
    ```
 4. **Move issue to WIP**:
    ```bash
-   mv _meta/issues/new/Worker1/300-*.md _meta/issues/wip/
+   mv _meta/issues/new/Worker01/300-*.md _meta/issues/wip/
    ```
 5. **Implement the solution** following the issue plan
 6. **Create a pull request** when done
@@ -217,10 +217,10 @@ When multiple issues are near completion:
 
 ### Code Reviews
 
-- **Worker 1** issues reviewed by backend developers
-- **Worker 2** issues reviewed for clarity and accuracy
-- **Worker 3** issues reviewed by full-stack developers
-- **Worker 4** issues reviewed for test quality and coverage
+- **Worker 01** issues reviewed by backend developers
+- **Worker 02** issues reviewed for clarity and accuracy
+- **Worker 03** issues reviewed by full-stack developers
+- **Worker 04** issues reviewed for test quality and coverage
 
 ---
 
@@ -294,12 +294,12 @@ As new issues are identified, they should be:
 
 | Worker | Active Issues | Status |
 |--------|--------------|--------|
-| Worker 1 | 1 (#300) | 🟢 Active |
-| Worker 2 | 1 (#301) | 🟢 Active |
-| Worker 3 | 1 (#302) | 🟢 Active |
-| Worker 4 | 1 (#303) | 🟢 Active |
-| Worker 5 | 0 | ⚪ Available |
-| Worker 6 | 0 | ⚪ Available |
+| Worker 01 | 1 (#300) | 🟢 Active |
+| Worker 02 | 1 (#301) | 🟢 Active |
+| Worker 03 | 1 (#302) | 🟢 Active |
+| Worker 04 | 1 (#303) | 🟢 Active |
+| Worker 05 | 0 | ⚪ Available |
+| Worker 06 | 0 | ⚪ Available |
 | **Total** | **4** | **Ready to Start** |
 
 ### Completion Timeline

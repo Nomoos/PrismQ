@@ -11,20 +11,20 @@
 
 Issues organized by worker for **parallel development**:
 
-- **[Worker1/](./Worker1/)** - Backend/Source Development
-  - [#300 - Implement YouTube Shorts Keyword Search Mode](./Worker1/300-implement-youtube-keyword-search.md)
+- **[Worker01/](./Worker01/)** - Backend/Source Development
+  - [#300 - Implement YouTube Shorts Keyword Search Mode](./Worker01/300-implement-youtube-keyword-search.md)
 
-- **[Worker2/](./Worker2/)** - Documentation/Technical Writing
-  - [#301 - Document YouTube Shorts Module Flow and Architecture](./Worker2/301-document-module-flow-architecture.md)
+- **[Worker02/](./Worker02/)** - Documentation/Technical Writing
+  - [#301 - Document YouTube Shorts Module Flow and Architecture](./Worker02/301-document-module-flow-architecture.md)
 
-- **[Worker3/](./Worker3/)** - Full Stack Development
-  - [#302 - Improve Module Parameter Validation and Mode Switching](./Worker3/302-improve-parameter-validation-mode-switching.md)
+- **[Worker03/](./Worker03/)** - Full Stack Development
+  - [#302 - Improve Module Parameter Validation and Mode Switching](./Worker03/302-improve-parameter-validation-mode-switching.md)
 
-- **[Worker4/](./Worker4/)** - QA/Testing
-  - [#303 - Add Comprehensive Testing for Windows Subprocess Execution](./Worker4/303-comprehensive-windows-subprocess-testing.md)
+- **[Worker04/](./Worker04/)** - QA/Testing
+  - [#303 - Add Comprehensive Testing for Windows Subprocess Execution](./Worker04/303-comprehensive-windows-subprocess-testing.md)
 
-- **[Worker5/](./Worker5/)** - Reserved (Empty)
-- **[Worker6/](./Worker6/)** - Reserved (Empty)
+- **[Worker05/](./Worker05/)** - Reserved (Empty)
+- **[Worker06/](./Worker06/)** - Reserved (Empty)
 
 **📖 See [README-WORKER-ORGANIZATION.md](./README-WORKER-ORGANIZATION.md) for complete worker-based parallelization strategy**
 
@@ -67,10 +67,10 @@ All current worker-based issues can be developed **simultaneously** with zero de
 
 | Issue | Worker | Duration | Can Start | Dependencies |
 |-------|--------|----------|-----------|--------------|
-| #300 | Worker 1 | 1-2 weeks | ✅ Now | None |
-| #301 | Worker 2 | 3-5 days | ✅ Now | None |
-| #302 | Worker 3 | 1 week | ✅ Now | None |
-| #303 | Worker 4 | 3-5 days | ✅ Now | None |
+| #300 | Worker 01 | 1-2 weeks | ✅ Now | None |
+| #301 | Worker 02 | 3-5 days | ✅ Now | None |
+| #302 | Worker 03 | 1 week | ✅ Now | None |
+| #303 | Worker 04 | 3-5 days | ✅ Now | None |
 
 **Timeline**: All can complete in **1-2 weeks** with parallel development
 
@@ -84,7 +84,7 @@ All current worker-based issues can be developed **simultaneously** with zero de
 2. **Read the complete issue** including requirements and implementation plan
 3. **Move issue to WIP** when you start working:
    ```bash
-   mv _meta/issues/new/Worker1/300-*.md _meta/issues/wip/
+   mv _meta/issues/new/Worker01/300-*.md _meta/issues/wip/
    ```
 4. **Create feature branch** and implement
 5. **Move to done** after merge:

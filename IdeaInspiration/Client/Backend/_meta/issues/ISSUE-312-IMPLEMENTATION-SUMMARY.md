@@ -47,7 +47,7 @@ All acceptance criteria have been met:
    - Memory management tests
    - Integration tests with real subprocess operations
 
-3. **`Client/Backend/docs/RESOURCE_POOLING.md`** (453 lines)
+3. **`Client/Backend/_meta/docs/RESOURCE_POOLING.md`** (453 lines)
    - Complete usage guide
    - Architecture overview
    - Best practices
@@ -55,13 +55,13 @@ All acceptance criteria have been met:
    - Troubleshooting guide
    - Migration examples
 
-4. **`Client/Backend/scripts/verify_resource_pool.py`** (145 lines)
+4. **`Client/Backend/_meta/_scripts/verify_resource_pool.py`** (145 lines)
    - Verification script for manual testing
 
-5. **`Client/Backend/scripts/test_resource_pool_standalone.py`** (239 lines)
+5. **`Client/Backend/_meta/_scripts/test_resource_pool_standalone.py`** (239 lines)
    - Standalone test script
 
-6. **`Client/Backend/scripts/demo_resource_pool.py`** (182 lines)
+6. **`Client/Backend/_meta/_scripts/demo_resource_pool.py`** (182 lines)
    - Demo script showing usage patterns
 
 ### Modified Files

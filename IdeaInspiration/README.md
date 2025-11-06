@@ -86,7 +86,7 @@ _meta\_scripts\run_both.bat
 
 ### Architecture & Design
 - **[System Architecture](./_meta/docs/ARCHITECTURE.md)** - Complete system architecture with diagrams
-- **[Web Client Architecture](./Client/docs/ARCHITECTURE.md)** - Detailed Client architecture
+- **[Web Client Architecture](./Client/_meta/docs/ARCHITECTURE.md)** - Detailed Client architecture
 - **[Scoring Module Architecture](./Scoring/_meta/docs/ARCHITECTURE.md)** - Scoring module details
 - **[Python Packaging Standard](./_meta/docs/PYTHON_PACKAGING_STANDARD.md)** - Standardized configuration
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project

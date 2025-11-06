@@ -10,7 +10,7 @@ Medium
 Feature - Best Practices Implementation
 
 ## Worker
-Worker 6 - Backend Development
+Worker 06 - Backend Development
 
 ## Description
 
@@ -81,7 +81,7 @@ class ResourcePool:
 - `Client/Backend/src/core/resource_pool.py` - New ResourcePool class
 - `Client/Backend/src/main.py` - Initialize global resource pool
 - `Client/Backend/_meta/tests/test_resource_pool.py` - Tests
-- `Client/Backend/docs/RESOURCE_POOLING.md` - Pooling guide
+- `Client/Backend/_meta/docs/RESOURCE_POOLING.md` - Pooling guide
 
 ### Dependencies
 

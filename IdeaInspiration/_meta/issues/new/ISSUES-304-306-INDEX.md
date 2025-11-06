@@ -10,8 +10,8 @@
 
 | # | Title | Priority | Worker | Estimated | Status |
 |---|-------|----------|--------|-----------|--------|
-| **304** | Fix Windows Subprocess Deployment and Server Startup | CRITICAL | Worker 5 | 1-2 days | 🟢 Ready |
-| **305** | Verify and Document YouTube Module Windows Subprocess Issue | HIGH | Worker 6 | 2-4 hours | 🟢 Ready |
+| **304** | Fix Windows Subprocess Deployment and Server Startup | CRITICAL | Worker 05 | 1-2 days | 🟢 Ready |
+| **305** | Verify and Document YouTube Module Windows Subprocess Issue | HIGH | Worker 06 | 2-4 hours | 🟢 Ready |
 | **306** | Windows Subprocess Issue - Complete Resolution Index | CRITICAL | Infrastructure | N/A | ✅ Complete |
 
 ---
@@ -97,8 +97,8 @@ except RuntimeError as e:
 
 ## Issue #304: Deployment and Documentation
 
-**Worker**: Worker 5 (Infrastructure/DevOps)  
-**File**: [Worker5/304-windows-subprocess-deployment-fix.md](./Worker5/304-windows-subprocess-deployment-fix.md)  
+**Worker**: Worker 05 (Infrastructure/DevOps)  
+**File**: [Worker05/304-windows-subprocess-deployment-fix.md](./Worker05/304-windows-subprocess-deployment-fix.md)  
 **Estimated**: 1-2 days  
 **Status**: 🟢 Ready to Start
 
@@ -139,8 +139,8 @@ Code fix deployed but users need:
 
 ## Issue #305: YouTube Verification
 
-**Worker**: Worker 6 (QA/Testing)  
-**File**: [Worker6/305-verify-youtube-windows-subprocess-issue.md](./Worker6/305-verify-youtube-windows-subprocess-issue.md)  
+**Worker**: Worker 06 (QA/Testing)  
+**File**: [Worker06/305-verify-youtube-windows-subprocess-issue.md](./Worker06/305-verify-youtube-windows-subprocess-issue.md)  
 **Estimated**: 2-4 hours  
 **Status**: 🟢 Ready to Start
 
@@ -256,7 +256,7 @@ Immediate solutions for users experiencing the issue:
 
 ### Phase 2: Deployment 🔄 IN PROGRESS
 
-**Worker**: Worker 5  
+**Worker**: Worker 05  
 **Duration**: 1-2 days  
 **Target**: 2025-11-06
 
@@ -267,7 +267,7 @@ Immediate solutions for users experiencing the issue:
 
 ### Phase 3: Verification 🔄 IN PROGRESS
 
-**Worker**: Worker 6  
+**Worker**: Worker 06  
 **Duration**: 2-4 hours  
 **Target**: 2025-11-05
 

@@ -127,13 +127,13 @@ Total: 11-13 days (4-6 days patterns + 5-7 days integration)
 ┌─────────────┬──────────────────────────────────┬──────────┐
 │   Worker    │          Issue & Pattern          │   Days   │
 ├─────────────┼──────────────────────────────────┼──────────┤
-│  Worker 1   │  #307: Simple Execution          │   3-5    │
-│  Worker 2   │  #308: Long-Running Task         │   4-6    │
-│  Worker 3   │  #309: Concurrent Execution      │   3-5    │
-│  Worker 4   │  #310: Fire-and-Forget           │   3-4    │
-│  Worker 5   │  #311: Periodic Tasks            │   2-3    │
-│  Worker 6   │  #312: Resource Pooling          │   2-3    │
-│  Worker 7   │  #313: Pattern Integration       │   5-7    │
+│  Worker 01   │  #307: Simple Execution          │   3-5    │
+│  Worker 02   │  #308: Long-Running Task         │   4-6    │
+│  Worker 03   │  #309: Concurrent Execution      │   3-5    │
+│  Worker 04   │  #310: Fire-and-Forget           │   3-4    │
+│  Worker 05   │  #311: Periodic Tasks            │   2-3    │
+│  Worker 06   │  #312: Resource Pooling          │   2-3    │
+│  Worker 07   │  #313: Pattern Integration       │   5-7    │
 └─────────────┴──────────────────────────────────┴──────────┘
 
 Phase 1 (Parallel):
@@ -143,9 +143,9 @@ Day 5-6:  ███       Workers 2-3 finishing up
 Day 6+:   █         Final pattern testing
 
 Phase 2 (Sequential):
-Day 7-8:  ████      Worker 7 starts integration
-Day 9-11: ████████  Worker 7 continues
-Day 12-13: ██       Worker 7 finishes integration
+Day 7-8:  ████      Worker 07 starts integration
+Day 9-11: ████████  Worker 07 continues
+Day 12-13: ██       Worker 07 finishes integration
 ```
 
 ---
@@ -338,4 +338,4 @@ Status │  All   │  All   │  Most  │  Half  │   2    │   1    │
 
 - [Issues Index](ISSUES-307-312-BEST-PRACTICES-INDEX.md)
 - [Worker Organization](README-WORKER-ORGANIZATION.md)
-- [Best Practices Guide](../../../Client/Backend/docs/BACKGROUND_TASKS_BEST_PRACTICES.md)
+- [Best Practices Guide](../../../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md)

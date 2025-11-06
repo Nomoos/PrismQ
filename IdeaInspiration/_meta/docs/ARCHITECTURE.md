@@ -294,7 +294,7 @@ sequenceDiagram
   - Real-time log streaming (SSE)
   - Run history and monitoring
   - Concurrent execution support
-- **Documentation**: [Client Architecture](../../Client/docs/ARCHITECTURE.md)
+- **Documentation**: [Client Architecture](../../Client/_meta/docs/ARCHITECTURE.md)
 
 #### Sources Module
 - **Purpose**: Multi-platform content collection
@@ -357,7 +357,7 @@ All modules are optimized for:
 ## Related Documentation
 
 - [Contributing Guidelines](./CONTRIBUTING.md)
-- [Web Client Architecture](../../Client/docs/ARCHITECTURE.md) - Detailed Client architecture
+- [Web Client Architecture](../../Client/_meta/docs/ARCHITECTURE.md) - Detailed Client architecture
 - [Scoring Module Architecture](../../Scoring/_meta/docs/ARCHITECTURE.md) - Scoring module details
 - Main README: `/README.md`
 

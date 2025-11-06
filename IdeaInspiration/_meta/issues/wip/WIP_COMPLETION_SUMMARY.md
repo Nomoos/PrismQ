@@ -182,7 +182,7 @@ NOTE: 1 minor warning about unawaited coroutine (not a failure)
 ### Files Implemented
 - `Client/Backend/src/core/task_manager.py` - 266 lines of production code
 - `Client/Backend/_meta/tests/test_task_manager.py` - 564 lines of test code
-- `Client/Backend/docs/TASK_MANAGEMENT.md` - Comprehensive documentation
+- `Client/Backend/_meta/docs/TASK_MANAGEMENT.md` - Comprehensive documentation
 
 ### Features Implemented
 1. **Fire-and-Forget Task Launching**

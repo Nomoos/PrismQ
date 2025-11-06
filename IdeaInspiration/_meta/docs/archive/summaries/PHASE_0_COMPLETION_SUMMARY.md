@@ -234,10 +234,10 @@ Client/
 
 ### Documentation
 - Main README: `Client/README.md`
-- Setup Guide: `Client/docs/SETUP.md`
-- User Guide: `Client/docs/USER_GUIDE.md`
-- API Reference: `Client/docs/API.md`
-- Testing Guide: `Client/docs/TESTING.md`
+- Setup Guide: `Client/_meta/docs/SETUP.md`
+- User Guide: `Client/_meta/docs/USER_GUIDE.md`
+- API Reference: `Client/_meta/docs/API.md`
+- Testing Guide: `Client/_meta/docs/TESTING.md`
 
 ### API Documentation
 - Swagger UI: http://localhost:8000/docs (when running)

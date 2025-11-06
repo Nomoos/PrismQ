@@ -4,7 +4,7 @@
 **Type**: Testing/Infrastructure  
 **Module**: Client/Backend  
 **Estimated**: 3-5 days  
-**Assigned To**: Worker 4 - QA/Testing  
+**Assigned To**: Worker 04 - QA/Testing  
 **Dependencies**: None
 
 ---
@@ -396,7 +396,7 @@ jobs:
 ### Phase 5: Documentation (0.5 day)
 
 1. **Document Testing Strategy**
-   - [ ] Add testing guide to `Client/Backend/docs/TESTING.md`
+   - [ ] Add testing guide to `Client/Backend/_meta/docs/TESTING.md`
    - [ ] Document Windows-specific test requirements
    - [ ] Explain how to run tests on Windows
    - [ ] Document CI/CD setup

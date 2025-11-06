@@ -49,6 +49,32 @@ Documentation is organized into the following categories:
   - Blending strategies (topic, trend, multi-platform, temporal)
 - **[MODEL_QUESTIONS_ANSWERS.md](./MODEL_QUESTIONS_ANSWERS.md)** - Quick reference Q&A for Model extension questions
 
+### 🔄 Queue System ([queue/](./queue/))
+
+SQLite-based persistent task queue for distributed work processing:
+
+- **[QUEUE_ARCHITECTURE.md](./queue/QUEUE_ARCHITECTURE.md)** - System architecture, design decisions, and component overview
+  - Why SQLite vs MySQL/PostgreSQL/Redis
+  - Database schema and concurrency model
+  - WAL mode and Windows optimization
+  - Integration with PrismQ ecosystem
+- **[QUEUE_API_REFERENCE.md](./queue/QUEUE_API_REFERENCE.md)** - Complete API documentation
+  - QueueDatabase, Task, Worker, TaskLog classes
+  - Usage examples and error handling
+  - Best practices and performance tips
+- **[QUEUE_CONFIGURATION.md](./queue/QUEUE_CONFIGURATION.md)** - Configuration and tuning guide
+  - PRAGMA settings explained (WAL, synchronous, busy_timeout, etc.)
+  - Platform-specific configuration (Windows, Linux, macOS)
+  - Performance tuning for different workloads
+- **[QUEUE_QUICK_START.md](./queue/QUEUE_QUICK_START.md)** - Getting started guide
+  - Installation and setup
+  - Basic usage examples
+  - Common operations and troubleshooting
+- **[QUEUE_INTEGRATION.md](./queue/QUEUE_INTEGRATION.md)** - Integration and migration guide
+  - BackgroundTaskManager integration
+  - Use case examples (video processing, user actions, scheduling)
+  - Migration strategy and rollback plan
+
 ### 📁 Archive ([archive/](./archive/))
 
 Historical documentation that has been superseded or completed:

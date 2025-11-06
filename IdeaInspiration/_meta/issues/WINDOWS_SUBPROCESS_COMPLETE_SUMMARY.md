@@ -141,16 +141,16 @@ except SubprocessPolicyException as e:
 ### For Free Workers
 
 **Issue #304: Windows Subprocess Deployment Fix**
-- Worker: Worker 5 (Infrastructure/DevOps)
+- Worker: Worker 05 (Infrastructure/DevOps)
 - Tasks: Create startup scripts, update documentation
 - Estimated: 1-2 days
-- File: `_meta/issues/new/Worker5/304-windows-subprocess-deployment-fix.md`
+- File: `_meta/issues/new/Worker05/304-windows-subprocess-deployment-fix.md`
 
 **Issue #305: Verify YouTube Module Windows Subprocess Issue**
-- Worker: Worker 6 (QA/Testing)
+- Worker: Worker 06 (QA/Testing)
 - Tasks: Test all modules, verify auto-detection
 - Estimated: 2-4 hours
-- File: `_meta/issues/new/Worker6/305-verify-youtube-windows-subprocess-issue.md`
+- File: `_meta/issues/new/Worker06/305-verify-youtube-windows-subprocess-issue.md`
 
 **Issue #306: Windows Subprocess Resolution Index**
 - Type: Meta / Coordination
@@ -220,7 +220,7 @@ Delegated to Issue #305:
 
 ## Next Steps
 
-### Immediate (Worker 5 - Issue #304)
+### Immediate (Worker 05 - Issue #304)
 
 1. Create Windows startup scripts:
    - `Client/Backend/start_server.bat`
@@ -238,7 +238,7 @@ Delegated to Issue #305:
 
 **Estimated**: 1-2 days
 
-### Immediate (Worker 6 - Issue #305)
+### Immediate (Worker 06 - Issue #305)
 
 1. Test all modules on Windows:
    - reddit-posts ✓
@@ -257,7 +257,7 @@ Delegated to Issue #305:
 
 **Estimated**: 2-4 hours
 
-### Future (Worker 4 - Issue #303)
+### Future (Worker 04 - Issue #303)
 
 1. Comprehensive test suite for Windows subprocess
 2. CI/CD Windows testing
@@ -355,10 +355,10 @@ Delegated to Issue #305:
 4. `_meta/issues/WINDOWS_SUBPROCESS_QUICK_FIX.md`
    - User quick reference guide
 
-5. `_meta/issues/new/Worker5/304-windows-subprocess-deployment-fix.md`
+5. `_meta/issues/new/Worker05/304-windows-subprocess-deployment-fix.md`
    - Deployment task for Worker 5
 
-6. `_meta/issues/new/Worker6/305-verify-youtube-windows-subprocess-issue.md`
+6. `_meta/issues/new/Worker06/305-verify-youtube-windows-subprocess-issue.md`
    - Testing task for Worker 6
 
 7. `_meta/issues/new/Infrastructure_DevOps/306-windows-subprocess-resolution-index.md`

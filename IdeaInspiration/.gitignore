@@ -4,6 +4,13 @@
 *.backup
 Sources.bak/
 
+# Git merge conflict files
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
+*.orig
+
 # Python - Build and Distribution
 __pycache__/
 *.py[cod]

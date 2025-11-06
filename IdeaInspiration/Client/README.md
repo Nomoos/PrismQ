@@ -32,22 +32,22 @@ cd Frontend && npm run dev
 ## 📚 Documentation
 
 ### Getting Started
-- **[Setup Guide](./docs/SETUP.md)** - Installation and configuration
-- **[User Guide](./docs/USER_GUIDE.md)** - How to use the web client
-- **[Node.js Installation](./docs/NODEJS_INSTALLATION.md)** - Node.js setup instructions
-- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Setup Guide](./_meta/docs/SETUP.md)** - Installation and configuration
+- **[User Guide](./_meta/docs/USER_GUIDE.md)** - How to use the web client
+- **[Node.js Installation](./_meta/docs/NODEJS_INSTALLATION.md)** - Node.js setup instructions
+- **[Troubleshooting](./_meta/docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ### Technical Documentation
-- **[Architecture](./docs/ARCHITECTURE.md)** - System design and architecture
-- **[API Reference](./docs/API.md)** - REST API documentation
-- **[Development Guide](./docs/DEVELOPMENT.md)** - Contributing guide
-- **[Testing Guide](./docs/TESTING.md)** - Test coverage and commands
-- **[Configuration](./docs/CONFIGURATION.md)** - Configuration options
-- **[Modules Guide](./docs/MODULES.md)** - How to add new modules
+- **[Architecture](./_meta/docs/ARCHITECTURE.md)** - System design and architecture
+- **[API Reference](./_meta/docs/API.md)** - REST API documentation
+- **[Development Guide](./_meta/docs/DEVELOPMENT.md)** - Contributing guide
+- **[Testing Guide](./_meta/docs/TESTING.md)** - Test coverage and commands
+- **[Configuration](./_meta/docs/CONFIGURATION.md)** - Configuration options
+- **[Modules Guide](./_meta/docs/MODULES.md)** - How to add new modules
 
 ### Additional Resources
-- **[Screenshots Guide](./docs/SCREENSHOTS_GUIDE.md)** - UI screenshot capture
-- **[Postman Collection](./docs/POSTMAN_COLLECTION.md)** - API testing guide
+- **[Screenshots Guide](./_meta/docs/SCREENSHOTS_GUIDE.md)** - UI screenshot capture
+- **[Postman Collection](./_meta/docs/POSTMAN_COLLECTION.md)** - API testing guide
 
 ## 🔗 Related
 

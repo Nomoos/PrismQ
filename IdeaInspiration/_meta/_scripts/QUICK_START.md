@@ -121,4 +121,4 @@ taskkill /PID <pid_from_above> /F
 
 ---
 
-**Need help?** Check the [Troubleshooting Guide](Client/docs/TROUBLESHOOTING.md) or open an issue on GitHub.
+**Need help?** Check the [Troubleshooting Guide](Client/_meta/docs/TROUBLESHOOTING.md) or open an issue on GitHub.

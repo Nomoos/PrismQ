@@ -36,9 +36,9 @@ Successfully standardized all README files across the PrismQ.IdeaInspiration rep
 
 **Files:**
 - `Classification/README.md` - Updated to navigation format
-- `Classification/docs/SETUP.md` - Created with installation details
-- `Classification/docs/USER_GUIDE.md` - Created with usage examples
-- `Classification/docs/API.md` - Created with API reference
+- `Classification/_meta/docs/SETUP.md` - Created with installation details
+- `Classification/_meta/docs/USER_GUIDE.md` - Created with usage examples
+- `Classification/_meta/docs/API.md` - Created with API reference
 
 **Changes:**
 - Reduced README from ~362 lines to ~31 lines
@@ -170,9 +170,9 @@ Successfully standardized all README files across the PrismQ.IdeaInspiration rep
 1. `_meta/docs/templates/README_TEMPLATE.md`
 2. `_meta/docs/README_STANDARDS.md`
 3. `_meta/docs/SETUP.md`
-4. `Classification/docs/SETUP.md`
-5. `Classification/docs/USER_GUIDE.md`
-6. `Classification/docs/API.md`
+4. `Classification/_meta/docs/SETUP.md`
+5. `Classification/_meta/docs/USER_GUIDE.md`
+6. `Classification/_meta/docs/API.md`
 7. `Model/docs/SETUP.md`
 8. `Model/docs/USER_GUIDE.md`
 

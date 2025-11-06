@@ -10,17 +10,17 @@
 
 | # | Title | Priority | Worker | Estimated | Status |
 |---|-------|----------|--------|-----------|--------|
-| **300** | Implement YouTube Shorts Keyword Search Mode | HIGH | Worker 1 | 1-2 weeks | 🟢 Ready |
-| **301** | Document YouTube Shorts Module Flow and Architecture | MEDIUM | Worker 2 | 3-5 days | 🟢 Ready |
-| **302** | Improve Module Parameter Validation and Mode Switching | MEDIUM | Worker 3 | 1 week | 🟢 Ready |
-| **303** | Add Comprehensive Testing for Windows Subprocess Execution | HIGH | Worker 4 | 3-5 days | 🟢 Ready |
+| **300** | Implement YouTube Shorts Keyword Search Mode | HIGH | Worker 01 | 1-2 weeks | 🟢 Ready |
+| **301** | Document YouTube Shorts Module Flow and Architecture | MEDIUM | Worker 02 | 3-5 days | 🟢 Ready |
+| **302** | Improve Module Parameter Validation and Mode Switching | MEDIUM | Worker 03 | 1 week | 🟢 Ready |
+| **303** | Add Comprehensive Testing for Windows Subprocess Execution | HIGH | Worker 04 | 3-5 days | 🟢 Ready |
 
 ---
 
 ## Issue #300: Implement YouTube Shorts Keyword Search Mode
 
-**Worker**: Worker 1 (Backend/Source Development)  
-**File**: [Worker1/300-implement-youtube-keyword-search.md](./Worker1/300-implement-youtube-keyword-search.md)
+**Worker**: Worker 01 (Backend/Source Development)  
+**File**: [Worker01/300-implement-youtube-keyword-search.md](./Worker01/300-implement-youtube-keyword-search.md)
 
 ### Summary
 Implement true keyword search functionality for the YouTube Shorts Source module. Currently, keyword mode falls back to showing trending results instead of actual search results.
@@ -47,8 +47,8 @@ Implement true keyword search functionality for the YouTube Shorts Source module
 
 ## Issue #301: Document YouTube Shorts Module Flow and Architecture
 
-**Worker**: Worker 2 (Documentation/Technical Writing)  
-**File**: [Worker2/301-document-module-flow-architecture.md](./Worker2/301-document-module-flow-architecture.md)
+**Worker**: Worker 02 (Documentation/Technical Writing)  
+**File**: [Worker02/301-document-module-flow-architecture.md](./Worker02/301-document-module-flow-architecture.md)
 
 ### Summary
 Create comprehensive documentation of the YouTube Shorts Source module execution flow, from web client UI launch through CLI execution and database storage.
@@ -76,8 +76,8 @@ Create comprehensive documentation of the YouTube Shorts Source module execution
 
 ## Issue #302: Improve Module Parameter Validation and Mode Switching
 
-**Worker**: Worker 3 (Full Stack Development)  
-**File**: [Worker3/302-improve-parameter-validation-mode-switching.md](./Worker3/302-improve-parameter-validation-mode-switching.md)
+**Worker**: Worker 03 (Full Stack Development)  
+**File**: [Worker03/302-improve-parameter-validation-mode-switching.md](./Worker03/302-improve-parameter-validation-mode-switching.md)
 
 ### Summary
 Enhance the web client to show/hide parameters dynamically based on selected mode, provide mode-specific validation, and improve user guidance.
@@ -106,8 +106,8 @@ Enhance the web client to show/hide parameters dynamically based on selected mod
 
 ## Issue #303: Add Comprehensive Testing for Windows Subprocess Execution
 
-**Worker**: Worker 4 (QA/Testing)  
-**File**: [Worker4/303-comprehensive-windows-subprocess-testing.md](./Worker4/303-comprehensive-windows-subprocess-testing.md)
+**Worker**: Worker 04 (QA/Testing)  
+**File**: [Worker04/303-comprehensive-windows-subprocess-testing.md](./Worker04/303-comprehensive-windows-subprocess-testing.md)
 
 ### Summary
 Create comprehensive automated tests for the Windows subprocess execution fix (ProactorEventLoop policy) to prevent regressions and ensure reliability.
@@ -139,13 +139,13 @@ Create comprehensive automated tests for the Windows subprocess execution fix (P
 ### Can All Start Immediately ✅
 
 ```
-Worker 1 (Backend)    ─────────────────→  #300 (1-2 weeks)
+Worker 01 (Backend)    ─────────────────→  #300 (1-2 weeks)
                       
-Worker 2 (Docs)       ─────────→  #301 (3-5 days)
+Worker 02 (Docs)       ─────────→  #301 (3-5 days)
 
-Worker 3 (Full Stack) ──────────────→  #302 (1 week)
+Worker 03 (Full Stack) ──────────────→  #302 (1 week)
 
-Worker 4 (QA)         ─────────→  #303 (3-5 days)
+Worker 04 (QA)         ─────────→  #303 (3-5 days)
 ```
 
 **Dependencies**: NONE - All can work in parallel  
@@ -161,7 +161,7 @@ Worker 4 (QA)         ─────────→  #303 (3-5 days)
 | Issue | Primary Files | Potential Conflicts |
 |-------|--------------|---------------------|
 | #300 | `Sources/Content/Shorts/YouTube/src/plugins/youtube_search_plugin.py` (new) | ❌ None |
-| #301 | `Sources/Content/Shorts/YouTube/docs/` (new), `Client/docs/ARCHITECTURE.md` | ❌ None |
+| #301 | `Sources/Content/Shorts/YouTube/docs/` (new), `Client/_meta/docs/ARCHITECTURE.md` | ❌ None |
 | #302 | `Client/Frontend/src/components/ModuleLaunchModal.vue`, `Client/Backend/src/api/modules.py` | ❌ None |
 | #303 | `Client/Backend/tests/` (new), `.github/workflows/test-windows.yml` (new) | ❌ None |
 
