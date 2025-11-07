@@ -1,0 +1,342 @@
+2025-11-03 15:15:55 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-03 15:15:55 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-03 15:15:55 - prismq.client.backend - INFO - Environment: Development
+2025-11-03 16:44:53 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-03 16:46:31 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-03 16:46:31 - src.core.module_runner - ERROR - Run run_20251103_154631_youtube-shorts_cde2afe7 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python314\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python314\Lib\asyncio\base_events.py", line 1798, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python314\Lib\asyncio\base_events.py", line 533, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-03 16:46:37 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-03 16:46:52 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-03 17:24:56 - prismq.client.backend - INFO - Shutting down PrismQ Web Client Backend...
+2025-11-04 20:22:27 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 20:22:27 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 20:22:27 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 20:22:43 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 20:22:43 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 20:22:43 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 20:22:55 - src.core.run_registry - INFO - Loaded 1 runs from history
+2025-11-04 20:22:55 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 20:23:02 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 20:23:29 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 20:23:29 - src.core.module_runner - ERROR - Run run_20251104_192329_youtube-shorts_5f5b589e failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 20:23:44 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 20:23:50 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 20:23:50 - src.core.module_runner - ERROR - Run run_20251104_192350_youtube-shorts_e17e9a65 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 20:30:13 - prismq.client.backend - INFO - Shutting down PrismQ Web Client Backend...
+2025-11-04 20:54:52 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 20:54:52 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 20:54:52 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 20:54:53 - src.core.run_registry - INFO - Loaded 3 runs from history
+2025-11-04 20:54:53 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 20:55:14 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 20:55:21 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 20:55:21 - src.core.module_runner - ERROR - Run run_20251104_195521_youtube-shorts_e35aa030 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 21:17:33 - prismq.client.backend - INFO - Shutting down PrismQ Web Client Backend...
+2025-11-04 21:17:33 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 21:17:33 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 21:17:33 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 21:17:33 - src.core.run_registry - INFO - Loaded 4 runs from history
+2025-11-04 21:17:33 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 21:17:42 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 21:17:45 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 21:17:45 - src.core.module_runner - ERROR - Run run_20251104_201745_youtube-shorts_c95516a6 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 21:18:16 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 21:18:16 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 21:18:16 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 21:18:20 - src.core.run_registry - INFO - Loaded 5 runs from history
+2025-11-04 21:18:20 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 21:18:37 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 21:18:38 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 21:18:38 - src.core.module_runner - ERROR - Run run_20251104_201838_youtube-shorts_50782330 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 21:21:38 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 21:21:38 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 21:21:38 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 21:21:51 - src.core.run_registry - INFO - Loaded 6 runs from history
+2025-11-04 21:21:51 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 21:21:58 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 21:21:59 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 21:21:59 - src.core.module_runner - ERROR - Run run_20251104_202159_youtube-shorts_115affb8 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 22:01:13 - prismq.client.backend - INFO - Shutting down PrismQ Web Client Backend...
+2025-11-04 22:01:33 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 22:01:33 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 22:01:33 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 22:01:34 - src.core.run_registry - INFO - Loaded 7 runs from history
+2025-11-04 22:01:34 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 22:01:37 - prismq.client.backend - INFO - Shutting down PrismQ Web Client Backend...
+2025-11-04 22:01:44 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 22:01:44 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 22:01:44 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 22:01:44 - src.core.run_registry - INFO - Loaded 7 runs from history
+2025-11-04 22:01:44 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 22:02:05 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 22:02:09 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 22:02:09 - src.core.module_runner - ERROR - Run run_20251104_210209_youtube-shorts_793490da failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 22:04:31 - src.core.run_registry - INFO - Loaded 8 runs from history
+2025-11-04 22:04:31 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 22:04:31 - httpx - INFO - HTTP Request: GET http://test/api/health "HTTP/1.1 200 OK"
+2025-11-04 22:04:31 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 22:04:31 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 22:04:31 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 22:04:31 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 22:04:31 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210431_youtube-shorts_f4949c8c "HTTP/1.1 200 OK"
+2025-11-04 22:04:32 - src.core.output_capture - INFO - Started output capture for run run_20251104_210431_youtube-shorts_f4949c8c
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210431_youtube-shorts_f4949c8c "HTTP/1.1 200 OK"
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210431_youtube-shorts_f4949c8c/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210431_youtube-shorts_f4949c8c "HTTP/1.1 200 OK"
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: GET http://test/api/runs "HTTP/1.1 200 OK"
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 22:04:34 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 22:04:34 - src.core.output_capture - INFO - Started output capture for run run_20251104_210434_youtube-shorts_518e0baa
+2025-11-04 22:04:39 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210434_youtube-shorts_518e0baa "HTTP/1.1 200 OK"
+2025-11-04 22:04:39 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210434_youtube-shorts_518e0baa/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:39 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 22:04:39 - src.core.module_runner - INFO - Run run_20251104_210439_youtube-shorts_c21c91ec was cancelled
+2025-11-04 22:04:39 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 22:04:39 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 22:04:39 - src.core.output_capture - INFO - Started output capture for run run_20251104_210439_youtube-shorts_609c7725
+2025-11-04 22:04:40 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210439_youtube-shorts_609c7725/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:41 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210439_youtube-shorts_609c7725/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:42 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210439_youtube-shorts_609c7725/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:43 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210439_youtube-shorts_609c7725/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_210439_youtube-shorts_609c7725/logs "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: GET http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - src.core.config_storage - INFO - Deleted config for youtube-shorts
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: DELETE http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 22:04:44 - httpx - INFO - HTTP Request: GET http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:00:33 - src.core.config_storage - INFO - Saved config for reddit-posts
+2025-11-04 23:00:33 - src.core.module_runner - ERROR - Run run_20251104_220033_reddit-posts_0f575abb failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 23:02:03 - src.core.config_storage - INFO - Saved config for hacker-news
+2025-11-04 23:02:03 - src.core.module_runner - ERROR - Run run_20251104_220203_hacker-news_86556028 failed with exception: 
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 172, in _execute_async
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+2025-11-04 23:05:34 - src.core.run_registry - INFO - Loaded 10 runs from history
+2025-11-04 23:05:34 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 23:05:34 - src.core.subprocess_wrapper - INFO - Windows ProactorEventLoop detected - using ASYNC mode
+2025-11-04 23:05:34 - src.core.subprocess_wrapper - INFO - SubprocessWrapper initialized with mode: async
+2025-11-04 23:05:34 - src.core.module_runner - INFO - ModuleRunner initialized with subprocess mode: async
+2025-11-04 23:05:34 - httpx - INFO - HTTP Request: GET http://test/api/health "HTTP/1.1 200 OK"
+2025-11-04 23:05:34 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 23:05:34 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 23:05:34 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:05:34 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 23:05:34 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220534_youtube-shorts_94872f39 "HTTP/1.1 200 OK"
+2025-11-04 23:05:34 - src.core.subprocess_wrapper - INFO - ASYNC subprocess created, PID: 39192
+2025-11-04 23:05:34 - src.core.output_capture - INFO - Started output capture for run run_20251104_220534_youtube-shorts_94872f39
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220534_youtube-shorts_94872f39 "HTTP/1.1 200 OK"
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220534_youtube-shorts_94872f39/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220534_youtube-shorts_94872f39 "HTTP/1.1 200 OK"
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: GET http://test/api/runs "HTTP/1.1 200 OK"
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 23:05:36 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 23:05:36 - src.core.subprocess_wrapper - INFO - ASYNC subprocess created, PID: 28964
+2025-11-04 23:05:36 - src.core.output_capture - INFO - Started output capture for run run_20251104_220536_youtube-shorts_ae07f186
+2025-11-04 23:05:41 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220536_youtube-shorts_ae07f186 "HTTP/1.1 200 OK"
+2025-11-04 23:05:41 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220536_youtube-shorts_ae07f186/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:41 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 23:05:41 - src.core.module_runner - INFO - Run run_20251104_220541_youtube-shorts_50d09f8e was cancelled
+2025-11-04 23:05:41 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 23:05:41 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/run "HTTP/1.1 202 Accepted"
+2025-11-04 23:05:41 - src.core.subprocess_wrapper - INFO - ASYNC subprocess created, PID: 42372
+2025-11-04 23:05:41 - src.core.output_capture - INFO - Started output capture for run run_20251104_220541_youtube-shorts_d386a3a5
+2025-11-04 23:05:42 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220541_youtube-shorts_d386a3a5/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:43 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220541_youtube-shorts_d386a3a5/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:44 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220541_youtube-shorts_d386a3a5/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:45 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220541_youtube-shorts_d386a3a5/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: GET http://test/api/runs/run_20251104_220541_youtube-shorts_d386a3a5/logs "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: GET http://test/api/modules "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - src.core.config_storage - INFO - Saved config for youtube-shorts
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: POST http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - src.core.config_storage - INFO - Loaded config for youtube-shorts
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: GET http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - src.core.config_storage - INFO - Deleted config for youtube-shorts
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: DELETE http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:05:46 - httpx - INFO - HTTP Request: GET http://test/api/modules/youtube-shorts/config "HTTP/1.1 200 OK"
+2025-11-04 23:06:08 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 23:06:08 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 23:06:08 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 23:06:15 - src.core.run_registry - INFO - Loaded 14 runs from history
+2025-11-04 23:06:15 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 23:06:15 - src.core.subprocess_wrapper - INFO - Windows ProactorEventLoop detected - using ASYNC mode
+2025-11-04 23:06:15 - src.core.subprocess_wrapper - INFO - SubprocessWrapper initialized with mode: async
+2025-11-04 23:06:15 - src.core.module_runner - INFO - ModuleRunner initialized with subprocess mode: async
+2025-11-04 23:06:26 - src.core.config_storage - INFO - Loaded config for reddit-posts
+2025-11-04 23:06:27 - src.core.config_storage - INFO - Saved config for reddit-posts
+2025-11-04 23:06:27 - src.core.subprocess_wrapper - ERROR - asyncio.create_subprocess_exec not supported on this platform. On Windows, ensure ProactorEventLoopPolicy is set or use THREADED mode.
+2025-11-04 23:06:27 - src.core.module_runner - ERROR - Run run_20251104_220627_reddit-posts_b6c4f5ca failed with exception: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 156, in _async_subprocess
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 190, in _execute_async
+    process, stdout_reader, stderr_reader = await self.subprocess_wrapper.create_subprocess(
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 143, in create_subprocess
+    return await self._async_subprocess(*args, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs)
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 170, in _async_subprocess
+    raise RuntimeError(
+RuntimeError: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.
+2025-11-04 23:06:51 - src.core.config_storage - INFO - Loaded config for hacker-news
+2025-11-04 23:06:52 - src.core.config_storage - INFO - Saved config for hacker-news
+2025-11-04 23:06:52 - src.core.subprocess_wrapper - ERROR - asyncio.create_subprocess_exec not supported on this platform. On Windows, ensure ProactorEventLoopPolicy is set or use THREADED mode.
+2025-11-04 23:06:52 - src.core.module_runner - ERROR - Run run_20251104_220652_hacker-news_4a894463 failed with exception: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 156, in _async_subprocess
+    process = await asyncio.create_subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\subprocess.py", line 218, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 1652, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+  File "C:\Users\hittl\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 493, in _make_subprocess_transport
+    raise NotImplementedError
+NotImplementedError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\module_runner.py", line 190, in _execute_async
+    process, stdout_reader, stderr_reader = await self.subprocess_wrapper.create_subprocess(
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 143, in create_subprocess
+    return await self._async_subprocess(*args, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs)
+  File "C:\Users\hittl\PROJECTS\VideoMaking\PrismQ\IdeaInspiration\Client\Backend\src\core\subprocess_wrapper.py", line 170, in _async_subprocess
+    raise RuntimeError(
+RuntimeError: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.
+2025-11-04 23:21:26 - prismq.client.backend - INFO - Starting PrismQ Web Client Backend...
+2025-11-04 23:21:26 - prismq.client.backend - INFO - Version: 1.0.0
+2025-11-04 23:21:26 - prismq.client.backend - INFO - Environment: Development
+2025-11-04 23:21:33 - src.core.run_registry - INFO - Loaded 16 runs from history
+2025-11-04 23:21:33 - src.core.config_storage - INFO - ConfigStorage initialized with directory: configs\parameters
+2025-11-04 23:21:33 - src.core.subprocess_wrapper - INFO - Windows ProactorEventLoop detected - using ASYNC mode
+2025-11-04 23:21:33 - src.core.subprocess_wrapper - INFO - SubprocessWrapper initialized with mode: async
+2025-11-04 23:21:33 - src.core.module_runner - INFO - ModuleRunner initialized with subprocess mode: async
+2025-11-04 23:21:44 - src.core.config_storage - INFO - Loaded config for hacker-news
+2025-11-04 23:21:45 - src.core.config_storage - INFO - Saved config for hacker-news
+2025-11-04 23:21:45 - src.core.subprocess_wrapper - ERROR - asyncio.create_subprocess_exec not supported on this platform. On Windows, ensure ProactorEventLoopPolicy is set or use THREADED mode.
+2025-11-04 23:21:45 - src.core.module_runner - ERROR - SubprocessPolicyException in run run_20251104_222145_hacker-news_f4c305be: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.. Current policy: WindowsProactorEventLoopPolicy. Restart server with: python -m src.uvicorn_runner
+2025-11-04 23:22:03 - src.core.config_storage - INFO - Loaded config for reddit-posts
+2025-11-04 23:22:15 - src.core.config_storage - INFO - Loaded config for reddit-posts
+2025-11-04 23:22:16 - src.core.config_storage - INFO - Saved config for reddit-posts
+2025-11-04 23:22:16 - src.core.subprocess_wrapper - ERROR - asyncio.create_subprocess_exec not supported on this platform. On Windows, ensure ProactorEventLoopPolicy is set or use THREADED mode.
+2025-11-04 23:22:16 - src.core.module_runner - ERROR - SubprocessPolicyException in run run_20251104_222216_reddit-posts_685cf153: ASYNC mode requires Windows ProactorEventLoopPolicy. Set mode=THREADED or configure event loop policy.. Current policy: WindowsProactorEventLoopPolicy. Restart server with: python -m src.uvicorn_runner
