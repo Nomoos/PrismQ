@@ -12,7 +12,6 @@ if [ -z "$1" ]; then
     echo "  - Model"
     echo "  - Scoring"
     echo "  - Sources"
-    echo "  - Client/Backend"
     return 1
 fi
 

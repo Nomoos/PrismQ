@@ -643,13 +643,13 @@ onMounted(() => {
 
 **Files to Update**:
 - [ ] `Client/README.md` - Add Inspirations feature
-- [ ] `Client/docs/USER_GUIDE.md` - Usage instructions
-- [ ] `Client/docs/API.md` - New endpoints
+- [ ] `Client/_meta/docs/USER_GUIDE.md` - Usage instructions
+- [ ] `Client/_meta/docs/API.md` - New endpoints
 - [ ] `_meta/issues/wip/CURRENT_FUNCTIONALITY_EVALUATION.md` - Mark as completed
 
 **New Documentation**:
-- [ ] `Client/docs/INSPIRATIONS_GUIDE.md` - Complete guide
-- [ ] `Client/docs/DATABASE_INTEGRATION.md` - Technical details
+- [ ] `Client/_meta/docs/INSPIRATIONS_GUIDE.md` - Complete guide
+- [ ] `Client/_meta/docs/DATABASE_INTEGRATION.md` - Technical details
 
 ### 4.3 Screenshots
 

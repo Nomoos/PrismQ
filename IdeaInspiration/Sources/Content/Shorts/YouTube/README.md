@@ -222,20 +222,32 @@ See [_meta/docs/CONFIGURATION.md](_meta/docs/CONFIGURATION.md) for detailed conf
 
 ## Documentation
 
+### Core Architecture (Windows-Focused)
+
+- **[EXECUTION_FLOW.md](docs/EXECUTION_FLOW.md)** - Complete Windows execution flow from Web Client to database
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Module architecture and SOLID design patterns
+- **[KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md)** - Known limitations and Windows-specific issues
+- **[TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - Common problems and Windows debugging
+
+### Usage & Configuration
+
 - **[Quick Reference Card](_meta/docs/QUICK_REFERENCE.md)** - Fast command reference (Czech/English)
 - **[Manual Testing Procedure](_meta/docs/MANUAL_TESTING_PROCEDURE.md)** - Complete step-by-step manual testing guide (Czech/English)
 - **[Testing Guide](_meta/docs/TESTING_GUIDE.md)** - Testing with example channels and URLs
 - **[Configuration Guide](_meta/docs/CONFIGURATION.md)** - Working directories, .env management
+- **[Windows Quickstart](_meta/docs/WINDOWS_QUICKSTART.md)** - Windows-specific setup
+
+### Advanced Topics
+
 - **[Inspiration Sources](_meta/docs/INSPIRATION_SOURCES.md)** - Curated YouTube channels for content ideas
 - **[Channel Scraping](_meta/docs/CHANNEL_SCRAPING.md)** - Advanced channel scraping features
 - **[Metrics Documentation](_meta/docs/METRICS.md)** - Universal metrics system
 - **[YouTube Data Model](_meta/docs/YTB_DATA_MODEL.md)** - Complete database schema
 - **[Data Collection Guide](_meta/docs/DATA_COLLECTION_GUIDE.md)** - What data we collect
 - **[Scraping Best Practices](_meta/docs/SCRAPING_BEST_PRACTICES.md)** - Safety and re-scraping
-- **[Windows Quickstart](_meta/docs/WINDOWS_QUICKSTART.md)** - Windows-specific setup
 - **[Contributing](_meta/docs/CONTRIBUTING.md)** - How to contribute
 
-For a complete list of documentation, see [_meta/docs/](_meta/docs/).
+For a complete list of documentation, see [_meta/docs/](_meta/docs/) and [docs/](docs/).
 
 ## Testing
 

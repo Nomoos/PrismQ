@@ -9,6 +9,29 @@ Infrastructure, development operations, and tooling improvements for the PrismQ.
 
 ## Active Initiatives
 
+### 📊 SQLite Task Queue System (Issues #320-340)
+**[See Full Details →](./QUEUE-SYSTEM-INDEX.md)** | **[Database Comparison →](./DATABASE-COMPARISON-SQLITE-VS-ALTERNATIVES.md)** | **[Decision Tree →](./DATABASE-DECISION-TREE.md)** | **[FAQ →](./FAQ-DATABASE-CHOICE.md)**
+
+**DECISION: Use SQLite (not MySQL/PostgreSQL/Redis)**
+
+A comprehensive task queue system using SQLite 3 + WAL mode:
+- **#320** - Analysis & Design (Complete ✅)
+- **Database Comparison** - SQLite vs MySQL vs PostgreSQL vs Redis (Complete ✅)
+- **FAQ** - Common questions about database choice (Complete ✅)
+- **#321** - Core Infrastructure (Worker 01)
+- **#327** - Scheduling Strategies (Worker 04)
+- **#337** - Concurrency Research (Worker 09)
+- Plus 17 more planned issues
+
+**Key Decision**: SQLite chosen over MySQL/PostgreSQL/Redis because:
+- ✅ Zero infrastructure (no separate database server)
+- ✅ Perfect for single Windows host + moderate workload
+- ✅ Matches "simple architecture" principle
+- ✅ Sufficient performance (200-500 tasks/min)
+- ✅ Easy upgrade path to PostgreSQL when scaling needed
+
+**Estimated Effort**: 4 weeks across 3 implementation phases (10 workers in parallel)
+
 ### 🧹 Repository Cleanup Initiative (Issues #200-207)
 **[See Full Details →](./README-CLEANUP-INITIATIVE.md)**
 

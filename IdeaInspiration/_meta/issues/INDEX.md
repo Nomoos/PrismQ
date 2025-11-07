@@ -1,7 +1,13 @@
 # Documentation Index - What To Do Next
 
 **Created**: 2025-10-31  
+**Updated**: 2025-11-06 (Client module moved to separate repository)
 **Purpose**: Master index for all next-steps documentation
+
+> **Note**: This repository originally included a Client/Backend module for web-based control panel functionality. 
+> As of November 2025, the Client module has been moved to a separate repository for better modularity. 
+> References to "Client" in this documentation are preserved for historical context.
+> See [CLIENT_MIGRATION.md](../_meta/docs/CLIENT_MIGRATION.md) for details.
 
 ---
 

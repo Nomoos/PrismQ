@@ -7,7 +7,7 @@ name = "prismq-idea-sources-community-commentminingsource"
 version = "1.0.0"
 description = "PrismQ module for mining comments across social platforms"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 license = {text = "Proprietary"}
 authors = [{name = "PrismQ", email = "dev@prismq.com"}]
 

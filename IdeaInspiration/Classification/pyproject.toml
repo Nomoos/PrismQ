@@ -7,7 +7,7 @@ name = "prismq-idea-classification"
 version = "2.1.0"
 description = "Platform-agnostic content classification with generalized text analysis"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 license = {text = "Proprietary"}
 authors = [
     {name = "PrismQ Team", email = "dev@prismq.io"}
@@ -20,8 +20,6 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
 ]

@@ -1,6 +1,10 @@
 # Quick Reference - What To Do Next
 
 **Last Updated**: 2025-10-31
+**Updated**: 2025-11-06 (Client module moved to separate repository)
+
+> **Note**: This document contains references to Client module issues which have been moved to a separate repository.
+> These references are preserved for historical context. See [CLIENT_MIGRATION.md](../docs/CLIENT_MIGRATION.md) for details.
 
 ---
 

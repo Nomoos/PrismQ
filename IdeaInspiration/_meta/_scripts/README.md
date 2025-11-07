@@ -23,16 +23,19 @@ _meta\_scripts\run_backend.bat
 ```
 
 **Features:**
+- Automatically creates virtual environment if missing
+- Detects and recreates broken virtual environments
 - Automatically activates virtual environment
-- Checks for required dependencies
+- Auto-installs required dependencies
 - Starts server on http://localhost:8000
 - Enables auto-reload for development
-- Provides helpful error messages
+- Provides helpful error messages with troubleshooting tips
 
 **Requirements:**
-- Python 3.10+
-- Virtual environment at `Client/Backend/venv/`
-- Dependencies installed from `Client/Backend/requirements.txt`
+- Python 3.10+ installed and in PATH
+- Dependencies will be installed automatically from `Client/Backend/requirements.txt`
+
+**Note:** The script will automatically create and configure the virtual environment on first run, or recreate it if it becomes corrupted (e.g., if Python was reinstalled at a different location).
 
 ---
 

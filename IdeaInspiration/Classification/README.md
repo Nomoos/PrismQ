@@ -25,9 +25,9 @@ python -c "from prismq.idea.classification import CategoryClassifier; print('OK'
 
 ## 📚 Documentation
 
-- **[Setup Guide](./docs/SETUP.md)** - Installation and development environment
-- **[User Guide](./docs/USER_GUIDE.md)** - Complete usage examples and features
-- **[API Reference](./docs/API.md)** - Detailed API documentation
+- **[Setup Guide](./_meta/docs/SETUP.md)** - Installation and development environment
+- **[User Guide](./_meta/docs/USER_GUIDE.md)** - Complete usage examples and features
+- **[API Reference](./_meta/docs/API.md)** - Detailed API documentation
 - **[Generalized Classification](./_meta/docs/GENERALIZED_CLASSIFICATION.md)** - Advanced classification concepts
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - Development guidelines
 

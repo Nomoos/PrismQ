@@ -16,9 +16,9 @@ from . import SourcePlugin
 class YouTubeTrendingPlugin(SourcePlugin):
     """Plugin for scraping ideas from YouTube Trending and keyword searches using yt-dlp."""
     
-    # YouTube Shorts constraints
-    SHORTS_MAX_DURATION = 180  # 3 minutes max for Shorts
-    SHORTS_FETCH_MULTIPLIER = 3  # Fetch extra to compensate for filtering
+    # YouTube Shorts - relying on YouTube's own classification
+    # No strict duration/aspect ratio checks - YouTube determines what's a Short
+    SHORTS_FETCH_MULTIPLIER = 3  # Fetch extra to have buffer for results
     
     def __init__(self, config):
         """Initialize YouTube trending plugin.
@@ -301,16 +301,18 @@ class YouTubeTrendingPlugin(SourcePlugin):
             for srt_file in srt_files:
                 srt_file.unlink(missing_ok=True)
             
-            # Filter out non-shorts
-            duration_seconds = metadata.get('duration', 0)
-            if duration_seconds > self.SHORTS_MAX_DURATION:
-                print(f"    Skipped: Video is too long ({duration_seconds}s > {self.SHORTS_MAX_DURATION}s)")
-                return None
+            # Accept all videos - YouTube determines what's a Short
+            # We rely on the /shorts/ URL format or YouTube's classification
+            # No strict duration or aspect ratio filtering needed
             
-            # Check for vertical format (height > width) - relaxed for trending/keyword
+            # Log video info for debugging
+            duration_seconds = metadata.get('duration', 0)
             width = metadata.get('width', 0)
             height = metadata.get('height', 0)
-            # Note: We're more lenient here since trending may include various formats
+            webpage_url = metadata.get('webpage_url', '')
+            
+            is_shorts_url = '/shorts/' in webpage_url
+            print(f"    ✓ Video accepted: {duration_seconds}s, {width}x{height}, shorts_url={is_shorts_url}")
             
             return metadata
             

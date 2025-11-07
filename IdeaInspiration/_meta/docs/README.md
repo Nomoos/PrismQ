@@ -19,6 +19,10 @@ Documentation is organized into the following categories:
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, module organization patterns, and design decisions
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+- **[PYTHON_PACKAGING_STANDARD.md](./PYTHON_PACKAGING_STANDARD.md)** - Python packaging and configuration standards
+- **[PYTHON_VERSION_DECISION.md](./PYTHON_VERSION_DECISION.md)** - Python 3.10 version requirement and rationale
+- **[PYTHON_LAUNCHER_GUIDE.md](./PYTHON_LAUNCHER_GUIDE.md)** - How to use `py` launcher for version management
+- **[SETUP.md](./SETUP.md)** - Development environment setup guide
 - **[LOGGING_BEST_PRACTICES.md](./LOGGING_BEST_PRACTICES.md)** - Logging standards and best practices
 - **[BATCH_PROCESSING.md](./BATCH_PROCESSING.md)** - Batch processing patterns and guidelines
 - **[MODULE_DISCOVERY.md](./MODULE_DISCOVERY.md)** - Module discovery and dynamic loading
@@ -44,6 +48,32 @@ Documentation is organized into the following categories:
   - Source → Idea transformation pipeline
   - Blending strategies (topic, trend, multi-platform, temporal)
 - **[MODEL_QUESTIONS_ANSWERS.md](./MODEL_QUESTIONS_ANSWERS.md)** - Quick reference Q&A for Model extension questions
+
+### 🔄 Queue System ([queue/](./queue/))
+
+SQLite-based persistent task queue for distributed work processing:
+
+- **[QUEUE_ARCHITECTURE.md](./queue/QUEUE_ARCHITECTURE.md)** - System architecture, design decisions, and component overview
+  - Why SQLite vs MySQL/PostgreSQL/Redis
+  - Database schema and concurrency model
+  - WAL mode and Windows optimization
+  - Integration with PrismQ ecosystem
+- **[QUEUE_API_REFERENCE.md](./queue/QUEUE_API_REFERENCE.md)** - Complete API documentation
+  - QueueDatabase, Task, Worker, TaskLog classes
+  - Usage examples and error handling
+  - Best practices and performance tips
+- **[QUEUE_CONFIGURATION.md](./queue/QUEUE_CONFIGURATION.md)** - Configuration and tuning guide
+  - PRAGMA settings explained (WAL, synchronous, busy_timeout, etc.)
+  - Platform-specific configuration (Windows, Linux, macOS)
+  - Performance tuning for different workloads
+- **[QUEUE_QUICK_START.md](./queue/QUEUE_QUICK_START.md)** - Getting started guide
+  - Installation and setup
+  - Basic usage examples
+  - Common operations and troubleshooting
+- **[QUEUE_INTEGRATION.md](./queue/QUEUE_INTEGRATION.md)** - Integration and migration guide
+  - BackgroundTaskManager integration
+  - Use case examples (video processing, user actions, scheduling)
+  - Migration strategy and rollback plan
 
 ### 📁 Archive ([archive/](./archive/))
 

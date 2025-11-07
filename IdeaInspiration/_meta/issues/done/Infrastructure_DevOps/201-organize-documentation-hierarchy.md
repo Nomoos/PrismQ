@@ -124,7 +124,7 @@ Consolidate information from:
      - Main README.md
      - Model/README.md
      - Sources/README.md
-     - Client/docs/ARCHITECTURE.md
+     - Client/_meta/docs/ARCHITECTURE.md
      - Client/_meta/docs/README.md
      - _meta/docs/ARCHITECTURE.md
      - _meta/docs/development/DIRENV_SETUP.md

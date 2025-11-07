@@ -18,7 +18,7 @@ name = "module-name"
 version = "X.Y.Z"
 description = "Module description"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 license = {text = "Proprietary"}
 authors = [
     {name = "PrismQ", email = "info@prismq.example"}
@@ -27,8 +27,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
     # Production dependencies
@@ -106,10 +104,38 @@ Different modules use different package structures:
 
 All modules can now be installed using modern pip commands:
 
+### Windows Users: Use Python Launcher (`py`) - Recommended
+
+The Python Launcher provides better version management:
+
+```powershell
+# Verify Python 3.10 is available
+py -3.10 --version
+
+# Development installation with py launcher
+cd ModuleName
+py -3.10 -m pip install -e ".[dev]"
+
+# Production installation with py launcher
+py -3.10 -m pip install -e .
+```
+
+**Why use `py`?**
+- Explicitly use Python 3.10 even if other versions are installed
+- Keep multiple Python versions (3.10 for PrismQ, 3.11+ for other projects)
+- Better compatibility and version management on Windows
+
 ### Development Installation
 
 Install a module in editable mode with all development dependencies:
 
+**Using py launcher (Windows - Recommended):**
+```powershell
+cd ModuleName
+py -3.10 -m pip install -e ".[dev]"
+```
+
+**Using python command:**
 ```bash
 cd ModuleName
 pip install -e ".[dev]"
@@ -119,6 +145,13 @@ pip install -e ".[dev]"
 
 Install a module with only production dependencies:
 
+**Using py launcher (Windows - Recommended):**
+```powershell
+cd ModuleName
+py -3.10 -m pip install -e .
+```
+
+**Using python command:**
 ```bash
 cd ModuleName
 pip install -e .
@@ -128,6 +161,13 @@ pip install -e .
 
 For environments where network is slow or build dependencies are already installed:
 
+**Using py launcher (Windows - Recommended):**
+```powershell
+cd ModuleName
+py -3.10 -m pip install --no-build-isolation -e .
+```
+
+**Using python command:**
 ```bash
 cd ModuleName
 pip install --no-build-isolation -e .
@@ -212,11 +252,18 @@ Current recommendation: Keep both until all CI/CD pipelines are updated.
 
 ### Python Version Support
 
-All modules now target Python 3.10+ as the baseline. Consider:
+**IMPORTANT: All modules are restricted to Python 3.10.x only for DaVinci Resolve compatibility.**
 
+Rationale:
+- **DaVinci Resolve Compatibility**: DaVinci Resolve works best with Python 3.10
+- **Community Consensus**: Python 3.11+ can cause issues with DaVinci Resolve
+- **Stable Version**: Python 3.10.11 is the recommended version
+- **Version Constraint**: `requires-python = ">=3.10,<3.11"` ensures only 3.10.x is used
+
+Previous versions:
 - Python 3.8-3.9 are no longer officially supported
-- Focus on 3.10, 3.11, 3.12
-- Future: Add Python 3.13 when stable
+- Python 3.11-3.12 are intentionally excluded for Resolve compatibility
+- Future: May support newer versions once DaVinci Resolve officially supports them
 
 ## References
 

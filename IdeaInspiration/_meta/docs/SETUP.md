@@ -4,12 +4,36 @@ This guide covers setting up the PrismQ.IdeaInspiration development environment.
 
 ## Prerequisites
 
-- Python 3.10+
+- **Python 3.10.x ONLY** (NOT 3.11 or 3.12)
+  - Recommended: Python 3.10.11
+  - Download: [python-3.10.11-amd64.exe](https://www.python.org/downloads/release/python-31011/)
+  - Required for DaVinci Resolve compatibility
+  - **Tip**: Use Python Launcher `py -3.10` for better version management
 - Windows 10/11 (primary platform)
 - NVIDIA RTX 5090 with latest drivers (recommended)
 - AMD Ryzen processor
 - 64GB RAM
 - Git
+
+### Python Version Management
+
+**Recommended: Use Python Launcher (`py`) on Windows**
+
+The Python Launcher allows multiple Python versions to coexist:
+
+```powershell
+# Verify Python 3.10 is installed
+py -3.10 --version
+
+# Use py -3.10 for all Python commands
+py -3.10 -m venv venv
+py -3.10 -m pip install -e .
+```
+
+Benefits:
+- Have both Python 3.10 (for PrismQ/DaVinci) and Python 3.11+ (for other projects)
+- Explicitly specify version with `py -3.10`
+- Better compatibility and version management
 
 ## Quick Setup
 
@@ -82,7 +106,6 @@ All modules are optimized for:
 
 Each module has its own setup requirements. Refer to the module-specific documentation:
 
-- **[Client Setup](../Client/docs/SETUP.md)** - Web control panel setup
 - **[Classification Setup](../Classification/README.md)** - Content classification setup
 - **[Scoring Setup](../Scoring/README.md)** - Scoring engine setup
 - **[Sources Setup](../Sources/README.md)** - Source integrations setup

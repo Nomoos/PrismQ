@@ -137,23 +137,25 @@ class YouTubePlugin(SourcePlugin):
 
     @staticmethod
     def _is_short(duration: str) -> bool:
-        """Check if video duration indicates a Short (<= 3 minutes / 180 seconds).
+        """Check if video could be a YouTube Short based on duration.
+        
+        Note: YouTube Shorts rules have evolved. This is a basic format check.
+        The platform itself determines what qualifies as a Short.
+        We primarily rely on the /shorts/ URL format for accurate detection.
         
         Args:
-            duration: ISO 8601 duration string (e.g., 'PT45S', 'PT1M30S', 'PT2M45S')
+            duration: ISO 8601 duration string (e.g., 'PT45S', 'PT1M', 'PT59S')
             
         Returns:
-            True if video is a Short
+            True for all valid durations (no strict filtering)
         """
         import re
         
-        # Parse ISO 8601 duration
+        # Parse ISO 8601 duration to validate format
+        # Note: We don't use the parsed values for filtering, but keep the parsing
+        # for potential future use if YouTube provides official duration guidelines
         match = re.match(r'PT(?:(\d+)M)?(?:(\d+)S)?', duration)
-        if not match:
-            return False
         
-        minutes = int(match.group(1) or 0)
-        seconds = int(match.group(2) or 0)
-        
-        total_seconds = minutes * 60 + seconds
-        return total_seconds <= 180
+        # Accept all videos - let YouTube determine what's a Short
+        # This avoids false negatives as YouTube's rules may change
+        return bool(match)

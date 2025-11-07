@@ -4,6 +4,13 @@
 *.backup
 Sources.bak/
 
+# Git merge conflict files
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
+*.orig
+
 # Python - Build and Distribution
 __pycache__/
 *.py[cod]
@@ -98,16 +105,6 @@ docs/_build/
 docs/.doctrees/
 site/
 
-# Node.js (for Client)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
-*.ipynb
-
 # MyPy
 .mypy_cache/
 .dmypy.json
@@ -117,7 +114,4 @@ dmypy.json
 .ruff_cache/
 
 # Runtime data files
-Client/Backend/data/run_history.json
-Client/Backend/data/logs/
-Client/Backend/configs/parameters/
 data/

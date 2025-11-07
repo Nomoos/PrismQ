@@ -42,17 +42,47 @@ Write-Host ""
 
 # Check Python availability
 Write-Host "Checking Python availability..." -ForegroundColor Yellow
+
+# Try py launcher first (recommended for Windows)
+$UsePy = $false
 try {
-    $PythonVersion = python --version 2>&1 | Out-String
-    if ($LASTEXITCODE -ne 0) {
-        throw "Python not found"
+    $PyVersion = py -3.10 --version 2>&1 | Out-String
+    if ($LASTEXITCODE -eq 0) {
+        $UsePy = $true
+        Write-Host "✅ Python 3.10 found via py launcher: $($PyVersion.Trim())" -ForegroundColor Green
+        Write-Host "   Using: py -3.10" -ForegroundColor Cyan
     }
-    Write-Host "✅ Python found: $($PythonVersion.Trim())" -ForegroundColor Green
 } catch {
-    Write-Host "❌ ERROR: Python is not installed or not in PATH" -ForegroundColor Red
-    Write-Host "   Please install Python 3.8+ and ensure it's in PATH" -ForegroundColor Yellow
-    Write-Host "   Download from: https://www.python.org/downloads/" -ForegroundColor Cyan
-    exit 1
+    # py launcher not available or Python 3.10 not found
+}
+
+# Fallback to python command if py launcher didn't work
+if (-not $UsePy) {
+    try {
+        $PythonVersion = python --version 2>&1 | Out-String
+        if ($LASTEXITCODE -ne 0) {
+            throw "Python not found"
+        }
+        # Check if it's Python 3.10
+        if ($PythonVersion -match "Python 3\.10\.") {
+            Write-Host "✅ Python found: $($PythonVersion.Trim())" -ForegroundColor Green
+            Write-Host "   Using: python" -ForegroundColor Cyan
+        } else {
+            Write-Host "⚠️  WARNING: Found $($PythonVersion.Trim())" -ForegroundColor Yellow
+            Write-Host "   This project requires Python 3.10.x for DaVinci Resolve compatibility" -ForegroundColor Yellow
+            Write-Host "   Download: https://www.python.org/downloads/release/python-31011/" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "   Continuing anyway, but you may encounter issues..." -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "❌ ERROR: Python is not installed or not in PATH" -ForegroundColor Red
+        Write-Host "   Please install Python 3.10.x and ensure it's in PATH" -ForegroundColor Yellow
+        Write-Host "   Download: https://www.python.org/downloads/release/python-31011/" -ForegroundColor Cyan
+        Write-Host "" 
+        Write-Host "   Recommended: Install Python with the launcher (py)" -ForegroundColor Cyan
+        Write-Host "   Then use: py -3.10" -ForegroundColor Cyan
+        exit 1
+    }
 }
 Write-Host ""
 
@@ -76,7 +106,11 @@ foreach ($project in $Projects) {
     }
     
     # Create venv
-    python -m venv $venvPath
+    if ($UsePy) {
+        py -3.10 -m venv $venvPath
+    } else {
+        python -m venv $venvPath
+    }
     
     # Activate
     $activateScript = Join-Path $venvPath "Scripts\Activate.ps1"

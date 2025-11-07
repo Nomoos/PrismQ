@@ -8,21 +8,18 @@ PrismQ.IdeaInspiration is a multi-module repository that follows consistent arch
 
 The repository contains multiple specialized modules that work together:
 
-- **Client** - Web-based control panel for module management
 - **Classification** - Content categorization and story detection
 - **ConfigLoad** - Centralized configuration management
 - **Model** - Core IdeaInspiration data model
 - **Scoring** - Content scoring and evaluation engine
 - **Sources** - Content source integrations and taxonomy
 
+**Note**: The Web Client control panel has been moved to a separate repository for better modularity.
+
 ### System-Level Architecture Diagram
 
 ```mermaid
 graph TB
-    subgraph "User Interface Layer"
-        WebClient[Web Client<br/>Vue 3 + FastAPI]
-    end
-    
     subgraph "Data Collection Layer"
         Sources[Sources Module<br/>Multi-platform collectors]
         
@@ -52,10 +49,6 @@ graph TB
         Others[Other APIs...]
     end
     
-    WebClient -->|manages & executes| Sources
-    WebClient -->|monitors| Classification
-    WebClient -->|monitors| Scoring
-    
     Sources --> Content
     Sources --> Signals
     Sources --> Commerce
@@ -74,9 +67,7 @@ graph TB
     ConfigLoad -.provides config.- Sources
     ConfigLoad -.provides config.- Classification
     ConfigLoad -.provides config.- Scoring
-    ConfigLoad -.provides config.- WebClient
     
-    style WebClient fill:#e1f5ff
     style Model fill:#f0e1ff
     style Sources fill:#fff4e1
     style ConfigLoad fill:#e1ffe1
@@ -199,10 +190,6 @@ The modules in PrismQ.IdeaInspiration work together in a coordinated workflow:
 
 ```mermaid
 graph LR
-    subgraph "Orchestration"
-        Client[Web Client]
-    end
-    
     subgraph "Collection"
         Sources[Sources]
     end
@@ -217,22 +204,16 @@ graph LR
         ConfigLoad[ConfigLoad]
     end
     
-    Client -->|launches| Sources
-    Client -->|launches| Classification
-    Client -->|launches| Scoring
-    
     Sources -->|IdeaInspiration objects| Model
     Model -->|structured data| Classification
     Model -->|structured data| Scoring
     Classification -->|enriched data| Model
     Scoring -->|scored data| Model
     
-    ConfigLoad -.configuration.- Client
     ConfigLoad -.configuration.- Sources
     ConfigLoad -.configuration.- Classification
     ConfigLoad -.configuration.- Scoring
     
-    style Client fill:#e1f5ff
     style Model fill:#f0e1ff
     style ConfigLoad fill:#e1ffe1
 ```
@@ -241,60 +222,44 @@ graph LR
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant WebClient
     participant Sources
     participant Model
     participant Classification
     participant Scoring
     participant Storage
+    participant External
     
-    User->>WebClient: Launch Source Module
-    WebClient->>Sources: Execute with parameters
     Sources->>External: Fetch content
     External-->>Sources: Raw data
     Sources->>Model: Create IdeaInspiration objects
     Model-->>Storage: Persist data
     
-    User->>WebClient: Launch Classification
-    WebClient->>Classification: Execute
     Classification->>Model: Load IdeaInspiration
     Classification->>Classification: Categorize & detect stories
     Classification->>Model: Update with categories
     Model-->>Storage: Persist enriched data
     
-    User->>WebClient: Launch Scoring
-    WebClient->>Scoring: Execute
     Scoring->>Model: Load IdeaInspiration
     Scoring->>Scoring: Evaluate quality & engagement
     Scoring->>Model: Update with scores
     Model-->>Storage: Persist scored data
-    
-    WebClient-->>User: Display results & logs
 ```
 
 ### Typical Workflow
 
-1. **User Interface** → User accesses Web Client to manage modules
-2. **Sources** → Collect content from various platforms (YouTube, TikTok, Reddit, etc.)
-3. **Model** → Transform into unified IdeaInspiration structure
-4. **Classification** → Categorize and detect story potential
-5. **Scoring** → Evaluate quality and engagement metrics
-6. **ConfigLoad** → Manage configuration across all modules
+1. **Sources** → Collect content from various platforms (YouTube, TikTok, Reddit, etc.)
+2. **Model** → Transform into unified IdeaInspiration structure
+3. **Classification** → Categorize and detect story potential
+4. **Scoring** → Evaluate quality and engagement metrics
+5. **ConfigLoad** → Manage configuration across all modules
+
+**Note**: With the Client module now in a separate repository, these modules can be executed via:
+- Direct CLI invocation of each module
+- External orchestration tools
+- Custom automation scripts
+- The separate Web Client interface (if integrated)
 
 ### Module Details
-
-#### Web Client Module
-- **Purpose**: Unified control panel for managing all PrismQ modules
-- **Technology**: FastAPI (Backend) + Vue 3 (Frontend)
-- **Key Features**:
-  - Module discovery and catalog
-  - Parameter configuration and persistence
-  - One-click module launching
-  - Real-time log streaming (SSE)
-  - Run history and monitoring
-  - Concurrent execution support
-- **Documentation**: [Client Architecture](../../Client/docs/ARCHITECTURE.md)
 
 #### Sources Module
 - **Purpose**: Multi-platform content collection
@@ -357,16 +322,10 @@ All modules are optimized for:
 ## Related Documentation
 
 - [Contributing Guidelines](./CONTRIBUTING.md)
-- [Web Client Architecture](../../Client/docs/ARCHITECTURE.md) - Detailed Client architecture
 - [Scoring Module Architecture](../../Scoring/_meta/docs/ARCHITECTURE.md) - Scoring module details
 - Main README: `/README.md`
 
 ## Technology Stack
-
-### Web Client
-- **Backend**: FastAPI, Pydantic, Uvicorn (Python 3.10+)
-- **Frontend**: Vue 3, TypeScript, Vite, Tailwind CSS
-- **Communication**: REST API, Server-Sent Events (SSE)
 
 ### Data Processing Modules
 - **Language**: Python 3.10+

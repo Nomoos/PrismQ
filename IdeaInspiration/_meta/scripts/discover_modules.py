@@ -5,11 +5,13 @@ Shared module discovery library for PrismQ.IdeaInspiration.
 This library provides a single source of truth for discovering modules in the repository.
 It's used by:
 - Environment setup scripts (setup_all_envs, clean_all_envs, etc.)
-- Client module registration (potentially)
 - CI/CD pipelines
 - Other automation tools
 
 The discovery logic is centralized here to avoid duplication and ensure consistency.
+
+Note: The Client module has been moved to a separate repository. References to it
+in this file are preserved for backwards compatibility but are no longer active.
 """
 
 import json
@@ -23,7 +25,7 @@ from dataclasses import dataclass, asdict
 class ModuleInfo:
     """Information about a discovered module."""
     
-    name: str  # Relative path from repo root (e.g., "Classification", "Client/Backend")
+    name: str  # Relative path from repo root (e.g., "Classification", "Sources/Content/YouTube")
     path: Path  # Absolute path to module directory
     has_requirements: bool  # Has requirements.txt
     has_setup_py: bool  # Has setup.py
@@ -158,21 +160,25 @@ class ModuleDiscovery:
     
     def discover_for_client(self, max_depth: int = 3) -> List[ModuleInfo]:
         """
-        Discover modules that could be registered in the Client.
+        Discover modules that could be registered in external automation tools.
         
         This returns modules that have executable scripts (sources, processors, etc.)
-        and excludes infrastructure modules like ConfigLoad, Model, Client itself.
+        and excludes infrastructure modules like ConfigLoad, Model.
+        
+        Note: This method name is preserved for backwards compatibility. The Client
+        module has been moved to a separate repository. This method now supports
+        discovery for any external management or automation systems.
         
         Args:
             max_depth: Maximum depth to search from repo root
             
         Returns:
-            List of ModuleInfo objects suitable for Client registration
+            List of ModuleInfo objects suitable for external tool registration
         """
         all_modules = self.discover_all(max_depth)
         
         # Exclude infrastructure modules
-        infrastructure = {'ConfigLoad', 'Model', 'Client/Backend', 'Client/Frontend'}
+        infrastructure = {'ConfigLoad', 'Model'}
         
         client_modules = [
             m for m in all_modules

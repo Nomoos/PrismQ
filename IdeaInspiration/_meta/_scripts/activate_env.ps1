@@ -16,7 +16,6 @@ if (-not $ProjectName) {
     Write-Host "  - Model"
     Write-Host "  - Scoring"
     Write-Host "  - Sources"
-    Write-Host "  - Client\Backend"
     return
 }
 

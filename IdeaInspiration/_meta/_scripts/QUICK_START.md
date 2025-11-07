@@ -1,32 +1,14 @@
-# Quick Start Guide - Running PrismQ Web Client
+# Quick Start Guide - Running PrismQ Modules
 
-This guide shows you the easiest way to run the PrismQ Web Client on Windows.
+> **Note**: The Web Client control panel has been moved to a separate repository.
+> This guide is preserved for historical reference. For current setup instructions, see the main [README.md](../../README.md).
 
-## 🚀 One-Click Start (Recommended)
+## Historical Information
 
-The fastest way to get started:
+This guide originally described how to run the PrismQ Web Client on Windows.
 
-1. **Double-click** `_meta\_scripts\run_both.bat`
-
-That's it! The script will:
-- ✅ Start the Backend server (http://localhost:8000)
-- ✅ Start the Frontend server (http://localhost:5173)
-- ✅ Open your browser automatically to http://localhost:5173
-
-You'll see **two new console windows** open - one for Backend and one for Frontend. Keep them open while using the application.
-
-### What You'll See
-
-1. **This launcher window** - Shows progress and then closes automatically
-2. **PrismQ Backend Server** window - Shows Backend logs (keep open)
-3. **PrismQ Frontend Server** window - Shows Frontend logs (keep open)
-4. **Your browser** - Opens to the application at http://localhost:5173
-
-### Stopping the Servers
-
-Simply **close the two server console windows** (Backend and Frontend).
-
-## 🔧 Running Components Separately
+The Web Client module has been moved to a separate repository for better modularity.
+See [CLIENT_MIGRATION.md](../docs/CLIENT_MIGRATION.md) for details about this change.
 
 If you need to run only one component:
 
@@ -49,11 +31,16 @@ _meta\_scripts\run_frontend.bat
 Before running for the first time:
 
 ### Backend Requirements
-1. **Python 3.10+** installed
-2. **Virtual environment** created at `Client\Backend\venv\`
-3. **Dependencies** installed from `Client\Backend\requirements.txt`
+1. **Python 3.10+** installed and in PATH
+   - The script will automatically create the virtual environment
+   - Dependencies will be installed automatically
 
-**First-time setup:**
+**First-time setup is now automatic!** Just run the script and it will:
+- Create the virtual environment at `Client\Backend\venv\`
+- Install all dependencies from `Client\Backend\requirements.txt`
+
+**Manual setup (optional):**
+If you prefer to set up manually:
 ```cmd
 cd Client\Backend
 python -m venv venv
@@ -65,11 +52,8 @@ pip install -r requirements.txt
 1. **Node.js 18+** (24.11.0+ recommended)
 2. **Dependencies** will be installed automatically if missing
 
-**First-time setup (if needed):**
-```cmd
-cd Client\Frontend
-npm install
-```
+**First-time setup (automatic):**
+The script will install npm dependencies automatically if needed.
 
 ## 🆘 Troubleshooting
 
@@ -77,8 +61,15 @@ npm install
 - Make sure you're running the script from the repository root
 - The script should be at `_meta\_scripts\run_both.bat`
 
-### Script Says "Virtual environment not found"
-- You need to create the Backend virtual environment first (see Prerequisites above)
+### Script Says "Python is not installed"
+- Install Python 3.10 or higher from https://www.python.org/downloads/
+- Make sure to check "Add Python to PATH" during installation
+- Restart your terminal/command prompt after installation
+
+### Script Says "Virtual environment exists but appears broken"
+- The script will automatically recreate the virtual environment
+- This can happen if Python was reinstalled at a different location
+- Just run the script again and it will fix itself
 
 ### Script Says "Node.js is not installed"
 - Install Node.js from https://nodejs.org/
@@ -112,4 +103,4 @@ taskkill /PID <pid_from_above> /F
 
 ---
 
-**Need help?** Check the [Troubleshooting Guide](Client/docs/TROUBLESHOOTING.md) or open an issue on GitHub.
+**Need help?** Check the [Troubleshooting Guide](Client/_meta/docs/TROUBLESHOOTING.md) or open an issue on GitHub.
