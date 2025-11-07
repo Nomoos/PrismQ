@@ -14,6 +14,12 @@ from ..models.system import (
 from ..models.run import RunStatus
 from ..core import get_module_runner, get_resource_manager, ModuleRunner, ResourceManager
 from ..utils.module_loader import get_module_loader
+from ..core.maintenance import (
+    cleanup_old_runs,
+    check_system_health,
+    cleanup_temp_files,
+    log_statistics,
+)
 
 router = APIRouter()
 
@@ -121,3 +127,83 @@ async def system_stats(
     _stats_cache_time = current_time
     
     return result
+
+
+@router.post("/system/maintenance/cleanup-runs")
+async def trigger_cleanup_old_runs(
+    max_age_hours: int = 24,
+    runner: ModuleRunner = Depends(get_module_runner)
+):
+    """
+    Trigger cleanup of old runs (on-demand).
+    
+    This endpoint allows the UI to trigger maintenance operations as needed,
+    ensuring all background operations are initiated by user requests.
+    
+    Args:
+        max_age_hours: Maximum age of runs to keep (default: 24 hours)
+        runner: Module runner service (injected)
+        
+    Returns:
+        dict: Cleanup result with number of runs cleaned
+    """
+    cleanup_count = await cleanup_old_runs(
+        max_age_hours=max_age_hours,
+        registry=runner.registry
+    )
+    return {
+        "status": "success",
+        "runs_cleaned": cleanup_count,
+        "max_age_hours": max_age_hours
+    }
+
+
+@router.post("/system/maintenance/health-check")
+async def trigger_system_health_check():
+    """
+    Trigger system health check (on-demand).
+    
+    This endpoint allows the UI to request a comprehensive health check
+    as needed, rather than running it automatically on a schedule.
+    
+    Returns:
+        dict: Health check results
+    """
+    health = await check_system_health()
+    return health
+
+
+@router.post("/system/maintenance/cleanup-temp-files")
+async def trigger_cleanup_temp_files(max_age_hours: int = 24):
+    """
+    Trigger cleanup of temporary files (on-demand).
+    
+    This endpoint allows the UI to request temp file cleanup as needed.
+    
+    Args:
+        max_age_hours: Maximum age of files to keep (default: 24 hours)
+        
+    Returns:
+        dict: Cleanup result with number of files cleaned
+    """
+    cleanup_count = await cleanup_temp_files(max_age_hours=max_age_hours)
+    return {
+        "status": "success",
+        "files_cleaned": cleanup_count,
+        "max_age_hours": max_age_hours
+    }
+
+
+@router.post("/system/maintenance/log-statistics")
+async def trigger_log_statistics():
+    """
+    Trigger statistics logging (on-demand).
+    
+    This endpoint allows the UI to request statistics to be logged
+    as needed, rather than doing it automatically on a schedule.
+    
+    Returns:
+        dict: System statistics
+    """
+    stats = await log_statistics()
+    return stats

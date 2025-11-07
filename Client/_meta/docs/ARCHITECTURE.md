@@ -896,9 +896,9 @@ graph TB
 ### Related Documentation
 
 - [Main README](../README.md) - Project overview
-- [Backend Documentation](../_meta/docs/BACKEND.md) - Backend details
-- [Frontend Documentation](../_meta/docs/FRONTEND.md) - Frontend details
-- [API Reference](../Backend/API_REFERENCE.md) - REST API documentation
+- [Backend Documentation](../../Backend/_meta/docs/BACKEND.md) - Backend details
+- [Frontend Documentation](../../Frontend/_meta/docs/FRONTEND.md) - Frontend details
+- [API Reference](../../Backend/_meta/docs/API_REFERENCE.md) - REST API documentation
 - [Testing Guide](../_meta/docs/TESTING.md) - Test coverage and commands
 
 ### Architecture Diagrams Legend

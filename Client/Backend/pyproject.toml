@@ -38,6 +38,11 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "performance: marks tests as performance benchmarks (deselect with '-m \"not performance\"')",
+    "windows: marks tests as Windows-specific tests (deselect with '-m \"not windows\"')",
+]
 
 [tool.black]
 line-length = 100

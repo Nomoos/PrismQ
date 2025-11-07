@@ -319,9 +319,9 @@ When adding new YouTube-related tests:
 
 ## Related Documentation
 
-- [Backend API Reference](../../../API_REFERENCE.md)
-- [Integration Guide](../../../INTEGRATION_GUIDE.md)
-- [Log Streaming Guide](../../../LOG_STREAMING_GUIDE.md)
+- [Backend API Reference](../../docs/API_REFERENCE.md)
+- [Integration Guide](../../../../_meta/docs/INTEGRATION_GUIDE.md)
+- [Log Streaming Guide](../../docs/LOG_STREAMING_GUIDE.md)
 - [YouTube Module Documentation](../../../../../Sources/Content/Shorts/YouTube/README.md)
 
 ## Contact

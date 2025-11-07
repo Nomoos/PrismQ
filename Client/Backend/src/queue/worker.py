@@ -17,11 +17,15 @@ import random
 from typing import Optional, Callable, Any, Dict
 from datetime import datetime, timedelta
 from dataclasses import dataclass
+import logging
 
 from .database import QueueDatabase
 from .models import Task, SchedulingStrategy
 from .scheduling import TaskClaimerFactory
 from .exceptions import QueueDatabaseError
+from .task_handler_registry import TaskHandlerRegistry, TaskHandlerNotRegisteredError
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -248,6 +252,9 @@ class WorkerEngine:
     - Single Responsibility: Coordinates task claiming and execution
     - Dependency Inversion: Depends on abstractions (QueueDatabase, TaskExecutor)
     - Open/Closed: Can be extended with custom task handlers
+    
+    Integration: Uses TaskHandlerRegistry to ensure only registered handlers
+    can process tasks (Worker 10 - Issue #339)
     """
     
     def __init__(
@@ -257,7 +264,8 @@ class WorkerEngine:
         capabilities: Dict[str, Any] = None,
         scheduling_strategy: SchedulingStrategy = SchedulingStrategy.PRIORITY,
         lease_seconds: int = 60,
-        poll_interval_seconds: float = 1.0
+        poll_interval_seconds: float = 1.0,
+        handler_registry: Optional[TaskHandlerRegistry] = None
     ):
         """
         Initialize worker engine.
@@ -269,6 +277,8 @@ class WorkerEngine:
             scheduling_strategy: Strategy for claiming tasks
             lease_seconds: Duration to lease tasks
             poll_interval_seconds: Time to wait between polls when queue is empty
+            handler_registry: Optional TaskHandlerRegistry for validation. 
+                            If None, handler validation is skipped (legacy behavior).
         """
         self.db = db
         self.worker_id = worker_id
@@ -276,6 +286,7 @@ class WorkerEngine:
         self.scheduling_strategy = scheduling_strategy
         self.lease_seconds = lease_seconds
         self.poll_interval_seconds = poll_interval_seconds
+        self.handler_registry = handler_registry
         
         # Create task claimer and executor
         self.claimer = TaskClaimerFactory.create(scheduling_strategy, db)
@@ -285,13 +296,15 @@ class WorkerEngine:
     
     def claim_and_process(
         self,
-        task_handler: Callable[[Task], None]
+        task_handler: Optional[Callable[[Task], None]] = None
     ) -> bool:
         """
         Claim a single task and process it with retry support.
         
         Args:
-            task_handler: Function that processes the task.
+            task_handler: Optional function that processes the task.
+                         If provided, it will be used directly (legacy behavior).
+                         If None and handler_registry is set, will use registry to get handler.
                          Should raise exception on failure.
                          
         Returns:
@@ -299,6 +312,7 @@ class WorkerEngine:
             
         Raises:
             QueueDatabaseError: If database operation fails
+            TaskHandlerNotRegisteredError: If using registry and task type not registered
         """
         # Claim a task
         task = self.claimer.claim_task(
@@ -309,6 +323,33 @@ class WorkerEngine:
         
         if task is None:
             return False
+        
+        # Determine which handler to use
+        if task_handler is None and self.handler_registry is not None:
+            # Use registry to get handler for task type
+            try:
+                task_handler = self.handler_registry.get_handler(task.type)
+                logger.info(
+                    f"Worker {self.worker_id}: Using registered handler for task type '{task.type}'"
+                )
+            except TaskHandlerNotRegisteredError as e:
+                # No handler registered - fail the task immediately
+                logger.error(
+                    f"Worker {self.worker_id}: No handler for task #{task.id} type '{task.type}'"
+                )
+                error_message = str(e)
+                self.executor.fail_task(task.id, error_message, retry=False)
+                return True
+        
+        if task_handler is None:
+            # No handler provided and no registry - cannot process
+            error_message = (
+                f"No handler available for task #{task.id} type '{task.type}'. "
+                f"Either provide task_handler or configure handler_registry."
+            )
+            logger.error(f"Worker {self.worker_id}: {error_message}")
+            self.executor.fail_task(task.id, error_message, retry=False)
+            return True
         
         # Mark as processing
         try:
@@ -330,24 +371,29 @@ class WorkerEngine:
             task_handler(task)
             # Task succeeded - complete it
             self.executor.complete_task(task.id)
+            logger.info(f"Worker {self.worker_id}: Completed task #{task.id} type '{task.type}'")
             return True
             
         except Exception as e:
             # Task failed - apply retry logic
             error_message = f"{type(e).__name__}: {str(e)}"
+            logger.error(
+                f"Worker {self.worker_id}: Task #{task.id} failed: {error_message}"
+            )
             self.executor.fail_task(task.id, error_message, retry=True)
             return True
     
     def run_loop(
         self,
-        task_handler: Callable[[Task], None],
+        task_handler: Optional[Callable[[Task], None]] = None,
         max_iterations: Optional[int] = None
     ) -> None:
         """
         Run worker loop that continuously claims and processes tasks.
         
         Args:
-            task_handler: Function that processes tasks
+            task_handler: Optional function that processes tasks.
+                         If None and handler_registry is set, will use registry.
             max_iterations: Maximum number of iterations (None = infinite)
         """
         self._running = True

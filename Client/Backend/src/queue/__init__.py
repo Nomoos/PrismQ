@@ -105,11 +105,39 @@ from .worker import (
     WorkerEngine,
 )
 
+# Task handler registry (Worker 10 - Issue #339)
+from .task_handler_registry import (
+    TaskHandlerRegistry,
+    TaskHandlerInfo,
+    TaskHandlerNotRegisteredError,
+    TaskHandlerAlreadyRegisteredError,
+    get_global_registry,
+    reset_global_registry,
+)
+
+# Task handler configuration loader (Worker 10 - Issue #339)
+from .task_handler_config import (
+    TaskHandlerConfigLoader,
+    HandlerConfigError,
+    load_handlers_from_config,
+)
+
 # Validation and support tools (Worker 01 Phase 2)
 from .validation import (
     QueueValidator,
     quick_validate,
     validate_worker_integration,
+)
+
+# Integration utilities (Worker 10 - Issue #339)
+from .integration import (
+    create_queue_database,
+    get_or_create_queue_database,
+    create_queued_task_manager,
+    migrate_to_queue_system,
+    validate_queue_integration,
+    ensure_queue_ready,
+    QueueIntegrationError,
 )
 
 __all__ = [
@@ -143,10 +171,6 @@ __all__ = [
     "QueueBackupError",
     "QueueMaintenance",
     "QueueMaintenanceError",
-    # Worker engine
-    "QueueWorker",
-    "create_worker",
-    "TaskHandler",
     # Scheduling strategies
     "TaskClaimer",
     "FIFOTaskClaimer",
@@ -166,10 +190,29 @@ __all__ = [
     "RetryConfig",
     "TaskExecutor",
     "WorkerEngine",
+    # Task handler registry (Worker 10 - Issue #339)
+    "TaskHandlerRegistry",
+    "TaskHandlerInfo",
+    "TaskHandlerNotRegisteredError",
+    "TaskHandlerAlreadyRegisteredError",
+    "get_global_registry",
+    "reset_global_registry",
+    # Task handler configuration (Worker 10 - Issue #339)
+    "TaskHandlerConfigLoader",
+    "HandlerConfigError",
+    "load_handlers_from_config",
     # Validation and support tools
     "QueueValidator",
     "quick_validate",
     "validate_worker_integration",
+    # Integration utilities (Worker 10 - Issue #339)
+    "create_queue_database",
+    "get_or_create_queue_database",
+    "create_queued_task_manager",
+    "migrate_to_queue_system",
+    "validate_queue_integration",
+    "ensure_queue_ready",
+    "QueueIntegrationError",
 ]
 
 __version__ = '1.1.0'

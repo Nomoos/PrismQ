@@ -9,6 +9,7 @@ Local web control panel for running PrismQ data collection modules.
 - **Real-time monitoring** - Live log streaming and status updates
 - **Parameter configuration** - Form-based module configuration with persistence
 - **Concurrent execution** - Run multiple modules simultaneously
+- **On-demand architecture** - All operations triggered by UI requests (no autonomous background tasks)
 - **296 tests** - Comprehensive test coverage (195 backend + 101 frontend)
 
 ## 🚀 Quick Start
@@ -37,17 +38,30 @@ cd Frontend && npm run dev
 - **[Node.js Installation](./_meta/docs/NODEJS_INSTALLATION.md)** - Node.js setup instructions
 - **[Troubleshooting](./_meta/docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
-### Technical Documentation
-- **[Architecture](./_meta/docs/ARCHITECTURE.md)** - System design and architecture
-- **[API Reference](./_meta/docs/API.md)** - REST API documentation
+### Architecture & Design
+- **[On-Demand Architecture](./_meta/docs/ONDEMAND_ARCHITECTURE.md)** - Client architecture principles
+- **[System Architecture](./_meta/docs/ARCHITECTURE.md)** - Complete system design
+- **[API Reference](./Backend/_meta/docs/API_REFERENCE.md)** - REST API documentation
+- **[Integration Guide](./_meta/docs/INTEGRATION_GUIDE.md)** - Integration with PrismQ modules
+
+### Development
 - **[Development Guide](./_meta/docs/DEVELOPMENT.md)** - Contributing guide
 - **[Testing Guide](./_meta/docs/TESTING.md)** - Test coverage and commands
 - **[Configuration](./_meta/docs/CONFIGURATION.md)** - Configuration options
 - **[Modules Guide](./_meta/docs/MODULES.md)** - How to add new modules
+- **[Log Streaming Guide](./Backend/_meta/docs/LOG_STREAMING_GUIDE.md)** - Real-time log streaming
+
+### Operations & Deployment
+- **[Windows Setup](./Backend/_meta/docs/WINDOWS_SETUP.md)** - Windows-specific setup instructions
+- **[Data Directory Rationale](./_meta/docs/DATA_DIRECTORY_RATIONALE.md)** - Data storage design decisions
+- **[Security Fixes](./_meta/docs/SECURITY_FIXES.md)** - Security updates and patches
 
 ### Additional Resources
 - **[Screenshots Guide](./_meta/docs/SCREENSHOTS_GUIDE.md)** - UI screenshot capture
 - **[Postman Collection](./_meta/docs/POSTMAN_COLLECTION.md)** - API testing guide
+- **[Implementation Summary](./_meta/docs/IMPLEMENTATION_SUMMARY.md)** - Development history
+- **[Issue Organization](./_meta/docs/ISSUE_ORGANIZATION.md)** - Issue tracking structure
+- **[Documentation Index](./_meta/docs/README.md)** - Complete documentation overview
 
 ## 🔗 Related
 

@@ -336,7 +336,6 @@ PrismQ.IdeaInspiration/
 │              ├─ validate_youtube_tests.py
 │              ├─ README_YOUTUBE_TESTS.md
 │              ├─ QUICK_START.md
-│              ├─ IMPLEMENTATION_SUMMARY.md
 │              └─ HOW_TO_RUN.md        ⬅️ This file
 ```
 

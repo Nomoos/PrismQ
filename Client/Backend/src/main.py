@@ -5,6 +5,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
@@ -15,9 +16,15 @@ from .core.config import settings
 from .core.logger import setup_logging
 from .core.exceptions import WebClientException
 from .core.resource_pool import initialize_resource_pool, cleanup_resource_pool
-from .core.periodic_tasks import PeriodicTaskManager
-from .core.maintenance import MAINTENANCE_TASKS
-from .api import modules, runs, system, queue
+from .api import runs, system, queue
+
+# Import modular endpoints (new pattern - modules are self-contained at Backend/ level)
+# Add Backend directory to path to import modules
+backend_dir = Path(__file__).parent.parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
+from API.endpoints import task_types_router, task_list_router
+from Modules.endpoints import router as modules_router
 
 # Configure event loop policy for Windows
 # On Windows, the default SelectorEventLoop doesn't support subprocess operations
@@ -27,9 +34,6 @@ if sys.platform == 'win32':
 
 # Set up logging
 logger = setup_logging()
-
-# Initialize periodic task manager (global instance)
-periodic_task_manager = PeriodicTaskManager()
 
 
 @asynccontextmanager
@@ -54,23 +58,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Initialize global resource pool
     initialize_resource_pool(max_workers=settings.MAX_CONCURRENT_RUNS)
     logger.info("Resource pool initialized")
-    # Register and start periodic maintenance tasks
-    logger.info("Registering periodic maintenance tasks...")
-    for task_config in MAINTENANCE_TASKS:
-        try:
-            periodic_task_manager.register_task(
-                name=task_config["name"],
-                interval=task_config["interval"],
-                task_func=task_config["func"],
-                **task_config.get("kwargs", {})
-            )
-            logger.info(f"  - {task_config['name']}: {task_config['description']}")
-        except Exception as e:
-            logger.error(f"Failed to register task {task_config['name']}: {e}")
     
-    # Start all periodic tasks
-    periodic_task_manager.start_all()
-    logger.info("Periodic tasks started")
+    # Note: Periodic maintenance tasks are now disabled in favor of on-demand execution
+    # All background operations are triggered via API endpoints based on UI requests
+    logger.info("Background operations configured for on-demand execution only")
     
     yield
     
@@ -80,10 +71,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Cleanup global resource pool
     cleanup_resource_pool()
     logger.info("Resource pool cleaned up")
-    # Stop all periodic tasks
-    logger.info("Stopping periodic tasks...")
-    await periodic_task_manager.stop_all(timeout=10.0)
-    logger.info("Periodic tasks stopped")
 
 
 # Create FastAPI application
@@ -170,10 +157,14 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 
 # Include routers
-app.include_router(modules.router, prefix="/api", tags=["Modules"])
+app.include_router(modules_router, prefix="/api", tags=["Modules"])
 app.include_router(runs.router, prefix="/api", tags=["Runs"])
 app.include_router(system.router, prefix="/api", tags=["System"])
 app.include_router(queue.router, prefix="/api", tags=["Queue"])
+
+# Include new API module routers
+app.include_router(task_types_router, prefix="/api", tags=["TaskTypes"])
+app.include_router(task_list_router, prefix="/api", tags=["TaskList"])
 
 
 # Root endpoint

@@ -132,7 +132,6 @@ integration/
 ├── run_youtube_tests.py                # Helper script to run tests
 ├── validate_youtube_tests.py           # Validate test structure
 ├── README_YOUTUBE_TESTS.md             # Detailed documentation
-├── IMPLEMENTATION_SUMMARY.md           # Implementation details
 └── QUICK_START.md                      # This file
 ```
 
@@ -259,7 +258,7 @@ Verify changes don't break YouTube integration.
 ## Getting Help
 
 - **Detailed docs**: `README_YOUTUBE_TESTS.md`
-- **Implementation**: `IMPLEMENTATION_SUMMARY.md`
+- **Implementation**: See `_meta/docs/IMPLEMENTATION_SUMMARY.md`
 - **Test validation**: Run `validate_youtube_tests.py`
 - **GitHub issues**: Report problems on the repository
 

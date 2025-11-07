@@ -1,0 +1,32 @@
+{
+  "handlers": [
+    {
+      "task_type": "send_email",
+      "module": "src.queue.example_handlers",
+      "function": "handle_send_email",
+      "description": "Sends email notifications to users",
+      "version": "1.0.0"
+    },
+    {
+      "task_type": "generate_report",
+      "module": "src.queue.example_handlers",
+      "function": "handle_generate_report",
+      "description": "Generates PDF/CSV reports",
+      "version": "1.2.0"
+    },
+    {
+      "task_type": "backup_database",
+      "module": "src.queue.example_handlers",
+      "function": "handle_backup_database",
+      "description": "Creates database backup files",
+      "version": "2.0.0"
+    },
+    {
+      "task_type": "process_payment",
+      "module": "src.queue.example_handlers",
+      "function": "handle_process_payment",
+      "description": "Processes payment transactions",
+      "version": "1.5.0"
+    }
+  ]
+}

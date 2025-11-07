@@ -1,0 +1,4 @@
+# Benchmark results - these are generated files
+*.json
+*.md
+!README.md
