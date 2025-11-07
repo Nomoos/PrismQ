@@ -1,8 +1,11 @@
 # YouTube Shorts Module Fix - Implementation Summary
 
+<<<<<<< HEAD
 > **Historical Document**: This document references the Client/Backend module which has been moved to a separate repository.
 > The content is preserved for historical context. See [CLIENT_MIGRATION.md](./CLIENT_MIGRATION.md) for details.
 
+=======
+>>>>>>> origin/main
 ## Overview
 
 This document provides a comprehensive summary of the fixes implemented to resolve the YouTube Shorts source module issues on Windows.

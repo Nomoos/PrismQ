@@ -261,6 +261,21 @@ sequenceDiagram
 
 ### Module Details
 
+<<<<<<< HEAD
+=======
+#### Web Client Module
+- **Purpose**: Unified control panel for managing all PrismQ modules
+- **Technology**: FastAPI (Backend) + Vue 3 (Frontend)
+- **Key Features**:
+  - Module discovery and catalog
+  - Parameter configuration and persistence
+  - One-click module launching
+  - Real-time log streaming (SSE)
+  - Run history and monitoring
+  - Concurrent execution support
+- **Documentation**: [Client Architecture](../../Client/_meta/docs/ARCHITECTURE.md)
+
+>>>>>>> origin/main
 #### Sources Module
 - **Purpose**: Multi-platform content collection
 - **Categories**: Content, Signals, Commerce, Events, Community, Creative, Internal
@@ -322,6 +337,10 @@ All modules are optimized for:
 ## Related Documentation
 
 - [Contributing Guidelines](./CONTRIBUTING.md)
+<<<<<<< HEAD
+=======
+- [Web Client Architecture](../../Client/_meta/docs/ARCHITECTURE.md) - Detailed Client architecture
+>>>>>>> origin/main
 - [Scoring Module Architecture](../../Scoring/_meta/docs/ARCHITECTURE.md) - Scoring module details
 - Main README: `/README.md`
 

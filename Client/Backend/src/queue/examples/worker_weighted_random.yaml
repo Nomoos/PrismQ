@@ -1,0 +1,19 @@
+# Worker Configuration - Weighted Random Strategy
+# Balanced worker for load distribution
+
+worker_id: worker-balanced
+capabilities:
+  region: us-central
+  gpu: RTX5090
+  cpu_cores: 12
+  ram_gb: 48
+  formats:
+    - mp4
+    - png
+    - jpg
+    - webm
+  max_video_duration: 900
+scheduling_strategy: weighted_random
+lease_duration_seconds: 60
+poll_interval_seconds: 1
+max_retries: 3

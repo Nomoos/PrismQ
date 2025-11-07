@@ -23,7 +23,11 @@ Central hub for AI-powered content idea collection, classification, scoring, and
 
 - **Required Version**: Python 3.10.x (recommended: 3.10.11)
 - **Download**: [python-3.10.11-amd64.exe](https://www.python.org/downloads/release/python-31011/)
+<<<<<<< HEAD
 - **Reason**: DaVinci Resolve compatibility + module dependencies
+=======
+- **Reason**: DaVinci Resolve compatibility + Client module dependencies
+>>>>>>> origin/main
 - **Do NOT use**: Python 3.11+ will cause compatibility issues
 
 ### Windows Python Launcher (`py`) - Recommended
@@ -82,6 +86,10 @@ cd PrismQ.IdeaInspiration
 
 ### Architecture & Design
 - **[System Architecture](./_meta/docs/ARCHITECTURE.md)** - Complete system architecture with diagrams
+<<<<<<< HEAD
+=======
+- **[Web Client Architecture](./Client/_meta/docs/ARCHITECTURE.md)** - Detailed Client architecture
+>>>>>>> origin/main
 - **[Scoring Module Architecture](./Scoring/_meta/docs/ARCHITECTURE.md)** - Scoring module details
 - **[Python Packaging Standard](./_meta/docs/PYTHON_PACKAGING_STANDARD.md)** - Standardized configuration
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project
