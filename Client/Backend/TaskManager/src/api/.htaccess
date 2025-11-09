@@ -1,0 +1,43 @@
+# TaskManager API .htaccess
+# Enables clean URLs and routes all requests to index.php
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Set base directory (adjust if needed)
+RewriteBase /api/
+
+# Don't rewrite if the file or directory exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route all requests to index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Set error documents (optional)
+ErrorDocument 404 /api/index.php
+ErrorDocument 500 /api/index.php
+
+# Security headers
+<IfModule mod_headers.c>
+    # Prevent caching of API responses
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+    
+    # Security headers
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# PHP settings (if allowed on shared hosting)
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value memory_limit 128M
+    php_value max_execution_time 30
+</IfModule>

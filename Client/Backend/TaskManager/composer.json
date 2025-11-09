@@ -1,0 +1,19 @@
+{
+    "name": "prismq/taskmanager",
+    "description": "Lightweight PHP Task Queue with Data-Driven API",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.0",
+        "zircote/swagger-php": "^4.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "TaskManager\\": "src/api/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

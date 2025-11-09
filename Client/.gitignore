@@ -1,1 +1,18 @@
 __pycache__/
+
+# Node modules
+node_modules/
+
+# Test results and artifacts
+test-results/
+e2e-results/
+playwright-report/
+*.png
+!Frontend/TaskManager/_meta/docs/screenshots/*.png
+*.mp4
+*.webm
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo

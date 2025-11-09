@@ -1,0 +1,21 @@
+{
+  "name": "prismq-client",
+  "version": "1.0.0",
+  "description": "PrismQ Client - Task Management System",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:mobile": "playwright test --project=redmi-chrome --project=redmi-firefox --project=redmi-3g",
+    "test:e2e:accessibility": "playwright test Frontend/TaskManager/_meta/tests/e2e/accessibility",
+    "test:e2e:performance": "playwright test Frontend/TaskManager/_meta/tests/e2e/performance",
+    "test:e2e:smoke": "playwright test Frontend/TaskManager/_meta/tests/e2e/smoke.spec.ts",
+    "test:e2e:report": "playwright show-report Frontend/TaskManager/_meta/tests/e2e-results"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

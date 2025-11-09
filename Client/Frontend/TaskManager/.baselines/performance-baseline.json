@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-11-09T21:22:08.415Z",
+  "date": "11/9/2025, 9:22:08 PM",
+  "git": {
+    "commit": "c89b25b",
+    "branch": "copilot/implement-performance-baseline-analysis",
+    "author": "copilot-swe-agent[bot]",
+    "message": "Add comprehensive tests for baseline analysis"
+  },
+  "metrics": {
+    "totalSize": 205882,
+    "jsSize": 180896,
+    "cssSize": 17918,
+    "htmlSize": 904,
+    "assetSize": 6164,
+    "fileCount": {
+      "total": 14,
+      "js": 9,
+      "css": 2,
+      "html": 1,
+      "assets": 2
+    },
+    "largestChunks": [
+      {
+        "name": "vue-vendor-CiE07igK.js",
+        "size": 100873
+      },
+      {
+        "name": "axios-vendor-zfHfuG8p.js",
+        "size": 38141
+      },
+      {
+        "name": "index-ilCCplmw.js",
+        "size": 12536
+      },
+      {
+        "name": "TaskDetail-B1KOcmtt.js",
+        "size": 9521
+      },
+      {
+        "name": "tasks-BbqCz-yG.js",
+        "size": 6645
+      }
+    ]
+  },
+  "budgets": {
+    "totalSize": 1048576,
+    "jsSize": 512000,
+    "cssSize": 51200,
+    "chunkSize": 102400
+  }
+}

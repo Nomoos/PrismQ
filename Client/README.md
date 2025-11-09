@@ -52,11 +52,21 @@ cd Frontend && npm run dev
 - **[Log Streaming Guide](./Backend/_meta/docs/LOG_STREAMING_GUIDE.md)** - Real-time log streaming
 
 ### Operations & Deployment
+- **[Release Management Guide](./RELEASE.md)** - Version control and release process (Worker01)
+- **[Deployment Checklist](./DEPLOYMENT_CHECKLIST.md)** - Production deployment procedures
+- **[Changelog](./CHANGELOG.md)** - Version history and changes
 - **[Windows Setup](./Backend/_meta/docs/WINDOWS_SETUP.md)** - Windows-specific setup instructions
 - **[Data Directory Rationale](./_meta/docs/DATA_DIRECTORY_RATIONALE.md)** - Data storage design decisions
 - **[Security Fixes](./_meta/docs/SECURITY_FIXES.md)** - Security updates and patches
 
+### Worker Implementation
+- **[Worker Implementation Plan](./_meta/docs/WORKER_IMPLEMENTATION_PLAN.md)** - Strategic implementation plan
+- **[Worker Implementation Guidelines](./_meta/docs/WORKER_IMPLEMENTATION_GUIDELINES.md)** - Best practices and patterns
+- **[Worker Examples](./examples/workers/README.md)** - Production-ready worker examples (Python, PHP)
+- **[Worker Integration Guide](./examples/workers/INTEGRATION_GUIDE.md)** - Complete integration documentation
+
 ### Additional Resources
+- **[Documentation Templates](./_meta/templates/README.md)** - Standard templates for creating documentation
 - **[Screenshots Guide](./_meta/docs/SCREENSHOTS_GUIDE.md)** - UI screenshot capture
 - **[Postman Collection](./_meta/docs/POSTMAN_COLLECTION.md)** - API testing guide
 - **[Implementation Summary](./_meta/docs/IMPLEMENTATION_SUMMARY.md)** - Development history
@@ -68,6 +78,7 @@ cd Frontend && npm run dev
 - [Main Repository](../) - PrismQ.IdeaInspiration overview
 - [Backend](./Backend/) - FastAPI REST API
 - [Frontend](./Frontend/) - Vue 3 web UI
+- [TaskManager](./Backend/TaskManager/) - Task queue system
 
 ## 📄 License
 

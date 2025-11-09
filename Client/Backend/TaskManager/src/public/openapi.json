@@ -1,0 +1,589 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TaskManager API",
+        "version": "1.0.0",
+        "description": "Lightweight PHP Task Queue with Data-Driven API for shared hosting environments. Provides REST API for managing task types and tasks with JSON schema validation, deduplication, and worker coordination.",
+        "contact": {
+            "name": "PrismQ",
+            "url": "https://github.com/Nomoos/PrismQ.Client"
+        }
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "TaskManager API Server"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "apiKey": {
+                "type": "apiKey",
+                "name": "X-API-Key",
+                "in": "header",
+                "description": "API key authentication. Include your API key in the X-API-Key header."
+            }
+        }
+    },
+    "security": [
+        {
+            "apiKey": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Health",
+            "description": "Health check and system status"
+        },
+        {
+            "name": "Task Types",
+            "description": "Task type registration and management"
+        },
+        {
+            "name": "Tasks",
+            "description": "Task creation, claiming, and completion"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "operationId": "healthCheck",
+                "summary": "Health check endpoint",
+                "description": "Check if the API and database are operational. This endpoint does not require authentication.",
+                "tags": ["Health"],
+                "security": [],
+                "responses": {
+                    "200": {
+                        "description": "System is healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "integer",
+                                            "example": 1699372800
+                                        },
+                                        "database": {
+                                            "type": "string",
+                                            "example": "connected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/task-types/register": {
+            "post": {
+                "operationId": "registerTaskType",
+                "summary": "Register or update a task type",
+                "description": "Register a new task type or update an existing one with a new schema version.",
+                "tags": ["Task Types"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["name", "version", "param_schema"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Unique task type identifier",
+                                        "example": "PrismQ.Script.Generate"
+                                    },
+                                    "version": {
+                                        "type": "string",
+                                        "description": "Schema version",
+                                        "example": "1.0.0"
+                                    },
+                                    "param_schema": {
+                                        "type": "object",
+                                        "description": "JSON Schema for parameter validation",
+                                        "example": {
+                                            "type": "object",
+                                            "properties": {
+                                                "topic": {
+                                                    "type": "string",
+                                                    "minLength": 1
+                                                },
+                                                "style": {
+                                                    "type": "string",
+                                                    "enum": ["formal", "casual", "technical"]
+                                                }
+                                            },
+                                            "required": ["topic", "style"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task type registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "PrismQ.Script.Generate"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "created": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "updated": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    }
+                }
+            }
+        },
+        "/task-types/{name}": {
+            "get": {
+                "operationId": "getTaskType",
+                "summary": "Get a specific task type by name",
+                "tags": ["Task Types"],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Task type name",
+                        "schema": {
+                            "type": "string",
+                            "example": "PrismQ.Script.Generate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task type details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {"type": "integer"},
+                                        "name": {"type": "string"},
+                                        "version": {"type": "string"},
+                                        "param_schema": {"type": "object"},
+                                        "is_active": {"type": "boolean"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    },
+                    "404": {
+                        "description": "Task type not found"
+                    }
+                }
+            }
+        },
+        "/task-types": {
+            "get": {
+                "operationId": "listTaskTypes",
+                "summary": "List all task types",
+                "tags": ["Task Types"],
+                "parameters": [
+                    {
+                        "name": "active_only",
+                        "in": "query",
+                        "required": false,
+                        "description": "Filter to only active task types",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of task types",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {"type": "integer"},
+                                            "name": {"type": "string"},
+                                            "version": {"type": "string"},
+                                            "is_active": {"type": "boolean"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "post": {
+                "operationId": "createTask",
+                "summary": "Create a new task",
+                "tags": ["Tasks"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["type", "params"],
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Task type name",
+                                        "example": "PrismQ.Script.Generate"
+                                    },
+                                    "params": {
+                                        "type": "object",
+                                        "description": "Task parameters (validated against task type schema)",
+                                        "example": {
+                                            "topic": "AI in Healthcare",
+                                            "style": "formal",
+                                            "length": 1500
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task created or existing task returned (deduplication)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {"type": "integer", "example": 123},
+                                        "type": {"type": "string", "example": "PrismQ.Script.Generate"},
+                                        "status": {"type": "string", "example": "pending"},
+                                        "dedupe_key": {"type": "string"},
+                                        "duplicate": {"type": "boolean", "example": false}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or parameter validation failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    },
+                    "404": {
+                        "description": "Task type not found"
+                    }
+                }
+            },
+            "get": {
+                "operationId": "listTasks",
+                "summary": "List tasks with optional filters",
+                "tags": ["Tasks"],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["pending", "claimed", "completed", "failed"]
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by type (supports SQL LIKE patterns)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of results",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Result offset for pagination",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of tasks",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {"type": "integer"},
+                                            "type": {"type": "string"},
+                                            "status": {"type": "string"},
+                                            "created_at": {"type": "string", "format": "date-time"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    }
+                }
+            }
+        },
+        "/tasks/claim": {
+            "post": {
+                "operationId": "claimTask",
+                "summary": "Claim a pending task for processing",
+                "description": "Workers use this endpoint to claim a task from the queue. Returns the oldest pending task matching the optional type pattern.",
+                "tags": ["Tasks"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["worker_id", "task_type_id"],
+                                "properties": {
+                                    "worker_id": {
+                                        "type": "string",
+                                        "description": "Unique worker identifier",
+                                        "example": "worker-001"
+                                    },
+                                    "task_type_id": {
+                                        "type": "integer",
+                                        "description": "Specific task type ID to claim",
+                                        "example": 1
+                                    },
+                                    "type_pattern": {
+                                        "type": "string",
+                                        "description": "Optional: filter by type pattern (SQL LIKE syntax)",
+                                        "example": "PrismQ.Script.%"
+                                    },
+                                    "sort_by": {
+                                        "type": "string",
+                                        "description": "Optional: field to sort by",
+                                        "enum": ["created_at", "priority", "id", "attempts"],
+                                        "default": "created_at"
+                                    },
+                                    "sort_order": {
+                                        "type": "string",
+                                        "description": "Optional: sort direction",
+                                        "enum": ["ASC", "DESC"],
+                                        "default": "ASC"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task claimed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {"type": "integer", "example": 123},
+                                        "type": {"type": "string", "example": "PrismQ.Script.Generate"},
+                                        "params": {"type": "object"},
+                                        "attempts": {"type": "integer", "example": 1},
+                                        "priority": {"type": "integer", "example": 0}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request - Invalid sort_by or sort_order"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    },
+                    "404": {
+                        "description": "No tasks available"
+                    }
+                }
+            }
+        },
+        "/tasks/{id}": {
+            "get": {
+                "operationId": "getTask",
+                "summary": "Get task status and details",
+                "tags": ["Tasks"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Task ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {"type": "integer"},
+                                        "type": {"type": "string"},
+                                        "status": {
+                                            "type": "string",
+                                            "enum": ["pending", "claimed", "completed", "failed"]
+                                        },
+                                        "params": {"type": "object"},
+                                        "result": {"type": "object"},
+                                        "error_message": {"type": "string"},
+                                        "attempts": {"type": "integer"},
+                                        "created_at": {"type": "string", "format": "date-time"},
+                                        "completed_at": {"type": "string", "format": "date-time"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    },
+                    "404": {
+                        "description": "Task not found"
+                    }
+                }
+            }
+        },
+        "/tasks/{id}/complete": {
+            "post": {
+                "operationId": "completeTask",
+                "summary": "Mark a task as completed or failed",
+                "description": "Workers use this endpoint to report task completion or failure.",
+                "tags": ["Tasks"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Task ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["worker_id", "success"],
+                                "properties": {
+                                    "worker_id": {
+                                        "type": "string",
+                                        "description": "Worker ID that claimed the task",
+                                        "example": "worker-001"
+                                    },
+                                    "success": {
+                                        "type": "boolean",
+                                        "description": "Whether the task completed successfully",
+                                        "example": true
+                                    },
+                                    "result": {
+                                        "type": "object",
+                                        "description": "Task result (required if success=true)"
+                                    },
+                                    "error": {
+                                        "type": "string",
+                                        "description": "Error message (required if success=false)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {"type": "boolean", "example": true},
+                                        "message": {"type": "string", "example": "Task completed successfully"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API key"
+                    },
+                    "404": {
+                        "description": "Task not found"
+                    }
+                }
+            }
+        }
+    }
+}

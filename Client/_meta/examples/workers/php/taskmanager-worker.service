@@ -1,0 +1,49 @@
+[Unit]
+Description=TaskManager PHP Worker
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+# Working directory
+WorkingDirectory=/path/to/examples/workers/php
+
+# Command to execute
+# IMPORTANT: Update the paths and API URL for your environment
+ExecStart=/usr/bin/php /path/to/examples/workers/php/worker.php \
+    --api-url=https://api.example.com/api \
+    --worker-id=worker-%H-%i \
+    --poll-interval=5
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Environment variables (optional)
+Environment="DEBUG=false"
+Environment="MAX_RUNS=0"
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=taskmanager-worker
+
+# Security hardening (optional)
+# PrivateTmp=yes
+# NoNewPrivileges=yes
+# ProtectSystem=strict
+# ProtectHome=yes
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

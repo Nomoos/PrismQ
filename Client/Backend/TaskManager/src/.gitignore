@@ -1,0 +1,40 @@
+# TaskManager .gitignore
+# Exclude sensitive configuration files
+
+# Configuration with credentials (never commit!)
+config/config.php
+
+# Security data files
+.rate_limit_data
+.auth_failures.log
+
+# Database backups
+*.sql.gz
+*.sql.bak
+backup_*.sql
+
+# Logs
+*.log
+logs/
+
+# PHP temporary files
+*.tmp
+*.temp
+
+# Testing scripts (not for production)
+test_deploy.php
+test_check_setup.php
+
+# Composer dependencies
+vendor/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

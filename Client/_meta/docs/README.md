@@ -327,6 +327,29 @@ npm run coverage
 - Verify backend CORS_ORIGINS includes frontend URL
 - Check both services are running on correct ports
 
+## Worker Implementation
+
+The PrismQ system supports distributed workers that integrate with the TaskManager API to process tasks asynchronously. Workers can be implemented in external repositories for specific purposes (e.g., YouTube scraping, content processing).
+
+### Documentation
+
+- **[Worker Implementation Plan](./WORKER_IMPLEMENTATION_PLAN.md)** - Strategic plan and roadmap
+- **[Worker Implementation Guidelines](./WORKER_IMPLEMENTATION_GUIDELINES.md)** - Best practices and patterns
+- **[Worker Examples](../examples/workers/README.md)** - Complete working examples
+
+### Available Examples
+
+- **[YouTube Shorts Scraper (Python)](../examples/workers/youtube/)** - YouTube scraping worker example
+- **[PHP Worker](../../examples/workers/php/)** - General-purpose PHP worker
+
+### Quick Start with Workers
+
+1. Review the [Worker Implementation Plan](./WORKER_IMPLEMENTATION_PLAN.md)
+2. Choose an example that matches your use case
+3. Copy the example to your repository
+4. Customize the task processing logic
+5. Deploy and configure your worker
+
 ## License
 
 Proprietary - Copyright (c) 2025 PrismQ
