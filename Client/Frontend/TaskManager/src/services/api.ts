@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig, type CancelTokenSource } from 'axios'
 import { APIError, NetworkError } from '../types'
+import { captureSentryException, addSentryBreadcrumb } from '../utils/sentry'
 
 class ApiClient {
   private client: AxiosInstance
@@ -23,6 +24,13 @@ class ApiClient {
         if (import.meta.env.DEV) {
           console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, config.data)
         }
+        
+        // Add Sentry breadcrumb for API request
+        addSentryBreadcrumb(`API ${config.method?.toUpperCase()} ${config.url}`, {
+          method: config.method,
+          url: config.url,
+          // Don't include data to avoid logging sensitive information
+        })
         
         // Generate request key for deduplication
         const requestKey = this.getRequestKey(config)
@@ -84,12 +92,41 @@ class ApiClient {
           const message = (error.response.data as any)?.message || 
                          (error.response.data as any)?.error || 
                          'API Error'
-          throw new APIError(message, error.response.status, error.response.data)
+          const apiError = new APIError(message, error.response.status, error.response.data)
+          
+          // Capture API errors to Sentry (exclude expected errors)
+          if (error.response.status >= 500) {
+            // Server errors - always capture
+            captureSentryException(apiError, {
+              url: config?.url,
+              method: config?.method,
+              status: error.response.status,
+              responseData: error.response.data
+            })
+          }
+          
+          throw apiError
         } else if (error.request) {
           // Network error
-          throw new NetworkError('Network error - please check your connection')
+          const networkError = new NetworkError('Network error - please check your connection')
+          
+          // Capture network errors to Sentry (after retries exhausted)
+          if (config && config._retry && config._retry >= this.maxRetries) {
+            captureSentryException(networkError, {
+              url: config?.url,
+              method: config?.method,
+              retries: config._retry
+            })
+          }
+          
+          throw networkError
         } else {
-          throw new Error(error.message)
+          // Unexpected error
+          const unexpectedError = new Error(error.message)
+          captureSentryException(unexpectedError, {
+            originalError: error
+          })
+          throw unexpectedError
         }
       }
     )

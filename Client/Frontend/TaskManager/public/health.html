@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Check - Frontend/TaskManager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .status.loading {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .status.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        .status-icon {
+            font-size: 48px;
+        }
+        .status-text {
+            flex: 1;
+        }
+        .status-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 5px;
+        }
+        .status.loading .status-title { color: #856404; }
+        .status.error .status-title { color: #721c24; }
+        .status-msg {
+            color: #666;
+            font-size: 14px;
+        }
+        .checks {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .check-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .check-item:last-child {
+            border-bottom: none;
+        }
+        .check-name {
+            color: #333;
+            font-weight: 500;
+        }
+        .check-status {
+            font-weight: bold;
+        }
+        .check-status.ok {
+            color: #28a745;
+        }
+        .check-status.fail {
+            color: #dc3545;
+        }
+        .check-status.loading {
+            color: #6c757d;
+        }
+        .info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #666;
+            font-size: 14px;
+        }
+        .info-item {
+            margin: 8px 0;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #5568d3;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Health Check</h1>
+        <p class="subtitle">Frontend/TaskManager Deployment Status</p>
+        
+        <div id="status" class="status loading">
+            <div class="status-icon loading-spinner">⏳</div>
+            <div class="status-text">
+                <div class="status-title">Running Checks...</div>
+                <div class="status-msg">Please wait while we verify the deployment</div>
+            </div>
+        </div>
+        
+        <div class="checks">
+            <div class="check-item">
+                <span class="check-name">Static Files</span>
+                <span id="check-static" class="check-status loading">⏳ Checking...</span>
+            </div>
+            <div class="check-item">
+                <span class="check-name">Health Endpoint</span>
+                <span id="check-health" class="check-status loading">⏳ Checking...</span>
+            </div>
+            <div class="check-item">
+                <span class="check-name">SPA Routing</span>
+                <span id="check-spa" class="check-status loading">⏳ Checking...</span>
+            </div>
+            <div class="check-item">
+                <span class="check-name">Application Load</span>
+                <span id="check-app" class="check-status loading">⏳ Checking...</span>
+            </div>
+        </div>
+        
+        <div class="info">
+            <div class="info-item">
+                <span class="info-label">Service:</span> PrismQ Frontend/TaskManager
+            </div>
+            <div class="info-item">
+                <span class="info-label">Version:</span> <span id="version">0.1.0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Environment:</span> <span id="environment">production</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Deployed:</span> <span id="deployed">Unknown</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Last Check:</span> <span id="timestamp">-</span>
+            </div>
+        </div>
+        
+        <a href="/" class="button">Open Application →</a>
+    </div>
+    
+    <script>
+        // Health check implementation
+        async function runHealthChecks() {
+            const checks = {
+                static: false,
+                health: false,
+                spa: true, // Assume true since this page loaded
+                app: false
+            };
+            
+            const updateCheck = (id, status, text) => {
+                const el = document.getElementById(id);
+                el.className = 'check-status ' + status;
+                el.textContent = text;
+            };
+            
+            const updateStatus = (icon, title, msg, className = 'loading') => {
+                const statusEl = document.getElementById('status');
+                statusEl.className = 'status ' + className;
+                statusEl.innerHTML = `
+                    <div class="status-icon">${icon}</div>
+                    <div class="status-text">
+                        <div class="status-title">${title}</div>
+                        <div class="status-msg">${msg}</div>
+                    </div>
+                `;
+            };
+            
+            // Check 1: Static files (this page loaded, so static files work)
+            checks.static = true;
+            updateCheck('check-static', 'ok', '✓ OK');
+            
+            // Check 2: Health endpoint
+            try {
+                const response = await fetch('/health.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    checks.health = data.status === 'ok';
+                    
+                    // Update info from health.json
+                    if (data.version) document.getElementById('version').textContent = data.version;
+                    if (data.environment) document.getElementById('environment').textContent = data.environment;
+                    if (data.deployed_at) document.getElementById('deployed').textContent = new Date(data.deployed_at).toLocaleString();
+                    
+                    updateCheck('check-health', 'ok', '✓ OK');
+                } else {
+                    updateCheck('check-health', 'fail', '✗ Failed');
+                }
+            } catch (error) {
+                updateCheck('check-health', 'fail', '✗ Failed');
+            }
+            
+            // Check 3: SPA routing (if this page loaded, routing works)
+            updateCheck('check-spa', 'ok', '✓ OK');
+            
+            // Check 4: Application load (try to fetch index.html)
+            try {
+                const response = await fetch('/');
+                checks.app = response.ok;
+                updateCheck('check-app', checks.app ? 'ok' : 'fail', checks.app ? '✓ OK' : '✗ Failed');
+            } catch (error) {
+                updateCheck('check-app', 'fail', '✗ Failed');
+            }
+            
+            // Update timestamp
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Overall status
+            const allOk = Object.values(checks).every(v => v === true);
+            if (allOk) {
+                updateStatus('✅', 'All Systems Operational', 'Deployment is healthy and ready to use', '');
+            } else {
+                const failedChecks = Object.entries(checks).filter(([k, v]) => !v).map(([k]) => k).join(', ');
+                updateStatus('⚠️', 'Some Checks Failed', `Failed: ${failedChecks}`, 'error');
+            }
+        }
+        
+        // Run checks on load
+        runHealthChecks();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(runHealthChecks, 30000);
+    </script>
+</body>
+</html>

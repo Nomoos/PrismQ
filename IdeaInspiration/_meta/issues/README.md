@@ -17,7 +17,7 @@ The [INDEX.md](INDEX.md) document is your master guide. It will direct you to th
 | **Quick answer - what to do now?** | [QUICK_START.md](QUICK_START.md) | 1-page action guide |
 | **Complete understanding** | [NEXT_STEPS.md](NEXT_STEPS.md) | Comprehensive 627-line plan |
 | **Visual timeline** | [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md) | Diagrams and charts |
-| **Parallel work assignments** | [PARALLELIZATION_MATRIX.md](PARALLELIZATION_MATRIX.md) | Team coordination |
+| **Parallel work assignments** | [WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md) | Team coordination |
 | **Track progress** | [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) | Daily/weekly tracking |
 | **Master overview** | [INDEX.md](INDEX.md) | Complete documentation index |
 
@@ -53,7 +53,7 @@ Each EPIC folder in `new/` contains:
 - **NEXT_STEPS.md** - Detailed implementation guide with parallelization strategy
 - **QUICK_START.md** - Quick reference for what to do next ⭐
 - **IMPLEMENTATION_TIMELINE.md** - Visual timeline, dependency graphs, and resource allocation
-- **PARALLELIZATION_MATRIX.md** - At-a-glance parallel work assignments
+- **WORKER_ALLOCATION_MATRIX.md** - At-a-glance parallel work assignments
 - **PROGRESS_CHECKLIST.md** - Track your implementation progress
 
 ## Issue Workflow

@@ -12,7 +12,6 @@ require_once __DIR__ . '/SecurityMiddleware.php';
 
 // Set headers to prevent caching
 header('Cache-Control: ' . API_RESPONSE_CACHE_CONTROL);
-header('Content-Type: application/json');
 
 // CORS Configuration
 $allowedOrigins = defined('CORS_ALLOWED_ORIGINS') ? CORS_ALLOWED_ORIGINS : '*';
@@ -149,6 +148,9 @@ require_once __DIR__ . '/ActionExecutor.php';
 
 // Get HTTP method
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Set Content-Type for API responses
+header('Content-Type: application/json');
 
 // Route the request using data-driven router
 try {

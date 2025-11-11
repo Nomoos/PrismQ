@@ -54,10 +54,10 @@ import { useToast } from '../../composables/useToast'
 const { toasts, removeToast } = useToast()
 
 const typeClasses: Record<string, string> = {
-  success: 'bg-green-600',
-  error: 'bg-red-600',
-  warning: 'bg-yellow-600',
-  info: 'bg-blue-600'
+  success: 'bg-green-600 dark:bg-dark-success-bg',
+  error: 'bg-red-600 dark:bg-dark-error-bg',
+  warning: 'bg-yellow-600 dark:bg-dark-warning-bg',
+  info: 'bg-blue-600 dark:bg-dark-info-bg'
 }
 </script>
 

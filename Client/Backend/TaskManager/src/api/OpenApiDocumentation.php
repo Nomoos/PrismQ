@@ -319,6 +319,43 @@ use OpenApi\Attributes as OA;
  * )
  */
 
+/**
+ * @OA\Post(
+ *     path="/tasks/{id}/progress",
+ *     operationId="updateTaskProgress",
+ *     summary="Update task progress",
+ *     tags={"Tasks"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Task ID",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"worker_id", "progress"},
+ *             @OA\Property(property="worker_id", type="string", example="worker-001"),
+ *             @OA\Property(property="progress", type="integer", minimum=0, maximum=100, example=50, description="Progress percentage"),
+ *             @OA\Property(property="message", type="string", example="Processing item 5 of 10", description="Optional progress message")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Progress updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id", type="integer", example=123),
+ *             @OA\Property(property="progress", type="integer", example=50),
+ *             @OA\Property(property="message", type="string", example="Task progress updated successfully")
+ *         )
+ *     ),
+ *     @OA\Response(response=400, description="Invalid progress value or task not in claimed state"),
+ *     @OA\Response(response=403, description="Task is claimed by another worker"),
+ *     @OA\Response(response=404, description="Task not found")
+ * )
+ */
+
 class OpenApiDocumentation
 {
     // This class only exists to hold OpenAPI documentation

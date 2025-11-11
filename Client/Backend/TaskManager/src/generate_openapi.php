@@ -6,7 +6,7 @@
  * Run: php generate_openapi.php
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/api/OpenApiConfig.php';
 
 use OpenApi\Attributes as OA;

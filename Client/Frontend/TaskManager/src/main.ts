@@ -5,11 +5,15 @@ import router from './router'
 import './assets/main.css'
 import { initPerformanceMonitoring } from './utils/performance'
 import { registerServiceWorker } from './utils/serviceWorker'
+import { initSentry, getSentryConfig } from './utils/sentry'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+
+// Initialize Sentry for error tracking (production/staging only)
+initSentry(app, router, getSentryConfig())
 
 app.mount('#app')
 

@@ -39,9 +39,14 @@ env/
 
 # Database
 *.db
+*.db-wal
+*.db-shm
 *.s3db
 *.sqlite
 *.sqlite3
+
+# Worker queue database
+data/worker_queue.db*
 
 # Logs
 *.log

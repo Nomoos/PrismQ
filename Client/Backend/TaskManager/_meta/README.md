@@ -1,179 +1,48 @@
-# TaskManager Project Organization
+# TaskManager Meta-Information
 
-This directory contains project documentation and issue tracking for the TaskManager implementation.
+Navigation for TaskManager project documentation, examples, tests, and issue tracking.
 
-## Quick Links
+## 🚀 Quick Start
 
-- **[📋 PROJECT_PLAN.md](PROJECT_PLAN.md)** - Comprehensive project plan and roadmap
-- **[📊 PARALLELIZATION_MATRIX.md](PARALLELIZATION_MATRIX.md)** - Worker coordination and dependencies
-- **[📁 issues/INDEX.md](issues/INDEX.md)** - Complete issue tracking and status
-- **[📖 ORGANIZATION_SUMMARY.md](ORGANIZATION_SUMMARY.md)** - Implementation details
+- **New to TaskManager?** → [Quick Start Deployment](docs/deployment/QUICK_START_DEPLOY.md)
+- **Need API docs?** → [API Reference](docs/api/API_REFERENCE.md) or [Swagger UI](docs/api/SWAGGER_DEPLOYMENT_INFO.md)
+- **Want to understand the architecture?** → [Data-Driven Architecture](docs/architecture/DATA_DRIVEN_ARCHITECTURE.md)
 
-## Structure
+## 📚 Documentation
 
-```
-_meta/
-├── PROJECT_PLAN.md           # Master project plan (START HERE)
-├── PARALLELIZATION_MATRIX.md # Worker coordination strategy
-├── ORGANIZATION_SUMMARY.md   # Implementation summary
-├── docs/                     # Project documentation
-├── issues/                   # Issue tracking with worker specialization
-│   ├── INDEX.md              # Issue tracking and status
-│   ├── new/                  # New issues to be assigned
-│   │   ├── Worker01/ - Project Manager & Issue Creation Specialist
-│   │   ├── Worker02/ - SQL Database Expert
-│   │   ├── Worker03/ - PHP Backend Expert
-│   │   ├── Worker04/ - API Design & Integration Specialist
-│   │   ├── Worker05/ - Security & Validation Expert
-│   │   ├── Worker06/ - Documentation Specialist
-│   │   ├── Worker07/ - Testing & QA Specialist
-│   │   ├── Worker08/ - DevOps & Deployment Specialist
-│   │   ├── Worker09/ - Performance & Optimization Expert
-│   │   └── Worker10/ - Senior Review Master
-│   ├── wip/                  # Work in progress issues by worker
-│   │   └── Worker01-10/ (same structure as new/)
-│   └── done/                 # Completed issues (archived without worker folders)
-└── README.md                 # This file
-```
+**[Complete Documentation Index](docs/README.md)**
 
-## Worker Specializations
+- **[Architecture](docs/architecture/)** - System design and data-driven architecture
+- **[API Reference](docs/api/)** - REST API documentation and OpenAPI/Swagger
+- **[Deployment](docs/deployment/)** - Deployment guides and operations
+- **[Development](docs/development/)** - Developer guides and tools
+- **[Security](docs/security/)** - Security guidelines and best practices
+- **[Planning Archive](docs/planning/)** - Historical planning documents
 
-### Worker01 - Project Manager & Issue Creation Specialist
-**Responsibilities**:
-- Creating and managing project issues
-- Issue templates and organization
-- Project planning and coordination
-- Task breakdown and assignment
-- Progress tracking and reporting
+## 🎯 Navigate by Role
 
-**Skills**: Project management, issue tracking, coordination
+### For First-Time Users
+1. [Quick Start Guide](docs/deployment/QUICK_START_DEPLOY.md)
+2. [API Reference](docs/api/API_REFERENCE.md)
+3. [Examples](examples/)
 
-### Worker02 - SQL Database Expert
-**Responsibilities**:
-- Database schema design and optimization
-- SQL query optimization
-- Index design and management
-- Data integrity and constraints
-- Database migration scripts
+### For Developers
+1. [Architecture Overview](docs/architecture/DATA_DRIVEN_ARCHITECTURE.md)
+2. [Development Guide](docs/development/)
+3. [API Examples](docs/api/ENDPOINT_EXAMPLES.md)
+4. [Test Suite](tests/)
 
-**Skills**: MySQL/MariaDB, database design, performance tuning
+### For Operations/DevOps
+1. [Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md)
+2. [Environment Setup](docs/deployment/CHECK_SETUP_GUIDE.md)
+3. [Monitoring](docs/deployment/PRODUCTION_OPTIMIZATION_GUIDE.md)
 
-### Worker03 - PHP Backend Expert
-**Responsibilities**:
-- PHP code implementation
-- Business logic development
-- Code architecture and patterns
-- PHP best practices
-- Error handling and logging
+### For Security Review
+1. [Security Guidelines](docs/security/SECURITY.md)
+2. [Security Hardening](docs/security/SECURITY_HARDENING_SUMMARY.md)
 
-**Skills**: PHP 7.4+, OOP, design patterns
+## 📋 More Information
 
-### Worker04 - API Design & Integration Specialist
-**Responsibilities**:
-- REST API design and implementation
-- API endpoint routing
-- Request/response handling
-- CORS and headers management
-- API versioning
-
-**Skills**: REST APIs, HTTP protocols, API design
-
-### Worker05 - Security & Validation Expert
-**Responsibilities**:
-- Input validation and sanitization
-- SQL injection prevention
-- XSS prevention
-- Authentication and authorization
-- Security best practices
-- JSON Schema validation
-
-**Skills**: Security, validation, cryptography
-
-### Worker06 - Documentation Specialist
-**Responsibilities**:
-- Technical documentation
-- API reference documentation
-- Deployment guides
-- Code comments and inline docs
-- README files
-- User guides
-
-**Skills**: Technical writing, markdown, documentation tools
-
-### Worker07 - Testing & QA Specialist
-**Responsibilities**:
-- Unit test creation
-- Integration testing
-- Test coverage analysis
-- Bug identification and reporting
-- Test automation
-- Quality assurance
-
-**Skills**: Testing frameworks, QA methodologies
-
-### Worker08 - DevOps & Deployment Specialist
-**Responsibilities**:
-- Deployment scripts and procedures
-- Server configuration
-- Environment setup
-- CI/CD pipeline
-- Monitoring and logging
-- Backup strategies
-
-**Skills**: DevOps, Apache, MySQL admin, shell scripting
-
-### Worker09 - Performance & Optimization Expert
-**Responsibilities**:
-- Performance profiling
-- Query optimization
-- Code optimization
-- Caching strategies
-- Resource usage optimization
-- Bottleneck identification
-
-**Skills**: Performance analysis, profiling tools, optimization
-
-### Worker10 - Senior Review Master
-**Responsibilities**:
-- Code review and quality assessment
-- Architecture review
-- Best practices enforcement
-- Asking clarifying questions
-- Providing suggestions and improvements
-- Final approval of implementations
-
-**Skills**: Senior-level expertise across all domains, code review
-
-**Note**: Worker10 focuses on asking questions, providing comments, and making suggestions rather than direct implementation.
-
-## Issue Workflow
-
-1. **New Issues** → Created in `issues/new/WorkerXX/`
-2. **Assignment** → Issue moved to appropriate worker's folder
-3. **Work in Progress** → Issue moved to `issues/wip/WorkerXX/`
-4. **Completion** → Issue moved to `issues/done/` (no worker subfolders)
-
-## Issue Naming Convention
-
-```
-ISSUE-TASKMANAGER-XXX-description.md
-```
-
-Where:
-- XXX is the issue number (000, 001, 002, etc.)
-- description is a brief kebab-case description
-
-## Parallelization
-
-See `PARALLELIZATION_MATRIX.md` for detailed worker dependencies and parallel execution strategy.
-
-## Deployment
-
-The project will be deployed manually by running a PHP deployment script that:
-1. Checks out the appropriate branch from GitHub
-2. Downloads required scripts and files
-3. Sets up the database
-4. Configures the environment
-5. Validates the installation
-
-See `docs/DEPLOYMENT_SCRIPT.md` for details.
+- **[Directory Structure](STRUCTURE.md)** - Detailed directory organization
+- **[Project Status](STATUS.md)** - Current status and metrics
+- **[Organization Review](ORGANIZATION_REVIEW.md)** - SOLID principles and reorganization details

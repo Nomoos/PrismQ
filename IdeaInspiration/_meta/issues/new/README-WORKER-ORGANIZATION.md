@@ -281,7 +281,7 @@ As new issues are identified, they should be:
 
 ## Related Documentation
 
-- **Parallelization Matrix**: `_meta/issues/PARALLELIZATION_MATRIX.md`
+- **Worker Allocation Matrix**: `_meta/issues/WORKER_ALLOCATION_MATRIX.md`
 - **Next Steps**: `_meta/issues/NEXT_STEPS.md`
 - **Roadmap**: `_meta/issues/ROADMAP.md`
 - **Issue Tracking Workflow**: `_meta/issues/README.md`

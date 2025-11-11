@@ -1,15 +1,11 @@
 # PrismQ.IdeaInspiration - Next Steps Summary
 
 **Date**: 2025-11-04  
-<<<<<<< HEAD
 **Updated**: 2025-11-06 (Client module moved to separate repository)
-=======
->>>>>>> origin/main
 **Status**: Phase 0 Complete - Transitioning to Phase 1  
 **Purpose**: Comprehensive guide for what to implement next with parallelization strategy
 
-> **Note**: This document contains references to the Client/Backend module which has been moved to a separate repository.
-> These references are preserved for historical context. See [CLIENT_MIGRATION.md](../docs/CLIENT_MIGRATION.md) for details.
+> **Note**: This document contains historical references to the Client/Backend module which has been moved to a separate repository.
 
 ---
 
@@ -460,7 +456,7 @@ Purpose: Enhance IdeaInspiration model
 
 ---
 
-## Parallelization Matrix
+## Worker Allocation Matrix
 
 This matrix shows which issues can be worked on simultaneously by different developers.
 
@@ -790,7 +786,7 @@ Phase 4: Advanced Features (AFTER PHASE 3)
    - RESTful API Endpoints (#005) - HIGH priority
    - Removed client-related tasks that are done
 
-4. **Parallelization Matrix**: Updated for Phase 1
+4. **Worker Allocation Matrix**: Updated for Phase 1
    - Team structure focused on backend/infrastructure work
    - Infrastructure improvements (#203, #205) can run in parallel
 

@@ -1110,7 +1110,7 @@ Medium/Low: Minor issues, can be fixed without rollback
 - [#331 Maintenance Utilities](../Worker06/331-implement-queue-maintenance-utilities.md)
 
 ### References
-- [Parallelization Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
+- [Worker Allocation Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
 - [Queue System Summary](../Infrastructure_DevOps/QUEUE-SYSTEM-SUMMARY.md)
 
 ---

@@ -19,7 +19,7 @@
 define('GITHUB_REPO_OWNER', 'Nomoos');
 define('GITHUB_REPO_NAME', 'PrismQ.Client');
 define('GITHUB_BRANCH', 'main');
-define('GITHUB_PATH', 'Backend/TaskManager');
+define('GITHUB_PATH', 'Backend/TaskManager/src');
 define('DEPLOY_FILE', 'deploy.php');
 
 // Target path

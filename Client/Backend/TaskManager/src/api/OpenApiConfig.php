@@ -8,6 +8,9 @@
 
 use OpenApi\Attributes as OA;
 
+#[OA\OpenApi(
+    openapi: "3.0.0"
+)]
 #[OA\Info(
     version: "1.0.0",
     title: "TaskManager API",

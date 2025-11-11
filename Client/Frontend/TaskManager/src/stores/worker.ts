@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { setSentryUser } from '../utils/sentry'
 
 export const useWorkerStore = defineStore('worker', () => {
   // State
@@ -18,6 +19,18 @@ export const useWorkerStore = defineStore('worker', () => {
       localStorage.setItem('worker_id', id)
     }
     status.value = 'idle'
+    
+    // Set Sentry user context
+    setSentryUser(workerId.value)
+  }
+  
+  // Update worker ID
+  function setWorkerId(id: string) {
+    workerId.value = id
+    localStorage.setItem('worker_id', id)
+    
+    // Update Sentry user context
+    setSentryUser(id)
   }
   
   // Update worker status
@@ -33,6 +46,7 @@ export const useWorkerStore = defineStore('worker', () => {
     status,
     isInitialized,
     initializeWorker,
+    setWorkerId,
     setStatus
   }
 })

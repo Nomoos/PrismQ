@@ -26,7 +26,7 @@
 5. **[Quick Reference](./Infrastructure_DevOps/QUEUE-SYSTEM-QUICK-REFERENCE.md)** - TL;DR guide
 6. **[Summary](./Infrastructure_DevOps/QUEUE-SYSTEM-SUMMARY.md)** - Executive summary
 7. **[Index](./Infrastructure_DevOps/QUEUE-SYSTEM-INDEX.md)** - All 20 issues
-8. **[Parallelization Matrix](./Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)** - Visual work allocation
+8. **[Worker Allocation Matrix](./Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)** - Visual work allocation
 
 ### Implementation Issues (Created)
 - **[#321: Core Infrastructure](./Worker01/321-implement-sqlite-queue-core-infrastructure.md)** (Worker 01)

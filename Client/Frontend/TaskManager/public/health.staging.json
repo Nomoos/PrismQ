@@ -1,0 +1,33 @@
+{
+  "status": "ok",
+  "service": "PrismQ Frontend/TaskManager",
+  "version": "0.1.0",
+  "environment": "staging",
+  "deployed_at": "2025-11-10T12:00:00Z",
+  "build": {
+    "bundle_size_kb": 210,
+    "gzipped_size_kb": 71,
+    "build_date": "2025-11-10",
+    "build_time": "2025-11-10T12:00:00Z"
+  },
+  "checks": {
+    "static_files": "ok",
+    "spa_routing": "ok"
+  },
+  "monitoring": {
+    "health_endpoint": "/health.json",
+    "health_page": "/health.html",
+    "sentry_enabled": false,
+    "performance_tracking": true,
+    "debug_mode": true
+  },
+  "server": {
+    "location": "vedos-staging",
+    "deployment_method": "automated"
+  },
+  "features": {
+    "debug_enabled": true,
+    "console_logging": true,
+    "beta_features": true
+  }
+}

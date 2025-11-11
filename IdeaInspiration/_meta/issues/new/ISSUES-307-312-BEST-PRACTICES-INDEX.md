@@ -248,7 +248,7 @@ All patterns should:
 
 - [Background Tasks Best Practices](../../../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md) - Source guide
 - [Worker Organization](README-WORKER-ORGANIZATION.md) - Worker coordination
-- [Parallelization Visualization](PARALLELIZATION-VISUALIZATION.md) - Parallel execution guide
+- [Worker Allocation Visualization](WORKER-ALLOCATION-VISUALIZATION.md) - Parallel execution guide
 
 ---
 

@@ -8,8 +8,6 @@
 
 require_once __DIR__ . '/JsonSchemaValidator.php';
 
-use OpenApi\Attributes as OA;
-
 class CustomHandlers {
     private $db;
     
@@ -20,25 +18,6 @@ class CustomHandlers {
     /**
      * Health check handler
      */
-    #[OA\Get(
-        path: '/health',
-        operationId: 'healthCheck',
-        summary: 'Health check endpoint',
-        tags: ['Health'],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'System is healthy',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'healthy'),
-                        new OA\Property(property: 'timestamp', type: 'integer', example: 1699372800),
-                        new OA\Property(property: 'database', type: 'string', example: 'connected')
-                    ]
-                )
-            )
-        ]
-    )]
     public function health_check($requestData, $config) {
         return [
             'status' => 'healthy',
@@ -50,53 +29,6 @@ class CustomHandlers {
     /**
      * Register/Update Task Type
      */
-    #[OA\Post(
-        path: '/task-types/register',
-        operationId: 'registerTaskType',
-        summary: 'Register or update a task type',
-        security: [['apiKey' => []]],
-        tags: ['Task Types'],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name', 'version', 'param_schema'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string', example: 'PrismQ.Script.Generate', description: 'Unique task type identifier'),
-                    new OA\Property(property: 'version', type: 'string', example: '1.0.0', description: 'Schema version'),
-                    new OA\Property(
-                        property: 'param_schema',
-                        type: 'object',
-                        description: 'JSON Schema for parameter validation',
-                        example: [
-                            'type' => 'object',
-                            'properties' => [
-                                'topic' => ['type' => 'string', 'minLength' => 1],
-                                'style' => ['type' => 'string', 'enum' => ['formal', 'casual', 'technical']]
-                            ],
-                            'required' => ['topic', 'style']
-                        ]
-                    )
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Task type registered successfully',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer', example: 1),
-                        new OA\Property(property: 'name', type: 'string', example: 'PrismQ.Script.Generate'),
-                        new OA\Property(property: 'version', type: 'string', example: '1.0.0'),
-                        new OA\Property(property: 'created', type: 'boolean', example: true),
-                        new OA\Property(property: 'updated', type: 'boolean', example: false)
-                    ]
-                )
-            ),
-            new OA\Response(response: 400, description: 'Invalid request or validation error'),
-            new OA\Response(response: 401, description: 'Unauthorized - Invalid API key')
-        ]
-    )]
     public function task_type_register($requestData, $config) {
         $data = $requestData['body'];
         
@@ -165,50 +97,6 @@ class CustomHandlers {
     /**
      * Create Task
      */
-    #[OA\Post(
-        path: '/tasks',
-        operationId: 'createTask',
-        summary: 'Create a new task',
-        security: [['apiKey' => []]],
-        tags: ['Tasks'],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['type', 'params'],
-                properties: [
-                    new OA\Property(property: 'type', type: 'string', example: 'PrismQ.Script.Generate', description: 'Task type name'),
-                    new OA\Property(
-                        property: 'params',
-                        type: 'object',
-                        description: 'Task parameters (validated against task type schema)',
-                        example: [
-                            'topic' => 'AI in Healthcare',
-                            'style' => 'formal',
-                            'length' => 1500
-                        ]
-                    )
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Task created or existing task returned',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer', example: 123),
-                        new OA\Property(property: 'type', type: 'string', example: 'PrismQ.Script.Generate'),
-                        new OA\Property(property: 'status', type: 'string', example: 'pending'),
-                        new OA\Property(property: 'dedupe_key', type: 'string', example: 'abc123...'),
-                        new OA\Property(property: 'duplicate', type: 'boolean', example: false)
-                    ]
-                )
-            ),
-            new OA\Response(response: 400, description: 'Invalid request or parameter validation failed'),
-            new OA\Response(response: 401, description: 'Unauthorized - Invalid API key'),
-            new OA\Response(response: 404, description: 'Task type not found')
-        ]
-    )]
     public function task_create($requestData, $config) {
         $data = $requestData['body'];
         
@@ -468,48 +356,6 @@ class CustomHandlers {
     /**
      * Update Task Progress
      */
-    #[OA\Post(
-        path: '/tasks/{id}/progress',
-        operationId: 'updateTaskProgress',
-        summary: 'Update task progress',
-        tags: ['Tasks'],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                required: true,
-                description: 'Task ID',
-                schema: new OA\Schema(type: 'integer')
-            )
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['worker_id', 'progress'],
-                properties: [
-                    new OA\Property(property: 'worker_id', type: 'string', example: 'worker-001'),
-                    new OA\Property(property: 'progress', type: 'integer', minimum: 0, maximum: 100, example: 50, description: 'Progress percentage'),
-                    new OA\Property(property: 'message', type: 'string', example: 'Processing item 5 of 10', description: 'Optional progress message')
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Progress updated successfully',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer', example: 123),
-                        new OA\Property(property: 'progress', type: 'integer', example: 50),
-                        new OA\Property(property: 'message', type: 'string', example: 'Task progress updated successfully')
-                    ]
-                )
-            ),
-            new OA\Response(response: 400, description: 'Invalid progress value or task not in claimed state'),
-            new OA\Response(response: 403, description: 'Task is claimed by another worker'),
-            new OA\Response(response: 404, description: 'Task not found')
-        ]
-    )]
     public function task_update_progress($requestData, $config) {
         $data = $requestData['body'];
         $task_id = $requestData['path']['id'];

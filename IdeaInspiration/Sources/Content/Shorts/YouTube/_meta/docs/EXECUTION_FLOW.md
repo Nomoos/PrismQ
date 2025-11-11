@@ -1,23 +1,14 @@
 # YouTube Shorts Module - Execution Flow
 
 **Platform Focus**: Windows 10/11 with NVIDIA RTX 5090  
-<<<<<<< HEAD
 **Last Updated**: 2025-11-04  
 **Updated**: 2025-11-06 (Client module moved to separate repository)
 
-> **Note**: This document references the Web Client module which has been moved to a separate repository.
-> The content is preserved for historical context. See [CLIENT_MIGRATION.md](../../../../../_meta/docs/CLIENT_MIGRATION.md) for details.
+> **Note**: This document contains historical references to the Web Client module which has been moved to a separate repository.
 
 ## Overview
 
 This document provides a comprehensive walkthrough of how the YouTube Shorts Source module originally executed from user interaction in the Web Client to data storage in the database. The flow was optimized for Windows platforms with special attention to subprocess execution and event loop handling.
-=======
-**Last Updated**: 2025-11-04
-
-## Overview
-
-This document provides a comprehensive walkthrough of how the YouTube Shorts Source module executes from user interaction in the Web Client to data storage in the database. The flow is optimized for Windows platforms with special attention to subprocess execution and event loop handling.
->>>>>>> origin/main
 
 ## High-Level Flow
 

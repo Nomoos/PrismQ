@@ -259,7 +259,7 @@ These issues were identified from a **research flow analysis** that examined:
 
 - **Main README**: [README.md](./README.md)
 - **Worker Organization**: [README-WORKER-ORGANIZATION.md](./README-WORKER-ORGANIZATION.md)
-- **Parallelization**: `_meta/issues/PARALLELIZATION_MATRIX.md`
+- **Worker Allocation Matrix**: `_meta/issues/WORKER_ALLOCATION_MATRIX.md`
 - **Next Steps**: `_meta/issues/NEXT_STEPS.md`
 
 ---

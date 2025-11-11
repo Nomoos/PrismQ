@@ -23,6 +23,8 @@ export interface TaskType {
   version: string
   param_schema: Record<string, any>
   is_active: boolean
+  usage_count?: number
+  last_used_at?: string | null
   created_at: string
   updated_at: string
 }

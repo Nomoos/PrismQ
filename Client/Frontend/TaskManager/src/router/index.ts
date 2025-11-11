@@ -9,6 +9,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Tasks' }
   },
   {
+    path: '/tasks/new',
+    name: 'task-create',
+    component: () => import('../views/TaskCreate.vue'),
+    meta: { title: 'Create Task' }
+  },
+  {
     path: '/tasks/:id',
     name: 'task-detail',
     component: () => import('../views/TaskDetail.vue'),

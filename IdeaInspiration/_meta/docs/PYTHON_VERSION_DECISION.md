@@ -82,15 +82,14 @@ py -3.10 -m pip install -e .
 
 ## Changes Made
 
-### 1. Configuration Files (41 files)
+### 1. Configuration Files
 
 Updated all `pyproject.toml` files:
 - Classification
-- Client/Backend
 - ConfigLoad
 - Model
 - Scoring
-- Sources (all 36 source modules)
+- Sources (all source modules)
 
 Changes:
 - `requires-python = ">=3.10,<3.11"` (was `>=3.10`)

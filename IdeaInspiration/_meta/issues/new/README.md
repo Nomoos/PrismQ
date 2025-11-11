@@ -167,7 +167,7 @@ See [Infrastructure_DevOps/README.md](./Infrastructure_DevOps/README.md) for pri
 
 - **Worker Organization**: [README-WORKER-ORGANIZATION.md](./README-WORKER-ORGANIZATION.md)
 - **Next Steps**: `_meta/issues/NEXT_STEPS.md`
-- **Parallelization Matrix**: `_meta/issues/PARALLELIZATION_MATRIX.md`
+- **Worker Allocation Matrix**: `_meta/issues/WORKER_ALLOCATION_MATRIX.md`
 - **Roadmap**: `_meta/issues/ROADMAP.md`
 - **Issue Tracking**: `_meta/issues/README.md`
 

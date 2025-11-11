@@ -42,7 +42,7 @@
 ---
 
 ### "Show me which tasks can run in parallel"
-👉 **[PARALLELIZATION_MATRIX.md](PARALLELIZATION_MATRIX.md)** (At-a-glance 234-line matrix)
+👉 **[WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md)** (At-a-glance 234-line matrix)
 - Parallel work streams by week
 - Team size recommendations
 - ROI of parallelization
@@ -69,7 +69,7 @@
 | **QUICK_START.md** | 346 | 8.4KB | One-page summary | Quick decisions |
 | **NEXT_STEPS.md** | 627 | 18KB | Comprehensive guide | Deep understanding |
 | **IMPLEMENTATION_TIMELINE.md** | 495 | 32KB | Visual timeline | Project managers |
-| **PARALLELIZATION_MATRIX.md** | 234 | 8.2KB | Parallel work matrix | Team leads |
+| **WORKER_ALLOCATION_MATRIX.md** | 234 | 8.2KB | Parallel work matrix | Team leads |
 | **PROGRESS_CHECKLIST.md** | 358 | 9.4KB | Progress tracking | Daily standups |
 
 **Total**: 2,060 lines of comprehensive guidance
@@ -97,7 +97,7 @@
 
 ### For Team Leads
 
-1. **Plan**: Review [PARALLELIZATION_MATRIX.md](PARALLELIZATION_MATRIX.md) to assign work
+1. **Plan**: Review [WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md) to assign work
 2. **Schedule**: Use [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md) for sprints
 3. **Monitor**: Check [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) in standups
 4. **Coordinate**: Refer to [NEXT_STEPS.md](NEXT_STEPS.md) for dependencies
@@ -106,7 +106,7 @@
 
 1. **Strategy**: Review [NEXT_STEPS.md](NEXT_STEPS.md) for complete picture
 2. **Timeline**: Use [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md) for estimates
-3. **Resources**: Check [PARALLELIZATION_MATRIX.md](PARALLELIZATION_MATRIX.md) for team size
+3. **Resources**: Check [WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md) for team size
 4. **Status**: Monitor [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) weekly
 
 ---
@@ -181,7 +181,7 @@ START
   │
   ├─ Need visual timeline? → IMPLEMENTATION_TIMELINE.md
   │
-  ├─ Need to assign work? → PARALLELIZATION_MATRIX.md
+  ├─ Need to assign work? → WORKER_ALLOCATION_MATRIX.md
   │
   └─ Need to track progress? → PROGRESS_CHECKLIST.md
 ```
@@ -195,7 +195,7 @@ All planning documents have been created and are ready to use:
 - [x] QUICK_START.md - One-page action guide ✅
 - [x] NEXT_STEPS.md - Comprehensive implementation plan ✅
 - [x] IMPLEMENTATION_TIMELINE.md - Visual timeline and diagrams ✅
-- [x] PARALLELIZATION_MATRIX.md - Parallel work assignments ✅
+- [x] WORKER_ALLOCATION_MATRIX.md - Parallel work assignments ✅
 - [x] PROGRESS_CHECKLIST.md - Progress tracking ✅
 - [x] INDEX.md - This master index ✅
 - [x] README.md - Updated with all links ✅

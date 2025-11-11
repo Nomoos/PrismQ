@@ -196,9 +196,9 @@ python3 generate_test_data.py | \
 ]
 ```
 
-## Integration with PrismQ Web Client
+## Integration with PrismQ Modules
 
-The modules are automatically registered in the Web Client's module registry (`Client/Backend/configs/modules.json`) and can be executed through the web interface.
+The modules can be registered in a module registry and can be executed through a web interface or command line.
 
 ### Module Configuration
 ```json

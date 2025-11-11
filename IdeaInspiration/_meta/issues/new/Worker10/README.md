@@ -279,7 +279,7 @@ Week 4 (Nov 20-26):   ░░░░░░░░░░░░ Phase 3: Implementati
 - [Migration Planning (#340)](340-create-migration-utilities-and-rollback-procedures.md)
 
 ### Reference Documents
-- [Parallelization Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
+- [Worker Allocation Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
 - [Queue System Summary](../Infrastructure_DevOps/QUEUE-SYSTEM-SUMMARY.md)
 - [Background Tasks Best Practices](../../../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md)
 

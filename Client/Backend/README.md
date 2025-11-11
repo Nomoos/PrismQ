@@ -1,23 +1,24 @@
 # PrismQ.Client - Backend
 
-**Navigation file for Backend projects**
+**Navigation file for Backend modules**
 
 ---
 
-## 📋 TaskManager - Lightweight PHP Task Queue
+## 📋 TaskManager Module - Backend
+
+**Backend module of the TaskManager task queue system**
 
 ### Project Documentation
-- [Main README](../README.md)
-- [Release Management](../RELEASE.md)
-- [Deployment Checklist](../DEPLOYMENT_CHECKLIST.md)
+- [Main README](../README.md) - PrismQ.Client overview
+- [Frontend/TaskManager](../Frontend/TaskManager/README.md) - Frontend module of TaskManager
 
-A simple, on-demand task management system designed to run on shared hosting using only MySQL and PHP.
+A lightweight, on-demand task management system designed to run on shared hosting using only MySQL and PHP.
 
-**👉 [Go to TaskManager Documentation](./TaskManager/README.md)**
+**👉 [Go to Backend/TaskManager Documentation](./TaskManager/README.md)**
 
 ### Quick Links
 
-- **[TaskManager README](./TaskManager/README.md)** - Complete project overview
+- **[TaskManager README](./TaskManager/README.md)** - Complete backend module overview
 - **[API Reference](./TaskManager/_meta/docs/API_REFERENCE.md)** - Complete API documentation
 - **[Data-Driven Architecture](./TaskManager/_meta/docs/DATA_DRIVEN_ARCHITECTURE.md)** - Learn how endpoints work
 - **[Deployment Guide](./TaskManager/_meta/docs/DEPLOYMENT_GUIDE.md)** - How to deploy to production
@@ -25,9 +26,9 @@ A simple, on-demand task management system designed to run on shared hosting usi
 
 ---
 
-## Project Status
+## Module Status
 
-**TaskManager**: ✅ PRODUCTION READY  
+**Backend/TaskManager**: ✅ PRODUCTION READY  
 **Progress**: 8.8/10 (Core features complete, tested, ready for deployment)
 
 See [TaskManager README](./TaskManager/README.md) for full details.

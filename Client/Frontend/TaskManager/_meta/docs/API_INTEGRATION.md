@@ -1,876 +1,652 @@
-# Frontend/TaskManager - API Integration Guide
+# API Integration Guide
 
-**Version**: 1.0  
-**Last Updated**: 2025-11-09  
-**Audience**: Developers
-
----
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [API Client Setup](#api-client-setup)
-3. [Endpoint Reference](#endpoint-reference)
-4. [Request/Response Examples](#requestresponse-examples)
-5. [Error Handling](#error-handling)
-6. [Authentication](#authentication)
-7. [TypeScript Types](#typescript-types)
-8. [Best Practices](#best-practices)
-
----
+Complete guide for integrating with the Frontend/TaskManager API layer.
 
 ## Overview
 
-Frontend/TaskManager integrates with the Backend/TaskManager REST API to manage tasks, task types, and workers. All communication uses JSON over HTTPS.
+The Frontend/TaskManager uses a service-based architecture to communicate with the Backend/TaskManager API. All API communication goes through typed service layers with built-in error handling, retry logic, and caching.
 
-### Base Configuration
+## Architecture
 
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Vue Components                      │
+│              (TaskList, TaskDetail, etc.)               │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                   Pinia Stores                          │
+│              (useTaskStore, useWorkerStore)             │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Service Layer                          │
+│         (taskService, healthService, etc.)              │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  API Client (Axios)                     │
+│        (api.ts - with retry & error handling)           │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+          Backend/TaskManager REST API
+```
+
+## Core Components
+
+### 1. API Client (`src/services/api.ts`)
+
+The base API client handles all HTTP communication.
+
+**Features:**
+- Automatic retry on network errors (3 attempts)
+- Request/response logging in development
+- Error transformation
+- Configurable timeout (30s default)
+- API key authentication
+
+**Configuration:**
 ```typescript
 // Environment variables (.env)
-VITE_API_BASE_URL=https://api.prismq.nomoos.cz/api
+VITE_API_BASE_URL=http://localhost:8000/api
 VITE_API_KEY=your-api-key-here
 ```
 
-### API Client
-
-The application uses Axios for HTTP requests with interceptors for authentication and error handling.
-
----
-
-## API Client Setup
-
-### Core Configuration
-
+**Usage:**
 ```typescript
-// src/services/api.ts
-import axios, { AxiosInstance } from 'axios'
+import api from '@/services/api'
 
-const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  timeout: 10000 // 10 seconds
-})
+// GET request
+const data = await api.get<ResponseType>('/endpoint', { param: 'value' })
 
-// Request interceptor
-apiClient.interceptors.request.use(
-  (config) => {
-    // Add API key if available
-    const apiKey = import.meta.env.VITE_API_KEY
-    if (apiKey) {
-      config.headers.Authorization = `Bearer ${apiKey}`
-    }
-    
-    // Log request in debug mode
-    if (import.meta.env.VITE_DEBUG_MODE === 'true') {
-      console.log('[API Request]', config.method?.toUpperCase(), config.url)
-    }
-    
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+// POST request
+const result = await api.post<ResponseType>('/endpoint', { key: 'value' })
 
-// Response interceptor
-apiClient.interceptors.response.use(
-  (response) => {
-    // Log response in debug mode
-    if (import.meta.env.VITE_DEBUG_MODE === 'true') {
-      console.log('[API Response]', response.status, response.config.url)
-    }
-    return response
-  },
-  (error) => {
-    // Handle errors globally
-    if (error.response) {
-      // Server responded with error status
-      console.error('[API Error]', error.response.status, error.response.data)
-    } else if (error.request) {
-      // Request made but no response received
-      console.error('[Network Error]', 'No response received')
-    } else {
-      // Error in request setup
-      console.error('[Request Error]', error.message)
-    }
-    return Promise.reject(error)
-  }
-)
+// PUT request
+const updated = await api.put<ResponseType>('/endpoint', { key: 'value' })
 
-export default apiClient
+// DELETE request
+const deleted = await api.delete<ResponseType>('/endpoint')
 ```
 
----
+### 2. Task Service (`src/services/taskService.ts`)
 
-## Endpoint Reference
+Handles all task-related API operations.
 
-### Health Check
+**Available Methods:**
 
-#### GET /health
-
-Check API health and availability.
-
-**Request**: None
-
-**Response**:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-11-09T12:00:00Z"
-}
-```
-
-**Usage**:
+#### Get Tasks
 ```typescript
-const response = await apiClient.get('/health')
-console.log(response.data.status) // "ok"
-```
-
----
-
-### Task Types
-
-#### POST /task-types/register
-
-Register a new task type with parameter schema.
-
-**Request**:
-```json
-{
-  "name": "PrismQ.IdeaInspiration.Generate",
-  "version": "1.0.0",
-  "param_schema": {
-    "type": "object",
-    "properties": {
-      "topic": { "type": "string" },
-      "count": { "type": "integer", "minimum": 1, "maximum": 10 }
-    },
-    "required": ["topic"]
-  }
-}
-```
-
-**Response**:
-```json
-{
-  "task_type": {
-    "id": 1,
-    "name": "PrismQ.IdeaInspiration.Generate",
-    "version": "1.0.0",
-    "param_schema": { ... },
-    "is_active": true,
-    "created_at": "2025-11-09T12:00:00Z"
-  }
-}
-```
-
-#### GET /task-types/{name}
-
-Get a specific task type by name.
-
-**Request**: None
-
-**Response**:
-```json
-{
-  "task_type": {
-    "id": 1,
-    "name": "PrismQ.IdeaInspiration.Generate",
-    "version": "1.0.0",
-    "param_schema": { ... },
-    "is_active": true
-  }
-}
-```
-
-#### GET /task-types
-
-List all task types.
-
-**Request**: None
-
-**Response**:
-```json
-{
-  "task_types": [
-    {
-      "id": 1,
-      "name": "PrismQ.IdeaInspiration.Generate",
-      "version": "1.0.0",
-      "is_active": true
-    },
-    ...
-  ]
-}
-```
-
----
-
-### Tasks
-
-#### POST /tasks
-
-Create a new task.
-
-**Request**:
-```json
-{
-  "task_type_id": 1,
-  "params": {
-    "topic": "AI and creativity",
-    "count": 5
-  },
-  "priority": 5
-}
-```
-
-**Response**:
-```json
-{
-  "task": {
-    "id": 42,
-    "task_type_id": 1,
-    "task_type": "PrismQ.IdeaInspiration.Generate",
-    "status": "pending",
-    "params": { ... },
-    "priority": 5,
-    "attempts": 0,
-    "created_at": "2025-11-09T12:00:00Z"
-  }
-}
-```
-
-#### GET /tasks
-
-List all tasks with optional filtering.
-
-**Query Parameters**:
-- `status` (optional): Filter by status (pending, claimed, completed, failed)
-- `task_type_id` (optional): Filter by task type ID
-- `limit` (optional): Maximum number of tasks to return
-- `offset` (optional): Offset for pagination
-
-**Request**:
-```
-GET /tasks?status=pending&limit=10
-```
-
-**Response**:
-```json
-{
-  "tasks": [
-    {
-      "id": 42,
-      "task_type": "PrismQ.IdeaInspiration.Generate",
-      "status": "pending",
-      "priority": 5,
-      "attempts": 0,
-      "progress": 0,
-      "created_at": "2025-11-09T12:00:00Z"
-    },
-    ...
-  ],
-  "total": 25,
-  "limit": 10,
-  "offset": 0
-}
-```
-
-#### GET /tasks/{id}
-
-Get a specific task by ID.
-
-**Request**: None
-
-**Response**:
-```json
-{
-  "task": {
-    "id": 42,
-    "task_type_id": 1,
-    "task_type": "PrismQ.IdeaInspiration.Generate",
-    "status": "pending",
-    "params": {
-      "topic": "AI and creativity",
-      "count": 5
-    },
-    "result": null,
-    "error_message": null,
-    "priority": 5,
-    "attempts": 0,
-    "progress": 0,
-    "claimed_by": null,
-    "claimed_at": null,
-    "completed_at": null,
-    "created_at": "2025-11-09T12:00:00Z",
-    "updated_at": "2025-11-09T12:00:00Z"
-  }
-}
-```
-
-#### POST /tasks/claim
-
-Claim a task for processing.
-
-**Request**:
-```json
-{
-  "task_type_id": 1,
-  "worker_id": "worker-123-abc"
-}
-```
-
-**Response**:
-```json
-{
-  "task": {
-    "id": 42,
-    "status": "claimed",
-    "claimed_by": "worker-123-abc",
-    "claimed_at": "2025-11-09T12:05:00Z",
-    ...
-  }
-}
-```
-
-**Error Response** (no tasks available):
-```json
-{
-  "error": "No pending tasks available for this type"
-}
-```
-
-#### POST /tasks/{id}/complete
-
-Complete a task with result or error.
-
-**Request** (Success):
-```json
-{
-  "status": "completed",
-  "result": {
-    "ideas": [
-      "Idea 1",
-      "Idea 2",
-      "Idea 3"
-    ],
-    "count": 3
-  }
-}
-```
-
-**Request** (Failed):
-```json
-{
-  "status": "failed",
-  "error_message": "API rate limit exceeded"
-}
-```
-
-**Response**:
-```json
-{
-  "task": {
-    "id": 42,
-    "status": "completed",
-    "result": { ... },
-    "completed_at": "2025-11-09T12:10:00Z",
-    ...
-  }
-}
-```
-
-#### POST /tasks/{id}/progress
-
-Update task progress (0-100).
-
-**Request**:
-```json
-{
-  "progress": 50
-}
-```
-
-**Response**:
-```json
-{
-  "task": {
-    "id": 42,
-    "progress": 50,
-    "updated_at": "2025-11-09T12:07:00Z",
-    ...
-  }
-}
-```
-
----
-
-## Request/Response Examples
-
-### Complete Task Flow Example
-
-```typescript
-// src/services/taskService.ts
-import apiClient from './api'
-import type { Task, CreateTaskRequest } from '@/types/task'
-
-export const taskService = {
-  // 1. Create a task
-  async create(data: CreateTaskRequest) {
-    return apiClient.post<{ task: Task }>('/tasks', data)
-  },
-  
-  // 2. Claim the task
-  async claim(taskTypeId: number, workerId: string) {
-    return apiClient.post<{ task: Task }>('/tasks/claim', {
-      task_type_id: taskTypeId,
-      worker_id: workerId
-    })
-  },
-  
-  // 3. Update progress
-  async updateProgress(taskId: number, progress: number) {
-    return apiClient.post<{ task: Task }>(`/tasks/${taskId}/progress`, {
-      progress
-    })
-  },
-  
-  // 4. Complete the task
-  async complete(taskId: number, result: object) {
-    return apiClient.post<{ task: Task }>(`/tasks/${taskId}/complete`, {
-      status: 'completed',
-      result
-    })
-  },
-  
-  // 5. Or mark as failed
-  async fail(taskId: number, errorMessage: string) {
-    return apiClient.post<{ task: Task }>(`/tasks/${taskId}/complete`, {
-      status: 'failed',
-      error_message: errorMessage
-    })
-  }
-}
-```
-
-### Using in Component
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
 import { taskService } from '@/services/taskService'
 
-const workerId = 'worker-123-abc'
-const processing = ref(false)
+// Get all tasks with optional filters
+const response = await taskService.getTasks({
+  status: 'pending',  // optional: pending, claimed, completed, failed
+  type: 'task-type',  // optional: filter by task type
+  limit: 20,          // optional: pagination limit
+  offset: 0           // optional: pagination offset
+})
 
-async function processTask() {
-  processing.value = true
-  
-  try {
-    // 1. Claim task
-    const claimResponse = await taskService.claim(1, workerId)
-    const task = claimResponse.data.task
-    console.log('Claimed task:', task.id)
-    
-    // 2. Simulate processing with progress updates
-    for (let i = 0; i <= 100; i += 20) {
-      await taskService.updateProgress(task.id, i)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-    }
-    
-    // 3. Complete task
-    const result = {
-      status: 'success',
-      output: 'Task completed successfully'
-    }
-    await taskService.complete(task.id, result)
-    console.log('Task completed')
-    
-  } catch (error) {
-    console.error('Error processing task:', error)
-    // Optionally mark as failed
-    // await taskService.fail(taskId, error.message)
-  } finally {
-    processing.value = false
-  }
-}
-</script>
+// Response type: PaginatedResponse<Task>
+console.log(response.data)    // Task[]
+console.log(response.total)   // number
+console.log(response.success) // boolean
 ```
 
----
+#### Get Single Task
+```typescript
+// Get task by ID (cached for 30 seconds)
+const response = await taskService.getTask(taskId)
+
+if (response.success) {
+  const task = response.data
+  console.log(task.status)
+  console.log(task.params)
+  console.log(task.result)
+}
+```
+
+#### Create Task
+```typescript
+const response = await taskService.createTask({
+  type: 'PrismQ.YouTube.ScrapeShorts',
+  params: {
+    search_query: 'inspiration',
+    max_results: 10
+  },
+  priority: 5
+})
+
+if (response.success) {
+  const newTask = response.data
+  console.log('Created task:', newTask.id)
+}
+```
+
+#### Claim Task
+```typescript
+const response = await taskService.claimTask({
+  worker_id: 'worker-123',
+  task_type_id: 1
+})
+
+if (response.success && response.data) {
+  const claimedTask = response.data
+  console.log('Processing:', claimedTask.id)
+}
+```
+
+#### Complete Task
+```typescript
+// Success
+await taskService.completeTask(taskId, {
+  worker_id: 'worker-123',
+  success: true,
+  result: {
+    videos_found: 42,
+    data: [/* ... */]
+  }
+})
+
+// Failure
+await taskService.completeTask(taskId, {
+  worker_id: 'worker-123',
+  success: false,
+  error: 'API rate limit exceeded'
+})
+```
+
+#### Update Progress
+```typescript
+await taskService.updateProgress(taskId, {
+  worker_id: 'worker-123',
+  progress: 65,  // percentage
+  message: 'Processing video 13/20'
+})
+```
+
+#### Task Types
+```typescript
+// Get all active task types (cached for 5 minutes)
+const response = await taskService.getTaskTypes(true)
+const taskTypes = response.data
+
+// Get specific task type
+const typeResponse = await taskService.getTaskType('PrismQ.YouTube.ScrapeShorts')
+
+// Register new task type
+await taskService.registerTaskType({
+  name: 'PrismQ.Custom.NewTask',
+  version: '1.0.0',
+  param_schema: {
+    param1: { type: 'string', required: true },
+    param2: { type: 'number', default: 10 }
+  }
+})
+```
+
+### 3. Health Service (`src/services/healthService.ts`)
+
+Check API health status.
+
+```typescript
+import { healthService } from '@/services/healthService'
+
+const response = await healthService.check()
+if (response.status === 'healthy') {
+  console.log('API is operational')
+}
+```
+
+## Using Stores (Recommended)
+
+For Vue components, use Pinia stores instead of calling services directly.
+
+### Task Store (`src/stores/tasks.ts`)
+
+```typescript
+import { useTaskStore } from '@/stores/tasks'
+
+export default {
+  setup() {
+    const taskStore = useTaskStore()
+    
+    // Fetch tasks
+    await taskStore.fetchTasks({ status: 'pending' })
+    
+    // Access state
+    console.log(taskStore.tasks)
+    console.log(taskStore.pendingTasks)
+    console.log(taskStore.loading)
+    console.log(taskStore.error)
+    
+    // Create task
+    const response = await taskStore.createTask({
+      type: 'task-type',
+      params: {}
+    })
+    
+    // Claim task
+    const task = await taskStore.claimTask('worker-id', taskTypeId)
+    
+    // Complete task
+    await taskStore.completeTask(
+      taskId,
+      'worker-id',
+      true,
+      { result: 'data' }
+    )
+    
+    // Update progress
+    await taskStore.updateProgress(
+      taskId,
+      'worker-id',
+      50,
+      'Halfway done'
+    )
+    
+    return { taskStore }
+  }
+}
+```
+
+### Worker Store (`src/stores/worker.ts`)
+
+```typescript
+import { useWorkerStore } from '@/stores/worker'
+
+export default {
+  setup() {
+    const workerStore = useWorkerStore()
+    
+    // Initialize worker (generates ID if needed)
+    workerStore.initializeWorker()
+    
+    // Access worker info
+    console.log(workerStore.workerId)
+    console.log(workerStore.status)
+    console.log(workerStore.isInitialized)
+    
+    // Update status
+    workerStore.setStatus('active')
+    
+    return { workerStore }
+  }
+}
+```
 
 ## Error Handling
 
 ### Error Types
 
-1. **Network Errors**: No response from server
-2. **Server Errors**: 5xx status codes
-3. **Client Errors**: 4xx status codes
-4. **Validation Errors**: Invalid request data
-
-### Error Response Format
-
-```json
-{
-  "error": "Error message",
-  "details": {
-    "field": "validation error details"
-  },
-  "code": "ERROR_CODE"
-}
-```
-
-### Handling Errors
+The API client throws specific error types:
 
 ```typescript
-import axios from 'axios'
+import { APIError, NetworkError } from '@/types'
 
 try {
-  const response = await taskService.claim(1, workerId)
+  await taskService.getTasks()
 } catch (error) {
-  if (axios.isAxiosError(error)) {
-    if (error.response) {
-      // Server responded with error status
-      const status = error.response.status
-      const message = error.response.data.error || 'Unknown error'
-      
-      switch (status) {
-        case 400:
-          console.error('Bad Request:', message)
-          break
-        case 401:
-          console.error('Unauthorized:', message)
-          // Redirect to login or refresh token
-          break
-        case 404:
-          console.error('Not Found:', message)
-          break
-        case 409:
-          console.error('Conflict:', message)
-          // Task already claimed
-          break
-        case 500:
-          console.error('Server Error:', message)
-          break
-        default:
-          console.error('Error:', status, message)
-      }
-    } else if (error.request) {
-      // Request made but no response
-      console.error('Network error: No response from server')
-      // Show offline message to user
-    } else {
-      // Error in request setup
-      console.error('Request error:', error.message)
-    }
+  if (error instanceof APIError) {
+    // Server error with status code
+    console.error('API Error:', error.message)
+    console.error('Status:', error.status)
+    console.error('Data:', error.data)
+  } else if (error instanceof NetworkError) {
+    // Network connectivity issue
+    console.error('Network Error:', error.message)
   } else {
-    // Non-Axios error
-    console.error('Unexpected error:', error)
+    // Other error
+    console.error('Error:', error)
   }
 }
 ```
 
-### Global Error Handler
+### Automatic Retry
 
+Network errors are automatically retried up to 3 times with exponential backoff:
+- Attempt 1: immediate
+- Attempt 2: 1 second delay
+- Attempt 3: 2 second delay
+- Attempt 4: 3 second delay
+
+### Cache Invalidation
+
+Some methods automatically invalidate caches:
 ```typescript
-// In Pinia store
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
-export const useErrorStore = defineStore('errors', () => {
-  const lastError = ref<string | null>(null)
-  
-  function handleError(error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const message = error.response?.data?.error || error.message
-      lastError.value = message
-      
-      // Show toast notification
-      showToast(message, 'error')
-    }
-  }
-  
-  return { lastError, handleError }
-})
+// Invalidates task:{id} cache
+await taskService.completeTask(id, data)
+await taskService.updateProgress(id, data)
 ```
 
----
+## Request Caching
 
-## Authentication
-
-### API Key Authentication
-
-The API uses Bearer token authentication:
+The service layer uses intelligent caching via `src/utils/cache.ts`:
 
 ```typescript
-// Automatically added by request interceptor
-headers: {
-  'Authorization': `Bearer ${apiKey}`
-}
-```
+import { requestCache } from '@/utils/cache'
 
-### Configuration
-
-Set API key in environment:
-
-```env
-VITE_API_KEY=your-api-key-here
-```
-
-Or use runtime configuration:
-
-```typescript
-// src/services/api.ts
-function getApiKey(): string | null {
-  // Try runtime config first
-  if (window.APP_CONFIG?.API_KEY) {
-    return window.APP_CONFIG.API_KEY
-  }
-  // Fall back to environment variable
-  return import.meta.env.VITE_API_KEY || null
-}
-```
-
-### Refreshing Tokens (if applicable)
-
-```typescript
-apiClient.interceptors.response.use(
-  response => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      // Token expired - refresh it
-      try {
-        const newToken = await refreshToken()
-        // Retry original request with new token
-        error.config.headers.Authorization = `Bearer ${newToken}`
-        return apiClient.request(error.config)
-      } catch (refreshError) {
-        // Redirect to login
-        window.location.href = '/login'
-        return Promise.reject(refreshError)
-      }
-    }
-    return Promise.reject(error)
+// Cached request (default TTL: 60s)
+const data = await requestCache.get(
+  'cache-key',
+  async () => {
+    return await fetchDataFromAPI()
   }
 )
+
+// Custom TTL
+const data = await requestCache.get(
+  'cache-key',
+  async () => fetchDataFromAPI(),
+  { ttl: 300000 } // 5 minutes
+)
+
+// Manual invalidation
+requestCache.invalidate('cache-key')
+
+// Clear all cache
+requestCache.clear()
+
+// Check cache stats
+console.log(requestCache.stats())
 ```
 
----
+## Real-time Updates
 
-## TypeScript Types
-
-### Task Types
+Use the polling composable for real-time task updates:
 
 ```typescript
-// src/types/task.ts
+import { useTaskPolling } from '@/composables/useTaskPolling'
 
-export interface Task {
+export default {
+  setup() {
+    const { isPolling, startPolling, stopPolling } = useTaskPolling({
+      interval: 5000  // 5 seconds
+    })
+    
+    // Start polling
+    startPolling()
+    
+    // Stop polling
+    onUnmounted(() => {
+      stopPolling()
+    })
+    
+    return { isPolling }
+  }
+}
+```
+
+## Type Definitions
+
+All API types are defined in `src/types/index.ts`:
+
+```typescript
+// Core types
+interface Task {
   id: number
-  task_type_id: number
-  task_type: string
-  status: TaskStatus
+  type: string
+  status: 'pending' | 'claimed' | 'completed' | 'failed'
   params: Record<string, any>
-  result: Record<string, any> | null
-  error_message: string | null
+  result?: Record<string, any>
+  error_message?: string
   priority: number
-  attempts: number
   progress: number
-  claimed_by: string | null
-  claimed_at: string | null
-  completed_at: string | null
   created_at: string
-  updated_at: string
+  claimed_at?: string
+  completed_at?: string
+  worker_id?: string
 }
 
-export type TaskStatus = 'pending' | 'claimed' | 'completed' | 'failed'
+interface TaskType {
+  id: number
+  name: string
+  version: string
+  param_schema: Record<string, any>
+  active: boolean
+}
 
-export interface CreateTaskRequest {
-  task_type_id: number
+// Request types
+interface CreateTaskRequest {
+  type: string
   params: Record<string, any>
   priority?: number
 }
 
-export interface ClaimTaskRequest {
-  task_type_id: number
+interface ClaimTaskRequest {
   worker_id: string
+  task_type_id: number
 }
 
-export interface CompleteTaskRequest {
-  status: 'completed' | 'failed'
+interface CompleteTaskRequest {
+  worker_id: string
+  success: boolean
   result?: Record<string, any>
-  error_message?: string
+  error?: string
 }
 
-export interface UpdateProgressRequest {
-  progress: number
-}
-```
-
-### API Response Types
-
-```typescript
-// src/types/api.ts
-
-export interface ApiResponse<T> {
-  data: T
+// Response types
+interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
   message?: string
 }
 
-export interface ApiError {
-  error: string
-  details?: Record<string, string>
-  code?: string
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
+interface PaginatedResponse<T> extends ApiResponse<T[]> {
   total: number
   limit: number
   offset: number
 }
 ```
 
----
-
 ## Best Practices
 
-### 1. Use TypeScript Types
-
-Always type your API responses:
-
+### 1. Use Stores in Components
+✅ **Good:**
 ```typescript
-const response = await apiClient.get<{ tasks: Task[] }>('/tasks')
-const tasks: Task[] = response.data.tasks
+const taskStore = useTaskStore()
+await taskStore.fetchTasks()
 ```
 
-### 2. Handle Errors Properly
-
-Don't swallow errors:
-
+❌ **Avoid:**
 ```typescript
-// ❌ Bad
-async function fetchTasks() {
-  try {
-    const response = await taskService.list()
-    return response.data.tasks
-  } catch (error) {
-    // Silent failure
-  }
-}
-
-// ✅ Good
-async function fetchTasks() {
-  try {
-    const response = await taskService.list()
-    return response.data.tasks
-  } catch (error) {
-    console.error('Failed to fetch tasks:', error)
-    throw error // Re-throw for caller to handle
-  }
-}
+import { taskService } from '@/services/taskService'
+await taskService.getTasks()
 ```
 
-### 3. Use Loading States
-
-Show loading indicators:
-
+### 2. Handle Loading States
 ```typescript
-const loading = ref(false)
+const taskStore = useTaskStore()
 
-async function loadTasks() {
-  loading.value = true
-  try {
-    const response = await taskService.list()
-    tasks.value = response.data.tasks
-  } finally {
-    loading.value = false
+watchEffect(() => {
+  if (taskStore.loading) {
+    // Show spinner
   }
+})
+
+await taskStore.fetchTasks()
+```
+
+### 3. Handle Errors Gracefully
+```typescript
+try {
+  await taskStore.createTask(data)
+  // Show success toast
+} catch (error) {
+  // Show error toast
+  console.error(error)
 }
 ```
 
-### 4. Cache Responses
-
-Avoid unnecessary API calls:
-
+### 4. Clean Up Polling
 ```typescript
-const cache = new Map<string, { data: any, timestamp: number }>()
-const CACHE_TTL = 60000 // 1 minute
-
-async function getCached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
-  const cached = cache.get(key)
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data as T
-  }
-  
-  const data = await fetcher()
-  cache.set(key, { data, timestamp: Date.now() })
-  return data
-}
+onUnmounted(() => {
+  stopPolling()
+})
 ```
 
-### 5. Use Optimistic Updates
+### 5. Use TypeScript Types
+```typescript
+import type { Task, TaskType } from '@/types'
 
-Update UI immediately, rollback on error:
+const task: Task = await taskStore.fetchTask(id)
+```
+
+## Examples
+
+### Complete Task Workflow
 
 ```typescript
-async function completeTask(taskId: number, result: object) {
-  // Optimistic update
-  const task = tasks.value.find(t => t.id === taskId)
-  if (task) {
-    const originalStatus = task.status
-    task.status = 'completed'
+import { useTaskStore } from '@/stores/tasks'
+import { useWorkerStore } from '@/stores/worker'
+import { useToast } from '@/composables/useToast'
+
+export default {
+  setup() {
+    const taskStore = useTaskStore()
+    const workerStore = useWorkerStore()
+    const { showSuccess, showError } = useToast()
     
-    try {
-      await taskService.complete(taskId, result)
-    } catch (error) {
-      // Rollback on error
-      task.status = originalStatus
-      throw error
+    // Initialize worker
+    workerStore.initializeWorker()
+    
+    async function processTask() {
+      try {
+        // Claim a task
+        const task = await taskStore.claimTask(
+          workerStore.workerId!,
+          1 // task type id
+        )
+        
+        if (!task) {
+          showError('No tasks available')
+          return
+        }
+        
+        showSuccess('Task claimed')
+        
+        // Simulate processing with progress updates
+        for (let i = 0; i <= 100; i += 20) {
+          await taskStore.updateProgress(
+            task.id,
+            workerStore.workerId!,
+            i,
+            `Processing: ${i}%`
+          )
+          await sleep(1000)
+        }
+        
+        // Complete task
+        await taskStore.completeTask(
+          task.id,
+          workerStore.workerId!,
+          true,
+          { processed: true }
+        )
+        
+        showSuccess('Task completed')
+        
+      } catch (error) {
+        showError('Task processing failed')
+        console.error(error)
+      }
+    }
+    
+    return { processTask }
+  }
+}
+```
+
+### Task List with Polling
+
+```typescript
+import { useTaskStore } from '@/stores/tasks'
+import { useTaskPolling } from '@/composables/useTaskPolling'
+
+export default {
+  setup() {
+    const taskStore = useTaskStore()
+    
+    // Initial load
+    onMounted(async () => {
+      await taskStore.fetchTasks({ status: 'pending' })
+    })
+    
+    // Auto-refresh every 5 seconds
+    const { startPolling, stopPolling } = useTaskPolling({
+      interval: 5000
+    })
+    
+    startPolling()
+    
+    onUnmounted(() => {
+      stopPolling()
+    })
+    
+    return {
+      tasks: computed(() => taskStore.pendingTasks),
+      loading: computed(() => taskStore.loading)
     }
   }
 }
 ```
 
-### 6. Debounce Requests
+## Troubleshooting
 
-For search or frequent updates:
-
-```typescript
-import { debounce } from 'lodash-es'
-
-const searchTasks = debounce(async (query: string) => {
-  const response = await taskService.search(query)
-  searchResults.value = response.data.tasks
-}, 300)
+### CORS Errors
+Ensure Backend/TaskManager has CORS configured:
+```python
+# Backend config
+CORS_ORIGINS = ["http://localhost:5173", "https://your-domain.com"]
 ```
 
-### 7. Cancel Requests
-
-Cancel pending requests when component unmounts:
-
-```typescript
-import { onUnmounted } from 'vue'
-
-const abortController = new AbortController()
-
-async function fetchTasks() {
-  const response = await apiClient.get('/tasks', {
-    signal: abortController.signal
-  })
-  return response.data.tasks
-}
-
-onUnmounted(() => {
-  abortController.abort()
-})
+### Authentication Errors
+Set the API key in `.env`:
+```bash
+VITE_API_KEY=your-api-key
 ```
+
+### Network Timeouts
+Increase timeout in `api.ts`:
+```typescript
+timeout: 60000  // 60 seconds
+```
+
+### Cache Issues
+Clear cache manually:
+```typescript
+import { requestCache } from '@/utils/cache'
+requestCache.clear()
+```
+
+## API Endpoints Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tasks` | List tasks |
+| GET | `/api/tasks/:id` | Get task details |
+| POST | `/api/tasks` | Create task |
+| POST | `/api/tasks/claim` | Claim pending task |
+| POST | `/api/tasks/:id/complete` | Complete task |
+| POST | `/api/tasks/:id/progress` | Update progress |
+| GET | `/api/task-types` | List task types |
+| GET | `/api/task-types/:name` | Get task type |
+| POST | `/api/task-types/register` | Register task type |
+| GET | `/api/health` | Health check |
+
+## Support
+
+- **Documentation**: `/Frontend/TaskManager/README.md`
+- **Issues**: GitHub Issues
+- **Examples**: `/Frontend/TaskManager/src/views/`
 
 ---
 
-**Document Owner**: Worker06 (Documentation Specialist)  
+**Version**: 1.0.0  
 **Last Updated**: 2025-11-09  
-**Version**: 1.0  
-**Status**: ✅ Complete
+**Maintained by**: Worker06 (API Integration Documentation)

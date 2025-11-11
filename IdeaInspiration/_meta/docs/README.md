@@ -19,6 +19,7 @@ Documentation is organized into the following categories:
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, module organization patterns, and design decisions
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+- **[README_STANDARDS.md](./README_STANDARDS.md)** - Standards for writing README files in the PrismQ ecosystem
 - **[PYTHON_PACKAGING_STANDARD.md](./PYTHON_PACKAGING_STANDARD.md)** - Python packaging and configuration standards
 - **[PYTHON_VERSION_DECISION.md](./PYTHON_VERSION_DECISION.md)** - Python 3.10 version requirement and rationale
 - **[PYTHON_LAUNCHER_GUIDE.md](./PYTHON_LAUNCHER_GUIDE.md)** - How to use `py` launcher for version management
@@ -75,39 +76,6 @@ SQLite-based persistent task queue for distributed work processing:
   - Use case examples (video processing, user actions, scheduling)
   - Migration strategy and rollback plan
 
-### 📁 Archive ([archive/](./archive/))
-
-Historical documentation that has been superseded or completed:
-
-#### Migrations ([archive/migrations/](./archive/migrations/))
-- **[SINGLE_DB_MIGRATION_COMPLETE.md](./archive/migrations/SINGLE_DB_MIGRATION_COMPLETE.md)** - Single database migration completion summary
-- **[SINGLE_DB_IMPLEMENTATION_SUMMARY.md](./archive/migrations/SINGLE_DB_IMPLEMENTATION_SUMMARY.md)** - Single database implementation details
-- **[SINGLE_DB_MIGRATION_GUIDE.md](./archive/migrations/SINGLE_DB_MIGRATION_GUIDE.md)** - Migration guide from dual-save to single database
-- **[SINGLE_DB_MIGRATION_STATUS.md](./archive/migrations/SINGLE_DB_MIGRATION_STATUS.md)** - Migration status tracker
-
-#### Decisions (Archived) ([archive/decisions/](./archive/decisions/))
-- **[VENV_STRATEGY_DECISION.md](./archive/decisions/VENV_STRATEGY_DECISION.md)** - Virtual environment strategy decision (full analysis)
-- **[VENV_STRATEGY_EXECUTIVE_SUMMARY.md](./archive/decisions/VENV_STRATEGY_EXECUTIVE_SUMMARY.md)** - VENV strategy executive summary
-- **[VENV_STRATEGY_VISUAL_DECISION.md](./archive/decisions/VENV_STRATEGY_VISUAL_DECISION.md)** - Visual decision guide
-- **[VIRTUAL_ENV_PER_PROJECT.md](./archive/decisions/VIRTUAL_ENV_PER_PROJECT.md)** - Per-project virtual environment guide
-- **[WHICH_STRATEGY_ANSWER.md](./archive/decisions/WHICH_STRATEGY_ANSWER.md)** - Direct answer to strategy question
-
-#### Deprecated Architecture ([archive/](./archive/))
-- **[DATABASE_INTEGRATION.md](./archive/DATABASE_INTEGRATION.md)** - Old dual-save architecture (deprecated)
-- **[DATABASE_INTEGRATION_SUMMARY.md](./archive/DATABASE_INTEGRATION_SUMMARY.md)** - Old dual-save pattern (deprecated)
-
-#### Validation Reports ([archive/validation/](./archive/validation/))
-- **[COVERAGE_SUMMARY.md](./archive/validation/COVERAGE_SUMMARY.md)** - Test coverage analysis summary (88.7% overall)
-- **[TEST_COVERAGE_REPORT.md](./archive/validation/TEST_COVERAGE_REPORT.md)** - Detailed coverage report
-- **[COVERAGE_IMPROVEMENT_PLAN.md](./archive/validation/COVERAGE_IMPROVEMENT_PLAN.md)** - Coverage improvement action plan
-- **[COVERAGE_ANALYSIS_COMPLETE.md](./archive/validation/COVERAGE_ANALYSIS_COMPLETE.md)** - Complete coverage analysis
-- **[TESTING_QUICK_REFERENCE.md](./archive/validation/TESTING_QUICK_REFERENCE.md)** - Legacy testing reference (superseded by development/TESTING.md)
-- Repository purpose validation reports (completed November 2025)
-
-#### Other ([archive/completed_issues/](./archive/completed_issues/))
-- **[LEGACY_CLEANUP_SUMMARY.md](./archive/completed_issues/LEGACY_CLEANUP_SUMMARY.md)** - Summary of legacy content cleanup (November 2025)
-- **[107-live-logs-ui-implementation.md](./archive/completed_issues/107-live-logs-ui-implementation.md)** - Live logs UI implementation notes
-
 ## Documentation Guidelines
 
 ### Where to Add New Documentation
@@ -115,17 +83,17 @@ Historical documentation that has been superseded or completed:
 - **Core architecture/design**: Repository root (`_meta/docs/`)
 - **Development guides**: `_meta/docs/development/`
 - **Architecture decisions**: `_meta/docs/decisions/`
-- **Research documents**: Repository root (`_meta/docs/`)
-- **Completed projects/migrations**: `_meta/docs/archive/`
-- **Validation reports**: `_meta/docs/archive/validation/`
+- **Research documents**: `_meta/research/`
+- **Documentation standards**: `_meta/docs/` or `_meta/docs/templates/`
 
 ### Documentation Best Practices
 
 1. **Use clear, descriptive titles** - Make it easy to find what you're looking for
 2. **Include dates and status** - Track when documents were created/updated
 3. **Link related documents** - Help readers find additional context
-4. **Archive superseded docs** - Move old versions to `archive/` with clear notes
+4. **Follow SOLID documentation principles** - Single responsibility, well-scoped topics
 5. **Keep consolidation in mind** - Combine related documents when possible
+6. **Avoid duplication** - Each piece of information should exist in exactly ONE place
 
 ## Module-Specific Documentation
 

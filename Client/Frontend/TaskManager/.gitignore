@@ -27,13 +27,18 @@ dist-ssr
 # Environment
 .env
 .env.local
+.env.staging
 .env.production
 
 # Testing
 coverage
 test-results
 playwright-report
+_meta/tests/e2e-results
 .nyc_output
+
+# Lighthouse CI reports
+.lighthouseci
 
 # Build
 .vite

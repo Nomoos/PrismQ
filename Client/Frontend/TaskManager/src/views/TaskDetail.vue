@@ -1,118 +1,154 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-20">
-    <header class="bg-white shadow-sm sticky top-0 z-10">
+  <div class="min-h-screen bg-gray-50 dark:bg-dark-canvas-default pb-20">
+    <header 
+      role="banner"
+      class="bg-white dark:bg-dark-surface-default shadow-sm sticky top-0 z-10 dark:border-b dark:border-dark-border-default"
+    >
       <div class="max-w-7xl mx-auto px-4 py-4 flex items-center">
-        <button @click="$router.back()" class="mr-4 text-gray-600 hover:text-gray-900">
+        <button 
+          @click="$router.back()" 
+          class="mr-4 text-gray-600 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text-primary"
+          aria-label="Go back to task list"
+        >
           ← Back
         </button>
-        <h1 class="text-xl font-bold text-gray-900">Task Detail</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text-primary">Task Detail</h1>
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-4">
+    <main 
+      id="main-content"
+      role="main"
+      aria-label="Task details"
+      class="max-w-7xl mx-auto px-4 py-6 space-y-4"
+      tabindex="-1"
+    >
       <!-- Loading State -->
-      <div v-if="loading" class="card text-center py-8">
-        <LoadingSpinner size="lg" />
-        <p class="mt-2 text-gray-600">Loading task...</p>
+      <div v-if="loading" class="card">
+        <LoadingState message="Loading task..." />
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p class="text-red-800">{{ error }}</p>
-        <button @click="loadTask" class="btn-primary mt-2">
-          Retry
-        </button>
-      </div>
+      <ErrorDisplay 
+        v-else-if="error" 
+        :message="error"
+        @retry="loadTask"
+      />
 
       <!-- Task Details -->
       <div v-else-if="task" class="space-y-4">
         <!-- Status Card -->
-        <div class="card">
+        <section class="card" aria-labelledby="task-status-heading">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold text-gray-900">{{ task.type }}</h2>
+            <h2 id="task-status-heading" class="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">{{ task.type }}</h2>
             <StatusBadge :status="task.status" />
           </div>
           
           <!-- Progress Bar for claimed tasks -->
           <div v-if="task.status === 'claimed' && task.progress > 0" class="mb-4">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-sm font-medium text-gray-700">Progress</span>
-              <span class="text-sm font-medium text-gray-900">{{ task.progress }}%</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-dark-text-secondary">Progress</span>
+              <span class="text-sm font-medium text-gray-900 dark:text-dark-text-primary">{{ task.progress }}%</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-3">
+            <div 
+              class="w-full bg-gray-200 dark:bg-dark-neutral-bg rounded-full h-3"
+              role="progressbar"
+              :aria-valuenow="task.progress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              :aria-label="`Task progress: ${task.progress}%`"
+            >
               <div
-                class="bg-primary-500 h-3 rounded-full transition-all duration-300"
+                class="bg-primary-500 dark:bg-dark-primary-bg h-3 rounded-full transition-all duration-300"
                 :style="{ width: `${task.progress}%` }"
               ></div>
             </div>
           </div>
 
           <!-- Key Information -->
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span class="text-gray-500">Task ID:</span>
-              <p class="font-medium text-gray-900">#{{ task.id }}</p>
+          <div class="grid grid-cols-2 gap-4 text-sm" role="list" aria-label="Task information">
+            <div role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Task ID:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">#{{ task.id }}</p>
             </div>
-            <div>
-              <span class="text-gray-500">Priority:</span>
-              <p class="font-medium text-gray-900">{{ task.priority }}</p>
+            <div role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Priority:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ task.priority }}</p>
             </div>
-            <div>
-              <span class="text-gray-500">Attempts:</span>
-              <p class="font-medium text-gray-900">{{ task.attempts }}/{{ task.max_attempts }}</p>
+            <div role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Attempts:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ task.attempts }}/{{ task.max_attempts }}</p>
             </div>
-            <div>
-              <span class="text-gray-500">Created:</span>
-              <p class="font-medium text-gray-900">{{ formatDate(task.created_at) }}</p>
+            <div role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Created:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ formatDate(task.created_at) }}</p>
             </div>
           </div>
-        </div>
+        </section>
 
         <!-- Worker Information -->
-        <div v-if="task.claimed_by" class="card">
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Worker Information</h3>
-          <div class="space-y-2 text-sm">
-            <div>
-              <span class="text-gray-500">Claimed by:</span>
-              <p class="font-medium text-gray-900">{{ task.claimed_by }}</p>
+        <section v-if="task.claimed_by" class="card" aria-labelledby="worker-info-heading">
+          <h3 id="worker-info-heading" class="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-3">Worker Information</h3>
+          <div class="space-y-2 text-sm" role="list" aria-label="Worker details">
+            <div role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Claimed by:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ task.claimed_by }}</p>
             </div>
-            <div v-if="task.claimed_at">
-              <span class="text-gray-500">Claimed at:</span>
-              <p class="font-medium text-gray-900">{{ formatDate(task.claimed_at) }}</p>
+            <div v-if="task.claimed_at" role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Claimed at:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ formatDate(task.claimed_at) }}</p>
             </div>
-            <div v-if="task.completed_at">
-              <span class="text-gray-500">Completed at:</span>
-              <p class="font-medium text-gray-900">{{ formatDate(task.completed_at) }}</p>
+            <div v-if="task.completed_at" role="listitem">
+              <span class="text-gray-500 dark:text-dark-text-secondary">Completed at:</span>
+              <p class="font-medium text-gray-900 dark:text-dark-text-primary">{{ formatDate(task.completed_at) }}</p>
             </div>
           </div>
-        </div>
+        </section>
 
         <!-- Parameters -->
-        <div class="card">
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Parameters</h3>
-          <pre class="bg-gray-100 rounded p-3 text-xs overflow-x-auto">{{ JSON.stringify(task.params, null, 2) }}</pre>
-        </div>
+        <section class="card" aria-labelledby="parameters-heading">
+          <h3 id="parameters-heading" class="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-3">Parameters</h3>
+          <pre 
+            class="bg-gray-100 dark:bg-dark-canvas-inset rounded p-3 text-xs overflow-x-auto text-gray-900 dark:text-dark-text-primary"
+            role="region"
+            aria-label="Task parameters"
+            tabindex="0"
+          >{{ JSON.stringify(task.params, null, 2) }}</pre>
+        </section>
 
         <!-- Result (if completed) -->
-        <div v-if="task.result" class="card">
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Result</h3>
-          <pre class="bg-gray-100 rounded p-3 text-xs overflow-x-auto">{{ JSON.stringify(task.result, null, 2) }}</pre>
-        </div>
+        <section v-if="task.result" class="card" aria-labelledby="result-heading">
+          <h3 id="result-heading" class="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-3">Result</h3>
+          <pre 
+            class="bg-gray-100 dark:bg-dark-canvas-inset rounded p-3 text-xs overflow-x-auto text-gray-900 dark:text-dark-text-primary"
+            role="region"
+            aria-label="Task result"
+            tabindex="0"
+          >{{ JSON.stringify(task.result, null, 2) }}</pre>
+        </section>
 
         <!-- Error Message (if failed) -->
-        <div v-if="task.error_message" class="card bg-red-50 border border-red-200">
-          <h3 class="text-lg font-semibold text-red-900 mb-3">Error Message</h3>
-          <p class="text-red-800 text-sm">{{ task.error_message }}</p>
-        </div>
+        <section 
+          v-if="task.error_message" 
+          class="card bg-red-50 dark:bg-dark-error-subtle border border-red-200 dark:border-dark-error-border"
+          aria-labelledby="error-heading"
+          role="alert"
+        >
+          <h3 id="error-heading" class="text-lg font-semibold text-red-900 dark:text-dark-error-text mb-3">Error Message</h3>
+          <p class="text-red-800 dark:text-dark-error-text text-sm">{{ task.error_message }}</p>
+        </section>
 
         <!-- Action Buttons -->
-        <div class="card">
+        <section class="card" aria-labelledby="actions-heading">
+          <h3 id="actions-heading" class="sr-only">Task Actions</h3>
           <div class="space-y-3">
             <!-- Claim Button (for pending tasks) -->
             <button
               v-if="task.status === 'pending'"
               @click="handleClaim"
               :disabled="actionLoading"
+              :aria-busy="actionLoading"
+              aria-label="Claim this task"
               class="w-full btn-primary flex items-center justify-center min-h-[44px]"
             >
               <LoadingSpinner v-if="actionLoading" size="sm" color="white" class="mr-2" />
@@ -124,7 +160,9 @@
               <button
                 @click="handleComplete(true)"
                 :disabled="actionLoading"
-                class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 flex items-center justify-center min-h-[44px]"
+                :aria-busy="actionLoading && completingSuccess"
+                aria-label="Mark task as complete"
+                class="w-full bg-green-600 dark:bg-dark-success-bg text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 dark:hover:bg-dark-success-muted disabled:bg-gray-300 dark:disabled:bg-dark-neutral-bg flex items-center justify-center min-h-[44px]"
               >
                 <LoadingSpinner v-if="actionLoading && completingSuccess" size="sm" color="white" class="mr-2" />
                 {{ actionLoading && completingSuccess ? 'Completing...' : 'Mark as Complete' }}
@@ -133,18 +171,24 @@
               <button
                 @click="showFailConfirmation = true"
                 :disabled="actionLoading"
-                class="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-300 flex items-center justify-center min-h-[44px]"
+                aria-label="Mark task as failed"
+                class="w-full bg-red-600 dark:bg-dark-error-bg text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 dark:hover:bg-dark-error-muted disabled:bg-gray-300 dark:disabled:bg-dark-neutral-bg flex items-center justify-center min-h-[44px]"
               >
                 Mark as Failed
               </button>
             </div>
 
             <!-- Info message for claimed tasks by other workers -->
-            <div v-if="task.status === 'claimed' && task.claimed_by !== workerStore.workerId" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p class="text-blue-800 text-sm">This task is claimed by another worker: {{ task.claimed_by }}</p>
+            <div 
+              v-if="task.status === 'claimed' && task.claimed_by !== workerStore.workerId" 
+              class="bg-blue-50 dark:bg-dark-info-subtle border border-blue-200 dark:border-dark-info-border rounded-lg p-3"
+              role="status"
+              aria-live="polite"
+            >
+              <p class="text-blue-800 dark:text-dark-info-text text-sm">This task is claimed by another worker: {{ task.claimed_by }}</p>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
 
@@ -162,25 +206,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useTaskStore } from '../stores/tasks'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useWorkerStore } from '../stores/worker'
-import { useToast } from '../composables/useToast'
+import { useTaskDetail } from '../composables/useTaskDetail'
+import { useTaskActions } from '../composables/useTaskActions'
 import ConfirmDialog from '../components/base/ConfirmDialog.vue'
-import LoadingSpinner from '../components/base/LoadingSpinner.vue'
+import LoadingState from '../components/base/LoadingState.vue'
+import ErrorDisplay from '../components/base/ErrorDisplay.vue'
 import StatusBadge from '../components/base/StatusBadge.vue'
-import type { Task } from '../types'
+import { formatDate as formatDateUtil } from '../utils/dateFormatting'
 
 const route = useRoute()
-const router = useRouter()
-const taskStore = useTaskStore()
 const workerStore = useWorkerStore()
-const toast = useToast()
 
-const task = ref<Task | null>(null)
-const actionLoading = ref(false)
-const completingSuccess = ref(false)
 const showFailConfirmation = ref(false)
 
 // Initialize worker if not already initialized
@@ -188,89 +227,25 @@ if (!workerStore.isInitialized) {
   workerStore.initializeWorker()
 }
 
-const loading = computed(() => taskStore.loading)
-const error = computed(() => taskStore.error)
-
-async function loadTask() {
-  const taskId = Number(route.params.id)
-  if (isNaN(taskId)) {
-    taskStore.error = 'Invalid task ID'
-    return
-  }
-
-  try {
-    const fetchedTask = await taskStore.fetchTask(taskId)
-    if (fetchedTask) {
-      task.value = fetchedTask
-    }
-  } catch (e) {
-    console.error('Failed to load task:', e)
-  }
-}
+// Use composables for task detail and actions
+const taskId = Number(route.params.id)
+const { task, loading, error, loadTask } = useTaskDetail(taskId)
+const { actionLoading, completingSuccess, claim, completeSuccess, completeFailed } = useTaskActions(task)
 
 async function handleClaim() {
-  if (!task.value || !workerStore.workerId) return
-  
-  actionLoading.value = true
-  try {
-    const claimedTask = await taskStore.claimTask(workerStore.workerId, task.value.type_id)
-    if (claimedTask) {
-      task.value = claimedTask
-      toast.success('Task claimed successfully!')
-    }
-  } catch (e) {
-    console.error('Failed to claim task:', e)
-    toast.error('Failed to claim task. Please try again.')
-  } finally {
-    actionLoading.value = false
-  }
+  await claim()
 }
 
 async function handleComplete(success: boolean) {
-  if (!task.value || !workerStore.workerId) return
-  
-  actionLoading.value = true
-  completingSuccess.value = success
-  
-  try {
-    const result = success ? { completed: true, timestamp: new Date().toISOString() } : undefined
-    const errorMessage = success ? undefined : 'Task marked as failed by user'
-    
-    const completedTask = await taskStore.completeTask(
-      task.value.id,
-      workerStore.workerId,
-      success,
-      result,
-      errorMessage
-    )
-    
-    if (completedTask) {
-      task.value = completedTask
-      toast.success(success ? 'Task completed successfully!' : 'Task marked as failed')
-      // Navigate back to task list after a short delay
-      setTimeout(() => {
-        router.push('/')
-      }, 1500)
-    }
-  } catch (e) {
-    console.error('Failed to complete task:', e)
-    toast.error('Failed to complete task. Please try again.')
-  } finally {
-    actionLoading.value = false
+  if (success) {
+    await completeSuccess()
+  } else {
+    await completeFailed()
   }
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000)
-  
-  if (diffInMinutes < 1) return 'Just now'
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`
-  
-  // Format as full date for older items
-  return date.toLocaleString()
+  return formatDateUtil(dateString)
 }
 
 onMounted(() => {

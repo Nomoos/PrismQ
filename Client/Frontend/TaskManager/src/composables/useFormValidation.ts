@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { sanitizeWorkerId, isContentSafe } from '../utils/sanitize'
 
 export interface ValidationRule {
   message: string
@@ -170,5 +171,34 @@ export const validationRules = {
   custom: (validator: (value: any) => boolean, message: string): ValidationRule => ({
     message,
     validator
+  }),
+
+  // Worker ID validation
+  workerId: (message = 'Invalid worker ID format'): ValidationRule => ({
+    message,
+    validator: (value) => {
+      if (typeof value !== 'string') return false
+      const sanitized = sanitizeWorkerId(value.trim())
+      
+      // Must be at least 3 characters after sanitization
+      if (sanitized.length < 3) return false
+      
+      // Must not exceed 50 characters
+      if (sanitized.length > 50) return false
+      
+      // Must start with alphanumeric
+      if (!/^[a-zA-Z0-9]/.test(sanitized)) return false
+      
+      return true
+    }
+  }),
+
+  // XSS safety check
+  safeContent: (message = 'Content contains potentially unsafe characters'): ValidationRule => ({
+    message,
+    validator: (value) => {
+      if (typeof value !== 'string') return true
+      return isContentSafe(value)
+    }
   })
 }

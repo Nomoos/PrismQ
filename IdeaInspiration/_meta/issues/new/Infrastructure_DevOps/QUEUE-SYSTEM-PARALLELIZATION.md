@@ -1,4 +1,4 @@
-# SQLite Queue System - Parallelization Matrix
+# SQLite Queue System - Worker Allocation Matrix
 
 > **📍 NOTICE**: This document has been moved to `Client/_meta/issues/queue-system/QUEUE-SYSTEM-PARALLELIZATION.md`  
 > **Reason**: Queue system is specific to PrismQ.Client component  

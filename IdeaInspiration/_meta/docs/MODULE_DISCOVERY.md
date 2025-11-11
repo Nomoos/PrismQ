@@ -59,7 +59,6 @@ client_modules = discovery.discover_for_client()
 
 Returns top-level modules needed for environment setup:
 - Classification
-- Client/Backend
 - ConfigLoad
 - Model
 - Scoring
@@ -95,7 +94,7 @@ Each discovered module provides:
 ```python
 @dataclass
 class ModuleInfo:
-    name: str                    # e.g., "Classification", "Client/Backend"
+    name: str                    # e.g., "Classification", "Scoring"
     path: Path                   # Absolute path to module directory
     has_requirements: bool       # Has requirements.txt
     has_setup_py: bool          # Has setup.py

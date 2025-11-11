@@ -1,22 +1,24 @@
 # PrismQ.Client - Frontend
 
-**Navigation file for Frontend projects**
+**Navigation file for Frontend modules**
 
 ---
 
-## 📱 TaskManager - Mobile-First Task Management UI
+## 📱 TaskManager Module - Frontend
+
+**Frontend module of the TaskManager task queue system**
 
 ### Project Documentation
-- [Main README](../README.md)
-- [Release Management](../RELEASE.md)
-- [Deployment Checklist](../DEPLOYMENT_CHECKLIST.md)
-The main Frontend application for managing tasks from the Backend/TaskManager system.
+- [Main README](../README.md) - PrismQ.Client overview
+- [Backend/TaskManager](../Backend/TaskManager/README.md) - Backend module of TaskManager
 
-**👉 [Go to TaskManager Documentation](./TaskManager/README.md)**
+The mobile-first Frontend application for managing tasks from the Backend/TaskManager system.
+
+**👉 [Go to Frontend/TaskManager Documentation](./TaskManager/README.md)**
 
 ### Quick Links
 
-- **[TaskManager README](./TaskManager/README.md)** - Complete project overview
+- **[TaskManager README](./TaskManager/README.md)** - Complete frontend module overview
 - **[User Guide](./TaskManager/_meta/docs/USER_GUIDE.md)** - How to use the application
 - **[Developer Guide](./TaskManager/_meta/docs/DEVELOPER_GUIDE.md)** - Development setup and practices
 - **[Deployment Guide](./TaskManager/_meta/docs/DEPLOYMENT_GUIDE.md)** - How to deploy to production
@@ -24,9 +26,9 @@ The main Frontend application for managing tasks from the Backend/TaskManager sy
 
 ---
 
-## Project Status
+## Module Status
 
-**TaskManager**: ✅ MVP COMPLETE - Ready for Deployment  
+**Frontend/TaskManager**: ✅ MVP COMPLETE - Ready for Deployment  
 **Progress**: 95% (Core features complete, deployment pending)
 
 See [TaskManager README](./TaskManager/README.md) for full details.

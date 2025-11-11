@@ -650,7 +650,7 @@ async def get_run_status(run_id: str) -> Run:
 - [#340 Migration Utilities](340-create-migration-utilities-and-rollback-procedures.md)
 
 ### References
-- [Parallelization Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
+- [Worker Allocation Matrix](../Infrastructure_DevOps/QUEUE-SYSTEM-PARALLELIZATION.md)
 - [Background Tasks Best Practices](../../../Client/Backend/_meta/docs/BACKGROUND_TASKS_BEST_PRACTICES.md)
 
 ---

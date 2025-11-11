@@ -34,12 +34,15 @@ INSERT IGNORE INTO api_endpoints (path, method, description, action_type, action
 
 -- List All Task Types
 INSERT IGNORE INTO api_endpoints (path, method, description, action_type, action_config_json, is_active) VALUES
-('/task-types', 'GET', 'List all task types', 'query',
+('/task-types', 'GET', 'List all task types with usage statistics', 'query',
 '{
-    "table": "task_types",
-    "select": ["id", "name", "version", "is_active", "created_at", "updated_at"],
-    "where_optional": {"is_active": "{{query.active_only}}"},
-    "order": "name ASC"
+    "table": "task_types tt",
+    "joins": [
+        {"type": "LEFT", "table": "(SELECT type_id, COUNT(*) as usage_count, MAX(created_at) as last_used_at FROM tasks GROUP BY type_id) t", "on": "tt.id = t.type_id"}
+    ],
+    "select": ["tt.id", "tt.name", "tt.version", "tt.is_active", "tt.created_at", "tt.updated_at", "COALESCE(t.usage_count, 0) as usage_count", "t.last_used_at"],
+    "where_optional": {"tt.is_active": "{{query.active_only}}"},
+    "order": "{{query.sort_by:usage_count}} {{query.sort_order:DESC}}"
 }', TRUE);
 
 -- Create Task

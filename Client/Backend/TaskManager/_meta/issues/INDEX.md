@@ -3,7 +3,7 @@
 ## Overview
 This directory contains all issues for the TaskManager project - a **lightweight PHP task queue** with a **data-driven architecture** designed for shared hosting environments. The system operates entirely on-demand (no background processes) with endpoints, validation rules, and actions configured in the database rather than hardcoded in PHP.
 
-**📋 See also**: [PROJECT_PLAN.md](../PROJECT_PLAN.md) - Comprehensive project plan with timeline, dependencies, and roadmap
+**📋 See also**: [PROJECT_PLAN.md](../docs/planning/PROJECT_PLAN.md) - Comprehensive project plan with timeline, dependencies, and roadmap
 
 ## Architecture Context
 
