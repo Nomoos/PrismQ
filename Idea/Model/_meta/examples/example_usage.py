@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from src.idea import Idea, IdeaStatus, TargetPlatform, ContentGenre
+from src.idea import Idea, IdeaStatus, ContentGenre
 
 
 def example_basic_idea():
@@ -28,14 +28,14 @@ def example_basic_idea():
             "interests": "true_crime,technology",
             "regions": "US,UK,CA"
         },
-        target_platform=TargetPlatform.YOUTUBE,
+        target_platform="youtube",
         genre=ContentGenre.TRUE_CRIME,
         style="narrative investigation",
     )
     
     print(f"\nCreated: {idea}")
     print(f"Title: {idea.title}")
-    print(f"Platform: {idea.target_platform.value}")
+    print(f"Platform: {idea.target_platform}")
     print(f"Genre: {idea.genre.value}")
     print(f"Status: {idea.status.value}")
     print(f"Version: {idea.version}")
@@ -80,7 +80,7 @@ def example_from_inspirations():
         purpose="Combine true crime storytelling with tech education",
         emotional_quality="suspenseful, investigative, educational",
         target_audience="Tech-savvy true crime fans",
-        target_platform=TargetPlatform.YOUTUBE,
+        target_platform="youtube",
         genre=ContentGenre.TRUE_CRIME,
         style="investigative documentary",
         created_by="AI-ContentAgent-001"
@@ -106,7 +106,7 @@ def example_versioning():
     idea_v1 = Idea(
         title="Mystery Podcast Series",
         concept="Weekly podcast exploring unsolved mysteries",
-        target_platform=TargetPlatform.PODCAST,
+        target_platform="podcast",
         genre=ContentGenre.MYSTERY,
         status=IdeaStatus.DRAFT
     )
@@ -149,7 +149,7 @@ def example_serialization():
     original = Idea(
         title="Tech Documentary",
         concept="Exploring the future of AI",
-        target_platform=TargetPlatform.YOUTUBE,
+        target_platform="youtube",
         genre=ContentGenre.DOCUMENTARY,
         potential_scores={
             "platform:youtube": 88,

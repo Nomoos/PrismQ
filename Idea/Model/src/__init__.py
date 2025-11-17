@@ -7,7 +7,6 @@ content concepts in the PrismQ content creation workflow.
 from .idea import (
     Idea,
     IdeaStatus,
-    TargetPlatform,
     ContentGenre,
 )
 from .idea_db import (
@@ -18,7 +17,6 @@ from .idea_db import (
 __all__ = [
     "Idea",
     "IdeaStatus",
-    "TargetPlatform",
     "ContentGenre",
     "IdeaDatabase",
     "setup_database",

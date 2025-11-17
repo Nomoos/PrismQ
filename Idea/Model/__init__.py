@@ -9,13 +9,13 @@ for creative content generation in the workflow:
     IdeaInspiration → Idea → Script → Proofreading → Publishing
 
 Example:
-    >>> from idea import Idea, TargetPlatform, ContentGenre
+    >>> from idea import Idea, ContentGenre
     >>> 
     >>> idea = Idea(
     ...     title="The Digital Phantom Mystery",
     ...     concept="An investigation into unsolved internet mysteries",
     ...     purpose="Engage true crime audience with unique digital angle",
-    ...     target_platform=TargetPlatform.YOUTUBE,
+    ...     target_platform="youtube",
     ...     genre=ContentGenre.TRUE_CRIME
     ... )
 """
@@ -23,14 +23,12 @@ Example:
 from src.idea import (
     Idea,
     IdeaStatus,
-    TargetPlatform,
     ContentGenre,
 )
 
 __all__ = [
     "Idea",
     "IdeaStatus",
-    "TargetPlatform",
     "ContentGenre",
 ]
 

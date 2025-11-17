@@ -21,7 +21,7 @@ cd Idea/Model
 pip install -e .
 
 # Basic usage
-python -c "from idea import Idea, TargetPlatform, ContentGenre; print('OK')"
+python -c "from idea import Idea, ContentGenre; print('OK')"
 ```
 
 ## 📋 Basic Usage
@@ -29,7 +29,7 @@ python -c "from idea import Idea, TargetPlatform, ContentGenre; print('OK')"
 ### Creating a Basic Idea
 
 ```python
-from idea import Idea, TargetPlatform, ContentGenre, IdeaStatus
+from idea import Idea, ContentGenre, IdeaStatus
 
 # Create a new idea
 idea = Idea(
@@ -43,7 +43,7 @@ idea = Idea(
         "interests": "true_crime,technology",
         "regions": "US,UK,CA"
     },
-    target_platform=TargetPlatform.YOUTUBE,
+    target_platform="youtube",
     genre=ContentGenre.TRUE_CRIME,
     style="narrative investigation",
 )
@@ -55,7 +55,7 @@ print(idea)
 ### Creating from IdeaInspiration Sources
 
 ```python
-from idea import Idea, TargetPlatform, ContentGenre
+from idea import Idea, ContentGenre
 
 # Assume we have IdeaInspiration instances
 inspirations = [inspiration1, inspiration2, inspiration3]
@@ -68,7 +68,7 @@ idea = Idea.from_inspirations(
     purpose="Investigate fascinating cases of lost digital history",
     emotional_quality="nostalgic, mysterious, investigative",
     target_audience="Tech-savvy millennials and Gen Z",
-    target_platform=TargetPlatform.YOUTUBE,
+    target_platform="youtube",
     genre=ContentGenre.DOCUMENTARY,
     created_by="AI-Agent-001"
 )
@@ -141,13 +141,14 @@ idea.potential_scores = {
 
 ## 🎯 Target Platforms
 
-Supported platforms:
-- `TargetPlatform.YOUTUBE` - Long-form video content
-- `TargetPlatform.TIKTOK` - Short-form video content
-- `TargetPlatform.PODCAST` - Audio content
-- `TargetPlatform.BLOG` - Written content
-- `TargetPlatform.SOCIAL_MEDIA` - Social posts
-- `TargetPlatform.MULTIPLE` - Multi-platform content
+The `target_platform` field is a string that can contain any platform name, such as:
+- `"youtube"` - Long-form video content
+- `"tiktok"` - Short-form video content
+- `"podcast"` - Audio content
+- `"blog"` - Written content
+- `"social_media"` - Social posts
+- `"multiple"` - Multi-platform content
+- Or any custom platform name you need
 
 ## 📚 Content Genres
 

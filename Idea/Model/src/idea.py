@@ -28,17 +28,6 @@ class IdeaStatus(Enum):
     ARCHIVED = "archived"
 
 
-class TargetPlatform(Enum):
-    """Target platform for content delivery."""
-    
-    YOUTUBE = "youtube"
-    TIKTOK = "tiktok"
-    PODCAST = "podcast"
-    BLOG = "blog"
-    SOCIAL_MEDIA = "social_media"
-    MULTIPLE = "multiple"
-
-
 class ContentGenre(Enum):
     """Genre classification for content."""
     
@@ -69,7 +58,7 @@ class Idea:
         emotional_quality: The emotional tone and impact (e.g., "suspenseful", "inspiring")
         target_audience: Description of the intended audience
         target_demographics: Specific demographic data (age ranges, regions, languages)
-        target_platform: Primary platform for content delivery
+        target_platform: Primary platform for content delivery (string, e.g., "youtube", "tiktok")
         genre: Primary content genre
         style: Content style or approach (e.g., "narrative", "analytical")
         potential_scores: Potential performance across contexts (platform, region, demographic)
@@ -90,7 +79,7 @@ class Idea:
         ...     emotional_quality="mysterious, suspenseful, intriguing",
         ...     target_audience="True crime enthusiasts aged 18-35",
         ...     target_demographics={"age_range": "18-35", "interests": "true_crime,technology"},
-        ...     target_platform=TargetPlatform.YOUTUBE,
+        ...     target_platform="youtube",
         ...     genre=ContentGenre.TRUE_CRIME,
         ...     inspiration_ids=["insp-123", "insp-456"]
         ... )
@@ -102,7 +91,7 @@ class Idea:
     emotional_quality: str = ""
     target_audience: str = ""
     target_demographics: Dict[str, str] = field(default_factory=dict)
-    target_platform: TargetPlatform = TargetPlatform.MULTIPLE
+    target_platform: str = ""
     genre: ContentGenre = ContentGenre.OTHER
     style: str = ""
     potential_scores: Dict[str, int] = field(default_factory=dict)
@@ -129,7 +118,6 @@ class Idea:
             Dictionary containing all fields with Enums converted to strings
         """
         data = asdict(self)
-        data["target_platform"] = self.target_platform.value
         data["genre"] = self.genre.value
         data["status"] = self.status.value
         return data
@@ -145,13 +133,6 @@ class Idea:
             Idea instance
         """
         # Handle enum conversions
-        target_platform = data.get("target_platform", "multiple")
-        if isinstance(target_platform, str):
-            try:
-                target_platform = TargetPlatform(target_platform)
-            except ValueError:
-                target_platform = TargetPlatform.MULTIPLE
-        
         genre = data.get("genre", "other")
         if isinstance(genre, str):
             try:
@@ -173,7 +154,7 @@ class Idea:
             emotional_quality=data.get("emotional_quality", ""),
             target_audience=data.get("target_audience", ""),
             target_demographics=data.get("target_demographics", {}),
-            target_platform=target_platform,
+            target_platform=data.get("target_platform", ""),
             genre=genre,
             style=data.get("style", ""),
             potential_scores=data.get("potential_scores", {}),
@@ -197,7 +178,7 @@ class Idea:
         emotional_quality: str = "",
         target_audience: str = "",
         target_demographics: Optional[Dict[str, str]] = None,
-        target_platform: TargetPlatform = TargetPlatform.MULTIPLE,
+        target_platform: str = "",
         genre: ContentGenre = ContentGenre.OTHER,
         style: str = "",
         created_by: Optional[str] = None,
@@ -216,7 +197,7 @@ class Idea:
             emotional_quality: Emotional tone and impact
             target_audience: Description of target audience
             target_demographics: Demographic targeting data
-            target_platform: Primary target platform
+            target_platform: Primary target platform (e.g., "youtube", "tiktok", "podcast")
             genre: Content genre
             style: Content style or approach
             created_by: Creator identifier

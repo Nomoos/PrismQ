@@ -73,7 +73,7 @@ This creates an SQLite database file `idea.db` with the following schema:
 
 ```python
 from src.idea_db import IdeaDatabase
-from src.idea import Idea, TargetPlatform, ContentGenre
+from src.idea import Idea, ContentGenre
 
 # Initialize database
 db = IdeaDatabase("idea.db")
@@ -83,7 +83,7 @@ db.connect()
 idea = Idea(
     title="Mystery Documentary",
     concept="Exploring unsolved mysteries",
-    target_platform=TargetPlatform.YOUTUBE,
+    target_platform="youtube",
     genre=ContentGenre.DOCUMENTARY,
     inspiration_ids=["insp-001", "insp-002"]
 )
@@ -164,7 +164,7 @@ If you have Idea objects in memory and want to persist them:
 idea = Idea(
     title="Test Idea",
     concept="Test concept",
-    target_platform=TargetPlatform.YOUTUBE
+    target_platform="youtube"
 )
 
 # Convert to dict

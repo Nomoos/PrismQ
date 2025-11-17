@@ -2,7 +2,7 @@
 
 import pytest
 from datetime import datetime
-from src.idea import Idea, IdeaStatus, TargetPlatform, ContentGenre
+from src.idea import Idea, IdeaStatus, ContentGenre
 
 
 class TestIdeaBasic:
@@ -21,7 +21,7 @@ class TestIdeaBasic:
         assert idea.emotional_quality == ""
         assert idea.target_audience == ""
         assert idea.target_demographics == {}
-        assert idea.target_platform == TargetPlatform.MULTIPLE
+        assert idea.target_platform == ""
         assert idea.genre == ContentGenre.OTHER
         assert idea.style == ""
         assert idea.potential_scores == {}
@@ -54,7 +54,7 @@ class TestIdeaBasic:
             emotional_quality="exciting, innovative",
             target_audience="Tech enthusiasts",
             target_demographics=target_demographics,
-            target_platform=TargetPlatform.YOUTUBE,
+            target_platform="youtube",
             genre=ContentGenre.TECHNOLOGY,
             style="educational",
             potential_scores=potential_scores,
@@ -72,7 +72,7 @@ class TestIdeaBasic:
         assert idea.emotional_quality == "exciting, innovative"
         assert idea.target_audience == "Tech enthusiasts"
         assert idea.target_demographics == target_demographics
-        assert idea.target_platform == TargetPlatform.YOUTUBE
+        assert idea.target_platform == "youtube"
         assert idea.genre == ContentGenre.TECHNOLOGY
         assert idea.style == "educational"
         assert idea.potential_scores == potential_scores
@@ -109,7 +109,7 @@ class TestIdeaSerialization:
         idea = Idea(
             title="Test Idea",
             concept="Test concept",
-            target_platform=TargetPlatform.YOUTUBE,
+            target_platform="youtube",
             genre=ContentGenre.DOCUMENTARY,
             status=IdeaStatus.DRAFT,
             inspiration_ids=["insp-1", "insp-2"]
@@ -120,7 +120,7 @@ class TestIdeaSerialization:
         assert isinstance(data, dict)
         assert data["title"] == "Test Idea"
         assert data["concept"] == "Test concept"
-        assert data["target_platform"] == "youtube"  # Converted to string
+        assert data["target_platform"] == "youtube"
         assert data["genre"] == "documentary"  # Converted to string
         assert data["status"] == "draft"  # Converted to string
         assert data["inspiration_ids"] == ["insp-1", "insp-2"]
@@ -144,7 +144,7 @@ class TestIdeaSerialization:
         assert idea.title == "Dict Idea"
         assert idea.concept == "From dictionary"
         assert idea.purpose == "Testing"
-        assert idea.target_platform == TargetPlatform.TIKTOK
+        assert idea.target_platform == "tiktok"
         assert idea.genre == ContentGenre.ENTERTAINMENT
         assert idea.status == IdeaStatus.VALIDATED
         assert idea.inspiration_ids == ["id-1"]
@@ -163,7 +163,7 @@ class TestIdeaSerialization:
         idea = Idea.from_dict(data)
         
         # Should fall back to defaults
-        assert idea.target_platform == TargetPlatform.MULTIPLE
+        assert idea.target_platform == "invalid_platform"  # Strings are kept as-is
         assert idea.genre == ContentGenre.OTHER
         assert idea.status == IdeaStatus.DRAFT
     
@@ -176,7 +176,7 @@ class TestIdeaSerialization:
             emotional_quality="analytical",
             target_audience="Developers",
             target_demographics={"age": "25-40"},
-            target_platform=TargetPlatform.PODCAST,
+            target_platform="podcast",
             genre=ContentGenre.TECHNOLOGY,
             style="conversational",
             potential_scores={"us": 85},
@@ -233,14 +233,14 @@ class TestIdeaFromInspirations:
             title="Fused Idea",
             concept="Combined from multiple sources",
             purpose="Test fusion",
-            target_platform=TargetPlatform.YOUTUBE,
+            target_platform="youtube",
             genre=ContentGenre.DOCUMENTARY
         )
         
         assert idea.title == "Fused Idea"
         assert idea.concept == "Combined from multiple sources"
         assert idea.purpose == "Test fusion"
-        assert idea.target_platform == TargetPlatform.YOUTUBE
+        assert idea.target_platform == "youtube"
         assert idea.genre == ContentGenre.DOCUMENTARY
         assert len(idea.inspiration_ids) == 3
         assert "insp-1" in idea.inspiration_ids
@@ -352,15 +352,6 @@ class TestIdeaEnums:
         assert IdeaStatus.APPROVED.value == "approved"
         assert IdeaStatus.IN_PRODUCTION.value == "in_production"
         assert IdeaStatus.ARCHIVED.value == "archived"
-    
-    def test_target_platform_values(self):
-        """Test TargetPlatform enum values."""
-        assert TargetPlatform.YOUTUBE.value == "youtube"
-        assert TargetPlatform.TIKTOK.value == "tiktok"
-        assert TargetPlatform.PODCAST.value == "podcast"
-        assert TargetPlatform.BLOG.value == "blog"
-        assert TargetPlatform.SOCIAL_MEDIA.value == "social_media"
-        assert TargetPlatform.MULTIPLE.value == "multiple"
     
     def test_content_genre_values(self):
         """Test ContentGenre enum values."""
