@@ -17,16 +17,29 @@ Documentation is organized into the following categories:
 
 ### 📋 Core Documentation (Repository Root)
 
+**Essential Starting Points**:
+- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** ⭐ - Quick navigation guide for the project
+- **[ISSUE_MANAGEMENT.md](./ISSUE_MANAGEMENT.md)** - Issue workflow and tracking guide
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture, module organization patterns, and design decisions
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+
+**Standards & Guidelines**:
+- **[SOLID_PRINCIPLES.md](./SOLID_PRINCIPLES.md)** ⭐ - SOLID design principles guide with Python examples
 - **[README_STANDARDS.md](./README_STANDARDS.md)** - Standards for writing README files in the PrismQ ecosystem
 - **[PYTHON_PACKAGING_STANDARD.md](./PYTHON_PACKAGING_STANDARD.md)** - Python packaging and configuration standards
 - **[PYTHON_VERSION_DECISION.md](./PYTHON_VERSION_DECISION.md)** - Python 3.10 version requirement and rationale
 - **[PYTHON_LAUNCHER_GUIDE.md](./PYTHON_LAUNCHER_GUIDE.md)** - How to use `py` launcher for version management
-- **[SETUP.md](./SETUP.md)** - Development environment setup guide
 - **[LOGGING_BEST_PRACTICES.md](./LOGGING_BEST_PRACTICES.md)** - Logging standards and best practices
+
+**Setup & Development**:
+- **[SETUP.md](./SETUP.md)** - Development environment setup guide
 - **[BATCH_PROCESSING.md](./BATCH_PROCESSING.md)** - Batch processing patterns and guidelines
 - **[MODULE_DISCOVERY.md](./MODULE_DISCOVERY.md)** - Module discovery and dynamic loading
+
+**Planning & History**:
+- **[FUTURE_ENHANCEMENTS.md](./FUTURE_ENHANCEMENTS.md)** - Planned features and architectural improvements
+- **[IMPLEMENTATION_HISTORY.md](./IMPLEMENTATION_HISTORY.md)** - Historical record of major implementations
+- **[archive/](./archive/)** - Archived phase documentation (Phase 0, Phase 1 complete)
 
 ### 🛠️ Development Guides ([development/](./development/))
 
@@ -35,6 +48,15 @@ Documentation is organized into the following categories:
 - **[TESTING.md](./development/TESTING.md)** - Testing and coverage guide (consolidated)
 - **[DIRENV_SETUP.md](./development/DIRENV_SETUP.md)** - direnv configuration for automatic environment activation
 - **[MIGRATION.md](./development/MIGRATION.md)** - Guide for migrating modules to use ConfigLoad
+
+### 🎯 SOLID Principles ([solid/](./solid/))
+
+Central location for SOLID design principle resources:
+
+- **[SOLID_PRINCIPLES.md](./SOLID_PRINCIPLES.md)** - Comprehensive SOLID principles guide
+- **[solid/code_reviews/](./solid/code_reviews/)** - SOLID compliance code reviews
+  - Core Modules (Classification, ConfigLoad, Model, Scoring)
+  - Video and Text Modules
 
 ### 🎯 Architecture Decisions ([decisions/](./decisions/))
 

@@ -174,8 +174,8 @@ Add any other context about the problem here
 2. **Acknowledged**: Issue confirmed and prioritized
 3. **Planned**: Issue added to roadmap
 4. **In Progress**: Issue being worked on (move to _meta/issues/wip/)
-5. **Done**: Issue resolved (move to _meta/issues/done/)
+5. **Done**: Issue resolved (document in IMPLEMENTATION_HISTORY.md if significant)
 
 ---
 
-**Last Updated**: 2025-11-04
+**Last Updated**: 2025-11-12

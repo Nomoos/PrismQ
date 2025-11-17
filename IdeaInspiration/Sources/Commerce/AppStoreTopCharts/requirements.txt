@@ -1,7 +1,0 @@
-requests>=2.31.0
-python-dotenv>=1.0.0
-google-play-scraper>=1.2.0
-app-store-scraper>=0.3.5
-click>=8.1.7
-pytest>=7.4.0
-pytest-cov>=4.1.0

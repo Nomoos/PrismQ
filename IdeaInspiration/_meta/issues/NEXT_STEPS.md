@@ -1,11 +1,21 @@
 # PrismQ.IdeaInspiration - Next Steps Summary
 
+> ⚠️ **NOTICE**: This document is **superseded** by the unified [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> 
+> **For current status and planning, see**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> 
+> This document is preserved for historical reference only.
+
+---
+
 **Date**: 2025-11-04  
-**Updated**: 2025-11-06 (Client module moved to separate repository)
-**Status**: Phase 0 Complete - Transitioning to Phase 1  
-**Purpose**: Comprehensive guide for what to implement next with parallelization strategy
+**Updated**: 2025-11-13 (Superseded by DEVELOPMENT_PLAN.md)
+**Status**: ⚠️ ARCHIVED - See DEVELOPMENT_PLAN.md for current plan  
+**Purpose**: Historical reference - Original Phase 0 planning
 
 > **Note**: This document contains historical references to the Client/Backend module which has been moved to a separate repository.
+
+> **Superseded (2025-11-13)**: All planning consolidated into [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md). See that document for current status, phases, and next steps.
 
 ---
 
@@ -15,6 +25,16 @@ This document provides a clear roadmap of what needs to be implemented next in t
 
 **Key Achievements:**
 - **✅ Phase 0 Complete**: Web Client Control Panel fully functional (all 12 issues #101-#112)
+- **✅ Source Modules Phase 1 Complete (2025-11-12)**: TaskManager Python Client integration complete
+  - TaskManager client implemented (383 lines)
+  - Worker pattern established (535 line example)
+  - Code review approved (9.9/10 score)
+  - Production-ready release
+- **✅ Repository Organization (2025-11-13)**: All completed work archived
+  - 17 items archived (7 completed + 10 obsolete)
+  - 100% code verification (0 conflicts found)
+  - Comprehensive documentation created (31.6KB)
+  - See `_meta/issues/done/` and `ARCHIVE_TASK_COMPLETION_REPORT.md`
 - **✅ All Sources Complete**: 38 source implementations across all categories
   - Content: 11 sources ✅
   - Commerce: 3 sources ✅
@@ -24,11 +44,16 @@ This document provides a clear roadmap of what needs to be implemented next in t
   - Internal: 2 sources ✅
   - Signals: 12 sources ✅
 
-**Next Focus - Phase 1:**
+**Next Focus - Phase 1 (Main Repository):**
 - **Database Integration**: Production-ready persistence layer
 - **Unified Pipeline**: Seamless data flow between modules
 - **API Endpoints**: RESTful interface for data management
 - **Performance Optimization**: GPU-accelerated batch processing
+
+**Next Focus - Phase 2 (Source Modules):**
+- **Video Module**: ✅ Infrastructure complete (Issue #001, 2025-11-13) - CLI and mapping next
+- **Text Module**: Reddit and HackerNews workers
+- **Audio Module**: Planning and coordination
 
 ---
 
@@ -176,7 +201,7 @@ Phase 0 (Web Client Control Panel) is now complete! The next priority is **Phase
 
 **Developer Assignment**: Backend Developer #1 or Database Specialist
 
-**Related Issues**: See `_meta/issues/backlog/002-database-integration.md`
+**Related Issues**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 2 - Database Patterns)
 
 ---
 
@@ -205,7 +230,7 @@ Phase 0 (Web Client Control Panel) is now complete! The next priority is **Phase
 
 **Developer Assignment**: Senior Backend Developer or Full Stack Developer
 
-**Related Issues**: See `_meta/issues/backlog/001-unified-pipeline-integration.md`
+**Related Issues**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 1 - Unified Pipeline)
 
 ---
 
@@ -235,7 +260,7 @@ Phase 0 (Web Client Control Panel) is now complete! The next priority is **Phase
 
 **Developer Assignment**: Backend Developer #2 or API Specialist
 
-**Related Issues**: See `_meta/issues/backlog/005-api-endpoints.md`
+**Related Issues**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 5 - API Endpoints)
 
 ---
 
@@ -400,7 +425,7 @@ These issues provide additional structure and capabilities for the database laye
 - Concrete repositories for each entity
 - Unit of Work pattern integration
 
-**Related**: See `_meta/issues/backlog/500-repository-pattern-implementation.md`
+**Related**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 2.1 - Repository Pattern)
 
 ---
 
@@ -412,7 +437,7 @@ These issues provide additional structure and capabilities for the database laye
 - Change tracking
 - Rollback capabilities
 
-**Related**: See `_meta/issues/backlog/501-unit-of-work-pattern.md`
+**Related**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 2.2 - Unit of Work Pattern)
 
 ---
 
@@ -424,7 +449,7 @@ These issues provide additional structure and capabilities for the database laye
 - Relationship mappings
 - Query optimization
 
-**Related**: See `_meta/issues/backlog/502-sqlalchemy-orm-layer.md`
+**Related**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 2.3 - SQLAlchemy ORM)
 
 ---
 
@@ -439,7 +464,7 @@ Purpose: Create module for building/assembling content
 - Template system
 - Output formatting
 
-**Related**: See `_meta/issues/backlog/503-builder-module-implementation.md`
+**Related**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 3 - Builder Module)
 
 ---
 
@@ -452,7 +477,7 @@ Purpose: Enhance IdeaInspiration model
 - Scoring metadata
 - Version tracking
 
-**Related**: See `_meta/issues/backlog/504-extend-model-classification-scoring.md`
+**Related**: See `_meta/docs/FUTURE_ENHANCEMENTS.md` (Section 11 - Model Extensions)
 
 ---
 
@@ -650,7 +675,7 @@ Phase 4: Advanced Features (AFTER PHASE 3)
    - #005 (RESTful API Endpoints) - Start after #002 begins
 
 2. **Review the issue details**
-   - Check the backlog: `_meta/issues/backlog/` for full specifications
+   - Check `_meta/docs/FUTURE_ENHANCEMENTS.md` for feature specifications
    - Understand dependencies and success criteria
    - Review the current codebase to understand integration points
 
@@ -659,9 +684,10 @@ Phase 4: Advanced Features (AFTER PHASE 3)
    git checkout -b feature/issue-002-database-integration
    ```
 
-4. **Move issue from `backlog/` to `wip/`**
+4. **Move issue to `wip/` when starting work**
    ```bash
-   mv _meta/issues/backlog/002-database-integration.md _meta/issues/wip/
+   # Create issue file in wip/ directory
+   touch _meta/issues/wip/002-database-integration.md
    ```
 
 5. **Implement following SOLID principles**
@@ -684,10 +710,9 @@ Phase 4: Advanced Features (AFTER PHASE 3)
    - Include screenshots/demos if applicable
    - Ensure CI passes (tests, linting)
 
-9. **Move to `done/` when complete**
-   ```bash
-   mv _meta/issues/wip/002-database-integration.md _meta/issues/done/
-   ```
+9. **Document completion when done**
+   - Add significant implementations to `_meta/docs/IMPLEMENTATION_HISTORY.md`
+   - Update relevant documentation as needed
 
 ---
 
@@ -723,10 +748,12 @@ Phase 4: Advanced Features (AFTER PHASE 3)
 - **System Architecture**: `_meta/docs/ARCHITECTURE.md`
 
 ### Issue Tracking
-- **Backlog**: `_meta/issues/backlog/` (Phase 1-4 issues ready to start)
+- **New Issues**: `_meta/issues/new/` (Phase-organized issues to be prioritized)
 - **In Progress**: `_meta/issues/wip/` (Currently active work)
-- **Completed**: `_meta/issues/done/` (All Phase 0 issues + infrastructure work)
-- **New Issues**: `_meta/issues/new/` (Phase-organized, pending prioritization)
+- **Completed Work**: `_meta/issues/done/` (Archived completed work - see ARCHIVE_SUMMARY_2025-11-13.md)
+- **Obsolete Issues**: `Source/_meta/issues/obsolete/` (Superseded planning documents)
+- **Future Planning**: `_meta/docs/FUTURE_ENHANCEMENTS.md` (Consolidated future features)
+- **Archive Report**: `ARCHIVE_TASK_COMPLETION_REPORT.md` (Latest archive summary - 2025-11-13)
 
 ### Code References
 - **Web Client** (Complete): `Client/Backend/` and `Client/Frontend/`
@@ -736,22 +763,24 @@ Phase 4: Advanced Features (AFTER PHASE 3)
 - **Model Module**: `Model/`
 - **ConfigLoad Module**: `ConfigLoad/`
 
-### Phase 1 Backlog Issues (Ready to Start)
-- `_meta/issues/backlog/001-unified-pipeline-integration.md`
-- `_meta/issues/backlog/002-database-integration.md`
-- `_meta/issues/backlog/005-api-endpoints.md`
-- `_meta/issues/backlog/500-repository-pattern-implementation.md`
-- `_meta/issues/backlog/501-unit-of-work-pattern.md`
-- `_meta/issues/backlog/502-sqlalchemy-orm-layer.md`
+### Planned Features (See FUTURE_ENHANCEMENTS.md)
 
-### Phase 2+ Backlog Issues (Future)
-- `_meta/issues/backlog/003-batch-processing-optimization.md`
-- `_meta/issues/backlog/004-analytics-dashboard.md`
-- `_meta/issues/backlog/006-monitoring-observability.md`
-- `_meta/issues/backlog/007-data-export-reporting.md`
-- `_meta/issues/backlog/008-advanced-source-integrations.md`
-- `_meta/issues/backlog/009-ml-enhanced-classification.md`
-- `_meta/issues/backlog/010-ab-testing-framework.md`
+**Phase 1 Priority Features:**
+- Unified Pipeline Integration
+- Database Patterns (Repository, Unit of Work, SQLAlchemy ORM)
+- API Endpoints
+- Builder Module for Transformations
+
+**Phase 2+ Features:**
+- Batch Processing Optimization
+- Analytics Dashboard
+- Monitoring and Observability
+- Data Export and Reporting
+- Advanced Source Integrations
+- ML-Enhanced Classification
+- A/B Testing Framework
+
+For detailed specifications, see `_meta/docs/FUTURE_ENHANCEMENTS.md`
 
 ---
 
@@ -802,6 +831,7 @@ Phase 4: Advanced Features (AFTER PHASE 3)
 
 ---
 
-**Last Updated**: 2025-11-04  
+**Last Updated**: 2025-11-13 (Archive work complete)
 **Next Review**: Weekly during Phase 1 implementation  
-**Status**: ✅ Phase 0 Complete - Phase 1 Ready to Start
+**Status**: ✅ Phase 0 Complete - Phase 1 in Progress (Main Repo & Source Modules)  
+**Latest Archive**: 2025-11-13 - All completed work organized (see `_meta/issues/done/`)

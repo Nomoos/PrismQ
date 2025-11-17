@@ -1,5 +1,0 @@
-python-dotenv>=1.0.0
-click>=8.1.7
-holidays>=0.35
-pytest>=7.4.0
-pytest-cov>=4.1.0

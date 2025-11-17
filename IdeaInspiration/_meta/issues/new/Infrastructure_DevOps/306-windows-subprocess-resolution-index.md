@@ -26,7 +26,7 @@
 
 ### For Users Experiencing This Issue NOW
 
-**Immediate Fix**: See [WINDOWS_SUBPROCESS_QUICK_FIX.md](../WINDOWS_SUBPROCESS_QUICK_FIX.md)
+**Immediate Fix**: See [WINDOWS_SUBPROCESS_QUICK_FIX.md](../../archive/planning/WINDOWS_SUBPROCESS_QUICK_FIX.md) (Archived)
 
 **TL;DR**: Restart server with:
 ```powershell
@@ -234,7 +234,7 @@ except RuntimeError as e:
 
 ### In This Repository
 
-- [WINDOWS_SUBPROCESS_QUICK_FIX.md](../WINDOWS_SUBPROCESS_QUICK_FIX.md) - Immediate user guide
+- [WINDOWS_SUBPROCESS_QUICK_FIX.md](../../archive/planning/WINDOWS_SUBPROCESS_QUICK_FIX.md) - Immediate user guide (Archived)
 - [Issue #304](Worker05/304-windows-subprocess-deployment-fix.md) - Deployment solution
 - [Issue #305](Worker06/305-verify-youtube-windows-subprocess-issue.md) - Testing task
 - [Issue #303](Worker04/303-comprehensive-windows-subprocess-testing.md) - Future testing
@@ -262,7 +262,7 @@ The Windows subprocess error is now resolved. After pulling the latest code, the
 2. Restart server: `python -m src.uvicorn_runner`
 3. All modules should now work!
 
-**See**: [Quick Fix Guide](../WINDOWS_SUBPROCESS_QUICK_FIX.md)
+**See**: [Quick Fix Guide](../../archive/planning/WINDOWS_SUBPROCESS_QUICK_FIX.md) (Archived)
 
 ### For Developers
 

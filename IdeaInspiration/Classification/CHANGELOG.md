@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-11-13
+
+### Added
+
+#### Worker Architecture for Distributed Processing
+- **Worker Infrastructure**: Complete worker implementation for TaskManager API integration
+  - `ClassificationWorker`: Main worker class for processing classification tasks
+  - `WorkerFactory`: Factory pattern for creating worker instances (Open/Closed Principle)
+  - Worker protocols and data types (`Task`, `TaskResult`, `TaskStatus`)
+  - Support for single and batch classification tasks
+
+#### TaskManager API Integration
+- Task type registration for classification operations
+  - `PrismQ.Classification.ContentEnrich`: Single content classification
+  - `PrismQ.Classification.BatchEnrich`: Batch classification
+- Configurable claiming policies (FIFO, LIFO, PRIORITY)
+- Exponential backoff for empty queues
+- Graceful shutdown and statistics tracking
+
+#### Scripts and Tools
+- `scripts/run_worker.py`: Worker launcher with comprehensive CLI options
+- `scripts/register_task_types.py`: Task type registration utility
+- Support for custom worker IDs, polling intervals, and backoff strategies
+
+#### Documentation
+- Comprehensive Worker README with architecture diagrams
+- Example worker usage (`_meta/examples/example_worker.py`)
+- Updated main README with worker information
+
+#### Tests
+- Worker functionality tests (all passing)
+- Factory pattern tests
+- Integration tests with IdeaInspiration database
+
+### Changed
+- Fixed Model import paths to use correct directory structure
+- Updated dependencies to include `click` and `python-dotenv`
+- Added worker optional dependencies to `pyproject.toml`
+
+### Fixed
+- Database integration to use `get_by_id` and insert-only model
+- Path resolution for worker imports
+- Import handling for optional TaskManager dependency
+
 ## [2.1.0] - 2025-10-13
 
 ### Added

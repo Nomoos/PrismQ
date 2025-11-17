@@ -1,7 +1,19 @@
 # Worker Allocation Matrix - At-a-Glance
 
-**Last Updated**: 2025-10-31  
-**Purpose**: Quick visual reference for parallel work assignments
+> ⚠️ **NOTICE**: This document is **superseded** by [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> 
+> **For current team structure and allocation, see**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "Team Structure" section
+> 
+> This document is preserved for historical reference only.
+
+---
+
+**Last Updated**: 2025-11-13 (Superseded by DEVELOPMENT_PLAN.md)  
+**Purpose**: Historical reference - Original Phase 0 worker allocation
+
+**Status**: ⚠️ ARCHIVED - See DEVELOPMENT_PLAN.md for current team structure
+
+**Note**: The allocation matrix below reflects the original Phase 0 plan (now complete). For current Phase 1 work, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md).
 
 ---
 

@@ -1,237 +1,163 @@
-# Documentation Index - What To Do Next
+# Issue Tracking Index
 
 **Created**: 2025-10-31  
-**Updated**: 2025-11-06 (Client module moved to separate repository)
-**Purpose**: Master index for all next-steps documentation
+**Updated**: 2025-11-17 (Documentation cleanup and SOLID restructure)
+**Purpose**: Master index for issue tracking and workflow
 
-> **Note**: This repository originally included a Client/Backend module for web-based control panel functionality. 
-> As of November 2025, the Client module has been moved to a separate repository for better modularity. 
-> References to "Client" in this documentation are preserved for historical context.
-> See [CLIENT_MIGRATION.md](../_meta/docs/CLIENT_MIGRATION.md) for details.
+> **Important**: For current development status and overall plan, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
 
----
-
-## 🎯 Start Here Based on Your Need
-
-### "I just want to know what to do RIGHT NOW"
-👉 **[QUICK_START.md](QUICK_START.md)** (1-page summary)
-- Immediate action items by role (Backend/Frontend/Sources)
-- Which issue to start today
-- How to get started
+> **Note**: The Client/Backend module for web-based control panel (Phase 0) has been completed and moved to a separate repository.
+> See [_meta/docs/archive/phase-0/](../_meta/docs/archive/phase-0/) for historical context.
 
 ---
 
-### "I need a complete understanding of what's next"
-👉 **[NEXT_STEPS.md](NEXT_STEPS.md)** (Comprehensive 627-line guide)
-- Full detailed plan for all remaining work
-- Dependencies between issues
-- Parallelization opportunities
-- Team structure recommendations
-- Success criteria for each phase
+## 🎯 Quick Navigation
+
+### "I want to understand the overall project status"
+👉 **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** (Unified development plan)
+- Current phase and progress
+- Team structure and roles
+- Completed and planned work
+- Success criteria and metrics
 
 ---
 
-### "I want to see the timeline visually"
-👉 **[IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md)** (Visual 495-line guide)
-- Week-by-week timeline diagrams
-- Dependency flow charts
-- Resource allocation matrix
-- Critical path analysis
-- Risk mitigation timeline
+### "I want to know what to work on next"
+👉 **[ROADMAP.md](ROADMAP.md)** + **[Issue Folders](#issue-folders)**
+- Check `new/` folders for available issues
+- Review issue assignment by Worker/Developer
+- Start with highest priority issues
 
 ---
 
-### "Show me which tasks can run in parallel"
-👉 **[WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md)** (At-a-glance 234-line matrix)
-- Parallel work streams by week
-- Team size recommendations
-- ROI of parallelization
-- Quick decision matrix
-- Work distribution by skill
+### "I need detailed planning documents"
+👉 **Legacy Planning Documents** (See below)
+- Historical planning documents preserved for reference
+- Current planning is in DEVELOPMENT_PLAN.md
+- Phase-specific archives in `_meta/docs/archive/`
 
 ---
 
-### "I need to track our progress"
-👉 **[PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md)** (Tracking 358-line checklist)
-- Week-by-week checklists
-- Milestone tracking
-- Quality gates
-- Daily/weekly progress log templates
+## 📂 Issue Folders
+
+### Directory Structure
+
+```
+_meta/issues/
+├── new/          # New issues ready to start
+│   ├── Worker01-10/       # Issues by worker role
+│   ├── Infrastructure_DevOps/  # Infrastructure issues
+│   ├── Reddit/            # Reddit-specific issues
+│   └── planning docs      # Active planning documents
+├── ready/        # Fully specified, ready to implement
+├── wip/          # Work in progress
+├── review/       # Code complete, awaiting review
+├── blocked/      # Cannot proceed (dependencies/clarification)
+├── done/         # Completed issues
+├── archive/      # Archived planning and historical docs
+└── templates/    # Issue templates
+```
+
+### Issue Workflow
+
+1. **New**: Issue created in `new/{Worker}/`, ready to start
+2. **WIP**: Moved to `wip/` when work begins
+3. **Done**: Moved to `done/` when complete, tested, documented
+
+### Current Status
+
+See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) for:
+- Current phase status
+- Available issues
+- Team assignments
+- Progress tracking
 
 ---
 
-## 📚 All Documentation Files
+## 🎓 Legacy Planning Documents
 
-### Planning Documents (What to do next)
+The following comprehensive planning documents were created for Phase 0 (Web Client).
+They are preserved for reference but have been superseded by [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md).
 
-| Document | Lines | Size | Purpose | Best For |
-|----------|-------|------|---------|----------|
-| **QUICK_START.md** | 346 | 8.4KB | One-page summary | Quick decisions |
-| **NEXT_STEPS.md** | 627 | 18KB | Comprehensive guide | Deep understanding |
-| **IMPLEMENTATION_TIMELINE.md** | 495 | 32KB | Visual timeline | Project managers |
-| **WORKER_ALLOCATION_MATRIX.md** | 234 | 8.2KB | Parallel work matrix | Team leads |
-| **PROGRESS_CHECKLIST.md** | 358 | 9.4KB | Progress tracking | Daily standups |
+### Phase 0 Planning (Archived)
+- **QUICK_START.md** - One-page action guide
+- **NEXT_STEPS.md** - Comprehensive implementation plan
+- **IMPLEMENTATION_TIMELINE.md** - Visual timeline and diagrams
+- **WORKER_ALLOCATION_MATRIX.md** - Parallel work assignments
+- **PROGRESS_CHECKLIST.md** - Progress tracking
 
-**Total**: 2,060 lines of comprehensive guidance
+**Status**: Phase 0 complete. Documents preserved for historical reference.
+**Archive**: See `_meta/docs/archive/phase-0/` for completion reports.
 
----
-
-### Reference Documents (Background)
-
-| Document | Purpose |
-|----------|---------|
-| **ROADMAP.md** | Overall project roadmap (all phases) |
-| **KNOWN_ISSUES.md** | Known bugs and limitations |
-| **README.md** | Issue tracking workflow |
+### Current Planning
+All current planning is now consolidated in:
+- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Unified plan covering all phases
+- **[ROADMAP.md](ROADMAP.md)** - Long-term vision
+- **[Source Module Planning](../../Source/_meta/issues/new/INDEX.md)** - Source module details
 
 ---
 
-## 🎓 How to Use This Documentation
+## 🎯 Current Status (2025-11-13)
 
-### For Individual Contributors
+### Overall Progress
+- **Phase 0**: ✅ 100% Complete (Web Client Control Panel)
+- **Phase 1**: ✅ 100% Complete (Foundation & Integration)
+- **Phase 2**: 🔄 20% Complete (Source Module Implementations)
+- **Phase 3**: 📅 Planned (Analytics & Performance)
 
-1. **Start**: Read [QUICK_START.md](QUICK_START.md) to pick an issue
-2. **Understand**: Read the full issue details in `new/[issue-number].md`
-3. **Reference**: Check [NEXT_STEPS.md](NEXT_STEPS.md) for detailed requirements
-4. **Track**: Update [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) as you work
+### Active Work (Phase 2)
+- **Batch 1**: ✅ Complete (Infrastructure)
+- **Batch 2**: 🔄 Ready to Start (6 parallel issues)
+  - Video module implementations (3 issues)
+  - Text module implementations (3 issues)
 
-### For Team Leads
+### Next Actions
+1. Start Phase 2 Batch 2 implementations
+2. Assign issues from `new/` folders
+3. Track progress via `wip/` and `done/` folders
 
-1. **Plan**: Review [WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md) to assign work
-2. **Schedule**: Use [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md) for sprints
-3. **Monitor**: Check [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) in standups
-4. **Coordinate**: Refer to [NEXT_STEPS.md](NEXT_STEPS.md) for dependencies
-
-### For Project Managers
-
-1. **Strategy**: Review [NEXT_STEPS.md](NEXT_STEPS.md) for complete picture
-2. **Timeline**: Use [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md) for estimates
-3. **Resources**: Check [WORKER_ALLOCATION_MATRIX.md](WORKER_ALLOCATION_MATRIX.md) for team size
-4. **Status**: Monitor [PROGRESS_CHECKLIST.md](PROGRESS_CHECKLIST.md) weekly
-
----
-
-## 🎯 Current Status at a Glance
-
-### ✅ Completed (33% of Phase 0)
-- Issues #101, #102, #103 (Client foundation)
-- 27 of 38 total sources (71% of all sources)
-
-### 🚧 Ready to Start (9 Client issues)
-- **Week 1-2**: #104, #105, #106 (HIGH priority)
-- **Week 3-4**: #107, #108
-- **Week 5-6**: #109, #110 (start)
-- **Week 7-8**: #110 (complete), #111, #112
-
-### 🔮 Ongoing (12 Signals sources)
-- Can work on these in parallel at any time
-- No dependencies on Client work
-
----
-
-## 📊 Quick Facts
-
-### Timeline
-- **With 1 developer**: 10-12 weeks
-- **With 2-3 developers**: 8-10 weeks
-- **With 4-6 developers**: 7-8 weeks (optimal)
-
-### Parallelization
-- **Week 1-2**: 4 independent work streams
-- **Week 3-4**: 3 independent work streams
-- **Week 5-6**: 3 independent work streams
-- **Week 7-8**: 3 independent work streams
-
-### Deliverables
-- **Client Module**: 9 remaining issues
-- **Signals Sources**: 12 remaining implementations
-- **Documentation**: 5 comprehensive planning documents ✅
-- **Total**: 21 deliverables remaining
+For detailed status, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
 
 ---
 
 ## 🔗 Quick Links
 
-### Issue Files
-- **New Issues**: `_meta/issues/new/` (Issues #104-#112 ready to start)
-- **Backlog**: `_meta/issues/backlog/` (Issues #001-#010 for future)
-- **WIP**: `_meta/issues/wip/` (Currently empty - move issues here when starting)
-- **Done**: `_meta/issues/done/` (Issues #101-#103 and all completed sources)
+### Primary Documentation
+- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Start here for complete overview
+- **[ROADMAP.md](ROADMAP.md)** - Long-term vision and phases
+- **[KNOWN_ISSUES.md](KNOWN_ISSUES.md)** - Current limitations and bugs
 
-### Code Locations
-- **Client Backend**: `/Client/Backend/`
-- **Client Frontend**: `/Client/Frontend/`
-- **Sources (Signals)**: `/Sources/Signals/`
-- **Reference Source**: `/Sources/Signals/Trends/GoogleTrends/`
+### Issue Management
+- **New Issues**: `_meta/issues/new/` (Ready to start)
+- **WIP Issues**: `_meta/issues/wip/` (Currently being worked on)
+- **Done Issues**: `_meta/issues/done/` (Completed work)
 
-### External
-- **Repository**: https://github.com/Nomoos/PrismQ.IdeaInspiration
-- **Issues Tracker**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+### Source Module Issues
+- **[Source Module Index](../../Source/_meta/issues/new/INDEX.md)** - Developer team and planning
+- **Source New**: `Source/_meta/issues/new/` (Module-specific issues)
+- **Source Done**: `Source/_meta/issues/done/` (Completed module work)
 
----
-
-## 📞 Decision Tree
-
-```
-START
-  │
-  ├─ Need quick answer? → QUICK_START.md
-  │
-  ├─ Need complete plan? → NEXT_STEPS.md
-  │
-  ├─ Need visual timeline? → IMPLEMENTATION_TIMELINE.md
-  │
-  ├─ Need to assign work? → WORKER_ALLOCATION_MATRIX.md
-  │
-  └─ Need to track progress? → PROGRESS_CHECKLIST.md
-```
+### Archives
+- **[Archive Index](../_meta/docs/archive/)** - Historical documentation
+- **[Phase 0 Archive](../_meta/docs/archive/phase-0/)** - Web Client completion
+- **[Phase 1 Archive](../_meta/docs/archive/phase-1/)** - Foundation completion
 
 ---
 
-## ✅ Document Completeness
+## 📞 For More Information
 
-All planning documents have been created and are ready to use:
+### By Role
+- **Contributors**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For New Contributors"
+- **Team Leads**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For Team Leads"
+- **Project Managers**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For Project Managers"
 
-- [x] QUICK_START.md - One-page action guide ✅
-- [x] NEXT_STEPS.md - Comprehensive implementation plan ✅
-- [x] IMPLEMENTATION_TIMELINE.md - Visual timeline and diagrams ✅
-- [x] WORKER_ALLOCATION_MATRIX.md - Parallel work assignments ✅
-- [x] PROGRESS_CHECKLIST.md - Progress tracking ✅
-- [x] INDEX.md - This master index ✅
-- [x] README.md - Updated with all links ✅
-
-**Status**: Documentation Complete 🎉
+### By Need
+- **Current Status**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "Progress Tracking"
+- **What to Work On**: Check `_meta/issues/new/` or `Source/_meta/issues/new/`
+- **Historical Context**: See `_meta/docs/archive/`
 
 ---
 
-## 🎓 Key Takeaways
-
-1. **Start with QUICK_START.md** - Don't overthink, just pick an issue and start
-2. **Issues #104-#106 can start NOW** - These are high priority and ready
-3. **Maximum parallelization**: 4-6 developers can work without conflicts
-4. **Timeline**: 7-8 weeks to complete all Client issues
-5. **Signals sources**: Work on these anytime, completely independent
-
----
-
-## 📈 Success Metrics
-
-By the end of Week 8, we should have:
-- ✅ All 9 Client issues complete (#104-#112)
-- ✅ Web client fully functional
-- ✅ >80% test coverage
-- ✅ Complete documentation
-- ✅ 8-12 Signals sources implemented
-- ✅ Ready for production use
-
----
-
-**For immediate action**: Go to [QUICK_START.md](QUICK_START.md)  
-**For complete understanding**: Go to [NEXT_STEPS.md](NEXT_STEPS.md)  
-**For visual planning**: Go to [IMPLEMENTATION_TIMELINE.md](IMPLEMENTATION_TIMELINE.md)
-
----
-
-**Last Updated**: 2025-10-31  
-**Next Review**: Weekly during active development  
-**Status**: ✅ Complete and ready for use
+**Last Updated**: 2025-11-13  
+**Next Review**: After Phase 2 Batch 2 completion  
+**Status**: Active - Phase 2 in progress

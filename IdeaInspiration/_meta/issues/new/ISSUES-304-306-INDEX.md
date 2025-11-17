@@ -219,7 +219,7 @@ Central coordination document that:
 
 ### For Users NOW
 
-📄 **[WINDOWS_SUBPROCESS_QUICK_FIX.md](../WINDOWS_SUBPROCESS_QUICK_FIX.md)**
+📄 **[WINDOWS_SUBPROCESS_QUICK_FIX.md](../archive/planning/WINDOWS_SUBPROCESS_QUICK_FIX.md)** (Archived)
 
 Immediate solutions for users experiencing the issue:
 - Restart server correctly

@@ -1,10 +1,18 @@
 # Quick Reference - What To Do Next
 
-**Last Updated**: 2025-10-31
-**Updated**: 2025-11-06 (Client module moved to separate repository)
+> ⚠️ **NOTICE**: This document is **superseded** by [QUICK_REFERENCE.md](../docs/QUICK_REFERENCE.md) and [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> 
+> **For current quick reference, see**: [QUICK_REFERENCE.md](../docs/QUICK_REFERENCE.md)
+> 
+> This document is preserved for historical reference only.
 
-> **Note**: This document contains references to Client module issues which have been moved to a separate repository.
-> These references are preserved for historical context. See [CLIENT_MIGRATION.md](../docs/CLIENT_MIGRATION.md) for details.
+---
+
+**Last Updated**: 2025-11-13 (Superseded by QUICK_REFERENCE.md)
+**Status**: ⚠️ ARCHIVED - See QUICK_REFERENCE.md for current guide
+
+> **Note**: This document reflects the original Phase 0 plan (now complete). These references are preserved for historical context.
+> For current work items, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) for comprehensive planning.
 
 ---
 
@@ -55,7 +63,7 @@
 - **Estimated**: 3-5 days per source
 - **Location**: `Sources/Signals/` directory
 - **Reference**: `Sources/Signals/Trends/GoogleTrends/` (completed example)
-- **Master Plan**: `_meta/issues/done/027-source-implementation-master-plan.md`
+- **Documentation**: See `_meta/docs/IMPLEMENTATION_HISTORY.md` for completed patterns
 
 **Available Sources to Implement**:
 1. TrendsFileSource (Trends subcategory)
@@ -105,10 +113,12 @@
 
 ```
 _meta/issues/
-├── new/           ← Issues ready to start (#104-#112)
+├── new/           ← Issues ready to start
 ├── wip/           ← Move here when you start working
-├── done/          ← Move here when complete (#101-#103 are here)
-└── backlog/       ← Future work (#001-#010)
+└── templates/     ← Issue templates
+
+See _meta/docs/FUTURE_ENHANCEMENTS.md for planned features
+See _meta/docs/IMPLEMENTATION_HISTORY.md for completed work
 ```
 
 ---

@@ -259,8 +259,18 @@ channel_variant = TaskVariant(
         ),
     ],
     examples=[
+        # Basic usage with @ username format
         {'channel_url': '@SnappyStories_1', 'max_results': 50},
-        {'channel_url': 'https://youtube.com/@MrBeast', 'max_results': 100}
+        # Full URL format with higher max_results
+        {'channel_url': 'https://youtube.com/@MrBeast', 'max_results': 100},
+        # Using default max_results (will be 50)
+        {'channel_url': '@TechReviews'},
+        # Maximum allowed results
+        {'channel_url': 'https://youtube.com/@EducationalContent', 'max_results': 500},
+        # Minimal results for quick testing
+        {'channel_url': '@NewsChannel', 'max_results': 10},
+        # Different URL format variations
+        {'channel_url': 'https://www.youtube.com/@CodingTutorials', 'max_results': 75}
     ]
 )
 
@@ -294,8 +304,22 @@ trending_variant = TaskVariant(
         ),
     ],
     examples=[
+        # Default settings (US, all categories, 50 results)
         {'max_results': 50},
-        {'max_results': 100, 'category': 'Gaming', 'region': 'US'}
+        # Gaming category in US
+        {'max_results': 100, 'category': 'Gaming', 'region': 'US'},
+        # UK trending with Music category
+        {'max_results': 75, 'category': 'Music', 'region': 'GB'},
+        # Japanese trending, all categories
+        {'region': 'JP', 'max_results': 60},
+        # News category, multiple regions can be tried
+        {'category': 'News', 'region': 'CA', 'max_results': 40},
+        # Entertainment in German region
+        {'category': 'Entertainment', 'region': 'DE', 'max_results': 80},
+        # Sports in Australian region, maximum results
+        {'category': 'Sports', 'region': 'AU', 'max_results': 200},
+        # Minimal results for quick overview
+        {'max_results': 10, 'region': 'FR'}
     ]
 )
 
@@ -336,8 +360,24 @@ keyword_variant = TaskVariant(
         ),
     ],
     examples=[
+        # Basic search with default settings
         {'query': 'startup ideas', 'max_results': 50},
-        {'query': 'business tips', 'sort_by': 'date', 'upload_date': 'week'}
+        # Recent business content
+        {'query': 'business tips', 'sort_by': 'date', 'upload_date': 'week'},
+        # Most viewed tech videos from the past month
+        {'query': 'python programming', 'sort_by': 'views', 'upload_date': 'month', 'max_results': 100},
+        # Today's trending searches
+        {'query': 'breaking news', 'sort_by': 'date', 'upload_date': 'today', 'max_results': 30},
+        # Popular educational content from the year
+        {'query': 'machine learning tutorial', 'sort_by': 'views', 'upload_date': 'year', 'max_results': 150},
+        # Relevance-based search for inspiration
+        {'query': 'creative video ideas', 'sort_by': 'relevance', 'max_results': 75},
+        # Comprehensive search with all parameters
+        {'query': 'ai tools 2024', 'sort_by': 'date', 'upload_date': 'month', 'max_results': 200},
+        # Quick search with minimal results
+        {'query': 'daily vlog ideas', 'max_results': 10},
+        # Recent high-view content
+        {'query': 'viral video trends', 'sort_by': 'views', 'upload_date': 'week', 'max_results': 50}
     ]
 )
 
@@ -407,7 +447,9 @@ registry.register(keyword_variant)
 
 ## Notes
 
-### Usage Example
+### Usage Examples
+
+#### Basic Registry Usage
 
 ```python
 from src.core.variant_registry import get_registry
@@ -425,6 +467,205 @@ is_valid, errors = registry.validate('youtube_channel', params)
 
 # Get documentation
 docs = registry.get_documentation('youtube_channel')
+```
+
+#### Advanced Validation Examples
+
+```python
+from src.core.variant_registry import get_registry
+
+registry = get_registry()
+
+# Example 1: Valid channel scrape with all parameters
+channel_params = {
+    'channel_url': 'https://youtube.com/@TechChannel',
+    'max_results': 100
+}
+is_valid, errors = registry.validate('youtube_channel', channel_params)
+# is_valid = True, errors = []
+
+# Example 2: Invalid - missing required parameter
+invalid_params = {'max_results': 50}  # Missing 'channel_url'
+is_valid, errors = registry.validate('youtube_channel', invalid_params)
+# is_valid = False, errors = ['Missing required parameter: channel_url']
+
+# Example 3: Invalid - value out of range
+out_of_range = {'channel_url': '@TestChannel', 'max_results': 1000}
+is_valid, errors = registry.validate('youtube_channel', out_of_range)
+# is_valid = False, errors = ['max_results must be <= 500']
+
+# Example 4: Invalid - wrong enum value
+trending_params = {'category': 'InvalidCategory', 'max_results': 50}
+is_valid, errors = registry.validate('youtube_trending', trending_params)
+# is_valid = False, errors = ["category must be one of ['Gaming', 'Music', 'News', 'Sports', 'Entertainment']"]
+```
+
+#### Applying Defaults
+
+```python
+# Get variant and apply defaults
+variant = registry.get('youtube_channel')
+
+# Parameters without optional fields
+params = {'channel_url': '@MyChannel'}
+prepared = variant.apply_defaults(params)
+# prepared = {'channel_url': '@MyChannel', 'max_results': 50}
+
+# Defaults not applied if value provided
+params_with_override = {'channel_url': '@MyChannel', 'max_results': 100}
+prepared = variant.apply_defaults(params_with_override)
+# prepared = {'channel_url': '@MyChannel', 'max_results': 100}
+```
+
+#### Complete Workflow Examples
+
+```python
+# Example: Create and validate a YouTube keyword search task
+
+# Step 1: Prepare parameters
+search_params = {
+    'query': 'python tutorials',
+    'sort_by': 'views',
+    'upload_date': 'month'
+}
+
+# Step 2: Validate
+is_valid, errors = registry.validate('youtube_keyword', search_params)
+
+if not is_valid:
+    print(f"Validation errors: {errors}")
+    exit(1)
+
+# Step 3: Apply defaults
+variant = registry.get('youtube_keyword')
+final_params = variant.apply_defaults(search_params)
+# final_params includes default max_results=50
+
+# Step 4: Use in task creation
+task_id = create_task('youtube_keyword', final_params)
+print(f"Task created: {task_id}")
+```
+
+#### Error Handling Patterns
+
+```python
+from src.core.variant_registry import get_registry
+
+def create_scraping_task(task_type: str, params: dict) -> dict:
+    """
+    Create a scraping task with validation.
+    
+    Args:
+        task_type: Type of scraping task
+        params: Task parameters
+        
+    Returns:
+        dict with success status and result/errors
+    """
+    registry = get_registry()
+    
+    # Check if task type exists
+    variant = registry.get(task_type)
+    if not variant:
+        return {
+            'success': False,
+            'error': f'Unknown task type: {task_type}',
+            'available_types': registry.list_variants()
+        }
+    
+    # Validate parameters
+    is_valid, errors = variant.validate_parameters(params)
+    if not is_valid:
+        return {
+            'success': False,
+            'errors': errors,
+            'hint': 'Use registry.get_documentation() for parameter details'
+        }
+    
+    # Apply defaults and create task
+    final_params = variant.apply_defaults(params)
+    task_id = _create_task_internal(task_type, final_params)
+    
+    return {
+        'success': True,
+        'task_id': task_id,
+        'parameters': final_params
+    }
+
+# Usage examples
+result1 = create_scraping_task('youtube_channel', {
+    'channel_url': '@TechReviews',
+    'max_results': 75
+})
+# Returns: {'success': True, 'task_id': 123, 'parameters': {...}}
+
+result2 = create_scraping_task('youtube_trending', {
+    'category': 'Gaming'
+})
+# Returns: {'success': True, 'task_id': 124, 'parameters': {'category': 'Gaming', 'max_results': 50, 'region': 'US'}}
+
+result3 = create_scraping_task('invalid_type', {})
+# Returns: {'success': False, 'error': 'Unknown task type: invalid_type', 'available_types': [...]}
+```
+
+#### Batch Validation
+
+```python
+def validate_multiple_tasks(tasks: list[dict]) -> dict:
+    """
+    Validate multiple tasks at once.
+    
+    Args:
+        tasks: List of tasks with 'type' and 'params' keys
+        
+    Returns:
+        Validation results for all tasks
+    """
+    registry = get_registry()
+    results = []
+    
+    for idx, task in enumerate(tasks):
+        task_type = task.get('type')
+        params = task.get('params', {})
+        
+        is_valid, errors = registry.validate(task_type, params)
+        
+        results.append({
+            'index': idx,
+            'task_type': task_type,
+            'valid': is_valid,
+            'errors': errors if not is_valid else None
+        })
+    
+    return {
+        'total': len(tasks),
+        'valid': sum(1 for r in results if r['valid']),
+        'invalid': sum(1 for r in results if not r['valid']),
+        'results': results
+    }
+
+# Example usage
+tasks_to_validate = [
+    {
+        'type': 'youtube_channel',
+        'params': {'channel_url': '@Channel1', 'max_results': 50}
+    },
+    {
+        'type': 'youtube_trending',
+        'params': {'category': 'Gaming', 'max_results': 100}
+    },
+    {
+        'type': 'youtube_keyword',
+        'params': {'query': 'tech reviews'}  # Will get default max_results
+    },
+    {
+        'type': 'youtube_channel',
+        'params': {'max_results': 50}  # Invalid - missing channel_url
+    }
+]
+
+validation_results = validate_multiple_tasks(tasks_to_validate)
+# Returns: {'total': 4, 'valid': 3, 'invalid': 1, 'results': [...]}
 ```
 
 ### Benefits

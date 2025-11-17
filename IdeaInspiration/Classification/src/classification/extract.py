@@ -18,7 +18,7 @@ from .idea_inspiration import IdeaInspirationDict
 # Import IdeaInspiration from Model
 import sys
 from pathlib import Path
-_model_path = Path(__file__).parent.parent.parent.parent / 'Model'
+_model_path = Path(__file__).parent.parent.parent.parent / 'Model' / 'src'
 if str(_model_path) not in sys.path:
     sys.path.insert(0, str(_model_path))
 

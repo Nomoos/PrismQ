@@ -1,6 +1,0 @@
-*.pyc
-__pycache__/
-*.s3db
-.env
-*.egg-info/
-submissions/

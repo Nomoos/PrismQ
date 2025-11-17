@@ -24,27 +24,29 @@ The [INDEX.md](INDEX.md) document is your master guide. It will direct you to th
 ## Structure
 
 ### Directories
-- **new/** - New issues and feature requests, organized by EPIC/Phase
-  - **Phase_0_Web_Client_Control_Panel/** - Web client issues (#101-#112)
-  - **Phase_1_Foundation_Integration/** - Pipeline and database issues
-  - **Phase_2_Performance_Scale/** - Performance optimization issues
-  - **Phase_3_Analytics_Insights/** - Analytics and reporting issues
-  - **Phase_4_Advanced_Features/** - Advanced feature issues
-  - **Infrastructure_DevOps/** - Development tooling and infrastructure (#200+)
-- **backlog/** - Backlog items not currently planned for active work
+- **new/** - New issues and feature requests, organized by Worker
+  - **Worker01-10/** - Issues organized by worker role for parallel development
+  - **Infrastructure_DevOps/** - Development tooling and infrastructure
+  - **Reddit/** - Reddit-specific issues
+- **ready/** - Fully specified issues, ready for implementation
 - **wip/** - Issues currently being worked on (Work In Progress)
-- **done/** - Recently completed issues, organized by year
-  - **2024/** - Issues completed in 2024
-  - **2025/** - Recent issues completed in 2025
-  - *Note: Old completed issues are removed from the repository but remain accessible in git history*
+- **review/** - Code complete, awaiting review
+- **blocked/** - Issues that cannot proceed (dependencies, clarification needed)
+- **done/** - Completed issues (organized by year and worker)
+- **archive/** - Archived planning documents and historical materials
 - **templates/** - Issue templates for creating new issues
   - **feature_issue.md** - Template for feature requests
   - **bug_issue.md** - Template for bug reports
   - **infrastructure_issue.md** - Template for infrastructure/DevOps issues
 
-Each EPIC folder in `new/` contains:
-- A `README.md` describing the phase objectives and success criteria
-- Individual issue files for that phase
+**Note:** Completed issues and future enhancements are documented in:
+- **`_meta/docs/IMPLEMENTATION_HISTORY.md`** - Historical record of completed work
+- **`_meta/docs/FUTURE_ENHANCEMENTS.md`** - Consolidated future features and planning
+- **`archive/`** - Archived planning documents and resolved issue documentation
+
+Each worker folder in `new/` contains:
+- A `README.md` describing the worker's role and responsibilities
+- Individual issue files for that worker
 - `.gitkeep` to maintain the directory in version control
 
 ### Planning Documents
@@ -75,12 +77,9 @@ Each EPIC folder in `new/` contains:
 ### Issue Lifecycle
 
 1. **New Issues** - Issues start in `new/` organized by category/phase
-2. **Backlog** - Move to `backlog/` for items that are not currently planned but may be worked on later
-3. **Work In Progress** - Move to `wip/` when work begins on an issue
-4. **Completed** - Move to `done/YYYY/` (year subdirectory) when finished
-   - Use `done/2025/` for current year
-   - Group related issues in subdirectories as needed if there are many related issues
-   - Remove old issues periodically (they remain in git history for reference)
+2. **Work In Progress** - Move to `wip/` when work begins on an issue
+3. **Completed** - Document significant implementations in `_meta/docs/IMPLEMENTATION_HISTORY.md`
+4. **Future Planning** - Planned features documented in `_meta/docs/FUTURE_ENHANCEMENTS.md`
 
 ### Archiving
 

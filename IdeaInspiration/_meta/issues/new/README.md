@@ -1,7 +1,39 @@
 # New Issues Directory
 
+> ℹ️ **For issue workflow and management, see**: [ISSUE_MANAGEMENT.md](../../docs/ISSUE_MANAGEMENT.md)
+> 
+> **For current planning and priorities, see**: [DEVELOPMENT_PLAN.md](../../../DEVELOPMENT_PLAN.md)
+
+---
+
 **Purpose**: Storage for new issues awaiting prioritization and assignment  
-**Last Updated**: 2025-11-04
+**Last Updated**: 2025-11-13  
+**Status**: Active issue tracking - See DEVELOPMENT_PLAN.md for current priorities
+
+**Workflow**: See [ISSUE_MANAGEMENT.md](../../docs/ISSUE_MANAGEMENT.md) for complete issue workflow (new → wip → done)
+
+---
+
+## ⚠️ Recent Updates (2025-11-13)
+
+### Worker10 Quality Review Complete
+
+Worker10 completed comprehensive quality review of YouTube Worker Refactor issues (25 total).
+
+**Key Findings**:
+- Overall quality: 63% (below 80% target)
+- High-quality issues: Worker02 (95%), Worker06 (98%), Worker03 (85%)
+- Low-quality issues: Worker04 (25%), Worker10 (30%), Worker05 (45%)
+- SOLID analysis coverage: 44% (11/25 issues)
+
+**Action Required**: Worker01 must decide:
+- **Option A**: Expand low-quality issues before implementation (3-4 days)
+- **Option B**: Fix issues during implementation (risky)
+- **Option C**: Accept quality gaps (high risk)
+
+**Documents**:
+- Review findings: `Source/Video/YouTube/_meta/issues/new/Worker10/REVIEW_FINDINGS.md`
+- Updated: `Source/_meta/issues/new/NEXT_PARALLEL_RUN.md`
 
 ---
 
@@ -191,6 +223,6 @@ See [Infrastructure_DevOps/README.md](./Infrastructure_DevOps/README.md) for pri
 
 ---
 
-**Status**: ✅ Ready for Assignment  
-**Last Updated**: 2025-11-04  
-**Next Review**: Weekly
+**Status**: ⚠️ Worker10 Review Complete - Awaiting Worker01 Decision  
+**Last Updated**: 2025-11-13  
+**Next Review**: After Worker01 decision on quality gaps

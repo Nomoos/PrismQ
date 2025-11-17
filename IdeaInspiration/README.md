@@ -87,11 +87,20 @@ cd PrismQ.IdeaInspiration
 - **[Contributing](./_meta/docs/CONTRIBUTING.md)** - How to contribute to this project
 
 ### Planning & Development
-- **[Project Roadmap](./_meta/issues/ROADMAP.md)** - Future development plans
+- **[Development Plan](./DEVELOPMENT_PLAN.md)** - Unified development plan and current status (START HERE)
+- **[Project Roadmap](./_meta/issues/ROADMAP.md)** - Long-term roadmap and future plans
 - **[Known Issues](./_meta/issues/KNOWN_ISSUES.md)** - Current limitations and bugs
-- **[Research](./_meta/research/)** - Experimental work and investigations
+- **[Issue Tracking](./_meta/issues/INDEX.md)** - Issue management and workflow
 - **[Setup Guide](./_meta/docs/SETUP.md)** - Installation and environment setup
 - **[Documentation Index](./_meta/docs/README.md)** - Complete documentation overview
+- **[Archive](./_meta/docs/archive/)** - Historical documentation and completed phases
+
+### Legacy Reference Materials
+- **[Legacy Reference](./Legacy_Reference/)** - Legacy code and reference materials for learning
+  - **Architecture/** - SOLID principles, project splitting, and design patterns from StoryGenerator
+  - **Documentation/** - Repository overview and architecture philosophy
+  - **Pipeline/** - Pipeline architecture and modular design patterns
+  - **Content/, Commerce/, Signals/, etc.** - Previous source implementations organized by category
 
 ## 🔗 Related
 

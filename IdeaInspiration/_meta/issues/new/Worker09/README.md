@@ -36,7 +36,7 @@ Worker 09 is assigned as the Research Engineer for the SQLite Queue System proje
 **Status**: ⛔ Blocked by #327  
 **Priority**: High  
 **Dependencies**: #327 (Queue Scheduling Strategies - MUST COMPLETE FIRST)  
-**File**: `338-research-scheduling-strategy-performance.md`
+**File**: `../../blocked/338-research-scheduling-strategy-performance.md` (moved to blocked folder)
 
 **Objective**: Research and analyze the four scheduling strategies (FIFO, LIFO, Priority, Weighted Random), evaluating fairness, starvation risks, and use-case recommendations.
 
