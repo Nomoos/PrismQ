@@ -52,6 +52,9 @@ class IdeaDatabase:
                 target_platform TEXT,
                 genre TEXT,
                 style TEXT,
+                keywords TEXT,  -- JSON string (list of keywords)
+                outline TEXT,
+                skeleton TEXT,
                 potential_scores TEXT,  -- JSON string
                 metadata TEXT,  -- JSON string
                 version INTEGER DEFAULT 1,
@@ -119,6 +122,7 @@ class IdeaDatabase:
         
         # Extract and serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
+        keywords = json.dumps(idea_dict.get("keywords", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
         metadata = json.dumps(idea_dict.get("metadata", {}))
         inspiration_ids = idea_dict.get("inspiration_ids", [])
@@ -126,10 +130,10 @@ class IdeaDatabase:
         cursor.execute("""
             INSERT INTO ideas (
                 title, concept, purpose, emotional_quality, target_audience,
-                target_demographics, target_platform, genre, style,
-                potential_scores, metadata, version, status, notes,
+                target_demographics, target_platform, genre, style, keywords,
+                outline, skeleton, potential_scores, metadata, version, status, notes,
                 created_at, updated_at, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             idea_dict.get("title"),
             idea_dict.get("concept"),
@@ -137,9 +141,12 @@ class IdeaDatabase:
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
             target_demographics,
-            idea_dict.get("target_platform", "multiple"),
+            idea_dict.get("target_platform", ""),
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
+            keywords,
+            idea_dict.get("outline", ""),
+            idea_dict.get("skeleton", ""),
             potential_scores,
             metadata,
             idea_dict.get("version", 1),
@@ -184,6 +191,7 @@ class IdeaDatabase:
         # Convert row to dict and deserialize JSON fields
         idea_dict = dict(row)
         idea_dict["target_demographics"] = json.loads(idea_dict["target_demographics"])
+        idea_dict["keywords"] = json.loads(idea_dict["keywords"])
         idea_dict["potential_scores"] = json.loads(idea_dict["potential_scores"])
         idea_dict["metadata"] = json.loads(idea_dict["metadata"])
         
@@ -267,6 +275,7 @@ class IdeaDatabase:
         
         # Serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
+        keywords = json.dumps(idea_dict.get("keywords", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
         metadata = json.dumps(idea_dict.get("metadata", {}))
         
@@ -274,7 +283,8 @@ class IdeaDatabase:
             UPDATE ideas SET
                 title = ?, concept = ?, purpose = ?, emotional_quality = ?,
                 target_audience = ?, target_demographics = ?, target_platform = ?,
-                genre = ?, style = ?, potential_scores = ?, metadata = ?,
+                genre = ?, style = ?, keywords = ?, outline = ?, skeleton = ?,
+                potential_scores = ?, metadata = ?,
                 version = ?, status = ?, notes = ?, updated_at = ?, created_by = ?
             WHERE id = ?
         """, (
@@ -284,7 +294,12 @@ class IdeaDatabase:
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
             target_demographics,
-            idea_dict.get("target_platform", "multiple"),
+            idea_dict.get("target_platform", ""),
+            idea_dict.get("genre", "other"),
+            idea_dict.get("style", ""),
+            keywords,
+            idea_dict.get("outline", ""),
+            idea_dict.get("skeleton", ""),
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
             potential_scores,

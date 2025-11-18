@@ -47,9 +47,12 @@ class ContentGenre(Enum):
 class Idea:
     """Core data model for distilled content ideas.
     
-    Idea represents a refined concept derived from one or more IdeaInspiration
-    instances. It captures the essence of a creative concept with clear purpose,
-    theme, target audience, and execution strategy.
+    Idea represents a refined concept that can be created independently or derived 
+    from one or more IdeaInspiration instances. It captures the essence of a creative 
+    concept with clear purpose, theme, target audience, and execution strategy.
+    
+    Note: Ideas can exist without IdeaInspiration sources - they can be created 
+    directly with manual input.
     
     Attributes:
         title: Clear, compelling title for the idea
@@ -61,8 +64,11 @@ class Idea:
         target_platform: Primary platform for content delivery (string, e.g., "youtube", "tiktok")
         genre: Primary content genre
         style: Content style or approach (e.g., "narrative", "analytical")
+        keywords: List of keywords or tags associated with the idea
+        outline: Structured outline or content structure
+        skeleton: Basic framework or skeleton of the content
         potential_scores: Potential performance across contexts (platform, region, demographic)
-        inspiration_ids: List of IdeaInspiration IDs that contributed to this Idea
+        inspiration_ids: List of IdeaInspiration IDs that contributed to this Idea (can be empty)
         metadata: Additional flexible metadata (string key-value pairs)
         version: Version number for tracking iterations
         status: Current workflow status
@@ -81,7 +87,17 @@ class Idea:
         ...     target_demographics={"age_range": "18-35", "interests": "true_crime,technology"},
         ...     target_platform="youtube",
         ...     genre=ContentGenre.TRUE_CRIME,
-        ...     inspiration_ids=["insp-123", "insp-456"]
+        ...     keywords=["mystery", "internet", "unsolved", "digital forensics"],
+        ...     outline="1. Introduction\n2. Case Presentation\n3. Investigation\n4. Conclusion",
+        ...     skeleton="Hook → Background → Evidence → Theory → Resolution"
+        ... )
+        >>> 
+        >>> # Ideas can also be created without IdeaInspiration sources
+        >>> manual_idea = Idea(
+        ...     title="Tech Tutorial Series",
+        ...     concept="Teaching Python to beginners",
+        ...     keywords=["python", "programming", "tutorial"],
+        ...     inspiration_ids=[]  # No source inspirations
         ... )
     """
     
@@ -94,6 +110,9 @@ class Idea:
     target_platform: str = ""
     genre: ContentGenre = ContentGenre.OTHER
     style: str = ""
+    keywords: List[str] = field(default_factory=list)
+    outline: str = ""
+    skeleton: str = ""
     potential_scores: Dict[str, int] = field(default_factory=dict)
     inspiration_ids: List[str] = field(default_factory=list)
     metadata: Dict[str, str] = field(default_factory=dict)
@@ -157,6 +176,9 @@ class Idea:
             target_platform=data.get("target_platform", ""),
             genre=genre,
             style=data.get("style", ""),
+            keywords=data.get("keywords", []),
+            outline=data.get("outline", ""),
+            skeleton=data.get("skeleton", ""),
             potential_scores=data.get("potential_scores", {}),
             inspiration_ids=data.get("inspiration_ids", []),
             metadata=data.get("metadata", {}),
@@ -181,6 +203,9 @@ class Idea:
         target_platform: str = "",
         genre: ContentGenre = ContentGenre.OTHER,
         style: str = "",
+        keywords: Optional[List[str]] = None,
+        outline: str = "",
+        skeleton: str = "",
         created_by: Optional[str] = None,
     ) -> "Idea":
         """Create Idea from one or more IdeaInspiration instances.
@@ -200,6 +225,9 @@ class Idea:
             target_platform: Primary target platform (e.g., "youtube", "tiktok", "podcast")
             genre: Content genre
             style: Content style or approach
+            keywords: List of keywords or tags
+            outline: Structured outline or content structure
+            skeleton: Basic framework or skeleton of the content
             created_by: Creator identifier
             
         Returns:
@@ -212,6 +240,15 @@ class Idea:
                 inspiration_ids.append(insp.source_id)
             elif hasattr(insp, 'id'):
                 inspiration_ids.append(str(insp.id))
+        
+        # Aggregate keywords from inspirations if not provided
+        if keywords is None:
+            keywords = []
+            for insp in inspirations:
+                if hasattr(insp, 'keywords') and insp.keywords:
+                    keywords.extend(insp.keywords)
+            # Remove duplicates while preserving order
+            keywords = list(dict.fromkeys(keywords))
         
         # Aggregate potential scores from inspirations if available
         potential_scores = {}
@@ -234,6 +271,9 @@ class Idea:
             target_platform=target_platform,
             genre=genre,
             style=style,
+            keywords=keywords,
+            outline=outline,
+            skeleton=skeleton,
             potential_scores=potential_scores,
             inspiration_ids=inspiration_ids,
             created_by=created_by,

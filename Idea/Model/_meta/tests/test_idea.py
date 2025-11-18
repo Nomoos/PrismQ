@@ -24,6 +24,9 @@ class TestIdeaBasic:
         assert idea.target_platform == ""
         assert idea.genre == ContentGenre.OTHER
         assert idea.style == ""
+        assert idea.keywords == []
+        assert idea.outline == ""
+        assert idea.skeleton == ""
         assert idea.potential_scores == {}
         assert idea.inspiration_ids == []
         assert idea.metadata == {}
@@ -57,6 +60,9 @@ class TestIdeaBasic:
             target_platform="youtube",
             genre=ContentGenre.TECHNOLOGY,
             style="educational",
+            keywords=["tech", "innovation", "tutorial"],
+            outline="1. Intro\n2. Main Content\n3. Conclusion",
+            skeleton="Hook → Teach → Practice → Review",
             potential_scores=potential_scores,
             inspiration_ids=inspiration_ids,
             metadata=metadata,
@@ -75,6 +81,9 @@ class TestIdeaBasic:
         assert idea.target_platform == "youtube"
         assert idea.genre == ContentGenre.TECHNOLOGY
         assert idea.style == "educational"
+        assert idea.keywords == ["tech", "innovation", "tutorial"]
+        assert idea.outline == "1. Intro\n2. Main Content\n3. Conclusion"
+        assert idea.skeleton == "Hook → Teach → Practice → Review"
         assert idea.potential_scores == potential_scores
         assert idea.inspiration_ids == inspiration_ids
         assert idea.metadata == metadata
@@ -82,6 +91,24 @@ class TestIdeaBasic:
         assert idea.status == IdeaStatus.VALIDATED
         assert idea.notes == "Test notes"
         assert idea.created_by == "test-user"
+    
+    def test_create_idea_without_inspirations(self):
+        """Test creating an Idea without IdeaInspiration sources."""
+        idea = Idea(
+            title="Manual Idea",
+            concept="Manually created without sources",
+            keywords=["manual", "standalone"],
+            outline="Custom outline",
+            skeleton="Custom skeleton"
+        )
+        
+        assert idea.title == "Manual Idea"
+        assert idea.concept == "Manually created without sources"
+        assert idea.keywords == ["manual", "standalone"]
+        assert idea.outline == "Custom outline"
+        assert idea.skeleton == "Custom skeleton"
+        assert idea.inspiration_ids == []  # No inspirations
+        assert idea.status == IdeaStatus.DRAFT
     
     def test_timestamps_auto_generated(self):
         """Test that timestamps are automatically generated."""
@@ -179,6 +206,9 @@ class TestIdeaSerialization:
             target_platform="podcast",
             genre=ContentGenre.TECHNOLOGY,
             style="conversational",
+            keywords=["test", "serialization", "roundtrip"],
+            outline="Test outline structure",
+            skeleton="Test skeleton framework",
             potential_scores={"us": 85},
             inspiration_ids=["a", "b"],
             metadata={"key": "value"},
@@ -202,6 +232,9 @@ class TestIdeaSerialization:
         assert restored.target_platform == original.target_platform
         assert restored.genre == original.genre
         assert restored.style == original.style
+        assert restored.keywords == original.keywords
+        assert restored.outline == original.outline
+        assert restored.skeleton == original.skeleton
         assert restored.potential_scores == original.potential_scores
         assert restored.inspiration_ids == original.inspiration_ids
         assert restored.metadata == original.metadata
@@ -253,6 +286,7 @@ class TestIdeaFromInspirations:
             def __init__(self, source_id, scores):
                 self.source_id = source_id
                 self.contextual_category_scores = scores
+                self.keywords = []
         
         inspirations = [
             MockInspiration("insp-1", {"region:us": 80, "age:18-24": 70}),
@@ -271,6 +305,37 @@ class TestIdeaFromInspirations:
         assert "region:us" in idea.potential_scores
         # US should be averaged: (80 + 90) / 2 = 85
         assert idea.potential_scores["region:us"] == 85
+    
+    def test_from_inspirations_with_keywords(self):
+        """Test that keywords are aggregated from inspirations."""
+        class MockInspiration:
+            def __init__(self, source_id, keywords):
+                self.source_id = source_id
+                self.keywords = keywords
+                self.contextual_category_scores = {}
+        
+        inspirations = [
+            MockInspiration("insp-1", ["mystery", "crime", "investigation"]),
+            MockInspiration("insp-2", ["crime", "thriller", "suspense"]),
+            MockInspiration("insp-3", ["mystery", "detective"])
+        ]
+        
+        idea = Idea.from_inspirations(
+            inspirations=inspirations,
+            title="Keyword Test",
+            concept="Testing keyword aggregation"
+        )
+        
+        # Should aggregate and deduplicate keywords
+        assert "mystery" in idea.keywords
+        assert "crime" in idea.keywords
+        assert "investigation" in idea.keywords
+        assert "thriller" in idea.keywords
+        assert "suspense" in idea.keywords
+        assert "detective" in idea.keywords
+        # No duplicates
+        assert idea.keywords.count("mystery") == 1
+        assert idea.keywords.count("crime") == 1
     
     def test_from_inspirations_with_created_by(self):
         """Test from_inspirations with creator tracking."""

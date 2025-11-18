@@ -31,20 +31,52 @@ def example_basic_idea():
         target_platform="youtube",
         genre=ContentGenre.TRUE_CRIME,
         style="narrative investigation",
+        keywords=["mystery", "unsolved", "internet", "investigation", "digital"],
+        outline="1. Hook\n2. Case Introduction\n3. Investigation\n4. Theory\n5. Conclusion",
+        skeleton="Mystery → Evidence → Analysis → Resolution"
     )
     
     print(f"\nCreated: {idea}")
     print(f"Title: {idea.title}")
     print(f"Platform: {idea.target_platform}")
     print(f"Genre: {idea.genre.value}")
+    print(f"Keywords: {', '.join(idea.keywords)}")
     print(f"Status: {idea.status.value}")
     print(f"Version: {idea.version}")
+
+
+def example_manual_idea():
+    """Example: Creating Idea without IdeaInspiration sources."""
+    print("\n" + "=" * 60)
+    print("Example 2: Manual Idea (Without IdeaInspiration)")
+    print("=" * 60)
+    
+    # Ideas can be created independently without source inspirations
+    idea = Idea(
+        title="Python Beginner Tutorial Series",
+        concept="Teaching Python fundamentals through practical projects",
+        purpose="Help absolute beginners learn programming",
+        target_audience="Complete programming beginners",
+        target_platform="youtube",
+        genre=ContentGenre.EDUCATIONAL,
+        keywords=["python", "programming", "tutorial", "beginner", "coding"],
+        outline="1. Setup\n2. Variables\n3. Functions\n4. Projects",
+        skeleton="Intro → Theory → Practice → Challenge",
+        inspiration_ids=[]  # No source inspirations
+    )
+    
+    print(f"\nCreated manually: {idea}")
+    print(f"Title: {idea.title}")
+    print(f"Has inspirations: {len(idea.inspiration_ids) > 0}")
+    print(f"Keywords: {', '.join(idea.keywords)}")
+    print(f"Outline: {idea.outline}")
+    print(f"Skeleton: {idea.skeleton}")
 
 
 def example_from_inspirations():
     """Example: Creating Idea from IdeaInspiration sources."""
     print("\n" + "=" * 60)
-    print("Example 2: Fusion from Multiple Inspirations")
+    print("Example 3: Fusion from Multiple Inspirations")
     print("=" * 60)
     
     # Mock IdeaInspiration objects
@@ -99,7 +131,7 @@ def example_from_inspirations():
 def example_versioning():
     """Example: Working with Idea versions."""
     print("\n" + "=" * 60)
-    print("Example 3: Version Management")
+    print("Example 4: Version Management")
     print("=" * 60)
     
     # Create initial idea
@@ -143,7 +175,7 @@ def example_versioning():
 def example_serialization():
     """Example: Serialization and deserialization."""
     print("\n" + "=" * 60)
-    print("Example 4: Serialization")
+    print("Example 5: Serialization")
     print("=" * 60)
     
     original = Idea(
@@ -178,6 +210,7 @@ def main():
     print("=" * 60)
     
     example_basic_idea()
+    example_manual_idea()
     example_from_inspirations()
     example_versioning()
     example_serialization()

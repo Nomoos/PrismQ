@@ -4,10 +4,11 @@ Core data model for content ideas in the PrismQ content creation workflow.
 
 ## ✨ Highlights
 
-- **Distillation Model** - Represents refined concepts fused from multiple IdeaInspiration sources
-- **M:N Relationship** - Links multiple inspirations to create cohesive ideas
+- **Standalone or Derived** - Can be created independently or fused from multiple IdeaInspiration sources
+- **M:N Relationship** - Links multiple inspirations to create cohesive ideas (optional)
 - **Workflow Integration** - Second stage in content pipeline: IdeaInspiration → **Idea** → Script
 - **Platform Targeting** - Built-in support for different content platforms (YouTube, TikTok, Podcast, etc.)
+- **Structured Content** - Keywords, outline, and skeleton fields for content planning
 - **Versioning** - Track idea evolution through iterations
 - **Potential Scoring** - Evaluate cross-platform, regional, and demographic potential
 - **Zero Dependencies** - Pure Python implementation
@@ -31,7 +32,7 @@ python -c "from idea import Idea, ContentGenre; print('OK')"
 ```python
 from idea import Idea, ContentGenre, IdeaStatus
 
-# Create a new idea
+# Create a new idea with structure
 idea = Idea(
     title="The Digital Phantom Mystery",
     concept="An investigation into unsolved internet mysteries",
@@ -46,13 +47,42 @@ idea = Idea(
     target_platform="youtube",
     genre=ContentGenre.TRUE_CRIME,
     style="narrative investigation",
+    keywords=["mystery", "unsolved", "internet", "investigation"],
+    outline="1. Hook\n2. Case Introduction\n3. Investigation\n4. Theory\n5. Conclusion",
+    skeleton="Mystery → Evidence → Analysis → Resolution"
 )
 
 print(idea)
 # Output: Idea(title='The Digital Phantom Mystery...', version=1, status=draft, inspirations=0 sources)
 ```
 
+### Creating Ideas Without IdeaInspiration
+
+Ideas can be created independently without any source inspirations:
+
+```python
+from idea import Idea, ContentGenre
+
+# Create idea manually (no IdeaInspiration sources needed)
+manual_idea = Idea(
+    title="Python Tutorial Series",
+    concept="Teaching Python fundamentals through projects",
+    purpose="Help beginners learn programming",
+    target_platform="youtube",
+    genre=ContentGenre.EDUCATIONAL,
+    keywords=["python", "programming", "tutorial", "beginner"],
+    outline="1. Setup\n2. Variables\n3. Functions\n4. Projects",
+    skeleton="Intro → Theory → Practice → Challenge",
+    inspiration_ids=[]  # No source inspirations
+)
+
+print(f"Has inspirations: {len(manual_idea.inspiration_ids) > 0}")
+# Output: Has inspirations: False
+```
+
 ### Creating from IdeaInspiration Sources
+
+When you have multiple IdeaInspiration sources, you can fuse them:
 
 ```python
 from idea import Idea, ContentGenre
@@ -61,6 +91,7 @@ from idea import Idea, ContentGenre
 inspirations = [inspiration1, inspiration2, inspiration3]
 
 # Fuse/distill into a single Idea
+# Keywords are automatically aggregated from inspirations
 idea = Idea.from_inspirations(
     inspirations=inspirations,
     title="Mystery of the Lost Internet Archive",
@@ -70,10 +101,12 @@ idea = Idea.from_inspirations(
     target_audience="Tech-savvy millennials and Gen Z",
     target_platform="youtube",
     genre=ContentGenre.DOCUMENTARY,
+    outline="Custom outline for this specific idea",
     created_by="AI-Agent-001"
 )
 
 print(f"Created from {len(idea.inspiration_ids)} inspirations")
+print(f"Aggregated keywords: {idea.keywords}")  # From inspirations
 ```
 
 ### Working with Versions
