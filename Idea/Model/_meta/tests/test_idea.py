@@ -23,7 +23,8 @@ class TestIdeaBasic:
         assert idea.emotional_quality == ""
         assert idea.target_audience == ""
         assert idea.target_demographics == {}
-        assert idea.target_platform == ""
+        assert idea.target_platforms == []
+        assert idea.target_formats == []
         assert idea.genre == ContentGenre.OTHER
         assert idea.style == ""
         assert idea.keywords == []
@@ -45,7 +46,7 @@ class TestIdeaBasic:
         assert idea.created_by is None
     
     def test_create_with_all_fields(self):
-        """Test creating Idea with all fields."""
+        """Test creating Idea with all fields for universal content generation."""
         target_demographics = {
             "age_range": "18-35",
             "interests": "technology,science"
@@ -60,14 +61,22 @@ class TestIdeaBasic:
         idea = Idea(
             title="Complete Idea",
             concept="Full concept",
+            synopsis="A short synopsis",
+            story_premise="Story premise for AI",
             purpose="Test purpose",
             emotional_quality="exciting, innovative",
             target_audience="Tech enthusiasts",
             target_demographics=target_demographics,
-            target_platform="youtube",
+            target_platforms=["youtube", "tiktok", "podcast"],
+            target_formats=["text", "audio", "video"],
             genre=ContentGenre.TECHNOLOGY,
             style="educational",
             keywords=["tech", "innovation", "tutorial"],
+            themes=["innovation", "education"],
+            character_notes="Expert hosts",
+            setting_notes="Modern tech spaces",
+            tone_guidance="Engaging and accessible",
+            length_target="15-20 minutes",
             outline="1. Intro\n2. Main Content\n3. Conclusion",
             skeleton="Hook → Teach → Practice → Review",
             potential_scores=potential_scores,
@@ -81,11 +90,14 @@ class TestIdeaBasic:
         
         assert idea.title == "Complete Idea"
         assert idea.concept == "Full concept"
+        assert idea.synopsis == "A short synopsis"
+        assert idea.story_premise == "Story premise for AI"
         assert idea.purpose == "Test purpose"
         assert idea.emotional_quality == "exciting, innovative"
         assert idea.target_audience == "Tech enthusiasts"
         assert idea.target_demographics == target_demographics
-        assert idea.target_platform == "youtube"
+        assert idea.target_platforms == ["youtube", "tiktok", "podcast"]
+        assert idea.target_formats == ["text", "audio", "video"]
         assert idea.genre == ContentGenre.TECHNOLOGY
         assert idea.style == "educational"
         assert idea.keywords == ["tech", "innovation", "tutorial"]
@@ -166,7 +178,8 @@ class TestIdeaSerialization:
         idea = Idea(
             title="Test Idea",
             concept="Test concept",
-            target_platform="youtube",
+            target_platforms=["youtube", "medium"],
+            target_formats=["video", "text"],
             genre=ContentGenre.DOCUMENTARY,
             status=IdeaStatus.DRAFT,
             inspiration_ids=["insp-1", "insp-2"]
@@ -177,7 +190,8 @@ class TestIdeaSerialization:
         assert isinstance(data, dict)
         assert data["title"] == "Test Idea"
         assert data["concept"] == "Test concept"
-        assert data["target_platform"] == "youtube"
+        assert data["target_platforms"] == ["youtube", "medium"]
+        assert data["target_formats"] == ["video", "text"]
         assert data["genre"] == "documentary"  # Converted to string
         assert data["status"] == "draft"  # Converted to string
         assert data["inspiration_ids"] == ["insp-1", "insp-2"]
@@ -189,7 +203,8 @@ class TestIdeaSerialization:
             "title": "Dict Idea",
             "concept": "From dictionary",
             "purpose": "Testing",
-            "target_platform": "tiktok",
+            "target_platforms": ["tiktok", "instagram"],
+            "target_formats": ["video"],
             "genre": "entertainment",
             "status": "validated",
             "inspiration_ids": ["id-1"],
@@ -201,7 +216,8 @@ class TestIdeaSerialization:
         assert idea.title == "Dict Idea"
         assert idea.concept == "From dictionary"
         assert idea.purpose == "Testing"
-        assert idea.target_platform == "tiktok"
+        assert idea.target_platforms == ["tiktok", "instagram"]
+        assert idea.target_formats == ["video"]
         assert idea.genre == ContentGenre.ENTERTAINMENT
         assert idea.status == IdeaStatus.VALIDATED
         assert idea.inspiration_ids == ["id-1"]
@@ -212,15 +228,17 @@ class TestIdeaSerialization:
         data = {
             "title": "Test",
             "concept": "Test",
-            "target_platform": "invalid_platform",
+            "target_platforms": ["invalid_platform"],
+            "target_formats": ["text"],
             "genre": "invalid_genre",
             "status": "invalid_status"
         }
         
         idea = Idea.from_dict(data)
         
-        # Should fall back to defaults
-        assert idea.target_platform == "invalid_platform"  # Strings are kept as-is
+        # Should fall back to defaults for enums
+        assert idea.target_platforms == ["invalid_platform"]  # Lists are kept as-is
+        assert idea.target_formats == ["text"]
         assert idea.genre == ContentGenre.OTHER
         assert idea.status == IdeaStatus.DRAFT
     
@@ -233,10 +251,12 @@ class TestIdeaSerialization:
             emotional_quality="analytical",
             target_audience="Developers",
             target_demographics={"age": "25-40"},
-            target_platform="podcast",
+            target_platforms=["podcast", "youtube"],
+            target_formats=["audio", "video"],
             genre=ContentGenre.TECHNOLOGY,
             style="conversational",
             keywords=["test", "serialization", "roundtrip"],
+            themes=["technology", "testing"],
             outline="Test outline structure",
             skeleton="Test skeleton framework",
             potential_scores={"us": 85},
@@ -259,7 +279,8 @@ class TestIdeaSerialization:
         assert restored.emotional_quality == original.emotional_quality
         assert restored.target_audience == original.target_audience
         assert restored.target_demographics == original.target_demographics
-        assert restored.target_platform == original.target_platform
+        assert restored.target_platforms == original.target_platforms
+        assert restored.target_formats == original.target_formats
         assert restored.genre == original.genre
         assert restored.style == original.style
         assert restored.keywords == original.keywords
@@ -296,14 +317,16 @@ class TestIdeaFromInspirations:
             title="Fused Idea",
             concept="Combined from multiple sources",
             purpose="Test fusion",
-            target_platform="youtube",
+            target_platforms=["youtube", "tiktok"],
+            target_formats=["video"],
             genre=ContentGenre.DOCUMENTARY
         )
         
         assert idea.title == "Fused Idea"
         assert idea.concept == "Combined from multiple sources"
         assert idea.purpose == "Test fusion"
-        assert idea.target_platform == "youtube"
+        assert idea.target_platforms == ["youtube", "tiktok"]
+        assert idea.target_formats == ["video"]
         assert idea.genre == ContentGenre.DOCUMENTARY
         assert len(idea.inspiration_ids) == 3
         assert "insp-1" in idea.inspiration_ids

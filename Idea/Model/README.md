@@ -4,11 +4,12 @@ Core data model for content ideas in the PrismQ content creation workflow.
 
 ## ✨ Highlights
 
+- **Universal Content Generation** - Each idea can be released as text, audio, and video across multiple platforms simultaneously
 - **Standalone or Derived** - Can be created independently or fused from multiple IdeaInspiration sources
 - **M:N Relationship** - Links multiple inspirations to create cohesive ideas (optional)
 - **Workflow Integration** - Second stage in content pipeline: IdeaInspiration → **Idea** → Script
 - **AI-Ready** - Rich fields optimized for AI story generation (synopsis, story_premise, character_notes, etc.)
-- **Platform Targeting** - Built-in support for different content platforms (YouTube, TikTok, Podcast, etc.)
+- **Multi-Platform & Multi-Format** - Target multiple platforms and output formats without platform-specific constraints
 - **Structured Content** - Keywords, outline, skeleton, themes for comprehensive content planning
 - **Story Depth** - Character notes, setting details, tone guidance for complex narratives
 - **Versioning** - Track idea evolution through iterations
@@ -29,15 +30,16 @@ python -c "from idea import Idea, ContentGenre; print('OK')"
 
 ## 📋 Basic Usage
 
-### Creating a Basic Idea
+### Creating a Universal Content Idea
 
 ```python
 from idea import Idea, ContentGenre, IdeaStatus
 
-# Create a new idea with structure
+# Create idea for universal generation (text, audio, video across multiple platforms)
 idea = Idea(
     title="The Digital Phantom Mystery",
     concept="An investigation into unsolved internet mysteries",
+    synopsis="A deep dive into the most puzzling mysteries of the internet age",
     purpose="Engage true crime audience with unique digital angle",
     emotional_quality="mysterious, suspenseful, intriguing",
     target_audience="True crime enthusiasts aged 18-35",
@@ -46,17 +48,25 @@ idea = Idea(
         "interests": "true_crime,technology",
         "regions": "US,UK,CA"
     },
-    target_platform="youtube",
+    target_platforms=["youtube", "spotify", "medium", "tiktok"],
+    target_formats=["text", "audio", "video"],
     genre=ContentGenre.TRUE_CRIME,
     style="narrative investigation",
     keywords=["mystery", "unsolved", "internet", "investigation"],
+    themes=["digital privacy", "online identity", "modern detective work"],
     outline="1. Hook\n2. Case Introduction\n3. Investigation\n4. Theory\n5. Conclusion",
-    skeleton="Mystery → Evidence → Analysis → Resolution"
+    skeleton="Mystery → Evidence → Analysis → Resolution",
+    length_target="15-20 minutes per episode"
 )
 
 print(idea)
 # Output: Idea(title='The Digital Phantom Mystery...', version=1, status=draft, inspirations=0 sources)
 ```
+
+**Universal Generator Note**: This idea can be simultaneously released as:
+- **Text**: Blog posts, articles on Medium, social media threads
+- **Audio**: Podcast episodes on Spotify, Apple Podcasts
+- **Video**: YouTube videos, TikTok shorts, Instagram Reels
 
 ### Creating Ideas Without IdeaInspiration
 

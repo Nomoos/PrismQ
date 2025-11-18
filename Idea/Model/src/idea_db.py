@@ -51,7 +51,8 @@ class IdeaDatabase:
                 emotional_quality TEXT,
                 target_audience TEXT,
                 target_demographics TEXT,  -- JSON string
-                target_platform TEXT,
+                target_platforms TEXT,  -- JSON string (list of platforms)
+                target_formats TEXT,  -- JSON string (list of formats: text, audio, video)
                 genre TEXT,
                 style TEXT,
                 keywords TEXT,  -- JSON string (list of keywords)
@@ -129,6 +130,8 @@ class IdeaDatabase:
         
         # Extract and serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
+        target_platforms = json.dumps(idea_dict.get("target_platforms", []))
+        target_formats = json.dumps(idea_dict.get("target_formats", []))
         keywords = json.dumps(idea_dict.get("keywords", []))
         themes = json.dumps(idea_dict.get("themes", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
@@ -138,11 +141,11 @@ class IdeaDatabase:
         cursor.execute("""
             INSERT INTO ideas (
                 title, concept, synopsis, story_premise, purpose, emotional_quality, target_audience,
-                target_demographics, target_platform, genre, style, keywords, themes,
+                target_demographics, target_platforms, target_formats, genre, style, keywords, themes,
                 character_notes, setting_notes, tone_guidance, length_target,
                 outline, skeleton, potential_scores, metadata, version, status, notes,
                 created_at, updated_at, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             idea_dict.get("title"),
             idea_dict.get("concept"),
@@ -152,7 +155,8 @@ class IdeaDatabase:
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
             target_demographics,
-            idea_dict.get("target_platform", ""),
+            target_platforms,
+            target_formats,
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
             keywords,
@@ -207,6 +211,8 @@ class IdeaDatabase:
         # Convert row to dict and deserialize JSON fields
         idea_dict = dict(row)
         idea_dict["target_demographics"] = json.loads(idea_dict["target_demographics"])
+        idea_dict["target_platforms"] = json.loads(idea_dict["target_platforms"])
+        idea_dict["target_formats"] = json.loads(idea_dict["target_formats"])
         idea_dict["keywords"] = json.loads(idea_dict["keywords"])
         idea_dict["themes"] = json.loads(idea_dict["themes"])
         idea_dict["potential_scores"] = json.loads(idea_dict["potential_scores"])
@@ -292,6 +298,8 @@ class IdeaDatabase:
         
         # Serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
+        target_platforms = json.dumps(idea_dict.get("target_platforms", []))
+        target_formats = json.dumps(idea_dict.get("target_formats", []))
         keywords = json.dumps(idea_dict.get("keywords", []))
         themes = json.dumps(idea_dict.get("themes", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
@@ -301,7 +309,7 @@ class IdeaDatabase:
             UPDATE ideas SET
                 title = ?, concept = ?, synopsis = ?, story_premise = ?,
                 purpose = ?, emotional_quality = ?,
-                target_audience = ?, target_demographics = ?, target_platform = ?,
+                target_audience = ?, target_demographics = ?, target_platforms = ?, target_formats = ?,
                 genre = ?, style = ?, keywords = ?, themes = ?,
                 character_notes = ?, setting_notes = ?, tone_guidance = ?, length_target = ?,
                 outline = ?, skeleton = ?,
@@ -317,7 +325,8 @@ class IdeaDatabase:
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
             target_demographics,
-            idea_dict.get("target_platform", ""),
+            target_platforms,
+            target_formats,
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
             keywords,

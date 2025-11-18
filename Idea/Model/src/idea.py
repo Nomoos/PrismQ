@@ -63,7 +63,8 @@ class Idea:
         emotional_quality: The emotional tone and impact (e.g., "suspenseful", "inspiring")
         target_audience: Description of the intended audience
         target_demographics: Specific demographic data (age ranges, regions, languages)
-        target_platform: Primary platform for content delivery (string, e.g., "youtube", "tiktok")
+        target_platforms: List of target platforms (e.g., ["youtube", "tiktok", "podcast", "blog"])
+        target_formats: List of output formats (e.g., ["text", "audio", "video"])
         genre: Primary content genre
         style: Content style or approach (e.g., "narrative", "analytical")
         keywords: List of keywords or tags associated with the idea
@@ -84,7 +85,13 @@ class Idea:
         updated_at: Timestamp of last update
         created_by: Creator identifier (human or AI agent)
     
+    Note on Universal Generation:
+        Ideas are designed for universal content generation. Each idea can be released
+        simultaneously as text, audio, and video across multiple platforms. The target_formats
+        and target_platforms fields support this multi-format, multi-platform approach.
+    
     Example:
+        >>> # Universal content - released as text, audio, and video across multiple platforms
         >>> idea = Idea(
         ...     title="The Digital Phantom Mystery",
         ...     concept="An investigation into unsolved internet mysteries",
@@ -98,7 +105,8 @@ class Idea:
         ...     emotional_quality="mysterious, suspenseful, intriguing",
         ...     target_audience="True crime enthusiasts aged 18-35",
         ...     target_demographics={"age_range": "18-35", "interests": "true_crime,technology"},
-        ...     target_platform="youtube",
+        ...     target_platforms=["youtube", "spotify", "medium", "tiktok"],
+        ...     target_formats=["text", "audio", "video"],
         ...     genre=ContentGenre.TRUE_CRIME,
         ...     keywords=["mystery", "internet", "unsolved", "digital forensics"],
         ...     themes=["digital privacy", "online identity", "modern detective work"],
@@ -107,7 +115,7 @@ class Idea:
         ...     setting_notes="Modern digital landscape, dark web forums, social media platforms",
         ...     tone_guidance="Start mysterious and intriguing, build suspense through investigation, "
         ...                   "maintain journalistic credibility while being engaging",
-        ...     length_target="15-20 minute episodes, 8-10 episode season",
+        ...     length_target="15-20 minutes per episode, 8-10 episode season",
         ...     outline="1. Introduction\n2. Case Presentation\n3. Investigation\n4. Conclusion",
         ...     skeleton="Hook → Background → Evidence → Theory → Resolution"
         ... )
@@ -117,6 +125,8 @@ class Idea:
         ...     title="Tech Tutorial Series",
         ...     concept="Teaching Python to beginners",
         ...     synopsis="A beginner-friendly Python course that teaches through real projects",
+        ...     target_platforms=["youtube", "udemy", "blog"],
+        ...     target_formats=["video", "text"],
         ...     keywords=["python", "programming", "tutorial"],
         ...     themes=["learn by doing", "practical skills"],
         ...     length_target="10-15 minute videos",
@@ -132,7 +142,8 @@ class Idea:
     emotional_quality: str = ""
     target_audience: str = ""
     target_demographics: Dict[str, str] = field(default_factory=dict)
-    target_platform: str = ""
+    target_platforms: List[str] = field(default_factory=list)
+    target_formats: List[str] = field(default_factory=list)
     genre: ContentGenre = ContentGenre.OTHER
     style: str = ""
     keywords: List[str] = field(default_factory=list)
@@ -205,7 +216,8 @@ class Idea:
             emotional_quality=data.get("emotional_quality", ""),
             target_audience=data.get("target_audience", ""),
             target_demographics=data.get("target_demographics", {}),
-            target_platform=data.get("target_platform", ""),
+            target_platforms=data.get("target_platforms", []),
+            target_formats=data.get("target_formats", []),
             genre=genre,
             style=data.get("style", ""),
             keywords=data.get("keywords", []),
@@ -239,7 +251,8 @@ class Idea:
         emotional_quality: str = "",
         target_audience: str = "",
         target_demographics: Optional[Dict[str, str]] = None,
-        target_platform: str = "",
+        target_platforms: Optional[List[str]] = None,
+        target_formats: Optional[List[str]] = None,
         genre: ContentGenre = ContentGenre.OTHER,
         style: str = "",
         keywords: Optional[List[str]] = None,
@@ -268,7 +281,8 @@ class Idea:
             emotional_quality: Emotional tone and impact
             target_audience: Description of target audience
             target_demographics: Demographic targeting data
-            target_platform: Primary target platform (e.g., "youtube", "tiktok", "podcast")
+            target_platforms: List of target platforms (e.g., ["youtube", "spotify", "medium"])
+            target_formats: List of output formats (e.g., ["text", "audio", "video"])
             genre: Content genre
             style: Content style or approach
             keywords: List of keywords or tags
@@ -330,7 +344,8 @@ class Idea:
             emotional_quality=emotional_quality,
             target_audience=target_audience,
             target_demographics=target_demographics or {},
-            target_platform=target_platform,
+            target_platforms=target_platforms or [],
+            target_formats=target_formats or [],
             genre=genre,
             style=style,
             keywords=keywords,
