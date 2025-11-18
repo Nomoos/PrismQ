@@ -57,6 +57,8 @@ class Idea:
     Attributes:
         title: Clear, compelling title for the idea
         concept: Core concept or hook that defines the idea
+        synopsis: Short version/first draft summary (1-3 paragraphs) for quick understanding
+        story_premise: Core story premise providing AI context for generation
         purpose: What problem does this solve or what value does it provide
         emotional_quality: The emotional tone and impact (e.g., "suspenseful", "inspiring")
         target_audience: Description of the intended audience
@@ -65,6 +67,11 @@ class Idea:
         genre: Primary content genre
         style: Content style or approach (e.g., "narrative", "analytical")
         keywords: List of keywords or tags associated with the idea
+        themes: List of core themes to explore in the content
+        character_notes: Character descriptions, roles, and relationships for story depth
+        setting_notes: Setting, world-building, and environmental details
+        tone_guidance: Detailed guidance on tone, mood, and atmosphere for AI generation
+        length_target: Target length specification (e.g., "2000 words", "15 minutes", "10 episodes")
         outline: Structured outline or content structure
         skeleton: Basic framework or skeleton of the content
         potential_scores: Potential performance across contexts (platform, region, demographic)
@@ -81,6 +88,12 @@ class Idea:
         >>> idea = Idea(
         ...     title="The Digital Phantom Mystery",
         ...     concept="An investigation into unsolved internet mysteries",
+        ...     synopsis="A deep dive into the most puzzling unsolved mysteries of the internet age. "
+        ...              "From vanished influencers to encrypted messages, we explore digital cold cases "
+        ...              "that continue to baffle investigators and captivate online communities.",
+        ...     story_premise="In an era where everything is documented online, some mysteries remain unsolved. "
+        ...                   "This series investigates digital disappearances, cryptic online phenomena, "
+        ...                   "and internet legends through the lens of modern forensics.",
         ...     purpose="Engage true crime audience with unique digital angle",
         ...     emotional_quality="mysterious, suspenseful, intriguing",
         ...     target_audience="True crime enthusiasts aged 18-35",
@@ -88,6 +101,13 @@ class Idea:
         ...     target_platform="youtube",
         ...     genre=ContentGenre.TRUE_CRIME,
         ...     keywords=["mystery", "internet", "unsolved", "digital forensics"],
+        ...     themes=["digital privacy", "online identity", "modern detective work"],
+        ...     character_notes="Host: Tech-savvy investigator with cybersecurity background. "
+        ...                     "Supporting: Digital forensics experts, online community members",
+        ...     setting_notes="Modern digital landscape, dark web forums, social media platforms",
+        ...     tone_guidance="Start mysterious and intriguing, build suspense through investigation, "
+        ...                   "maintain journalistic credibility while being engaging",
+        ...     length_target="15-20 minute episodes, 8-10 episode season",
         ...     outline="1. Introduction\n2. Case Presentation\n3. Investigation\n4. Conclusion",
         ...     skeleton="Hook → Background → Evidence → Theory → Resolution"
         ... )
@@ -96,13 +116,18 @@ class Idea:
         >>> manual_idea = Idea(
         ...     title="Tech Tutorial Series",
         ...     concept="Teaching Python to beginners",
+        ...     synopsis="A beginner-friendly Python course that teaches through real projects",
         ...     keywords=["python", "programming", "tutorial"],
+        ...     themes=["learn by doing", "practical skills"],
+        ...     length_target="10-15 minute videos",
         ...     inspiration_ids=[]  # No source inspirations
         ... )
     """
     
     title: str
     concept: str
+    synopsis: str = ""
+    story_premise: str = ""
     purpose: str = ""
     emotional_quality: str = ""
     target_audience: str = ""
@@ -111,6 +136,11 @@ class Idea:
     genre: ContentGenre = ContentGenre.OTHER
     style: str = ""
     keywords: List[str] = field(default_factory=list)
+    themes: List[str] = field(default_factory=list)
+    character_notes: str = ""
+    setting_notes: str = ""
+    tone_guidance: str = ""
+    length_target: str = ""
     outline: str = ""
     skeleton: str = ""
     potential_scores: Dict[str, int] = field(default_factory=dict)
@@ -169,6 +199,8 @@ class Idea:
         return cls(
             title=data.get("title", ""),
             concept=data.get("concept", ""),
+            synopsis=data.get("synopsis", ""),
+            story_premise=data.get("story_premise", ""),
             purpose=data.get("purpose", ""),
             emotional_quality=data.get("emotional_quality", ""),
             target_audience=data.get("target_audience", ""),
@@ -177,6 +209,11 @@ class Idea:
             genre=genre,
             style=data.get("style", ""),
             keywords=data.get("keywords", []),
+            themes=data.get("themes", []),
+            character_notes=data.get("character_notes", ""),
+            setting_notes=data.get("setting_notes", ""),
+            tone_guidance=data.get("tone_guidance", ""),
+            length_target=data.get("length_target", ""),
             outline=data.get("outline", ""),
             skeleton=data.get("skeleton", ""),
             potential_scores=data.get("potential_scores", {}),
@@ -196,6 +233,8 @@ class Idea:
         inspirations: List[Any],
         title: str,
         concept: str,
+        synopsis: str = "",
+        story_premise: str = "",
         purpose: str = "",
         emotional_quality: str = "",
         target_audience: str = "",
@@ -204,6 +243,11 @@ class Idea:
         genre: ContentGenre = ContentGenre.OTHER,
         style: str = "",
         keywords: Optional[List[str]] = None,
+        themes: Optional[List[str]] = None,
+        character_notes: str = "",
+        setting_notes: str = "",
+        tone_guidance: str = "",
+        length_target: str = "",
         outline: str = "",
         skeleton: str = "",
         created_by: Optional[str] = None,
@@ -218,6 +262,8 @@ class Idea:
             inspirations: List of IdeaInspiration instances to blend
             title: Title for the new Idea
             concept: Core concept distilled from the inspirations
+            synopsis: Short version/first draft summary
+            story_premise: Core story premise for AI context
             purpose: Purpose of this Idea
             emotional_quality: Emotional tone and impact
             target_audience: Description of target audience
@@ -226,6 +272,11 @@ class Idea:
             genre: Content genre
             style: Content style or approach
             keywords: List of keywords or tags
+            themes: List of core themes
+            character_notes: Character descriptions and roles
+            setting_notes: Setting and world-building details
+            tone_guidance: Detailed tone/mood guidance for AI
+            length_target: Target length specification
             outline: Structured outline or content structure
             skeleton: Basic framework or skeleton of the content
             created_by: Creator identifier
@@ -250,6 +301,15 @@ class Idea:
             # Remove duplicates while preserving order
             keywords = list(dict.fromkeys(keywords))
         
+        # Aggregate themes from inspirations if not provided
+        if themes is None:
+            themes = []
+            for insp in inspirations:
+                if hasattr(insp, 'themes') and insp.themes:
+                    themes.extend(insp.themes)
+            # Remove duplicates while preserving order
+            themes = list(dict.fromkeys(themes))
+        
         # Aggregate potential scores from inspirations if available
         potential_scores = {}
         for insp in inspirations:
@@ -264,6 +324,8 @@ class Idea:
         return cls(
             title=title,
             concept=concept,
+            synopsis=synopsis,
+            story_premise=story_premise,
             purpose=purpose,
             emotional_quality=emotional_quality,
             target_audience=target_audience,
@@ -272,6 +334,11 @@ class Idea:
             genre=genre,
             style=style,
             keywords=keywords,
+            themes=themes,
+            character_notes=character_notes,
+            setting_notes=setting_notes,
+            tone_guidance=tone_guidance,
+            length_target=length_target,
             outline=outline,
             skeleton=skeleton,
             potential_scores=potential_scores,

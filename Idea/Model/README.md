@@ -7,8 +7,10 @@ Core data model for content ideas in the PrismQ content creation workflow.
 - **Standalone or Derived** - Can be created independently or fused from multiple IdeaInspiration sources
 - **M:N Relationship** - Links multiple inspirations to create cohesive ideas (optional)
 - **Workflow Integration** - Second stage in content pipeline: IdeaInspiration → **Idea** → Script
+- **AI-Ready** - Rich fields optimized for AI story generation (synopsis, story_premise, character_notes, etc.)
 - **Platform Targeting** - Built-in support for different content platforms (YouTube, TikTok, Podcast, etc.)
-- **Structured Content** - Keywords, outline, and skeleton fields for content planning
+- **Structured Content** - Keywords, outline, skeleton, themes for comprehensive content planning
+- **Story Depth** - Character notes, setting details, tone guidance for complex narratives
 - **Versioning** - Track idea evolution through iterations
 - **Potential Scoring** - Evaluate cross-platform, regional, and demographic potential
 - **Zero Dependencies** - Pure Python implementation
@@ -154,6 +156,70 @@ idea = Idea.from_inspirations(
 print(idea.inspiration_ids)
 # Output: ['insp-123', 'insp-456', 'insp-789']
 ```
+
+## 🤖 AI-Ready Fields for Story Generation
+
+The model includes rich fields specifically designed to help AI generate complex, comprehensive stories:
+
+### Synopsis & Story Premise
+
+```python
+idea = Idea(
+    title="The Last Archive",
+    concept="A librarian discovers humanity's lost memories in a digital vault",
+    synopsis="""
+        In a world where memories can be digitized and stored, a young librarian 
+        named Ada discovers a hidden section of the Global Archive containing 
+        memories that were supposed to be deleted. As she explores these forbidden 
+        recollections, she uncovers a conspiracy that challenges everything she 
+        knows about her society.
+    """,
+    story_premise="""
+        Set in 2147, memories are currency and identity. The Global Archive stores 
+        everyone's experiences, but some memories are deemed too dangerous. When Ada 
+        finds the deletion vault, she must decide whether to expose the truth or 
+        protect the carefully constructed peace of her world.
+    """
+)
+```
+
+### Character & Setting Details
+
+```python
+idea.character_notes = """
+    Ada: 28, introverted librarian, photographic memory, haunted by deleted childhood
+    Marcus: Archive security chief, Ada's mentor, hiding dark past
+    Collective Voice: AI consciousness representing the Archive's will
+"""
+
+idea.setting_notes = """
+    Primary: The Global Archive - vast digital library with physical manifestation
+    Secondary: Memory Districts - neighborhoods organized by emotional themes
+    Atmosphere: Clean futuristic aesthetic hiding dystopian control
+"""
+```
+
+### Themes & Tone
+
+```python
+idea.themes = [
+    "identity and memory",
+    "truth vs. comfort",
+    "digital consciousness",
+    "rebellion against authority"
+]
+
+idea.tone_guidance = """
+    Act 1: Wonder and discovery (mysterious, hopeful)
+    Act 2: Growing unease (suspenseful, philosophical)
+    Act 3: Confrontation (intense, thought-provoking)
+    Overall: Balance sci-fi concepts with human emotion
+"""
+
+idea.length_target = "Feature film, 110-120 minutes, or 8-episode limited series"
+```
+
+These fields provide AI with comprehensive context for generating detailed, coherent narratives.
 
 ## 📊 Potential Scoring
 

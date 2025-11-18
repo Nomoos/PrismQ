@@ -17,6 +17,8 @@ class TestIdeaBasic:
         
         assert idea.title == "Test Idea"
         assert idea.concept == "Test concept for validation"
+        assert idea.synopsis == ""
+        assert idea.story_premise == ""
         assert idea.purpose == ""
         assert idea.emotional_quality == ""
         assert idea.target_audience == ""
@@ -25,6 +27,11 @@ class TestIdeaBasic:
         assert idea.genre == ContentGenre.OTHER
         assert idea.style == ""
         assert idea.keywords == []
+        assert idea.themes == []
+        assert idea.character_notes == ""
+        assert idea.setting_notes == ""
+        assert idea.tone_guidance == ""
+        assert idea.length_target == ""
         assert idea.outline == ""
         assert idea.skeleton == ""
         assert idea.potential_scores == {}
@@ -126,6 +133,29 @@ class TestIdeaBasic:
             datetime.fromisoformat(idea.updated_at)
         except ValueError:
             pytest.fail("Timestamps should be in ISO format")
+    
+    def test_ai_generation_fields(self):
+        """Test AI generation support fields."""
+        idea = Idea(
+            title="Complex Story Idea",
+            concept="Multi-layered narrative",
+            synopsis="A short version of the story in 2-3 paragraphs for quick AI context",
+            story_premise="Deep story premise providing AI with narrative foundation",
+            themes=["redemption", "identity", "technology"],
+            character_notes="Protagonist: Tech detective with dark past. Antagonist: AI mastermind",
+            setting_notes="Near-future cyberpunk city, underground hacker networks",
+            tone_guidance="Start mysterious, build tension, maintain hope, end with twist",
+            length_target="Feature length, 90-120 minutes"
+        )
+        
+        assert idea.synopsis == "A short version of the story in 2-3 paragraphs for quick AI context"
+        assert idea.story_premise == "Deep story premise providing AI with narrative foundation"
+        assert len(idea.themes) == 3
+        assert "redemption" in idea.themes
+        assert idea.character_notes.startswith("Protagonist:")
+        assert idea.setting_notes.startswith("Near-future")
+        assert "tension" in idea.tone_guidance
+        assert "90-120 minutes" in idea.length_target
 
 
 class TestIdeaSerialization:

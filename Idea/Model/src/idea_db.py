@@ -45,6 +45,8 @@ class IdeaDatabase:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 concept TEXT NOT NULL,
+                synopsis TEXT,
+                story_premise TEXT,
                 purpose TEXT,
                 emotional_quality TEXT,
                 target_audience TEXT,
@@ -53,6 +55,11 @@ class IdeaDatabase:
                 genre TEXT,
                 style TEXT,
                 keywords TEXT,  -- JSON string (list of keywords)
+                themes TEXT,  -- JSON string (list of themes)
+                character_notes TEXT,
+                setting_notes TEXT,
+                tone_guidance TEXT,
+                length_target TEXT,
                 outline TEXT,
                 skeleton TEXT,
                 potential_scores TEXT,  -- JSON string
@@ -123,20 +130,24 @@ class IdeaDatabase:
         # Extract and serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
         keywords = json.dumps(idea_dict.get("keywords", []))
+        themes = json.dumps(idea_dict.get("themes", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
         metadata = json.dumps(idea_dict.get("metadata", {}))
         inspiration_ids = idea_dict.get("inspiration_ids", [])
         
         cursor.execute("""
             INSERT INTO ideas (
-                title, concept, purpose, emotional_quality, target_audience,
-                target_demographics, target_platform, genre, style, keywords,
+                title, concept, synopsis, story_premise, purpose, emotional_quality, target_audience,
+                target_demographics, target_platform, genre, style, keywords, themes,
+                character_notes, setting_notes, tone_guidance, length_target,
                 outline, skeleton, potential_scores, metadata, version, status, notes,
                 created_at, updated_at, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             idea_dict.get("title"),
             idea_dict.get("concept"),
+            idea_dict.get("synopsis", ""),
+            idea_dict.get("story_premise", ""),
             idea_dict.get("purpose", ""),
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
@@ -145,6 +156,11 @@ class IdeaDatabase:
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
             keywords,
+            themes,
+            idea_dict.get("character_notes", ""),
+            idea_dict.get("setting_notes", ""),
+            idea_dict.get("tone_guidance", ""),
+            idea_dict.get("length_target", ""),
             idea_dict.get("outline", ""),
             idea_dict.get("skeleton", ""),
             potential_scores,
@@ -192,6 +208,7 @@ class IdeaDatabase:
         idea_dict = dict(row)
         idea_dict["target_demographics"] = json.loads(idea_dict["target_demographics"])
         idea_dict["keywords"] = json.loads(idea_dict["keywords"])
+        idea_dict["themes"] = json.loads(idea_dict["themes"])
         idea_dict["potential_scores"] = json.loads(idea_dict["potential_scores"])
         idea_dict["metadata"] = json.loads(idea_dict["metadata"])
         
@@ -276,20 +293,26 @@ class IdeaDatabase:
         # Serialize complex fields
         target_demographics = json.dumps(idea_dict.get("target_demographics", {}))
         keywords = json.dumps(idea_dict.get("keywords", []))
+        themes = json.dumps(idea_dict.get("themes", []))
         potential_scores = json.dumps(idea_dict.get("potential_scores", {}))
         metadata = json.dumps(idea_dict.get("metadata", {}))
         
         cursor.execute("""
             UPDATE ideas SET
-                title = ?, concept = ?, purpose = ?, emotional_quality = ?,
+                title = ?, concept = ?, synopsis = ?, story_premise = ?,
+                purpose = ?, emotional_quality = ?,
                 target_audience = ?, target_demographics = ?, target_platform = ?,
-                genre = ?, style = ?, keywords = ?, outline = ?, skeleton = ?,
+                genre = ?, style = ?, keywords = ?, themes = ?,
+                character_notes = ?, setting_notes = ?, tone_guidance = ?, length_target = ?,
+                outline = ?, skeleton = ?,
                 potential_scores = ?, metadata = ?,
                 version = ?, status = ?, notes = ?, updated_at = ?, created_by = ?
             WHERE id = ?
         """, (
             idea_dict.get("title"),
             idea_dict.get("concept"),
+            idea_dict.get("synopsis", ""),
+            idea_dict.get("story_premise", ""),
             idea_dict.get("purpose", ""),
             idea_dict.get("emotional_quality", ""),
             idea_dict.get("target_audience", ""),
@@ -298,10 +321,13 @@ class IdeaDatabase:
             idea_dict.get("genre", "other"),
             idea_dict.get("style", ""),
             keywords,
+            themes,
+            idea_dict.get("character_notes", ""),
+            idea_dict.get("setting_notes", ""),
+            idea_dict.get("tone_guidance", ""),
+            idea_dict.get("length_target", ""),
             idea_dict.get("outline", ""),
             idea_dict.get("skeleton", ""),
-            idea_dict.get("genre", "other"),
-            idea_dict.get("style", ""),
             potential_scores,
             metadata,
             idea_dict.get("version", 1),
