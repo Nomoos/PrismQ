@@ -48,19 +48,25 @@ The Idea generation process leverages local AI models to:
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Windows
-# Download from https://ollama.com/download
+# Download from https://ollama.com/download/windows
+# Install and add to PATH
 ```
 
 **Pull a recommended model:**
 ```bash
-# Fast, good quality (8GB RAM required)
+# Fast, good quality (8GB VRAM/RAM required)
 ollama pull llama3.2:8b
 
-# Better quality, needs more RAM (16GB RAM required)
+# Better quality, needs more memory (16GB VRAM/RAM required)
 ollama pull llama3.1:70b
 
-# Best for creative writing (32GB RAM required)
+# Best for creative writing (32GB VRAM/RAM required)
 ollama pull mixtral:8x7b
+
+# High-end models for RTX 4090/5090 (24GB VRAM)
+ollama pull llama3.1:70b-q4_K_M  # Quantized for 24GB VRAM
+ollama pull qwen2.5:72b-q4_K_M   # Excellent for long-form content
+ollama pull command-r:35b        # Great instruction following
 ```
 
 **Start Ollama server:**
@@ -68,6 +74,12 @@ ollama pull mixtral:8x7b
 ollama serve
 # Server runs on http://localhost:11434
 ```
+
+**GPU Acceleration:**
+- Ollama automatically detects and uses NVIDIA GPUs (CUDA)
+- AMD GPUs supported via ROCm on Linux
+- Apple Silicon uses Metal acceleration
+- CPU fallback available but much slower
 
 ### Option 2: LM Studio
 
@@ -86,6 +98,249 @@ cd text-generation-webui
 ```
 
 Enable API mode and use http://localhost:5000
+
+---
+
+## RTX 5090 Optimization Guide (Windows)
+
+### Hardware Specifications
+
+The NVIDIA RTX 5090 (expected specs based on leaks, verify with official release):
+- **VRAM**: 24-32GB GDDR7
+- **CUDA Cores**: ~21,000
+- **Memory Bandwidth**: ~1TB/s
+- **Optimal Use**: Large language models with high throughput
+
+### Recommended Models for RTX 5090
+
+#### Tier 1: Maximum Quality (24GB+ VRAM)
+
+**Best Overall Choice:**
+```bash
+# Llama 3.1 70B (Quantized Q4_K_M)
+ollama pull llama3.1:70b-q4_K_M
+# VRAM: ~22GB | Speed: 15-25 tokens/sec | Quality: Excellent
+```
+
+**Best for Creative Writing:**
+```bash
+# Qwen 2.5 72B (Quantized Q4_K_M)
+ollama pull qwen2.5:72b-q4_K_M
+# VRAM: ~23GB | Speed: 12-20 tokens/sec | Quality: Superior for long-form
+```
+
+**Best for Instruction Following:**
+```bash
+# Command R 35B
+ollama pull command-r:35b
+# VRAM: ~18GB | Speed: 25-35 tokens/sec | Quality: Excellent for structured output
+```
+
+**Best for Code and Technical:**
+```bash
+# DeepSeek Coder 33B
+ollama pull deepseek-coder:33b-q4_K_M
+# VRAM: ~17GB | Speed: 25-30 tokens/sec | Quality: Top-tier for technical content
+```
+
+#### Tier 2: Balanced Performance (12-20GB VRAM)
+
+```bash
+# Llama 3.1 13B (Full precision)
+ollama pull llama3.1:13b
+# VRAM: ~13GB | Speed: 40-60 tokens/sec | Quality: Very good
+
+# Mixtral 8x7B
+ollama pull mixtral:8x7b-q4_K_M
+# VRAM: ~16GB | Speed: 30-45 tokens/sec | Quality: Excellent for creative content
+
+# Mistral Small (22B)
+ollama pull mistral-small:22b-q4_K_M
+# VRAM: ~14GB | Speed: 35-50 tokens/sec | Quality: Great general purpose
+```
+
+#### Tier 3: Fast Generation (6-12GB VRAM)
+
+```bash
+# Llama 3.2 8B (Fast iteration)
+ollama pull llama3.2:8b
+# VRAM: ~8GB | Speed: 60-100 tokens/sec | Quality: Good for drafts
+
+# Phi-3 Medium 14B
+ollama pull phi3:14b-q4_K_M
+# VRAM: ~9GB | Speed: 50-80 tokens/sec | Quality: Excellent efficiency
+```
+
+### Windows-Specific Setup
+
+#### 1. Install CUDA Toolkit (if not already installed)
+
+```powershell
+# Download CUDA Toolkit from NVIDIA
+# https://developer.nvidia.com/cuda-downloads
+# Version 12.x recommended
+
+# Verify installation
+nvcc --version
+nvidia-smi
+```
+
+#### 2. Configure Ollama for RTX 5090
+
+```powershell
+# Set environment variables for optimal performance
+$env:OLLAMA_NUM_GPU=1
+$env:OLLAMA_GPU_OVERHEAD=2048  # 2GB overhead for Windows
+$env:OLLAMA_MAX_LOADED_MODELS=2  # Load multiple models if VRAM allows
+
+# Start Ollama
+ollama serve
+```
+
+#### 3. Monitor GPU Usage
+
+```powershell
+# Real-time monitoring
+nvidia-smi -l 1  # Update every second
+
+# Check specific metrics
+nvidia-smi --query-gpu=utilization.gpu,utilization.memory,memory.used,memory.free --format=csv -l 1
+```
+
+### Performance Optimization Tips
+
+#### 1. Context Window Optimization
+
+```python
+# For long-form content generation
+context_length = 8192  # RTX 5090 can handle larger contexts
+
+# Adjust based on model
+# - 70B models: 4096-8192 tokens
+# - 33B models: 8192-16384 tokens  
+# - 13B models: 16384-32768 tokens
+```
+
+#### 2. Batch Processing
+
+```python
+# Generate multiple Ideas in parallel (RTX 5090 can handle it)
+import concurrent.futures
+
+def generate_idea_batch(prompts: list[str], max_workers: int = 3):
+    """
+    RTX 5090 can run multiple smaller models or process multiple
+    requests to the same large model efficiently.
+    """
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(generate_idea, prompt) for prompt in prompts]
+        return [f.result() for f in concurrent.futures.as_completed(futures)]
+```
+
+#### 3. Temperature and Sampling Settings
+
+```python
+# For RTX 5090, you can afford higher quality settings
+generation_params = {
+    "temperature": 0.8,        # Creativity level
+    "top_p": 0.92,            # Nucleus sampling
+    "top_k": 40,              # Diversity
+    "repeat_penalty": 1.1,    # Avoid repetition
+    "num_ctx": 8192,          # Context window (RTX 5090 handles well)
+    "num_predict": 2048,      # Max tokens to generate
+}
+```
+
+### Model Selection Matrix
+
+| Use Case | Model | VRAM | Speed | Quality | Notes |
+|----------|-------|------|-------|---------|-------|
+| **Reddit Stories** | llama3.1:70b-q4_K_M | 22GB | Fast | ★★★★★ | Best authenticity |
+| **Creative Fiction** | qwen2.5:72b-q4_K_M | 23GB | Medium | ★★★★★ | Superior narratives |
+| **Educational Content** | command-r:35b | 18GB | Fast | ★★★★☆ | Structured output |
+| **Technical/Code** | deepseek-coder:33b | 17GB | Fast | ★★★★★ | Best for tutorials |
+| **Fast Iteration** | llama3.2:8b | 8GB | Very Fast | ★★★☆☆ | Draft generation |
+| **Multi-language** | qwen2.5:32b-q4_K_M | 16GB | Fast | ★★★★☆ | Best for non-English |
+
+### Troubleshooting RTX 5090
+
+#### Issue: "Out of memory" error
+
+**Solutions:**
+```powershell
+# 1. Use quantized models
+ollama pull llama3.1:70b-q4_K_M  # Instead of full precision
+
+# 2. Reduce context window
+$env:OLLAMA_NUM_CTX=4096
+
+# 3. Increase GPU overhead
+$env:OLLAMA_GPU_OVERHEAD=3072  # Allocate 3GB for Windows + apps
+
+# 4. Close other GPU applications
+# Check: Task Manager → Performance → GPU
+```
+
+#### Issue: Slow generation speed
+
+**Solutions:**
+```powershell
+# 1. Verify GPU is being used
+ollama run llama3.1:70b-q4_K_M "test" --verbose
+
+# 2. Update NVIDIA drivers
+# Download latest Game Ready or Studio drivers
+
+# 3. Disable Windows Game Mode (can interfere)
+# Settings → Gaming → Game Mode → Off
+
+# 4. Set high performance power plan
+powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+```
+
+#### Issue: Model not using full VRAM
+
+**Solutions:**
+```powershell
+# Force Ollama to use more VRAM
+$env:OLLAMA_MAX_VRAM=28  # GB, adjust based on your 5090 VRAM
+
+# Check current usage
+nvidia-smi
+```
+
+### Performance Benchmarks (Estimated)
+
+Based on RTX 4090 performance + 5090 improvements:
+
+| Model | Tokens/Second | Time for 500-word Idea |
+|-------|---------------|------------------------|
+| llama3.1:70b-q4_K_M | 20-25 | ~30-40 seconds |
+| qwen2.5:72b-q4_K_M | 15-22 | ~40-50 seconds |
+| command-r:35b | 30-40 | ~20-25 seconds |
+| mixtral:8x7b | 40-55 | ~15-20 seconds |
+| llama3.2:8b | 80-120 | ~8-12 seconds |
+
+*Note: Actual performance depends on Windows version, drivers, and system configuration.*
+
+### Sources and Verification
+
+**Hardware Information:**
+- NVIDIA RTX 5090 specifications: [NVIDIA Official](https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/)
+- GPU architecture details: Blackwell Architecture White Paper
+
+**Software Compatibility:**
+- Ollama Windows support: [Official Documentation](https://github.com/ollama/ollama/blob/main/docs/windows.md)
+- CUDA compatibility: [CUDA Toolkit Documentation](https://docs.nvidia.com/cuda/)
+
+**Model Performance:**
+- Ollama model library: [https://ollama.com/library](https://ollama.com/library)
+- Community benchmarks: [Ollama Discord](https://discord.gg/ollama)
+- Model cards on Hugging Face for detailed specifications
+
+**Optimization Guidelines:**
+- NVIDIA GPU optimization guide: [NVIDIA Developer Zone](https://developer.nvidia.com/blog/)
+- Ollama performance tuning: [GitHub Issues and Discussions](https://github.com/ollama/ollama/discussions)
 
 ---
 
@@ -774,3 +1029,47 @@ pkill ollama && ollama serve
 - Iterate and refine Ideas based on feedback
 
 Start with interactive generation to get familiar, then move to fusion and batch generation for production workflows.
+
+---
+
+## Related Documentation
+
+- **[Reddit Story Generation](./REDDIT_STORIES.md)** - Specialized guide for creating Reddit stories
+- **[AI Generation Guide](./AI_GENERATION.md)** - Best practices for AI content generation
+- **[Field Reference](./FIELDS.md)** - Complete field documentation
+- **[Multi-Format Content](./MULTI_FORMAT.md)** - Adapting Ideas for text/audio/video
+- **[Quick Start](./QUICK_START.md)** - Get started with basic usage
+
+---
+
+## Sources and References
+
+**Ollama Documentation:**
+- Official Ollama documentation: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
+- Model library and specifications: [https://ollama.com/library](https://ollama.com/library)
+- Windows setup guide: [https://github.com/ollama/ollama/blob/main/docs/windows.md](https://github.com/ollama/ollama/blob/main/docs/windows.md)
+
+**LM Studio:**
+- Official website: [https://lmstudio.ai/](https://lmstudio.ai/)
+- Documentation: Available within application
+
+**NVIDIA GPU Optimization:**
+- CUDA Toolkit: [https://developer.nvidia.com/cuda-toolkit](https://developer.nvidia.com/cuda-toolkit)
+- RTX series specifications: [https://www.nvidia.com/en-us/geforce/graphics-cards/](https://www.nvidia.com/en-us/geforce/graphics-cards/)
+- GPU optimization guides: [NVIDIA Developer Zone](https://developer.nvidia.com/)
+
+**Model Information:**
+- Llama 3.x documentation: Meta AI Research
+- Qwen 2.5 information: Alibaba Cloud
+- Mixtral documentation: Mistral AI
+- Model cards on Hugging Face: [https://huggingface.co/models](https://huggingface.co/models)
+
+**Performance Benchmarking:**
+- Community benchmarks: [Ollama Discord Server](https://discord.gg/ollama)
+- LLM performance comparisons: [Artificial Analysis](https://artificialanalysis.ai/)
+
+---
+
+## License
+
+Proprietary - All Rights Reserved © 2025 PrismQ

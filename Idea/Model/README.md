@@ -57,6 +57,7 @@ print(idea)
 - **[AI Content Generation](./_meta/docs/AI_GENERATION.md)** - Using AI-ready fields for story generation
 - **[Multi-Format Content](./_meta/docs/MULTI_FORMAT.md)** - Universal text/audio/video generation
 - **[Local AI Generation](./_meta/docs/LOCAL_AI_GENERATION.md)** - Generate Ideas using local AI models (Ollama, LM Studio)
+- **[Reddit Story Generation](./_meta/docs/REDDIT_STORIES.md)** - Create viral Reddit stories from short prompts
 
 ### Technical Documentation
 - **[Code Examples](./_meta/examples/example_usage.py)** - Practical usage examples
