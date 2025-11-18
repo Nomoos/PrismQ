@@ -56,11 +56,10 @@ print(idea)
 - **[Database Operations](./_meta/docs/DATABASE.md)** - CRUD operations, queries, backups
 - **[AI Content Generation](./_meta/docs/AI_GENERATION.md)** - Using AI-ready fields for story generation
 - **[Multi-Format Content](./_meta/docs/MULTI_FORMAT.md)** - Universal text/audio/video generation
+- **[Local AI Generation](./_meta/docs/LOCAL_AI_GENERATION.md)** - Generate Ideas using local AI models (Ollama, LM Studio)
 
 ### Technical Documentation
-- **[Database Setup](./_meta/docs/SETUP.md)** - Detailed database configuration (deprecated - see DATABASE.md)
 - **[Code Examples](./_meta/examples/example_usage.py)** - Practical usage examples
-- **[Implementation Summary](../IMPLEMENTATION_SUMMARY.md)** - Technical architecture details
 
 ---
 
