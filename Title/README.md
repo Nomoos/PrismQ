@@ -1,10 +1,14 @@
-# Title
+# Title (Název)
 
 **Workflow Stage: Idea Development Phase**
 
 ## Overview
 
 The **Title** stage represents the phase where the content is given its final title and metadata. This critical stage defines how the content will be presented and discovered.
+
+A strong title should be **short and punchy** (krátký, úderný), designed to:
+- **Attract attention** (přitáhnout pozornost)
+- **Suggest genre or mood** (naznačit žánr nebo náladu)
 
 ## Position in Workflow
 
@@ -16,7 +20,7 @@ IdeaInspiration → Idea → Outline → Skeleton → [Title] → Script
 
 Develop compelling titles and metadata that capture attention and accurately represent the content. This stage creates:
 
-- Main title (headline)
+- Main title (headline) - short, punchy, attention-grabbing
 - Subtitle (if applicable)
 - Social media variations
 - SEO-optimized versions
