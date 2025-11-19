@@ -19,12 +19,67 @@ from datetime import datetime
 
 
 class IdeaStatus(Enum):
-    """Status of an Idea in the content workflow."""
+    """Status of an Idea in the content workflow.
     
+    This enum represents the complete workflow stages from initial inspiration
+    to final publication and archival. Each state represents a distinct phase
+    in the content creation pipeline.
+    
+    Workflow Flow:
+        IdeaInspiration → Idea → Outline → Skeleton → Title
+          ↓
+        Script → ScriptDraft → ScriptReview → ScriptApproved
+          ↓
+        Voiceover → VoiceoverReview → VoiceoverApproved
+          ↓
+        ScenePlanning → KeyframePlanning → KeyframeGeneration
+          ↓
+        VideoAssembly → VideoReview → VideoFinalized
+          ↓
+        PublishPlanning → Published → AnalyticsReview
+          ↓
+        Archived
+    """
+    
+    # Legacy states (kept for backward compatibility)
     DRAFT = "draft"
     VALIDATED = "validated"
     APPROVED = "approved"
     IN_PRODUCTION = "in_production"
+    
+    # Idea Development Phase
+    IDEA = "idea"
+    OUTLINE = "outline"
+    SKELETON = "skeleton"
+    TITLE = "title"
+    
+    # Script Development Phase
+    SCRIPT = "script"
+    SCRIPT_DRAFT = "script_draft"
+    SCRIPT_REVIEW = "script_review"
+    SCRIPT_APPROVED = "script_approved"
+    
+    # Voiceover Production Phase
+    VOICEOVER = "voiceover"
+    VOICEOVER_REVIEW = "voiceover_review"
+    VOICEOVER_APPROVED = "voiceover_approved"
+    
+    # Visual Production Phase
+    SCENE_PLANNING = "scene_planning"
+    KEYFRAME_PLANNING = "keyframe_planning"
+    KEYFRAME_GENERATION = "keyframe_generation"
+    
+    # Video Assembly Phase
+    VIDEO_ASSEMBLY = "video_assembly"
+    VIDEO_REVIEW = "video_review"
+    VIDEO_FINALIZED = "video_finalized"
+    
+    # Publication Phase
+    PUBLISH_PLANNING = "publish_planning"
+    PUBLISHED = "published"
+    ANALYTICS_REVIEW = "analytics_review"
+    
+    # Final State
     ARCHIVED = "archived"
 
 
