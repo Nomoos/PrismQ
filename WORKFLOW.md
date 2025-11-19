@@ -36,7 +36,6 @@ stateDiagram-v2
     ScriptReview --> Archived
 
     ScriptApproved --> TextPublishing
-    ScriptApproved --> Voiceover
     ScriptApproved --> ScriptReview
     ScriptApproved --> Archived
 
@@ -45,24 +44,25 @@ stateDiagram-v2
     TextPublishing --> ScriptApproved
     TextPublishing --> Archived
 
+    PublishedText --> Voiceover
     PublishedText --> AnalyticsReviewText
     PublishedText --> Archived
 
     AnalyticsReviewText --> Archived
     AnalyticsReviewText --> IdeaInspiration
 
-    %% Audio Production continues
+    %% Audio Production uses published text
     Voiceover --> VoiceoverReview
-    Voiceover --> ScriptApproved
+    Voiceover --> PublishedText
     Voiceover --> Archived
 
     VoiceoverReview --> VoiceoverApproved
     VoiceoverReview --> Voiceover
-    VoiceoverReview --> ScriptApproved
+    VoiceoverReview --> PublishedText
     VoiceoverReview --> Archived
 
     VoiceoverApproved --> AudioPublishing
-    VoiceoverApproved --> ScenePlanning
+    VoiceoverApproved --> VoiceoverReview
     VoiceoverApproved --> Archived
 
     %% Audio Publication Branch
@@ -70,15 +70,16 @@ stateDiagram-v2
     AudioPublishing --> VoiceoverApproved
     AudioPublishing --> Archived
 
+    PublishedAudio --> ScenePlanning
     PublishedAudio --> AnalyticsReviewAudio
     PublishedAudio --> Archived
 
     AnalyticsReviewAudio --> Archived
     AnalyticsReviewAudio --> IdeaInspiration
 
-    %% Video Production continues
+    %% Video Production uses published audio
     ScenePlanning --> KeyframePlanning
-    ScenePlanning --> VoiceoverApproved
+    ScenePlanning --> PublishedAudio
     ScenePlanning --> Archived
 
     KeyframePlanning --> KeyframeGeneration
@@ -116,7 +117,7 @@ stateDiagram-v2
 
 ## Workflow Phases
 
-The workflow is organized into major phases with **three parallel publication tracks**:
+The workflow is organized into **progressive enrichment phases** where each format builds on the previous:
 
 ### Phase 1: Inspiration & Ideation
 - **[IdeaInspiration](./IdeaInspiration/)** - Content idea collection and scoring
@@ -130,111 +131,136 @@ The workflow is organized into major phases with **three parallel publication tr
 - **[ScriptReview](./Script/ScriptReview/)** - Editorial review and enhancement
 - **[ScriptApproved](./Script/ScriptApproved/)** - Final approved script
 
-### Phase 3A: Text Publication Track (Optional Branch)
-- **[TextPublishing](./Text/TextPublishing/)** - Text-only publication
+### Phase 3: Text Publication (First Format)
+- **[TextPublishing](./Text/TextPublishing/)** - Text content publication
   - Platforms: Medium, Substack, Blog, LinkedIn, Twitter
   - **PublishedText** - Live text content
+    - Can route to: AnalyticsReviewText, Voiceover (for audio production), or Archived
   - **AnalyticsReviewText** - Text performance analysis
-  - Routes to: Archived or IdeaInspiration (feedback loop)
 
-### Phase 3B: Audio Production
-- **[Voiceover](./Voiceover/)** - Voice recording/synthesis
+### Phase 4: Audio Production (Uses Published Text)
+- **[Voiceover](./Voiceover/)** - Voice recording/synthesis from published text
 - **[VoiceoverReview](./Voiceover/VoiceoverReview/)** - Audio quality review
 - **[VoiceoverApproved](./Voiceover/VoiceoverApproved/)** - Final approved audio
 
-### Phase 4A: Audio Publication Track (Optional Branch)
-- **[AudioPublishing](./Audio/AudioPublishing/)** - Audio-only publication
+### Phase 5: Audio Publication (Second Format)
+- **[AudioPublishing](./Audio/AudioPublishing/)** - Audio content publication
   - Platforms: Spotify, Apple Podcasts, SoundCloud, Audible
   - **PublishedAudio** - Live audio content
+    - Can route to: AnalyticsReviewAudio, ScenePlanning (for video production), or Archived
   - **AnalyticsReviewAudio** - Audio performance analysis
-  - Routes to: Archived or IdeaInspiration (feedback loop)
 
-### Phase 4B: Visual Production
-- **[ScenePlanning](./Visual/ScenePlanning/)** - Visual design and scene structure
+### Phase 6: Visual Production (Uses Published Audio)
+- **[ScenePlanning](./Visual/ScenePlanning/)** - Visual design from published audio
 - **[KeyframePlanning](./Visual/KeyframePlanning/)** - Keyframe design and specification
 - **[KeyframeGeneration](./Visual/KeyframeGeneration/)** - Visual asset creation
 
-### Phase 5: Video Assembly
+### Phase 7: Video Assembly
 - **[VideoAssembly](./Video/VideoAssembly/)** - Timeline editing and assembly
 - **[VideoReview](./Video/VideoReview/)** - Quality review and corrections
 - **[VideoFinalized](./Video/VideoFinalized/)** - Final approved video
 
-### Phase 6: Video Publishing
+### Phase 8: Video Publishing (Third Format)
 - **[PublishPlanning](./Publishing/PublishPlanning/)** - Publication strategy
 - **PublishedVideo** - Live video content
   - Platforms: YouTube, TikTok, Instagram Reels
 - **AnalyticsReviewVideo** - Video performance analysis
-- Routes to: Archived or IdeaInspiration (feedback loop)
 
-### Phase 7: Archive
+### Phase 9: Archive
 - **[Archived](./Archived/)** - Terminal state for completed/terminated content
 
-## Multi-Format Publishing Strategy
+## Progressive Multi-Format Publishing Strategy
 
-### Three Independent Publication Tracks
+### Sequential Format Enrichment
 
-**1. Text Track (Fastest)**
-```
-ScriptApproved → TextPublishing → PublishedText → AnalyticsReviewText
-Timeline: Hours to days
-```
+The workflow follows a **progressive enrichment model** where each format builds on the previous:
 
-**2. Audio Track (Medium)**
-```
-VoiceoverApproved → AudioPublishing → PublishedAudio → AnalyticsReviewAudio
-Timeline: Days to week
-```
+**1. Text → 2. Audio → 3. Video**
 
-**3. Video Track (Full Production)**
+**Stage 1: Text Publication (Foundation)**
 ```
-VideoFinalized → PublishPlanning → PublishedVideo → AnalyticsReviewVideo
-Timeline: Weeks
+ScriptApproved → TextPublishing → PublishedText
+  ├─→ AnalyticsReviewText (optional early analytics)
+  ├─→ Voiceover (continue to audio production)
+  └─→ Archived (text-only release)
 ```
+- **Timeline**: Hours to days
+- **Use Case**: Immediate publication, SEO content, blog posts
+- **Published text serves as source for voiceover recording**
 
-### Content Reuse Benefits
+**Stage 2: Audio Publication (Enrichment)**
+```
+PublishedText → Voiceover → VoiceoverReview → VoiceoverApproved → 
+AudioPublishing → PublishedAudio
+  ├─→ AnalyticsReviewAudio (optional early analytics)
+  ├─→ ScenePlanning (continue to video production)
+  └─→ Archived (audio-only release)
+```
+- **Timeline**: Days to week
+- **Use Case**: Podcast distribution, audio storytelling
+- **Published audio serves as foundation for video scenes**
 
-- **Same Core Content, Three Formats**: Write once, publish three times
-- **Staggered Release**: Build anticipation with sequential releases
-- **Platform Optimization**: Each format optimized for its platforms
-- **Audience Reach**: Cover all consumption preferences (readers, listeners, viewers)
-- **SEO Benefits**: Multiple pieces of content for same topic
+**Stage 3: Video Publication (Full Experience)**
+```
+PublishedAudio → ScenePlanning → KeyframePlanning → 
+KeyframeGeneration → VideoAssembly → VideoReview → VideoFinalized → 
+PublishPlanning → PublishedVideo → AnalyticsReviewVideo
+```
+- **Timeline**: Weeks
+- **Use Case**: YouTube, TikTok, maximum engagement
+- **Video combines published audio with visual elements**
+
+### Content Flow Benefits
+
+- **Progressive Release**: Publish text immediately, audio days later, video weeks later
+- **Quality Builds**: Each format uses the refined previous format as source
+- **Platform Optimization**: Each format optimized for its specific platforms
+- **Audience Reach**: Cover all consumption preferences sequentially
+- **Early Feedback**: Text analytics inform audio production, audio analytics inform video
+- **SEO Layering**: Multiple publication dates and formats boost discoverability
+- **Reduced Waste**: Stop at any stage (text-only, audio-only, or full video)
 
 ## State Transitions
 
-### Forward Progression (Multi-Format Paths)
+### Forward Progression (Sequential Format Enrichment)
 
-The workflow supports three parallel publication paths:
+The workflow follows a **progressive enrichment model**:
 
-**Text-Only Path (Fastest):**
+**Text-Only Path (Fastest - Stop after text):**
 ```
 IdeaInspiration → Idea (Outline → Skeleton → Title) → ScriptDraft → 
 ScriptReview → ScriptApproved → TextPublishing → PublishedText → 
 AnalyticsReviewText → Archived
 ```
 
-**Audio Path (Medium Timeline):**
+**Text + Audio Path (Medium - Stop after audio):**
 ```
-IdeaInspiration → Idea → ScriptDraft → ScriptReview → ScriptApproved → 
-Voiceover → VoiceoverReview → VoiceoverApproved → AudioPublishing → 
-PublishedAudio → AnalyticsReviewAudio → Archived
+... → ScriptApproved → TextPublishing → PublishedText → Voiceover → 
+VoiceoverReview → VoiceoverApproved → AudioPublishing → PublishedAudio → 
+AnalyticsReviewAudio → Archived
 ```
 
-**Video Path (Full Production):**
+**Full Production Path (Complete - All formats):**
 ```
-IdeaInspiration → Idea → ScriptDraft → ScriptReview → ScriptApproved → 
-Voiceover → VoiceoverReview → VoiceoverApproved → ScenePlanning → 
+... → PublishedText → Voiceover → ... → PublishedAudio → ScenePlanning → 
 KeyframePlanning → KeyframeGeneration → VideoAssembly → VideoReview → 
 VideoFinalized → PublishPlanning → PublishedVideo → AnalyticsReviewVideo → 
 Archived
 ```
 
-**Combined Strategy (Maximum Reach):**
+**Key Data Flow:**
 ```
-ScriptApproved ──┬──→ TextPublishing → PublishedText → AnalyticsReviewText
-                 │
-                 └──→ Voiceover → VoiceoverApproved ──┬──→ AudioPublishing → PublishedAudio
-                                                       │
-                                                       └──→ ScenePlanning → ... → PublishedVideo
+ScriptApproved
+    ↓
+TextPublishing → PublishedText (text is published)
+    ↓
+Voiceover (uses published text as source)
+    ↓
+VoiceoverApproved → AudioPublishing → PublishedAudio (audio is published)
+    ↓
+ScenePlanning (uses published audio as foundation)
+    ↓
+... → PublishedVideo (video is published)
 ```
 
 ### Backward Transitions (Revision Loops)
@@ -248,19 +274,21 @@ Quality issues or improvements trigger backward movement:
 
 **Text Publishing Revisions**
 - `TextPublishing → ScriptApproved` - Text formatting issues, need script revision
+- `Voiceover → PublishedText` - Voiceover issues with published text source
 
 **Voiceover Phase Revisions**
 - `VoiceoverReview → Voiceover` - Re-recording needed
-- `VoiceoverReview → ScriptApproved` - Script changes affect voiceover
-- `Voiceover → ScriptApproved` - Script errors discovered during recording
+- `VoiceoverReview → PublishedText` - Need to revise published text source
+- `Voiceover → PublishedText` - Published text has errors discovered during recording
 
 **Audio Publishing Revisions**
 - `AudioPublishing → VoiceoverApproved` - Audio file issues, need re-export
+- `ScenePlanning → PublishedAudio` - Video planning issues with audio source
 
 **Visual Phase Revisions**
 - `KeyframePlanning → ScenePlanning` - Scene structure needs revision
 - `KeyframeGeneration → KeyframePlanning` - Keyframe specs need adjustment
-- `ScenePlanning → VoiceoverApproved` - Audio timing issues affect visuals
+- `ScenePlanning → PublishedAudio` - Audio timing issues affect visuals
 
 **Video Phase Revisions**
 - `VideoReview → VideoAssembly` - Assembly/editing issues
@@ -277,6 +305,7 @@ Quality issues or improvements trigger backward movement:
 - `AnalyticsReviewAudio → IdeaInspiration` - Audio performance insights  
 - `AnalyticsReviewVideo → IdeaInspiration` - Video performance insights
 - Cross-format insights inform future content strategy
+- Early format analytics inform production decisions for later formats
 - Performance data feeds back to improve future content
 
 **Concept Refinement Loop**

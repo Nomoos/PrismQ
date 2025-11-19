@@ -25,27 +25,32 @@ class IdeaStatus(Enum):
     to final publication and archival. Each state represents a distinct phase
     in the content creation pipeline.
     
-    Multi-Format Workflow Flow:
+    Progressive Multi-Format Workflow:
         IdeaInspiration → Idea → Outline → Skeleton → Title
           ↓
         Script → ScriptDraft → ScriptReview → ScriptApproved
-          ├─→ Text Publishing → Published (Text) → AnalyticsReview (Text)
+          ↓
+        TextPublishing → PublishedText (text is published & used for voiceover)
+          ├─→ AnalyticsReviewText (optional early analytics)
           ↓
         Voiceover → VoiceoverReview → VoiceoverApproved
-          ├─→ Audio Publishing → Published (Audio) → AnalyticsReview (Audio)
+          ↓
+        AudioPublishing → PublishedAudio (audio is published & used for video)
+          ├─→ AnalyticsReviewAudio (optional early analytics)
           ↓
         ScenePlanning → KeyframePlanning → KeyframeGeneration
           ↓
         VideoAssembly → VideoReview → VideoFinalized
           ↓
-        PublishPlanning → Published (Video) → AnalyticsReview (Video)
+        PublishPlanning → PublishedVideo → AnalyticsReviewVideo
           ↓
         Archived
     
-    Note: Content can be published in multiple formats:
-    - Text: ScriptApproved → Text Publishing
-    - Audio: VoiceoverApproved → Audio Publishing
-    - Video: VideoFinalized → Video Publishing
+    Note: Content follows progressive enrichment:
+    - Text: Published text serves as source for voiceover recording
+    - Audio: Published audio serves as foundation for video scene planning
+    - Video: Combines published audio with visual elements
+    - Can stop at any stage (text-only, audio-only, or full video)
     """
     
     # Legacy states (kept for backward compatibility)
@@ -66,22 +71,22 @@ class IdeaStatus(Enum):
     SCRIPT_REVIEW = "script_review"
     SCRIPT_APPROVED = "script_approved"
     
-    # Text Publication Branch (from ScriptApproved)
+    # Text Publication (First Format - Source for Audio)
     TEXT_PUBLISHING = "text_publishing"
     TEXT_PUBLISHED = "text_published"
     TEXT_ANALYTICS = "text_analytics"
     
-    # Voiceover Production Phase
+    # Voiceover Production Phase (Uses Published Text)
     VOICEOVER = "voiceover"
     VOICEOVER_REVIEW = "voiceover_review"
     VOICEOVER_APPROVED = "voiceover_approved"
     
-    # Audio Publication Branch (from VoiceoverApproved)
+    # Audio Publication (Second Format - Source for Video)
     AUDIO_PUBLISHING = "audio_publishing"
     AUDIO_PUBLISHED = "audio_published"
     AUDIO_ANALYTICS = "audio_analytics"
     
-    # Visual Production Phase
+    # Visual Production Phase (Uses Published Audio)
     SCENE_PLANNING = "scene_planning"
     KEYFRAME_PLANNING = "keyframe_planning"
     KEYFRAME_GENERATION = "keyframe_generation"
@@ -91,7 +96,7 @@ class IdeaStatus(Enum):
     VIDEO_REVIEW = "video_review"
     VIDEO_FINALIZED = "video_finalized"
     
-    # Video Publication Branch (from VideoFinalized)
+    # Video Publication (Third Format)
     VIDEO_PUBLISH_PLANNING = "video_publish_planning"
     VIDEO_PUBLISHED = "video_published"
     VIDEO_ANALYTICS = "video_analytics"
