@@ -25,20 +25,27 @@ class IdeaStatus(Enum):
     to final publication and archival. Each state represents a distinct phase
     in the content creation pipeline.
     
-    Workflow Flow:
+    Multi-Format Workflow Flow:
         IdeaInspiration → Idea → Outline → Skeleton → Title
           ↓
         Script → ScriptDraft → ScriptReview → ScriptApproved
+          ├─→ Text Publishing → Published (Text) → AnalyticsReview (Text)
           ↓
         Voiceover → VoiceoverReview → VoiceoverApproved
+          ├─→ Audio Publishing → Published (Audio) → AnalyticsReview (Audio)
           ↓
         ScenePlanning → KeyframePlanning → KeyframeGeneration
           ↓
         VideoAssembly → VideoReview → VideoFinalized
           ↓
-        PublishPlanning → Published → AnalyticsReview
+        PublishPlanning → Published (Video) → AnalyticsReview (Video)
           ↓
         Archived
+    
+    Note: Content can be published in multiple formats:
+    - Text: ScriptApproved → Text Publishing
+    - Audio: VoiceoverApproved → Audio Publishing
+    - Video: VideoFinalized → Video Publishing
     """
     
     # Legacy states (kept for backward compatibility)
@@ -59,10 +66,20 @@ class IdeaStatus(Enum):
     SCRIPT_REVIEW = "script_review"
     SCRIPT_APPROVED = "script_approved"
     
+    # Text Publication Branch (from ScriptApproved)
+    TEXT_PUBLISHING = "text_publishing"
+    TEXT_PUBLISHED = "text_published"
+    TEXT_ANALYTICS = "text_analytics"
+    
     # Voiceover Production Phase
     VOICEOVER = "voiceover"
     VOICEOVER_REVIEW = "voiceover_review"
     VOICEOVER_APPROVED = "voiceover_approved"
+    
+    # Audio Publication Branch (from VoiceoverApproved)
+    AUDIO_PUBLISHING = "audio_publishing"
+    AUDIO_PUBLISHED = "audio_published"
+    AUDIO_ANALYTICS = "audio_analytics"
     
     # Visual Production Phase
     SCENE_PLANNING = "scene_planning"
@@ -74,7 +91,12 @@ class IdeaStatus(Enum):
     VIDEO_REVIEW = "video_review"
     VIDEO_FINALIZED = "video_finalized"
     
-    # Publication Phase
+    # Video Publication Branch (from VideoFinalized)
+    VIDEO_PUBLISH_PLANNING = "video_publish_planning"
+    VIDEO_PUBLISHED = "video_published"
+    VIDEO_ANALYTICS = "video_analytics"
+    
+    # Legacy Publication States (for backward compatibility)
     PUBLISH_PLANNING = "publish_planning"
     PUBLISHED = "published"
     ANALYTICS_REVIEW = "analytics_review"

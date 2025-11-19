@@ -35,10 +35,23 @@ stateDiagram-v2
     ScriptReview --> Idea
     ScriptReview --> Archived
 
+    ScriptApproved --> TextPublishing
     ScriptApproved --> Voiceover
     ScriptApproved --> ScriptReview
     ScriptApproved --> Archived
 
+    %% Text Publication Branch
+    TextPublishing --> PublishedText
+    TextPublishing --> ScriptApproved
+    TextPublishing --> Archived
+
+    PublishedText --> AnalyticsReviewText
+    PublishedText --> Archived
+
+    AnalyticsReviewText --> Archived
+    AnalyticsReviewText --> IdeaInspiration
+
+    %% Audio Production continues
     Voiceover --> VoiceoverReview
     Voiceover --> ScriptApproved
     Voiceover --> Archived
@@ -48,9 +61,22 @@ stateDiagram-v2
     VoiceoverReview --> ScriptApproved
     VoiceoverReview --> Archived
 
+    VoiceoverApproved --> AudioPublishing
     VoiceoverApproved --> ScenePlanning
     VoiceoverApproved --> Archived
 
+    %% Audio Publication Branch
+    AudioPublishing --> PublishedAudio
+    AudioPublishing --> VoiceoverApproved
+    AudioPublishing --> Archived
+
+    PublishedAudio --> AnalyticsReviewAudio
+    PublishedAudio --> Archived
+
+    AnalyticsReviewAudio --> Archived
+    AnalyticsReviewAudio --> IdeaInspiration
+
+    %% Video Production continues
     ScenePlanning --> KeyframePlanning
     ScenePlanning --> VoiceoverApproved
     ScenePlanning --> Archived
@@ -76,20 +102,21 @@ stateDiagram-v2
     VideoFinalized --> VideoReview
     VideoFinalized --> Archived
 
-    PublishPlanning --> Published
+    %% Video Publication Branch
+    PublishPlanning --> PublishedVideo
     PublishPlanning --> VideoFinalized
     PublishPlanning --> Archived
 
-    Published --> AnalyticsReview
-    Published --> Archived
+    PublishedVideo --> AnalyticsReviewVideo
+    PublishedVideo --> Archived
 
-    AnalyticsReview --> Archived
-    AnalyticsReview --> IdeaInspiration
+    AnalyticsReviewVideo --> Archived
+    AnalyticsReviewVideo --> IdeaInspiration
 ```
 
 ## Workflow Phases
 
-The workflow is organized into 7 major phases:
+The workflow is organized into major phases with **three parallel publication tracks**:
 
 ### Phase 1: Inspiration & Ideation
 - **[IdeaInspiration](./IdeaInspiration/)** - Content idea collection and scoring
@@ -103,12 +130,26 @@ The workflow is organized into 7 major phases:
 - **[ScriptReview](./Script/ScriptReview/)** - Editorial review and enhancement
 - **[ScriptApproved](./Script/ScriptApproved/)** - Final approved script
 
-### Phase 3: Audio Production
+### Phase 3A: Text Publication Track (Optional Branch)
+- **[TextPublishing](./Text/TextPublishing/)** - Text-only publication
+  - Platforms: Medium, Substack, Blog, LinkedIn, Twitter
+  - **PublishedText** - Live text content
+  - **AnalyticsReviewText** - Text performance analysis
+  - Routes to: Archived or IdeaInspiration (feedback loop)
+
+### Phase 3B: Audio Production
 - **[Voiceover](./Voiceover/)** - Voice recording/synthesis
 - **[VoiceoverReview](./Voiceover/VoiceoverReview/)** - Audio quality review
 - **[VoiceoverApproved](./Voiceover/VoiceoverApproved/)** - Final approved audio
 
-### Phase 4: Visual Production
+### Phase 4A: Audio Publication Track (Optional Branch)
+- **[AudioPublishing](./Audio/AudioPublishing/)** - Audio-only publication
+  - Platforms: Spotify, Apple Podcasts, SoundCloud, Audible
+  - **PublishedAudio** - Live audio content
+  - **AnalyticsReviewAudio** - Audio performance analysis
+  - Routes to: Archived or IdeaInspiration (feedback loop)
+
+### Phase 4B: Visual Production
 - **[ScenePlanning](./Visual/ScenePlanning/)** - Visual design and scene structure
 - **[KeyframePlanning](./Visual/KeyframePlanning/)** - Keyframe design and specification
 - **[KeyframeGeneration](./Visual/KeyframeGeneration/)** - Visual asset creation
@@ -118,25 +159,82 @@ The workflow is organized into 7 major phases:
 - **[VideoReview](./Video/VideoReview/)** - Quality review and corrections
 - **[VideoFinalized](./Video/VideoFinalized/)** - Final approved video
 
-### Phase 6: Publishing
+### Phase 6: Video Publishing
 - **[PublishPlanning](./Publishing/PublishPlanning/)** - Publication strategy
-- **[Published](./Publishing/Published/)** - Live content management
-- **[AnalyticsReview](./Publishing/AnalyticsReview/)** - Performance analysis
+- **PublishedVideo** - Live video content
+  - Platforms: YouTube, TikTok, Instagram Reels
+- **AnalyticsReviewVideo** - Video performance analysis
+- Routes to: Archived or IdeaInspiration (feedback loop)
 
 ### Phase 7: Archive
 - **[Archived](./Archived/)** - Terminal state for completed/terminated content
 
+## Multi-Format Publishing Strategy
+
+### Three Independent Publication Tracks
+
+**1. Text Track (Fastest)**
+```
+ScriptApproved → TextPublishing → PublishedText → AnalyticsReviewText
+Timeline: Hours to days
+```
+
+**2. Audio Track (Medium)**
+```
+VoiceoverApproved → AudioPublishing → PublishedAudio → AnalyticsReviewAudio
+Timeline: Days to week
+```
+
+**3. Video Track (Full Production)**
+```
+VideoFinalized → PublishPlanning → PublishedVideo → AnalyticsReviewVideo
+Timeline: Weeks
+```
+
+### Content Reuse Benefits
+
+- **Same Core Content, Three Formats**: Write once, publish three times
+- **Staggered Release**: Build anticipation with sequential releases
+- **Platform Optimization**: Each format optimized for its platforms
+- **Audience Reach**: Cover all consumption preferences (readers, listeners, viewers)
+- **SEO Benefits**: Multiple pieces of content for same topic
+
 ## State Transitions
 
-### Forward Progression (Happy Path)
+### Forward Progression (Multi-Format Paths)
 
-The normal forward flow through the workflow:
+The workflow supports three parallel publication paths:
+
+**Text-Only Path (Fastest):**
 ```
 IdeaInspiration → Idea (Outline → Skeleton → Title) → ScriptDraft → 
-ScriptReview → ScriptApproved → Voiceover → VoiceoverReview → 
-VoiceoverApproved → ScenePlanning → KeyframePlanning → 
-KeyframeGeneration → VideoAssembly → VideoReview → VideoFinalized → 
-PublishPlanning → Published → AnalyticsReview → Archived
+ScriptReview → ScriptApproved → TextPublishing → PublishedText → 
+AnalyticsReviewText → Archived
+```
+
+**Audio Path (Medium Timeline):**
+```
+IdeaInspiration → Idea → ScriptDraft → ScriptReview → ScriptApproved → 
+Voiceover → VoiceoverReview → VoiceoverApproved → AudioPublishing → 
+PublishedAudio → AnalyticsReviewAudio → Archived
+```
+
+**Video Path (Full Production):**
+```
+IdeaInspiration → Idea → ScriptDraft → ScriptReview → ScriptApproved → 
+Voiceover → VoiceoverReview → VoiceoverApproved → ScenePlanning → 
+KeyframePlanning → KeyframeGeneration → VideoAssembly → VideoReview → 
+VideoFinalized → PublishPlanning → PublishedVideo → AnalyticsReviewVideo → 
+Archived
+```
+
+**Combined Strategy (Maximum Reach):**
+```
+ScriptApproved ──┬──→ TextPublishing → PublishedText → AnalyticsReviewText
+                 │
+                 └──→ Voiceover → VoiceoverApproved ──┬──→ AudioPublishing → PublishedAudio
+                                                       │
+                                                       └──→ ScenePlanning → ... → PublishedVideo
 ```
 
 ### Backward Transitions (Revision Loops)
@@ -148,10 +246,16 @@ Quality issues or improvements trigger backward movement:
 - `ScriptReview → Idea` - Fundamental concept changes required
 - `ScriptApproved → ScriptReview` - Issues found after approval
 
+**Text Publishing Revisions**
+- `TextPublishing → ScriptApproved` - Text formatting issues, need script revision
+
 **Voiceover Phase Revisions**
 - `VoiceoverReview → Voiceover` - Re-recording needed
 - `VoiceoverReview → ScriptApproved` - Script changes affect voiceover
 - `Voiceover → ScriptApproved` - Script errors discovered during recording
+
+**Audio Publishing Revisions**
+- `AudioPublishing → VoiceoverApproved` - Audio file issues, need re-export
 
 **Visual Phase Revisions**
 - `KeyframePlanning → ScenePlanning` - Scene structure needs revision
@@ -165,12 +269,14 @@ Quality issues or improvements trigger backward movement:
 
 **Publishing Phase Revisions**
 - `PublishPlanning → VideoFinalized` - Video changes needed before publish
-- `Published → Archived` - Immediate archive (remove from platforms)
 
 ### Feedback Loops
 
-**Learning Loop**
-- `AnalyticsReview → IdeaInspiration` - Insights inform new content
+**Format-Specific Learning Loops**
+- `AnalyticsReviewText → IdeaInspiration` - Text performance insights
+- `AnalyticsReviewAudio → IdeaInspiration` - Audio performance insights  
+- `AnalyticsReviewVideo → IdeaInspiration` - Video performance insights
+- Cross-format insights inform future content strategy
 - Performance data feeds back to improve future content
 
 **Concept Refinement Loop**
