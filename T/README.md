@@ -23,9 +23,9 @@ Analytics Feedback              Audio Pipeline (A)
 
 Gather and evaluate content inspiration from multiple sources to identify high-potential ideas.
 
-- **[Collection](./IdeaInspiration/Collection/)** - Multi-source inspiration collection
-- **[Classification](./IdeaInspiration/Classification/)** - Content categorization
-- **[Scoring](./IdeaInspiration/Scoring/)** - Engagement potential scoring
+- Collection - Multi-source inspiration collection (planned)
+- Classification - Content categorization (planned)
+- Scoring - Engagement potential scoring (planned)
 
 **[→ Explore IdeaInspiration Module](./IdeaInspiration/README.md)**
 

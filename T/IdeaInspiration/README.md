@@ -60,9 +60,9 @@ Scores each inspiration on a **0-100 scale** based on:
 ```
 IdeaInspiration/
 ├── README.md              # This file
-├── Collection/            # Source collection strategies
-├── Classification/        # Content categorization
-├── Scoring/              # Engagement potential scoring
+├── Collection/            # (Planned) Source collection strategies
+├── Classification/        # (Planned) Content categorization
+├── Scoring/              # (Planned) Engagement potential scoring
 └── _meta/                # Module metadata
     ├── docs/             # Documentation
     ├── examples/         # Usage examples
