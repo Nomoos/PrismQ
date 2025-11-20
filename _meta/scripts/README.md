@@ -130,11 +130,28 @@ This validator can be integrated into:
 - Node.js >= 18.0.0
 - No external dependencies (uses only Node.js built-in modules)
 
+## Testing
+
+The validator includes a comprehensive test suite to ensure reliability:
+
+```bash
+node _meta/scripts/test-validator.js
+```
+
+The test suite validates:
+- Simple state diagrams
+- Composite states
+- Multiple transitions
+- Comment handling
+- Error detection
+
 ## File Structure
 
 ```
 _meta/scripts/
 ├── validate-mermaid-states.js    # Main validation script
+├── test-validator.js             # Test suite
+├── VALIDATION_REPORT.md          # Detailed validation report
 └── README.md                      # This file
 ```
 
