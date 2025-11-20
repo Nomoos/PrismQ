@@ -54,6 +54,7 @@ print(idea)
 
 ### Guides by Topic
 - **[Database Operations](./_meta/docs/DATABASE.md)** - CRUD operations, queries, backups
+- **[Multi-Language Translation](./_meta/docs/TRANSLATION.md)** - 🆕 Story translations with AI feedback loop
 - **[AI Content Generation](./_meta/docs/AI_GENERATION.md)** - Using AI-ready fields for story generation
 - **[Multi-Format Content](./_meta/docs/MULTI_FORMAT.md)** - Universal text/audio/video generation
 - **[Local AI Generation](./_meta/docs/LOCAL_AI_GENERATION.md)** - Generate Ideas using local AI models (Ollama, LM Studio)
@@ -68,6 +69,7 @@ print(idea)
 
 ✅ **Universal Content Generation** - Same idea → text, audio, and video  
 ✅ **Multi-Platform** - YouTube, Spotify, Medium, TikTok, and more  
+✅ **Multi-Language Support** - 🆕 Translate stories with AI feedback loop  
 ✅ **Standalone or Derived** - Create independently or fuse from inspirations  
 ✅ **M:N Relationships** - Link multiple IdeaInspiration sources  
 ✅ **AI-Ready Fields** - Rich context for AI story generation (synopsis, character notes, tone guidance)  
