@@ -24,7 +24,7 @@ node _meta/scripts/validate-mermaid-states.js
 Or from the project root:
 
 ```bash
-cd /home/runner/work/PrismQ/PrismQ
+cd PrismQ
 node _meta/scripts/validate-mermaid-states.js
 ```
 

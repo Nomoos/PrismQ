@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const MermaidStateValidator = require('./validate-mermaid-states.js');
 
 // Test cases
@@ -101,7 +102,7 @@ function runTests() {
         const validator = new MermaidStateValidator();
         
         // Extract and parse diagram
-        const tempFile = `/tmp/test-${index}.md`;
+        const tempFile = path.join(os.tmpdir(), `test-mermaid-${index}.md`);
         fs.writeFileSync(tempFile, testCase.content);
         
         const diagrams = validator.extractMermaidDiagrams(tempFile);

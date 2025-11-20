@@ -34,27 +34,27 @@
 4. **Archived** (Terminal)
 5. AudioPublishing
 6. **Idea** (Composite)
-   - Outline (substate)
-   - Skeleton (substate)
-   - Title (substate)
 7. IdeaInspiration (Start)
 8. KeyframeGeneration
 9. KeyframePlanning
-10. PublishPlanning
-11. PublishedAudio
-12. PublishedText
-13. PublishedVideo
-14. ScenePlanning
-15. ScriptApproved
-16. ScriptDraft
-17. ScriptReview
-18. TextPublishing
-19. VideoAssembly
-20. VideoFinalized
-21. VideoReview
-22. Voiceover
-23. VoiceoverApproved
-24. VoiceoverReview
+10. **Outline** (substate of Idea)
+11. PublishPlanning
+12. PublishedAudio
+13. PublishedText
+14. PublishedVideo
+15. ScenePlanning
+16. ScriptApproved
+17. ScriptDraft
+18. ScriptReview
+19. **Skeleton** (substate of Idea)
+20. TextPublishing
+21. **Title** (substate of Idea)
+22. VideoAssembly
+23. VideoFinalized
+24. VideoReview
+25. Voiceover
+26. VoiceoverApproved
+27. VoiceoverReview
 
 ### Composite States
 
