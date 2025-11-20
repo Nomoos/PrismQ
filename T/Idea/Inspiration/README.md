@@ -152,6 +152,7 @@ This creates a continuous improvement loop where published content performance i
 
 ### Python Namespace
 ```python
+from datetime import datetime
 from PrismQ.T.Idea.Inspiration import Collection, Classification, Scoring
 
 # Collect inspiration from sources
