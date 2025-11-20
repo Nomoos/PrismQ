@@ -1,8 +1,164 @@
+# T/Idea - Idea Development Module
 
-PrismQ.Idea bude reprezentovat jednotku kreativního obsahu — základní „myšlenkový objekt“, který vzniká z procesu inspirace, analýzy a transformace. Je to abstraktní entita, která zachycuje samotnou podstatu nové myšlenky: její účel, téma, potenciál i směr dalšího rozvoje. Nemá být pouhým textem nebo jednorázovým konceptem, ale strukturovaným produktem, který lze sledovat, vyhodnocovat, modifikovat a integrovat do větších workflow (např. generování scénářů, podcastů, videí, marketingového obsahu nebo produktových návrhů).
+**Namespace**: `PrismQ.T.Idea`
 
-Součástí Idea bude popis jejího zaměření — co představuje, jaký problém řeší, jakou emocionální kvalitu nese, pro koho je určená a jaký dopad má mít. Idea bude obsahovat metadata jako cílovou demografii, platformu, styl či žánr, ale i technická nebo strategická kritéria, která určují její použitelnost v různých kontextech. Díky tomu bude možné jednu ideu nejen uchovat, ale také snadno analyzovat, řadit, filtrovat a znovu používat v dalších projektech.
+The Idea module represents a unit of creative content — the fundamental "thought object" that emerges from inspiration, analysis, and transformation. It is an abstract entity that captures the essence of a new idea: its purpose, theme, potential, and direction for further development.
 
-Důležitou funkcí Idea bude modelování jejího potenciálu — tedy schopnosti ideje fungovat napříč platformami, regiony nebo věkovými skupinami. Idea tak nebude izolovaným nápadem, ale měřitelným prvkem s ohodnocenými parametry, které umožňují rozhodnout, zda je vhodná pro krátká videa, delší podcasty, mezinárodní publikum nebo úzce specializovanou skupinu. Hodnocení potenciálu může být výpočetní nebo expertně zadávané, ale vždy bude formálně součástí struktury.
+## Purpose
 
-Idea bude také navržená tak, aby reflektovala iterativní povahu tvorby. Bude podporovat verze, vývoj v čase, doplňování kontextů nebo úprav podle zpětné vazby. Díky tomu může být Idea jádrem celého kreativního life-cycle: od prvního zachycení nápadu, přes jeho analýzu a validaci, až po konkrétní použití v generování finálního výstupu. Tím se stává základní stavební jednotkou celého systému PrismQ.
+Transform inspiration into structured content concepts with clear outlines, validated potential, and production-ready foundations. Ideas are not mere text or one-time concepts, but structured products that can be tracked, evaluated, modified, and integrated into larger workflows.
+
+## Submodules
+
+### [Model](./Model/)
+**Core data model and structure**
+
+Defines the Idea data structure, fields, validation, and database schema.
+
+- Data model definition
+- Field specifications and validation
+- Database integration
+- AI generation support
+- Multi-format content support
+
+**[→ View Model Documentation](./Model/README.md)**
+
+**[→ View Model Metadata](./Model/_meta/)**
+- [Docs](./Model/_meta/docs/) - Model documentation
+- [Examples](./Model/_meta/examples/) - Usage examples
+- [Tests](./Model/_meta/tests/) - Model tests
+
+---
+
+### [Outline](./Outline/)
+**Content outline development**
+
+Structured content outline creation and refinement.
+
+- Topic organization
+- Structure development
+- Flow and hierarchy
+- Section planning
+
+**[→ View Outline Documentation](./Outline/README.md)**
+
+**[→ View Outline Metadata](./Outline/_meta/)**
+- [Docs](./Outline/_meta/docs/) - Outline documentation
+- [Examples](./Outline/_meta/examples/) - Outline examples
+- [Tests](./Outline/_meta/tests/) - Outline tests
+
+---
+
+### [Review](./Review/)
+**Idea validation and review**
+
+Validate ideas for viability, potential, and alignment with content strategy.
+
+- Concept validation
+- Potential assessment
+- Strategy alignment
+- Feasibility review
+
+**[→ View Review Documentation](./Review/README.md)**
+
+**[→ View Review Metadata](./Review/_meta/)**
+- [Docs](./Review/_meta/docs/) - Review documentation
+- [Examples](./Review/_meta/examples/) - Review examples
+- [Tests](./Review/_meta/tests/) - Review tests
+
+---
+
+## Module Metadata
+
+### Documentation
+Technical documentation and implementation guides.
+
+**[→ View Idea/_meta/docs/](./_meta/docs/)**
+
+### Examples
+Usage examples and sample implementations.
+
+**[→ View Idea/_meta/examples/](./_meta/examples/)**
+
+### Tests
+Test suites and test data.
+
+**[→ View Idea/_meta/tests/](./_meta/tests/)**
+
+---
+
+## Key Features
+
+### Structured Content Object
+Ideas are structured entities with:
+- **Purpose**: What the idea represents and what problem it solves
+- **Theme**: Core topic and emotional quality
+- **Target Audience**: Demographics, platforms, style, genre
+- **Metadata**: Technical and strategic criteria for usability
+
+### Potential Modeling
+Ideas model their cross-platform potential:
+- Platform suitability (short videos, podcasts, articles)
+- Regional and demographic reach
+- Measurable parameters for decision making
+- Computational or expert-based scoring
+
+### Iterative Development
+Ideas support evolution over time:
+- Version control
+- Context refinement
+- Feedback integration
+- Life-cycle tracking from capture to production
+
+### Multi-Format Support
+Ideas serve as foundation for:
+- Script generation
+- Podcast production
+- Video creation
+- Marketing content
+- Product proposals
+
+## Workflow Integration
+
+```
+IdeaInspiration
+    ↓
+Idea Module
+    ├─ Model (data structure)
+    ├─ Outline (organization)
+    └─ Review (validation)
+    ↓
+ScriptDraft
+```
+
+## Usage Example
+
+```python
+from PrismQ.T.Idea import Model, Outline, Review
+
+# Create new idea
+idea = Model.create(
+    title="AI Content Generation Guide",
+    purpose="Educate developers on AI tools",
+    target_audience="Software engineers",
+    platform="Blog, YouTube"
+)
+
+# Develop outline
+outline = Outline.create_from_idea(idea)
+outline.add_section("Introduction to AI Tools")
+outline.add_section("Practical Implementation")
+
+# Review and validate
+review = Review.validate(idea)
+if review.is_viable:
+    idea.status = IdeaStatus.APPROVED
+```
+
+## Navigation
+
+**[← Back to T](../README.md)** | **[→ Script Module](../Script/)** | **[→ T/_meta](./_meta/)**
+
+---
+
+*Part of the PrismQ.T Text Generation Pipeline*

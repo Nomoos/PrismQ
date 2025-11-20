@@ -22,23 +22,81 @@ This pipeline **uses published text** from the Text Generation pipeline as its s
 PrismQ.T.PublishedText → PrismQ.A.Voiceover
 ```
 
-## Modules
+## 📁 Modules
 
-### Voiceover
-Professional audio recording from published text:
-- **Recording**: Voice talent records from published text script
-- **Review**: Quality check, retakes, audio editing
-- **Approved**: Final voiceover approved for production
+### [Voiceover](./Voiceover/)
+**Professional audio recording from published text**
 
-### Processing
-Platform-specific audio optimization:
-- **Normalization**: Volume leveling, loudness standards (LUFS)
-- **Mastering**: EQ, compression, final polish for podcast/streaming platforms
+Voice talent records from published text script with quality review.
 
-### Publishing
-Audio distribution:
-- **AudioPublishing**: Platform-specific exports, RSS feed preparation
-- **PublishedAudio**: Live audio on podcast platforms
+- Recording from published text
+- Quality check and retakes
+- Audio editing
+- Final approval for production
+
+**[→ View Voiceover Metadata](./Voiceover/_meta/)**
+
+---
+
+### [Narrator](./Narrator/)
+**Narrator selection and management**
+
+Select and manage voice talent for audio production.
+
+- [Selection](./Narrator/Selection/) - Voice talent selection
+
+**[→ View Narrator Metadata](./Narrator/_meta/)**
+
+---
+
+### [Normalized](./Normalized/)
+**Audio normalization**
+
+Volume leveling and loudness standards (LUFS).
+
+**[→ View Normalized Metadata](./Normalized/_meta/)**
+
+---
+
+### [Enhancement](./Enhancement/)
+**Audio enhancement**
+
+EQ, compression, and final polish for podcast/streaming platforms.
+
+**[→ View Enhancement Metadata](./Enhancement/_meta/)**
+
+---
+
+### [Publishing](./Publishing/)
+**Audio distribution**
+
+Platform-specific exports and RSS feed preparation.
+
+- [SEO](./Publishing/SEO/) - Audio SEO optimization
+- [Finalization](./Publishing/Finalization/) - Final publication preparation
+
+**[→ View Publishing Metadata](./Publishing/_meta/)**
+
+---
+
+## 📖 Module Metadata
+
+### Documentation
+Technical documentation and implementation guides.
+
+**[→ View A/_meta/docs/](./_meta/docs/)**
+
+### Examples
+Usage examples and sample implementations.
+
+**[→ View A/_meta/examples/](./_meta/examples/)**
+
+### Tests
+Test suites and test data.
+
+**[→ View A/_meta/tests/](./_meta/tests/)**
+
+---
 
 ## Data Flow
 
@@ -98,8 +156,14 @@ content.status = ContentStatus.AUDIO_PUBLISHING
 
 ## Related Pipelines
 
-- **Previous Stage**: `PrismQ.T` (Text Generation) - Provides published text source
-- **Next Stage**: `PrismQ.V` (Video Generation) - Uses published audio for video sync
+- **Previous Stage**: [PrismQ.T](../T/README.md) (Text Generation) - Provides published text source
+- **Next Stage**: [PrismQ.V](../V/README.md) (Video Generation) - Uses published audio for video sync
+
+---
+
+## Navigation
+
+**[← Back to Main](../README.md)** | **[← Text Pipeline](../T/README.md)** | **[Video Pipeline →](../V/README.md)** | **[Workflow](../WORKFLOW.md)**
 
 ---
 
