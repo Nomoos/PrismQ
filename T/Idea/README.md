@@ -10,6 +10,25 @@ Transform inspiration into structured content concepts with clear outlines, vali
 
 ## Submodules
 
+### [Inspiration](./Inspiration/)
+**Idea inspiration and collection**
+
+Gather and evaluate content inspiration from multiple sources to identify high-potential concepts for idea development.
+
+- Multi-source inspiration collection (24+ sources)
+- Content classification (8 categories)
+- Engagement potential scoring (0-100 scale)
+- Analytics feedback integration
+
+**[→ View Inspiration Documentation](./Inspiration/README.md)**
+
+**[→ View Inspiration Metadata](./Inspiration/_meta/)**
+- [Docs](./Inspiration/_meta/docs/) - Inspiration documentation
+- [Examples](./Inspiration/_meta/examples/) - Inspiration examples
+- [Tests](./Inspiration/_meta/tests/) - Inspiration tests
+
+---
+
 ### [Model](./Model/)
 **Core data model and structure**
 

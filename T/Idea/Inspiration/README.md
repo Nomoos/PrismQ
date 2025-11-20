@@ -1,23 +1,23 @@
-# T/IdeaInspiration - Idea Inspiration Module
+# T/Idea/Inspiration - Idea Inspiration Submodule
 
-**Namespace**: `PrismQ.T.IdeaInspiration`
+**Namespace**: `PrismQ.T.Idea.Inspiration`
 
-The IdeaInspiration module represents the entry point of the PrismQ content production workflow. It collects, classifies, and scores creative content ideas from multiple sources, serving as the foundation for all content development.
+The Inspiration submodule represents the initial stage of idea development where raw inspiration is collected, classified, and scored before being developed into structured Ideas. It serves as the entry point for all content creation in the PrismQ workflow.
 
 ## Purpose
 
-Gather and evaluate content inspiration from diverse sources to identify high-potential ideas for development. This module transforms raw inspiration into structured, scored concepts ready for ideation.
+Gather and evaluate content inspiration from diverse sources to identify high-potential concepts for idea development. This submodule transforms raw inspiration into structured, scored concepts ready for the Idea development process (Model, Outline, Review).
 
 ## Workflow Position
 
 ```
-[*] → IdeaInspiration → Idea (Outline → Skeleton → Title) → Script...
+[*] → Idea.Inspiration → Idea (Model/Outline/Review) → Script...
        ↑
        └─── Analytics Feedback Loop (Text/Audio/Video Performance)
 ```
 
 **Entry Point**: Initial state for all new content  
-**Next Stage**: Idea (Concept Development)  
+**Next Stage**: Idea development (Model, Outline, Review)  
 **Feedback Loop**: Performance analytics from published content
 
 ## Key Features
@@ -55,15 +55,15 @@ Scores each inspiration on a **0-100 scale** based on:
 - **Timeliness**: Time-sensitivity and evergreen potential
 - **Production Feasibility**: Resource requirements and complexity
 
-## Module Structure
+## Submodule Structure
 
 ```
-IdeaInspiration/
+Inspiration/
 ├── README.md              # This file
 ├── Collection/            # (Planned) Source collection strategies
 ├── Classification/        # (Planned) Content categorization
 ├── Scoring/              # (Planned) Engagement potential scoring
-└── _meta/                # Module metadata
+└── _meta/                # Submodule metadata
     ├── docs/             # Documentation
     ├── examples/         # Usage examples
     └── tests/            # Test suites
@@ -99,7 +99,7 @@ IdeaInspiration/
 
 ## Deliverables
 
-Each IdeaInspiration produces:
+Each Inspiration produces:
 
 - **Concept Summary**: Brief description of the inspiration
 - **Source Attribution**: Where the idea came from
@@ -111,7 +111,7 @@ Each IdeaInspiration produces:
 
 ## Transition Criteria
 
-**Move to Idea Stage when**:
+**Move to Idea.Model when**:
 - Inspiration score ≥ 70 (high potential)
 - Clear story angle identified
 - Target audience defined
@@ -131,17 +131,17 @@ Each IdeaInspiration produces:
 
 Performance data feeds back to improve future inspiration:
 
-- **AnalyticsReviewText → IdeaInspiration**
+- **AnalyticsReviewText → Idea.Inspiration**
   - Which topics performed well in text format
   - SEO keywords and search trends
   - Reader engagement patterns
 
-- **AnalyticsReviewAudio → IdeaInspiration**
+- **AnalyticsReviewAudio → Idea.Inspiration**
   - Podcast listening patterns
   - Audio completion rates
   - Platform-specific preferences
 
-- **AnalyticsReviewVideo → IdeaInspiration**
+- **AnalyticsReviewVideo → Idea.Inspiration**
   - Video watch time and retention
   - Thumbnail and title effectiveness
   - Platform algorithm preferences
@@ -152,7 +152,7 @@ This creates a continuous improvement loop where published content performance i
 
 ### Python Namespace
 ```python
-from PrismQ.T.IdeaInspiration import Collection, Classification, Scoring
+from PrismQ.T.Idea.Inspiration import Collection, Classification, Scoring
 
 # Collect inspiration from sources
 inspiration = Collection.from_reddit(subreddit="technology")
@@ -164,7 +164,7 @@ category = Classification.categorize(inspiration)
 score = Scoring.calculate_potential(inspiration)
 
 # Create inspiration record
-idea_inspiration = IdeaInspiration(
+idea_inspiration = Inspiration(
     concept=inspiration.summary,
     source="Reddit: r/technology",
     category=category,
@@ -176,19 +176,19 @@ idea_inspiration = IdeaInspiration(
 ### State Transitions
 ```python
 # Start with inspiration
-content = Content(status=ContentStatus.IDEA_INSPIRATION)
+idea = Idea(status=IdeaStatus.INSPIRATION)
 
 # Collect and score
-content.inspiration = collect_inspiration(sources)
-content.score = calculate_score(content.inspiration)
+idea.inspiration = collect_inspiration(sources)
+idea.score = calculate_score(idea.inspiration)
 
-# High score → move to Idea development
-if content.score >= 70:
-    content.status = ContentStatus.IDEA_OUTLINE
+# High score → move to Model development
+if idea.score >= 70:
+    idea.status = IdeaStatus.MODEL
     
 # Low score → archive
-elif content.score < 40:
-    content.status = ContentStatus.ARCHIVED
+elif idea.score < 40:
+    idea.status = IdeaStatus.ARCHIVED
 ```
 
 ## Best Practices
@@ -230,35 +230,35 @@ elif content.score < 40:
 - Published content performance vs. predicted score
 - Scoring accuracy improvement over time
 
-## Related Modules
+## Related Submodules
 
-- **Next Stage**: [Idea](../Idea/README.md) - Concept development
-- **Related**: [T/Publishing](../Publishing/README.md) - Text publication (produces analytics feedback)
-- **Related**: [A/Publishing](../../A/Publishing/README.md) - Audio publication (produces analytics feedback)
+- **Next Stage**: [Model](../Model/README.md) - Idea data structure
+- **Next Stage**: [Outline](../Outline/README.md) - Content outline development
+- **Next Stage**: [Review](../Review/README.md) - Idea validation
 
-## Module Metadata
+## Submodule Metadata
 
 ### Documentation
 Technical documentation and implementation guides.
 
-**[→ View IdeaInspiration/_meta/docs/](./_meta/docs/)**
+**[→ View Inspiration/_meta/docs/](./_meta/docs/)**
 
 ### Examples
 Usage examples and sample implementations.
 
-**[→ View IdeaInspiration/_meta/examples/](./_meta/examples/)**
+**[→ View Inspiration/_meta/examples/](./_meta/examples/)**
 
 ### Tests
 Test suites and test data.
 
-**[→ View IdeaInspiration/_meta/tests/](./_meta/tests/)**
+**[→ View Inspiration/_meta/tests/](./_meta/tests/)**
 
 ---
 
 ## Navigation
 
-**[← Back to T Module](../README.md)** | **[Next: Idea →](../Idea/README.md)** | **[Workflow](../../WORKFLOW.md)**
+**[← Back to Idea Module](../README.md)** | **[Next: Model →](../Model/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 
-*Part of the PrismQ sequential progressive enrichment workflow: Inspiration → Text → Audio → Video*
+*Part of the PrismQ.T.Idea module in the sequential progressive enrichment workflow*
