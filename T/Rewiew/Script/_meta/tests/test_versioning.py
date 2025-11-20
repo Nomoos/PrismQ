@@ -1,7 +1,7 @@
 """Tests for script versioning functionality."""
 
 import pytest
-from T.Script.Review import ScriptReview, ScriptVersion, ContentLength
+from T.Rewiew.Script import ScriptReview, ScriptVersion, ContentLength
 from T.Script.Writer import ScriptWriter
 
 
@@ -115,7 +115,7 @@ class TestScriptVersioning:
     
     def test_writer_version_comparison(self):
         """Test writer version comparison."""
-        from T.Script.Review import ImprovementPoint, ReviewCategory
+        from T.Rewiew.Script import ImprovementPoint, ReviewCategory
         
         writer = ScriptWriter(target_score_threshold=85)
         

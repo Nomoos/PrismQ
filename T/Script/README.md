@@ -18,23 +18,10 @@ First draft creation from idea outlines.
 **[→ View Draft Documentation](./Draft/README.md)**
 **[→ View Draft Metadata](./Draft/_meta/)**
 
-### [Review](./Review/)
-**AI-powered script review** ⭐ NEW
-
-AI script reviewer with comprehensive scoring (0-100%) and improvement recommendations.
-
-- Category-specific evaluation (engagement, pacing, clarity, etc.)
-- YouTube short optimization (< 3 minutes, variable length)
-- Prioritized improvement points with impact scores
-- Target audience alignment scoring
-
-**[→ View Review Documentation](./Review/README.md)**
-**[→ View Review Metadata](./Review/_meta/)**
-
 ### [Writer](./Writer/)
 **AI script writer with feedback loop** ⭐ NEW
 
-AI-powered script writer that optimizes content based on review feedback.
+AI-powered script writer that optimizes content based on review feedback from **[T/Rewiew/Script](../Rewiew/Script/)**.
 
 - Iterative optimization (review → write → review cycle)
 - Multiple optimization strategies
@@ -68,7 +55,7 @@ Final optimization for flow, readability, and impact.
 
 ## AI-Powered Feedback Loop Workflow
 
-The Review and Writer modules work together in an iterative feedback loop:
+The **[T/Rewiew/Script](../Rewiew/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
 
 ```
 1. Draft → Original Script (145 seconds)
@@ -108,7 +95,7 @@ The Review and Writer modules work together in an iterative feedback loop:
 ### Quick Start
 
 ```python
-from PrismQ.T.Script.Review import ScriptReview, ContentLength
+from PrismQ.T.Rewiew.Script import ScriptReview, ContentLength
 from PrismQ.T.Script.Writer import ScriptWriter
 
 # AI Reviewer evaluates
@@ -134,7 +121,7 @@ if writer.should_continue_iteration():
     pass
 ```
 
-See **[Feedback Loop Example](./Review/_meta/examples/feedback_loop_example.py)** for complete implementation.
+See **[Feedback Loop Example](../Rewiew/Script/_meta/examples/feedback_loop_example.py)** for complete implementation.
 
 ## Navigation
 

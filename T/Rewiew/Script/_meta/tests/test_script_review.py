@@ -2,7 +2,7 @@
 
 import pytest
 from datetime import datetime
-from T.Script.Review import (
+from T.Rewiew.Script import (
     ScriptReview,
     ReviewCategory,
     ContentLength,

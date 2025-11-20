@@ -8,7 +8,7 @@ from T.Script.Writer import (
     OptimizationResult,
     FeedbackLoopIteration
 )
-from T.Script.Review import (
+from T.Rewiew.Script import (
     ScriptReview,
     ReviewCategory,
     ContentLength,
