@@ -22,24 +22,61 @@ This pipeline **uses published audio** from the Audio Generation pipeline as its
 PrismQ.A.PublishedAudio → PrismQ.V.ScenePlanning
 ```
 
-## Modules
+## 📁 Modules
 
-### Visual
-Visual content creation synchronized to audio:
-- **ScenePlanning**: Plan scenes, visual style, and timing based on published audio
-- **KeyframePlanning**: Identify key visual moments and transitions
-- **KeyframeGeneration**: Generate or create keyframe visuals, graphics, footage
+### [Scene](./Scene/)
+**Scene planning from published audio**
 
-### Assembly
-Video production and editing:
-- **Timeline**: Assemble visuals, sync with audio, add transitions/effects
-- **Review**: Quality check, revisions, refinements
-- **Finalized**: Final rendered video ready for publication
+Plan scenes, visual style, and timing based on published audio.
 
-### Publishing
-Video distribution:
-- **PublishPlanning**: Platform optimization, thumbnails, metadata, descriptions
-- **PublishedVideo**: Live video on platforms (YouTube, TikTok, Instagram Reels)
+- [FromSubtitles](./Scene/FromSubtitles/) - Generate scenes from subtitles/transcript
+
+**[→ View Scene Documentation](./Scene/README.md)**
+**[→ View Scene Metadata](./Scene/_meta/)**
+
+---
+
+### [Keyframe](./Keyframe/)
+**Keyframe planning and generation**
+
+Identify key visual moments and generate keyframe visuals.
+
+- [FromTextScenes](./Keyframe/FromTextScenes/) - Generate keyframes from text scenes
+- [FromKeyfranesAndTextScenes](./Keyframe/FromKeyfranesAndTextScenes/) - Combined generation
+
+**[→ View Keyframe Documentation](./Keyframe/README.md)**
+**[→ View Keyframe Metadata](./Keyframe/_meta/)**
+
+---
+
+### [Video](./Video/)
+**Video assembly and production**
+
+Assemble visuals, sync with audio, add transitions and effects.
+
+**[→ View Video Documentation](./Video/README.md)**
+**[→ View Video Metadata](./Video/_meta/)**
+
+---
+
+## 📖 Module Metadata
+
+### Documentation
+Technical documentation and implementation guides.
+
+**[→ View V/_meta/docs/](./_meta/docs/)**
+
+### Examples
+Usage examples and sample implementations.
+
+**[→ View V/_meta/examples/](./_meta/examples/)**
+
+### Tests
+Test suites and test data.
+
+**[→ View V/_meta/tests/](./_meta/tests/)**
+
+---
 
 ## Data Flow
 
@@ -105,8 +142,14 @@ content.status = ContentStatus.VIDEO_ASSEMBLY
 
 ## Related Pipelines
 
-- **First Stage**: `PrismQ.T` (Text Generation) - Originating published text
-- **Second Stage**: `PrismQ.A` (Audio Generation) - Provides published audio foundation
+- **First Stage**: [PrismQ.T](../T/README.md) (Text Generation) - Originating published text
+- **Second Stage**: [PrismQ.A](../A/README.md) (Audio Generation) - Provides published audio foundation
+
+---
+
+## Navigation
+
+**[← Back to Main](../README.md)** | **[← Audio Pipeline](../A/README.md)** | **[← Text Pipeline](../T/README.md)** | **[Workflow](../WORKFLOW.md)**
 
 ---
 
