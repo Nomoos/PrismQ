@@ -1,9 +1,0 @@
-# PrismQ.IdeaInspiration.Model - No runtime dependencies
-# All development and testing dependencies are in extras_require in setup.py
-
-# Development dependencies (install with: pip install -e ".[dev]")
-# - pytest>=7.0.0
-# - pytest-cov>=4.0.0
-# - black>=23.0.0
-# - flake8>=6.0.0
-# - mypy>=1.0.0

@@ -1,1 +1,0 @@
-"""ConfigLoad source implementation."""
