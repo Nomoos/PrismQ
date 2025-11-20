@@ -120,8 +120,8 @@ stateDiagram-v2
 The workflow is organized into **progressive enrichment phases** where each format builds on the previous:
 
 ### Phase 1: Inspiration & Ideation
-- **[IdeaInspiration](./IdeaInspiration/)** - Content idea collection and scoring
-- **[Idea](./Idea/)** - Distilled concept with sub-states:
+- **[IdeaInspiration](./T/IdeaInspiration/)** - Content idea collection and scoring
+- **[Idea](./T/Idea/)** - Distilled concept with sub-states:
   - **[Outline](./Outline/)** - Structured content outline
   - **[Skeleton](./Skeleton/)** - Basic structural framework
   - **[Title](./Title/)** - Finalized title and metadata
@@ -488,7 +488,7 @@ Track workflow health with key indicators:
 
 ## Related Documentation
 
-- **[IdeaInspiration Module](./IdeaInspiration/README.md)** - Inspiration and collection
+- **[IdeaInspiration Module](./T/IdeaInspiration/README.md)** - Inspiration and collection
 - **[Idea Model](./Idea/Model/README.md)** - Core data model
 - **[Content Production Workflow States Research](./_ meta/research/content-production-workflow-states.md)** - Detailed research
 - **[YouTube Metadata Optimization](../_meta/research/youtube-metadata-optimization-smart-strategy.md)** - Platform strategy

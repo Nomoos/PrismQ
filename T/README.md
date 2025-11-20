@@ -18,6 +18,19 @@ Analytics Feedback              Audio Pipeline (A)
 
 ## 📁 Modules
 
+### [IdeaInspiration](./IdeaInspiration/README.md)
+**Content idea collection and scoring**
+
+Gather and evaluate content inspiration from multiple sources to identify high-potential ideas.
+
+- **[Collection](./IdeaInspiration/Collection/)** - Multi-source inspiration collection
+- **[Classification](./IdeaInspiration/Classification/)** - Content categorization
+- **[Scoring](./IdeaInspiration/Scoring/)** - Engagement potential scoring
+
+**[→ Explore IdeaInspiration Module](./IdeaInspiration/README.md)**
+
+---
+
 ### [Idea](./Idea/README.md)
 **Idea development and structuring**
 
@@ -159,6 +172,7 @@ PublishedText → Audio Pipeline (A)
 
 ### Python Namespace
 ```python
+from PrismQ.T.IdeaInspiration import Collection, Classification, Scoring
 from PrismQ.T.Idea import Outline, Model
 from PrismQ.T.Script import Draft, Improvements
 from PrismQ.T.Publishing import SEO, Finalization
@@ -166,7 +180,11 @@ from PrismQ.T.Publishing import SEO, Finalization
 
 ### State Transitions
 ```python
-content = Content(status=ContentStatus.IDEA_OUTLINE)
+# Start with inspiration collection
+content = Content(status=ContentStatus.IDEA_INSPIRATION)
+# Collect and score inspiration...
+if content.inspiration_score >= 70:
+    content.status = ContentStatus.IDEA_OUTLINE
 # Develop outline...
 content.status = ContentStatus.SCRIPT_DRAFT
 # Write script...
