@@ -9,7 +9,7 @@
 **Current Structure**:
 ```
 T/
-├── Rewiew/               # Manual content review
+├── Rewiew/               # Automated content review (various aspects)
 │   ├── Grammar/         # Grammar and syntax checking
 │   ├── Readability/     # Reading level optimization
 │   ├── Tone/            # Tone and voice consistency
@@ -21,35 +21,40 @@ T/
     ├── Draft/           # Initial script writing
     ├── Improvements/    # Script enhancements
     ├── Optimization/    # Script optimization
-    ├── Review/          # AI-powered script review ⭐ NEW
+    ├── Review/          # AI-powered script review with scoring ⭐ NEW
     └── Writer/          # AI script writer with feedback loop ⭐ NEW
 ```
 
 **Why T/Script/Review (not T/Rewiew/Script)?**
 
-1. **Different Purpose**:
-   - `T/Rewiew/*`: Manual, human-driven review of specific aspects (grammar, tone, etc.)
-   - `T/Script/Review`: AI-driven, automated script evaluation with scoring and feedback loop
+**NOTE**: Both `T/Rewiew` and `T/Script/Review` are automated (not manual). The distinction is:
 
-2. **Different Scope**:
-   - `T/Rewiew/*`: Specialized review for specific dimensions (one module per dimension)
-   - `T/Script/Review`: Comprehensive script-specific review with YouTube short optimization
+1. **Different Scope**:
+   - `T/Rewiew/*`: Specialized review for specific dimensions (grammar, readability, tone, etc.) - one aspect at a time
+   - `T/Script/Review`: Comprehensive script-level review with scoring (0-100%) across all aspects simultaneously
+
+2. **Different Focus**:
+   - `T/Rewiew/*`: Dimensional review (focuses on one quality aspect)
+   - `T/Script/Review`: Holistic script review with YouTube short optimization, length optimization, viral potential
 
 3. **Workflow Integration**:
-   - `T/Rewiew/*`: Part of manual quality assurance workflow
-   - `T/Script/Review`: Part of automated AI feedback loop with Writer
+   - `T/Rewiew/*`: Part of quality assurance workflow (after script approved)
+   - `T/Script/Review`: Part of iterative AI feedback loop with Writer (during script development)
 
 4. **Data Models**:
-   - `T/Rewiew/*`: No specific data models (procedural review)
-   - `T/Script/Review`: Rich data models (ScriptReview, ScriptVersion, ImprovementPoint, CategoryScore)
+   - `T/Rewiew/*`: Lightweight, aspect-specific
+   - `T/Script/Review`: Rich data models (ScriptReview, ScriptVersion, ImprovementPoint, CategoryScore) for feedback loop
 
-**Alternative Considered**: `T/Rewiew/Script/AI/` 
-- Rejected because it's too nested and doesn't reflect the AI feedback loop relationship with Writer
+**Alternative Considered**: `T/Rewiew/Script/` 
+- Could work since both are automated
+- Would group all review functionality together
+- Trade-off: Separates Review from Writer (they work together in feedback loop)
 
-**Clarification in Documentation**:
-- Updated README.md to clearly distinguish AI-powered review from manual review
-- Added references to `T/Rewiew` for manual review aspects
-- Documented workflow integration differences
+**Current Rationale**:
+- Placed under `T/Script/` to keep feedback loop partners (Review + Writer) together
+- Both are script-development tools (not post-approval QA like `T/Rewiew`)
+- Clarified that both `T/Rewiew` and `T/Script/Review` are automated (not manual)
+- Documented workflow integration differences (QA vs development)
 
 ### 2. Script Versioning for Comparison and Research
 
