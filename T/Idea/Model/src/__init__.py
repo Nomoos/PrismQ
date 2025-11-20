@@ -19,6 +19,7 @@ from .story_translation import (
     StoryTranslation,
     TranslationStatus,
     TranslationFeedback,
+    MEANING_SCORE_THRESHOLD,
 )
 
 __all__ = [
@@ -30,6 +31,7 @@ __all__ = [
     "StoryTranslation",
     "TranslationStatus",
     "TranslationFeedback",
+    "MEANING_SCORE_THRESHOLD",
 ]
 
 __version__ = "0.1.0"

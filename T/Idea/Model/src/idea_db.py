@@ -100,8 +100,12 @@ class IdeaDatabase:
             ON ideas(status)
         """)
         
-        # Note: target_platforms is JSON text, not ideal for indexing
-        # Omit index on target_platforms as it's a JSON field
+        # Note: target_platforms is stored as JSON text
+        # Trade-off: No index on target_platforms to avoid complexity
+        # - Indexing JSON strings in SQLite is not straightforward
+        # - Alternative: Create junction table (ideas_platforms) for exact matching
+        # - Current LIKE search adequate for small-medium datasets
+        # For production with large datasets, consider migrating to junction table
         
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_ideas_genre 
@@ -304,6 +308,10 @@ class IdeaDatabase:
         """Retrieve all Ideas for a specific platform.
         
         Note: target_platforms is stored as JSON, so this does a LIKE search.
+        This may produce false positives (e.g., 'book' matches 'facebook').
+        For production with strict matching needs, consider:
+        - Post-filter results with json.loads() to verify exact match
+        - Or migrate to junction table (ideas_platforms) for precise queries
         
         Args:
             platform: Platform to filter by
@@ -315,8 +323,8 @@ class IdeaDatabase:
             self.connect()
         
         cursor = self.conn.cursor()
-        # Use LIKE to search in JSON array string
-        cursor.execute("SELECT id FROM ideas WHERE target_platforms LIKE ?", (f'%{platform}%',))
+        # LIKE search in JSON array string (simple but approximate)
+        cursor.execute("SELECT id FROM ideas WHERE target_platforms LIKE ?", (f'%"{platform}"%',))
         
         return [self.get_idea(row[0]) for row in cursor.fetchall()]
     

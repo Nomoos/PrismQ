@@ -37,6 +37,10 @@ class TranslationStatus(Enum):
     PUBLISHED = "published"  # Translation published and live
 
 
+# Translation approval threshold
+MEANING_SCORE_THRESHOLD = 85  # Minimum score (0-100) for automatic approval
+
+
 @dataclass
 class TranslationFeedback:
     """Feedback from AI Reviewer to AI Translator.
@@ -185,8 +189,8 @@ class StoryTranslation:
         # Update last feedback summary
         self.last_feedback = f"Iteration {self.iteration_count}: {len(issues)} issues found"
         
-        # Update status
-        if len(issues) == 0 and meaning_score and meaning_score >= 85:
+        # Update status based on feedback
+        if len(issues) == 0 and meaning_score and meaning_score >= MEANING_SCORE_THRESHOLD:
             self.status = TranslationStatus.APPROVED
             self.meaning_verified = True
             self.approved_at = datetime.now().isoformat()
@@ -263,13 +267,19 @@ class StoryTranslation:
             
         Returns:
             StoryTranslation instance
+            
+        Raises:
+            ValueError: If invalid status value provided
         """
-        # Handle enum conversion
+        # Handle enum conversion with validation
         status = data.get("status", "draft")
         if isinstance(status, str):
             try:
                 status = TranslationStatus(status)
-            except ValueError:
+            except ValueError as e:
+                # Log invalid status and provide helpful error
+                import logging
+                logging.warning(f"Invalid translation status '{status}', defaulting to DRAFT. Valid values: {[s.value for s in TranslationStatus]}")
                 status = TranslationStatus.DRAFT
         
         return cls(
