@@ -10,6 +10,20 @@ Ensure content quality through comprehensive review across grammar, readability,
 
 ## Submodules
 
+### [Script](./Script/)
+**AI-powered script review** ⭐ NEW
+
+Comprehensive script evaluation with scoring (0-100%) and improvement recommendations.
+
+- Overall and category-specific scoring (engagement, pacing, clarity, etc.)
+- YouTube short optimization (< 3 minutes, variable length)
+- Prioritized improvement points with impact scores
+- Script versioning for comparison and research
+- Feedback loop integration with **[T/Script/Writer](../Script/Writer/)**
+
+**[→ View Script Documentation](./Script/README.md)**
+**[→ View Script Metadata](./Script/_meta/)**
+
 ### [Grammar](./Grammar/)
 **Grammar and syntax**
 
