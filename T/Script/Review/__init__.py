@@ -5,6 +5,7 @@ AI-powered script evaluation with scoring and improvement recommendations.
 
 from .script_review import (
     ScriptReview,
+    ScriptVersion,
     ReviewCategory,
     ContentLength,
     ImprovementPoint,
@@ -13,6 +14,7 @@ from .script_review import (
 
 __all__ = [
     "ScriptReview",
+    "ScriptVersion",
     "ReviewCategory",
     "ContentLength",
     "ImprovementPoint",

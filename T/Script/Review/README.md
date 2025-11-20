@@ -12,6 +12,7 @@ The Review module provides:
 - **Prioritized improvement recommendations** with impact estimates
 - **YouTube short optimization** (< 3 minutes, variable length)
 - **Feedback loop integration** with Script Writer
+- **Script versioning** for comparison and research ⭐ NEW
 
 ## Core Components
 
@@ -22,6 +23,14 @@ Main data model for script evaluation with:
 - Prioritized improvement points
 - YouTube short readiness assessment
 - Target audience alignment metrics
+- **Script version tracking** for research
+
+### ScriptVersion ⭐ NEW
+Version tracking for comparison and research:
+- Stores script text for each iteration
+- Tracks changes between versions
+- Enables side-by-side comparison
+- Measures feedback loop effectiveness
 
 ### ReviewCategory
 Evaluation categories:
@@ -109,6 +118,21 @@ print(f"Length: {readiness['length_feedback']}")
 high_priority = review.get_high_priority_improvements()
 for imp in high_priority:
     print(f"- {imp.title} (impact: +{imp.impact_score})")
+
+# Store script version for comparison and research
+review.add_script_version(
+    script_text=script_text,
+    length_seconds=145,
+    created_by="AI-Writer-001",
+    changes_from_previous="Initial version after first review"
+)
+
+# Later, compare versions
+comparison = review.get_version_comparison()
+if comparison["comparison_available"]:
+    print(f"Versions: {comparison['versions_count']}")
+    print(f"Score improvement: +{comparison['improvements']['score_change']}%")
+    print(f"Length change: {comparison['improvements']['length_change_seconds']}s")
 ```
 
 ## Key Features
@@ -137,6 +161,13 @@ for imp in high_priority:
 - **Alignment scoring** (0-100%)
 - **Demographic optimization** recommendations
 - **Platform-specific** guidance
+
+### Script Versioning ⭐ NEW
+- **Version storage** - Store complete script text for each iteration
+- **Change tracking** - Track what changed between versions
+- **Side-by-side comparison** - Compare any two versions
+- **Research support** - Analyze feedback loop effectiveness
+- **Export capability** - Export version history for analysis
 
 ## Module Structure
 

@@ -157,6 +157,9 @@ class ScriptWriter:
     youtube_short_mode: bool = False
     focus_areas: List[str] = field(default_factory=list)
     
+    # Script Versioning (NEW for comparison and research)
+    script_versions: List[Dict[str, Any]] = field(default_factory=list)  # Stores version metadata
+    
     # Metadata
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now().isoformat())
@@ -251,6 +254,14 @@ class ScriptWriter:
         )
         self.iterations_history.append(iteration)
         
+        # Store script version (NEW for comparison and research)
+        self._store_script_version(
+            script_text=optimized_text,
+            iteration=self.current_iteration,
+            score=estimated_new_score,
+            changes=changes_made
+        )
+        
         # Create result
         result = OptimizationResult(
             original_text=original_script,
@@ -287,6 +298,75 @@ class ScriptWriter:
                 return False
         
         return True
+    
+    def _store_script_version(
+        self,
+        script_text: str,
+        iteration: int,
+        score: int,
+        changes: List[str]
+    ) -> None:
+        """Store script version for comparison and research.
+        
+        Args:
+            script_text: The script text content
+            iteration: Iteration number
+            score: Review score for this version
+            changes: List of changes made
+        """
+        version_data = {
+            "version_number": iteration,
+            "script_text": script_text,
+            "length_seconds": self.target_length_seconds,
+            "created_at": datetime.now().isoformat(),
+            "created_by": self.writer_id,
+            "score": score,
+            "changes_summary": ", ".join(changes[:3]) if changes else "Initial version",
+            "changes_count": len(changes)
+        }
+        self.script_versions.append(version_data)
+    
+    def get_version_comparison(self) -> Dict[str, Any]:
+        """Get comparison data for all script versions.
+        
+        Returns:
+            Dictionary with version comparison metrics
+        """
+        if len(self.script_versions) < 2:
+            return {
+                "versions_count": len(self.script_versions),
+                "comparison_available": False,
+                "message": "Need at least 2 versions for comparison"
+            }
+        
+        first = self.script_versions[0]
+        latest = self.script_versions[-1]
+        
+        # Calculate improvements
+        score_improvement = latest["score"] - first["score"]
+        length_change = None
+        if first.get("length_seconds") and latest.get("length_seconds"):
+            length_change = latest["length_seconds"] - first["length_seconds"]
+        
+        return {
+            "versions_count": len(self.script_versions),
+            "comparison_available": True,
+            "versions": self.script_versions,
+            "summary": {
+                "iterations": len(self.script_versions) - 1,
+                "score_improvement": score_improvement,
+                "length_change_seconds": length_change,
+                "total_changes": sum(v["changes_count"] for v in self.script_versions),
+                "first_version": {
+                    "score": first["score"],
+                    "created_at": first["created_at"]
+                },
+                "latest_version": {
+                    "score": latest["score"],
+                    "created_at": latest["created_at"]
+                }
+            }
+        }
     
     def get_feedback_loop_summary(self) -> Dict[str, Any]:
         """Get summary of feedback loop progress.
@@ -402,6 +482,7 @@ class ScriptWriter:
             target_length_seconds=data.get("target_length_seconds"),
             youtube_short_mode=data.get("youtube_short_mode", False),
             focus_areas=data.get("focus_areas", []),
+            script_versions=data.get("script_versions", []),
             created_at=data.get("created_at", datetime.now().isoformat()),
             updated_at=data.get("updated_at", datetime.now().isoformat()),
             notes=data.get("notes", ""),
