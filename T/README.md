@@ -4,6 +4,10 @@
 
 The Text Generation Pipeline is the foundation of the PrismQ content workflow. It transforms initial ideas into high-quality, published text content optimized for blogs, articles, and social media platforms.
 
+## 📋 Quick Start
+
+**[→ Title & Script Creation Workflow](./TITLE_SCRIPT_WORKFLOW.md)** - Complete step-by-step guide from Idea.Creation to Publishing
+
 ## Purpose
 
 This pipeline handles the complete text content lifecycle from inspiration through ideation, scripting, review, and publication. Published text from this pipeline serves as the **foundation** for subsequent audio and video production.
@@ -126,7 +130,7 @@ Test suites and test data.
 ```
 IdeaInspiration
     ↓
-Idea (Outline → Skeleton → Title)
+Idea (Creation → Outline → Skeleton → Title)
     ↓
 ScriptDraft
     ↓
