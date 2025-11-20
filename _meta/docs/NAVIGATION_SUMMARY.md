@@ -115,6 +115,12 @@ _meta/
 ├── docs/          # Module documentation
 ├── examples/      # Usage examples
 ├── tests/         # Test suites
+├── research/      # Research documents and analysis
+├── issues/        # Issue tracking
+│   ├── new/       # Newly created issues
+│   ├── blocked/   # Blocked issues
+│   ├── wip/       # Work in progress
+│   └── done/      # Completed issues
 └── README.md      # Metadata directory overview
 ```
 

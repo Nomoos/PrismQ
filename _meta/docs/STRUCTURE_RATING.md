@@ -35,11 +35,18 @@ All modules now have standardized `_meta/` directories with:
 - `docs/` - Documentation
 - `examples/` - Usage examples
 - `tests/` - Test suites
+- `research/` - Research documents and analysis
+- `issues/` - Issue tracking with state management
+  - `new/` - Newly created issues
+  - `blocked/` - Blocked issues
+  - `wip/` - Work in progress
+  - `done/` - Completed issues
 
 **Rating**: ⭐⭐⭐⭐⭐ (5/5)
-- Consistent across all 42 modules
+- Consistent across all 46 modules
 - Clear separation of metadata from production code
 - Easy to locate documentation and examples
+- Standardized issue tracking structure
 
 #### 3. Hierarchical Module Organization
 Each pipeline has logical submodules:
@@ -73,14 +80,17 @@ Progressive enrichment: Text → Audio → Video
 - Consider renaming to `Review` in major version update
 
 #### 2. Documentation Completeness
-**Issue**: Some _meta directories are empty (only structure exists)
+**Issue**: _meta directories now have structure but await content
 
-**Rating**: ⭐⭐⭐ (3/5)
+**Rating**: ⭐⭐⭐⭐ (4/5)
+
+**Status**: Structure is complete and standardized. Content will be added as modules develop.
 
 **Recommendation**:
 - Gradually populate _meta/docs with module-specific documentation
 - Add examples as modules are implemented
 - Create test templates for each module type
+- Use issues/ folders for tracking module development tasks
 
 #### 3. Cross-Module Navigation
 **Issue**: Navigation between related modules could be clearer
@@ -154,8 +164,24 @@ PrismQ/
 
 ### 3. _meta Directory Usage
 
-#### Required Content
-All `_meta/` directories should eventually contain:
+#### Required Structure
+All `_meta/` directories now follow this standardized structure:
+
+```
+_meta/
+├── docs/          # Module documentation
+├── examples/      # Usage examples
+├── tests/         # Test suites
+├── research/      # Research documents and analysis
+├── issues/        # Issue tracking
+│   ├── new/       # Newly created issues
+│   ├── blocked/   # Blocked issues
+│   ├── wip/       # Work in progress
+│   └── done/      # Completed issues
+└── README.md      # Metadata directory overview
+```
+
+#### Content Guidelines
 
 **docs/**
 - Module overview and purpose
@@ -174,6 +200,18 @@ All `_meta/` directories should eventually contain:
 - Integration tests
 - Test data
 - Test documentation
+
+**research/**
+- Research documents
+- Analysis and findings
+- Performance studies
+- Design explorations
+
+**issues/**
+- Track module-specific issues
+- Organize by state (new/blocked/wip/done)
+- Use descriptive file names
+- Link to related documentation
 
 #### Optional Content
 Additional subdirectories for specific needs:
