@@ -286,6 +286,10 @@ class Idea:
     setting_notes: str = ""
     tone_guidance: str = ""
     length_target: str = ""
+    
+    # Multi-Language Support
+    original_language: str = "en"  # ISO 639-1 code for original language
+    
     potential_scores: Dict[str, int] = field(default_factory=dict)
     inspiration_ids: List[str] = field(default_factory=list)
     metadata: Dict[str, str] = field(default_factory=dict)
@@ -373,6 +377,7 @@ class Idea:
             setting_notes=data.get("setting_notes", ""),
             tone_guidance=data.get("tone_guidance", ""),
             length_target=data.get("length_target", ""),
+            original_language=data.get("original_language", "en"),
             potential_scores=data.get("potential_scores", {}),
             inspiration_ids=data.get("inspiration_ids", []),
             metadata=data.get("metadata", {}),

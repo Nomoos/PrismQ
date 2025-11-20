@@ -2,6 +2,11 @@
 
 This module provides SQLite database schema and utilities for storing Idea
 instances and their relationships with IdeaInspiration instances.
+
+Extended with multi-language story translation support following best practices:
+- Story translations table with composite key (story_id, language_code)
+- Translation feedback loop tracking
+- Original language designation in ideas table
 """
 
 import sqlite3
@@ -26,6 +31,8 @@ class IdeaDatabase:
         """Establish database connection."""
         self.conn = sqlite3.connect(self.db_path)
         self.conn.row_factory = sqlite3.Row
+        # Enable foreign key constraints in SQLite
+        self.conn.execute("PRAGMA foreign_keys = ON")
     
     def close(self):
         """Close database connection."""
@@ -63,6 +70,7 @@ class IdeaDatabase:
                 length_target TEXT,
                 outline TEXT,
                 skeleton TEXT,
+                original_language TEXT DEFAULT 'en',  -- ISO 639-1 code for original language
                 potential_scores TEXT,  -- JSON string
                 metadata TEXT,  -- JSON string
                 version INTEGER DEFAULT 1,
@@ -92,10 +100,8 @@ class IdeaDatabase:
             ON ideas(status)
         """)
         
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_ideas_platform 
-            ON ideas(target_platform)
-        """)
+        # Note: target_platforms is JSON text, not ideal for indexing
+        # Omit index on target_platforms as it's a JSON field
         
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_ideas_genre 
@@ -110,6 +116,55 @@ class IdeaDatabase:
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_idea_inspirations_inspiration 
             ON idea_inspirations(inspiration_id)
+        """)
+        
+        # Create story_translations table for multi-language support
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS story_translations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                story_id INTEGER NOT NULL,
+                language_code TEXT NOT NULL,
+                title TEXT NOT NULL,
+                text TEXT NOT NULL,
+                status TEXT DEFAULT 'draft',
+                iteration_count INTEGER DEFAULT 0,
+                max_iterations INTEGER DEFAULT 2,
+                translator_id TEXT,
+                reviewer_id TEXT,
+                feedback_history TEXT,  -- JSON string (list of feedback objects)
+                last_feedback TEXT,
+                meaning_verified INTEGER DEFAULT 0,  -- Boolean: 0=False, 1=True
+                translated_from TEXT DEFAULT 'en',
+                version INTEGER DEFAULT 1,
+                created_at TEXT,
+                updated_at TEXT,
+                approved_at TEXT,
+                published_at TEXT,
+                notes TEXT,
+                FOREIGN KEY (story_id) REFERENCES ideas(id) ON DELETE CASCADE,
+                UNIQUE(story_id, language_code)
+            )
+        """)
+        
+        # Create indexes for story_translations
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_translations_story 
+            ON story_translations(story_id)
+        """)
+        
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_translations_language 
+            ON story_translations(language_code)
+        """)
+        
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_translations_status 
+            ON story_translations(status)
+        """)
+        
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_translations_composite 
+            ON story_translations(story_id, language_code)
         """)
         
         self.conn.commit()
@@ -143,9 +198,9 @@ class IdeaDatabase:
                 title, concept, synopsis, story_premise, purpose, emotional_quality, target_audience,
                 target_demographics, target_platforms, target_formats, genre, style, keywords, themes,
                 character_notes, setting_notes, tone_guidance, length_target,
-                outline, skeleton, potential_scores, metadata, version, status, notes,
+                outline, skeleton, original_language, potential_scores, metadata, version, status, notes,
                 created_at, updated_at, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             idea_dict.get("title"),
             idea_dict.get("concept"),
@@ -167,6 +222,7 @@ class IdeaDatabase:
             idea_dict.get("length_target", ""),
             idea_dict.get("outline", ""),
             idea_dict.get("skeleton", ""),
+            idea_dict.get("original_language", "en"),
             potential_scores,
             metadata,
             idea_dict.get("version", 1),
@@ -247,6 +303,8 @@ class IdeaDatabase:
     def get_ideas_by_platform(self, platform: str) -> List[Dict[str, Any]]:
         """Retrieve all Ideas for a specific platform.
         
+        Note: target_platforms is stored as JSON, so this does a LIKE search.
+        
         Args:
             platform: Platform to filter by
             
@@ -257,7 +315,8 @@ class IdeaDatabase:
             self.connect()
         
         cursor = self.conn.cursor()
-        cursor.execute("SELECT id FROM ideas WHERE target_platform = ?", (platform,))
+        # Use LIKE to search in JSON array string
+        cursor.execute("SELECT id FROM ideas WHERE target_platforms LIKE ?", (f'%{platform}%',))
         
         return [self.get_idea(row[0]) for row in cursor.fetchall()]
     
@@ -312,7 +371,7 @@ class IdeaDatabase:
                 target_audience = ?, target_demographics = ?, target_platforms = ?, target_formats = ?,
                 genre = ?, style = ?, keywords = ?, themes = ?,
                 character_notes = ?, setting_notes = ?, tone_guidance = ?, length_target = ?,
-                outline = ?, skeleton = ?,
+                outline = ?, skeleton = ?, original_language = ?,
                 potential_scores = ?, metadata = ?,
                 version = ?, status = ?, notes = ?, updated_at = ?, created_by = ?
             WHERE id = ?
@@ -337,6 +396,7 @@ class IdeaDatabase:
             idea_dict.get("length_target", ""),
             idea_dict.get("outline", ""),
             idea_dict.get("skeleton", ""),
+            idea_dict.get("original_language", "en"),
             potential_scores,
             metadata,
             idea_dict.get("version", 1),
@@ -379,6 +439,245 @@ class IdeaDatabase:
         self.conn.commit()
         
         return cursor.rowcount > 0
+    
+    # Translation Management Methods
+    
+    def insert_translation(self, translation_dict: Dict[str, Any]) -> int:
+        """Insert a StoryTranslation into the database.
+        
+        Args:
+            translation_dict: Dictionary representation of StoryTranslation
+            
+        Returns:
+            ID of inserted translation
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        
+        # Serialize complex fields
+        feedback_history = json.dumps(translation_dict.get("feedback_history", []))
+        meaning_verified = 1 if translation_dict.get("meaning_verified", False) else 0
+        
+        cursor.execute("""
+            INSERT INTO story_translations (
+                story_id, language_code, title, text, status,
+                iteration_count, max_iterations, translator_id, reviewer_id,
+                feedback_history, last_feedback, meaning_verified,
+                translated_from, version, created_at, updated_at,
+                approved_at, published_at, notes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            translation_dict.get("story_id"),
+            translation_dict.get("language_code"),
+            translation_dict.get("title"),
+            translation_dict.get("text"),
+            translation_dict.get("status", "draft"),
+            translation_dict.get("iteration_count", 0),
+            translation_dict.get("max_iterations", 2),
+            translation_dict.get("translator_id"),
+            translation_dict.get("reviewer_id"),
+            feedback_history,
+            translation_dict.get("last_feedback", ""),
+            meaning_verified,
+            translation_dict.get("translated_from", "en"),
+            translation_dict.get("version", 1),
+            translation_dict.get("created_at"),
+            translation_dict.get("updated_at"),
+            translation_dict.get("approved_at"),
+            translation_dict.get("published_at"),
+            translation_dict.get("notes", "")
+        ))
+        
+        translation_id = cursor.lastrowid
+        self.conn.commit()
+        return translation_id
+    
+    def get_translation(self, story_id: int, language_code: str) -> Optional[Dict[str, Any]]:
+        """Retrieve a translation by story ID and language code.
+        
+        Args:
+            story_id: ID of the story
+            language_code: ISO 639-1 language code
+            
+        Returns:
+            Dictionary representation of StoryTranslation or None
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT * FROM story_translations 
+            WHERE story_id = ? AND language_code = ?
+        """, (story_id, language_code))
+        
+        row = cursor.fetchone()
+        if not row:
+            return None
+        
+        # Convert row to dict and deserialize JSON fields
+        translation_dict = dict(row)
+        translation_dict["feedback_history"] = json.loads(translation_dict["feedback_history"])
+        translation_dict["meaning_verified"] = bool(translation_dict["meaning_verified"])
+        
+        return translation_dict
+    
+    def get_all_translations(self, story_id: int) -> List[Dict[str, Any]]:
+        """Get all translations for a story.
+        
+        Args:
+            story_id: ID of the story
+            
+        Returns:
+            List of translation dictionaries
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT language_code FROM story_translations
+            WHERE story_id = ?
+            ORDER BY language_code
+        """, (story_id,))
+        
+        translations = []
+        for row in cursor.fetchall():
+            translation = self.get_translation(story_id, row[0])
+            if translation:
+                translations.append(translation)
+        
+        return translations
+    
+    def get_translations_by_status(self, status: str) -> List[Dict[str, Any]]:
+        """Get all translations with a specific status.
+        
+        Args:
+            status: Translation status to filter by
+            
+        Returns:
+            List of translation dictionaries
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT story_id, language_code FROM story_translations
+            WHERE status = ?
+        """, (status,))
+        
+        translations = []
+        for row in cursor.fetchall():
+            translation = self.get_translation(row[0], row[1])
+            if translation:
+                translations.append(translation)
+        
+        return translations
+    
+    def update_translation(
+        self,
+        story_id: int,
+        language_code: str,
+        translation_dict: Dict[str, Any]
+    ) -> bool:
+        """Update an existing translation.
+        
+        Args:
+            story_id: ID of the story
+            language_code: Language code of translation to update
+            translation_dict: Dictionary with updated fields
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        
+        # Serialize complex fields
+        feedback_history = json.dumps(translation_dict.get("feedback_history", []))
+        meaning_verified = 1 if translation_dict.get("meaning_verified", False) else 0
+        
+        cursor.execute("""
+            UPDATE story_translations SET
+                title = ?, text = ?, status = ?,
+                iteration_count = ?, max_iterations = ?,
+                translator_id = ?, reviewer_id = ?,
+                feedback_history = ?, last_feedback = ?,
+                meaning_verified = ?, translated_from = ?,
+                version = ?, updated_at = ?,
+                approved_at = ?, published_at = ?, notes = ?
+            WHERE story_id = ? AND language_code = ?
+        """, (
+            translation_dict.get("title"),
+            translation_dict.get("text"),
+            translation_dict.get("status"),
+            translation_dict.get("iteration_count", 0),
+            translation_dict.get("max_iterations", 2),
+            translation_dict.get("translator_id"),
+            translation_dict.get("reviewer_id"),
+            feedback_history,
+            translation_dict.get("last_feedback", ""),
+            meaning_verified,
+            translation_dict.get("translated_from", "en"),
+            translation_dict.get("version", 1),
+            translation_dict.get("updated_at"),
+            translation_dict.get("approved_at"),
+            translation_dict.get("published_at"),
+            translation_dict.get("notes", ""),
+            story_id,
+            language_code
+        ))
+        
+        self.conn.commit()
+        return cursor.rowcount > 0
+    
+    def delete_translation(self, story_id: int, language_code: str) -> bool:
+        """Delete a translation.
+        
+        Args:
+            story_id: ID of the story
+            language_code: Language code of translation to delete
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            DELETE FROM story_translations 
+            WHERE story_id = ? AND language_code = ?
+        """, (story_id, language_code))
+        
+        self.conn.commit()
+        return cursor.rowcount > 0
+    
+    def get_available_languages(self, story_id: int) -> List[str]:
+        """Get list of available language codes for a story.
+        
+        Args:
+            story_id: ID of the story
+            
+        Returns:
+            List of ISO 639-1 language codes
+        """
+        if not self.conn:
+            self.connect()
+        
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT language_code FROM story_translations
+            WHERE story_id = ?
+            ORDER BY language_code
+        """, (story_id,))
+        
+        return [row[0] for row in cursor.fetchall()]
 
 
 def setup_database(db_path: str = "idea.db") -> IdeaDatabase:
