@@ -17,9 +17,9 @@ from idea import Idea, ContentGenre
 
 
 def example_reddit_story_workflow():
-    """Complete Reddit story production workflow."""
+    """Complete Reddit story production workflow with quality gates."""
     print("=" * 70)
-    print("REDDIT STORY PRODUCTION WORKFLOW")
+    print("REDDIT STORY PRODUCTION WORKFLOW WITH QUALITY GATES")
     print("=" * 70)
     
     # Step 1: Create an Idea for a Reddit story
@@ -47,20 +47,23 @@ def example_reddit_story_workflow():
     print(f"   Initial state: {story.state.value}")
     print(f"   Status: {story.status.value}")
     
-    # Step 3: Progress through Idea development
-    print("\n3. Developing Idea structure...")
+    # Step 3: Idea Review and Development
+    print("\n3. Reviewing and developing Idea...")
     
-    print("   → IDEA_SKELETON")
-    story.transition_to(StoryState.IDEA_SKELETON)
+    print("   → IDEA_REVIEW")
+    story.transition_to(StoryState.IDEA_REVIEW)
     print(f"     Status: {story.status.value}")
     
-    print("   → IDEA_TITLE")
-    story.transition_to(StoryState.IDEA_TITLE)
-    story.script_title = "AITA for choosing my dream career over family approval?"
-    print(f"     Final title: {story.script_title}")
+    print("   → OUTLINE")
+    story.transition_to(StoryState.OUTLINE)
     
-    # Step 4: Script development
-    print("\n4. Writing script...")
+    print("   → TITLE_DRAFT")
+    story.transition_to(StoryState.TITLE_DRAFT)
+    story.script_title = "AITA for choosing my dream career over family approval?"
+    print(f"     Initial title: {story.script_title}")
+    
+    # Step 4: Script Creation
+    print("\n4. Creating script...")
     
     print("   → SCRIPT_DRAFT")
     story.transition_to(StoryState.SCRIPT_DRAFT)
@@ -89,57 +92,49 @@ AITA for choosing my dream career over family approval?
     print(f"     Script length: {len(story.script_text)} characters")
     print(f"     Status: {story.status.value}")
     
-    print("   → SCRIPT_REVIEW")
-    story.transition_to(StoryState.SCRIPT_REVIEW, notes="Editorial review - pacing and emotional beats")
+    # Step 5: Quality Review Pipeline
+    print("\n5. Going through quality review pipeline...")
     
-    print("   → SCRIPT_APPROVED")
-    story.transition_to(StoryState.SCRIPT_APPROVED, notes="Ready for publication")
+    print("   → CONTENT_REVIEW")
+    story.transition_to(StoryState.CONTENT_REVIEW)
+    
+    print("   → EDITING")
+    story.transition_to(StoryState.EDITING)
+    
+    print("   → GRAMMAR_REVIEW")
+    story.transition_to(StoryState.GRAMMAR_REVIEW)
     print(f"     Status: {story.status.value}")
     
-    # Step 5: Text publication (Reddit)
-    print("\n5. Publishing to Reddit...")
+    print("   → CONSISTENCY_CHECK")
+    story.transition_to(StoryState.CONSISTENCY_CHECK)
     
-    print("   → TEXT_PUBLISHING")
-    story.transition_to(StoryState.TEXT_PUBLISHING)
+    print("   → TONE_CHECK")
+    story.transition_to(StoryState.TONE_CHECK)
+    
+    print("   → READABILITY_REVIEW")
+    story.transition_to(StoryState.READABILITY_REVIEW)
+    print("     All quality gates passed!")
+    
+    # Step 6: Finalization
+    print("\n6. Finalizing for publication...")
+    
+    print("   → FINALIZATION")
+    story.transition_to(StoryState.FINALIZATION)
     print(f"     Status: {story.status.value}")
     
-    print("   → TEXT_PUBLISHED")
+    print("   → TITLE_OPTIMIZATION")
+    story.transition_to(StoryState.TITLE_OPTIMIZATION)
+    story.script_title = "AITA for Choosing My Dream Career Over Family Approval? 💔"
+    print(f"     Optimized title: {story.script_title}")
+    
+    # Step 7: Publishing
+    print("\n7. Publishing to Reddit...")
+    
+    print("   → PUBLISHING")
     story.published_text_url = "https://reddit.com/r/AmItheAsshole/comments/abc123/aita_for_choosing_dream_career"
-    story.transition_to(StoryState.TEXT_PUBLISHED, notes="Posted to r/AITA")
+    story.transition_to(StoryState.PUBLISHING)
     print(f"     Published at: {story.published_text_url}")
     print(f"     Status: {story.status.value}")
-    
-    # Step 6: Optional - Continue to video for TikTok
-    print("\n6. Creating video version for TikTok...")
-    
-    print("   → AUDIO_RECORDING")
-    story.transition_to(StoryState.AUDIO_RECORDING, notes="Recording voiceover")
-    
-    print("   → AUDIO_REVIEW")
-    story.transition_to(StoryState.AUDIO_REVIEW)
-    
-    print("   → AUDIO_PUBLISHED")
-    story.published_audio_url = "https://storage.prismq.com/audio/story_001.mp3"
-    story.transition_to(StoryState.AUDIO_PUBLISHED)
-    
-    print("   → VIDEO_PLANNING")
-    story.transition_to(StoryState.VIDEO_PLANNING, notes="Planning visual scenes with text overlays")
-    
-    print("   → VIDEO_PRODUCTION")
-    story.transition_to(StoryState.VIDEO_PRODUCTION, notes="Assembling video with stock footage")
-    
-    print("   → VIDEO_REVIEW")
-    story.transition_to(StoryState.VIDEO_REVIEW)
-    
-    print("   → VIDEO_PUBLISHED")
-    story.published_video_url = "https://tiktok.com/@prismq/video/7123456789"
-    story.transition_to(StoryState.VIDEO_PUBLISHED, notes="Posted to TikTok")
-    print(f"     Published at: {story.published_video_url}")
-    
-    # Step 7: Analytics
-    print("\n7. Analyzing performance...")
-    print("   → VIDEO_ANALYTICS")
-    story.transition_to(StoryState.VIDEO_ANALYTICS, notes="Tracking views, engagement, shares")
     
     # Step 8: Archive
     print("\n8. Completing workflow...")
@@ -157,8 +152,6 @@ AITA for choosing my dream career over family approval?
     print(f"Final Status: {story.status.value}")
     print(f"\nPublished Content:")
     print(f"  - Text: {story.published_text_url}")
-    print(f"  - Audio: {story.published_audio_url}")
-    print(f"  - Video: {story.published_video_url}")
     print(f"\nState Transitions: {len(story.state_history)}")
     
     # Show state history
@@ -171,43 +164,49 @@ AITA for choosing my dream career over family approval?
     return story
 
 
-def example_text_only_workflow():
-    """Text-only workflow (no audio/video)."""
+def example_with_improvements_loop():
+    """Workflow demonstrating improvement loop."""
     print("\n" + "=" * 70)
-    print("TEXT-ONLY WORKFLOW (FAST PUBLICATION)")
+    print("WORKFLOW WITH IMPROVEMENT LOOP")
     print("=" * 70)
     
     # Create idea
     idea = Idea(
-        title="Quick Blog Post",
-        concept="Short-form content for immediate publication",
-        target_platforms=["medium", "blog"],
-        target_formats=["text"]
+        title="Story Needing Revisions",
+        concept="Example showing revision workflow"
     )
     
     # Create and progress story
     story = Story.from_idea(idea)
     
-    # Fast progression to publication
-    story.transition_to(StoryState.IDEA_SKELETON)
-    story.transition_to(StoryState.IDEA_TITLE)
+    # Progress to grammar review
+    story.transition_to(StoryState.IDEA_REVIEW)
+    story.transition_to(StoryState.OUTLINE)
+    story.transition_to(StoryState.TITLE_DRAFT)
     story.transition_to(StoryState.SCRIPT_DRAFT)
-    story.script_text = "Blog post content..."
-    story.transition_to(StoryState.SCRIPT_REVIEW)
-    story.transition_to(StoryState.SCRIPT_APPROVED)
-    story.transition_to(StoryState.TEXT_PUBLISHING)
-    story.published_text_url = "https://medium.com/@user/post"
-    story.transition_to(StoryState.TEXT_PUBLISHED)
+    story.script_text = "Initial script with issues..."
+    story.transition_to(StoryState.CONTENT_REVIEW)
+    story.transition_to(StoryState.EDITING)
+    story.transition_to(StoryState.GRAMMAR_REVIEW)
     
-    # Optional analytics
-    story.transition_to(StoryState.TEXT_ANALYTICS)
+    print("Found grammar issues - routing to ScriptImprovements...")
+    story.transition_to(StoryState.SCRIPT_IMPROVEMENTS, notes="Grammar issues found")
     
-    # Archive
+    print("Looping back to Editing for fixes...")
+    story.transition_to(StoryState.EDITING)
+    
+    # Continue through pipeline
+    story.transition_to(StoryState.GRAMMAR_REVIEW)
+    story.transition_to(StoryState.CONSISTENCY_CHECK)
+    story.transition_to(StoryState.TONE_CHECK)
+    story.transition_to(StoryState.READABILITY_REVIEW)
+    story.transition_to(StoryState.FINALIZATION)
+    story.transition_to(StoryState.TITLE_OPTIMIZATION)
+    story.transition_to(StoryState.PUBLISHING)
     story.transition_to(StoryState.ARCHIVED)
     
-    print(f"Story '{story.title}' completed text-only workflow")
+    print(f"Story '{story.title}' completed with improvement loop")
     print(f"Total transitions: {len(story.state_history)}")
-    print(f"Published: {story.published_text_url}")
 
 
 def example_database_operations():
@@ -224,12 +223,13 @@ def example_database_operations():
     # Create some stories
     idea1 = Idea(title="Story 1", concept="Concept 1")
     story1 = Story.from_idea(idea1)
-    story1.transition_to(StoryState.IDEA_SKELETON)
+    story1.transition_to(StoryState.IDEA_REVIEW)
     
     idea2 = Idea(title="Story 2", concept="Concept 2")
     story2 = Story.from_idea(idea2)
-    story2.transition_to(StoryState.IDEA_SKELETON)
-    story2.transition_to(StoryState.IDEA_TITLE)
+    story2.transition_to(StoryState.IDEA_REVIEW)
+    story2.transition_to(StoryState.OUTLINE)
+    story2.transition_to(StoryState.TITLE_DRAFT)
     story2.transition_to(StoryState.SCRIPT_DRAFT)
     
     # Insert stories
@@ -247,7 +247,7 @@ def example_database_operations():
     print(f"Stories in IN_DEVELOPMENT status: {len(in_dev)}")
     
     # Update story
-    story1.transition_to(StoryState.IDEA_TITLE)
+    story1.transition_to(StoryState.OUTLINE)
     db.update_story(id1, story1.to_dict())
     print(f"\nUpdated story 1 to state: {story1.state.value}")
     
@@ -268,19 +268,19 @@ def example_state_transitions():
     print(f"Valid transitions: {[s.value for s in story.get_valid_transitions()]}")
     
     # Check if transition is valid
-    print(f"\nCan transition to IDEA_SKELETON? {story.can_transition_to(StoryState.IDEA_SKELETON)}")
-    print(f"Can transition to VIDEO_PUBLISHED? {story.can_transition_to(StoryState.VIDEO_PUBLISHED)}")
+    print(f"\nCan transition to IDEA_REVIEW? {story.can_transition_to(StoryState.IDEA_REVIEW)}")
+    print(f"Can transition to PUBLISHING? {story.can_transition_to(StoryState.PUBLISHING)}")
     
     # Try invalid transition
     print("\nAttempting invalid transition...")
     try:
-        story.transition_to(StoryState.VIDEO_PUBLISHED)
+        story.transition_to(StoryState.PUBLISHING)
     except ValueError as e:
         print(f"Error (expected): {e}")
     
     # Valid transition
     print("\nPerforming valid transition...")
-    story.transition_to(StoryState.IDEA_SKELETON)
+    story.transition_to(StoryState.IDEA_REVIEW)
     print(f"New state: {story.state.value}")
     print(f"Valid transitions: {[s.value for s in story.get_valid_transitions()]}")
 
@@ -291,8 +291,8 @@ if __name__ == "__main__":
     # Main Reddit story workflow
     story = example_reddit_story_workflow()
     
-    # Text-only workflow
-    example_text_only_workflow()
+    # Workflow with improvements loop
+    example_with_improvements_loop()
     
     # Database operations
     example_database_operations()
