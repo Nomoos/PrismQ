@@ -16,101 +16,116 @@ class TestStoryStateTransitions:
     """Test state machine transitions."""
     
     def test_initial_state(self):
-        """Test that Story starts in IDEA_OUTLINE state."""
+        """Test that Story starts in IDEA state."""
         story = Story(title="Test Story", idea_id="idea_1")
-        assert story.state == StoryState.IDEA_OUTLINE
+        assert story.state == StoryState.IDEA
         assert story.status == StoryStatus.DRAFT
     
     def test_valid_transition(self):
         """Test valid state transition."""
         story = Story(title="Test Story", idea_id="idea_1")
         
-        # Valid transition: IDEA_OUTLINE -> IDEA_SKELETON
-        result = story.transition_to(StoryState.IDEA_SKELETON)
+        # Valid transition: IDEA -> IDEA_REVIEW
+        result = story.transition_to(StoryState.IDEA_REVIEW)
         assert result is True
-        assert story.state == StoryState.IDEA_SKELETON
+        assert story.state == StoryState.IDEA_REVIEW
         assert len(story.state_history) == 2
     
     def test_invalid_transition(self):
         """Test that invalid transitions raise ValueError."""
         story = Story(title="Test Story", idea_id="idea_1")
         
-        # Invalid: Can't go directly from IDEA_OUTLINE to SCRIPT_DRAFT
+        # Invalid: Can't go directly from IDEA to SCRIPT_DRAFT
         with pytest.raises(ValueError, match="Invalid state transition"):
             story.transition_to(StoryState.SCRIPT_DRAFT)
     
     def test_full_workflow_text_only(self):
-        """Test complete workflow for text-only story."""
-        story = Story(title="Reddit Story", idea_id="idea_reddit_1")
+        """Test complete workflow through all review stages."""
+        story = Story(title="Quality Story", idea_id="idea_quality_1")
         
         # Progress through Idea phase
-        story.transition_to(StoryState.IDEA_SKELETON)
-        story.transition_to(StoryState.IDEA_TITLE)
+        story.transition_to(StoryState.IDEA_REVIEW)
+        story.transition_to(StoryState.OUTLINE)
+        story.transition_to(StoryState.TITLE_DRAFT)
         
         # Progress through Script phase
         story.transition_to(StoryState.SCRIPT_DRAFT)
         story.script_text = "Once upon a time..."
-        story.transition_to(StoryState.SCRIPT_REVIEW)
-        story.transition_to(StoryState.SCRIPT_APPROVED)
+        story.transition_to(StoryState.CONTENT_REVIEW)
+        story.transition_to(StoryState.EDITING)
         
-        # Publish text
-        story.transition_to(StoryState.TEXT_PUBLISHING)
-        story.published_text_url = "https://reddit.com/r/nosleep/story"
-        story.transition_to(StoryState.TEXT_PUBLISHED)
+        # Progress through Quality Review Pipeline
+        story.transition_to(StoryState.GRAMMAR_REVIEW)
+        story.transition_to(StoryState.CONSISTENCY_CHECK)
+        story.transition_to(StoryState.TONE_CHECK)
+        story.transition_to(StoryState.READABILITY_REVIEW)
         
-        # Analytics
-        story.transition_to(StoryState.TEXT_ANALYTICS)
+        # Finalize and publish
+        story.transition_to(StoryState.FINALIZATION)
+        story.transition_to(StoryState.TITLE_OPTIMIZATION)
+        story.transition_to(StoryState.PUBLISHING)
         
         # Archive
         story.transition_to(StoryState.ARCHIVED)
         
         assert story.state == StoryState.ARCHIVED
         assert story.status == StoryStatus.ARCHIVED
-        assert len(story.state_history) == 10
+        assert len(story.state_history) == 15  # 1 initial + 14 transitions
     
-    def test_full_workflow_with_audio(self):
-        """Test complete workflow including audio production."""
-        story = Story(title="Podcast Story", idea_id="idea_podcast_1")
+    def test_workflow_with_improvements(self):
+        """Test workflow with script improvements loop."""
+        story = Story(title="Story with Improvements", idea_id="idea_improve_1")
         
-        # Progress to text published
-        story.transition_to(StoryState.IDEA_SKELETON)
-        story.transition_to(StoryState.IDEA_TITLE)
+        # Progress through initial phases
+        story.transition_to(StoryState.IDEA_REVIEW)
+        story.transition_to(StoryState.OUTLINE)
+        story.transition_to(StoryState.TITLE_DRAFT)
         story.transition_to(StoryState.SCRIPT_DRAFT)
-        story.transition_to(StoryState.SCRIPT_REVIEW)
-        story.transition_to(StoryState.SCRIPT_APPROVED)
-        story.transition_to(StoryState.TEXT_PUBLISHING)
-        story.transition_to(StoryState.TEXT_PUBLISHED)
+        story.transition_to(StoryState.CONTENT_REVIEW)
+        story.transition_to(StoryState.EDITING)
+        story.transition_to(StoryState.GRAMMAR_REVIEW)
         
-        # Continue to audio
-        story.transition_to(StoryState.AUDIO_RECORDING)
-        story.transition_to(StoryState.AUDIO_REVIEW)
-        story.published_audio_url = "https://spotify.com/episode/123"
-        story.transition_to(StoryState.AUDIO_PUBLISHED)
+        # Found language issues - go to improvements
+        story.transition_to(StoryState.SCRIPT_IMPROVEMENTS, notes="Grammar issues found")
         
-        # Analytics and archive
-        story.transition_to(StoryState.AUDIO_ANALYTICS)
+        # Loop back to editing
+        story.transition_to(StoryState.EDITING)
+        story.transition_to(StoryState.GRAMMAR_REVIEW)
+        story.transition_to(StoryState.CONSISTENCY_CHECK)
+        story.transition_to(StoryState.TONE_CHECK)
+        story.transition_to(StoryState.READABILITY_REVIEW)
+        
+        # Complete workflow
+        story.transition_to(StoryState.FINALIZATION)
+        story.transition_to(StoryState.TITLE_OPTIMIZATION)
+        story.transition_to(StoryState.PUBLISHING)
         story.transition_to(StoryState.ARCHIVED)
         
         assert story.state == StoryState.ARCHIVED
-        assert story.published_audio_url is not None
+        assert len(story.state_history) == 18  # 1 initial + 17 transitions
     
     def test_backward_transition_script_revision(self):
-        """Test backward transition for script revision."""
+        """Test backward transition using improvements hub."""
         story = Story(title="Story", idea_id="idea_1")
         
-        # Progress to script review
-        story.transition_to(StoryState.IDEA_SKELETON)
-        story.transition_to(StoryState.IDEA_TITLE)
+        # Progress to tone check
+        story.transition_to(StoryState.IDEA_REVIEW)
+        story.transition_to(StoryState.OUTLINE)
+        story.transition_to(StoryState.TITLE_DRAFT)
         story.transition_to(StoryState.SCRIPT_DRAFT)
-        story.transition_to(StoryState.SCRIPT_REVIEW)
+        story.transition_to(StoryState.CONTENT_REVIEW)
+        story.transition_to(StoryState.EDITING)
+        story.transition_to(StoryState.GRAMMAR_REVIEW)
+        story.transition_to(StoryState.CONSISTENCY_CHECK)
+        story.transition_to(StoryState.TONE_CHECK)
         
-        # Go back to draft for revisions
-        story.transition_to(StoryState.SCRIPT_DRAFT, notes="Major revisions needed")
-        assert story.state == StoryState.SCRIPT_DRAFT
+        # Go to improvements for tone mismatch
+        story.transition_to(StoryState.SCRIPT_IMPROVEMENTS, notes="Tone mismatch")
+        assert story.state == StoryState.SCRIPT_IMPROVEMENTS
         
         # Verify state history
-        assert len(story.state_history) == 6
-        assert story.state_history[-1]["notes"] == "Major revisions needed"
+        assert len(story.state_history) == 11
+        assert story.state_history[-1]["notes"] == "Tone mismatch"
     
     def test_early_archive(self):
         """Test that stories can be archived from any state."""
@@ -149,9 +164,9 @@ class TestStoryOperations:
         """Test getting valid transitions for current state."""
         story = Story(title="Story", idea_id="idea_1")
         
-        # From IDEA_OUTLINE
+        # From IDEA
         valid = story.get_valid_transitions()
-        assert StoryState.IDEA_SKELETON in valid
+        assert StoryState.IDEA_REVIEW in valid
         assert StoryState.ARCHIVED in valid
         assert StoryState.SCRIPT_DRAFT not in valid
     
@@ -159,7 +174,7 @@ class TestStoryOperations:
         """Test checking if transition is valid."""
         story = Story(title="Story", idea_id="idea_1")
         
-        assert story.can_transition_to(StoryState.IDEA_SKELETON) is True
+        assert story.can_transition_to(StoryState.IDEA_REVIEW) is True
         assert story.can_transition_to(StoryState.SCRIPT_DRAFT) is False
     
     def test_status_updates(self):
@@ -170,23 +185,29 @@ class TestStoryOperations:
         assert story.status == StoryStatus.DRAFT
         
         # Development phase
-        story.transition_to(StoryState.IDEA_SKELETON)
-        story.transition_to(StoryState.IDEA_TITLE)
+        story.transition_to(StoryState.IDEA_REVIEW)
+        story.transition_to(StoryState.OUTLINE)
+        story.transition_to(StoryState.TITLE_DRAFT)
         story.transition_to(StoryState.SCRIPT_DRAFT)
         assert story.status == StoryStatus.IN_DEVELOPMENT
         
         # Ready for review
-        story.transition_to(StoryState.SCRIPT_REVIEW)
-        story.transition_to(StoryState.SCRIPT_APPROVED)
+        story.transition_to(StoryState.CONTENT_REVIEW)
+        story.transition_to(StoryState.EDITING)
+        story.transition_to(StoryState.GRAMMAR_REVIEW)
         assert story.status == StoryStatus.READY_FOR_REVIEW
         
-        # In production
-        story.transition_to(StoryState.TEXT_PUBLISHING)
-        assert story.status == StoryStatus.IN_PRODUCTION
+        # Approved/finalization
+        story.transition_to(StoryState.CONSISTENCY_CHECK)
+        story.transition_to(StoryState.TONE_CHECK)
+        story.transition_to(StoryState.READABILITY_REVIEW)
+        story.transition_to(StoryState.FINALIZATION)
+        assert story.status == StoryStatus.APPROVED
         
-        # Published
-        story.transition_to(StoryState.TEXT_PUBLISHED)
-        assert story.status == StoryStatus.PUBLISHED
+        # In production
+        story.transition_to(StoryState.TITLE_OPTIMIZATION)
+        story.transition_to(StoryState.PUBLISHING)
+        assert story.status == StoryStatus.IN_PRODUCTION
     
     def test_to_dict_from_dict(self):
         """Test serialization and deserialization."""
@@ -201,7 +222,7 @@ class TestStoryOperations:
         # Convert to dict
         story_dict = story.to_dict()
         assert story_dict["title"] == "Test Story"
-        assert story_dict["state"] == "idea_outline"
+        assert story_dict["state"] == "idea"
         
         # Convert back
         story2 = Story.from_dict(story_dict)
@@ -243,13 +264,13 @@ class TestStoryDatabase:
         
         # Update
         story.title = "Updated Title"
-        story.transition_to(StoryState.IDEA_SKELETON)
+        story.transition_to(StoryState.IDEA_REVIEW)
         db.update_story(story_id, story.to_dict())
         
         # Retrieve and verify
         retrieved = db.get_story(story_id)
         assert retrieved["title"] == "Updated Title"
-        assert retrieved["state"] == "idea_skeleton"
+        assert retrieved["state"] == "idea_review"
     
     def test_get_stories_by_idea(self, db):
         """Test retrieving stories by idea ID."""
@@ -270,13 +291,13 @@ class TestStoryDatabase:
         """Test retrieving stories by state."""
         story1 = Story(title="Story 1", idea_id="idea_1")
         story2 = Story(title="Story 2", idea_id="idea_2")
-        story2.transition_to(StoryState.IDEA_SKELETON)
+        story2.transition_to(StoryState.IDEA_REVIEW)
         
         db.insert_story(story1.to_dict())
         db.insert_story(story2.to_dict())
         
-        # Query for IDEA_OUTLINE state
-        stories = db.get_stories_by_state(StoryState.IDEA_OUTLINE)
+        # Query for IDEA state
+        stories = db.get_stories_by_state(StoryState.IDEA)
         assert len(stories) == 1
         assert stories[0]["title"] == "Story 1"
     
@@ -284,8 +305,9 @@ class TestStoryDatabase:
         """Test retrieving stories by status."""
         story1 = Story(title="Story 1", idea_id="idea_1")
         story2 = Story(title="Story 2", idea_id="idea_2")
-        story2.transition_to(StoryState.IDEA_SKELETON)
-        story2.transition_to(StoryState.IDEA_TITLE)
+        story2.transition_to(StoryState.IDEA_REVIEW)
+        story2.transition_to(StoryState.OUTLINE)
+        story2.transition_to(StoryState.TITLE_DRAFT)
         story2.transition_to(StoryState.SCRIPT_DRAFT)
         
         db.insert_story(story1.to_dict())

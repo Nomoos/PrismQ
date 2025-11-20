@@ -46,56 +46,51 @@ class StoryStatus(Enum):
 class StoryState(Enum):
     """State machine states for story production workflow.
     
-    This enum defines the complete state machine for producing stories,
-    particularly optimized for Reddit-style story production where:
+    This enum defines the complete state machine for producing stories with
+    granular review and quality control stages:
     - One Idea generates one Story
-    - Story progresses through clear stages
-    - Each state has specific outputs
+    - Story progresses through detailed quality gates
+    - Each state represents a specific review or refinement phase
     
-    State Machine Flow for Reddit Stories:
-        IDEA_OUTLINE → IDEA_SKELETON → IDEA_TITLE →
-        SCRIPT_DRAFT → SCRIPT_REVIEW → SCRIPT_APPROVED →
-        TEXT_PUBLISHING → TEXT_PUBLISHED →
-        (optional) AUDIO_PRODUCTION → AUDIO_PUBLISHED →
-        (optional) VIDEO_PRODUCTION → VIDEO_PUBLISHED →
-        ARCHIVED
+    State Machine Flow:
+        Idea → IdeaReview → Outline → TitleDraft →
+        ScriptDraft → ContentReview → Editing →
+        GrammarReview → ConsistencyCheck → ToneCheck → ReadabilityReview →
+        Finalization → TitleOptimization → Publishing
     
-    Each state represents a specific phase in story development:
-    - IDEA states: Concept development and structure
-    - SCRIPT states: Writing and refinement
-    - PUBLISHING states: Platform-specific publication
-    - PRODUCTION states: Multi-format production (audio/video)
+    ScriptImprovements serves as a central hub for revisions,
+    allowing loops back to Editing or TitleRefinement.
     """
     
-    # Idea Development Phase (3 states)
-    IDEA_OUTLINE = "idea_outline"      # Detailed content outline and structure
-    IDEA_SKELETON = "idea_skeleton"    # Core story framework (3-6 points)
-    IDEA_TITLE = "idea_title"          # Finalized title and hook
+    # Concept Phase (4 states)
+    IDEA = "idea"                          # Initial concept
+    IDEA_REVIEW = "idea_review"            # Review and validate concept
+    OUTLINE = "outline"                    # Create structured outline
+    TITLE_DRAFT = "title_draft"            # Draft initial title
     
-    # Script Development Phase (3 states)
-    SCRIPT_DRAFT = "script_draft"      # Initial script writing
-    SCRIPT_REVIEW = "script_review"    # Editorial review and revision
-    SCRIPT_APPROVED = "script_approved" # Final approved script
+    # Script Creation Phase (2 states)
+    SCRIPT_DRAFT = "script_draft"          # Write initial script
+    CONTENT_REVIEW = "content_review"      # Review content structure and flow
     
-    # Text Publishing Phase (2 states)
-    TEXT_PUBLISHING = "text_publishing" # Preparing for text publication
-    TEXT_PUBLISHED = "text_published"   # Live text content (Reddit, Medium, etc.)
+    # Editing Phase (1 state)
+    EDITING = "editing"                    # Edit for clarity and coherence
     
-    # Audio Production Phase (optional - 3 states)
-    AUDIO_RECORDING = "audio_recording"     # Voice recording/synthesis
-    AUDIO_REVIEW = "audio_review"           # Audio quality review
-    AUDIO_PUBLISHED = "audio_published"     # Live audio content (Spotify, etc.)
+    # Quality Review Pipeline (4 states)
+    GRAMMAR_REVIEW = "grammar_review"      # Check grammar, spelling, punctuation
+    CONSISTENCY_CHECK = "consistency_check" # Verify consistency (names, facts, timeline)
+    TONE_CHECK = "tone_check"              # Validate tone and style match
+    READABILITY_REVIEW = "readability_review" # Ensure suitable for voiceover
     
-    # Video Production Phase (optional - 4 states)
-    VIDEO_PLANNING = "video_planning"       # Scene and visual planning
-    VIDEO_PRODUCTION = "video_production"   # Video assembly and editing
-    VIDEO_REVIEW = "video_review"           # Video quality review
-    VIDEO_PUBLISHED = "video_published"     # Live video content (YouTube, TikTok)
+    # Improvement Hub (1 state)
+    SCRIPT_IMPROVEMENTS = "script_improvements" # Central hub for revisions
     
-    # Analytics and Learning (3 states)
-    TEXT_ANALYTICS = "text_analytics"      # Text performance analysis
-    AUDIO_ANALYTICS = "audio_analytics"    # Audio performance analysis
-    VIDEO_ANALYTICS = "video_analytics"    # Video performance analysis
+    # Title Refinement (2 states)
+    TITLE_REFINEMENT = "title_refinement"  # Align title with final script
+    TITLE_OPTIMIZATION = "title_optimization" # Optimize for engagement/SEO
+    
+    # Final Phase (2 states)
+    FINALIZATION = "finalization"          # Final preparation
+    PUBLISHING = "publishing"              # Publish to platform
     
     # Terminal State
     ARCHIVED = "archived"                  # Completed or terminated
@@ -103,99 +98,88 @@ class StoryState(Enum):
 
 # Define valid state transitions for the state machine
 VALID_TRANSITIONS: Dict[StoryState, List[StoryState]] = {
-    # Idea Development transitions
-    StoryState.IDEA_OUTLINE: [
-        StoryState.IDEA_SKELETON,
-        StoryState.ARCHIVED  # Can cancel during outline
+    # Concept Phase transitions
+    StoryState.IDEA: [
+        StoryState.IDEA_REVIEW,
+        StoryState.ARCHIVED  # Can cancel at any time
     ],
-    StoryState.IDEA_SKELETON: [
-        StoryState.IDEA_TITLE,
-        StoryState.IDEA_OUTLINE,  # Can revise outline
+    StoryState.IDEA_REVIEW: [
+        StoryState.OUTLINE,
+        StoryState.IDEA,  # Revise concept
         StoryState.ARCHIVED
     ],
-    StoryState.IDEA_TITLE: [
+    StoryState.OUTLINE: [
+        StoryState.TITLE_DRAFT,
+        StoryState.ARCHIVED
+    ],
+    StoryState.TITLE_DRAFT: [
         StoryState.SCRIPT_DRAFT,
-        StoryState.IDEA_SKELETON,  # Can revise skeleton
         StoryState.ARCHIVED
     ],
     
-    # Script Development transitions
+    # Script Creation transitions
     StoryState.SCRIPT_DRAFT: [
-        StoryState.SCRIPT_REVIEW,
-        StoryState.IDEA_TITLE,  # Major revisions needed
+        StoryState.CONTENT_REVIEW,
+        StoryState.TITLE_REFINEMENT,  # Can refine title during draft
         StoryState.ARCHIVED
     ],
-    StoryState.SCRIPT_REVIEW: [
-        StoryState.SCRIPT_APPROVED,
-        StoryState.SCRIPT_DRAFT,  # Needs rewriting
-        StoryState.IDEA_TITLE,    # Fundamental concept change
-        StoryState.ARCHIVED
-    ],
-    StoryState.SCRIPT_APPROVED: [
-        StoryState.TEXT_PUBLISHING,
-        StoryState.SCRIPT_REVIEW,  # Found issues after approval
+    StoryState.CONTENT_REVIEW: [
+        StoryState.EDITING,
         StoryState.ARCHIVED
     ],
     
-    # Text Publishing transitions
-    StoryState.TEXT_PUBLISHING: [
-        StoryState.TEXT_PUBLISHED,
-        StoryState.SCRIPT_APPROVED,  # Issues with publication prep
-        StoryState.ARCHIVED
-    ],
-    StoryState.TEXT_PUBLISHED: [
-        StoryState.TEXT_ANALYTICS,  # Analyze performance
-        StoryState.AUDIO_RECORDING,  # Continue to audio
-        StoryState.ARCHIVED  # Text-only release
-    ],
-    
-    # Audio Production transitions (optional path)
-    StoryState.AUDIO_RECORDING: [
-        StoryState.AUDIO_REVIEW,
-        StoryState.TEXT_PUBLISHED,  # Issues with source text
-        StoryState.ARCHIVED
-    ],
-    StoryState.AUDIO_REVIEW: [
-        StoryState.AUDIO_PUBLISHED,
-        StoryState.AUDIO_RECORDING,  # Re-record needed
-        StoryState.ARCHIVED
-    ],
-    StoryState.AUDIO_PUBLISHED: [
-        StoryState.AUDIO_ANALYTICS,  # Analyze performance
-        StoryState.VIDEO_PLANNING,    # Continue to video
-        StoryState.ARCHIVED  # Audio-only release
-    ],
-    
-    # Video Production transitions (optional path)
-    StoryState.VIDEO_PLANNING: [
-        StoryState.VIDEO_PRODUCTION,
-        StoryState.AUDIO_PUBLISHED,  # Issues with audio source
-        StoryState.ARCHIVED
-    ],
-    StoryState.VIDEO_PRODUCTION: [
-        StoryState.VIDEO_REVIEW,
-        StoryState.VIDEO_PLANNING,  # Need to revise plan
-        StoryState.ARCHIVED
-    ],
-    StoryState.VIDEO_REVIEW: [
-        StoryState.VIDEO_PUBLISHED,
-        StoryState.VIDEO_PRODUCTION,  # Needs more work
-        StoryState.ARCHIVED
-    ],
-    StoryState.VIDEO_PUBLISHED: [
-        StoryState.VIDEO_ANALYTICS,
+    # Editing Phase
+    StoryState.EDITING: [
+        StoryState.GRAMMAR_REVIEW,
         StoryState.ARCHIVED
     ],
     
-    # Analytics transitions (feed back to learning)
-    StoryState.TEXT_ANALYTICS: [
-        StoryState.ARCHIVED  # Analytics complete
-    ],
-    StoryState.AUDIO_ANALYTICS: [
+    # Quality Review Pipeline
+    StoryState.GRAMMAR_REVIEW: [
+        StoryState.CONSISTENCY_CHECK,
+        StoryState.SCRIPT_IMPROVEMENTS,  # Major language issues
         StoryState.ARCHIVED
     ],
-    StoryState.VIDEO_ANALYTICS: [
+    StoryState.CONSISTENCY_CHECK: [
+        StoryState.TONE_CHECK,
+        StoryState.SCRIPT_IMPROVEMENTS,  # Inconsistencies found
         StoryState.ARCHIVED
+    ],
+    StoryState.TONE_CHECK: [
+        StoryState.READABILITY_REVIEW,
+        StoryState.SCRIPT_IMPROVEMENTS,  # Tone mismatch
+        StoryState.ARCHIVED
+    ],
+    StoryState.READABILITY_REVIEW: [
+        StoryState.FINALIZATION,
+        StoryState.SCRIPT_IMPROVEMENTS,  # Not suitable for voiceover
+        StoryState.ARCHIVED
+    ],
+    
+    # Improvement Hub (central point for revisions)
+    StoryState.SCRIPT_IMPROVEMENTS: [
+        StoryState.EDITING,  # Re-edit after improvements
+        StoryState.TITLE_REFINEMENT,  # Refine title
+        StoryState.ARCHIVED
+    ],
+    
+    # Title Refinement
+    StoryState.TITLE_REFINEMENT: [
+        StoryState.FINALIZATION,  # Title aligned with script
+        StoryState.ARCHIVED
+    ],
+    
+    # Final Phase
+    StoryState.FINALIZATION: [
+        StoryState.TITLE_OPTIMIZATION,
+        StoryState.ARCHIVED
+    ],
+    StoryState.TITLE_OPTIMIZATION: [
+        StoryState.PUBLISHING,
+        StoryState.ARCHIVED
+    ],
+    StoryState.PUBLISHING: [
+        StoryState.ARCHIVED  # End of workflow
     ],
     
     # Terminal state - no exits
@@ -258,17 +242,23 @@ class Story:
         ... )
         >>> 
         >>> # Progress through states
-        >>> story.transition_to(StoryState.IDEA_SKELETON)
-        >>> story.transition_to(StoryState.IDEA_TITLE)
+        >>> story.transition_to(StoryState.IDEA_REVIEW)
+        >>> story.transition_to(StoryState.OUTLINE)
+        >>> story.transition_to(StoryState.TITLE_DRAFT)
         >>> story.transition_to(StoryState.SCRIPT_DRAFT)
         >>> story.script_text = "Last night I woke up... but my body kept sleeping."
         >>> 
-        >>> # Continue to publication
-        >>> story.transition_to(StoryState.SCRIPT_REVIEW)
-        >>> story.transition_to(StoryState.SCRIPT_APPROVED)
-        >>> story.transition_to(StoryState.TEXT_PUBLISHING)
+        >>> # Continue through review pipeline
+        >>> story.transition_to(StoryState.CONTENT_REVIEW)
+        >>> story.transition_to(StoryState.EDITING)
+        >>> story.transition_to(StoryState.GRAMMAR_REVIEW)
+        >>> story.transition_to(StoryState.CONSISTENCY_CHECK)
+        >>> story.transition_to(StoryState.TONE_CHECK)
+        >>> story.transition_to(StoryState.READABILITY_REVIEW)
+        >>> story.transition_to(StoryState.FINALIZATION)
+        >>> story.transition_to(StoryState.TITLE_OPTIMIZATION)
         >>> story.published_text_url = "https://reddit.com/r/nosleep/..."
-        >>> story.transition_to(StoryState.TEXT_PUBLISHED)
+        >>> story.transition_to(StoryState.PUBLISHING)
     """
     
     # Core identification
@@ -276,7 +266,7 @@ class Story:
     idea_id: str  # Required - exactly one Idea per Story
     
     # State machine
-    state: StoryState = StoryState.IDEA_OUTLINE
+    state: StoryState = StoryState.IDEA
     status: StoryStatus = StoryStatus.DRAFT
     
     # Script information (populated during script phase)
@@ -361,20 +351,19 @@ class Story:
     
     def _update_status(self) -> None:
         """Update the simplified status based on current state."""
-        if self.state in [StoryState.IDEA_OUTLINE, StoryState.IDEA_SKELETON, StoryState.IDEA_TITLE]:
+        if self.state in [StoryState.IDEA, StoryState.IDEA_REVIEW, StoryState.OUTLINE, StoryState.TITLE_DRAFT]:
             self.status = StoryStatus.DRAFT
-        elif self.state in [StoryState.SCRIPT_DRAFT, StoryState.SCRIPT_REVIEW]:
+        elif self.state in [StoryState.SCRIPT_DRAFT, StoryState.CONTENT_REVIEW, StoryState.EDITING]:
             self.status = StoryStatus.IN_DEVELOPMENT
-        elif self.state == StoryState.SCRIPT_APPROVED:
+        elif self.state in [StoryState.GRAMMAR_REVIEW, StoryState.CONSISTENCY_CHECK, 
+                           StoryState.TONE_CHECK, StoryState.READABILITY_REVIEW,
+                           StoryState.SCRIPT_IMPROVEMENTS]:
             self.status = StoryStatus.READY_FOR_REVIEW
-        elif self.state in [StoryState.TEXT_PUBLISHING, StoryState.AUDIO_RECORDING, 
-                           StoryState.AUDIO_REVIEW, StoryState.VIDEO_PLANNING,
-                           StoryState.VIDEO_PRODUCTION, StoryState.VIDEO_REVIEW]:
+        elif self.state in [StoryState.TITLE_REFINEMENT, StoryState.FINALIZATION, 
+                           StoryState.TITLE_OPTIMIZATION]:
+            self.status = StoryStatus.APPROVED
+        elif self.state == StoryState.PUBLISHING:
             self.status = StoryStatus.IN_PRODUCTION
-        elif self.state in [StoryState.TEXT_PUBLISHED, StoryState.AUDIO_PUBLISHED, 
-                           StoryState.VIDEO_PUBLISHED, StoryState.TEXT_ANALYTICS,
-                           StoryState.AUDIO_ANALYTICS, StoryState.VIDEO_ANALYTICS]:
-            self.status = StoryStatus.PUBLISHED
         elif self.state == StoryState.ARCHIVED:
             self.status = StoryStatus.ARCHIVED
     
