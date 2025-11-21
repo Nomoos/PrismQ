@@ -62,10 +62,11 @@
 
 **Key Innovations**:
 - **Co-dependent improvement**: Title reviewed by script context, script by title context
-- **Version tracking**: v1 (initial), v2 (first improvements), v3+ (refinements)
+- **Version tracking**: v1 (initial), v2 (first improvements), v3+ (refinements - can reach v4, v5, v6, v7, etc.)
 - **Explicit acceptance gates**: Must pass checks before proceeding (steps 12-13)
 - **Final readability validation**: Ensures publishing quality (steps 14-15)
 - **Context preservation**: Original versions kept for reference throughout
+- **Latest version principle**: All loops use the newest/latest version of title and script, not hardcoded versions
 
 **Folder Paths:**
 - `T/Idea/Creation/` - Idea creation
@@ -262,39 +263,43 @@ Worker02: Implement #MVP-011 in T/Script/Improvements/
 ```
 Worker10: Implement #MVP-012 in T/Rewiew/Idea/
 - Module: PrismQ.T.Rewiew.Title.Acceptance
-- Dependencies: #MVP-011 (need title v3)
+- Dependencies: #MVP-011 (need latest title version)
 - Priority: Critical
 - Effort: 0.5 days
-- Deliverable: Acceptance check for title v3
+- Deliverable: Acceptance check for title (latest version - v3, v4, v5, v6, v7, etc.)
   - If ACCEPTED: proceed to #MVP-013
-  - If NOT ACCEPTED: loop back to #MVP-008 (review again → refine to v4)
+  - If NOT ACCEPTED: loop back to #MVP-008 (review newest version → refine to next version)
+  - **Always uses newest title version**
 
 Worker10: Implement #MVP-013 in T/Rewiew/Script/
 - Module: PrismQ.T.Rewiew.Script.Acceptance
 - Dependencies: #MVP-012 (title must be accepted first)
 - Priority: Critical
 - Effort: 0.5 days
-- Deliverable: Acceptance check for script v3
+- Deliverable: Acceptance check for script (latest version - v3, v4, v5, v6, v7, etc.)
   - If ACCEPTED: proceed to #MVP-014
-  - If NOT ACCEPTED: loop back to #MVP-010 (review again → refine to v4)
+  - If NOT ACCEPTED: loop back to #MVP-010 (review newest version → refine to next version)
+  - **Always uses newest script version**
 
 Worker10: Implement #MVP-014 in T/Rewiew/Readability/
 - Module: PrismQ.T.Rewiew.Title.Readability
 - Dependencies: #MVP-013 (both must be accepted)
 - Priority: Critical
 - Effort: 0.5 days
-- Deliverable: Readability check for title
+- Deliverable: Readability check for title (accepted version - latest)
   - If PASSES: proceed to #MVP-015
-  - If FAILS: return to #MVP-009 (refine with readability feedback)
+  - If FAILS: return to #MVP-009 (refine with readability feedback - creates next version)
+  - **Uses newest accepted title**
 
 Worker10: Implement #MVP-015 in T/Rewiew/Readability/
 - Module: PrismQ.T.Rewiew.Script.Readability
 - Dependencies: #MVP-014 (title readability passed)
 - Priority: Critical
 - Effort: 0.5 days
-- Deliverable: Readability/voiceover check for script
+- Deliverable: Readability/voiceover check for script (accepted version - latest)
   - If PASSES: proceed to #MVP-016
-  - If FAILS: return to #MVP-011 (refine with readability feedback)
+  - If FAILS: return to #MVP-011 (refine with readability feedback - creates next version)
+  - **Uses newest accepted script**
 
 Worker04: Complete E2E testing with all iteration paths
 - Dependencies: All MVP features
@@ -305,7 +310,8 @@ Worker04: Complete E2E testing with all iteration paths
   - Title acceptance loop (fails once, then passes)
   - Script acceptance loop (fails once, then passes)
   - Readability loops (title fails, script fails)
-  - Multiple iterations (v4, v5, etc.)
+  - Multiple iterations (v4, v5, v6, v7, v8, etc. - test that version numbering works correctly)
+  - **Verify newest versions always used in loops**
 ```
 
 **Week 5 Deliverable**: ✅ All acceptance gates and readability checks implemented + tested
@@ -346,7 +352,8 @@ Worker15: Complete user guide with iteration loop documentation
   - How iteration loops work
   - Examples of acceptance gate failures
   - How to trigger readability re-checks
-  - Version tracking explanation (v1, v2, v3, etc.)
+  - Version tracking explanation (v1, v2, v3, v4, v5, v6, v7, etc.)
+  - **Important**: Clarify that loops always use newest versions, not hardcoded v3
 
 Worker04: Final MVP validation of all paths
 - Dependencies: All MVP features
@@ -375,11 +382,11 @@ Worker04: Final MVP validation of all paths
 | #MVP-006 | PrismQ.T.Title.Improvements | Title v2 | Worker13 | 2d | Title v2 using cross-reviews + title v1, script v1 |
 | #MVP-007 | PrismQ.T.Script.Improvements | Script v2 | Worker02 | 2d | Script v2 using cross-reviews + new title v2, script v1 |
 | #MVP-008 | PrismQ.T.Rewiew.Title.ByScript | **Title Review v2** | Worker10 | 1d | Review title v2 against script v2 |
-| #MVP-009 | PrismQ.T.Title.Refinement | Title v3 | Worker13 | 1d | Refine title v2 → v3 |
-| #MVP-010 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review v2** | Worker10 | 1d | Review script v2 against title v3 |
-| #MVP-011 | PrismQ.T.Script.Refinement | Script v3 | Worker02 | 2d | Refine script v2 → v3 |
-| #MVP-012 | PrismQ.T.Rewiew.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title v3 is accepted (loop if not) |
-| #MVP-013 | PrismQ.T.Rewiew.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script v3 is accepted (loop if not) |
+| #MVP-009 | PrismQ.T.Title.Refinement | Title v3+ | Worker13 | 1d | Refine title to v3, v4, v5, v6, v7, etc. (newest version) |
+| #MVP-010 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review v2+** | Worker10 | 1d | Review script (latest) against title (latest) |
+| #MVP-011 | PrismQ.T.Script.Refinement | Script v3+ | Worker02 | 2d | Refine script to v3, v4, v5, v6, v7, etc. (newest version) |
+| #MVP-012 | PrismQ.T.Rewiew.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title (latest version) is accepted (loop if not) |
+| #MVP-013 | PrismQ.T.Rewiew.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script (latest version) is accepted (loop if not) |
 | #MVP-014 | PrismQ.T.Rewiew.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability/voiceover validation |
 | #MVP-015 | PrismQ.T.Rewiew.Script.Readability | **Readability Check** | Worker10 | 0.5d | Final script readability/voiceover validation |
 | #MVP-016 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing approved + validated content |
@@ -388,10 +395,11 @@ Worker04: Final MVP validation of all paths
 
 **Key Features**:
 - **Co-dependent improvement**: Title and script reviewed against each other (steps 4-5, 8, 10)
-- **Version tracking**: v1 (initial), v2 (improved), v3+ (refined)
+- **Version tracking**: v1 (initial), v2 (improved), v3+ (refined - can reach v4, v5, v6, v7, etc.)
 - **Explicit acceptance gates**: Must pass before proceeding (steps 12-13)
 - **Final readability validation**: Ensures publishing quality (steps 14-15)
 - **Iteration loops**: Return to refinement if acceptance/readability fails
+- **Latest version principle**: All loops always use the newest/latest version of title and script
 
 **Folder Paths:**
 - `T/Idea/Creation/` (step 1)
@@ -434,10 +442,11 @@ Publishing --> [*]
 ```
 
 **Loop Paths**:
-- **Title Acceptance Loop**: Steps 12 → 8 → 9 → 10 → 11 → 12 (until accepted)
-- **Script Acceptance Loop**: Steps 13 → 10 → 11 → 13 (until accepted)
-- **Title Readability Loop**: Steps 14 → 9 → ... → 14 (until passes)
-- **Script Readability Loop**: Steps 15 → 11 → ... → 15 (until passes)
+- **Title Acceptance Loop**: Steps 12 → 8 → 9 → 10 → 11 → 12 (until accepted) - versions increment: v3 → v4 → v5 → v6 → v7, etc.
+- **Script Acceptance Loop**: Steps 13 → 10 → 11 → 13 (until accepted) - versions increment: v3 → v4 → v5 → v6 → v7, etc.
+- **Title Readability Loop**: Steps 14 → 9 → ... → 14 (until passes) - creates next version each time
+- **Script Readability Loop**: Steps 15 → 11 → ... → 15 (until passes) - creates next version each time
+- **Important**: All loops use the newest/latest version of title and script, not hardcoded versions
 
 ---
 

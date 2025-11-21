@@ -70,7 +70,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 - **v1**: Initial drafts (from idea)
 - **v2**: First improvement cycle (using initial reviews)
 - **v3**: Second refinement cycle (using v2 reviews)
-- **v4+**: Additional cycles if acceptance checks fail
+- **v4+**: Additional cycles if acceptance checks fail (can iterate to v5, v6, v7, etc.)
+
+**Important**: When loops occur, **always use the newest/latest version** of both title and script. For example, if title is at v7 and script at v6, use those versions - not hardcoded v3.
 
 ### 3. Explicit Acceptance Gates
 - **Title acceptance check** (step 12): Must pass before checking script
@@ -238,13 +240,13 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Worker**: Worker13  
 **Effort**: 1 day
 
-**MVP Issue: #MVP-009 - Title Refinement v3**
-- **Input**: Title v2, Review feedback (from stage 8)
+**MVP Issue: #MVP-009 - Title Refinement v3+**
+- **Input**: Title v2 (or latest version), Review feedback (from stage 8)
 - **Process**: Apply review feedback to refine title
-- **Output**: Title v3
-- **Version**: v3 (refinement)
+- **Output**: Title v3 (or v4, v5, v6, v7... depending on loop iteration)
+- **Version**: v3+ (refinement - increments with each loop)
 
-**Return Path**: If stage 12 (acceptance check) fails, returns here for v4, v5, etc.
+**Return Path**: If stage 12 (acceptance check) fails, returns here for v4, v5, v6, v7, etc. **Always uses newest title version.**
 
 ---
 
@@ -270,13 +272,13 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Worker**: Worker02  
 **Effort**: 2 days
 
-**MVP Issue: #MVP-011 - Script Refinement v3**
-- **Input**: Script v2, Review feedback (from stage 10), Title v3
-- **Process**: Apply review feedback, ensure alignment with title v3
-- **Output**: Script v3
-- **Version**: v3 (refinement)
+**MVP Issue: #MVP-011 - Script Refinement v3+**
+- **Input**: Script v2 (or latest version), Review feedback (from stage 10), Title (latest version)
+- **Process**: Apply review feedback, ensure alignment with latest title version
+- **Output**: Script v3 (or v4, v5, v6, v7... depending on loop iteration)
+- **Version**: v3+ (refinement - increments with each loop)
 
-**Return Path**: If stage 13 (acceptance check) fails, returns here for v4, v5, etc.
+**Return Path**: If stage 13 (acceptance check) fails, returns here for v4, v5, v6, v7, etc. **Always uses newest script and title versions.**
 
 ---
 
@@ -287,16 +289,16 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Effort**: 0.5 days
 
 **MVP Issue: #MVP-012 - Title Acceptance Gate**
-- **Input**: Title v3 (current version)
+- **Input**: Title (latest version - v3, v4, v5, v6, v7, etc.)
 - **Check**: Is title accepted?
   - Quality meets standard
   - Aligns with script
   - No further changes needed
 - **Output**: 
   - **ACCEPTED**: Proceed to stage 13
-  - **NOT ACCEPTED**: Return to stage 8 (review v3 again → refine to v4)
+  - **NOT ACCEPTED**: Return to stage 8 (review latest version → refine to next version)
 
-**Critical Gate**: Must pass before checking script.
+**Critical Gate**: Must pass before checking script. **Always checks the newest title version.**
 
 ---
 
@@ -307,16 +309,16 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Effort**: 0.5 days
 
 **MVP Issue: #MVP-013 - Script Acceptance Gate**
-- **Input**: Script v3 (current version), Title v3 (accepted)
+- **Input**: Script (latest version - v3, v4, v5, v6, v7, etc.), Title (accepted version)
 - **Check**: Is script accepted?
   - Quality meets standard
   - Delivers on title promise
   - No further changes needed
 - **Output**:
   - **ACCEPTED**: Proceed to stage 14
-  - **NOT ACCEPTED**: Return to stage 10 (review v3 again → refine to v4)
+  - **NOT ACCEPTED**: Return to stage 10 (review latest version → refine to next version)
 
-**Critical Gate**: Must pass before readability checks.
+**Critical Gate**: Must pass before readability checks. **Always checks the newest script version.**
 
 ---
 
@@ -327,7 +329,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Effort**: 0.5 days
 
 **MVP Issue: #MVP-014 - Title Readability/Voiceover Review**
-- **Input**: Title v3 (accepted version)
+- **Input**: Title (accepted version - latest that passed stage 12)
 - **Check**: Readability and voiceover validation
   - Clear and understandable
   - Appropriate length
@@ -335,9 +337,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
   - Engaging and scannable
 - **Output**:
   - **PASSES**: Proceed to stage 15
-  - **FAILS**: Return to stage 9 (Title Refinement) with readability feedback
+  - **FAILS**: Return to stage 9 (Title Refinement) with readability feedback (creates next version)
 
-**Final Quality Gate** for title before publishing.
+**Final Quality Gate** for title before publishing. **Uses the newest accepted title version.**
 
 ---
 
@@ -348,6 +350,17 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 **Effort**: 0.5 days
 
 **MVP Issue: #MVP-015 - Script Readability/Voiceover Review**
+- **Input**: Script (accepted version - latest that passed stage 13)
+- **Check**: Readability and voiceover quality validation
+  - Clear pronunciation
+  - Natural flow for voiceover
+  - No grammar/spelling issues
+  - Appropriate pacing
+- **Output**:
+  - **PASSES**: Proceed to stage 16 (Publishing)
+  - **FAILS**: Return to stage 11 (Script Refinement) with readability feedback (creates next version)
+
+**Final Quality Gate** for script before publishing. **Uses the newest accepted script version.**
 - **Input**: Script v3 (accepted version)
 - **Check**: Readability and voiceover validation
   - Flows naturally when read aloud
