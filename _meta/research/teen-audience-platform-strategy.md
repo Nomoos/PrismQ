@@ -1227,98 +1227,215 @@ Based on your channel plan data, here's how platforms align with language market
 - **Hosting**: Cloudways, WPEngine, or Kinsta ($15-50/month)
 - **Theme**: Astra or GeneratePress (fast, mobile-optimized)
 - **Plugins**:
-  - Yoast SEO (search optimization)
+  - **WPML or Polylang** (multilanguage support - PRIORITY)
+  - **TranslatePress** (alternative, visual translation editor)
+  - **Language Switcher** (flag dropdown in header, like Wikipedia)
+  - Yoast SEO (search optimization with multilang support)
   - MonsterInsights (Google Analytics integration)
   - OptinMonster (email capture popups)
   - WP Rocket (speed optimization)
   - Easy Table of Contents (better UX)
 
+**Multilanguage WordPress Strategy** (Your Preference):
+- **Language Switcher**: Flags in top navigation (like Wikipedia)
+- **26 Language Versions**: One WordPress site, multiple languages
+- **Content Structure**:
+  - `/en/story-name` (English)
+  - `/cs/story-name` (Czech/Slovak)
+  - `/de/story-name` (German)
+  - `/es/story-name` (Spanish)
+  - etc. for all 26 languages
+- **Benefits**:
+  - Single domain, multiple languages (SEO benefit)
+  - Centralized management
+  - Language-specific SEO optimization
+  - Cross-language content discovery
+  - Easier than managing 26 separate sites
+
+**WordPress Multilanguage Setup**:
+1. **Plugin Choice**: WPML (paid, $99/year) or Polylang (free, $99/year for pro)
+2. **Flag Switcher**: Top-right corner, dropdown with country flags
+3. **Translation Workflow**:
+   - Write story in English first
+   - Translate/adapt for each language (AI-assisted + human review)
+   - Publish all languages simultaneously
+4. **SEO Per Language**:
+   - Each language targets local keywords
+   - Hreflang tags for Google (automatic with WPML/Polylang)
+   - Local backlinks for each language version
+
 **WordPress Cons**:
 - Need to build traffic (no built-in audience)
-- Costs $15-50/month (hosting)
+- Costs $15-50/month (hosting) + $99/year (multilang plugin)
 - Technical maintenance required
 - Slower to monetization (need 50K pageviews)
+- Translation management for 26 languages
 
 ---
 
-### Recommended Hybrid Strategy (BEST APPROACH)
+### Recommended Strategy (UPDATED - WordPress First)
 
-**Use both platforms strategically:**
+**User Preference: WordPress FIRST for multilanguage control**
 
-#### Phase 1: Wattpad First (Months 1-3)
-1. **Post stories to Wattpad** - build teen audience, test engagement
-2. **Link to YouTube in author notes** - "Watch the video version"
-3. **Analyze which stories perform best** on Wattpad
-4. **Prioritize top Wattpad stories for video production**
-5. **Goal**: Build 10K+ followers, test 20-30 stories
+#### Phase 1: WordPress Launch (Months 1-3)
+1. **Launch WordPress multilanguage site** with your domain (nomstory.com or similar)
+2. **Setup 26 language versions** - start with CS, EN, DE (priority 3)
+3. **Add language switcher** - flags in top navigation (like Wikipedia)
+4. **Publish stories in multiple languages** - CS first (test bed), then EN, DE
+5. **Optimize for SEO** - target horror/drama story keywords per language
+6. **Embed YouTube videos** at top of each story post
+7. **Goal**: 10K pageviews/month, 500 email subscribers, 3 languages live
 
-#### Phase 2: WordPress Launch (Months 4-6)
-1. **Launch WordPress blog** with your domain (nomstory.com or similar)
-2. **Repurpose top Wattpad stories** - post expanded versions on WordPress
-3. **Optimize for SEO** - target horror/drama story keywords
-4. **Embed YouTube videos** in WordPress posts
-5. **Add email capture** - build owned audience
-6. **Goal**: 10K pageviews/month, 500 email subscribers
+#### Phase 2: Video Integration (Months 1-6 parallel)
+1. **TikTok CS testing** - test story engagement
+2. **YouTube Shorts CS** - post winning stories
+3. **YouTube Shorts EN** - few hours after CS
+4. **Embed videos in WordPress** - drive traffic both ways
+5. **Cross-promote**: WordPress story → YouTube video → back to WordPress
+6. **Goal**: Build YouTube audience while establishing WordPress authority
 
-#### Phase 3: Dual Publishing (Months 7-12)
-1. **Publish to BOTH platforms simultaneously**:
-   - Wattpad: Serialized chapters (free, builds community)
-   - WordPress: Full story (SEO-optimized, monetization focus)
-2. **Cross-promote**:
-   - Wattpad → "Full story + video on nomstory.com"
-   - WordPress → "Join the community on Wattpad"
-3. **Email list drives to both** Wattpad chapters + WordPress posts
-4. **Goal**: 50K Wattpad followers, 50K WordPress pageviews, 2K email subs
+#### Phase 3: Language Expansion (Months 4-6)
+1. **Add 6 more languages**: ES, PT, FR, HI, TR, ID (high-priority markets)
+2. **Translate top-performing stories** from EN
+3. **Optimize SEO per language** - local keywords
+4. **Goal**: 9 languages live, 50K pageviews/month across all languages
 
-#### Phase 4: Monetization Focus (Months 12+)
-1. **Wattpad Paid Stories** - monetize 50K+ read stories
-2. **WordPress Mediavine** - display ads at 50K pageviews
-3. **Email newsletter premium tier** - $5-10/month exclusives
-4. **YouTube remains primary monetization** (highest CPM)
-5. **Goal**: $2K-5K/month combined (Wattpad + WordPress + YouTube)
+#### Phase 4: Optional Wattpad Integration (Months 7-12)
+1. **If needed**: Add Wattpad for additional teen audience testing
+2. **Use case**: Serialized chapters, community engagement
+3. **Cross-promote**: Wattpad → WordPress (full story) → YouTube (video)
+4. **Goal**: Diversified audience, multiple revenue streams
+
+#### Phase 5: Monetization Focus (Months 6+)
+1. **WordPress Mediavine/Ezoic** - display ads at 50K pageviews
+2. **Email newsletter premium tier** - $5-10/month exclusives per language
+3. **YouTube primary monetization** - $8-12 CPM (EN), lower for other languages
+4. **Affiliate marketing** - horror merchandise, books
+5. **Goal**: $2K-5K/month combined (WordPress + YouTube)
 
 ---
 
-### Content Flow Across Platforms
-
-**Recommended Publishing Workflow**:
+### Updated Content Flow (WordPress First Strategy)
 
 **Week 1: Story Creation**
-- Write 3,000-5,000 word story
-- Structure: Beginning (hook), middle (tension), end (twist)
+- Write 3,000-5,000 word story in English
 - Adapt for teen language (conversational, emotional)
+- Prepare for translation (clear structure)
 
-**Week 2: Wattpad Release**
-- Post as **3 chapters** on Wattpad (1,000-1,500 words each)
-- Monday: Chapter 1, Wednesday: Chapter 2, Friday: Chapter 3
-- Monitor: Comments, votes, reads
-- Promote: TikTok teaser ("New story on Wattpad"), Discord announcement
+**Week 2: WordPress Publication (Multilanguage)**
+- Translate to CS (test bed language)
+- Publish on WordPress: `/cs/story-name` and `/en/story-name`
+- Optimize SEO for both languages
+- Add video placeholder (to be filled Week 4)
 
 **Week 3: Video Production**
-- Take top-performing Wattpad story from previous week
-- Create 30-90 second video version for TikTok/YouTube Shorts
-- Film and edit based on Wattpad feedback
+- Create 30-90 second video for CS TikTok
+- Monitor engagement (2-4 hours)
+- Produce video for YouTube Shorts CS
+- Few hours later: YouTube Shorts EN
 
-**Week 4: WordPress Publication + Video Release**
-- Publish **full story on WordPress** (SEO-optimized)
-- Embed YouTube video at top of post
-- Post video to TikTok CS → analyze → post to YouTube Shorts CS/EN
-- Email newsletter: "New story + video"
-- Cross-promote: Wattpad → WordPress → YouTube
+**Week 4: Video Embed + Cross-Promotion**
+- Embed YouTube videos in WordPress posts (CS and EN versions)
+- Update WordPress posts with "Watch Video" CTAs
+- Email newsletter: "New story available in CS and EN"
+- Social promotion: TikTok, Instagram, X (link to WordPress)
+
+**Week 5+: Language Expansion**
+- Translate winning stories to DE, ES, PT, FR
+- Publish additional language versions
+- Embed same YouTube videos (with language-specific captions/subtitles)
 
 **Result**: 
-- Wattpad = audience building + story testing
-- WordPress = SEO traffic + email capture + long-term monetization
-- YouTube = primary monetization ($8-12 CPM for EN)
-- TikTok = viral discovery
+- **WordPress = Primary platform** (multilanguage, owned, SEO)
+- **YouTube = Primary monetization** ($8-12 CPM for EN)
+- **TikTok = Viral discovery** + traffic to WordPress
+- **Wattpad = Optional** (if needed for additional teen testing)
 
 ---
 
-### Platform Comparison Matrix
+### Updated Platform Priority (WordPress First)
 
-| Feature | Wattpad | WordPress |
-|---------|---------|-----------|
-| **Teen Audience** | 40-45M built-in | Need to build (SEO) |
+**Tier 1: Must-Have (Daily Posting)**
+1. **WordPress Multilanguage** - Primary text platform, owned asset
+2. **YouTube Shorts** - Primary monetization + video distribution
+3. **TikTok** - Viral testing + traffic driver to WordPress
+
+**Tier 2: High Value (3-5x per week)**
+4. **Instagram Reels** - Secondary video reach
+5. **Instagram Stories** - Community building
+6. **Email Newsletter** - Owned audience, drive to WordPress
+
+**Tier 3: Medium Value (2-3x per week)**
+7. **X (Twitter) Threads** - Text-based viral potential, link to WordPress
+8. **Pinterest** - SEO + aesthetic discovery, drive to WordPress
+9. **Snapchat Spotlight** - Teen reach
+
+**Tier 4: Low Priority (1x per week or optional)**
+10. **Wattpad** - Optional teen testing platform (not primary)
+11. **Reddit** - Text archives + community
+12. **Facebook Reels** - Parent audience
+
+**Tier 5: Skip**
+13. **Truth Social** - No teen audience
+
+---
+
+### Platform Comparison Matrix (Updated)
+
+| Feature | WordPress (Your Choice) | Wattpad (Optional) |
+|---------|---------|---------|
+| **Priority** | PRIMARY | Optional/Secondary |
+| **Teen Audience** | Need to build (SEO) | 40-45M built-in |
+| **Setup Cost** | $15-50/month + $99/year (multilang) | Free |
+| **Multilanguage** | ✅ Easy (WPML/Polylang) | ❌ Difficult (separate accounts) |
+| **Audience Ownership** | ✅ You own 100% | ❌ Platform controls |
+| **Monetization Threshold** | 50K pageviews/month | 50K reads |
+| **Revenue Potential** | $500-2,000/month avg | $100-500/month avg |
+| **Revenue Split** | ✅ 100% yours (minus ads) | ❌ 50% to Wattpad |
+| **SEO Value** | ✅ High (permanent traffic) | ❌ Low (doesn't rank) |
+| **Language Management** | ✅ Centralized (1 site, 26 langs) | ❌ Complex (26 accounts) |
+| **Cross-Promotion** | ✅ Easy (embeds, links) | ✅ Easy (author notes) |
+| **Long-Term Control** | ✅ Full control | ❌ Platform risk |
+| **Best For** | Owned platform + multilang SEO | Optional teen testing |
+| **Your Preference** | ✅ YES - PRIMARY | ⚠️ Optional if needed |
+
+---
+
+### Final Recommendation (Updated for WordPress First)
+
+**For NomStory project (teen-focused scary/drama stories with 26 languages):**
+
+✅ **PRIMARY: WordPress Multilanguage** (Months 1+):
+- Perfect for 26-language management (single site, flag switcher)
+- Full ownership and control
+- SEO traffic compounds over time (all languages)
+- Higher monetization potential (100% yours)
+- Professional brand presence
+- Email list building (most valuable asset)
+
+✅ **PRIMARY: YouTube Shorts** (Months 1+):
+- Highest monetization ($8-12 CPM EN market)
+- Video embeds drive WordPress traffic
+- 26 language versions with subtitles
+
+✅ **PRIMARY: TikTok** (Months 1+):
+- Viral discovery and testing
+- Drive traffic to WordPress
+- CS test bed strategy
+
+⚠️ **OPTIONAL: Wattpad** (Months 6+ if needed):
+- Only if WordPress + YouTube isn't generating enough teen engagement
+- Use for additional audience testing
+- Cross-promote to WordPress (full control)
+
+**Priority Order**:
+1. **WordPress Multilanguage** (owned platform, SEO, 26 languages)
+2. **YouTube Shorts** (primary monetization $8-12 CPM)
+3. **TikTok** (viral testing + WordPress traffic)
+4. **Email Newsletter** (owned audience)
+5. **Wattpad** (optional, only if needed for additional testing)
+
+---
 | **Setup Cost** | Free | $15-50/month |
 | **Audience Ownership** | Platform controls | You own 100% |
 | **Monetization Threshold** | 50K reads | 50K pageviews/month |
