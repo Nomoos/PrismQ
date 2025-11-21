@@ -1226,18 +1226,343 @@ Based on your channel plan data, here's how platforms align with language market
 - **Platform**: WordPress.org (self-hosted, not .com)
 - **Hosting**: Cloudways, WPEngine, or Kinsta ($15-50/month)
 - **Theme**: Astra or GeneratePress (fast, mobile-optimized)
-- **Plugins**:
-  - **WPML or Polylang** (multilanguage support - PRIORITY)
-  - **TranslatePress** (alternative, visual translation editor)
-  - **Language Switcher** (flag dropdown in header, like Wikipedia)
-  - Yoast SEO (search optimization with multilang support)
-  - MonsterInsights (Google Analytics integration)
-  - OptinMonster (email capture popups)
-  - WP Rocket (speed optimization)
-  - Easy Table of Contents (better UX)
+- **Plugins**: See detailed multilanguage comparison below
 
-**Multilanguage WordPress Strategy** (Your Preference):
-- **Language Switcher**: Flags in top navigation (like Wikipedia)
+---
+
+### WordPress Multilanguage Plugin Comparison
+
+**Overview of Options:**
+There are 5 main approaches for multilanguage WordPress sites. Each has different pros/cons for your 26-language NomStory project.
+
+---
+
+#### Option 1: WPML (WordPress Multilingual Plugin)
+
+**Type**: Premium plugin, industry standard
+
+**Pricing**:
+- **Multilingual Blog**: $99/year (unlimited languages, 1 site)
+- **Multilingual CMS**: $159/year (custom post types, 3 sites)
+- **Multilingual Agency**: $299/year (unlimited sites)
+- **Recommendation for NomStory**: Multilingual Blog ($99/year)
+
+**Pros**:
+- ✅ **Most powerful** - handles 26 languages easily
+- ✅ **Best SEO** - automatic hreflang tags, language-specific sitemaps
+- ✅ **Translation management** - built-in interface or connect to translation services
+- ✅ **String translation** - translate theme/plugin strings
+- ✅ **URL structure flexibility**: subdirectories (`/en/`, `/cs/`), subdomains (`en.nomstory.com`), or separate domains
+- ✅ **Media translation** - duplicate/translate image ALT tags
+- ✅ **Yoast SEO integration** - translate meta titles/descriptions
+- ✅ **E-commerce ready** - WooCommerce support (if you sell merch later)
+- ✅ **Professional support** - active development, frequent updates
+- ✅ **Advanced features**: Translation memory, automatic translation (DeepL, Google Translate), language-specific redirects
+
+**Cons**:
+- ❌ **Cost**: $99/year recurring (but worth it for 26 languages)
+- ❌ **Complexity**: Steeper learning curve (more features = more settings)
+- ❌ **Performance**: Can slow down site if not optimized (caching required)
+
+**Best For**: Professional multilanguage sites, 26 languages, long-term investment
+
+**Setup Time**: 2-3 hours initial, 15-30 min per language
+
+**Translation Workflow**:
+1. Write story in English
+2. Use WPML translation editor (side-by-side view)
+3. Manual translation OR connect to DeepL API (AI-assisted)
+4. Review and publish all languages
+
+**Flag Switcher**: Built-in, fully customizable, Wikipedia-style dropdown
+
+**Recommendation for NomStory**: ⭐⭐⭐⭐⭐ **BEST CHOICE**
+- Handles 26 languages professionally
+- Best SEO for multilanguage
+- Worth the $99/year investment for full control
+
+---
+
+#### Option 2: Polylang (Free/Pro)
+
+**Type**: Freemium plugin (free core, paid pro)
+
+**Pricing**:
+- **Free**: Core features, unlimited languages
+- **Pro**: €99/year (~$110/year) - adds advanced features
+- **Recommendation for NomStory**: Pro version for full features
+
+**Pros**:
+- ✅ **Free version available** - good for testing/low budget
+- ✅ **Simple interface** - easier to learn than WPML
+- ✅ **Good performance** - lightweight, doesn't slow site much
+- ✅ **URL structure**: subdirectories (`/en/`, `/cs/`) or subdomains
+- ✅ **Yoast SEO compatible** (Pro version)
+- ✅ **String translation** (Pro version)
+- ✅ **Duplicate content** - easy to copy post and translate
+- ✅ **Language switcher** - customizable flags dropdown
+- ✅ **Translation management** (Pro + Lingotek add-on)
+
+**Cons**:
+- ❌ **Pro features require payment** (SEO, string translation, etc.)
+- ❌ **No built-in translation services** (must use external + copy/paste)
+- ❌ **Less advanced** than WPML (no translation memory)
+- ❌ **E-commerce limitations** (basic WooCommerce support)
+- ❌ **Manual hreflang** (must configure yourself in Pro)
+
+**Best For**: Budget-conscious users, simpler multilanguage needs (5-10 languages)
+
+**Setup Time**: 1-2 hours initial, 10-20 min per language
+
+**Translation Workflow**:
+1. Write story in English
+2. Click "Add translation" button
+3. Copy content to new post
+4. Translate manually (or use external tool like DeepL, then paste)
+5. Publish each language version
+
+**Flag Switcher**: Built-in widget, customizable
+
+**Recommendation for NomStory**: ⭐⭐⭐⭐ **GOOD ALTERNATIVE**
+- Cheaper than WPML (€99 vs $99, similar price)
+- Simpler interface
+- Good for 26 languages but less powerful than WPML
+
+---
+
+#### Option 3: TranslatePress
+
+**Type**: Premium plugin, visual translation
+
+**Pricing**:
+- **Personal**: $89/year (1 site)
+- **Business**: $143/year (5 sites)
+- **Developer**: $179/year (unlimited sites)
+- **Recommendation for NomStory**: Personal ($89/year)
+
+**Pros**:
+- ✅ **Visual translation** - translate directly on page (WYSIWYG)
+- ✅ **Easiest to use** - see changes in real-time
+- ✅ **Automatic translation** - Google Translate or DeepL integration
+- ✅ **SEO-friendly** - automatic hreflang tags
+- ✅ **Fast setup** - quickest to get started
+- ✅ **Translate everything** - page builder content, theme strings, plugins
+- ✅ **URL structure**: subdirectories (`/en/`, `/cs/`)
+- ✅ **Language switcher** - floating or menu, with flags
+
+**Cons**:
+- ❌ **No translation memory** (can't reuse translations)
+- ❌ **No translation management** (can't assign translators)
+- ❌ **Automatic translation quality** varies (AI isn't perfect)
+- ❌ **Limited to Google Translate/DeepL** (no other services)
+- ❌ **Less flexible** than WPML for complex sites
+- ❌ **No subdomain option** (only subdirectories)
+
+**Best For**: Users who want visual editing, quick setup, AI-assisted translation
+
+**Setup Time**: 30 min - 1 hour initial, 5-15 min per language (with AI)
+
+**Translation Workflow**:
+1. Write story in English
+2. Click "Translate" in visual editor
+3. AI translates automatically (Google/DeepL)
+4. Review and edit translation on the page
+5. Save and publish
+
+**Flag Switcher**: Built-in, floating button or menu integration
+
+**Recommendation for NomStory**: ⭐⭐⭐⭐ **BEST FOR SPEED**
+- Fastest setup and translation workflow
+- AI-assisted translations save time
+- Cheapest option ($89/year)
+- Great for quickly launching 26 languages
+
+---
+
+#### Option 4: Weglot
+
+**Type**: SaaS translation service (cloud-based)
+
+**Pricing**:
+- **Starter**: €99/year (1 language, 10K words)
+- **Business**: €190/year (5 languages, 50K words)
+- **Pro**: €490/year (10 languages, 200K words)
+- **Advanced**: Custom pricing (26 languages would be expensive)
+- **Recommendation for NomStory**: Too expensive for 26 languages
+
+**Pros**:
+- ✅ **Automatic translation** - instant multilanguage site
+- ✅ **No server overhead** - translations stored in cloud
+- ✅ **Fast setup** - 10 minutes to full multilanguage
+- ✅ **SEO-friendly** - automatic hreflang, dedicated URLs
+- ✅ **Translation dashboard** - cloud-based management
+- ✅ **Professional translations** available (human review)
+- ✅ **URL structure**: subdirectories or subdomains
+
+**Cons**:
+- ❌ **EXPENSIVE** - 26 languages = $1,000+/year
+- ❌ **Word limits** - each story counts toward quota
+- ❌ **Subscription required** - can't export translations
+- ❌ **Less control** - translations stored externally
+- ❌ **Monthly fees** - not sustainable long-term
+
+**Best For**: E-commerce sites with high budget, 3-5 languages maximum
+
+**Setup Time**: 10-15 minutes initial, automatic per language
+
+**Recommendation for NomStory**: ⭐⭐ **TOO EXPENSIVE**
+- Would cost $1,000+/year for 26 languages
+- Not sustainable for content-heavy site
+
+---
+
+#### Option 5: MultilingualPress
+
+**Type**: Premium plugin, multisite-based
+
+**Pricing**:
+- **Single**: $99/year (1 site)
+- **Developer**: $199/year (unlimited sites)
+- **Recommendation**: Single ($99/year)
+
+**Pros**:
+- ✅ **Multisite architecture** - each language is separate site
+- ✅ **Independent databases** - better performance
+- ✅ **URL structure**: subdirectories or subdomains
+- ✅ **SEO-friendly** - automatic hreflang tags
+- ✅ **Content relationships** - link content across languages
+- ✅ **Language switcher** - customizable
+
+**Cons**:
+- ❌ **Requires multisite** - complex WordPress setup
+- ❌ **26 separate sites** - more maintenance
+- ❌ **Complex management** - harder to bulk update
+- ❌ **Plugin compatibility** - must install plugins on each site
+- ❌ **Steeper learning curve** - multisite knowledge required
+
+**Best For**: Advanced users, large organizations, enterprise sites
+
+**Setup Time**: 4-6 hours initial (multisite setup), 30 min per language
+
+**Recommendation for NomStory**: ⭐⭐⭐ **TOO COMPLEX**
+- Multisite overkill for single-person operation
+- 26 sites = too much maintenance
+
+---
+
+### Detailed Comparison Matrix
+
+| Feature | WPML | Polylang Pro | TranslatePress | Weglot | MultilingualPress |
+|---------|------|--------------|----------------|--------|-------------------|
+| **Price/Year** | $99 | €99 (~$110) | $89 | $1,000+ | $99 |
+| **26 Languages** | ✅ Easy | ✅ Yes | ✅ Yes | ❌ Too expensive | ✅ Yes (complex) |
+| **Setup Difficulty** | Medium | Easy | Very Easy | Very Easy | Hard |
+| **Translation Method** | Manual/AI | Manual | Visual AI | Automatic | Manual |
+| **AI Translation** | ✅ DeepL, Google | ❌ External only | ✅ Google, DeepL | ✅ Automatic | ❌ External only |
+| **Translation Memory** | ✅ Yes | ❌ No | ❌ No | ✅ Yes | ❌ No |
+| **SEO Quality** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Performance** | Medium | Good | Good | Excellent | Good |
+| **URL Structure** | All options | Subdirectory/subdomain | Subdirectory only | All options | All options |
+| **Flag Switcher** | ✅ Built-in | ✅ Built-in | ✅ Built-in | ✅ Built-in | ✅ Built-in |
+| **Yoast SEO** | ✅ Full | ✅ Pro only | ✅ Yes | ✅ Yes | ✅ Yes |
+| **String Translation** | ✅ Yes | ✅ Pro only | ✅ Yes | ✅ Yes | ✅ Yes |
+| **E-commerce** | ✅ WooCommerce | ⚠️ Basic | ⚠️ Basic | ✅ Full | ✅ Full |
+| **Translation UI** | Side-by-side | Separate posts | Visual on-page | Dashboard | Separate sites |
+| **Learning Curve** | 2-3 hours | 1-2 hours | 30 min | 15 min | 4-6 hours |
+| **Maintenance** | Low | Low | Very Low | Very Low | High |
+| **Long-term Cost (5 years)** | $495 | €495 (~$550) | $445 | $5,000+ | $495 |
+| **Best For** | Professional 26 languages | Budget-friendly | Speed/AI | 3-5 languages | Enterprise |
+
+---
+
+### Recommendation for NomStory Project
+
+**🏆 WINNER: TranslatePress ($89/year)**
+
+**Why TranslatePress is best for your use case:**
+
+1. **Cheapest option** ($89/year vs $99-110)
+2. **Fastest setup** (30 min vs 2-3 hours)
+3. **AI-assisted translations** - Google Translate or DeepL built-in
+4. **Visual editing** - translate directly on page, see results immediately
+5. **26 languages ready** - no complexity, just add languages
+6. **Time-saving** - AI translates, you review/edit (saves 70% time vs manual)
+7. **SEO-friendly** - automatic hreflang tags
+8. **Flag switcher** - Wikipedia-style dropdown included
+
+**Workflow with TranslatePress:**
+- Week 1: Write story in English on WordPress
+- Week 2: Click "Translate", select CS → AI translates instantly → review 5-10 min → publish
+- Week 2: Repeat for EN, DE → 3 languages live in 30 minutes
+- Week 3-4: Add ES, PT, FR, HI, TR, ID → 9 languages total
+- Result: **26 languages in 2-3 weeks** (vs 2-3 months manual)
+
+**Cost Comparison (5 years):**
+- TranslatePress: $445
+- WPML: $495
+- Polylang Pro: ~$550
+- Weglot: $5,000+
+
+**🥈 RUNNER-UP: WPML ($99/year)**
+
+**Choose WPML if:**
+- You want **maximum control** over translations
+- You need **translation memory** (reuse translated phrases)
+- You plan to **hire translators** (translation management features)
+- You want **best SEO** (most powerful hreflang implementation)
+- Budget allows extra $10/year
+
+**🥉 THIRD CHOICE: Polylang Pro (€99/year)**
+
+**Choose Polylang if:**
+- You want **simplicity** over features
+- You're comfortable with **manual translation** workflow
+- You don't need AI translation
+- You want **open-source** base (free version)
+
+---
+
+### Final Recommendation Setup
+
+**For NomStory (26 languages, teen stories, video embeds):**
+
+**Primary Choice: TranslatePress Personal ($89/year)**
+
+**Reasons:**
+1. ✅ **AI translations** save 10-15 hours per week
+2. ✅ **Visual editing** = see exactly what teens will see
+3. ✅ **Fastest to market** = launch 26 languages in 2-3 weeks
+4. ✅ **Cheapest** = $89/year (saves $10-20 vs competitors)
+5. ✅ **Low maintenance** = automatic AI translations for new stories
+6. ✅ **DeepL integration** = better AI translations than Google
+
+**Setup Steps:**
+1. Install TranslatePress plugin ($89/year license)
+2. Connect DeepL API (better translations than Google)
+3. Add 26 languages in settings
+4. Create flag switcher in header (like Wikipedia)
+5. Write story in English
+6. Click "Translate" → AI translates all 26 languages in 5 minutes
+7. Review CS translation (5 min), EN (already done), DE (5 min)
+8. Spot-check remaining 23 languages (30 min total)
+9. Publish all 26 languages simultaneously
+
+**Time Savings:**
+- Manual translation: 2-3 hours per language × 26 = 52-78 hours per story
+- TranslatePress AI: 5 min AI + 45 min review = 50 minutes per story
+- **Savings: 51-77 hours per story** (you can create 50-70 more stories/year)
+
+**Alternative: WPML if you grow**
+- Start with TranslatePress ($89/year)
+- If you later need translation memory or team management → migrate to WPML ($99/year)
+- Migration tools exist (can switch later without losing content)
+
+---
+
+**Multilanguage WordPress Strategy** (Updated with TranslatePress):
+- **Plugin**: TranslatePress Personal ($89/year) - RECOMMENDED
+- **Alternative**: WPML ($99/year) if you need translation memory
+- **Language Switcher**: Flags in top navigation (like Wikipedia) - built-in
 - **26 Language Versions**: One WordPress site, multiple languages
 - **Content Structure**:
   - `/en/story-name` (English)
@@ -1251,25 +1576,48 @@ Based on your channel plan data, here's how platforms align with language market
   - Language-specific SEO optimization
   - Cross-language content discovery
   - Easier than managing 26 separate sites
+  - AI-assisted translations save 51-77 hours per story
 
-**WordPress Multilanguage Setup**:
-1. **Plugin Choice**: WPML (paid, $99/year) or Polylang (free, $99/year for pro)
-2. **Flag Switcher**: Top-right corner, dropdown with country flags
-3. **Translation Workflow**:
+**WordPress Multilanguage Setup (TranslatePress)**:
+1. **Plugin Installation**: TranslatePress Personal ($89/year)
+2. **DeepL Integration**: Connect DeepL API for better AI translations
+3. **Add 26 Languages**: Settings → Add all target languages
+4. **Flag Switcher**: Automatic in top navigation, customize position/style
+5. **Translation Workflow**:
    - Write story in English first
-   - Translate/adapt for each language (AI-assisted + human review)
-   - Publish all languages simultaneously
-4. **SEO Per Language**:
+   - Click "Translate" button in visual editor
+   - AI translates all 26 languages automatically (5 minutes)
+   - Review CS (test bed), EN (source), DE (priority) - 15 minutes
+   - Spot-check remaining languages - 30 minutes
+   - Publish all languages simultaneously - instant
+6. **SEO Per Language**:
+   - Automatic hreflang tags (built-in)
+   - Translate meta titles/descriptions per language
    - Each language targets local keywords
-   - Hreflang tags for Google (automatic with WPML/Polylang)
-   - Local backlinks for each language version
+   - Language-specific sitemaps (automatic)
 
-**WordPress Cons**:
-- Need to build traffic (no built-in audience)
-- Costs $15-50/month (hosting) + $99/year (multilang plugin)
-- Technical maintenance required
-- Slower to monetization (need 50K pageviews)
-- Translation management for 26 languages
+**WordPress Costs (Updated)**:
+- **Hosting**: $15-50/month (Cloudways, WPEngine, or Kinsta)
+- **Multilanguage Plugin**: $89/year (TranslatePress Personal)
+- **DeepL API**: $5-20/month (pay per character, estimates 500K chars = $10/month for weekly stories)
+- **Total First Year**: $180-600 hosting + $89 plugin + $60-240 DeepL = **$329-929/year**
+- **Total Ongoing**: ~$400-700/year average
+
+**WordPress Pros (Updated)**:
+- ✅ Full ownership and control (100% revenue)
+- ✅ Higher monetization potential ($500-2K/month at 50K pageviews)
+- ✅ **AI translations save 51-77 hours per story**
+- ✅ SEO traffic compounds over time (all 26 languages)
+- ✅ Professional brand presence
+- ✅ Email list building (most valuable asset)
+- ✅ **26 languages in 2-3 weeks** (vs 2-3 months manual)
+
+**WordPress Cons (Updated)**:
+- ❌ Need to build traffic (no built-in audience)
+- ❌ Costs $329-929 first year (but pays for itself with monetization)
+- ❌ Technical maintenance required
+- ❌ Slower to monetization (need 50K pageviews)
+- ❌ AI translations need human review (10-15% may need edits)
 
 ---
 
