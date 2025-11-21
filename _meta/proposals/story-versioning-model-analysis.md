@@ -1528,7 +1528,7 @@ ORDER BY lang_id;
 | Translation | `parentId = original_id` | `parentId = original_id` |
 | Query Clarity | Complex (self-join or filter) | Simple (`IS NULL` check) |
 | Data Integrity | Risk of orphans | Clear hierarchy |
-| Foreign Key | Problematic (circular) | Clean (self-ref with proper FK) |
+| Foreign Key | Problematic (circular) | Self-ref with ON DELETE SET NULL |
 
 **Updated Design with Self-Referential FK:**
 
@@ -1581,9 +1581,7 @@ INSERT INTO languages (code, name, native_name, direction) VALUES
 ('de', 'German', 'Deutsch', 'ltr'),
 ('es', 'Spanish', 'Español', 'ltr'),
 ('fr', 'French', 'Français', 'ltr'),
-('ar', 'Arabic', 'العربية', 'rtl'),
-('zh', 'Chinese', '中文', 'ltr'),
-('ja', 'Japanese', '日本語', 'ltr');
+('ar', 'Arabic', 'العربية', 'rtl');
 ```
 
 **Stories Table Integration:**
