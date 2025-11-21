@@ -15,25 +15,35 @@
 - **Resource efficiency**: 3-4 workers vs 10-12 workers
 - **Early feedback**: Learn from real usage before building advanced features
 
-### MVP Workflow
+### MVP Workflow with Real Folder Names
 
 ```
-Idea.Create
+PrismQ.T.Idea.Creation          → Basic idea capture
     ↓
-T.Title.Draft (generate 3-5 title variants)
+PrismQ.T.Title.Draft            → Generate 3-5 title variants
     ↓
-T.Script.Draft (generate basic script)
+PrismQ.T.Script.Draft           → Generate basic script
     ↓
-T.Review.Initial (manual review, approve/changes requested)
+PrismQ.T.Rewiew.Script          → Manual review, approve/changes requested
     ↓
-T.Script.Improvements (edit based on feedback)
+PrismQ.T.Script.Improvements    → Edit based on feedback
     ↓
-T.Title.Improvements (update title if needed)
+PrismQ.T.Title.Refinement       → Update title if needed
     ↓
-T.Review.Final (final approval gate)
+PrismQ.T.Rewiew.Content         → Final approval gate
     ↓
-T.Publish (mark as published)
+PrismQ.T.Publishing.Finalization → Mark as published
 ```
+
+**Folder Paths:**
+- `T/Idea/Creation/` - Idea creation
+- `T/Title/Draft/` - Title drafting
+- `T/Script/Draft/` - Script drafting
+- `T/Rewiew/Script/` - Script review
+- `T/Script/Improvements/` - Script improvements
+- `T/Title/Refinement/` - Title refinement
+- `T/Rewiew/Content/` - Content review
+- `T/Publishing/Finalization/` - Publishing
 
 ---
 
@@ -53,13 +63,15 @@ T.Publish (mark as published)
 
 **Commands**:
 ```
-Worker02: Implement #MVP-001 in T/Idea/
+Worker02: Implement #MVP-001 in T/Idea/Creation/
+- Module: PrismQ.T.Idea.Creation
 - Dependencies: None
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Basic idea capture and storage working
 
-Worker13: Implement #MVP-002 in T/Title/
+Worker13: Implement #MVP-002 in T/Title/Draft/
+- Module: PrismQ.T.Title.Draft
 - Dependencies: #MVP-001 (can start in parallel)
 - Priority: Critical
 - Effort: 2 days
@@ -84,13 +96,15 @@ Worker13: Implement #MVP-002 in T/Title/
 
 **Commands**:
 ```
-Worker02: Implement #MVP-003 in T/Script/
+Worker02: Implement #MVP-003 in T/Script/Draft/
+- Module: PrismQ.T.Script.Draft
 - Dependencies: #MVP-001, #MVP-002
 - Priority: Critical
 - Effort: 3 days
 - Deliverable: Generate basic script from idea + selected title
 
-Worker10: Implement #MVP-004 in T/Rewiew/
+Worker10: Implement #MVP-004 in T/Rewiew/Script/
+- Module: PrismQ.T.Rewiew.Script
 - Dependencies: #MVP-003 (can start design in parallel)
 - Priority: Critical
 - Effort: 2 days
@@ -117,19 +131,22 @@ Worker10: Implement #MVP-004 in T/Rewiew/
 
 **Commands**:
 ```
-Worker02: Implement #MVP-005 in T/Script/
+Worker02: Implement #MVP-005 in T/Script/Improvements/
+- Module: PrismQ.T.Script.Improvements
 - Dependencies: #MVP-004
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Edit script based on review feedback
 
-Worker13: Implement #MVP-006 in T/Title/
+Worker13: Implement #MVP-006 in T/Title/Refinement/
+- Module: PrismQ.T.Title.Refinement
 - Dependencies: #MVP-005
 - Priority: High
 - Effort: 1 day
 - Deliverable: Update title after script changes
 
-Worker10: Implement #MVP-007 in T/Rewiew/
+Worker10: Implement #MVP-007 in T/Rewiew/Content/
+- Module: PrismQ.T.Rewiew.Content
 - Dependencies: #MVP-005, #MVP-006
 - Priority: Critical
 - Effort: 1 day
@@ -153,7 +170,8 @@ Worker10: Implement #MVP-007 in T/Rewiew/
 
 **Commands**:
 ```
-Worker02: Implement #MVP-008 in T/Publishing/
+Worker02: Implement #MVP-008 in T/Publishing/Finalization/
+- Module: PrismQ.T.Publishing.Finalization
 - Dependencies: #MVP-007
 - Priority: Critical
 - Effort: 2 days
@@ -178,18 +196,28 @@ Worker04: Final MVP testing
 
 ## MVP Issues Summary
 
-| Issue | Stage | Worker | Effort | Description |
-|-------|-------|--------|--------|-------------|
-| #MVP-001 | Idea.Create | Worker02 | 2d | Basic idea capture |
-| #MVP-002 | T.Title.Draft | Worker13 | 2d | Title generation |
-| #MVP-003 | T.Script.Draft | Worker02 | 3d | Script generation |
-| #MVP-004 | T.Review.Initial | Worker10 | 2d | Review workflow |
-| #MVP-005 | T.Script.Improvements | Worker02 | 2d | Script editing |
-| #MVP-006 | T.Title.Improvements | Worker13 | 1d | Title update |
-| #MVP-007 | T.Review.Final | Worker10 | 1d | Final approval |
-| #MVP-008 | T.Publish | Worker02 | 2d | Publishing |
+| Issue | Module | Stage | Worker | Effort | Description |
+|-------|--------|-------|--------|--------|-------------|
+| #MVP-001 | PrismQ.T.Idea.Creation | Idea.Create | Worker02 | 2d | Basic idea capture |
+| #MVP-002 | PrismQ.T.Title.Draft | Title.Draft | Worker13 | 2d | Title generation |
+| #MVP-003 | PrismQ.T.Script.Draft | Script.Draft | Worker02 | 3d | Script generation |
+| #MVP-004 | PrismQ.T.Rewiew.Script | Review.Initial | Worker10 | 2d | Script review |
+| #MVP-005 | PrismQ.T.Script.Improvements | Script.Improvements | Worker02 | 2d | Script editing |
+| #MVP-006 | PrismQ.T.Title.Refinement | Title.Refinement | Worker13 | 1d | Title update |
+| #MVP-007 | PrismQ.T.Rewiew.Content | Review.Final | Worker10 | 1d | Final approval |
+| #MVP-008 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing |
 
 **Total**: 8 issues, 15 days of work, 4 weeks calendar time with 3-4 workers
+
+**Folder Paths:**
+- `T/Idea/Creation/`
+- `T/Title/Draft/`
+- `T/Script/Draft/`
+- `T/Rewiew/Script/`
+- `T/Script/Improvements/`
+- `T/Title/Refinement/`
+- `T/Rewiew/Content/`
+- `T/Publishing/Finalization/`
 
 ---
 
@@ -197,17 +225,17 @@ Worker04: Final MVP testing
 
 ```mermaid
 stateDiagram-v2
-    [*] --> IdeaCreate
-    IdeaCreate --> TitleDraft
-    TitleDraft --> ScriptDraft
-    ScriptDraft --> ReviewInitial
-    ReviewInitial --> ScriptImprovements: changes_requested
-    ReviewInitial --> ReviewFinal: approved
-    ScriptImprovements --> TitleImprovements
-    TitleImprovements --> ReviewFinal
-    ReviewFinal --> Publish: approved
-    ReviewFinal --> ScriptImprovements: changes_requested
-    Publish --> [*]
+    [*] --> IdeaCreation: PrismQ.T.Idea.Creation
+    IdeaCreation --> TitleDraft: PrismQ.T.Title.Draft
+    TitleDraft --> ScriptDraft: PrismQ.T.Script.Draft
+    ScriptDraft --> ScriptReview: PrismQ.T.Rewiew.Script
+    ScriptReview --> ScriptImprovements: changes_requested
+    ScriptReview --> ContentReview: approved
+    ScriptImprovements --> TitleRefinement: PrismQ.T.Script.Improvements
+    TitleRefinement --> ContentReview: PrismQ.T.Title.Refinement
+    ContentReview --> Publishing: approved (PrismQ.T.Rewiew.Content)
+    ContentReview --> ScriptImprovements: changes_requested
+    Publishing --> [*]: PrismQ.T.Publishing.Finalization
 ```
 
 ---

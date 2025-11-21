@@ -13,23 +13,35 @@ This document defines the **Minimum Viable Product (MVP)** workflow for the Text
 
 ### MVP Workflow Sequence
 
+**Using Real Folder Names:**
+
 ```
-Idea.Create 
+PrismQ.T.Idea.Creation
     ↓
-T.Title.Draft
+PrismQ.T.Title.Draft
     ↓
-T.Script.Draft
+PrismQ.T.Script.Draft
     ↓
-T.Review.Initial
+PrismQ.T.Rewiew.Script (Initial Review)
     ↓
-T.Script.Improvements
+PrismQ.T.Script.Improvements
     ↓
-T.Title.Improvements
+PrismQ.T.Title.Refinement (Title Improvements)
     ↓
-T.Review.Final
+PrismQ.T.Rewiew.Content (Final Review)
     ↓
-T.Publish
+PrismQ.T.Publishing.Finalization
 ```
+
+**Folder Structure:**
+- `T/Idea/Creation/` - Idea creation and capture
+- `T/Title/Draft/` - Title generation
+- `T/Script/Draft/` - Script drafting
+- `T/Rewiew/Script/` - Script review
+- `T/Script/Improvements/` - Script improvements
+- `T/Title/Refinement/` - Title refinement
+- `T/Rewiew/Content/` - Content review
+- `T/Publishing/Finalization/` - Publishing
 
 ---
 
@@ -51,8 +63,9 @@ T.Publish
 
 ## Phase 1: MVP Core Workflow (Sprint 1-2)
 
-### Stage 1: Idea.Create
+### Stage 1: PrismQ.T.Idea.Creation
 **Goal**: Create basic idea from inspiration  
+**Folder**: `T/Idea/Creation/`  
 **Owner**: Worker02, Worker12  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 1
@@ -60,6 +73,7 @@ T.Publish
 #### MVP Issue: #MVP-001 - Basic Idea Creation
 - **Worker**: Worker02 (Python)
 - **Effort**: 2 days
+- **Module**: PrismQ.T.Idea.Creation
 - **Description**: Create simple idea capture and storage
 - **Acceptance Criteria**:
   - Input: Text description of idea
@@ -76,8 +90,9 @@ T.Publish
 
 ---
 
-### Stage 2: T.Title.Draft
+### Stage 2: PrismQ.T.Title.Draft
 **Goal**: Generate initial title options  
+**Folder**: `T/Title/Draft/`  
 **Owner**: Worker12, Worker13  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 1
@@ -85,6 +100,7 @@ T.Publish
 #### MVP Issue: #MVP-002 - Basic Title Generator
 - **Worker**: Worker13 (Prompt Master)
 - **Effort**: 2 days
+- **Module**: PrismQ.T.Title.Draft
 - **Description**: Simple AI title generation
 - **Acceptance Criteria**:
   - Input: Idea object
@@ -102,8 +118,9 @@ T.Publish
 
 ---
 
-### Stage 3: T.Script.Draft
+### Stage 3: PrismQ.T.Script.Draft
 **Goal**: Generate initial script from idea and title  
+**Folder**: `T/Script/Draft/`  
 **Owner**: Worker02, Worker13  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 2
@@ -111,6 +128,7 @@ T.Publish
 #### MVP Issue: #MVP-003 - Basic Script Generator
 - **Worker**: Worker02 (Python)
 - **Effort**: 3 days
+- **Module**: PrismQ.T.Script.Draft
 - **Description**: Simple script generation from idea
 - **Acceptance Criteria**:
   - Input: Idea + selected title
@@ -128,8 +146,9 @@ T.Publish
 
 ---
 
-### Stage 4: T.Review.Initial
+### Stage 4: PrismQ.T.Rewiew.Script (Initial Review)
 **Goal**: Basic review and feedback collection  
+**Folder**: `T/Rewiew/Script/`  
 **Owner**: Worker10, Worker12  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 2
@@ -137,6 +156,7 @@ T.Publish
 #### MVP Issue: #MVP-004 - Simple Review System
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 2 days
+- **Module**: PrismQ.T.Rewiew.Script
 - **Description**: Basic manual review workflow
 - **Acceptance Criteria**:
   - Review status: pending/approved/changes_requested
@@ -154,8 +174,9 @@ T.Publish
 
 ---
 
-### Stage 5: T.Script.Improvements
+### Stage 5: PrismQ.T.Script.Improvements
 **Goal**: Apply reviewer feedback to script  
+**Folder**: `T/Script/Improvements/`  
 **Owner**: Worker02, Worker12  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 1
@@ -163,6 +184,7 @@ T.Publish
 #### MVP Issue: #MVP-005 - Manual Script Editing
 - **Worker**: Worker02 (Python)
 - **Effort**: 2 days
+- **Module**: PrismQ.T.Script.Improvements
 - **Description**: Simple script editing interface
 - **Acceptance Criteria**:
   - Edit script content
@@ -180,8 +202,9 @@ T.Publish
 
 ---
 
-### Stage 6: T.Title.Improvements
+### Stage 6: PrismQ.T.Title.Refinement (Title Improvements)
 **Goal**: Refine title based on script changes  
+**Folder**: `T/Title/Refinement/`  
 **Owner**: Worker12, Worker13  
 **Priority**: High  
 **Timeline**: Sprint 2, Week 1
@@ -189,6 +212,7 @@ T.Publish
 #### MVP Issue: #MVP-006 - Title Update
 - **Worker**: Worker13 (Prompt Master)
 - **Effort**: 1 day
+- **Module**: PrismQ.T.Title.Refinement
 - **Description**: Simple title regeneration
 - **Acceptance Criteria**:
   - Input: Updated script
@@ -205,8 +229,9 @@ T.Publish
 
 ---
 
-### Stage 7: T.Review.Final
+### Stage 7: PrismQ.T.Rewiew.Content (Final Review)
 **Goal**: Final approval before publishing  
+**Folder**: `T/Rewiew/Content/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 1
@@ -214,6 +239,7 @@ T.Publish
 #### MVP Issue: #MVP-007 - Final Review Approval
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 1 day
+- **Module**: PrismQ.T.Rewiew.Content
 - **Description**: Final approval gate
 - **Acceptance Criteria**:
   - Reviewer marks as "approved" or "needs changes"
@@ -230,8 +256,9 @@ T.Publish
 
 ---
 
-### Stage 8: T.Publish
+### Stage 8: PrismQ.T.Publishing.Finalization
 **Goal**: Publish approved content  
+**Folder**: `T/Publishing/Finalization/`  
 **Owner**: Worker02, Worker14  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -239,6 +266,7 @@ T.Publish
 #### MVP Issue: #MVP-008 - Basic Publishing
 - **Worker**: Worker02 (Python)
 - **Effort**: 2 days
+- **Module**: PrismQ.T.Publishing.Finalization
 - **Description**: Simple content publishing
 - **Acceptance Criteria**:
   - Mark content as "published"
