@@ -1399,6 +1399,920 @@ The proposed Story model provides a **solid foundation** for version and transla
 
 ---
 
+## 11. Enriched Model Analysis (S3 + Database Storage)
+
+### 11.1 Overview: Enhanced Story Model with Relational Links
+
+The enriched Story model introduces **relational connections** to other business entities and adopts a **hybrid storage strategy** (S3 + Database) for optimal performance and cost efficiency.
+
+**New Model Structure:**
+
+```prisma
+model Story {
+  id              String   @id @default(cuid())
+
+  /// Grouping: all versions/languages of the same logical story
+  parentId        String?  // NULL for original stories, UUID of first/original for translations
+  channelGroupId  Int      // Channel definition (language, country, platform targeting)
+  audienceId      Int      // Audience segmentation
+  
+  version         Int      // Version number per lang (starts at 1, increments)
+  
+  title           String
+  text            String   // May be stored in S3 for large content
+  
+  ideaId          Int      // 1:1 link to Idea (original creative concept)
+  idea            Idea     @relation(fields: [ideaId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  stateId         Int      // Reference to current state (FSM integration)
+}
+```
+
+### 11.2 Key Enhancements
+
+#### Enhancement 1: Parent ID Clarification (NULL for Originals)
+
+**Change**: `parentId String?` with NULL for original stories
+
+**Benefits:**
+- ✅ **Clear distinction** between original and translated stories
+- ✅ **Simplified queries**: `WHERE parentId IS NULL` finds all originals
+- ✅ **No self-referential complexity**: Eliminates `parentId = id` pattern
+- ✅ **Better data integrity**: Foreign key can reference stories table without circular dependency
+
+**Query Patterns:**
+
+```sql
+-- Find all original stories (not translations)
+SELECT * FROM stories WHERE parent_id IS NULL;
+
+-- Find all translations of a specific story
+SELECT * FROM stories WHERE parent_id = 'story-123';
+
+-- Find story with all its translations
+SELECT * FROM stories 
+WHERE id = 'story-123' OR parent_id = 'story-123'
+ORDER BY lang_id;
+```
+
+**Comparison with Previous Model:**
+
+| Aspect | Previous (Self-Referential) | Enhanced (NULL for Originals) |
+|--------|---------------------------|------------------------------|
+| Original Story | `parentId = id` | `parentId = NULL` |
+| Translation | `parentId = original_id` | `parentId = original_id` |
+| Query Clarity | Complex (self-join or filter) | Simple (`IS NULL` check) |
+| Data Integrity | Risk of orphans | Clear hierarchy |
+| Foreign Key | Problematic (circular) | Clean (no circular ref) |
+
+---
+
+#### Enhancement 2: Channel Group Integration
+
+**New Field**: `channelGroupId Int`
+
+**Purpose**: Links story to channel configuration defining:
+- **Language**: Primary language (en, cs, de, etc.)
+- **Country**: Geographic targeting (US, CZ, DE, etc.)
+- **Platform Mix**: Which platforms to publish to (blog + podcast, or blog + podcast + video)
+- **Publication Strategy**: Text-only, Text+Audio, or Full Enrichment
+
+**Channel Group Table (Inferred):**
+
+```sql
+CREATE TABLE channel_groups (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    language VARCHAR(5) NOT NULL,  -- ISO 639-1 code
+    country VARCHAR(2) NOT NULL,   -- ISO 3166-1 alpha-2
+    platforms JSON NOT NULL,       -- {text: ['blog', 'medium'], audio: ['spotify'], video: ['youtube']}
+    enrichment_level ENUM('text_only', 'text_audio', 'full') DEFAULT 'text_only',
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    INDEX idx_language (language),
+    INDEX idx_country (country)
+);
+```
+
+**Benefits:**
+- ✅ **Centralized platform configuration**: Define once, reuse across stories
+- ✅ **Multi-regional support**: Same story, different channels per region
+- ✅ **Platform targeting**: Control which platforms per channel
+- ✅ **Enrichment control**: Configure progressive enrichment per channel
+
+**Example Use Cases:**
+
+```sql
+-- English stories for US audience (full enrichment)
+INSERT INTO channel_groups (name, language, country, platforms, enrichment_level) VALUES
+('US-English-Full', 'en', 'US', 
+ '{"text": ["blog", "medium", "linkedin"], "audio": ["spotify", "apple"], "video": ["youtube", "tiktok"]}', 
+ 'full');
+
+-- Czech stories for CZ audience (text + audio only)
+INSERT INTO channel_groups (name, language, country, platforms, enrichment_level) VALUES
+('CZ-Czech-Audio', 'cs', 'CZ', 
+ '{"text": ["blog"], "audio": ["spotify"]}', 
+ 'text_audio');
+
+-- German stories for DE audience (text only)
+INSERT INTO channel_groups (name, language, country, platforms, enrichment_level) VALUES
+('DE-German-Text', 'de', 'DE', 
+ '{"text": ["blog", "medium"]}', 
+ 'text_only');
+```
+
+**Query Examples:**
+
+```sql
+-- Find all stories for US English channel
+SELECT s.* FROM stories s
+JOIN channel_groups cg ON s.channel_group_id = cg.id
+WHERE cg.country = 'US' AND cg.language = 'en';
+
+-- Stories that need full enrichment (text + audio + video)
+SELECT s.* FROM stories s
+JOIN channel_groups cg ON s.channel_group_id = cg.id
+WHERE cg.enrichment_level = 'full'
+  AND s.text_state = 'published'
+  AND s.video_state != 'published';
+```
+
+---
+
+#### Enhancement 3: Audience Segmentation
+
+**New Field**: `audienceId Int`
+
+**Purpose**: Links story to audience segment for:
+- **Targeting**: Which demographic sees this content
+- **Personalization**: Tailor content to audience interests
+- **Analytics**: Track performance per audience segment
+- **A/B Testing**: Different versions for different audiences
+
+**Audience Table (Inferred):**
+
+```sql
+CREATE TABLE audiences (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    demographics JSON,  -- {age_range: '25-45', interests: ['tech', 'ai'], education: 'college+'}
+    behavior JSON,      -- {engagement_level: 'high', preferred_format: 'video', reading_time: '5-10min'}
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    INDEX idx_name (name)
+);
+```
+
+**Benefits:**
+- ✅ **Personalized content**: Tailor messaging per audience
+- ✅ **Performance analytics**: Track which content resonates with which audience
+- ✅ **A/B testing**: Same story, different versions per audience
+- ✅ **Campaign management**: Target specific segments
+
+**Example Use Cases:**
+
+```sql
+-- Create audience segments
+INSERT INTO audiences (name, description, demographics, behavior) VALUES
+('Tech Enthusiasts', 'Early adopters interested in AI and technology',
+ '{"age_range": "25-45", "interests": ["AI", "tech", "innovation"]}',
+ '{"engagement_level": "high", "preferred_format": "video"}'),
+ 
+('Business Leaders', 'C-level executives and entrepreneurs',
+ '{"age_range": "35-55", "interests": ["business", "strategy", "leadership"]}',
+ '{"engagement_level": "medium", "preferred_format": "text"}'),
+ 
+('Students', 'University students and recent graduates',
+ '{"age_range": "18-25", "interests": ["learning", "career", "tech"]}',
+ '{"engagement_level": "high", "preferred_format": "short_video"}');
+
+-- Query stories for specific audience
+SELECT s.* FROM stories s
+JOIN audiences a ON s.audience_id = a.id
+WHERE a.name = 'Tech Enthusiasts'
+  AND s.text_state = 'published';
+```
+
+---
+
+#### Enhancement 4: Idea Integration (1:1 Relationship)
+
+**New Field**: `ideaId Int` with 1:1 relation to `Idea` model
+
+**Purpose**: Links story to its original creative concept/inspiration
+
+**Benefits:**
+- ✅ **Traceability**: Track from idea to published content
+- ✅ **Analytics**: See which ideas generate successful content
+- ✅ **Workflow integration**: Seamless transition from Idea → Script → Story
+- ✅ **Content planning**: Understand idea-to-story conversion rate
+
+**Idea Table (Inferred from T/Idea module):**
+
+```sql
+CREATE TABLE ideas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    source VARCHAR(100),       -- YouTube, Twitter, News, Original
+    inspiration_url VARCHAR(500),
+    score INT,                 -- Idea quality score
+    category VARCHAR(100),
+    tags JSON,
+    status ENUM('inspiration', 'creation', 'outline', 'title', 'approved', 'script_started', 'published') DEFAULT 'inspiration',
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_status (status),
+    INDEX idx_score (score)
+);
+```
+
+**Workflow Integration:**
+
+```
+Idea (T/Idea module)
+    ↓ [1:1]
+Story (versioned text content)
+    ↓ [1:N progressive enrichment]
+PublishedText → PublishedAudio → PublishedVideo
+```
+
+**Query Examples:**
+
+```sql
+-- Find all stories derived from a specific idea
+SELECT s.* FROM stories s
+WHERE s.idea_id = 123;
+
+-- Track idea-to-publication conversion
+SELECT 
+    i.id,
+    i.title,
+    COUNT(s.id) as story_versions,
+    MAX(s.version) as latest_version,
+    MAX(CASE WHEN s.text_state = 'published' THEN 1 ELSE 0 END) as is_published
+FROM ideas i
+LEFT JOIN stories s ON i.id = s.idea_id
+GROUP BY i.id;
+
+-- Find ideas that haven't been turned into stories yet
+SELECT i.* FROM ideas i
+LEFT JOIN stories s ON i.id = s.idea_id
+WHERE s.id IS NULL
+  AND i.status = 'approved'
+ORDER BY i.score DESC;
+```
+
+**1:1 Relationship Enforcement:**
+
+```sql
+-- Unique constraint to enforce 1:1 per language and version
+ALTER TABLE stories
+ADD UNIQUE KEY unique_idea_lang_version (idea_id, lang_id, version);
+
+-- Or if truly 1:1 (one story per idea total):
+ALTER TABLE stories
+ADD UNIQUE KEY unique_idea (idea_id);
+```
+
+---
+
+#### Enhancement 5: State Management via State ID
+
+**New Field**: `stateId Int` - Reference to current state
+
+**Purpose**: External state management for FSM integration
+
+**Benefits:**
+- ✅ **Flexible state system**: States defined in separate table
+- ✅ **Dynamic workflow**: Add new states without schema changes
+- ✅ **State metadata**: Store additional state information (description, color, icon)
+- ✅ **Multi-tenant**: Different state machines per tenant if needed
+
+**State Table:**
+
+```sql
+CREATE TABLE workflow_states (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    state_type ENUM('text', 'audio', 'video', 'workflow') NOT NULL,
+    description TEXT,
+    display_color VARCHAR(7),  -- Hex color for UI
+    display_icon VARCHAR(50),   -- Icon name for UI
+    is_terminal BOOLEAN DEFAULT FALSE,
+    sort_order INT,
+    
+    INDEX idx_state_type (state_type),
+    INDEX idx_name (name)
+);
+
+-- Populate with PrismQ workflow states
+INSERT INTO workflow_states (name, state_type, description, is_terminal) VALUES
+('draft', 'text', 'Initial draft state', FALSE),
+('review', 'text', 'Under review', FALSE),
+('approved', 'text', 'Approved for publishing', FALSE),
+('published', 'text', 'Published to platforms', FALSE),
+('archived', 'text', 'Archived content', TRUE);
+```
+
+**Alternative: Composite State Tracking**
+
+If using parallel state machines (recommended), you'd need multiple state IDs:
+
+```sql
+ALTER TABLE stories
+ADD COLUMN text_state_id INT,
+ADD COLUMN audio_state_id INT,
+ADD COLUMN video_state_id INT,
+ADD FOREIGN KEY (text_state_id) REFERENCES workflow_states(id),
+ADD FOREIGN KEY (audio_state_id) REFERENCES workflow_states(id),
+ADD FOREIGN KEY (video_state_id) REFERENCES workflow_states(id);
+```
+
+**Query Examples:**
+
+```sql
+-- Find stories in specific state
+SELECT s.* FROM stories s
+JOIN workflow_states ws ON s.state_id = ws.id
+WHERE ws.name = 'review';
+
+-- Count stories per state
+SELECT ws.name, ws.state_type, COUNT(s.id) as story_count
+FROM workflow_states ws
+LEFT JOIN stories s ON ws.id = s.state_id
+GROUP BY ws.id
+ORDER BY ws.sort_order;
+```
+
+---
+
+### 11.3 S3 + Database Hybrid Storage Strategy
+
+**Problem**: Large text content can bloat database, increase backup time, and slow queries.
+
+**Solution**: Store large content in S3, keep metadata and small text in database.
+
+**Implementation Approaches:**
+
+#### Approach A: S3 for Large Content Only
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NULL,
+    channel_group_id INT NOT NULL,
+    audience_id INT NOT NULL,
+    idea_id INT NOT NULL UNIQUE,
+    version INT NOT NULL,
+    
+    title VARCHAR(500) NOT NULL,
+    
+    -- Conditional storage
+    text_preview TEXT,           -- First 1000 chars for preview/search
+    text_s3_key VARCHAR(500),    -- S3 key if text is large
+    text_size_bytes INT,         -- Original text size
+    
+    state_id INT NOT NULL,
+    
+    -- State machine fields
+    text_state_id INT,
+    audio_state_id INT,
+    video_state_id INT,
+    
+    -- Publication tracking
+    published_text TIMESTAMP NULL,
+    published_audio TIMESTAMP NULL,
+    published_video TIMESTAMP NULL,
+    publication_state JSON,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (channel_group_id) REFERENCES channel_groups(id),
+    FOREIGN KEY (audience_id) REFERENCES audiences(id),
+    FOREIGN KEY (idea_id) REFERENCES ideas(id),
+    FOREIGN KEY (state_id) REFERENCES workflow_states(id),
+    
+    UNIQUE KEY unique_story (idea_id, channel_group_id, version),
+    INDEX idx_parent (parent_id),
+    INDEX idx_channel (channel_group_id),
+    INDEX idx_audience (audience_id),
+    INDEX idx_state (state_id)
+);
+```
+
+**Storage Logic:**
+
+```python
+class StoryStorage:
+    """Hybrid storage strategy for stories"""
+    
+    THRESHOLD_BYTES = 10000  # 10KB threshold
+    
+    def save_story(self, story_data):
+        text = story_data['text']
+        text_size = len(text.encode('utf-8'))
+        
+        if text_size > self.THRESHOLD_BYTES:
+            # Store in S3
+            s3_key = f"stories/{story_data['id']}/v{story_data['version']}/text.txt"
+            self.s3_client.put_object(
+                Bucket='prismq-content',
+                Key=s3_key,
+                Body=text,
+                ContentType='text/plain; charset=utf-8'
+            )
+            
+            # Save metadata to database
+            db_data = {
+                **story_data,
+                'text_preview': text[:1000],
+                'text_s3_key': s3_key,
+                'text_size_bytes': text_size,
+                'text': None  # Don't store full text in DB
+            }
+        else:
+            # Store in database
+            db_data = {
+                **story_data,
+                'text_preview': text,
+                'text_s3_key': None,
+                'text_size_bytes': text_size
+            }
+        
+        self.db.insert('stories', db_data)
+    
+    def get_story_text(self, story_id):
+        """Retrieve full text from DB or S3"""
+        story = self.db.query('SELECT * FROM stories WHERE id = ?', [story_id])
+        
+        if story['text_s3_key']:
+            # Fetch from S3
+            response = self.s3_client.get_object(
+                Bucket='prismq-content',
+                Key=story['text_s3_key']
+            )
+            return response['Body'].read().decode('utf-8')
+        else:
+            # Return from database
+            return story['text_preview']
+```
+
+**Benefits:**
+- ✅ **Cost optimization**: S3 cheaper than database storage
+- ✅ **Performance**: Database queries faster without large text fields
+- ✅ **Scalability**: Can store unlimited text size in S3
+- ✅ **Backup efficiency**: Database backups smaller and faster
+- ✅ **Search capability**: text_preview enables full-text search
+
+**Drawbacks:**
+- ⚠️ Additional complexity (two storage systems)
+- ⚠️ Network latency for S3 fetches
+- ⚠️ Need S3 lifecycle management
+- ⚠️ Consistency challenges (DB + S3 sync)
+
+---
+
+#### Approach B: S3 for All Content (Recommended for Large Scale)
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NULL,
+    channel_group_id INT NOT NULL,
+    audience_id INT NOT NULL,
+    idea_id INT NOT NULL UNIQUE,
+    version INT NOT NULL,
+    
+    title VARCHAR(500) NOT NULL,
+    
+    -- All content in S3
+    s3_base_key VARCHAR(500) NOT NULL,  -- e.g., stories/abc123/v1/
+    content_files JSON,                  -- {text: 'text.txt', audio: 'audio.mp3', video: 'video.mp4'}
+    
+    -- Search/preview data
+    text_preview TEXT,                   -- First 1000 chars for search
+    text_size_bytes INT,
+    
+    -- ... rest of fields
+);
+```
+
+**S3 Structure:**
+
+```
+s3://prismq-content/
+  stories/
+    {story-id}/
+      v1/
+        text.txt           (full text content)
+        metadata.json      (additional metadata)
+        text.cs.txt        (Czech translation)
+        text.de.txt        (German translation)
+      v2/
+        text.txt
+        metadata.json
+      audio/
+        v1/
+          audio.mp3
+          transcript.txt
+      video/
+        v1/
+          video.mp4
+          subtitles.vtt
+```
+
+**Benefits:**
+- ✅ **Unified storage**: All versions in same location
+- ✅ **Version history**: Easy to access old versions
+- ✅ **Multi-format**: Text, audio, video in same hierarchy
+- ✅ **CDN integration**: Serve content directly from S3/CloudFront
+- ✅ **Disaster recovery**: S3 versioning + replication
+
+---
+
+### 11.4 Complete Enriched Model SQL Schema
+
+```sql
+-- Channel Groups table
+CREATE TABLE channel_groups (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    language VARCHAR(5) NOT NULL,
+    country VARCHAR(2) NOT NULL,
+    platforms JSON NOT NULL,
+    enrichment_level ENUM('text_only', 'text_audio', 'full') DEFAULT 'text_only',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_language (language),
+    INDEX idx_country (country),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Audiences table
+CREATE TABLE audiences (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    demographics JSON,
+    behavior JSON,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_name (name),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Ideas table
+CREATE TABLE ideas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    source VARCHAR(100),
+    inspiration_url VARCHAR(500),
+    score INT,
+    category VARCHAR(100),
+    tags JSON,
+    status ENUM('inspiration', 'creation', 'outline', 'title', 'approved', 'script_started', 'published') DEFAULT 'inspiration',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_status (status),
+    INDEX idx_score (score)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Workflow States table
+CREATE TABLE workflow_states (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    state_type ENUM('text', 'audio', 'video', 'workflow') NOT NULL,
+    description TEXT,
+    display_color VARCHAR(7),
+    display_icon VARCHAR(50),
+    is_terminal BOOLEAN DEFAULT FALSE,
+    sort_order INT,
+    
+    INDEX idx_state_type (state_type),
+    INDEX idx_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Enhanced Stories table with S3 hybrid storage
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    
+    -- Hierarchy and grouping
+    parent_id VARCHAR(36) NULL COMMENT 'NULL for originals, parent story ID for translations',
+    channel_group_id INT NOT NULL COMMENT 'Channel definition (language, country, platforms)',
+    audience_id INT NOT NULL COMMENT 'Target audience segment',
+    idea_id INT NOT NULL COMMENT '1:1 link to original creative concept',
+    version INT NOT NULL COMMENT 'Version number (starts at 1)',
+    
+    -- Content
+    title VARCHAR(500) NOT NULL,
+    text_preview TEXT COMMENT 'First 1000 chars or full text if small',
+    text_s3_key VARCHAR(500) COMMENT 'S3 key for large content',
+    text_size_bytes INT COMMENT 'Original text size',
+    
+    -- State management (parallel state machines)
+    text_state_id INT NOT NULL COMMENT 'Current text workflow state',
+    audio_state_id INT NOT NULL COMMENT 'Current audio workflow state',
+    video_state_id INT NOT NULL COMMENT 'Current video workflow state',
+    workflow_state_id INT NOT NULL COMMENT 'Overall workflow state',
+    
+    -- Multi-platform publication tracking
+    published_text TIMESTAMP NULL COMMENT 'Text publication timestamp',
+    published_audio TIMESTAMP NULL COMMENT 'Audio publication timestamp',
+    published_video TIMESTAMP NULL COMMENT 'Video publication timestamp',
+    publication_state JSON NULL COMMENT 'Per-platform publication details',
+    
+    -- Version lineage
+    previous_version_id VARCHAR(36) NULL COMMENT 'Previous version for lineage',
+    changes_summary JSON NULL COMMENT 'What changed in this version',
+    review_score INT NULL COMMENT 'Quality score from review',
+    
+    -- Performance flags
+    is_latest BOOLEAN DEFAULT FALSE COMMENT 'Latest version flag',
+    
+    -- Audit fields
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) COMMENT 'Creator identifier',
+    
+    -- Foreign keys
+    FOREIGN KEY (parent_id) REFERENCES stories(id) ON DELETE SET NULL,
+    FOREIGN KEY (channel_group_id) REFERENCES channel_groups(id),
+    FOREIGN KEY (audience_id) REFERENCES audiences(id),
+    FOREIGN KEY (idea_id) REFERENCES ideas(id),
+    FOREIGN KEY (text_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (audio_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (video_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (workflow_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (previous_version_id) REFERENCES stories(id) ON DELETE SET NULL,
+    
+    -- Unique constraints
+    UNIQUE KEY unique_story_version (idea_id, channel_group_id, version),
+    
+    -- Indexes
+    INDEX idx_parent (parent_id),
+    INDEX idx_channel (channel_group_id),
+    INDEX idx_audience (audience_id),
+    INDEX idx_idea (idea_id),
+    INDEX idx_text_state (text_state_id),
+    INDEX idx_audio_state (audio_state_id),
+    INDEX idx_video_state (video_state_id),
+    INDEX idx_workflow_state (workflow_state_id),
+    INDEX idx_is_latest (is_latest),
+    INDEX idx_published_text (published_text),
+    INDEX idx_published_audio (published_audio),
+    INDEX idx_published_video (published_video),
+    INDEX idx_created_at (created_at),
+    
+    -- Full-text search
+    FULLTEXT INDEX ft_content (title, text_preview)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Enhanced story model with channel, audience, idea integration and S3 hybrid storage';
+
+-- State transition history (unchanged from previous design)
+CREATE TABLE story_state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    story_id VARCHAR(36) NOT NULL,
+    state_type ENUM('text', 'audio', 'video', 'workflow') NOT NULL,
+    from_state_id INT NOT NULL,
+    to_state_id INT NOT NULL,
+    transitioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transitioned_by VARCHAR(255),
+    metadata JSON,
+    
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    FOREIGN KEY (from_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (to_state_id) REFERENCES workflow_states(id),
+    
+    INDEX idx_story (story_id),
+    INDEX idx_state_type (state_type),
+    INDEX idx_to_state (to_state_id),
+    INDEX idx_transitioned_at (transitioned_at)
+) ENGINE=InnoDB;
+```
+
+---
+
+### 11.5 Models Subject to Progressive Enrichment
+
+Based on the enriched model, these entities participate in the progressive enrichment workflow:
+
+#### Primary Model: Story
+- **Enrichment Flow**: Text → Audio → Video
+- **State Tracking**: Parallel state machines (text_state, audio_state, video_state)
+- **Content Storage**: Hybrid (DB + S3)
+- **Enrichment Level**: Controlled by channel_group_id
+
+#### Supporting Models:
+
+**1. Idea (T/Idea Module)**
+- **Role**: Original creative concept
+- **Relationship**: 1:1 with Story
+- **Enrichment**: Not directly enriched, but triggers Story creation
+- **Lifecycle**: Inspiration → Creation → Outline → Title → Approved → Story Created
+
+**2. Channel Group**
+- **Role**: Defines enrichment strategy per channel
+- **Enrichment Control**: 
+  - `text_only`: Only text published
+  - `text_audio`: Text + Audio published
+  - `full`: Text + Audio + Video published
+- **Platform Configuration**: Which platforms per enrichment stage
+
+**3. Audience**
+- **Role**: Target segment for personalization
+- **Enrichment Impact**: May influence which enrichment levels to pursue
+- **Analytics**: Track enrichment effectiveness per audience
+
+**4. Workflow States**
+- **Role**: Define valid states for each enrichment stage
+- **State Types**: text, audio, video, workflow
+- **Enrichment Tracking**: Monitor progress through enrichment stages
+
+---
+
+### 11.6 Pros and Cons of Enriched Model
+
+#### Pros ✅
+
+1. **Clear Original vs Translation Distinction**
+   - `parentId = NULL` for originals is cleaner than self-referential
+   - Simpler queries for finding originals
+
+2. **Channel Group Integration**
+   - Centralized platform configuration
+   - Multi-regional support
+   - Enrichment level control per channel
+
+3. **Audience Segmentation**
+   - Personalization capabilities
+   - Analytics per segment
+   - A/B testing support
+
+4. **Idea Traceability**
+   - Clear link from idea to published content
+   - Workflow integration (T/Idea → Story)
+   - Analytics on idea-to-story conversion
+
+5. **External State Management**
+   - Flexible FSM via state tables
+   - Dynamic workflow without schema changes
+   - UI metadata support (colors, icons)
+
+6. **S3 Hybrid Storage**
+   - Cost optimization
+   - Scalability for large content
+   - Performance improvement
+
+7. **Rich Relationships**
+   - Foreign keys enforce data integrity
+   - Easy joins for complex queries
+   - Better analytics capabilities
+
+#### Cons ⚠️
+
+1. **Increased Complexity**
+   - More tables to manage (channel_groups, audiences, ideas, workflow_states)
+   - More foreign keys to maintain
+   - More complex queries (multiple joins)
+
+2. **Migration Challenge**
+   - Need to migrate existing data to new structure
+   - Requires populating channel_groups, audiences, workflow_states
+   - Need to link stories to ideas retroactively
+
+3. **S3 Dependency**
+   - Additional infrastructure (S3 setup, lifecycle, permissions)
+   - Consistency challenges (DB + S3 sync)
+   - Network latency for large content fetches
+
+4. **State ID Instead of Enum**
+   - Lose database-level validation of state values
+   - Must validate states at application level
+   - More complex queries (JOIN to get state name)
+
+5. **Idea 1:1 Constraint**
+   - May be too restrictive if multiple stories from one idea
+   - Need to clarify: 1:1 per language? Or 1:1 total?
+   - Could limit flexibility
+
+6. **Multiple State IDs**
+   - text_state_id, audio_state_id, video_state_id, workflow_state_id
+   - 4 foreign keys to manage
+   - Potential inconsistency between parallel states
+
+7. **Channel Group Dependency**
+   - Cannot create story without channel group
+   - Need to pre-define all channel configurations
+   - May be over-engineering for simple use cases
+
+---
+
+### 11.7 Recommendations for Enriched Model
+
+#### Short-Term Implementation (Phase 1)
+
+1. **Start with Core Enhancements**
+   - Implement `parentId = NULL` for originals
+   - Add `ideaId` for workflow integration
+   - Keep state as ENUM initially (simpler validation)
+
+2. **Defer Complex Features**
+   - Postpone channel_groups (use simple lang_id + country_id)
+   - Postpone audience_id (add later when needed)
+   - Keep text in database initially (add S3 when volume grows)
+
+3. **Hybrid Approach**
+   ```sql
+   CREATE TABLE stories (
+       id VARCHAR(36) PRIMARY KEY,
+       parent_id VARCHAR(36) NULL,         -- NULL for originals ✅
+       idea_id INT NOT NULL,                -- Link to Idea ✅
+       lang_id VARCHAR(5) NOT NULL,         -- Keep simple for now
+       country_code VARCHAR(2),             -- Add country support
+       version INT NOT NULL,
+       
+       title VARCHAR(500) NOT NULL,
+       text LONGTEXT NOT NULL,              -- Keep in DB initially
+       
+       -- Use ENUMs for simplicity, migrate to state_id later
+       text_state ENUM(...),
+       audio_state ENUM(...),
+       video_state ENUM(...),
+       
+       -- Multi-platform tracking
+       published_text TIMESTAMP NULL,
+       published_audio TIMESTAMP NULL,
+       published_video TIMESTAMP NULL,
+       
+       -- ... other fields
+       
+       FOREIGN KEY (idea_id) REFERENCES ideas(id),
+       UNIQUE KEY (idea_id, lang_id, version)
+   );
+   ```
+
+#### Medium-Term Evolution (Phase 2)
+
+1. **Add Channel Groups**
+   - Create channel_groups table
+   - Migrate lang_id + country_code to channel_group_id
+   - Add enrichment level configuration
+
+2. **Implement S3 Hybrid Storage**
+   - Add text_s3_key, text_preview fields
+   - Implement conditional storage logic
+   - Migrate large content to S3
+
+3. **Add Audience Segmentation**
+   - Create audiences table
+   - Add audience_id to stories
+   - Start tracking per-audience analytics
+
+#### Long-Term Optimization (Phase 3)
+
+1. **State Table Migration**
+   - Create workflow_states table
+   - Migrate ENUMs to state IDs
+   - Implement state transition validation
+
+2. **Advanced Features**
+   - State transition analytics
+   - Cross-audience A/B testing
+   - Multi-channel orchestration
+   - S3 lifecycle management
+
+---
+
+### 11.8 Summary: Enriched vs Original Model
+
+| Aspect | Original Model | Enriched Model |
+|--------|---------------|----------------|
+| **parentId** | Self-referential | NULL for originals ✅ Better |
+| **Language** | `langId` field | `channelGroupId` (includes language + country) ✅ More powerful |
+| **Audience** | Not included | `audienceId` ✅ Enables personalization |
+| **Idea Link** | Not included | `ideaId` (1:1) ✅ Workflow integration |
+| **State Management** | String/Enum | `stateId` (external table) ⚠️ More flexible but complex |
+| **Storage** | Database only | S3 + Database hybrid ✅ Scalable and cost-effective |
+| **Complexity** | Simple (6 fields) | Complex (13+ fields, 6 foreign keys) ⚠️ |
+| **Foreign Keys** | None | 6 foreign keys ✅ Better integrity, ⚠️ More constraints |
+| **Scalability** | Limited by DB | Excellent (S3 for content) ✅ |
+| **Query Complexity** | Simple | Complex (multiple JOINs) ⚠️ |
+
+**Verdict**: The enriched model is **significantly more powerful** but requires careful phased implementation to avoid over-engineering.
+
+---
+
 ## Appendix A: SQL Schema Reference
 
 ### Complete Hybrid Model SQL
