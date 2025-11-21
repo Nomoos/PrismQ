@@ -1405,27 +1405,91 @@ The proposed Story model provides a **solid foundation** for version and transla
 
 The enriched Story model introduces **relational connections** to other business entities and adopts a **hybrid storage strategy** (S3 + Database) for optimal performance and cost efficiency.
 
+**Relationship Cardinality Clarifications:**
+
+- **Story → Audience**: Many-to-One (many stories can target one audience)
+- **Story → Idea**: Many-to-One (many stories/versions can derive from one idea)
+- **Story → ChannelGroup**: Many-to-One (many stories can use one channel configuration)
+- **Story → Language**: Many-to-One (many stories in one language)
+- **Story → Parent Story**: Many-to-One (many translations reference one original story)
+- **Story → State**: Many-to-One (many stories in one state)
+
+**Key Design Decisions:**
+
+1. **Parent is a Story**: `parentId` references the `stories` table itself (self-referential FK), NULL for originals
+2. **Language as separate table**: `languages` table with ISO codes, descriptions
+3. **Version with workflow pattern**: Sequential versions alternate between draft/review/improvement states
+4. **States with M:N transitions**: `workflow_states` table with `state_transitions` M:N table defining valid state changes
+
 **New Model Structure:**
 
 ```prisma
 model Story {
   id              String   @id @default(cuid())
 
-  /// Grouping: all versions/languages of the same logical story
-  parentId        String?  // NULL for original stories, ID of original story for translations
-  channelGroupId  Int      // Channel definition (language, country, platform targeting)
-  audienceId      Int      // Audience segmentation
+  /// Self-referential: parent is also a Story
+  parentId        String?  // NULL for originals, references stories.id for translations
+  parent          Story?   @relation("StoryTranslations", fields: [parentId], references: [id])
+  translations    Story[]  @relation("StoryTranslations")
   
-  version         Int      // Version number per lang (starts at 1, increments)
+  channelGroupId  Int      // M:1 - Many stories use one channel config
+  channelGroup    ChannelGroup @relation(fields: [channelGroupId], references: [id])
+  
+  audienceId      Int      // M:1 - Many stories target one audience
+  audience        Audience @relation(fields: [audienceId], references: [id])
+  
+  languageId      Int      // M:1 - Many stories in one language (NEW: separate table)
+  language        Language @relation(fields: [languageId], references: [id])
+  
+  version         Int      // Sequential: 1=draft, 2=review, 3=improved, 4=review, 5=improved...
   
   title           String
   text            String   // May be stored in S3 for large content
   
-  ideaId          Int      // 1:1 link to Idea (original creative concept)
+  ideaId          Int      // M:1 - Many stories/versions from one idea
   idea            Idea     @relation(fields: [ideaId], references: [id])
   
+  stateId         Int      // M:1 - Many stories in one state
+  state           WorkflowState @relation(fields: [stateId], references: [id])
+  
   createdAt       DateTime @default(now())
-  stateId         Int      // Reference to current state (FSM integration)
+  
+  @@unique([ideaId, channelGroupId, languageId, version])
+}
+
+model Language {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique  // ISO 639-1: "en", "cs", "de"
+  name        String              // "English", "Czech", "German"
+  nativeName  String              // "English", "Čeština", "Deutsch"
+  isActive    Boolean  @default(true)
+  stories     Story[]
+}
+
+model WorkflowState {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  description     String?
+  stateType       String   // "text", "audio", "video", "workflow"
+  displayColor    String?
+  isTerminal      Boolean  @default(false)
+  
+  stories         Story[]
+  
+  // M:N relationship for valid transitions
+  transitionsFrom StateTransition[] @relation("FromState")
+  transitionsTo   StateTransition[] @relation("ToState")
+}
+
+model StateTransition {
+  id              Int      @id @default(autoincrement())
+  fromStateId     Int
+  fromState       WorkflowState @relation("FromState", fields: [fromStateId], references: [id])
+  toStateId       Int
+  toState         WorkflowState @relation("ToState", fields: [toStateId], references: [id])
+  requiresApproval Boolean @default(false)
+  
+  @@unique([fromStateId, toStateId])
 }
 ```
 
@@ -1464,13 +1528,123 @@ ORDER BY lang_id;
 | Translation | `parentId = original_id` | `parentId = original_id` |
 | Query Clarity | Complex (self-join or filter) | Simple (`IS NULL` check) |
 | Data Integrity | Risk of orphans | Clear hierarchy |
-| Foreign Key | Problematic (circular) | Clean (no circular ref) |
+| Foreign Key | Problematic (circular) | Clean (self-ref with proper FK) |
+
+**Updated Design with Self-Referential FK:**
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NULL COMMENT 'NULL for originals, references stories.id for translations',
+    
+    -- Self-referential foreign key
+    FOREIGN KEY (parent_id) REFERENCES stories(id) ON DELETE SET NULL,
+    
+    INDEX idx_parent (parent_id)
+);
+```
+
+**Key Point**: Parent IS a Story (not a separate table), enabling proper self-referential relationship.
+
+---
+
+#### Enhancement 1b: Language as Separate Table (NEW)
+
+**New Design**: Extract language to separate `languages` table instead of inline `langId` string
+
+**Purpose**: 
+- **Centralized language management**: Add/disable languages without touching story data
+- **Metadata support**: Store language names, native names, directionality (LTR/RTL)
+- **Referential integrity**: Prevent invalid language codes
+- **Query optimization**: Better indexing and joins
+
+**Languages Table:**
+
+```sql
+CREATE TABLE languages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(5) NOT NULL UNIQUE COMMENT 'ISO 639-1 code: en, cs, de',
+    name VARCHAR(100) NOT NULL COMMENT 'English name: English, Czech, German',
+    native_name VARCHAR(100) NOT NULL COMMENT 'Native name: English, Čeština, Deutsch',
+    direction ENUM('ltr', 'rtl') DEFAULT 'ltr' COMMENT 'Text direction',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_code (code),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Populate with common languages
+INSERT INTO languages (code, name, native_name, direction) VALUES
+('en', 'English', 'English', 'ltr'),
+('cs', 'Czech', 'Čeština', 'ltr'),
+('de', 'German', 'Deutsch', 'ltr'),
+('es', 'Spanish', 'Español', 'ltr'),
+('fr', 'French', 'Français', 'ltr'),
+('ar', 'Arabic', 'العربية', 'rtl'),
+('zh', 'Chinese', '中文', 'ltr'),
+('ja', 'Japanese', '日本語', 'ltr');
+```
+
+**Stories Table Integration:**
+
+```sql
+ALTER TABLE stories 
+ADD COLUMN language_id INT NOT NULL,
+ADD FOREIGN KEY (language_id) REFERENCES languages(id),
+ADD INDEX idx_language (language_id);
+```
+
+**Benefits:**
+- ✅ **Data integrity**: Cannot use invalid language codes
+- ✅ **Centralized management**: Add/disable languages in one place
+- ✅ **Rich metadata**: Store language properties (direction, native names)
+- ✅ **Better queries**: JOIN for language info instead of hardcoded strings
+- ✅ **Normalization**: Reduces redundancy
+
+**Query Examples:**
+
+```sql
+-- Find all stories in Czech
+SELECT s.*, l.name as language_name, l.native_name
+FROM stories s
+JOIN languages l ON s.language_id = l.id
+WHERE l.code = 'cs';
+
+-- Count stories per language
+SELECT l.code, l.name, COUNT(s.id) as story_count
+FROM languages l
+LEFT JOIN stories s ON l.id = s.language_id
+GROUP BY l.id
+ORDER BY story_count DESC;
+
+-- Find all active languages with published stories
+SELECT DISTINCT l.*
+FROM languages l
+JOIN stories s ON l.id = s.language_id
+WHERE l.is_active = TRUE
+  AND s.published_text IS NOT NULL;
+```
+
+**Comparison:**
+
+| Aspect | Inline langId String | Separate Language Table |
+|--------|---------------------|------------------------|
+| Data Type | `VARCHAR(5)` | `INT (FK)` |
+| Validation | Application level | Database level (FK) |
+| Metadata | None | Name, native name, direction |
+| Management | Hardcoded | Centralized CRUD |
+| Query Performance | String comparison | Integer JOIN (faster) |
+| Storage | 5 bytes per row | 4 bytes per row + language table |
+| Extensibility | Limited | Easy to add properties |
 
 ---
 
 #### Enhancement 2: Channel Group Integration
 
 **New Field**: `channelGroupId Int`
+
+**Cardinality**: Many-to-One (many stories use one channel configuration)
 
 **Purpose**: Links story to channel configuration defining:
 - **Language**: Primary language (en, cs, de, etc.)
@@ -1545,6 +1719,8 @@ WHERE cg.enrichment_level = 'full'
 
 **New Field**: `audienceId Int`
 
+**Cardinality**: Many-to-One (many stories can target ONE audience, but one audience can be targeted by MANY stories)
+
 **Purpose**: Links story to audience segment for:
 - **Targeting**: Which demographic sees this content
 - **Personalization**: Tailor content to audience interests
@@ -1598,9 +1774,16 @@ WHERE a.name = 'Tech Enthusiasts'
 
 ---
 
-#### Enhancement 4: Idea Integration (1:1 Relationship)
+#### Enhancement 4: Idea Integration (Many-to-One Relationship)
 
-**New Field**: `ideaId Int` with 1:1 relation to `Idea` model
+**New Field**: `ideaId Int`
+
+**Cardinality**: Many-to-One (ONE idea can spawn MANY stories/versions/translations, but each story derives from ONE idea)
+
+**Clarification**: This is NOT 1:1 as initially stated. One idea can generate:
+- Multiple language versions (English, Czech, German stories from same idea)
+- Multiple story versions (v1, v2, v3... from same idea)
+- Multiple audience-targeted variations (Tech audience, Business audience from same idea)
 
 **Purpose**: Links story to its original creative concept/inspiration
 
@@ -1686,17 +1869,20 @@ ADD UNIQUE KEY unique_idea_channel_version (idea_id, channel_group_id, version);
 
 ---
 
-#### Enhancement 5: State Management via State ID
+#### Enhancement 5: State Management with M:N Transitions
 
 **New Field**: `stateId Int` - Reference to current state
 
-**Purpose**: External state management for FSM integration
+**Cardinality**: Many-to-One (many stories in one state)
+
+**Purpose**: External state management for FSM integration with **M:N state transitions** defining valid state changes
 
 **Benefits:**
 - ✅ **Flexible state system**: States defined in separate table
 - ✅ **Dynamic workflow**: Add new states without schema changes
 - ✅ **State metadata**: Store additional state information (description, color, icon)
-- ✅ **Multi-tenant**: Different state machines per tenant if needed
+- ✅ **M:N transitions**: Define which states can transition to which other states
+- ✅ **Workflow enforcement**: Prevent invalid state jumps at database level
 
 **State Table:**
 
@@ -1713,45 +1899,137 @@ CREATE TABLE workflow_states (
     
     INDEX idx_state_type (state_type),
     INDEX idx_name (name)
-);
+) ENGINE=InnoDB;
 
 -- Populate with PrismQ workflow states
-INSERT INTO workflow_states (name, state_type, description, is_terminal) VALUES
-('draft', 'text', 'Initial draft state', FALSE),
-('review', 'text', 'Under review', FALSE),
-('approved', 'text', 'Approved for publishing', FALSE),
-('published', 'text', 'Published to platforms', FALSE),
-('archived', 'text', 'Archived content', TRUE);
+INSERT INTO workflow_states (name, state_type, description, is_terminal, sort_order) VALUES
+('draft', 'text', 'Initial draft state', FALSE, 1),
+('review', 'text', 'Under review', FALSE, 2),
+('improved', 'text', 'Improvements made after review', FALSE, 3),
+('approved', 'text', 'Approved for publishing', FALSE, 4),
+('published', 'text', 'Published to platforms', FALSE, 5),
+('archived', 'text', 'Archived content', TRUE, 6);
 ```
 
-**Alternative: Composite State Tracking**
-
-If using parallel state machines (recommended), you'd need multiple state IDs:
+**M:N State Transitions Table (NEW):**
 
 ```sql
-ALTER TABLE stories
-ADD COLUMN text_state_id INT,
-ADD COLUMN audio_state_id INT,
-ADD COLUMN video_state_id INT,
-ADD FOREIGN KEY (text_state_id) REFERENCES workflow_states(id),
-ADD FOREIGN KEY (audio_state_id) REFERENCES workflow_states(id),
-ADD FOREIGN KEY (video_state_id) REFERENCES workflow_states(id);
+CREATE TABLE state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_state_id INT NOT NULL,
+    to_state_id INT NOT NULL,
+    requires_approval BOOLEAN DEFAULT FALSE,
+    description TEXT,
+    
+    FOREIGN KEY (from_state_id) REFERENCES workflow_states(id) ON DELETE CASCADE,
+    FOREIGN KEY (to_state_id) REFERENCES workflow_states(id) ON DELETE CASCADE,
+    
+    UNIQUE KEY unique_transition (from_state_id, to_state_id),
+    INDEX idx_from_state (from_state_id),
+    INDEX idx_to_state (to_state_id)
+) ENGINE=InnoDB;
+
+-- Populate valid state transitions
+INSERT INTO state_transitions (from_state_id, to_state_id, requires_approval, description) VALUES
+-- From draft
+(1, 2, FALSE, 'Submit draft for review'),       -- draft → review
+(1, 6, FALSE, 'Archive draft'),                 -- draft → archived
+
+-- From review
+(2, 3, FALSE, 'Request improvements'),          -- review → improved
+(2, 4, TRUE, 'Approve content'),                -- review → approved (requires approval)
+(2, 1, FALSE, 'Send back to draft'),            -- review → draft
+(2, 6, FALSE, 'Archive during review'),         -- review → archived
+
+-- From improved
+(3, 2, FALSE, 'Resubmit for review'),           -- improved → review
+(3, 6, FALSE, 'Archive improvements'),          -- improved → archived
+
+-- From approved
+(4, 5, FALSE, 'Publish approved content'),      -- approved → published
+(4, 2, FALSE, 'Send back to review'),           -- approved → review
+(4, 6, FALSE, 'Archive approved content'),      -- approved → archived
+
+-- From published
+(5, 6, FALSE, 'Archive published content'),     -- published → archived
+
+-- Note: Terminal state 'archived' has no outgoing transitions
 ```
+
+**Version Workflow Pattern:**
+
+Versions follow a review-improvement cycle:
+- **Version 1**: Initial draft (state: draft)
+- **Version 2**: After first review (state: review or improved)
+- **Version 3**: Improvements made (state: improved)
+- **Version 4**: Second review (state: review)
+- **Version 5**: Further improvements (state: improved)
+- **Version N**: Final approved/published (state: approved/published)
 
 **Query Examples:**
 
 ```sql
 -- Find stories in specific state
-SELECT s.* FROM stories s
+SELECT s.*, ws.name as current_state
+FROM stories s
 JOIN workflow_states ws ON s.state_id = ws.id
 WHERE ws.name = 'review';
 
--- Count stories per state
-SELECT ws.name, ws.state_type, COUNT(s.id) as story_count
+-- Find valid next states for a story's current state
+SELECT s.id, s.version, 
+       ws_from.name as current_state,
+       ws_to.name as possible_next_state,
+       st.requires_approval
+FROM stories s
+JOIN workflow_states ws_from ON s.state_id = ws_from.id
+JOIN state_transitions st ON ws_from.id = st.from_state_id
+JOIN workflow_states ws_to ON st.to_state_id = ws_to.id
+WHERE s.id = 'story-123';
+
+-- Count stories per state with transition options
+SELECT ws.name, ws.state_type, 
+       COUNT(s.id) as story_count,
+       GROUP_CONCAT(ws_next.name) as possible_transitions
 FROM workflow_states ws
 LEFT JOIN stories s ON ws.id = s.state_id
+LEFT JOIN state_transitions st ON ws.id = st.from_state_id
+LEFT JOIN workflow_states ws_next ON st.to_state_id = ws_next.id
 GROUP BY ws.id
 ORDER BY ws.sort_order;
+
+-- Validate state transition before update
+SELECT COUNT(*) as is_valid
+FROM state_transitions
+WHERE from_state_id = (SELECT state_id FROM stories WHERE id = 'story-123')
+  AND to_state_id = 4; -- trying to move to 'approved'
+-- Returns 1 if valid, 0 if invalid
+```
+
+**State Transition Trigger (Optional):**
+
+```sql
+DELIMITER //
+
+CREATE TRIGGER validate_state_transition
+BEFORE UPDATE ON stories
+FOR EACH ROW
+BEGIN
+    DECLARE valid_transition INT;
+    
+    IF NEW.state_id != OLD.state_id THEN
+        SELECT COUNT(*) INTO valid_transition
+        FROM state_transitions
+        WHERE from_state_id = OLD.state_id
+          AND to_state_id = NEW.state_id;
+        
+        IF valid_transition = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Invalid state transition';
+        END IF;
+    END IF;
+END//
+
+DELIMITER ;
 ```
 
 ---
@@ -1956,18 +2234,39 @@ s3://prismq-content/
 ### 11.4 Complete Enriched Model SQL Schema
 
 ```sql
+-- Languages table (NEW: separate table for language management)
+CREATE TABLE languages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(5) NOT NULL UNIQUE COMMENT 'ISO 639-1: en, cs, de',
+    name VARCHAR(100) NOT NULL COMMENT 'English name',
+    native_name VARCHAR(100) NOT NULL COMMENT 'Native name',
+    direction ENUM('ltr', 'rtl') DEFAULT 'ltr',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_code (code),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Populate common languages
+INSERT INTO languages (code, name, native_name, direction) VALUES
+('en', 'English', 'English', 'ltr'),
+('cs', 'Czech', 'Čeština', 'ltr'),
+('de', 'German', 'Deutsch', 'ltr'),
+('es', 'Spanish', 'Español', 'ltr'),
+('fr', 'French', 'Français', 'ltr'),
+('ar', 'Arabic', 'العربية', 'rtl');
+
 -- Channel Groups table
 CREATE TABLE channel_groups (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    language VARCHAR(5) NOT NULL,
-    country VARCHAR(2) NOT NULL,
+    country VARCHAR(2) NOT NULL COMMENT 'ISO 3166-1 alpha-2',
     platforms JSON NOT NULL,
     enrichment_level ENUM('text_only', 'text_audio', 'full') DEFAULT 'text_only',
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    INDEX idx_language (language),
     INDEX idx_country (country),
     INDEX idx_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -2019,16 +2318,60 @@ CREATE TABLE workflow_states (
     INDEX idx_name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Populate workflow states
+INSERT INTO workflow_states (name, state_type, description, is_terminal, sort_order) VALUES
+('draft', 'text', 'Initial draft', FALSE, 1),
+('review', 'text', 'Under review', FALSE, 2),
+('improved', 'text', 'Improvements made', FALSE, 3),
+('approved', 'text', 'Approved for publishing', FALSE, 4),
+('published', 'text', 'Published to platforms', FALSE, 5),
+('archived', 'text', 'Archived content', TRUE, 6);
+
+-- State Transitions table (M:N relationship - NEW)
+CREATE TABLE state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_state_id INT NOT NULL,
+    to_state_id INT NOT NULL,
+    requires_approval BOOLEAN DEFAULT FALSE,
+    description TEXT,
+    
+    FOREIGN KEY (from_state_id) REFERENCES workflow_states(id) ON DELETE CASCADE,
+    FOREIGN KEY (to_state_id) REFERENCES workflow_states(id) ON DELETE CASCADE,
+    
+    UNIQUE KEY unique_transition (from_state_id, to_state_id),
+    INDEX idx_from_state (from_state_id),
+    INDEX idx_to_state (to_state_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Populate valid state transitions
+INSERT INTO state_transitions (from_state_id, to_state_id, requires_approval, description) VALUES
+(1, 2, FALSE, 'Submit for review'),          -- draft → review
+(1, 6, FALSE, 'Archive draft'),              -- draft → archived
+(2, 3, FALSE, 'Request improvements'),       -- review → improved
+(2, 4, TRUE, 'Approve content'),             -- review → approved (requires approval)
+(2, 1, FALSE, 'Back to draft'),              -- review → draft
+(2, 6, FALSE, 'Archive'),                    -- review → archived
+(3, 2, FALSE, 'Resubmit for review'),        -- improved → review
+(3, 6, FALSE, 'Archive'),                    -- improved → archived
+(4, 5, FALSE, 'Publish'),                    -- approved → published
+(4, 2, FALSE, 'Back to review'),             -- approved → review
+(4, 6, FALSE, 'Archive'),                    -- approved → archived
+(5, 6, FALSE, 'Archive published content');  -- published → archived
+
 -- Enhanced Stories table with S3 hybrid storage
 CREATE TABLE stories (
     id VARCHAR(36) PRIMARY KEY,
     
-    -- Hierarchy and grouping
-    parent_id VARCHAR(36) NULL COMMENT 'NULL for originals, parent story ID for translations',
-    channel_group_id INT NOT NULL COMMENT 'Channel definition (language, country, platforms)',
-    audience_id INT NOT NULL COMMENT 'Target audience segment',
-    idea_id INT NOT NULL COMMENT '1:1 link to original creative concept',
-    version INT NOT NULL COMMENT 'Version number (starts at 1)',
+    -- Self-referential hierarchy (parent IS a story)
+    parent_id VARCHAR(36) NULL COMMENT 'NULL for originals, references stories.id for translations',
+    
+    -- Foreign keys to business entities (M:1 relationships)
+    channel_group_id INT NOT NULL COMMENT 'M:1 - Many stories use one channel config',
+    audience_id INT NOT NULL COMMENT 'M:1 - Many stories target one audience',
+    language_id INT NOT NULL COMMENT 'M:1 - Many stories in one language',
+    idea_id INT NOT NULL COMMENT 'M:1 - Many stories/versions from one idea',
+    
+    version INT NOT NULL COMMENT 'Sequential: 1=draft, 2=review, 3=improved, 4=review, 5=improved...',
     
     -- Content
     title VARCHAR(500) NOT NULL,
@@ -2036,11 +2379,8 @@ CREATE TABLE stories (
     text_s3_key VARCHAR(500) COMMENT 'S3 key for large content',
     text_size_bytes INT COMMENT 'Original text size',
     
-    -- State management (parallel state machines)
-    text_state_id INT NOT NULL COMMENT 'Current text workflow state',
-    audio_state_id INT NOT NULL COMMENT 'Current audio workflow state',
-    video_state_id INT NOT NULL COMMENT 'Current video workflow state',
-    workflow_state_id INT NOT NULL COMMENT 'Overall workflow state',
+    -- State management (single state for simplified model, or use parallel states)
+    state_id INT NOT NULL COMMENT 'M:1 - Current workflow state',
     
     -- Multi-platform publication tracking
     published_text TIMESTAMP NULL COMMENT 'Text publication timestamp',
@@ -2065,27 +2405,22 @@ CREATE TABLE stories (
     FOREIGN KEY (parent_id) REFERENCES stories(id) ON DELETE SET NULL,
     FOREIGN KEY (channel_group_id) REFERENCES channel_groups(id),
     FOREIGN KEY (audience_id) REFERENCES audiences(id),
+    FOREIGN KEY (language_id) REFERENCES languages(id),
     FOREIGN KEY (idea_id) REFERENCES ideas(id),
-    FOREIGN KEY (text_state_id) REFERENCES workflow_states(id),
-    FOREIGN KEY (audio_state_id) REFERENCES workflow_states(id),
-    FOREIGN KEY (video_state_id) REFERENCES workflow_states(id),
-    FOREIGN KEY (workflow_state_id) REFERENCES workflow_states(id),
+    FOREIGN KEY (state_id) REFERENCES workflow_states(id),
     FOREIGN KEY (previous_version_id) REFERENCES stories(id) ON DELETE SET NULL,
     
     -- Unique constraints
-    -- Note: For A/B testing with different audiences, add audience_id:
-    -- UNIQUE KEY unique_story_version (idea_id, channel_group_id, audience_id, version),
-    UNIQUE KEY unique_story_version (idea_id, channel_group_id, version),
+    -- Ensures one story per idea+channel+language+version combination
+    UNIQUE KEY unique_story_version (idea_id, channel_group_id, language_id, version),
     
     -- Indexes
     INDEX idx_parent (parent_id),
     INDEX idx_channel (channel_group_id),
     INDEX idx_audience (audience_id),
+    INDEX idx_language (language_id),
     INDEX idx_idea (idea_id),
-    INDEX idx_text_state (text_state_id),
-    INDEX idx_audio_state (audio_state_id),
-    INDEX idx_video_state (video_state_id),
-    INDEX idx_workflow_state (workflow_state_id),
+    INDEX idx_state (state_id),
     INDEX idx_is_latest (is_latest),
     INDEX idx_published_text (published_text),
     INDEX idx_published_audio (published_audio),
