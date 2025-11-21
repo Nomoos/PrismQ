@@ -645,7 +645,418 @@ Based on your channel plan data, here's how platforms align with language market
 
 ---
 
-## Monetization Strategy by Platform (Teen Audience)
+## Time Zone Optimization Strategy
+
+### Eastport, Maine Starting Point Strategy
+
+**Why Eastport, Maine (UTC-4/5)?**
+- **Earliest US time zone** (Atlantic Time)
+- Allows **rolling releases** across global markets
+- Captures **morning scroll** in US before West Coast wakes up
+- Hits **after-school** in Europe simultaneously
+
+### Rolling Release Schedule by Content Type
+
+#### Shorts (<90 seconds)
+
+**Week 1: Morning Start (Testing)**
+- **6:00 AM Eastport** = 11:00 AM London = 7:00 PM Bangkok
+  - Posts to: CS, EN, DE channels
+  - Target: European after-school + Asian evening
+  - Analyze: 4-6 hour performance window
+
+**Week 2: Midday Start (Testing)**
+- **12:00 PM Eastport** = 5:00 PM London = 1:00 AM Bangkok (next day)
+  - Posts to: CS, EN, DE channels
+  - Target: European evening + US morning scroll
+  - Analyze: 4-6 hour performance window
+
+**Week 3: Afternoon Start (Testing)**
+- **3:00 PM Eastport** = 8:00 PM London = 4:00 AM Bangkok (next day)
+  - Posts to: CS, EN, DE channels
+  - Target: European prime time + US after-school
+  - Analyze: 4-6 hour performance window
+
+**Week 4: Evening Start (Testing)**
+- **7:00 PM Eastport** = 12:00 AM London (next day) = 8:00 AM Bangkok (next day)
+  - Posts to: CS, EN, DE channels
+  - Target: US evening + Asian morning scroll
+  - Analyze: 4-6 hour performance window
+
+**Finding Sweet Spot:**
+- Track **completion rate, watch time, CTR** for each time slot
+- Compare **first 6 hours performance** across all tests
+- Identify which time gets **fastest momentum** (YouTube algorithm boost)
+- Double down on winning time slot in Month 2
+
+---
+
+#### Extended Shorts (<3 minutes)
+
+**Different Sweet Spot than Regular Shorts:**
+- Extended shorts need **longer watch sessions**
+- Teens watch 2-3 min videos during:
+  - **Commute times** (7-8am, 3-4pm)
+  - **Before bed** (10-11pm)
+  - **Weekend mornings** (9-11am)
+
+**Week 1-4 Testing Schedule (Staggered by 1 day):**
+- **Day 1**: Test 7:00 AM Eastport (commute time)
+- **Day 2**: Test 3:00 PM Eastport (after-school)
+- **Day 3**: Test 10:00 PM Eastport (before bed)
+- **Day 4**: Test 9:00 AM Saturday (weekend morning)
+- **Day 5-7**: Repeat best performer 3x to confirm
+
+**Key Metrics for Extended Shorts:**
+- **Average view duration** (target: 60%+)
+- **Watch time** (more important than views)
+- **Subscriber conversion** (longer content = better conversion)
+
+---
+
+#### Long Form (3m+)
+
+**Best for Deep Engagement:**
+- Long form = **intentional viewing** (not scroll-by)
+- Teens watch 3-10 min videos:
+  - **Weekend evenings** (Friday-Sunday 7-11pm)
+  - **Before bed** (10pm-12am)
+  - **Lazy mornings** (Saturday-Sunday 10am-1pm)
+
+**Monthly Testing Schedule:**
+- **Week 1**: Friday 8:00 PM Eastport release
+- **Week 2**: Saturday 10:00 AM Eastport release
+- **Week 3**: Sunday 7:00 PM Eastport release
+- **Week 4**: Best performer gets 2x releases
+
+**Long Form Strategy:**
+- **Compilations** of best Shorts (5-10 stories)
+- **Behind-the-scenes** + story breakdown
+- **Series finales** with extended endings
+- **Monetization focus** (higher CPM on long-form)
+
+---
+
+### Time Zone Rolling Release Example (One Day)
+
+**Target: Global teen audience across 24 hours**
+
+**6:00 AM Eastport (UTC-4)**:
+- 11:00 AM London → CS/DE/FR after lunch
+- 12:00 PM Prague → CS after lunch
+- 7:00 PM Bangkok → TH evening prime time
+- 8:00 PM Manila → PH evening prime time
+
+**12:00 PM Eastport (UTC-4)**:
+- 5:00 PM London → EN/DE evening commute
+- 6:00 PM Prague → CS evening prime time
+- 1:00 AM Bangkok → (skip, sleeping)
+- 11:00 AM Los Angeles → EN late morning
+
+**6:00 PM Eastport (UTC-4)**:
+- 11:00 PM London → (late but some teen scrolling)
+- 12:00 AM Prague → (skip, sleeping)
+- 7:00 AM Bangkok → TH/ID morning scroll
+- 3:00 PM Los Angeles → EN after-school peak
+
+**Strategy:** Use 3 release windows per day to capture **morning scroll** (Asia), **after-school** (Europe), and **evening prime** (Americas).
+
+---
+
+## Additional Platform Analysis
+
+### Meta Platforms
+
+#### Instagram (Already Covered - Expanding)
+
+**Instagram Reels** (Primary):
+- **Teen Female Users**: 120-140M (13-18)
+- **Best For**: Scary stories, aesthetic drama
+- **Posting**: 1-2x daily (7-9am, 7-9pm)
+- **CPM**: $3-6 (lower than YouTube but good engagement)
+
+**Instagram Stories** (Secondary):
+- **Teen Usage**: 250M+ daily teen users
+- **Best For**: Behind-the-scenes, polls, Q&A
+- **Posting**: 3-5 stories/day throughout day
+- **Monetization**: Drive traffic to Reels/YouTube
+
+**Instagram Feed Posts** (Tertiary):
+- **Teen Engagement**: Declining for feed posts
+- **Best For**: Carousel story summaries, announcements
+- **Posting**: 3-4x per week
+- **Purpose**: Profile aesthetic, archive content
+
+**Instagram Strategy for Teen Audience:**
+- **Reels = Primary** (algorithm push)
+- **Stories = Community building** (DMs, engagement)
+- **Feed = Archive** (less priority)
+- **Cross-promote** to YouTube in bio link
+
+---
+
+#### Facebook (Limited Teen Reach)
+
+**Facebook Teen Demographics**:
+- **Teen Female Users (13-18)**: ~60-80M globally (declining)
+- **Trend**: Teens leaving Facebook for TikTok/Instagram
+- **Main Use**: Messenger (communication, not content consumption)
+
+**Facebook Reels**:
+- **Teen Usage**: Very low (mostly 25+ audience)
+- **Best For**: Reaching parents (who share to teens)
+- **Posting**: 1-2x per week (repurpose from Instagram)
+- **CPM**: $2-4 (older audience pays more)
+
+**Facebook Strategy**:
+- **Low priority** for direct teen reach
+- **Secondary benefit**: Parents discover → share with teens
+- **Content**: Family-friendly drama stories only
+- **Cross-promote**: Drive to Instagram/YouTube
+
+**Facebook Groups** (Niche Opportunity):
+- Horror story communities: 1-5M members
+- Parenting groups: Indirect teen reach
+- Regional language groups: Good for CS, DE, ES, PT markets
+
+---
+
+### X (Twitter) Platform
+
+**X/Twitter Teen Demographics**:
+- **Teen Female Users (13-18)**: ~40-50M globally
+- **Trend**: Declining teen usage (shifting to TikTok)
+- **Best Age**: 16-18 (younger teens prefer visual platforms)
+
+**X Strategy for Story Content**:
+- **Thread Format**: Story told in 10-15 tweets
+- **Optimal Length**: 280 chars per tweet, 3,000-4,000 total
+- **Posting**: 1-2 threads per week
+- **Best Times**: 7-9pm (evening scroll)
+
+**Why X Works for Stories**:
+- **Viral potential**: Retweets drive massive reach
+- **Engagement**: Quote tweets = community discussion
+- **Cross-promotion**: Drive to YouTube/TikTok for full story
+- **Monetization**: X Premium revenue share (limited)
+
+**X Content Strategy**:
+- **Hook tweet**: "A thread about what happened at my school..." (with warning emoji)
+- **Storytelling**: Build suspense across tweets
+- **Cliffhanger**: "Full story on my YouTube (link)"
+- **Engagement**: "What would you do? 🤔" at end
+
+**X Teen Engagement**:
+- Lower than TikTok/Instagram but **text-based content** performs well
+- Good for **thought-provoking** drama/mystery stories
+- **Accessibility**: Good for vision-impaired audience
+- **SEO**: Twitter threads rank in Google search
+
+---
+
+### Truth Social (Limited Teen Reach)
+
+**Truth Social Teen Demographics**:
+- **Teen Female Users (13-18)**: <1M globally (minimal)
+- **Age Skew**: 45-65+ (conservative US adults)
+- **Teen Usage**: Nearly non-existent
+
+**Recommendation**: **Skip Truth Social for teen-focused content**
+- Wrong demographic (no teen audience)
+- Limited international reach (US-focused)
+- Content moderation unclear for horror/scary stories
+- Better to focus on TikTok, YouTube, Instagram
+
+---
+
+### Other Potentially Good Social Networks
+
+#### Snapchat
+
+**Snapchat Teen Demographics**:
+- **Teen Female Users (13-18)**: ~60-70M globally
+- **Strongest Age**: 13-17 (younger teens love Snapchat)
+- **Usage**: Daily communication + Discover content
+
+**Snapchat Spotlight** (Short Video Platform):
+- **Format**: Vertical videos up to 60 seconds
+- **Discovery**: Algorithm-driven feed (like TikTok)
+- **Monetization**: Spotlight Fund ($1M+ daily to creators)
+- **Teen Engagement**: Very high (70%+ of teens use daily)
+
+**Snapchat Strategy**:
+- **Priority**: Medium-High (massive teen audience)
+- **Content**: Repurpose TikTok/IG Reels for Spotlight
+- **Posting**: 2-3x per day
+- **Best Times**: 12-1pm (lunch), 8-10pm (evening)
+- **Monetization**: Spotlight payments + drive to YouTube
+
+**Why Snapchat Works for Teen Stories**:
+- **Authentic platform** (teens trust Snapchat)
+- **Discover section** = content consumption hub
+- **AR lenses** = interactive storytelling opportunity
+- **Direct messaging** = strong community building
+
+---
+
+#### Discord (Community Platform)
+
+**Discord Teen Demographics**:
+- **Teen Female Users (13-18)**: ~30-40M globally
+- **Best For**: Community building, not content distribution
+- **Usage**: Group chats, fan communities, voice channels
+
+**Discord Strategy**:
+- **Create NomStory Community Server**
+- **Channels by language** (CS, EN, DE, ES, PT, etc.)
+- **Story submissions**: Teens submit story ideas
+- **Early access**: Preview videos before public release
+- **Polls**: Vote on which stories to tell next
+
+**Discord Benefits**:
+- **Super fans**: Build loyal community
+- **User-generated content**: Story ideas from teens
+- **Feedback loop**: Real-time reactions to new videos
+- **Monetization**: Discord Nitro, paid memberships
+
+---
+
+#### Threads (Meta's Text Platform)
+
+**Threads Teen Demographics**:
+- **Teen Female Users (13-18)**: ~20-30M (growing)
+- **Launch**: July 2023 (relatively new)
+- **Integration**: Connected to Instagram (easy cross-post)
+
+**Threads Strategy**:
+- **Story teasers**: Short text hooks for video content
+- **Behind-the-scenes**: Writing process, story ideas
+- **Engagement**: Quick polls, questions
+- **Cross-promote**: Drive to Instagram Reels/YouTube
+
+**Threads Opportunity**:
+- Growing platform = **low competition**
+- Instagram integration = **easy audience transfer**
+- Text-based = **accessibility friendly**
+- Good for **teasers** driving to video platforms
+
+---
+
+#### BeReal (Authenticity Platform)
+
+**BeReal Teen Demographics**:
+- **Teen Female Users (13-18)**: ~15-20M (niche but loyal)
+- **Peak**: 2022 (declining but stable)
+- **Concept**: Daily authentic photo sharing
+
+**BeReal for Story Content**:
+- **NOT ideal** for story distribution (2-min photo sharing)
+- **Behind-the-scenes only**: "Writing today's scary story"
+- **Personal brand**: Show authentic creator side
+- **Community**: Very engaged but small audience
+
+---
+
+#### Pinterest (Visual Discovery)
+
+**Pinterest Teen Demographics**:
+- **Teen Female Users (13-18)**: ~40-50M globally
+- **Usage**: Inspiration, mood boards, aesthetic curation
+- **Best Age**: 15-18 (older teens planning life/style)
+
+**Pinterest Strategy**:
+- **Story aesthetic pins**: Visual quotes from stories
+- **Mood boards**: Scary story vibes, family drama themes
+- **Link to videos**: Drive traffic to YouTube/TikTok
+- **SEO benefit**: Pinterest ranks in Google search
+
+**Pinterest for Story Content**:
+- Create **story quote graphics** (dark aesthetic)
+- **Character mood boards** (visual storytelling)
+- **Story playlists**: Pin collection of related stories
+- **Cross-promote**: Links to full video content
+
+---
+
+#### Reddit (Community-Driven)
+
+**Reddit Teen Demographics**:
+- **Teen Female Users (13-18)**: ~8-10M (smaller but engaged)
+- **Best Subreddits**:
+  - r/nosleep (17M members) - Horror fiction
+  - r/LetsNotMeet (1.7M) - True scary stories
+  - r/TwoSentenceHorror (2M) - Micro horror
+  - r/relationships (7M) - Family drama
+
+**Reddit Strategy**:
+- **Text-first stories**: Post written versions
+- **Engagement**: Comment discussions drive views
+- **Cross-promote**: "Watch the video version" in post
+- **Authenticity**: Reddit users value real stories
+
+**Reddit Benefits**:
+- **Long-form text** platform (perfect for story archives)
+- **SEO**: Reddit posts rank high in Google
+- **Community**: Deep discussions, loyal readers
+- **Viral potential**: Front page = millions of views
+
+---
+
+### Platform Priority Matrix (Updated with All Platforms)
+
+**Tier 1: Must-Have (Daily Posting)**
+1. **YouTube Shorts** - Primary monetization + largest reach
+2. **TikTok** - Viral testing + teen engagement
+3. **Instagram Reels** - Secondary reach + aesthetic brand
+
+**Tier 2: High Value (3-5x per week)**
+4. **Snapchat Spotlight** - Massive teen audience + monetization
+5. **Instagram Stories** - Community building + engagement
+6. **YouTube Long-Form** - Weekend compilations + high CPM
+
+**Tier 3: Medium Value (2-3x per week)**
+7. **X (Twitter) Threads** - Text-based viral potential
+8. **Pinterest** - SEO + aesthetic discovery
+9. **Reddit** - Text archives + community building
+
+**Tier 4: Low Priority (1x per week or less)**
+10. **Facebook Reels** - Parent audience (indirect teen reach)
+11. **Discord** - Community server (not distribution)
+12. **Threads** - Growing platform, low competition
+
+**Tier 5: Skip**
+13. **Truth Social** - No teen audience
+14. **BeReal** - Wrong format for story content
+
+---
+
+### Cross-Platform Daily Workflow (Updated)
+
+**Morning (6-8 AM Eastport)**:
+1. Post to TikTok CS (3 videos)
+2. Post to Snapchat Spotlight CS (same 3 videos)
+3. Post to Instagram Stories (behind-the-scenes)
+
+**Midday (12-2 PM Eastport)**:
+1. Analyze morning performance
+2. Post winner to YouTube Shorts CS
+3. Post to Pinterest (story quote graphic)
+4. Post to X Thread (text version teaser)
+
+**Evening (6-8 PM Eastport)**:
+1. Post to TikTok EN (best CS performers)
+2. Post to YouTube Shorts EN (same videos)
+3. Post to Instagram Reels EN
+4. Post to Snapchat Spotlight EN
+5. Update Discord community (preview tomorrow's content)
+
+**Weekly (Weekends)**:
+1. Reddit post (text story + link to video)
+2. Facebook Reels (family-friendly reposts)
+3. YouTube Long-Form (compilation)
+4. Pinterest board (weekly story collection)
+
+---
 
 ### YouTube Shorts Fund & AdSense
 - **Requirements**: 1,000 subs, 10M Shorts views (90 days)
