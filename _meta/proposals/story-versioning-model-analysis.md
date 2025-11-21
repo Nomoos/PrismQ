@@ -801,7 +801,7 @@ CREATE TABLE story_state_history (
 ) ENGINE=InnoDB;
 
 -- Valid state transitions (FSM rules)
-CREATE TABLE story_state_transitions (
+CREATE TABLE story_transition_rules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     from_state VARCHAR(50) NOT NULL,
     to_state VARCHAR(50) NOT NULL,
@@ -814,7 +814,7 @@ CREATE TABLE story_state_transitions (
 ) ENGINE=InnoDB;
 
 -- Populate valid transitions from WORKFLOW.md
-INSERT INTO story_state_transitions (from_state, to_state, requires_approval) VALUES
+INSERT INTO story_transition_rules (from_state, to_state, requires_approval) VALUES
     ('IdeaInspiration', 'Idea', FALSE),
     ('IdeaInspiration', 'Archived', FALSE),
     ('Idea', 'ScriptDraft', FALSE),
@@ -862,7 +862,7 @@ BEGIN
     IF NEW.current_state != OLD.current_state THEN
         -- Validate transition is allowed
         SELECT COUNT(*) INTO valid_transition
-        FROM story_state_transitions
+        FROM story_transition_rules
         WHERE from_state = OLD.current_state
           AND to_state = NEW.current_state
           AND is_valid = TRUE;
@@ -1129,7 +1129,7 @@ WHERE s.text_state = 'review'
 
 ## 7. Technology Stack Considerations
 
-### 6.1 Current Stack: PHP + MySQL
+### 7.1 Current Stack: PHP + MySQL
 
 **Implications:**
 - Prisma models need conversion to SQL DDL
@@ -1165,7 +1165,7 @@ CREATE TABLE stories (
 
 ---
 
-### 6.2 Integration with Existing Systems
+### 7.2 Integration with Existing Systems
 
 #### T/Script Python Module
 - Currently uses Python dataclasses
