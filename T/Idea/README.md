@@ -10,38 +10,38 @@ Transform inspiration into structured content concepts with clear outlines, vali
 
 ## Submodules
 
-### [Creation (via Model)](./Model/)
-**Initial idea formation and concept development**
+### [Inspiration](./Inspiration/)
+**Idea inspiration and collection**
 
-The first step in the Idea workflow where inspiration transforms into a concrete idea concept. This is where raw inspiration from IdeaInspiration gets shaped into a defined creative unit.
+Gather and evaluate content inspiration from multiple sources to identify high-potential concepts for idea development.
 
-- Initial idea formation
-- Concept clarification
-- Purpose definition
-- Theme identification
-- Target audience specification
+- Multi-source inspiration collection (24+ sources)
+- Content classification (8 categories)
+- Engagement potential scoring (0-100 scale)
+- Analytics feedback integration
 
-**Workflow Position**: `IdeaInspiration → Idea.Creation → Idea.Outline`
+**[→ View Inspiration Documentation](./Inspiration/README.md)**
 
-**[→ View Model Documentation](./Model/README.md)** (Creation uses the core Model structure)
-
-**[→ View Model Metadata](./Model/_meta/)**
-- [Docs](./Model/_meta/docs/) - Model documentation
-- [Examples](./Model/_meta/examples/) - Usage examples
-- [Tests](./Model/_meta/tests/) - Model tests
+**[→ View Inspiration Metadata](./Inspiration/_meta/)**
+- [Docs](./Inspiration/_meta/docs/) - Inspiration documentation
+- [Examples](./Inspiration/_meta/examples/) - Inspiration examples
+- [Tests](./Inspiration/_meta/tests/) - Inspiration tests
 
 ---
 
 ### [Model](./Model/)
 **Core data model and structure**
 
-Defines the Idea data structure, fields, validation, and database schema.
+Defines the Idea data structure, fields, validation, and database schema. Also serves as the Creation stage where inspiration transforms into a concrete idea concept.
 
 - Data model definition
 - Field specifications and validation
 - Database integration
 - AI generation support
 - Multi-format content support
+- Initial idea formation and concept development
+
+**Workflow Position**: `Inspiration → Model (Creation) → Outline → Title`
 
 **[→ View Model Documentation](./Model/README.md)**
 
@@ -71,22 +71,10 @@ Structured content outline creation and refinement.
 
 ---
 
-### [Review](./Review/)
-**Idea validation and review**
+## Related Modules
 
-Validate ideas for viability, potential, and alignment with content strategy.
-
-- Concept validation
-- Potential assessment
-- Strategy alignment
-- Feasibility review
-
-**[→ View Review Documentation](./Review/README.md)**
-
-**[→ View Review Metadata](./Review/_meta/)**
-- [Docs](./Review/_meta/docs/) - Review documentation
-- [Examples](./Review/_meta/examples/) - Review examples
-- [Tests](./Review/_meta/tests/) - Review tests
+### Idea Review
+For idea validation and review, see **[T/Rewiew/Idea](../Rewiew/Idea/)** - validates ideas for viability, potential, and alignment with content strategy.
 
 ---
 
@@ -143,28 +131,30 @@ Ideas serve as foundation for:
 ## Workflow Integration
 
 ```
-IdeaInspiration
+Inspiration (Source Collection & Scoring)
     ↓
 Idea Module (Composite State)
-    ├─ Creation (idea formation) ← Starting sub-state
-    ├─ Outline (organization)
-    ├─ Skeleton (basic framework)
-    ├─ Title (finalization)
-    ├─ Model (data structure)
-    └─ Review (validation)
+    ├─ Model/Creation (idea formation) ← Starting sub-state
+    └─ Outline (organization)
     ↓
-ScriptDraft
+[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
 ```
 
 **Sub-state Flow within Idea:**
 ```
-Creation → Outline → Skeleton → Title → [Exit to ScriptDraft]
+Inspiration → Model (Creation) → Outline → [Exit to Rewiew/Idea for validation] → Title
 ```
+
+**Note**: 
+- Title is a separate module at `T/Title/`, not a sub-state of Idea
+- Idea validation/review is handled by `T/Rewiew/Idea/`, which is part of the review pipeline
+- After completing Outline, the workflow exits the Idea module and proceeds to Rewiew/Idea for validation
 
 ## Usage Example
 
 ```python
-from PrismQ.T.Idea import Model, Outline, Review
+from PrismQ.T.Idea import Model, Outline
+from PrismQ.T.Rewiew.Idea import Review
 
 # Create new idea
 idea = Model.create(

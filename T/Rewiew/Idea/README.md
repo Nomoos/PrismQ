@@ -1,10 +1,12 @@
-# IdeaReview
+# T/Rewiew/Idea - Idea Review and Validation
 
-**Review and validate concept**
+**Namespace**: `PrismQ.T.Rewiew.Idea`
+
+Review and validate the initial Idea concept before proceeding to detailed outline.
 
 ## Purpose
 
-Review and validate the initial Idea concept before proceeding to detailed outline.
+Review and validate the initial Idea concept to ensure viability, target audience fit, and potential impact before investing resources in detailed development.
 
 ## State Position
 
@@ -48,6 +50,12 @@ Idea → [IdeaReview] → Outline
 ## Tools & Operations
 
 _To be implemented_
+
+---
+
+## Navigation
+
+**[← Back to Rewiew](../README.md)** | **[Next: Script →](../Script/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 

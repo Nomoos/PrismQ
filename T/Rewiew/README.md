@@ -10,6 +10,20 @@ Ensure content quality through comprehensive review across grammar, readability,
 
 ## Submodules
 
+### [Idea](./Idea/)
+**Idea review and validation**
+
+Review and validate initial idea concepts for viability, target audience fit, and potential impact.
+
+- Concept viability assessment
+- Target audience validation
+- Originality and uniqueness check
+- Resource requirements evaluation
+- Impact assessment
+
+**[→ View Idea Documentation](./Idea/README.md)**
+**[→ View Idea Metadata](./Idea/_meta/)**
+
 ### [Script](./Script/)
 **AI-powered script review** ⭐ NEW
 
