@@ -144,7 +144,13 @@ pytest --cov=. --cov-report=html         # With coverage
 ## Related
 
 - **[Parent Directory](../)** - PrismQ.Idea overview
-- **[IdeaInspiration Model](../../IdeaInspiration/Model/)** - Source inspiration model
+- **[Inspiration Module](../Inspiration/)** - Source inspiration and collection
+
+---
+
+## Navigation
+
+**[← Back to Idea](../README.md)** | **[Previous: Inspiration](../Inspiration/README.md)** | **[Next: Outline →](../Outline/README.md)** | **[T Pipeline](../../README.md)**
 
 ---
 

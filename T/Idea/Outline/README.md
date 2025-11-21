@@ -48,4 +48,10 @@ _To be implemented_
 
 ---
 
+## Navigation
+
+**[← Back to Idea](../README.md)** | **[Previous: Model](../Model/README.md)** | **[Next: Review →](../Review/README.md)** | **[T Pipeline](../../README.md)**
+
+---
+
 Part of the Story production state machine workflow.
