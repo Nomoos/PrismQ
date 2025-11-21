@@ -1,0 +1,111 @@
+# PrismQ.IdeaInspiration - Git Attributes
+# Primary Platform: Windows
+
+# Auto detect text files and normalize line endings to LF in repository
+# but use CRLF in working directory on Windows
+* text=auto
+
+# Windows-specific files - always use CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+
+# Shell scripts - always use LF (for WSL/Git Bash compatibility)
+*.sh text eol=lf
+
+# Python files - use LF (Python standard, works on all platforms)
+*.py text eol=lf
+*.pyi text eol=lf
+
+# Config files - use LF (standard for cross-platform tools)
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+.env* text eol=lf
+.envrc text eol=lf
+
+# Documentation - use LF (Markdown standard)
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+
+# Web files - use LF (web standard)
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.json text eol=lf
+
+# Binary files - do not normalize
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.flv binary
+*.fla binary
+*.swf binary
+*.gz binary
+*.zip binary
+*.7z binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
+*.pyc binary
+*.pyd binary
+*.dll binary
+*.exe binary
+
+# Git files
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.gitmodules text eol=lf
+
+# IDE files
+.editorconfig text eol=lf
+.vscode/* text eol=lf
+*.code-workspace text eol=lf
+
+# Database files
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Archives
+*.tar binary
+*.tgz binary
+
+# Special handling for line ending normalization
+# Prevent Git from trying to normalize these files
+*.csv text eol=lf
+*.tsv text eol=lf
+*.sql text eol=lf
+
+# Linguist overrides (for GitHub language statistics)
+# Mark test files
+_meta/tests/* linguist-vendored
+**/tests/** linguist-vendored
+*.spec.ts linguist-vendored
+*.test.ts linguist-vendored
+*.spec.js linguist-vendored
+*.test.js linguist-vendored
+test_*.py linguist-vendored
+
+# Mark generated files
+*.min.js linguist-generated
+*.min.css linguist-generated
+dist/** linguist-generated
+build/** linguist-generated
+.vite/** linguist-generated

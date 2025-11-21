@@ -1,0 +1,172 @@
+{
+  "channel_sources": {
+    "primary_story_channels": [
+      {
+        "handle": "@FamilyRedditTales-s7g",
+        "name": "Family Reddit Tales",
+        "url": "https://www.youtube.com/@FamilyRedditTales-s7g/videos",
+        "content_focus": "Family-focused Reddit stories"
+      },
+      {
+        "handle": "@Fyra-d1u",
+        "name": "Fyra",
+        "url": "https://www.youtube.com/@Fyra-d1u/videos",
+        "content_focus": "General Reddit narratives"
+      }
+    ],
+    "reddit_story_channels": [
+      {
+        "handle": "@RecapsReddit",
+        "name": "Recaps Reddit",
+        "content_focus": "Reddit story recaps"
+      },
+      {
+        "handle": "@ytMinifablefever",
+        "name": "Mini Fable Fever",
+        "content_focus": "Short fable-like Reddit stories"
+      },
+      {
+        "handle": "@CookedReads",
+        "name": "Cooked Reads",
+        "content_focus": "Reddit story narration"
+      },
+      {
+        "handle": "@RedditRequested",
+        "name": "Reddit Requested",
+        "content_focus": "User-requested Reddit content"
+      },
+      {
+        "handle": "@Rycoreads",
+        "name": "Ryco Reads",
+        "content_focus": "Reddit story reading"
+      },
+      {
+        "handle": "@RadditReality",
+        "name": "Raddit Reality",
+        "content_focus": "Reality-based Reddit stories"
+      },
+      {
+        "handle": "@BuzzzTales",
+        "name": "Buzzz Tales",
+        "content_focus": "Trending Reddit tales"
+      },
+      {
+        "handle": "@CreekyStoriess",
+        "name": "Creeky Stories",
+        "content_focus": "Suspenseful Reddit stories"
+      },
+      {
+        "handle": "@SaneRedditor",
+        "name": "Sane Redditor",
+        "content_focus": "Rational Reddit perspectives"
+      },
+      {
+        "handle": "@TheRedditReader475",
+        "name": "The Reddit Reader",
+        "content_focus": "General Reddit reading"
+      },
+      {
+        "handle": "@Gymtalez",
+        "name": "Gym Tales",
+        "content_focus": "Fitness and gym-related stories"
+      },
+      {
+        "handle": "@SnappyStories_1",
+        "name": "Snappy Stories",
+        "content_focus": "Quick Reddit narratives"
+      },
+      {
+        "handle": "@ytbrainofreddit",
+        "name": "Brain of Reddit",
+        "content_focus": "Thought-provoking Reddit content"
+      },
+      {
+        "handle": "@crazysttories",
+        "name": "Crazy Stories",
+        "content_focus": "Wild and unusual Reddit tales"
+      },
+      {
+        "handle": "@LomuStories",
+        "name": "Lomu Stories",
+        "content_focus": "General story narration"
+      },
+      {
+        "handle": "@RedditTalks095",
+        "name": "Reddit Talks",
+        "content_focus": "Conversational Reddit content"
+      },
+      {
+        "handle": "@truthfulreads",
+        "name": "Truthful Reads",
+        "content_focus": "Authentic Reddit stories"
+      },
+      {
+        "handle": "@EmberTalez",
+        "name": "Ember Tales",
+        "content_focus": "Emotional Reddit narratives"
+      },
+      {
+        "handle": "@UnfilteredTalesYT",
+        "name": "Unfiltered Tales",
+        "content_focus": "Raw Reddit stories"
+      },
+      {
+        "handle": "@Unlimited.Stories",
+        "name": "Unlimited Stories",
+        "content_focus": "Diverse story collection"
+      },
+      {
+        "handle": "@Broken.Stories",
+        "name": "Broken Stories",
+        "content_focus": "Heartbreak and difficult stories"
+      },
+      {
+        "handle": "@DokaReads",
+        "name": "Doka Reads",
+        "content_focus": "Reddit story reading"
+      },
+      {
+        "handle": "@Reada-Reddit",
+        "name": "Reada Reddit",
+        "content_focus": "General Reddit content"
+      },
+      {
+        "handle": "@Anxtales",
+        "name": "Anx Tales",
+        "content_focus": "Anxiety-related stories"
+      },
+      {
+        "handle": "@Starterstoriess",
+        "name": "Starter Stories",
+        "content_focus": "Beginner-friendly narratives"
+      },
+      {
+        "handle": "@RedditReads_0",
+        "name": "Reddit Reads",
+        "content_focus": "General Reddit reading"
+      }
+    ],
+    "satisfying_lifestyle_channels": [
+      {
+        "name": "Oddly Satisfying",
+        "content_focus": "Visually satisfying content compilations"
+      },
+      {
+        "name": "Koala Reads",
+        "content_focus": "Story narration with calm aesthetic"
+      },
+      {
+        "name": "SA Reads",
+        "content_focus": "Story and article reading"
+      }
+    ]
+  },
+  "metadata": {
+    "total_channels": 31,
+    "total_handles": 28,
+    "last_updated": "2025-10-31",
+    "primary_focus": "Reddit stories, satisfying content, narrative shorts",
+    "scraping_compatible": true,
+    "note": "3 satisfying/lifestyle channels don't have handles yet"
+  }
+}

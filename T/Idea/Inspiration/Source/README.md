@@ -1,0 +1,149 @@
+# PrismQ Source Module
+
+**Modern, scalable source integration architecture for PrismQ.IdeaInspiration**
+
+## Overview
+
+The Source module provides a clean, hierarchical architecture for integrating external content sources into the PrismQ ecosystem. It uses a **simplified 4-category Media Type classification** for maximum clarity and intuitive organization.
+
+It also includes the **Content Funnel** - a transformation pipeline that processes content from one media type to another (Video → Audio → Text), enabling unified text extraction across all content types.
+
+## Directory Structure
+
+**Organization: 4-Category Media Type Classification**
+
+```
+Source/
+├── _meta/                      # Source module meta information
+│   ├── docs/                   # Documentation (including Content Funnel)
+│   ├── examples/               # Usage examples
+│   └── tests/                  # Test suite
+├── src/                        # Shared code across ALL Source modules
+│   └── core/                   # Core utilities (including ContentFunnel)
+├── Video/                      # VIDEO: All video content sources
+├── Audio/                      # AUDIO: All audio content sources
+├── Text/                       # TEXT: All text-based content & data
+└── Other/                      # OTHER: Specialized sources (Commerce, Events, Community, Internal)
+```
+
+## Content Funnel
+
+The **Content Funnel** is a transformation pipeline that enriches IdeaInspiration objects by extracting content through stages:
+
+```
+Video → Audio → Text (via subtitle extraction or audio transcription)
+Audio → Text (via transcription)
+Text (final form, passthrough)
+```
+
+**Key Features:**
+- 🎯 Unified text extraction from any media type
+- 📊 Transformation tracking and confidence scores
+- 🔄 Flexible processing with multiple extraction methods
+- 🛡️ Graceful error handling and fallback mechanisms
+
+**Quick Example:**
+```python
+from Source.src.core import ContentFunnel
+from Model.src import IdeaInspiration
+
+# Create funnel with extractors
+funnel = ContentFunnel(subtitle_extractor=my_subtitle_extractor)
+
+# Process video to extract text content
+video_idea = IdeaInspiration.from_video(
+    title="Python Tutorial",
+    source_url="https://youtube.com/watch?v=abc123"
+)
+
+enriched = funnel.process(video_idea, extract_subtitles=True)
+# enriched.content now contains subtitle text
+```
+
+**Documentation:**
+- [Content Funnel Architecture](_meta/docs/CONTENT_FUNNEL_ARCHITECTURE.md) - Complete guide
+- [Usage Examples](_meta/examples/content_funnel_example.py) - Working code examples
+
+## Media Type Classification
+
+### Why 4 Categories?
+
+**✅ Core media types** - Video, Audio, Text (universal)  
+**✅ Flexibility** - "Other" for specialized integrations  
+**✅ Clear boundaries** - Easy to determine source placement  
+**✅ Scalability** - Each category scales independently
+
+### Current Sources
+
+- **YouTube/** ✓ - Primary video platform (top level)
+- **Reddit/** ✓ - Social discussions (top level)
+- **Spotify/** ✓ - Music and podcast platform (top level)
+- **Text/HackerNews/** ✓ - Tech news
+
+### Future Sources (Recommended Next)
+
+- **Text/Trends/GoogleTrends/** ⭐ - Keyword/trend analysis (text data)
+- **Video/TikTok/** - Short-form video
+- **Text/Articles/Medium/** - Long-form articles
+- **Other/Commerce/Amazon/** - E-commerce product data
+- **Other/Events/CalendarHolidays/** - Event-based inspiration
+
+## GoogleTrends Placement: Text Category
+
+**Location:** `Source/Text/Trends/GoogleTrends/`
+
+**Rationale:**
+- Analyzes text keywords and search queries
+- Produces text-based trend insights
+- Consistent with other text analytics (hashtags, memes)
+- Text is the primary data type
+
+**Import:**
+```python
+from Source.Text.Trends.GoogleTrends import GoogleTrendsSource
+```
+
+## Usage Examples
+
+```python
+# Top-level sources (brand names)
+from Source.YouTube import YouTubeSource
+from Source.Reddit import RedditSource
+from Source.Spotify import SpotifyClient
+
+# Text sources
+from Source.Text.HackerNews import HackerNewsSource
+from Source.Text.Trends.GoogleTrends import GoogleTrendsSource  # Future
+
+# Audio sources
+from Source.Audio.Podcasts import PodcastClient
+
+# Other sources (specialized)
+from Source.Other.Commerce.Amazon import AmazonSource  # Future
+from Source.Other.Events.CalendarHolidays import HolidaysSource  # Future
+```
+
+## Documentation
+
+**Complete legacy source mapping (27+ sources):**
+[`_meta/research/LEGACY_SOURCE_PLACEMENT_GUIDE.md`](/_meta/research/LEGACY_SOURCE_PLACEMENT_GUIDE.md)
+
+**Research documents:**
+- FLAT_VS_GROUPED_ANALYSIS.md - 5 structural variants
+- SHALLOW_HIERARCHY_CONTENT_TYPE_VARIANTS.md - 5 content-type variants
+- LEGACY_SOURCE_PLACEMENT_GUIDE.md - Complete source mapping
+
+## Other Category
+
+The "Other" category provides a home for specialized sources that don't fit the core media types:
+- **Commerce/** - E-commerce integrations (Amazon, Etsy, AppStore)
+- **Events/** - Calendar-based sources (Holidays, Sports, Entertainment)
+- **Community/** - User feedback and Q&A sources
+- **Internal/** - Internal tools and utilities
+
+See [Other/README.md](Other/README.md) for details.
+
+---
+
+**Architecture Version**: 4.0 (4-Category)  
+**Last Updated**: 2025-11-11
