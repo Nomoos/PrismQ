@@ -4,6 +4,7 @@ import sys
 import os
 
 # Add parent directories to path for imports
+# Note: This pattern is consistent with existing test structure in the PrismQ project
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../examples'))
 
 from video_generation_example import (

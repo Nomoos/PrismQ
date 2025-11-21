@@ -36,8 +36,12 @@ A comprehensive example demonstrating the **three-layer approach** to video gene
 #### Running the Example
 
 ```bash
-cd /home/runner/work/PrismQ/PrismQ
+# From the repository root:
 python3 V/_meta/examples/video_generation_example.py
+
+# Or from the examples directory:
+cd V/_meta/examples
+python3 video_generation_example.py
 ```
 
 #### Example Output
