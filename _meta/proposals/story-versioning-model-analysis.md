@@ -13,9 +13,39 @@ This report analyzes the proposed Story model for managing text content versions
 
 **Key Findings:**
 - ✅ The proposed model addresses critical needs for version tracking and i18n
+- ⚠️ Single `isPublished` flag insufficient for multi-platform publishing (blog, podcast, YouTube, TikTok, Instagram)
 - ⚠️ Some design decisions require careful consideration for scalability
-- 💡 Alternative approaches may better fit existing PrismQ architecture
+- 💡 Alternative approaches better fit PrismQ's progressive enrichment model (Text → Audio → Video)
 - 🔄 Integration with existing T/Script versioning needs clarification
+- 🎯 Recommended: Multi-platform publication state tracking instead of boolean flags
+
+---
+
+## Key Insights from PrismQ Workflow Analysis
+
+### Multi-Platform Publishing Requirements
+
+The PrismQ workflow follows a **progressive enrichment model** where content flows through three publication stages:
+
+1. **Text Publication (Phase 1)**: Blog, Medium, Substack, LinkedIn, Twitter
+2. **Audio Publication (Phase 2)**: Spotify, Apple Podcasts, SoundCloud, Audible
+3. **Video Publication (Phase 3)**: YouTube, TikTok, Instagram Reels
+
+**Critical Finding**: A single `isPublished` boolean flag is **insufficient** for tracking this multi-stage, multi-platform workflow. The Story model must support:
+
+- ✅ **Platform-specific publication timestamps** (publishedText, publishedAudio, publishedVideo)
+- ✅ **Per-platform metadata** (URLs, status, publish dates for each specific platform)
+- ✅ **Progressive enrichment tracking** (identify stories at each stage: text-only, text+audio, fully enriched)
+- ✅ **Workflow state mapping** (integration with existing PrismQ states: PublishedText → PublishedAudio → PublishedVideo)
+
+### Translation Model Clarification
+
+**`parentId` Definition**: The original story ID from which all translations are derived. For example:
+- Original English story: `parentId = "story-001"` (self-referential or null)
+- Czech translation: `parentId = "story-001"`, `langId = "cs"`
+- German translation: `parentId = "story-001"`, `langId = "de"`
+
+All translations share the same `parentId`, enabling queries like "get all languages for story-001".
 
 ---
 
@@ -49,6 +79,7 @@ model Story {
 - **Composite Identifier**: parentId + langId + version uniquely identifies each story variant
 - **No Relations**: No formal foreign key relationships defined
 - **Prisma-Style**: Uses Prisma ORM syntax (currently system uses PHP/MySQL)
+- **Translation Model**: `parentId` represents the original story ID from which all translations are derived
 
 ---
 
@@ -62,7 +93,7 @@ model Story {
 - Minimal learning curve for developers
 
 #### ✅ Flexibility
-- `parentId` can represent any logical grouping concept
+- `parentId` represents the original story ID (source for all translations)
 - `comment` field allows arbitrary metadata
 - Easy to add new language/version combinations
 
@@ -147,8 +178,9 @@ For 1000 stories: 250MB (vs. ~5MB with diff-based approach)
 #### ⚠️ No Status Tracking
 - Cannot track workflow state (draft, review, published)
 - All versions have equal status
-- No way to mark "current published" version
-- Conflicts with existing PrismQ workflow states
+- No way to track publication across multiple platforms (blog, podcast, YouTube, TikTok, Instagram)
+- Single `publishedAt` timestamp insufficient for multi-platform publishing
+- Conflicts with existing PrismQ workflow states (PublishedText, PublishedAudio, PublishedVideo)
 
 #### ⚠️ Query Performance
 - Getting latest version requires `MAX()` aggregate
@@ -283,6 +315,25 @@ SELECT * FROM Story WHERE status = 'draft';
 ```
 **Status**: ❌ Impossible with current model
 
+#### UC11: Track Multi-Platform Publication
+```
+Want: Story published to blog (text), then Spotify (audio), then YouTube (video)
+Need: Track each platform separately with timestamps and metadata
+```
+**Status**: ❌ Single `publishedAt` timestamp insufficient  
+**Impact**: Cannot track PrismQ progressive enrichment workflow (Text → Audio → Video)
+
+#### UC12: Query Stories by Platform
+```sql
+-- Find all stories published to YouTube
+SELECT * FROM Story WHERE published_video IS NOT NULL;
+
+-- Find stories published to text but not audio yet
+SELECT * FROM Story WHERE published_text IS NOT NULL AND published_audio IS NULL;
+```
+**Status**: ❌ Impossible without platform-specific fields  
+**Impact**: Cannot manage multi-platform publishing pipeline
+
 ---
 
 ## 5. Alternative Approaches
@@ -294,7 +345,7 @@ SELECT * FROM Story WHERE status = 'draft';
 ```prisma
 model Story {
   id         String   @id @default(cuid())
-  parentId   String   
+  parentId   String   // Original story ID (source for all translations)
   langId     String   
   version    Int      
   
@@ -309,7 +360,12 @@ model Story {
   changeType String? // typo_fix, content_update, major_rewrite
   reviewScore Int?    // Integration with T/Rewiew
   isLatest   Boolean  @default(false) // Performance optimization
-  publishedAt DateTime? // Publication timestamp
+  
+  // Multi-platform publication tracking (PrismQ workflow integration)
+  publishedText   DateTime? // Published to blog/Medium/Substack
+  publishedAudio  DateTime? // Published to Spotify/Apple Podcasts
+  publishedVideo  DateTime? // Published to YouTube/TikTok/Instagram
+  publicationState JSON? // Detailed per-platform status: {blog: {status, url}, podcast: {status, url}, youtube: {...}}
   
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -321,6 +377,9 @@ model Story {
   @@index([parentId, isLatest])
   @@index([status])
   @@index([langId])
+  @@index([publishedText])
+  @@index([publishedAudio])
+  @@index([publishedVideo])
 }
 ```
 
@@ -330,11 +389,14 @@ model Story {
 - ✅ Adds version lineage
 - ✅ Improves query performance
 - ✅ Integrates with existing systems
+- ✅ **Multi-platform publication tracking** (blog, podcast, YouTube, TikTok, Instagram)
+- ✅ **Aligns with PrismQ progressive enrichment model** (Text → Audio → Video)
 
 **Drawbacks:**
 - Still has data redundancy
 - Still requires full text storage
 - Table grows large over time
+- Multiple timestamp fields (but necessary for multi-platform publishing)
 
 ---
 
@@ -482,7 +544,7 @@ model StoryMaterialized {
 ```prisma
 model Story {
   id          String   @id @default(cuid())
-  parentId    String
+  parentId    String   // Original story ID (source for all translations)
   langId      String
   version     Int
   
@@ -501,23 +563,33 @@ model Story {
   workflowState String? // Maps to PrismQ workflow states
   reviewScore Int?
   
+  // Multi-platform publication tracking (PrismQ progressive enrichment model)
+  publishedText   DateTime? // Text publication (blog, Medium, Substack, LinkedIn)
+  publishedAudio  DateTime? // Audio publication (Spotify, Apple Podcasts, SoundCloud)
+  publishedVideo  DateTime? // Video publication (YouTube, TikTok, Instagram Reels)
+  publicationState JSON? // Detailed per-platform status: {
+                        //   text: {blog: {status, url, publishedAt}, medium: {...}},
+                        //   audio: {spotify: {status, url, publishedAt}, ...},
+                        //   video: {youtube: {status, url, publishedAt}, tiktok: {...}}
+                        // }
+  
   // Performance optimization
   isLatest    Boolean  @default(false)
-  isPublished Boolean  @default(false)
   
   // Metadata
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  publishedAt DateTime?
   createdBy   String?
   comment     String?
   
   @@unique([parentId, langId, version])
   @@index([parentId, isLatest])
-  @@index([parentId, isPublished])
   @@index([status])
   @@index([langId])
   @@index([createdAt])
+  @@index([publishedText])
+  @@index([publishedAudio])
+  @@index([publishedVideo])
 }
 ```
 
@@ -526,13 +598,16 @@ model Story {
 - ✅ Diff information for analysis (changesSummary)
 - ✅ Version lineage tracking
 - ✅ Workflow integration
-- ✅ Performance optimizations (isLatest, isPublished)
+- ✅ **Multi-platform publication tracking** (replaces single isPublished flag)
+- ✅ **Progressive enrichment support** (Text → Audio → Video)
+- ✅ **Platform-specific metadata** via publicationState JSON
 - ✅ Reasonable storage (accept redundancy for simplicity)
 
 **Drawbacks:**
 - Still stores full text (but acceptable for most use cases)
 - Slightly more complex than original proposal
-- Need to maintain isLatest/isPublished flags
+- Need to maintain isLatest flag
+- Multiple publication timestamps (but required for multi-platform workflow)
 
 ---
 
@@ -550,7 +625,7 @@ model Story {
 ```sql
 CREATE TABLE stories (
     id VARCHAR(36) PRIMARY KEY,
-    parent_id VARCHAR(36) NOT NULL,
+    parent_id VARCHAR(36) NOT NULL COMMENT 'Original story ID (source for translations)',
     lang_id VARCHAR(5) NOT NULL,
     version INT NOT NULL,
     
@@ -569,6 +644,8 @@ CREATE TABLE stories (
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+
+**Note**: This basic schema lacks multi-platform publication tracking. See **Option D (Hybrid Approach)** in Appendix A for the recommended enhanced schema.
 
 ---
 
@@ -769,24 +846,30 @@ The proposed Story model provides a **solid foundation** for version and transla
 **Adopt Option D (Hybrid Approach) with following priorities:**
 
 1. **Phase 1**: Implement core Hybrid model in SQL
-   - Add status, isLatest, isPublished fields
+   - Add status, isLatest fields
+   - **Add multi-platform publication tracking** (publishedText, publishedAudio, publishedVideo)
+   - Add publicationState JSON for detailed platform metadata
    - Create comprehensive indexes
    - Build REST API
 
 2. **Phase 2**: Integrate with existing systems
    - Python adapter for T/Script
-   - Workflow state mapping
+   - Workflow state mapping (Text → Audio → Video)
    - Review score integration
+   - **Progressive enrichment pipeline support**
 
 3. **Phase 3**: Add advanced features
    - Change tracking/diffs
-   - Analytics dashboard
+   - Analytics dashboard per platform
    - Performance optimizations
+   - Cross-platform publishing orchestration
 
 **Expected Outcomes:**
 - ✅ Unified version management across PrismQ
-- ✅ Full translation support
+- ✅ Full translation support (parentId = original story ID)
 - ✅ Integration with existing workflows
+- ✅ **Multi-platform publication tracking** (blog, podcast, YouTube, TikTok, Instagram)
+- ✅ **Progressive enrichment support** (Text → Audio → Video)
 - ✅ Scalable for future growth
 - ✅ Maintains simplicity while adding necessary features
 
@@ -800,7 +883,7 @@ The proposed Story model provides a **solid foundation** for version and transla
 CREATE TABLE stories (
     -- Primary identification
     id VARCHAR(36) PRIMARY KEY,
-    parent_id VARCHAR(36) NOT NULL COMMENT 'Logical story group',
+    parent_id VARCHAR(36) NOT NULL COMMENT 'Original story ID (source for all translations)',
     lang_id VARCHAR(5) NOT NULL COMMENT 'ISO 639-1 language code',
     version INT NOT NULL COMMENT 'Version number (1, 2, 3...)',
     
@@ -817,14 +900,18 @@ CREATE TABLE stories (
     workflow_state VARCHAR(100) NULL COMMENT 'PrismQ workflow state',
     review_score INT NULL COMMENT 'Score from T/Rewiew (0-100)',
     
+    -- Multi-platform publication tracking (PrismQ progressive enrichment)
+    published_text TIMESTAMP NULL COMMENT 'Text publication (blog, Medium, Substack, LinkedIn)',
+    published_audio TIMESTAMP NULL COMMENT 'Audio publication (Spotify, Apple Podcasts, SoundCloud)',
+    published_video TIMESTAMP NULL COMMENT 'Video publication (YouTube, TikTok, Instagram Reels)',
+    publication_state JSON NULL COMMENT 'Per-platform publication details: {text: {blog: {status, url, publishedAt}}, audio: {...}, video: {...}}',
+    
     -- Performance flags
     is_latest BOOLEAN DEFAULT FALSE COMMENT 'Latest version for this lang',
-    is_published BOOLEAN DEFAULT FALSE COMMENT 'Currently published version',
     
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    published_at TIMESTAMP NULL,
     
     -- Metadata
     created_by VARCHAR(255) NULL COMMENT 'Creator identifier',
@@ -837,17 +924,19 @@ CREATE TABLE stories (
     -- Indexes for performance
     INDEX idx_parent (parent_id),
     INDEX idx_parent_latest (parent_id, is_latest),
-    INDEX idx_parent_published (parent_id, is_published),
     INDEX idx_lang (lang_id),
     INDEX idx_status (status),
     INDEX idx_created (created_at),
     INDEX idx_updated (updated_at),
     INDEX idx_review_score (review_score),
+    INDEX idx_published_text (published_text),
+    INDEX idx_published_audio (published_audio),
+    INDEX idx_published_video (published_video),
     
     -- Full-text search
     FULLTEXT INDEX ft_content (title, text)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Story versions with translations and workflow integration';
+COMMENT='Story versions with translations and multi-platform publication tracking';
 
 -- Triggers to maintain is_latest flag
 DELIMITER //
@@ -929,13 +1018,87 @@ curl http://api.prismq.com/stories/story-abc-123/languages
 # Compare two versions
 curl http://api.prismq.com/stories/story-abc-123/compare?from=1&to=2&lang=en
 
-# Update version status
+# Update version status (legacy single publication)
 curl -X PATCH http://api.prismq.com/stories/{id} \
   -H "Content-Type: application/json" \
   -d '{
-    "status": "published",
-    "publishedAt": "2025-11-21T14:00:00Z"
+    "status": "published"
   }'
+
+# Publish to text platform (blog) - Progressive enrichment step 1
+curl -X PATCH http://api.prismq.com/stories/{id}/publish/text \
+  -H "Content-Type: application/json" \
+  -d '{
+    "publishedText": "2025-11-21T14:00:00Z",
+    "publicationState": {
+      "text": {
+        "blog": {
+          "status": "published",
+          "url": "https://myblog.com/future-of-ai",
+          "publishedAt": "2025-11-21T14:00:00Z"
+        },
+        "medium": {
+          "status": "published",
+          "url": "https://medium.com/@user/future-of-ai",
+          "publishedAt": "2025-11-21T14:05:00Z"
+        }
+      }
+    }
+  }'
+
+# Publish to audio platform (podcast) - Progressive enrichment step 2
+curl -X PATCH http://api.prismq.com/stories/{id}/publish/audio \
+  -H "Content-Type: application/json" \
+  -d '{
+    "publishedAudio": "2025-11-22T10:00:00Z",
+    "publicationState": {
+      "audio": {
+        "spotify": {
+          "status": "published",
+          "url": "https://spotify.com/episode/xyz",
+          "publishedAt": "2025-11-22T10:00:00Z"
+        },
+        "apple_podcasts": {
+          "status": "published",
+          "url": "https://podcasts.apple.com/episode/xyz",
+          "publishedAt": "2025-11-22T10:15:00Z"
+        }
+      }
+    }
+  }'
+
+# Publish to video platform (YouTube, TikTok) - Progressive enrichment step 3
+curl -X PATCH http://api.prismq.com/stories/{id}/publish/video \
+  -H "Content-Type: application/json" \
+  -d '{
+    "publishedVideo": "2025-11-25T12:00:00Z",
+    "publicationState": {
+      "video": {
+        "youtube": {
+          "status": "published",
+          "url": "https://youtube.com/watch?v=xyz",
+          "publishedAt": "2025-11-25T12:00:00Z"
+        },
+        "tiktok": {
+          "status": "published",
+          "url": "https://tiktok.com/@user/video/xyz",
+          "publishedAt": "2025-11-25T12:30:00Z"
+        },
+        "instagram": {
+          "status": "published",
+          "url": "https://instagram.com/reel/xyz",
+          "publishedAt": "2025-11-25T13:00:00Z"
+        }
+      }
+    }
+  }'
+
+# Query stories by publication status
+curl http://api.prismq.com/stories?publishedText=true&publishedAudio=false
+# Returns: Stories published to text but not yet to audio
+
+curl http://api.prismq.com/stories?publishedVideo=true
+# Returns: Stories published to video platforms (fully enriched)
 ```
 
 ---
