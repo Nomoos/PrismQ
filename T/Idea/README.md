@@ -10,6 +10,45 @@ Transform inspiration into structured content concepts with clear outlines, vali
 
 ## Submodules
 
+### [Fusion](./Fusion/)
+**Combine multiple Ideas or IdeaInspiration sources**
+
+Fuse multiple Ideas or IdeaInspiration instances into unified, cohesive Ideas using AI-powered combination logic with batch processing support.
+
+- Batch processing of Ideas
+- Multiple fusion strategies (best_elements, weighted_merge, theme_based, keyword_cluster)
+- Signal aggregation (keywords, themes, platforms)
+- Story synthesis and narrative merging
+- Quality-based source selection
+
+**Workflow Position**: `IdeaInspiration (multiple) → Fusion → New Idea(s)` or `Idea (multiple) → Fusion → New Idea(s)`
+
+**[→ View Fusion Documentation](./Fusion/README.md)**
+
+**[→ View Fusion Metadata](./Fusion/_meta/)**
+- [Examples](./Fusion/_meta/examples/) - Usage examples
+- [Tests](./Fusion/_meta/tests/) - Fusion tests
+
+---
+
+### [Creation](./Creation/)
+**Generate multiple Ideas from simple inputs**
+
+Create multiple rich, detailed Ideas from minimal input (title or description) using AI-powered generation with variable-length optimization.
+
+- Create from title with variations
+- Create from description with auto-title generation
+- Variable-length content generation
+- Batch idea generation
+- Multi-format optimization
+
+**Workflow Position**: `Title/Description → Creation → Multiple Ideas`
+
+**[→ View Creation Documentation](./Creation/README.md)**
+
+**[→ View Creation Metadata](./Creation/_meta/)**
+- [Examples](./Creation/_meta/examples/) - Usage examples
+- [Tests](./Creation/_meta/tests/) - Creation tests
 ### [Inspiration](./Inspiration/)
 **Idea inspiration and collection**
 
@@ -39,6 +78,8 @@ Defines the Idea data structure, fields, validation, and database schema. Also s
 - Database integration
 - AI generation support
 - Multi-format content support
+- **Summary generation** (new)
+- **Czech translation** (new)
 - Initial idea formation and concept development
 
 **Workflow Position**: `Inspiration → Model (Creation) → Outline → Title`
@@ -129,8 +170,34 @@ Ideas serve as foundation for:
 - Product proposals
 
 ## Workflow Integration
-
 ```
+Creation Module → Multiple Idea variations
+    ↓
+Idea Module (Composite State)
+    ├─ Model (data structure, summary, translation)
+    ├─ Outline (organization)
+    ├─ Skeleton (basic framework)
+    ├─ Title (finalization)
+    └─ Review (validation)
+Inspiration (Source Collection & Scoring)
+    ↓
+Idea Module (Composite State)
+    ├─ Model/Creation (idea formation) ← Starting sub-state
+    └─ Outline (organization)
+    ↓
+[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
+```
+```
+Inspiration (multiple sources)
+    ↓
+Fusion Module → Fused Idea(s)
+    ↓
+Idea Module (Composite State)
+    ├─ Model (data structure, summary, translation)
+    ├─ Outline (organization)
+    ├─ Skeleton (basic framework)
+    ├─ Title (finalization)
+    └─ Review (validation)
 Inspiration (Source Collection & Scoring)
     ↓
 Idea Module (Composite State)
@@ -140,8 +207,69 @@ Idea Module (Composite State)
 [Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
 ```
 
-**Sub-state Flow within Idea:**
+**New Workflows:**
 ```
+# Fusion Workflow
+IdeaInspiration (multiple) → Fusion → New Idea(s)
+Idea (multiple) → Fusion → New Idea(s)
+
+# Creation Workflow
+Title/Description → Creation → Multiple Ideas (with variations)
+
+# Summary & Translation Workflow
+Idea → Generate Summary → Translate to Czech
+```
+
+## Usage Examples
+
+### Fusion Example
+
+```python
+from PrismQ.T.Idea.Fusion.src import IdeaFusion
+from PrismQ.T.Idea.Model.src import Idea, ContentGenre
+
+# Fuse multiple ideas
+idea1 = Idea(title="AI Ethics", concept="Ethical AI development", 
+             genre=ContentGenre.TECHNOLOGY)
+idea2 = Idea(title="Machine Learning", concept="ML algorithms explained",
+             genre=ContentGenre.EDUCATIONAL)
+
+fusion = IdeaFusion()
+fused_idea = fusion.fuse_ideas([idea1, idea2])
+```
+
+### Creation Example
+
+```python
+from PrismQ.T.Idea.Creation.src import IdeaCreator
+
+# Create multiple ideas from title
+creator = IdeaCreator()
+ideas = creator.create_from_title(
+    "The Future of AI",
+    num_ideas=3,
+    target_platforms=["youtube", "medium"],
+    target_formats=["video", "text"]
+)
+```
+
+### Summary & Translation Example
+
+```python
+from PrismQ.T.Idea.Model.src import Idea, ContentGenre
+
+# Create idea
+idea = Idea(
+    title="Digital Privacy",
+    concept="Protecting personal information",
+    genre=ContentGenre.EDUCATIONAL
+)
+
+# Generate summary
+summary = idea.generate_summary(max_length=500)
+```
+
+### Traditional Model Example
 Inspiration → Model (Creation) → Outline → [Exit to Rewiew/Idea for validation] → Title
 ```
 
