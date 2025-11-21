@@ -526,6 +526,126 @@ class Idea:
         data.update(updates)
         return Idea.from_dict(data)
     
+    def generate_summary(self, max_length: int = 500) -> str:
+        """Generate a concise summary of the Idea.
+        
+        Creates a summary that captures the essence of the Idea using key fields
+        like title, concept, premise, and synopsis. Useful for quick overview,
+        sharing, or translation.
+        
+        Args:
+            max_length: Maximum length of summary in characters (default 500)
+            
+        Returns:
+            Concise summary of the Idea
+            
+        Example:
+            >>> idea = Idea(title="The Echo", concept="Time travel horror", 
+            ...             premise="A girl hears her future self warning her")
+            >>> summary = idea.generate_summary(max_length=200)
+        """
+        # Build summary from available fields in order of priority
+        summary_parts = []
+        
+        # Always include title and concept
+        summary_parts.append(f"Title: {self.title}")
+        summary_parts.append(f"Concept: {self.concept}")
+        
+        # Add premise if available and not too long
+        if self.premise:
+            summary_parts.append(f"Premise: {self.premise}")
+        
+        # Add logline if available (usually concise)
+        if self.logline:
+            summary_parts.append(f"Logline: {self.logline}")
+        
+        # Add synopsis if available and we have space
+        if self.synopsis:
+            summary_parts.append(f"Synopsis: {self.synopsis}")
+        
+        # Add genre and target info
+        summary_parts.append(f"Genre: {self.genre.value}")
+        
+        if self.target_platforms:
+            platforms = ", ".join(self.target_platforms[:3])  # Limit to first 3
+            summary_parts.append(f"Platforms: {platforms}")
+        
+        if self.target_formats:
+            formats = ", ".join(self.target_formats)
+            summary_parts.append(f"Formats: {formats}")
+        
+        # Join and truncate if necessary
+        summary = "\n".join(summary_parts)
+        
+        if len(summary) > max_length:
+            # Truncate to max_length, breaking at last complete sentence/line
+            summary = summary[:max_length].rsplit('\n', 1)[0]
+            if not summary.endswith('.'):
+                summary += "..."
+        
+        return summary
+    
+    def translate_summary_to_czech(self, summary: Optional[str] = None) -> str:
+        """Translate summary to Czech language.
+        
+        Translates the Idea summary to Czech (CS) language. This is a placeholder
+        implementation that would integrate with translation services in production.
+        
+        Args:
+            summary: Optional pre-generated summary to translate. If not provided,
+                    generates summary first using generate_summary()
+            
+        Returns:
+            Czech translation of the summary
+            
+        Note:
+            In production, this would integrate with:
+            - StoryTranslation model for full translation workflow
+            - AI translation services (OpenAI, DeepL, etc.)
+            - Translation feedback loop for quality assurance
+            
+        Example:
+            >>> idea = Idea(title="The Echo", concept="Time travel horror")
+            >>> czech_summary = idea.translate_summary_to_czech()
+        """
+        # Get or generate summary
+        if summary is None:
+            summary = self.generate_summary()
+        
+        # Simple translation mapping for demonstration
+        # In production, this would use AI translation services
+        translation_map = {
+            "Title:": "Název:",
+            "Concept:": "Koncept:",
+            "Premise:": "Premisa:",
+            "Logline:": "Logline:",
+            "Synopsis:": "Synopse:",
+            "Genre:": "Žánr:",
+            "Platforms:": "Platformy:",
+            "Formats:": "Formáty:",
+            # Genre translations
+            "true_crime": "skutečný zločin",
+            "mystery": "mystérium",
+            "horror": "horor",
+            "science_fiction": "sci-fi",
+            "documentary": "dokumentární",
+            "educational": "vzdělávací",
+            "entertainment": "zábava",
+            "lifestyle": "životní styl",
+            "technology": "technologie",
+            "other": "jiné",
+        }
+        
+        # Apply translations
+        czech_summary = summary
+        for english, czech in translation_map.items():
+            czech_summary = czech_summary.replace(english, czech)
+        
+        # Add note about translation method
+        czech_summary += "\n\n[Poznámka: Pro produkční překlad použijte StoryTranslation model s AI překladačem]"
+        
+        return czech_summary
+    
     def __repr__(self) -> str:
         """String representation of Idea."""
         return (
