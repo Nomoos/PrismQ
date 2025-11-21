@@ -40,10 +40,12 @@ The PrismQ workflow follows a **progressive enrichment model** where content flo
 
 ### Translation Model Clarification
 
-**`parentId` Definition**: The original story ID from which all translations are derived. For example:
-- Original English story: `parentId = "story-001"` (self-referential or null)
-- Czech translation: `parentId = "story-001"`, `langId = "cs"`
-- German translation: `parentId = "story-001"`, `langId = "de"`
+**`parentId` Definition**: The original story ID from which all translations are derived. For the original story, `parentId` typically references itself (self-referential) or uses a logical group identifier.
+
+**Examples**:
+- Original English story: `id = "story-001"`, `parentId = "story-001"` (self-referential)
+- Czech translation: `id = "story-002"`, `parentId = "story-001"`, `langId = "cs"`
+- German translation: `id = "story-003"`, `parentId = "story-001"`, `langId = "de"`
 
 All translations share the same `parentId`, enabling queries like "get all languages for story-001".
 
@@ -568,9 +570,9 @@ model Story {
   publishedAudio  DateTime? // Audio publication (Spotify, Apple Podcasts, SoundCloud)
   publishedVideo  DateTime? // Video publication (YouTube, TikTok, Instagram Reels)
   publicationState JSON? // Detailed per-platform status: {
-                        //   text: {blog: {status, url, publishedAt}, medium: {...}},
-                        //   audio: {spotify: {status, url, publishedAt}, ...},
-                        //   video: {youtube: {status, url, publishedAt}, tiktok: {...}}
+                        //   text: {blog: {...}, medium: {...}, substack: {...}},
+                        //   audio: {spotify: {...}, apple_podcasts: {...}, soundcloud: {...}},
+                        //   video: {youtube: {...}, tiktok: {...}, instagram: {...}}
                         // }
   
   // Performance optimization
@@ -901,10 +903,10 @@ CREATE TABLE stories (
     review_score INT NULL COMMENT 'Score from T/Rewiew (0-100)',
     
     -- Multi-platform publication tracking (PrismQ progressive enrichment)
-    published_text TIMESTAMP NULL COMMENT 'Text publication (blog, Medium, Substack, LinkedIn)',
-    published_audio TIMESTAMP NULL COMMENT 'Audio publication (Spotify, Apple Podcasts, SoundCloud)',
+    published_text TIMESTAMP NULL COMMENT 'Text publication (blog, Medium, Substack, LinkedIn, Twitter)',
+    published_audio TIMESTAMP NULL COMMENT 'Audio publication (Spotify, Apple Podcasts, SoundCloud, Audible)',
     published_video TIMESTAMP NULL COMMENT 'Video publication (YouTube, TikTok, Instagram Reels)',
-    publication_state JSON NULL COMMENT 'Per-platform publication details: {text: {blog: {status, url, publishedAt}}, audio: {...}, video: {...}}',
+    publication_state JSON NULL COMMENT 'Per-platform publication details: {text: {blog: {status, url, publishedAt}, medium: {...}}, audio: {spotify: {...}}, video: {youtube: {...}}}',
     
     -- Performance flags
     is_latest BOOLEAN DEFAULT FALSE COMMENT 'Latest version for this lang',
