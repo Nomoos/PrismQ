@@ -30,9 +30,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
        ↓
 5. PrismQ.T.Rewiew.Script.ByTitle ← Review Script v1 by Title v1 + Idea
        ↓
-6. PrismQ.T.Title.Improvements (v2) ← Using reviews + original script + original title
+6. PrismQ.T.Title.Improvements (v2) ← Using reviews + title v1, script v1
        ↓
-7. PrismQ.T.Script.Improvements (v2) ← Using reviews + original script + new title v2
+7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2, script v1
        ↓
 8. PrismQ.T.Rewiew.Title.ByScript (v2) ←──────────────────────┐
        ↓                                                       │
@@ -171,7 +171,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 ---
 
 ### Stage 6: PrismQ.T.Title.Improvements (v2)
-**Goal**: Generate title v2 using reviews + original script + original title  
+**Goal**: Generate title v2 using reviews + title v1, script v1  
 **Folder**: `T/Title/Improvements/`  
 **Worker**: Worker13 (Prompt Master)  
 **Effort**: 2 days
@@ -180,8 +180,8 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 - **Input**: 
   - Title review feedback (from stage 4)
   - Script review feedback (from stage 5)
-  - Original script v1
-  - Original title v1
+  - Title v1
+  - Script v1
 - **Process**: 
   - Analyze feedback on title
   - Consider script content and its review
@@ -189,12 +189,12 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 - **Output**: Title v2
 - **Version**: v2 (first improvement)
 
-**Key**: Uses **both reviews** + **original versions** for context.
+**Key**: Uses **both reviews** + **v1 versions** for context.
 
 ---
 
 ### Stage 7: PrismQ.T.Script.Improvements (v2)
-**Goal**: Generate script v2 using reviews + original script + new title v2  
+**Goal**: Generate script v2 using reviews + new title v2, script v1  
 **Folder**: `T/Script/Improvements/`  
 **Worker**: Worker02  
 **Effort**: 2 days
@@ -203,7 +203,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 - **Input**:
   - Script review feedback (from stage 5)
   - Title review feedback (from stage 4)
-  - Original script v1
+  - Script v1
   - **New title v2** (from stage 6)
 - **Process**:
   - Analyze feedback on script
@@ -321,14 +321,14 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 ---
 
 ### Stage 14: PrismQ.T.Rewiew.Title.Readability
-**Goal**: Final readability validation for title  
+**Goal**: Final readability/voiceover validation for title  
 **Folder**: `T/Rewiew/Readability/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
-**MVP Issue: #MVP-014 - Title Readability Review**
+**MVP Issue: #MVP-014 - Title Readability/Voiceover Review**
 - **Input**: Title v3 (accepted version)
-- **Check**: Readability validation
+- **Check**: Readability and voiceover validation
   - Clear and understandable
   - Appropriate length
   - No grammar/spelling issues

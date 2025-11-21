@@ -33,9 +33,9 @@
        ↓
 5. PrismQ.T.Rewiew.Script.ByTitle ← Review Script v1 by Title v1 + Idea
        ↓
-6. PrismQ.T.Title.Improvements (v2) ← Using reviews + originals
+6. PrismQ.T.Title.Improvements (v2) ← Using reviews + title v1, script v1
        ↓
-7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2
+7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2, script v1
        ↓
 8. PrismQ.T.Rewiew.Title.ByScript (v2) ←──────────┐
        ↓                                           │
@@ -49,13 +49,13 @@
         ↓ YES                                      │
 13. Script Acceptance Check ─NO────────────────────┘
         ↓ YES
-14. PrismQ.T.Rewiew.Title.Readability ←──────┐
-        ↓                                     │
-        ├─FAILS─→ Return to step 9 ──────────┘
+14. PrismQ.T.Rewiew.Title.Readability (Voiceover) ←──────┐
+        ↓                                                │
+        ├─FAILS─→ Return to step 9 ──────────────────────┘
         ↓ PASSES
-15. PrismQ.T.Rewiew.Script.Readability ←─────┐
-        ↓                                     │
-        ├─FAILS─→ Return to step 11 ─────────┘
+15. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─────┐
+        ↓                                                 │
+        ├─FAILS─→ Return to step 11 ─────────────────────┘
         ↓ PASSES
 16. PrismQ.T.Publishing.Finalization
 ```
@@ -164,8 +164,8 @@ Worker10: Implement #MVP-005 in T/Rewiew/Script/
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
-| **Worker13** | #MVP-006 | 2d | Title Improvements v2 (using both reviews + originals) |
-| **Worker02** | #MVP-007 | 2d | Script Improvements v2 (using both reviews + new title v2) |
+| **Worker13** | #MVP-006 | 2d | Title Improvements v2 (using both reviews + title v1, script v1) |
+| **Worker02** | #MVP-007 | 2d | Script Improvements v2 (using both reviews + new title v2, script v1) |
 | **Worker10** | #MVP-008 | 1d | Title Review v2 (review title v2 by script v2) |
 
 **Commands**:
@@ -178,8 +178,8 @@ Worker13: Implement #MVP-006 in T/Title/Improvements/
 - Deliverable: Generate title v2 using:
   - Title review feedback (step 4)
   - Script review feedback (step 5)
-  - Original script v1
-  - Original title v1
+  - Title v1
+  - Script v1
 
 Worker02: Implement #MVP-007 in T/Script/Improvements/
 - Module: PrismQ.T.Script.Improvements
@@ -189,7 +189,7 @@ Worker02: Implement #MVP-007 in T/Script/Improvements/
 - Deliverable: Generate script v2 using:
   - Script review feedback (step 5)
   - Title review feedback (step 4)
-  - Original script v1
+  - Script v1
   - **New title v2** (from step 6)
 
 Worker10: Implement #MVP-008 in T/Rewiew/Idea/
@@ -372,15 +372,15 @@ Worker04: Final MVP validation of all paths
 | #MVP-003 | PrismQ.T.Script.Draft | Script v1 | Worker02 | 3d | Script generation from idea + title v1 |
 | #MVP-004 | PrismQ.T.Rewiew.Title.ByScript | **Title Review by Script** | Worker10 | 1d | Review title v1 against script v1 + idea |
 | #MVP-005 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review by Title** | Worker10 | 1d | Review script v1 against title v1 + idea |
-| #MVP-006 | PrismQ.T.Title.Improvements | Title v2 | Worker13 | 2d | Title v2 using cross-reviews + originals |
-| #MVP-007 | PrismQ.T.Script.Improvements | Script v2 | Worker02 | 2d | Script v2 using cross-reviews + title v2 |
+| #MVP-006 | PrismQ.T.Title.Improvements | Title v2 | Worker13 | 2d | Title v2 using cross-reviews + title v1, script v1 |
+| #MVP-007 | PrismQ.T.Script.Improvements | Script v2 | Worker02 | 2d | Script v2 using cross-reviews + new title v2, script v1 |
 | #MVP-008 | PrismQ.T.Rewiew.Title.ByScript | **Title Review v2** | Worker10 | 1d | Review title v2 against script v2 |
 | #MVP-009 | PrismQ.T.Title.Refinement | Title v3 | Worker13 | 1d | Refine title v2 → v3 |
 | #MVP-010 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review v2** | Worker10 | 1d | Review script v2 against title v3 |
 | #MVP-011 | PrismQ.T.Script.Refinement | Script v3 | Worker02 | 2d | Refine script v2 → v3 |
 | #MVP-012 | PrismQ.T.Rewiew.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title v3 is accepted (loop if not) |
 | #MVP-013 | PrismQ.T.Rewiew.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script v3 is accepted (loop if not) |
-| #MVP-014 | PrismQ.T.Rewiew.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability validation |
+| #MVP-014 | PrismQ.T.Rewiew.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability/voiceover validation |
 | #MVP-015 | PrismQ.T.Rewiew.Script.Readability | **Readability Check** | Worker10 | 0.5d | Final script readability/voiceover validation |
 | #MVP-016 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing approved + validated content |
 
@@ -415,8 +415,8 @@ IdeaCreation --> TitleDraft_v1: Step 1-2
 TitleDraft_v1 --> ScriptDraft_v1: Step 2-3
 ScriptDraft_v1 --> TitleReview_v1: Step 3-4 (review title by script context)
 TitleReview_v1 --> ScriptReview_v1: Step 4-5 (review script by title context)
-ScriptReview_v1 --> TitleImprovement_v2: Step 5-6 (use both reviews + originals)
-TitleImprovement_v2 --> ScriptImprovement_v2: Step 6-7 (use reviews + new title v2)
+ScriptReview_v1 --> TitleImprovement_v2: Step 5-6 (use both reviews + title v1, script v1)
+TitleImprovement_v2 --> ScriptImprovement_v2: Step 6-7 (use reviews + new title v2, script v1)
 ScriptImprovement_v2 --> TitleReview_v2: Step 7-8 (review title v2 by script v2)
 TitleReview_v2 --> TitleRefinement_v3: Step 8-9
 TitleRefinement_v3 --> ScriptReview_v2: Step 9-10 (review script v2 by title v3)
