@@ -55,7 +55,7 @@ _To be implemented_
 
 ## Navigation
 
-**[← Back to Rewiew](../README.md)** | **[Previous: Script](../Script/README.md)** | **[Next: Grammar →](../Grammar/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
+**[← Back to Rewiew](../README.md)** | **[Next: Script →](../Script/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 
