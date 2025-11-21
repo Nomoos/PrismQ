@@ -53,7 +53,7 @@ _To be implemented_
 
 ## Navigation
 
-**[← Back to Idea](../README.md)** | **[Previous: Outline](../Outline/README.md)** | **[Next: Title →](../../Title/README.md)** | **[T Pipeline](../../README.md)**
+**[← Back to Idea](../README.md)** | **[Previous: Outline](../Outline/README.md)** | **[Next: Title →](../../Title/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 

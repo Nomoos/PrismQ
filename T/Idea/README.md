@@ -148,16 +148,17 @@ Inspiration (Source Collection & Scoring)
 Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
     ├─ Outline (organization)
-    ├─ Review (validation)
-    └─ Title (finalization - external to Idea module)
+    └─ Review (validation)
     ↓
-ScriptDraft
+[Exit Idea Module] → Title (external) → ScriptDraft
 ```
 
 **Sub-state Flow within Idea:**
 ```
-Inspiration → Model (Creation) → Outline → Review → [Exit to Title/ScriptDraft]
+Inspiration → Model (Creation) → Outline → Review → [Exit to Title Module]
 ```
+
+**Note**: Title is a separate module at `T/Title/`, not a sub-state of Idea. After completing Review, the workflow exits the Idea module and proceeds to Title development.
 
 ## Usage Example
 

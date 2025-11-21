@@ -150,7 +150,7 @@ pytest --cov=. --cov-report=html         # With coverage
 
 ## Navigation
 
-**[← Back to Idea](../README.md)** | **[Previous: Inspiration](../Inspiration/README.md)** | **[Next: Outline →](../Outline/README.md)** | **[T Pipeline](../../README.md)**
+**[← Back to Idea](../README.md)** | **[Previous: Inspiration](../Inspiration/README.md)** | **[Next: Outline →](../Outline/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 
