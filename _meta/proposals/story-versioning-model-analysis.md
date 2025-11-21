@@ -1412,7 +1412,7 @@ model Story {
   id              String   @id @default(cuid())
 
   /// Grouping: all versions/languages of the same logical story
-  parentId        String?  // NULL for original stories, UUID of first/original for translations
+  parentId        String?  // NULL for original stories, ID of original story for translations
   channelGroupId  Int      // Channel definition (language, country, platform targeting)
   audienceId      Int      // Audience segmentation
   
@@ -1673,11 +1673,15 @@ ORDER BY i.score DESC;
 ```sql
 -- Unique constraint to enforce 1:1 per language and version
 ALTER TABLE stories
-ADD UNIQUE KEY unique_idea_lang_version (idea_id, lang_id, version);
+ADD UNIQUE KEY unique_idea_channel_version (idea_id, channel_group_id, version);
 
--- Or if truly 1:1 (one story per idea total):
-ALTER TABLE stories
-ADD UNIQUE KEY unique_idea (idea_id);
+-- Note: If supporting A/B testing with different audiences, use:
+-- ADD UNIQUE KEY unique_idea_channel_audience_version (idea_id, channel_group_id, audience_id, version);
+
+-- Note: This restricts to one story per idea globally
+-- For multiple languages/audiences per idea, use the composite constraint above instead:
+-- ALTER TABLE stories
+-- ADD UNIQUE KEY unique_idea_channel_audience_version (idea_id, channel_group_id, audience_id, version);
 ```
 
 ---
@@ -1852,13 +1856,25 @@ class StoryStorage:
         """Retrieve full text from DB or S3"""
         story = self.db.query('SELECT * FROM stories WHERE id = ?', [story_id])
         
+        if not story:
+            raise ValueError(f"Story {story_id} not found")
+        
         if story['text_s3_key']:
-            # Fetch from S3
-            response = self.s3_client.get_object(
-                Bucket='prismq-content',
-                Key=story['text_s3_key']
-            )
-            return response['Body'].read().decode('utf-8')
+            # Fetch from S3 with error handling
+            try:
+                response = self.s3_client.get_object(
+                    Bucket='prismq-content',
+                    Key=story['text_s3_key']
+                )
+                return response['Body'].read().decode('utf-8')
+            except self.s3_client.exceptions.NoSuchKey:
+                # S3 object missing, fall back to preview
+                print(f"Warning: S3 object {story['text_s3_key']} not found, using preview")
+                return story['text_preview']
+            except Exception as e:
+                # Log error and fall back to preview
+                print(f"Error fetching from S3: {e}")
+                return story['text_preview']
         else:
             # Return from database
             return story['text_preview']
@@ -2057,6 +2073,8 @@ CREATE TABLE stories (
     FOREIGN KEY (previous_version_id) REFERENCES stories(id) ON DELETE SET NULL,
     
     -- Unique constraints
+    -- Note: For A/B testing with different audiences, add audience_id:
+    -- UNIQUE KEY unique_story_version (idea_id, channel_group_id, audience_id, version),
     UNIQUE KEY unique_story_version (idea_id, channel_group_id, version),
     
     -- Indexes
