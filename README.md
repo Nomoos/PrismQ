@@ -144,6 +144,83 @@ PrismQ/
 3. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
 4. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
 
+## 🔄 State Machine Architecture
+
+PrismQ implements a **comprehensive state machine workflow** across five core modules:
+
+### Pipeline Flow: T → A → V → P → M
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PrismQ State Machine                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publishing)       │
+│     ↓              ↓             ↓              ↓                │
+│     └──────────────┴─────────────┴──────────────┘                │
+│                          ↓                                       │
+│                   M (Metrics/Analytics)                          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Module Descriptions
+
+1. **T (Text Generation)**
+   - **Purpose**: Transform ideas into high-quality text content
+   - **State Machine**: 16-stage iterative workflow with co-improvement cycles
+   - **Key States**: Idea.Creation → Title.Draft → Script.Draft → Reviews → Improvements → Refinements → Publishing
+   - **Quality Gates**: Title acceptance, script acceptance, readability validation
+   - **Output**: SEO-optimized published text
+   - **[📄 View T State Machine Documentation](./T/STATE_MACHINE.md)** *(Coming Soon)*
+
+2. **A (Audio Generation)**
+   - **Purpose**: Convert published text into professional audio content
+   - **State Machine**: Voice generation, enhancement, and podcast publishing *(To Be Implemented)*
+   - **Input**: Published text from T module
+   - **Output**: Professional audio files, podcast episodes
+   - **[📄 View A State Machine Documentation](./A/STATE_MACHINE.md)** *(Coming Soon)*
+
+3. **V (Video Generation)**
+   - **Purpose**: Combine audio with visuals for video platforms
+   - **State Machine**: Scene planning, keyframe generation, video assembly *(To Be Implemented)*
+   - **Input**: Published audio from A module
+   - **Output**: Platform-optimized videos (YouTube, TikTok, Instagram)
+   - **[📄 View V State Machine Documentation](./V/STATE_MACHINE.md)** *(Coming Soon)*
+
+4. **P (Publishing)**
+   - **Purpose**: Bulk distribution across platforms after content completion
+   - **State Machine**: Multi-platform publishing, scheduling, cross-posting *(To Be Implemented)*
+   - **Input**: Completed content from T, A, V modules
+   - **Output**: Published content across all target platforms
+   - **[📄 View P State Machine Documentation](./P/STATE_MACHINE.md)** *(Coming Soon)*
+
+5. **M (Metrics/Analytics)**
+   - **Purpose**: Cross-cutting observability across all modules
+   - **Type**: Meta-module (observes T/A/V/P, not sequential)
+   - **Functions**: Performance tracking, KPI collection, engagement metrics, A/B testing results
+   - **Output**: Insights feeding back to idea generation
+   - **[📄 View M State Machine Documentation](./M/STATE_MACHINE.md)** *(Coming Soon)*
+
+### State Machine Principles
+
+- **Sequential Pipeline**: T → A → V → P (each stage builds on previous)
+- **Quality Gates**: Explicit acceptance criteria at each transition
+- **Iterative Refinement**: Loops and feedback cycles within each module
+- **Progressive Publication**: Release at any stage based on goals
+- **Cross-Module Observability**: M module tracks metrics across all stages
+- **Version Tracking**: Dynamic versioning (v1, v2, v3+) with unlimited iterations
+
+### Current Implementation Status
+
+✅ **T Module**: Complete 16-stage iterative workflow with MVP documentation  
+🔄 **A Module**: State machine design in progress  
+🔄 **V Module**: State machine design in progress  
+🔄 **P Module**: Architecture planning phase  
+🔄 **M Module**: Metrics framework definition phase
+
+---
+
 ## 🔄 Progressive Enrichment Model
 
 PrismQ uses a **sequential format enrichment** approach:
