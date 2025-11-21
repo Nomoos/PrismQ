@@ -71,22 +71,10 @@ Structured content outline creation and refinement.
 
 ---
 
-### [Review](./Review/)
-**Idea validation and review**
+## Related Modules
 
-Validate ideas for viability, potential, and alignment with content strategy.
-
-- Concept validation
-- Potential assessment
-- Strategy alignment
-- Feasibility review
-
-**[→ View Review Documentation](./Review/README.md)**
-
-**[→ View Review Metadata](./Review/_meta/)**
-- [Docs](./Review/_meta/docs/) - Review documentation
-- [Examples](./Review/_meta/examples/) - Review examples
-- [Tests](./Review/_meta/tests/) - Review tests
+### Idea Review
+For idea validation and review, see **[T/Rewiew/Idea](../Rewiew/Idea/)** - validates ideas for viability, potential, and alignment with content strategy.
 
 ---
 
@@ -147,23 +135,26 @@ Inspiration (Source Collection & Scoring)
     ↓
 Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
-    ├─ Outline (organization)
-    └─ Review (validation)
+    └─ Outline (organization)
     ↓
-[Exit Idea Module] → Title (external) → ScriptDraft
+[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
 ```
 
 **Sub-state Flow within Idea:**
 ```
-Inspiration → Model (Creation) → Outline → Review → [Exit to Title Module]
+Inspiration → Model (Creation) → Outline → [Exit to Rewiew/Idea for validation] → Title
 ```
 
-**Note**: Title is a separate module at `T/Title/`, not a sub-state of Idea. After completing Review, the workflow exits the Idea module and proceeds to Title development.
+**Note**: 
+- Title is a separate module at `T/Title/`, not a sub-state of Idea
+- Idea validation/review is handled by `T/Rewiew/Idea/`, which is part of the review pipeline
+- After completing Outline, the workflow exits the Idea module and proceeds to Rewiew/Idea for validation
 
 ## Usage Example
 
 ```python
-from PrismQ.T.Idea import Model, Outline, Review
+from PrismQ.T.Idea import Model, Outline
+from PrismQ.T.Rewiew.Idea import Review
 
 # Create new idea
 idea = Model.create(
