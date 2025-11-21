@@ -81,12 +81,6 @@ The MVP simplifies the full workflow documented in `T/TITLE_SCRIPT_WORKFLOW.md`:
 - `T/Title/Refinement/` - Title refinement
 - `T/Rewiew/Content/` - Final content review (script + title together)
 - `T/Publishing/Finalization/` - Publishing
-- `T/Script/Draft/` - Script drafting
-- `T/Rewiew/Script/` - Script review
-- `T/Script/Improvements/` - Script improvements
-- `T/Title/Refinement/` - Title refinement
-- `T/Rewiew/Content/` - Content review
-- `T/Publishing/Finalization/` - Publishing
 
 ---
 
