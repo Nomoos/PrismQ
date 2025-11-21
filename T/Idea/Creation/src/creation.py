@@ -9,13 +9,23 @@ from typing import List, Dict, Any, Optional, Literal
 from dataclasses import dataclass
 import sys
 import os
-import hashlib
 
 # Add parent directories to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../Model/src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../Model'))
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+model_path = os.path.join(parent_dir, 'Model')
+sys.path.insert(0, os.path.join(model_path, 'src'))
+sys.path.insert(0, model_path)
 
 from idea import Idea, ContentGenre, IdeaStatus
+
+
+# Common English stop words for keyword extraction
+STOP_WORDS = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", 
+    "of", "with", "is", "are", "was", "were", "been", "be", "have", "has", 
+    "had", "do", "does", "did", "will", "would", "could", "should", "may",
+    "might", "can", "must", "shall"
+}
 
 
 @dataclass
@@ -452,8 +462,7 @@ class IdeaCreator:
         words = text.split()
         
         # Filter common words and extract unique keywords
-        stop_words = {"a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "is", "are"}
-        keywords = [w.strip(".,!?;:") for w in words if w not in stop_words and len(w) > 3]
+        keywords = [w.strip(".,!?;:") for w in words if w not in STOP_WORDS and len(w) > 3]
         
         # Remove duplicates while preserving order
         seen = set()

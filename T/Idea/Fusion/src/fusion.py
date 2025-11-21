@@ -10,8 +10,10 @@ import sys
 import os
 
 # Add parent directories to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../Model/src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../Model'))
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+model_path = os.path.join(parent_dir, 'Model')
+sys.path.insert(0, os.path.join(model_path, 'src'))
+sys.path.insert(0, model_path)
 
 from idea import Idea, ContentGenre, IdeaStatus
 

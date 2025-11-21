@@ -18,6 +18,10 @@ from enum import Enum
 from datetime import datetime
 
 
+# Translation constants
+CZECH_TRANSLATION_NOTE = "\n\n[Poznámka: Pro produkční překlad použijte StoryTranslation model s AI překladačem]"
+
+
 class IdeaStatus(Enum):
     """Status of an Idea in the content workflow.
     
@@ -579,7 +583,14 @@ class Idea:
         
         if len(summary) > max_length:
             # Truncate to max_length, breaking at last complete sentence/line
-            summary = summary[:max_length].rsplit('\n', 1)[0]
+            # Ensure we don't exceed max_length even if no newline is found
+            truncated = summary[:max_length]
+            last_newline = truncated.rfind('\n')
+            if last_newline > 0:
+                summary = truncated[:last_newline]
+            else:
+                summary = truncated
+            
             if not summary.endswith('.'):
                 summary += "..."
         
@@ -642,7 +653,7 @@ class Idea:
             czech_summary = czech_summary.replace(english, czech)
         
         # Add note about translation method
-        czech_summary += "\n\n[Poznámka: Pro produkční překlad použijte StoryTranslation model s AI překladačem]"
+        czech_summary += CZECH_TRANSLATION_NOTE
         
         return czech_summary
     
