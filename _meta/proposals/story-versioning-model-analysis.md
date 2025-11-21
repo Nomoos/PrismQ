@@ -1,0 +1,1134 @@
+# Story Model Versioning and Translation System - Analysis Report
+
+**Date**: 2025-11-21  
+**Author**: PrismQ Development Team  
+**Status**: Proposal Analysis  
+**Related**: T/Script Module Versioning, Content Production Pipeline
+
+---
+
+## Executive Summary
+
+This report analyzes the proposed Story model for managing text content versions and translations in the PrismQ content production system. The model aims to provide a unified approach for tracking content iterations, managing translations across multiple languages, and maintaining a clear lineage of content evolution.
+
+**Key Findings:**
+- ✅ The proposed model addresses critical needs for version tracking and i18n
+- ⚠️ Some design decisions require careful consideration for scalability
+- 💡 Alternative approaches may better fit existing PrismQ architecture
+- 🔄 Integration with existing T/Script versioning needs clarification
+
+---
+
+## 1. Proposed Model Structure
+
+```prisma
+model Story {
+  id         String   @id @default(cuid())
+
+  /// The "parent" story this is derived from.
+  /// Same for all translations and versions.
+  parentId   String   // e.g. ID of the original English story or logical story group
+  langId     String   // ISO code: "en", "cs", etc.
+  version    Int      // Version number (starts at 1, increments)
+
+  title      String
+  text       String
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  /// Optionally store the creator (AI, editor, translator)
+  createdBy  String?  
+  comment    String?  // Optional change reason or review notes
+}
+```
+
+### Model Characteristics
+
+- **Flat Structure**: All versions and translations stored in single table
+- **Composite Identifier**: parentId + langId + version uniquely identifies each story variant
+- **No Relations**: No formal foreign key relationships defined
+- **Prisma-Style**: Uses Prisma ORM syntax (currently system uses PHP/MySQL)
+
+---
+
+## 2. Detailed Analysis
+
+### 2.1 Strengths (PROS)
+
+#### ✅ Simplicity
+- **Flat structure** is easy to understand and query
+- **No complex joins** needed for basic operations
+- Minimal learning curve for developers
+
+#### ✅ Flexibility
+- `parentId` can represent any logical grouping concept
+- `comment` field allows arbitrary metadata
+- Easy to add new language/version combinations
+
+#### ✅ Translation Support
+- Clear `langId` field for language identification
+- All translations share same `parentId` for grouping
+- Supports ISO language codes (en, cs, de, etc.)
+
+#### ✅ Version Tracking
+- Simple integer versioning (1, 2, 3...)
+- Linear version progression per language
+- Easy to fetch latest version: `MAX(version)`
+
+#### ✅ Audit Trail
+- `createdAt`/`updatedAt` timestamps track changes
+- `createdBy` identifies who created each version
+- `comment` field for change documentation
+
+#### ✅ Query Patterns
+Simple queries for common use cases:
+```sql
+-- Get all versions of a story in English
+SELECT * FROM Story 
+WHERE parentId = 'xyz' AND langId = 'en' 
+ORDER BY version DESC;
+
+-- Get latest version for all languages
+SELECT * FROM Story s1
+WHERE version = (
+  SELECT MAX(version) 
+  FROM Story s2 
+  WHERE s2.parentId = s1.parentId 
+  AND s2.langId = s1.langId
+);
+
+-- Get specific version
+SELECT * FROM Story 
+WHERE parentId = 'xyz' AND langId = 'en' AND version = 2;
+```
+
+---
+
+### 2.2 Weaknesses (CONS)
+
+#### ⚠️ Data Redundancy
+- **Problem**: Full text stored for every version
+- **Impact**: Storage grows linearly with versions × languages
+- **Example**: 10 languages × 5 versions = 50 full text copies
+- **Scale**: For 1000 stories: 50,000 text records
+
+**Cost Analysis:**
+```
+Average story size: 5KB
+Storage per story: 5KB × 50 versions/translations = 250KB
+For 1000 stories: 250MB (vs. ~5MB with diff-based approach)
+```
+
+#### ⚠️ No Diff Tracking
+- Cannot see **what changed** between versions
+- Difficult to understand version evolution
+- No way to generate changelogs automatically
+- Manual comparison required for version analysis
+
+#### ⚠️ Missing Relationships
+- No formal `parent` relationship defined
+- Cannot enforce referential integrity
+- Risk of orphaned versions if parent deleted
+- No CASCADE delete behavior
+
+#### ⚠️ Version Conflicts
+- **Race condition**: Two editors create version 3 simultaneously
+- No locking or optimistic concurrency control
+- `version` field not unique alone (needs compound unique constraint)
+- Manual conflict resolution required
+
+#### ⚠️ Limited Metadata
+- No structured metadata about changes
+- `comment` is free-text (hard to query/analyze)
+- Missing: change type, change category, review status
+- No link to review/approval workflow
+
+#### ⚠️ No Status Tracking
+- Cannot track workflow state (draft, review, published)
+- All versions have equal status
+- No way to mark "current published" version
+- Conflicts with existing PrismQ workflow states
+
+#### ⚠️ Query Performance
+- Getting latest version requires `MAX()` aggregate
+- Finding all languages requires full table scan
+- No indexes defined in model
+- Grows expensive as versions accumulate
+
+#### ⚠️ Technology Mismatch
+- **Current Stack**: PHP + MySQL
+- **Proposed Model**: Prisma (Node.js/TypeScript)
+- Requires technology migration or parallel systems
+- Prisma not compatible with existing PHP backend
+
+---
+
+## 3. Comparison with Existing System
+
+### 3.1 Current T/Script Versioning (Python)
+
+The existing system (documented in `T/Script/STRUCTURE_AND_VERSIONING.md`) uses a different approach:
+
+```python
+@dataclass
+class ScriptVersion:
+    version_number: int
+    script_text: str
+    length_seconds: Optional[int]
+    created_at: str
+    created_by: str
+    changes_from_previous: str  # ← Diff description
+    review_score: Optional[int]  # ← Quality metric
+    notes: str
+```
+
+**Key Differences:**
+
+| Feature | Proposed Story Model | Current T/Script |
+|---------|---------------------|------------------|
+| **Storage** | Database table | In-memory/JSON |
+| **Diff Tracking** | ❌ No | ✅ Yes (`changes_from_previous`) |
+| **Quality Metrics** | ❌ No | ✅ Yes (`review_score`) |
+| **Metadata** | Limited | Rich (length, scores, detailed notes) |
+| **Translation** | ✅ Yes (`langId`) | ❌ No |
+| **Parent Grouping** | ✅ Yes (`parentId`) | ❌ No |
+| **Persistence** | Database | File/Memory |
+| **Technology** | Prisma/SQL | Python dataclass |
+
+---
+
+## 4. Use Case Analysis
+
+### 4.1 Supported Use Cases ✅
+
+#### UC1: Create New Translation
+```sql
+INSERT INTO Story (id, parentId, langId, version, title, text, createdBy)
+VALUES ('s2', 'parent1', 'cs', 1, 'Czech Title', 'Czech text...', 'translator-ai');
+```
+**Status**: ✅ Fully supported
+
+#### UC2: Create New Version
+```sql
+-- Get max version first
+SELECT MAX(version) FROM Story WHERE parentId = 'parent1' AND langId = 'en';
+-- Insert new version
+INSERT INTO Story (id, parentId, langId, version, title, text, createdBy, comment)
+VALUES ('s3', 'parent1', 'en', 3, 'Updated Title', 'Updated text...', 'editor', 'Fixed typos');
+```
+**Status**: ✅ Supported (requires manual version number management)
+
+#### UC3: Get Latest Version for Language
+```sql
+SELECT * FROM Story 
+WHERE parentId = 'parent1' AND langId = 'en'
+ORDER BY version DESC 
+LIMIT 1;
+```
+**Status**: ✅ Fully supported
+
+#### UC4: List All Languages Available
+```sql
+SELECT DISTINCT langId FROM Story WHERE parentId = 'parent1';
+```
+**Status**: ✅ Fully supported
+
+---
+
+### 4.2 Challenging Use Cases ⚠️
+
+#### UC5: Show What Changed Between Versions
+```sql
+-- Can only fetch both versions, manual diff required
+SELECT text FROM Story WHERE parentId = 'p1' AND langId = 'en' AND version IN (2, 3);
+```
+**Status**: ⚠️ Requires client-side diff algorithm  
+**Impact**: Cannot generate automated changelogs
+
+#### UC6: Track Version Lineage
+```
+Want: "Version 3 is based on version 2, which improved version 1"
+```
+**Status**: ❌ No explicit parent-child version relationship  
+**Workaround**: Use comment field (unstructured)
+
+#### UC7: Concurrent Version Creation
+```
+Editor A: Creates version 3 at 10:00
+Editor B: Creates version 3 at 10:01
+Result: Constraint violation or data corruption
+```
+**Status**: ❌ No concurrency control  
+**Solution needed**: Optimistic locking or version number generation
+
+#### UC8: Publish Specific Version
+```
+Want: Mark version 3 as "published", keep version 4 as "draft"
+```
+**Status**: ❌ No status field  
+**Impact**: Cannot integrate with PrismQ workflow states
+
+#### UC9: Version Approval Workflow
+```
+Want: Version 2 "pending review" → "approved" → "published"
+```
+**Status**: ❌ No workflow state tracking  
+**Impact**: Cannot integrate with existing T/Rewiew modules
+
+#### UC10: Find All Draft Versions Across All Stories
+```sql
+-- Cannot do this without status field
+SELECT * FROM Story WHERE status = 'draft';
+```
+**Status**: ❌ Impossible with current model
+
+---
+
+## 5. Alternative Approaches
+
+### 5.1 Option A: Enhanced Flat Model (Recommended)
+
+**Add these fields to proposed model:**
+
+```prisma
+model Story {
+  id         String   @id @default(cuid())
+  parentId   String   
+  langId     String   
+  version    Int      
+  
+  // Existing fields
+  title      String
+  text       String
+  
+  // ADDITIONS:
+  status     String   // draft, review, approved, published
+  basedOnVersionId String?  // ID of previous version (lineage)
+  changeDescription String? // What changed (structured)
+  changeType String? // typo_fix, content_update, major_rewrite
+  reviewScore Int?    // Integration with T/Rewiew
+  isLatest   Boolean  @default(false) // Performance optimization
+  publishedAt DateTime? // Publication timestamp
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?  
+  comment    String?  
+  
+  // INDEXES for performance
+  @@unique([parentId, langId, version])
+  @@index([parentId, isLatest])
+  @@index([status])
+  @@index([langId])
+}
+```
+
+**Benefits:**
+- ✅ Maintains simplicity of flat model
+- ✅ Adds workflow state tracking
+- ✅ Adds version lineage
+- ✅ Improves query performance
+- ✅ Integrates with existing systems
+
+**Drawbacks:**
+- Still has data redundancy
+- Still requires full text storage
+- Table grows large over time
+
+---
+
+### 5.2 Option B: Normalized Version Model
+
+**Separate tables for better normalization:**
+
+```prisma
+// Parent story (logical grouping)
+model StoryParent {
+  id          String   @id @default(cuid())
+  canonicalLang String  // Primary language
+  createdAt   DateTime @default(now())
+  stories     StoryLanguage[]
+}
+
+// Language variant (all versions of one language)
+model StoryLanguage {
+  id          String   @id @default(cuid())
+  parentId    String
+  parent      StoryParent @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  langId      String
+  latestVersionId String?
+  versions    StoryVersion[]
+  
+  @@unique([parentId, langId])
+}
+
+// Individual version
+model StoryVersion {
+  id          String   @id @default(cuid())
+  languageId  String
+  language    StoryLanguage @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  version     Int
+  
+  title       String
+  text        String
+  status      String   // draft, review, published
+  
+  basedOnId   String?  // Previous version
+  basedOn     StoryVersion? @relation("VersionLineage", fields: [basedOnId], references: [id])
+  derivedVersions StoryVersion[] @relation("VersionLineage")
+  
+  changeDescription String?
+  reviewScore Int?
+  
+  createdAt   DateTime @default(now())
+  createdBy   String?
+  publishedAt DateTime?
+  
+  @@unique([languageId, version])
+  @@index([status])
+}
+```
+
+**Benefits:**
+- ✅ Strong referential integrity
+- ✅ CASCADE deletes work correctly
+- ✅ Clear version lineage with self-reference
+- ✅ Can enforce business rules at DB level
+- ✅ Better query optimization potential
+
+**Drawbacks:**
+- ❌ More complex queries (requires joins)
+- ❌ Steeper learning curve
+- ❌ More tables to manage
+- ❌ Still stores full text per version
+
+---
+
+### 5.3 Option C: Diff-Based Storage (Most Efficient)
+
+**Store only differences between versions:**
+
+```prisma
+model StoryBase {
+  id          String   @id @default(cuid())
+  parentId    String
+  langId      String
+  baseText    String   // Original version 1
+  baseTitle   String
+  createdAt   DateTime @default(now())
+  versions    StoryDiff[]
+  
+  @@unique([parentId, langId])
+}
+
+model StoryDiff {
+  id          String   @id @default(cuid())
+  baseId      String
+  base        StoryBase @relation(fields: [baseId], references: [id], onDelete: Cascade)
+  version     Int
+  
+  // Store ONLY the diff, not full text
+  titleDiff   String?  // JSON patch for title
+  textDiff    String?  // JSON patch or unified diff
+  
+  status      String
+  changeDescription String?
+  reviewScore Int?
+  
+  createdAt   DateTime @default(now())
+  createdBy   String?
+  publishedAt DateTime?
+  
+  @@unique([baseId, version])
+  @@index([status])
+}
+
+// Materialized view for current versions (performance)
+model StoryMaterialized {
+  id          String   @id
+  parentId    String
+  langId      String
+  version     Int
+  title       String   // Reconstructed
+  text        String   // Reconstructed
+  lastUpdated DateTime
+  
+  @@unique([parentId, langId, version])
+  @@index([parentId, langId])
+}
+```
+
+**Benefits:**
+- ✅ **Massive storage savings** (90%+ for typical edits)
+- ✅ Built-in diff information
+- ✅ Can reconstruct any version
+- ✅ Perfect for audit trails
+- ✅ Scales to thousands of versions
+
+**Drawbacks:**
+- ❌ Complex reconstruction logic needed
+- ❌ Slower read performance (must apply diffs)
+- ❌ Requires diff algorithm implementation
+- ❌ Harder to debug/inspect data
+- ⚠️ Need materialized views for performance
+
+---
+
+### 5.4 Option D: Hybrid Approach (Best Balance)
+
+**Combine approaches for optimal balance:**
+
+```prisma
+model Story {
+  id          String   @id @default(cuid())
+  parentId    String
+  langId      String
+  version     Int
+  
+  // Full text for easy access
+  title       String
+  text        String
+  
+  // Diff from previous (optional, for analysis)
+  previousVersionId String?
+  previousVersion Story? @relation("VersionChain", fields: [previousVersionId], references: [id])
+  nextVersions    Story[] @relation("VersionChain")
+  changesSummary  String? // Structured JSON: {added: X, removed: Y, modified: Z}
+  
+  // Workflow integration
+  status      String   // draft, review, approved, published
+  workflowState String? // Maps to PrismQ workflow states
+  reviewScore Int?
+  
+  // Performance optimization
+  isLatest    Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+  createdBy   String?
+  comment     String?
+  
+  @@unique([parentId, langId, version])
+  @@index([parentId, isLatest])
+  @@index([parentId, isPublished])
+  @@index([status])
+  @@index([langId])
+  @@index([createdAt])
+}
+```
+
+**Benefits:**
+- ✅ Simple queries for common cases (full text available)
+- ✅ Diff information for analysis (changesSummary)
+- ✅ Version lineage tracking
+- ✅ Workflow integration
+- ✅ Performance optimizations (isLatest, isPublished)
+- ✅ Reasonable storage (accept redundancy for simplicity)
+
+**Drawbacks:**
+- Still stores full text (but acceptable for most use cases)
+- Slightly more complex than original proposal
+- Need to maintain isLatest/isPublished flags
+
+---
+
+## 6. Technology Stack Considerations
+
+### 6.1 Current Stack: PHP + MySQL
+
+**Implications:**
+- Prisma models need conversion to SQL DDL
+- No Prisma client available in PHP
+- Manual SQL queries or use PHP ORM (Eloquent, Doctrine)
+
+**SQL Equivalent of Proposed Model:**
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NOT NULL,
+    lang_id VARCHAR(5) NOT NULL,
+    version INT NOT NULL,
+    
+    title TEXT NOT NULL,
+    text LONGTEXT NOT NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    comment TEXT,
+    
+    UNIQUE KEY unique_version (parent_id, lang_id, version),
+    INDEX idx_parent (parent_id),
+    INDEX idx_lang (lang_id),
+    INDEX idx_version (version),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+---
+
+### 6.2 Integration with Existing Systems
+
+#### T/Script Python Module
+- Currently uses Python dataclasses
+- Stores versions in JSON/memory
+- Need adapter layer to sync with database
+
+**Potential Integration:**
+
+```python
+# Python side (T/Script)
+class ScriptVersionDBAdapter:
+    def save_to_db(self, script_version: ScriptVersion, parent_id: str, lang: str):
+        """Save Python ScriptVersion to Story database"""
+        story = {
+            'parentId': parent_id,
+            'langId': lang,
+            'version': script_version.version_number,
+            'title': '...',  # Extract from script
+            'text': script_version.script_text,
+            'createdBy': script_version.created_by,
+            'comment': script_version.changes_from_previous
+        }
+        # Call PHP API or direct DB insert
+        
+    def load_from_db(self, parent_id: str, lang: str, version: int) -> ScriptVersion:
+        """Load Story from DB into Python ScriptVersion"""
+        # Fetch from DB, convert to ScriptVersion
+```
+
+#### Client Backend (PHP TaskManager)
+- Add REST API endpoints for Story CRUD
+- Implement in data-driven API framework
+- Add to existing `api_endpoints` table
+
+**Example API Endpoints:**
+
+```
+POST   /api/stories              # Create new story (v1)
+POST   /api/stories/:id/versions # Create new version
+GET    /api/stories/:parentId    # Get all versions/languages
+GET    /api/stories/:parentId/latest/:lang # Get latest version
+PUT    /api/stories/:id          # Update story
+DELETE /api/stories/:id          # Delete version
+```
+
+---
+
+## 7. Migration Considerations
+
+### 7.1 From Current System to Proposed Model
+
+**Phase 1: Parallel Implementation**
+1. Add Story table to database
+2. Keep existing T/Script Python versioning
+3. Build adapter layer to sync both systems
+4. Test with non-critical content
+
+**Phase 2: Migration**
+1. Export existing script versions from Python
+2. Convert to Story format
+3. Import into database
+4. Validate data integrity
+
+**Phase 3: Deprecation**
+1. Update T/Script to use database directly
+2. Remove old versioning code
+3. Update documentation
+
+---
+
+### 7.2 Data Migration Script
+
+```sql
+-- Assuming existing script_versions table
+INSERT INTO stories (id, parent_id, lang_id, version, title, text, created_at, created_by, comment)
+SELECT 
+    CONCAT(script_id, '-', lang_code, '-v', version_num) as id,
+    script_id as parent_id,
+    lang_code as lang_id,
+    version_num as version,
+    title,
+    script_text as text,
+    created_timestamp as created_at,
+    creator as created_by,
+    change_notes as comment
+FROM legacy_script_versions;
+```
+
+---
+
+## 8. Recommendations
+
+### 8.1 Short-Term (Quick Wins)
+
+**Recommendation**: Implement **Option D (Hybrid Approach)** with SQL
+
+**Actions:**
+1. ✅ Create SQL schema based on Hybrid model
+2. ✅ Add to existing MySQL database
+3. ✅ Implement REST API in PHP backend
+4. ✅ Build Python adapter for T/Script integration
+5. ✅ Add comprehensive indexes for performance
+6. ✅ Document with examples
+
+**Timeline**: 1-2 weeks
+
+---
+
+### 8.2 Medium-Term (Improvements)
+
+**Enhance the basic model:**
+
+1. **Add Status Workflow Integration**
+   - Map to existing PrismQ workflow states
+   - Add state transition validation
+   - Integration with T/Rewiew modules
+
+2. **Implement Change Tracking**
+   - Add changesSummary JSON field
+   - Auto-generate from text diffs
+   - Enable changelog generation
+
+3. **Performance Optimization**
+   - Add materialized view for latest versions
+   - Implement caching layer (Redis)
+   - Add full-text search indexes
+
+4. **Rich Metadata**
+   - Add structured tags/categories
+   - Link to review scores
+   - Integration with publishing workflow
+
+**Timeline**: 1-2 months
+
+---
+
+### 8.3 Long-Term (Advanced Features)
+
+**Consider future enhancements:**
+
+1. **Diff-Based Storage (Option C)**
+   - Implement when version count grows large
+   - Start with hybrid: store full text + diff
+   - Migrate older versions to diff-only
+
+2. **Version Branching**
+   - Support experimental branches
+   - Merge branches back to main
+   - Git-like version tree
+
+3. **Collaborative Editing**
+   - Real-time conflict detection
+   - Merge conflict resolution
+   - Operational Transform or CRDT
+
+4. **Advanced Analytics**
+   - Version comparison dashboard
+   - A/B testing integration
+   - Performance metrics per version
+
+**Timeline**: 6-12 months
+
+---
+
+## 9. Conclusion
+
+### 9.1 Summary
+
+The proposed Story model provides a **solid foundation** for version and translation management but requires **enhancements** for production use in PrismQ.
+
+**Key Points:**
+- ✅ Core concept is sound and addresses real needs
+- ⚠️ Needs workflow state integration
+- ⚠️ Missing some critical features for production
+- ✅ Can be enhanced incrementally
+- ⚠️ Technology stack mismatch (Prisma vs PHP/MySQL)
+
+---
+
+### 9.2 Decision Matrix
+
+| Approach | Simplicity | Features | Performance | Storage | Recommendation |
+|----------|-----------|----------|-------------|---------|----------------|
+| **Original Proposal** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | Good start |
+| **Option A: Enhanced Flat** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ✅ **Recommended** |
+| **Option B: Normalized** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | Complex |
+| **Option C: Diff-Based** | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | Future |
+| **Option D: Hybrid** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ✅ **Best Overall** |
+
+---
+
+### 9.3 Final Recommendation
+
+**Adopt Option D (Hybrid Approach) with following priorities:**
+
+1. **Phase 1**: Implement core Hybrid model in SQL
+   - Add status, isLatest, isPublished fields
+   - Create comprehensive indexes
+   - Build REST API
+
+2. **Phase 2**: Integrate with existing systems
+   - Python adapter for T/Script
+   - Workflow state mapping
+   - Review score integration
+
+3. **Phase 3**: Add advanced features
+   - Change tracking/diffs
+   - Analytics dashboard
+   - Performance optimizations
+
+**Expected Outcomes:**
+- ✅ Unified version management across PrismQ
+- ✅ Full translation support
+- ✅ Integration with existing workflows
+- ✅ Scalable for future growth
+- ✅ Maintains simplicity while adding necessary features
+
+---
+
+## Appendix A: SQL Schema Reference
+
+### Complete Hybrid Model SQL
+
+```sql
+CREATE TABLE stories (
+    -- Primary identification
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NOT NULL COMMENT 'Logical story group',
+    lang_id VARCHAR(5) NOT NULL COMMENT 'ISO 639-1 language code',
+    version INT NOT NULL COMMENT 'Version number (1, 2, 3...)',
+    
+    -- Content
+    title VARCHAR(500) NOT NULL,
+    text LONGTEXT NOT NULL,
+    
+    -- Version lineage
+    previous_version_id VARCHAR(36) NULL COMMENT 'Previous version for lineage',
+    changes_summary JSON NULL COMMENT 'Structured diff summary',
+    
+    -- Workflow integration
+    status ENUM('draft', 'review', 'approved', 'published') DEFAULT 'draft',
+    workflow_state VARCHAR(100) NULL COMMENT 'PrismQ workflow state',
+    review_score INT NULL COMMENT 'Score from T/Rewiew (0-100)',
+    
+    -- Performance flags
+    is_latest BOOLEAN DEFAULT FALSE COMMENT 'Latest version for this lang',
+    is_published BOOLEAN DEFAULT FALSE COMMENT 'Currently published version',
+    
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    published_at TIMESTAMP NULL,
+    
+    -- Metadata
+    created_by VARCHAR(255) NULL COMMENT 'Creator identifier',
+    comment TEXT NULL COMMENT 'Change notes',
+    
+    -- Constraints
+    UNIQUE KEY unique_version (parent_id, lang_id, version),
+    FOREIGN KEY fk_previous (previous_version_id) REFERENCES stories(id) ON DELETE SET NULL,
+    
+    -- Indexes for performance
+    INDEX idx_parent (parent_id),
+    INDEX idx_parent_latest (parent_id, is_latest),
+    INDEX idx_parent_published (parent_id, is_published),
+    INDEX idx_lang (lang_id),
+    INDEX idx_status (status),
+    INDEX idx_created (created_at),
+    INDEX idx_updated (updated_at),
+    INDEX idx_review_score (review_score),
+    
+    -- Full-text search
+    FULLTEXT INDEX ft_content (title, text)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Story versions with translations and workflow integration';
+
+-- Triggers to maintain is_latest flag
+DELIMITER //
+
+CREATE TRIGGER story_after_insert
+AFTER INSERT ON stories
+FOR EACH ROW
+BEGIN
+    -- Mark this as latest for this parent+lang
+    UPDATE stories 
+    SET is_latest = FALSE 
+    WHERE parent_id = NEW.parent_id 
+      AND lang_id = NEW.lang_id 
+      AND id != NEW.id;
+    
+    UPDATE stories 
+    SET is_latest = TRUE 
+    WHERE id = NEW.id;
+END//
+
+DELIMITER ;
+```
+
+---
+
+## Appendix B: API Examples
+
+### REST API Usage Examples
+
+```bash
+# Create first version of a story
+curl -X POST http://api.prismq.com/stories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parentId": "story-abc-123",
+    "langId": "en",
+    "version": 1,
+    "title": "The Future of AI",
+    "text": "In this article, we explore...",
+    "createdBy": "ai-writer"
+  }'
+
+# Create Czech translation
+curl -X POST http://api.prismq.com/stories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parentId": "story-abc-123",
+    "langId": "cs",
+    "version": 1,
+    "title": "Budoucnost AI",
+    "text": "V tomto článku zkoumáme...",
+    "createdBy": "translator-ai"
+  }'
+
+# Create new version (v2) of English story
+curl -X POST http://api.prismq.com/stories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parentId": "story-abc-123",
+    "langId": "en",
+    "version": 2,
+    "title": "The Future of AI - Updated",
+    "text": "In this updated article...",
+    "previousVersionId": "story-en-v1-id",
+    "changesSummary": {"type": "content_update", "reason": "Added new examples"},
+    "createdBy": "editor",
+    "comment": "Added 2024 examples and updated statistics"
+  }'
+
+# Get latest version for English
+curl http://api.prismq.com/stories/story-abc-123/latest/en
+
+# Get all versions of a story
+curl http://api.prismq.com/stories/story-abc-123/versions
+
+# Get all available languages
+curl http://api.prismq.com/stories/story-abc-123/languages
+
+# Compare two versions
+curl http://api.prismq.com/stories/story-abc-123/compare?from=1&to=2&lang=en
+
+# Update version status
+curl -X PATCH http://api.prismq.com/stories/{id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "published",
+    "publishedAt": "2025-11-21T14:00:00Z"
+  }'
+```
+
+---
+
+## Appendix C: Integration Code Examples
+
+### Python Integration (T/Script Module)
+
+```python
+# File: T/Script/storage/story_db_adapter.py
+
+from dataclasses import dataclass
+from typing import Optional, List
+import requests
+
+@dataclass
+class StoryDBAdapter:
+    """Adapter to sync ScriptVersion with Story database"""
+    
+    api_base_url: str = "http://api.prismq.com"
+    
+    def save_script_version(
+        self,
+        script_version: 'ScriptVersion',
+        parent_id: str,
+        lang_id: str = "en",
+        status: str = "draft"
+    ) -> dict:
+        """Save a ScriptVersion to Story database"""
+        
+        # Convert ScriptVersion to Story format
+        story_data = {
+            "parentId": parent_id,
+            "langId": lang_id,
+            "version": script_version.version_number,
+            "title": self._extract_title(script_version.script_text),
+            "text": script_version.script_text,
+            "status": status,
+            "reviewScore": script_version.review_score,
+            "createdBy": script_version.created_by,
+            "comment": script_version.changes_from_previous,
+            "changesSummary": {
+                "notes": script_version.notes,
+                "length_seconds": script_version.length_seconds
+            }
+        }
+        
+        # Post to API
+        response = requests.post(
+            f"{self.api_base_url}/stories",
+            json=story_data
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def load_script_version(
+        self,
+        parent_id: str,
+        lang_id: str,
+        version: int
+    ) -> 'ScriptVersion':
+        """Load a Story from database into ScriptVersion"""
+        
+        response = requests.get(
+            f"{self.api_base_url}/stories/{parent_id}/version/{version}",
+            params={"lang": lang_id}
+        )
+        response.raise_for_status()
+        story = response.json()
+        
+        # Convert to ScriptVersion
+        return ScriptVersion(
+            version_number=story['version'],
+            script_text=story['text'],
+            length_seconds=story.get('changesSummary', {}).get('length_seconds'),
+            created_at=story['createdAt'],
+            created_by=story['createdBy'],
+            changes_from_previous=story['comment'] or '',
+            review_score=story.get('reviewScore'),
+            notes=story.get('changesSummary', {}).get('notes', '')
+        )
+    
+    def get_all_versions(
+        self,
+        parent_id: str,
+        lang_id: str = "en"
+    ) -> List['ScriptVersion']:
+        """Get all versions for a story"""
+        
+        response = requests.get(
+            f"{self.api_base_url}/stories/{parent_id}/versions",
+            params={"lang": lang_id}
+        )
+        response.raise_for_status()
+        stories = response.json()
+        
+        return [
+            self._story_to_script_version(story)
+            for story in stories
+        ]
+    
+    @staticmethod
+    def _extract_title(script_text: str) -> str:
+        """Extract title from script text (first line or first 100 chars)"""
+        lines = script_text.strip().split('\n')
+        if lines:
+            return lines[0][:100]
+        return script_text[:100]
+    
+    def _story_to_script_version(self, story: dict) -> 'ScriptVersion':
+        """Convert story dict to ScriptVersion"""
+        return ScriptVersion(
+            version_number=story['version'],
+            script_text=story['text'],
+            length_seconds=story.get('changesSummary', {}).get('length_seconds'),
+            created_at=story['createdAt'],
+            created_by=story['createdBy'],
+            changes_from_previous=story['comment'] or '',
+            review_score=story.get('reviewScore'),
+            notes=story.get('changesSummary', {}).get('notes', '')
+        )
+
+# Usage example
+adapter = StoryDBAdapter()
+
+# Save a script version
+script_v1 = ScriptVersion(
+    version_number=1,
+    script_text="The future of AI...",
+    length_seconds=145,
+    created_at="2025-11-21T10:00:00Z",
+    created_by="ai-writer",
+    changes_from_previous="Initial version",
+    review_score=75,
+    notes="First draft"
+)
+
+adapter.save_script_version(
+    script_v1,
+    parent_id="story-ai-future",
+    lang_id="en"
+)
+
+# Load back
+loaded = adapter.load_script_version(
+    parent_id="story-ai-future",
+    lang_id="en",
+    version=1
+)
+```
+
+---
+
+## Appendix D: Performance Benchmarks
+
+### Query Performance Estimates
+
+Based on table with 100,000 stories (10 versions × 5 languages average):
+
+| Query | Without Indexes | With Indexes | Notes |
+|-------|----------------|--------------|-------|
+| Get latest version | ~500ms | ~5ms | Using `is_latest=TRUE` |
+| Get all versions | ~200ms | ~10ms | Using `parent_id` index |
+| List languages | ~300ms | ~15ms | Using `DISTINCT lang_id` |
+| Full-text search | ~2s | ~50ms | Using FULLTEXT index |
+| Get by status | ~800ms | ~20ms | Using `status` index |
+| Version comparison | ~100ms | ~8ms | Using `version` index |
+
+**Storage Estimates:**
+
+```
+Average story:
+- Title: 100 chars = 100 bytes
+- Text: 5000 chars = 5 KB
+- Metadata: ~500 bytes
+- Total per version: ~5.6 KB
+
+For 1000 stories × 10 versions × 5 languages:
+= 50,000 records × 5.6 KB = 280 MB
+
+With indexes: +30% = 364 MB
+
+Acceptable for MySQL/MariaDB
+```
+
+---
+
+## Document Change Log
+
+| Date | Version | Changes | Author |
+|------|---------|---------|--------|
+| 2025-11-21 | 1.0 | Initial report creation | PrismQ Team |
+
+---
+
+**End of Report**
