@@ -1,0 +1,7 @@
+# Ignore all generated reports
+*
+
+# But track the directory structure and documentation
+!.gitignore
+!PERFORMANCE_BASELINE_REPORT.md
+!BOTTLENECK_IDENTIFICATION.md
