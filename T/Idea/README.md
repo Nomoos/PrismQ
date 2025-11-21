@@ -26,6 +26,25 @@ Gather and evaluate content inspiration from multiple sources to identify high-p
 - [Docs](./Inspiration/_meta/docs/) - Inspiration documentation
 - [Examples](./Inspiration/_meta/examples/) - Inspiration examples
 - [Tests](./Inspiration/_meta/tests/) - Inspiration tests
+### [Creation (via Model)](./Model/)
+**Initial idea formation and concept development**
+
+The first step in the Idea workflow where inspiration transforms into a concrete idea concept. This is where raw inspiration from IdeaInspiration gets shaped into a defined creative unit.
+
+- Initial idea formation
+- Concept clarification
+- Purpose definition
+- Theme identification
+- Target audience specification
+
+**Workflow Position**: `IdeaInspiration → Idea.Creation → Idea.Outline`
+
+**[→ View Model Documentation](./Model/README.md)** (Creation uses the core Model structure)
+
+**[→ View Model Metadata](./Model/_meta/)**
+- [Docs](./Model/_meta/docs/) - Model documentation
+- [Examples](./Model/_meta/examples/) - Usage examples
+- [Tests](./Model/_meta/tests/) - Model tests
 
 ---
 
@@ -142,12 +161,20 @@ Ideas serve as foundation for:
 ```
 IdeaInspiration
     ↓
-Idea Module
-    ├─ Model (data structure)
+Idea Module (Composite State)
+    ├─ Creation (idea formation) ← Starting sub-state
     ├─ Outline (organization)
+    ├─ Skeleton (basic framework)
+    ├─ Title (finalization)
+    ├─ Model (data structure)
     └─ Review (validation)
     ↓
 ScriptDraft
+```
+
+**Sub-state Flow within Idea:**
+```
+Creation → Outline → Skeleton → Title → [Exit to ScriptDraft]
 ```
 
 ## Usage Example
