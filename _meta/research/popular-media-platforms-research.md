@@ -184,7 +184,7 @@ Content creators today have access to an unprecedented array of distribution pla
 - Strong discovery through retweets
 
 **Technical Specifications:**
-- **Format**: 280 characters per tweet, unlimited thread length
+- **Format**: 280 characters per tweet (25,000 for premium users), unlimited thread length
 - **Optimal Length**: 5-15 tweets per thread
 - **Images**: Up to 4 images per tweet
 - **Video**: Up to 2 minutes 20 seconds
@@ -393,7 +393,7 @@ Content creators today have access to an unprecedented array of distribution pla
 - Amazon integration
 
 **Technical Specifications:**
-- **Format**: MP3, 192 kbps CBR, 44.1 kHz
+- **Format**: MP3, 192 kbps CBR (Constant Bit Rate), 44.1 kHz
 - **Mastering**: -23 LUFS to -18 LUFS, -3dB peak
 - **Room Tone**: Required at beginning and end
 - **Retail Audio Quality**: Professional standards
@@ -492,7 +492,7 @@ Content creators today have access to an unprecedented array of distribution pla
 **Technical Specifications:**
 - **Format**: MP4 or MOV
 - **Resolution**: 1080x1920 (vertical), 1080x1080 (square)
-- **Length**: 15 seconds to 10 minutes (3 minutes max for regular users)
+- **Length**: 15 seconds to 3 minutes (regular users), up to 10 minutes (verified accounts)
 - **File Size**: Up to 287.6MB (iOS), 72MB (Android)
 - **Aspect Ratio**: 9:16 (vertical) preferred
 
@@ -861,7 +861,7 @@ For maximum reach and efficiency, follow PrismQ's progressive enrichment model:
 ## Future Trends
 
 ### Emerging Platforms to Watch
-- **Threads** (Meta): Text-based Twitter alternative
+- **Threads** (Meta): Text-based social platform with Instagram integration
 - **Bluesky**: Decentralized social media
 - **BeReal**: Authentic social sharing
 - **Clubhouse**: Audio social networking (evolving)
@@ -890,7 +890,7 @@ The PrismQ progressive enrichment model—Text → Audio → Video—enables eff
 ---
 
 **Document Version**: 1.0
-**Last Updated**: November 2025
+**Last Updated**: November 2024
 **Author**: PrismQ Research Team
 **Related Documents**:
 - [Content Production Workflow States](./content-production-workflow-states.md)
