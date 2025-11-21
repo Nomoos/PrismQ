@@ -17,8 +17,7 @@ stateDiagram-v2
     state Idea {
         [*] --> Creation
         Creation --> Outline
-        Outline --> Skeleton
-        Skeleton --> Title
+        Outline --> Title
 
         Title --> [*]   %% Title is the final substate before exiting Idea
     }
@@ -121,11 +120,10 @@ stateDiagram-v2
 The workflow is organized into **progressive enrichment phases** where each format builds on the previous:
 
 ### Phase 1: Inspiration & Ideation
-- **[IdeaInspiration](./IdeaInspiration/)** - Content idea collection and scoring
-- **[Idea](./Idea/)** - Distilled concept with sub-states:
+- **[IdeaInspiration](./T/Idea/Inspiration/)** - Content idea collection and scoring
+- **[Idea](./T/Idea/)** - Distilled concept with sub-states:
   - **[Creation](./T/Idea/)** - Initial idea formation and concept development
   - **[Outline](./T/Idea/Outline/)** - Structured content outline
-  - **[Skeleton](./Skeleton/)** - Basic structural framework
   - **[Title](./T/Title/)** - Finalized title and metadata
 
 ### Phase 2: Script Development
@@ -230,7 +228,7 @@ The workflow follows a **progressive enrichment model**:
 
 **Text-Only Path (Fastest - Stop after text):**
 ```
-IdeaInspiration → Idea (Creation → Outline → Skeleton → Title) → ScriptDraft → 
+IdeaInspiration → Idea (Creation → Outline → Title) → ScriptDraft → 
 ScriptReview → ScriptApproved → TextPublishing → PublishedText → 
 AnalyticsReviewText → Archived
 ```
@@ -340,7 +338,7 @@ Content can be archived from any stage:
 - Support iterative refinement
 
 ### Composite States
-- **Idea** - Contains sub-states (Outline → Skeleton → Title)
+- **Idea** - Contains sub-states (Creation → Outline → Title)
 - Must complete all sub-states before exiting
 
 ### Terminal State
@@ -490,8 +488,8 @@ Track workflow health with key indicators:
 
 ## Related Documentation
 
-- **[IdeaInspiration Module](./IdeaInspiration/README.md)** - Inspiration and collection
-- **[Idea Model](./Idea/Model/README.md)** - Core data model
+- **[IdeaInspiration Module](./T/Idea/Inspiration/README.md)** - Inspiration and collection
+- **[Idea Model](./T/Idea/Model/README.md)** - Core data model
 - **[Content Production Workflow States Research](./_ meta/research/content-production-workflow-states.md)** - Detailed research
 - **[YouTube Metadata Optimization](../_meta/research/youtube-metadata-optimization-smart-strategy.md)** - Platform strategy
 
