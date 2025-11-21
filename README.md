@@ -89,6 +89,9 @@ Foundational research and strategic planning documents.
 - **[Research Documents](./_meta/research/)** - Content production research
   - [Content Production Workflow States](./_meta/research/content-production-workflow-states.md)
   - [YouTube Metadata Optimization](./_meta/research/youtube-metadata-optimization-smart-strategy.md)
+  - [Popular Media Platforms Research](./_meta/research/popular-media-platforms-research.md)
+  - [Content Platforms by Category and Age](./_meta/research/content-platforms-by-category-and-age.md)
+  - [Teen Audience Platform Strategy](./_meta/research/teen-audience-platform-strategy.md)
 - **[Proposals](./_meta/proposals/)** - Architecture and design proposals
   - [Module Reorganization](./_meta/proposals/module-reorganization.md)
 - **[Documentation](./_meta/docs/)** - Project-wide documentation
