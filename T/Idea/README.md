@@ -26,38 +26,22 @@ Gather and evaluate content inspiration from multiple sources to identify high-p
 - [Docs](./Inspiration/_meta/docs/) - Inspiration documentation
 - [Examples](./Inspiration/_meta/examples/) - Inspiration examples
 - [Tests](./Inspiration/_meta/tests/) - Inspiration tests
-### [Creation (via Model)](./Model/)
-**Initial idea formation and concept development**
-
-The first step in the Idea workflow where inspiration transforms into a concrete idea concept. This is where raw inspiration from IdeaInspiration gets shaped into a defined creative unit.
-
-- Initial idea formation
-- Concept clarification
-- Purpose definition
-- Theme identification
-- Target audience specification
-
-**Workflow Position**: `IdeaInspiration → Idea.Creation → Idea.Outline`
-
-**[→ View Model Documentation](./Model/README.md)** (Creation uses the core Model structure)
-
-**[→ View Model Metadata](./Model/_meta/)**
-- [Docs](./Model/_meta/docs/) - Model documentation
-- [Examples](./Model/_meta/examples/) - Usage examples
-- [Tests](./Model/_meta/tests/) - Model tests
 
 ---
 
 ### [Model](./Model/)
 **Core data model and structure**
 
-Defines the Idea data structure, fields, validation, and database schema.
+Defines the Idea data structure, fields, validation, and database schema. Also serves as the Creation stage where inspiration transforms into a concrete idea concept.
 
 - Data model definition
 - Field specifications and validation
 - Database integration
 - AI generation support
 - Multi-format content support
+- Initial idea formation and concept development
+
+**Workflow Position**: `Inspiration → Model (Creation) → Outline → Title`
 
 **[→ View Model Documentation](./Model/README.md)**
 
@@ -159,22 +143,20 @@ Ideas serve as foundation for:
 ## Workflow Integration
 
 ```
-IdeaInspiration
+Inspiration (Source Collection & Scoring)
     ↓
 Idea Module (Composite State)
-    ├─ Creation (idea formation) ← Starting sub-state
+    ├─ Model/Creation (idea formation) ← Starting sub-state
     ├─ Outline (organization)
-    ├─ Skeleton (basic framework)
-    ├─ Title (finalization)
-    ├─ Model (data structure)
-    └─ Review (validation)
+    ├─ Review (validation)
+    └─ Title (finalization - external to Idea module)
     ↓
 ScriptDraft
 ```
 
 **Sub-state Flow within Idea:**
 ```
-Creation → Outline → Skeleton → Title → [Exit to ScriptDraft]
+Inspiration → Model (Creation) → Outline → Review → [Exit to Title/ScriptDraft]
 ```
 
 ## Usage Example

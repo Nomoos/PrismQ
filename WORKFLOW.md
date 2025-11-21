@@ -17,8 +17,7 @@ stateDiagram-v2
     state Idea {
         [*] --> Creation
         Creation --> Outline
-        Outline --> Skeleton
-        Skeleton --> Title
+        Outline --> Title
 
         Title --> [*]   %% Title is the final substate before exiting Idea
     }
@@ -123,12 +122,8 @@ The workflow is organized into **progressive enrichment phases** where each form
 ### Phase 1: Inspiration & Ideation
 - **[IdeaInspiration](./T/Idea/Inspiration/)** - Content idea collection and scoring
 - **[Idea](./T/Idea/)** - Distilled concept with sub-states:
-  - **[Outline](./Outline/)** - Structured content outline
-- **[IdeaInspiration](./IdeaInspiration/)** - Content idea collection and scoring
-- **[Idea](./Idea/)** - Distilled concept with sub-states:
   - **[Creation](./T/Idea/)** - Initial idea formation and concept development
   - **[Outline](./T/Idea/Outline/)** - Structured content outline
-  - **[Skeleton](./Skeleton/)** - Basic structural framework
   - **[Title](./T/Title/)** - Finalized title and metadata
 
 ### Phase 2: Script Development
@@ -233,7 +228,7 @@ The workflow follows a **progressive enrichment model**:
 
 **Text-Only Path (Fastest - Stop after text):**
 ```
-IdeaInspiration → Idea (Creation → Outline → Skeleton → Title) → ScriptDraft → 
+IdeaInspiration → Idea (Creation → Outline → Title) → ScriptDraft → 
 ScriptReview → ScriptApproved → TextPublishing → PublishedText → 
 AnalyticsReviewText → Archived
 ```
@@ -343,7 +338,7 @@ Content can be archived from any stage:
 - Support iterative refinement
 
 ### Composite States
-- **Idea** - Contains sub-states (Outline → Skeleton → Title)
+- **Idea** - Contains sub-states (Creation → Outline → Title)
 - Must complete all sub-states before exiting
 
 ### Terminal State
