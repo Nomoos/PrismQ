@@ -19,23 +19,28 @@
 
 **Reference**: See `T/TITLE_SCRIPT_WORKFLOW.md` for complete workflow documentation.
 
-**MVP Simplified Path** (8 stages):
+**MVP Simplified Path** (9 stages with feedback loops):
 
 ```
 PrismQ.T.Idea.Creation          → Basic idea capture
     ↓
 PrismQ.T.Title.Draft            → Generate 3-5 title variants
     ↓
+PrismQ.T.Rewiew.Idea            → Title review ←──────────┐
+    ↓                                                      │
+    ├─→ If changes: return to Title.Draft ────────────────┘
+    ↓ (If approved)
 PrismQ.T.Script.Draft           → Generate basic script
     ↓
-PrismQ.T.Rewiew.Script          → Manual review, approve/changes requested
-    ↓
-PrismQ.T.Script.Improvements    → Edit based on feedback
-    ↓
-PrismQ.T.Title.Refinement       → Update title if needed
-    ↓
-PrismQ.T.Rewiew.Content         → Final approval gate
-    ↓
+PrismQ.T.Rewiew.Script          → Script review ←─────────┐
+    ↓                                                      │
+    ├─→ If changes: Script.Improvements ──────────────────┘
+    ↓ (If approved)
+PrismQ.T.Rewiew.Content         → Final content review ←──┐
+    ↓                                                      │
+    ├─→ Script changes: Script.Improvements → Rewiew.Script ─┘
+    ├─→ Title changes: Title.Refinement → Rewiew.Idea ───────┘
+    ↓ (If approved)
 PrismQ.T.Publishing.Finalization → Mark as published
 ```
 
@@ -48,6 +53,8 @@ TextPublishing (SEO: Keywords/Tags/Categories) → PublishedText
 
 **MVP Simplifications**:
 - Skips Idea.Outline and Idea.Skeleton (direct to Title.Draft)
+- **Adds explicit Title Review** with feedback loop (#MVP-003)
+- **Adds explicit feedback loops** at all review stages
 - Combines review stages (Script + Content vs. Grammar/Readability/Tone/Content/Consistency/Editing)
 - Basic publishing (skips comprehensive SEO optimization modules)
 - Iterative improvements instead of formal "Approved" state
@@ -55,27 +62,29 @@ TextPublishing (SEO: Keywords/Tags/Categories) → PublishedText
 **Folder Paths:**
 - `T/Idea/Creation/` - Idea creation
 - `T/Title/Draft/` - Title drafting
+- `T/Rewiew/Idea/` - **Title review** (NEW)
 - `T/Script/Draft/` - Script drafting
-- `T/Rewiew/Script/` - Script review
+- `T/Rewiew/Script/` - Script review (with feedback loop)
 - `T/Script/Improvements/` - Script improvements
-- `T/Title/Refinement/` - Title refinement
-- `T/Rewiew/Content/` - Content review
+- `T/Title/Refinement/` - Title refinement (if needed)
+- `T/Rewiew/Content/` - Content review (multi-path feedback)
 - `T/Publishing/Finalization/` - Publishing
 
 ---
 
 ## Sprint 1: Core Creation (Weeks 1-2)
 
-### Week 1: Foundation
+### Week 1: Foundation + Title Review Loop
 
-**Goal**: Idea → Title generation working  
+**Goal**: Idea → Title → Title Review (with feedback loop) working  
 **Active Workers**: 4
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
 | **Worker02** | #MVP-001 | 2d | Basic Idea Creation |
 | **Worker13** | #MVP-002 | 2d | Basic Title Generator |
-| **Worker15** | Documentation | 2d | MVP workflow docs |
+| **Worker10** | #MVP-003 | 1d | Title Review with Feedback Loop |
+| **Worker15** | Documentation | 2d | MVP workflow docs with feedback loops |
 | **Worker04** | Test Setup | 2d | Test framework |
 
 **Commands**:
@@ -93,121 +102,128 @@ Worker13: Implement #MVP-002 in T/Title/Draft/
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Generate 3-5 title variants from idea
+
+Worker10: Implement #MVP-003 in T/Rewiew/Idea/
+- Module: PrismQ.T.Rewiew.Idea
+- Dependencies: #MVP-002
+- Priority: Critical
+- Effort: 1 day
+- Deliverable: Title review with feedback loop (approve or return to Title.Draft)
 ```
 
-**Week 1 Deliverable**: ✅ Create idea → generate titles
+**Week 1 Deliverable**: ✅ Create idea → generate titles → review titles (with feedback loop)
 
 ---
 
-### Week 2: Script & Review
+### Week 2: Script & Script Review Loop
 
-**Goal**: Script generation and review system working  
+**Goal**: Script generation and script review with feedback loop working  
 **Active Workers**: 4
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
-| **Worker02** | #MVP-003 | 3d | Basic Script Generator |
-| **Worker10** | #MVP-004 | 2d | Simple Review System |
+| **Worker02** | #MVP-004 | 3d | Basic Script Generator |
+| **Worker10** | #MVP-005 | 2d | Script Review with Feedback Loop |
+| **Worker02** | #MVP-006 | 2d | Script Improvements (for loop) |
 | **Worker15** | API Docs | 2d | Document MVP APIs |
-| **Worker04** | Integration Tests | 2d | Test end-to-end flow |
+| **Worker04** | Integration Tests | 2d | Test end-to-end flow with loops |
 
 **Commands**:
 ```
-Worker02: Implement #MVP-003 in T/Script/Draft/
+Worker02: Implement #MVP-004 in T/Script/Draft/
 - Module: PrismQ.T.Script.Draft
-- Dependencies: #MVP-001, #MVP-002
+- Dependencies: #MVP-003 (approved title)
 - Priority: Critical
 - Effort: 3 days
-- Deliverable: Generate basic script from idea + selected title
+- Deliverable: Generate basic script from idea + approved title
 
-Worker10: Implement #MVP-004 in T/Rewiew/Script/
+Worker10: Implement #MVP-005 in T/Rewiew/Script/
 - Module: PrismQ.T.Rewiew.Script
-- Dependencies: #MVP-003 (can start design in parallel)
+- Dependencies: #MVP-004
 - Priority: Critical
 - Effort: 2 days
-- Deliverable: Review workflow with approve/request changes states
+- Deliverable: Script review with feedback loop (approve or send to Improvements)
+
+Worker02: Implement #MVP-006 in T/Script/Improvements/
+- Module: PrismQ.T.Script.Improvements
+- Dependencies: #MVP-005
+- Priority: Critical
+- Effort: 2 days
+- Deliverable: Script editing that returns to Rewiew.Script for re-approval
 ```
 
-**Week 2 Deliverable**: ✅ Generate script → perform review
+**Week 2 Deliverable**: ✅ Generate script → review script (with feedback loop to improvements)
 
 ---
 
 ## Sprint 2: Iteration & Publishing (Weeks 3-4)
 
-### Week 3: Improvements
+### Week 3: Final Content Review with Multi-Path Feedback
 
-**Goal**: Improvement cycle working  
+**Goal**: Final content review with feedback loops for both script and title  
 **Active Workers**: 4
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
-| **Worker02** | #MVP-005 | 2d | Manual Script Editing |
-| **Worker13** | #MVP-006 | 1d | Title Update |
-| **Worker10** | #MVP-007 | 1d | Final Review Approval |
-| **Worker04** | E2E Tests | 2d | Complete workflow tests |
+| **Worker10** | #MVP-007 | 1d | Final Content Review with Multi-Path Feedback |
+| **Worker13** | #MVP-008 | 1d | Title Refinement (if needed) |
+| **Worker04** | E2E Tests | 2d | Complete workflow tests with all loops |
 
 **Commands**:
 ```
-Worker02: Implement #MVP-005 in T/Script/Improvements/
-- Module: PrismQ.T.Script.Improvements
-- Dependencies: #MVP-004
-- Priority: Critical
-- Effort: 2 days
-- Deliverable: Edit script based on review feedback
-
-Worker13: Implement #MVP-006 in T/Title/Refinement/
-- Module: PrismQ.T.Title.Refinement
-- Dependencies: #MVP-005
-- Priority: High
-- Effort: 1 day
-- Deliverable: Update title after script changes
-
 Worker10: Implement #MVP-007 in T/Rewiew/Content/
 - Module: PrismQ.T.Rewiew.Content
-- Dependencies: #MVP-005, #MVP-006
+- Dependencies: #MVP-005 (approved script), #MVP-003 (approved title)
 - Priority: Critical
 - Effort: 1 day
-- Deliverable: Final approval gate before publishing
+- Deliverable: Final review with multi-path feedback (script → Improvements, title → Refinement, or approve → Publishing)
+
+Worker13: Implement #MVP-008 in T/Title/Refinement/
+- Module: PrismQ.T.Title.Refinement
+- Dependencies: #MVP-007
+- Priority: High
+- Effort: 1 day
+- Deliverable: Title update that returns to Rewiew.Idea then Rewiew.Content
 ```
 
-**Week 3 Deliverable**: ✅ Improvement cycle complete
+**Week 3 Deliverable**: ✅ Final content review with multi-path feedback loops working
 
 ---
 
 ### Week 4: Publishing
 
-**Goal**: End-to-end flow complete  
+**Goal**: End-to-end flow complete with all feedback loops validated  
 **Active Workers**: 3
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
-| **Worker02** | #MVP-008 | 2d | Basic Publishing |
-| **Worker15** | User Guide | 2d | Complete documentation |
-| **Worker04** | Final Testing | 2d | Validate all scenarios |
+| **Worker02** | #MVP-009 | 2d | Basic Publishing |
+| **Worker15** | User Guide | 2d | Complete documentation with feedback loops |
+| **Worker04** | Final Testing | 2d | Validate all scenarios (happy path + all feedback loops) |
 
 **Commands**:
 ```
-Worker02: Implement #MVP-008 in T/Publishing/Finalization/
+Worker02: Implement #MVP-009 in T/Publishing/Finalization/
 - Module: PrismQ.T.Publishing.Finalization
-- Dependencies: #MVP-007
+- Dependencies: #MVP-007 (final approval)
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Publish approved content (mark as published, export)
 
-Worker15: Complete user guide
+Worker15: Complete user guide with feedback loop documentation
 - Dependencies: All MVP features
 - Priority: High
 - Effort: 2 days
-- Deliverable: End-to-end user documentation
+- Deliverable: End-to-end user documentation including how to handle revisions
 
-Worker04: Final MVP testing
+Worker04: Final MVP testing of all paths
 - Dependencies: All MVP features
 - Priority: High
 - Effort: 2 days
-- Deliverable: Full E2E test suite passing
+- Deliverable: Full test suite covering happy path + all feedback loop variations
 ```
 
-**Week 4 Deliverable**: ✅ MVP complete and ready for use
+**Week 4 Deliverable**: ✅ MVP complete with full feedback loop support
 
 ---
 
@@ -217,18 +233,25 @@ Worker04: Final MVP testing
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Idea.Create | Worker02 | 2d | Basic idea capture |
 | #MVP-002 | PrismQ.T.Title.Draft | Title.Draft | Worker13 | 2d | Title generation |
-| #MVP-003 | PrismQ.T.Script.Draft | Script.Draft | Worker02 | 3d | Script generation |
-| #MVP-004 | PrismQ.T.Rewiew.Script | Review.Initial | Worker10 | 2d | Script review |
-| #MVP-005 | PrismQ.T.Script.Improvements | Script.Improvements | Worker02 | 2d | Script editing |
-| #MVP-006 | PrismQ.T.Title.Refinement | Title.Refinement | Worker13 | 1d | Title update |
-| #MVP-007 | PrismQ.T.Rewiew.Content | Review.Final | Worker10 | 1d | Final approval |
-| #MVP-008 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing |
+| #MVP-003 | PrismQ.T.Rewiew.Idea | **Title.Review** | Worker10 | 1d | **Title review with feedback loop** |
+| #MVP-004 | PrismQ.T.Script.Draft | Script.Draft | Worker02 | 3d | Script generation |
+| #MVP-005 | PrismQ.T.Rewiew.Script | **Script.Review** | Worker10 | 2d | **Script review with feedback loop** |
+| #MVP-006 | PrismQ.T.Script.Improvements | Script.Improvements | Worker02 | 2d | Script editing (for feedback loop) |
+| #MVP-007 | PrismQ.T.Rewiew.Content | **Content.Review** | Worker10 | 1d | **Final review with multi-path feedback** |
+| #MVP-008 | PrismQ.T.Title.Refinement | Title.Refinement | Worker13 | 1d | Title update (if final review requires) |
+| #MVP-009 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing |
 
-**Total**: 8 issues, 15 days of work, 4 weeks calendar time with 3-4 workers
+**Total**: 9 issues, 16 days of work, 4 weeks calendar time with 3-4 workers
+
+**Key Features**:
+- **3 Review stages** with feedback loops (Title, Script, Content)
+- **Iterative improvement** at each review stage
+- **Multi-path feedback** at final content review
 
 **Folder Paths:**
 - `T/Idea/Creation/`
 - `T/Title/Draft/`
+- `T/Rewiew/Idea/` ← **NEW: Title review**
 - `T/Script/Draft/`
 - `T/Rewiew/Script/`
 - `T/Script/Improvements/`
