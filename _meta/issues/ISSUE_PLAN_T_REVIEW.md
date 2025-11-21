@@ -9,7 +9,9 @@
 
 ## Module Overview
 
-The T.Review (note: spelled "Rewiew" in repo) module is responsible for:
+**Note**: The module directory is currently spelled "Rewiew" in the repository. This is a known typo that should be corrected in a future refactoring, but all documentation uses "Review" for clarity while acknowledging the actual directory path as T/Rewiew/.
+
+The T.Review module is responsible for:
 - Content review and editing
 - Quality assurance workflows
 - Feedback collection and management
