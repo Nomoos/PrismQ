@@ -18,6 +18,7 @@ This report analyzes the proposed Story model for managing text content versions
 - 💡 Alternative approaches better fit PrismQ's progressive enrichment model (Text → Audio → Video)
 - 🔄 Integration with existing T/Script versioning needs clarification
 - 🎯 Recommended: Multi-platform publication state tracking instead of boolean flags
+- 🔧 **State Machine (FSM/DFA) integration recommended** for workflow enforcement and audit trail
 
 ---
 
@@ -613,7 +614,520 @@ model Story {
 
 ---
 
-## 6. Technology Stack Considerations
+## 6. State Machine Integration (FSM/DFA)
+
+### 6.1 Why State Machines for Story Workflow?
+
+The Story model should incorporate **Finite State Machine (FSM)** principles to enforce PrismQ's workflow integrity. This ensures:
+
+- ✅ **Valid state transitions only** (prevent invalid jumps)
+- ✅ **Workflow enforcement** (can't publish without review)
+- ✅ **Audit trail** (complete state transition history)
+- ✅ **Rollback capability** (revert to previous states)
+- ✅ **Parallel workflows** (different states for text/audio/video)
+
+### 6.2 PrismQ Workflow State Machine
+
+Based on `WORKFLOW.md`, the complete state machine includes:
+
+```
+States (22 total):
+├── IdeaInspiration (entry)
+├── Idea (composite: Creation → Outline → Title)
+├── ScriptDraft
+├── ScriptReview
+├── ScriptApproved
+├── TextPublishing
+├── PublishedText ← First publication checkpoint
+├── AnalyticsReviewText
+├── Voiceover
+├── VoiceoverReview
+├── VoiceoverApproved
+├── AudioPublishing
+├── PublishedAudio ← Second publication checkpoint
+├── AnalyticsReviewAudio
+├── ScenePlanning
+├── KeyframePlanning
+├── KeyframeGeneration
+├── VideoAssembly
+├── VideoReview
+├── VideoFinalized
+├── PublishPlanning
+├── PublishedVideo ← Third publication checkpoint
+├── AnalyticsReviewVideo
+└── Archived (terminal)
+```
+
+**Key Characteristics:**
+- **Entry State**: IdeaInspiration
+- **Terminal State**: Archived
+- **Composite State**: Idea (has sub-states)
+- **Checkpoints**: PublishedText, PublishedAudio, PublishedVideo
+
+### 6.3 State Machine Implementation Approaches
+
+#### Approach A: Enum-Based Simple FSM
+
+**Add state field with enum validation:**
+
+```prisma
+model Story {
+  id          String   @id @default(cuid())
+  parentId    String
+  langId      String
+  version     Int
+  
+  // Content
+  title       String
+  text        String
+  
+  // State machine
+  currentState String  // Enum: IdeaInspiration, ScriptDraft, PublishedText, etc.
+  
+  // Multi-platform publication tracking
+  publishedText   DateTime?
+  publishedAudio  DateTime?
+  publishedVideo  DateTime?
+  
+  // ... other fields
+}
+```
+
+**SQL Implementation:**
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NOT NULL,
+    lang_id VARCHAR(5) NOT NULL,
+    version INT NOT NULL,
+    
+    title VARCHAR(500) NOT NULL,
+    text LONGTEXT NOT NULL,
+    
+    -- State machine
+    current_state ENUM(
+        'IdeaInspiration',
+        'Idea',
+        'ScriptDraft', 
+        'ScriptReview',
+        'ScriptApproved',
+        'TextPublishing',
+        'PublishedText',
+        'AnalyticsReviewText',
+        'Voiceover',
+        'VoiceoverReview',
+        'VoiceoverApproved',
+        'AudioPublishing',
+        'PublishedAudio',
+        'AnalyticsReviewAudio',
+        'ScenePlanning',
+        'KeyframePlanning',
+        'KeyframeGeneration',
+        'VideoAssembly',
+        'VideoReview',
+        'VideoFinalized',
+        'PublishPlanning',
+        'PublishedVideo',
+        'AnalyticsReviewVideo',
+        'Archived'
+    ) DEFAULT 'IdeaInspiration',
+    
+    -- Publication checkpoints
+    published_text TIMESTAMP NULL,
+    published_audio TIMESTAMP NULL,
+    published_video TIMESTAMP NULL,
+    
+    UNIQUE KEY unique_version (parent_id, lang_id, version),
+    INDEX idx_current_state (current_state)
+);
+```
+
+**Pros:**
+- ✅ Simple to implement
+- ✅ Database-level validation
+- ✅ Easy queries by state
+
+**Cons:**
+- ❌ No transition validation (can jump to any state)
+- ❌ No state history tracking
+- ❌ Limited to single linear workflow
+
+---
+
+#### Approach B: State History with Transition Table
+
+**Track complete state history:**
+
+```sql
+-- Main stories table
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NOT NULL,
+    lang_id VARCHAR(5) NOT NULL,
+    version INT NOT NULL,
+    
+    title VARCHAR(500) NOT NULL,
+    text LONGTEXT NOT NULL,
+    
+    -- Current state
+    current_state VARCHAR(50) NOT NULL DEFAULT 'IdeaInspiration',
+    
+    -- Publication tracking
+    published_text TIMESTAMP NULL,
+    published_audio TIMESTAMP NULL,
+    published_video TIMESTAMP NULL,
+    publication_state JSON NULL,
+    
+    UNIQUE KEY unique_version (parent_id, lang_id, version),
+    INDEX idx_current_state (current_state)
+);
+
+-- State transition history
+CREATE TABLE story_state_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    story_id VARCHAR(36) NOT NULL,
+    from_state VARCHAR(50) NOT NULL,
+    to_state VARCHAR(50) NOT NULL,
+    transitioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transitioned_by VARCHAR(255),
+    transition_reason TEXT,
+    metadata JSON COMMENT 'Additional transition data',
+    
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    INDEX idx_story (story_id),
+    INDEX idx_to_state (to_state),
+    INDEX idx_transitioned_at (transitioned_at)
+) ENGINE=InnoDB;
+
+-- Valid state transitions (FSM rules)
+CREATE TABLE story_state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_state VARCHAR(50) NOT NULL,
+    to_state VARCHAR(50) NOT NULL,
+    is_valid BOOLEAN DEFAULT TRUE,
+    requires_approval BOOLEAN DEFAULT FALSE,
+    validation_rules JSON COMMENT 'Conditions for transition',
+    
+    UNIQUE KEY unique_transition (from_state, to_state),
+    INDEX idx_from (from_state)
+) ENGINE=InnoDB;
+
+-- Populate valid transitions from WORKFLOW.md
+INSERT INTO story_state_transitions (from_state, to_state, requires_approval) VALUES
+    ('IdeaInspiration', 'Idea', FALSE),
+    ('IdeaInspiration', 'Archived', FALSE),
+    ('Idea', 'ScriptDraft', FALSE),
+    ('Idea', 'IdeaInspiration', FALSE),
+    ('Idea', 'Archived', FALSE),
+    ('ScriptDraft', 'ScriptReview', FALSE),
+    ('ScriptDraft', 'Idea', FALSE),
+    ('ScriptDraft', 'Archived', FALSE),
+    ('ScriptReview', 'ScriptApproved', TRUE),  -- Requires approval
+    ('ScriptReview', 'ScriptDraft', FALSE),
+    ('ScriptApproved', 'TextPublishing', FALSE),
+    ('TextPublishing', 'PublishedText', FALSE),
+    ('PublishedText', 'Voiceover', FALSE),
+    ('PublishedText', 'AnalyticsReviewText', FALSE),
+    ('PublishedText', 'Archived', FALSE),
+    ('Voiceover', 'VoiceoverReview', FALSE),
+    ('VoiceoverReview', 'VoiceoverApproved', TRUE),
+    ('VoiceoverApproved', 'AudioPublishing', FALSE),
+    ('AudioPublishing', 'PublishedAudio', FALSE),
+    ('PublishedAudio', 'ScenePlanning', FALSE),
+    ('PublishedAudio', 'AnalyticsReviewAudio', FALSE),
+    ('ScenePlanning', 'KeyframePlanning', FALSE),
+    ('KeyframePlanning', 'KeyframeGeneration', FALSE),
+    ('KeyframeGeneration', 'VideoAssembly', FALSE),
+    ('VideoAssembly', 'VideoReview', FALSE),
+    ('VideoReview', 'VideoFinalized', TRUE),
+    ('VideoFinalized', 'PublishPlanning', FALSE),
+    ('PublishPlanning', 'PublishedVideo', FALSE),
+    ('PublishedVideo', 'AnalyticsReviewVideo', FALSE),
+    ('AnalyticsReviewVideo', 'Archived', FALSE);
+```
+
+**State Transition Trigger:**
+
+```sql
+DELIMITER //
+
+CREATE TRIGGER story_state_transition_validate
+BEFORE UPDATE ON stories
+FOR EACH ROW
+BEGIN
+    DECLARE valid_transition INT;
+    
+    -- Check if state changed
+    IF NEW.current_state != OLD.current_state THEN
+        -- Validate transition is allowed
+        SELECT COUNT(*) INTO valid_transition
+        FROM story_state_transitions
+        WHERE from_state = OLD.current_state
+          AND to_state = NEW.current_state
+          AND is_valid = TRUE;
+        
+        IF valid_transition = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Invalid state transition';
+        END IF;
+        
+        -- Log state transition
+        INSERT INTO story_state_history (story_id, from_state, to_state, transitioned_by)
+        VALUES (NEW.id, OLD.current_state, NEW.current_state, NEW.created_by);
+    END IF;
+END//
+
+DELIMITER ;
+```
+
+**Pros:**
+- ✅ **Complete audit trail** of all state changes
+- ✅ **Enforced valid transitions** at database level
+- ✅ **Rollback capability** (view history)
+- ✅ **Metadata per transition** (who, why, when)
+- ✅ **Query state history** for analytics
+
+**Cons:**
+- ❌ More complex implementation
+- ❌ Additional tables to manage
+- ❌ Performance overhead for validation
+
+---
+
+#### Approach C: Parallel State Machines (Recommended)
+
+**Separate state machines for each content type:**
+
+```sql
+CREATE TABLE stories (
+    id VARCHAR(36) PRIMARY KEY,
+    parent_id VARCHAR(36) NOT NULL,
+    lang_id VARCHAR(5) NOT NULL,
+    version INT NOT NULL,
+    
+    title VARCHAR(500) NOT NULL,
+    text LONGTEXT NOT NULL,
+    
+    -- Parallel state machines (progressive enrichment)
+    text_state ENUM(
+        'draft', 'review', 'approved', 'publishing', 'published', 'archived'
+    ) DEFAULT 'draft',
+    
+    audio_state ENUM(
+        'not_started', 'voiceover', 'review', 'approved', 'publishing', 'published', 'archived'
+    ) DEFAULT 'not_started',
+    
+    video_state ENUM(
+        'not_started', 'planning', 'production', 'review', 'approved', 'publishing', 'published', 'archived'
+    ) DEFAULT 'not_started',
+    
+    -- Overall workflow state (computed or managed)
+    workflow_state VARCHAR(50) COMMENT 'Master state from WORKFLOW.md',
+    
+    -- Publication tracking (tied to state transitions)
+    published_text TIMESTAMP NULL COMMENT 'Set when text_state = published',
+    published_audio TIMESTAMP NULL COMMENT 'Set when audio_state = published',
+    published_video TIMESTAMP NULL COMMENT 'Set when video_state = published',
+    publication_state JSON NULL,
+    
+    UNIQUE KEY unique_version (parent_id, lang_id, version),
+    INDEX idx_text_state (text_state),
+    INDEX idx_audio_state (audio_state),
+    INDEX idx_video_state (video_state),
+    INDEX idx_workflow_state (workflow_state)
+);
+
+-- State transition history (for all three state machines)
+CREATE TABLE story_state_transitions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    story_id VARCHAR(36) NOT NULL,
+    state_type ENUM('text', 'audio', 'video', 'workflow') NOT NULL,
+    from_state VARCHAR(50) NOT NULL,
+    to_state VARCHAR(50) NOT NULL,
+    transitioned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transitioned_by VARCHAR(255),
+    metadata JSON,
+    
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    INDEX idx_story (story_id),
+    INDEX idx_state_type (state_type),
+    INDEX idx_to_state (to_state)
+);
+```
+
+**State Management Logic:**
+
+```python
+class StoryStateMachine:
+    """Manage parallel state machines for text, audio, video"""
+    
+    # Text state machine
+    TEXT_TRANSITIONS = {
+        'draft': ['review', 'archived'],
+        'review': ['approved', 'draft', 'archived'],
+        'approved': ['publishing', 'review', 'archived'],
+        'publishing': ['published', 'approved', 'archived'],
+        'published': ['archived'],
+        'archived': []
+    }
+    
+    # Audio state machine (depends on text being published)
+    AUDIO_TRANSITIONS = {
+        'not_started': ['voiceover', 'archived'],
+        'voiceover': ['review', 'archived'],
+        'review': ['approved', 'voiceover', 'archived'],
+        'approved': ['publishing', 'review', 'archived'],
+        'publishing': ['published', 'approved', 'archived'],
+        'published': ['archived'],
+        'archived': []
+    }
+    
+    # Video state machine (depends on audio being published)
+    VIDEO_TRANSITIONS = {
+        'not_started': ['planning', 'archived'],
+        'planning': ['production', 'archived'],
+        'production': ['review', 'planning', 'archived'],
+        'review': ['approved', 'production', 'archived'],
+        'approved': ['publishing', 'review', 'archived'],
+        'publishing': ['published', 'approved', 'archived'],
+        'published': ['archived'],
+        'archived': []
+    }
+    
+    def can_transition(self, state_type: str, from_state: str, to_state: str) -> bool:
+        """Check if transition is valid"""
+        transitions = {
+            'text': self.TEXT_TRANSITIONS,
+            'audio': self.AUDIO_TRANSITIONS,
+            'video': self.VIDEO_TRANSITIONS
+        }
+        return to_state in transitions[state_type].get(from_state, [])
+    
+    def can_start_audio(self, text_state: str) -> bool:
+        """Audio can only start after text is published"""
+        return text_state == 'published'
+    
+    def can_start_video(self, audio_state: str) -> bool:
+        """Video can only start after audio is published"""
+        return audio_state == 'published'
+    
+    def compute_workflow_state(self, text_state: str, audio_state: str, video_state: str) -> str:
+        """Map parallel states to master workflow state"""
+        if video_state == 'published':
+            return 'PublishedVideo'
+        elif audio_state == 'published':
+            return 'PublishedAudio'
+        elif text_state == 'published':
+            return 'PublishedText'
+        elif text_state == 'publishing':
+            return 'TextPublishing'
+        elif text_state == 'approved':
+            return 'ScriptApproved'
+        elif text_state == 'review':
+            return 'ScriptReview'
+        elif text_state == 'draft':
+            return 'ScriptDraft'
+        else:
+            return 'IdeaInspiration'
+```
+
+**Pros:**
+- ✅ **Parallel workflows** (text/audio/video independent)
+- ✅ **Progressive enrichment** naturally modeled
+- ✅ **Can publish text without audio/video**
+- ✅ **Clear dependencies** (audio needs text, video needs audio)
+- ✅ **Simpler state machines** (fewer states each)
+- ✅ **Better query performance** (separate indexes)
+
+**Cons:**
+- Need to maintain 3 state machines
+- More complex state management logic
+- Computed workflow_state needs synchronization
+
+---
+
+### 6.4 Recommended State Machine Design
+
+**Recommendation**: **Approach C (Parallel State Machines)** with state history tracking
+
+**Rationale:**
+1. **Aligns with PrismQ progressive enrichment** (Text → Audio → Video)
+2. **Each content type has independent lifecycle**
+3. **Clear publication checkpoints** (publishedText, publishedAudio, publishedVideo)
+4. **Flexible**: Can publish text-only or text+audio without video
+5. **Maintainable**: Simpler state machines easier to reason about
+
+**Implementation Priority:**
+
+**Phase 1**: Basic parallel states
+```sql
+ALTER TABLE stories ADD COLUMN text_state VARCHAR(20) DEFAULT 'draft';
+ALTER TABLE stories ADD COLUMN audio_state VARCHAR(20) DEFAULT 'not_started';
+ALTER TABLE stories ADD COLUMN video_state VARCHAR(20) DEFAULT 'not_started';
+```
+
+**Phase 2**: State transition history
+```sql
+CREATE TABLE story_state_transitions (...);
+```
+
+**Phase 3**: State validation triggers
+```sql
+CREATE TRIGGER validate_text_state_transition ...
+CREATE TRIGGER validate_audio_state_transition ...
+CREATE TRIGGER validate_video_state_transition ...
+```
+
+**Phase 4**: Application-level state machine
+```python
+# Implement StoryStateMachine class with validation
+```
+
+### 6.5 State Machine Query Examples
+
+```sql
+-- Get all stories in text review state
+SELECT * FROM stories WHERE text_state = 'review';
+
+-- Get stories published to text but not audio yet (progressive enrichment opportunity)
+SELECT * FROM stories 
+WHERE text_state = 'published' 
+  AND audio_state = 'not_started';
+
+-- Get fully enriched stories (all three formats published)
+SELECT * FROM stories
+WHERE text_state = 'published'
+  AND audio_state = 'published'
+  AND video_state = 'published';
+
+-- Get state transition history for a story
+SELECT * FROM story_state_transitions
+WHERE story_id = 'story-123'
+ORDER BY transitioned_at ASC;
+
+-- Find stories stuck in review (no transition in 7 days)
+SELECT s.*, sst.transitioned_at
+FROM stories s
+LEFT JOIN story_state_transitions sst ON s.id = sst.story_id
+WHERE s.text_state = 'review'
+  AND sst.transitioned_at < DATE_SUB(NOW(), INTERVAL 7 DAY);
+```
+
+### 6.6 State Machine Benefits for Story Model
+
+1. **Workflow Enforcement**: Cannot publish without approval
+2. **Audit Compliance**: Complete history of state changes
+3. **Analytics**: Track time in each state, bottlenecks
+4. **Rollback**: Can revert to previous states if needed
+5. **Progressive Enrichment**: Clear checkpoints for each format
+6. **Multi-Platform**: Separate tracking for blog, podcast, video
+7. **Validation**: Prevent invalid state jumps at database level
+8. **Reporting**: Dashboards showing content at each stage
+
+---
+
+## 7. Technology Stack Considerations
 
 ### 6.1 Current Stack: PHP + MySQL
 
@@ -699,9 +1213,9 @@ DELETE /api/stories/:id          # Delete version
 
 ---
 
-## 7. Migration Considerations
+## 8. Migration Considerations
 
-### 7.1 From Current System to Proposed Model
+### 8.1 From Current System to Proposed Model
 
 **Phase 1: Parallel Implementation**
 1. Add Story table to database
@@ -722,7 +1236,7 @@ DELETE /api/stories/:id          # Delete version
 
 ---
 
-### 7.2 Data Migration Script
+### 8.2 Data Migration Script
 
 ```sql
 -- Assuming existing script_versions table
@@ -742,9 +1256,9 @@ FROM legacy_script_versions;
 
 ---
 
-## 8. Recommendations
+## 9. Recommendations
 
-### 8.1 Short-Term (Quick Wins)
+### 9.1 Short-Term (Quick Wins)
 
 **Recommendation**: Implement **Option D (Hybrid Approach)** with SQL
 
@@ -760,7 +1274,7 @@ FROM legacy_script_versions;
 
 ---
 
-### 8.2 Medium-Term (Improvements)
+### 9.2 Medium-Term (Improvements)
 
 **Enhance the basic model:**
 
@@ -788,7 +1302,7 @@ FROM legacy_script_versions;
 
 ---
 
-### 8.3 Long-Term (Advanced Features)
+### 9.3 Long-Term (Advanced Features)
 
 **Consider future enhancements:**
 
@@ -816,9 +1330,9 @@ FROM legacy_script_versions;
 
 ---
 
-## 9. Conclusion
+## 10. Conclusion
 
-### 9.1 Summary
+### 10.1 Summary
 
 The proposed Story model provides a **solid foundation** for version and translation management but requires **enhancements** for production use in PrismQ.
 
@@ -831,7 +1345,7 @@ The proposed Story model provides a **solid foundation** for version and transla
 
 ---
 
-### 9.2 Decision Matrix
+### 10.2 Decision Matrix
 
 | Approach | Simplicity | Features | Performance | Storage | Recommendation |
 |----------|-----------|----------|-------------|---------|----------------|
@@ -843,28 +1357,34 @@ The proposed Story model provides a **solid foundation** for version and transla
 
 ---
 
-### 9.3 Final Recommendation
+### 10.3 Final Recommendation
 
-**Adopt Option D (Hybrid Approach) with following priorities:**
+**Adopt Option D (Hybrid Approach) with Parallel State Machines:**
 
 1. **Phase 1**: Implement core Hybrid model in SQL
    - Add status, isLatest fields
    - **Add multi-platform publication tracking** (publishedText, publishedAudio, publishedVideo)
+   - **Add parallel state machines** (text_state, audio_state, video_state)
    - Add publicationState JSON for detailed platform metadata
+   - Create state transition history table
    - Create comprehensive indexes
    - Build REST API
 
 2. **Phase 2**: Integrate with existing systems
    - Python adapter for T/Script
    - Workflow state mapping (Text → Audio → Video)
+   - **Implement state machine validation** (FSM rules enforcement)
    - Review score integration
    - **Progressive enrichment pipeline support**
+   - State transition triggers
 
 3. **Phase 3**: Add advanced features
    - Change tracking/diffs
    - Analytics dashboard per platform
+   - **State transition analytics** (time in each state, bottlenecks)
    - Performance optimizations
    - Cross-platform publishing orchestration
+   - Rollback capabilities via state history
 
 **Expected Outcomes:**
 - ✅ Unified version management across PrismQ
@@ -872,6 +1392,8 @@ The proposed Story model provides a **solid foundation** for version and transla
 - ✅ Integration with existing workflows
 - ✅ **Multi-platform publication tracking** (blog, podcast, YouTube, TikTok, Instagram)
 - ✅ **Progressive enrichment support** (Text → Audio → Video)
+- ✅ **Finite State Machine enforcement** (valid transitions only, audit trail)
+- ✅ **Parallel state tracking** (independent text/audio/video lifecycles)
 - ✅ Scalable for future growth
 - ✅ Maintains simplicity while adding necessary features
 
