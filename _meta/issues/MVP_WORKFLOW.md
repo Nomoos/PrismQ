@@ -11,9 +11,11 @@
 
 This document defines the **Minimum Viable Product (MVP)** workflow for the Text (T) pipeline, focusing on a streamlined, iterative approach to content creation.
 
+**Reference**: See `T/TITLE_SCRIPT_WORKFLOW.md` for complete detailed workflow documentation.
+
 ### MVP Workflow Sequence
 
-**Using Real Folder Names:**
+**Using Real Folder Names (Simplified for MVP):**
 
 ```
 PrismQ.T.Idea.Creation
@@ -32,6 +34,16 @@ PrismQ.T.Rewiew.Content (Final Review)
     ↓
 PrismQ.T.Publishing.Finalization
 ```
+
+**Relationship to Full Workflow:**
+
+The MVP simplifies the full workflow documented in `T/TITLE_SCRIPT_WORKFLOW.md`:
+- **Idea Composite State** (Creation → Outline → Skeleton → Title) is simplified to:
+  - MVP: Direct Creation → Title.Draft (skipping Outline & Skeleton for MVP)
+  - Post-MVP: Add Idea.Outline and Idea.Skeleton stages
+- **Script Review** uses existing `T/Rewiew` modules (Script, Content, etc.)
+- **Script Improvements** maps to iterative Script.Draft → Review cycle
+- **Publishing** uses `T/Publishing/Finalization` with SEO modules
 
 **Folder Structure:**
 - `T/Idea/Creation/` - Idea creation and capture
@@ -58,6 +70,38 @@ PrismQ.T.Publishing.Finalization
 - **MVP**: Core workflow that produces publishable content
 - **Full Features**: Advanced features added after MVP validates workflow
 - **Focus**: Speed to first published content
+
+### MVP Simplifications from Full Workflow
+
+Based on `T/TITLE_SCRIPT_WORKFLOW.md`, the MVP simplifies:
+
+1. **Idea Composite State**:
+   - Full: Idea.Creation → Idea.Outline → Idea.Skeleton → Idea.Title
+   - MVP: Idea.Creation → Title.Draft (direct path)
+   - Deferred: Idea.Outline and Idea.Skeleton stages
+
+2. **Review Stages**:
+   - Full: Multiple review modules (Grammar, Readability, Tone, Content, Consistency, Editing)
+   - MVP: Simplified review at Script and Content stages
+   - Deferred: Granular review dimensions (grammar, readability, tone separately)
+
+3. **Script Approval**:
+   - Full: ScriptDraft → ScriptReview → ScriptApproved → TextPublishing
+   - MVP: ScriptDraft → Review → Improvements → Review → Publishing
+   - Deferred: Formal "approved" state with version locking
+
+4. **Publishing Process**:
+   - Full: SEO (Keywords, Tags, Categories) + Finalization
+   - MVP: Basic finalization only
+   - Deferred: Comprehensive SEO optimization modules
+
+**Post-MVP Enhancement Path**:
+After MVP validates the basic workflow, expand with:
+- Idea.Outline creation for better structure
+- Idea.Skeleton framework development
+- Granular review modules (T/Rewiew/Grammar, Readability, Tone, etc.)
+- Formal approval states and version locking
+- Comprehensive SEO optimization (T/Publishing/SEO with Keywords, Tags, Categories)
 
 ---
 

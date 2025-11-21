@@ -17,6 +17,10 @@
 
 ### MVP Workflow with Real Folder Names
 
+**Reference**: See `T/TITLE_SCRIPT_WORKFLOW.md` for complete workflow documentation.
+
+**MVP Simplified Path** (8 stages):
+
 ```
 PrismQ.T.Idea.Creation          → Basic idea capture
     ↓
@@ -34,6 +38,19 @@ PrismQ.T.Rewiew.Content         → Final approval gate
     ↓
 PrismQ.T.Publishing.Finalization → Mark as published
 ```
+
+**Full Workflow** (from TITLE_SCRIPT_WORKFLOW.md):
+```
+Idea.Creation → Outline → Skeleton → Title → 
+ScriptDraft → ScriptReview → ScriptApproved → 
+TextPublishing (SEO: Keywords/Tags/Categories) → PublishedText
+```
+
+**MVP Simplifications**:
+- Skips Idea.Outline and Idea.Skeleton (direct to Title.Draft)
+- Combines review stages (Script + Content vs. Grammar/Readability/Tone/Content/Consistency/Editing)
+- Basic publishing (skips comprehensive SEO optimization modules)
+- Iterative improvements instead of formal "Approved" state
 
 **Folder Paths:**
 - `T/Idea/Creation/` - Idea creation
