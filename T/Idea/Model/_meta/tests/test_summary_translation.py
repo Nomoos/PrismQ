@@ -5,7 +5,10 @@ import os
 import pytest
 
 # Add parent directories to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+current_dir = os.path.dirname(__file__)
+model_dir = os.path.abspath(os.path.join(current_dir, '../..'))
+sys.path.insert(0, model_dir)
+sys.path.insert(0, os.path.join(model_dir, 'src'))
 
 from src.idea import Idea, ContentGenre, IdeaStatus
 
