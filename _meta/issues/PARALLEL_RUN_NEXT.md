@@ -1,9 +1,10 @@
 # PARALLEL_RUN_NEXT - MVP Sprint Execution (Iterative Co-Improvement)
 
-**Sprint**: Sprint 1-3 (6 weeks) - MVP Iterative Workflow  
+**Sprint**: Sprint 1-3 (7-8 weeks) - MVP Iterative Workflow  
 **Date**: 2025-11-21  
+**Updated**: 2025-11-22  
 **Status**: Planning  
-**Goal**: Build MVP with **iterative title-script co-improvement cycle** following: **Idea → Title v1 → Script v1 → Cross-Reviews → Title v2 ← Script v2 → Reviews v2 → Refinements v3 → Acceptance Gates → Readability Checks → Publish**
+**Goal**: Build MVP with **iterative title-script co-improvement cycle** following: **Idea → Title v1 → Script v1 → Cross-Reviews → Title v2 ← Script v2 → Reviews v2 → Refinements v3 → Acceptance Gates → Quality Reviews (Grammar, Tone, Content, Consistency, Editing) → Readability Checks → GPT Expert Review → Publish**
 
 ---
 
@@ -16,11 +17,11 @@
 - **Final validation**: Readability checks ensure publishing quality
 - **Trade-off**: +2 weeks (6 vs 4) for significantly better quality
 
-### Iterative Co-Improvement Workflow (16 Stages)
+### Iterative Co-Improvement Workflow (26 Stages + Loops)
 
-**Reference**: See `T/TITLE_SCRIPT_WORKFLOW.md` and `MVP_WORKFLOW.md` for complete documentation.
+**Reference**: See `MVP_WORKFLOW.md` for complete documentation.
 
-**Iterative Path** (16 stages with co-dependent improvement cycles):
+**Iterative Path** (26 stages with co-dependent improvement cycles and quality gates):
 
 ```
 1. PrismQ.T.Idea.Creation
@@ -37,48 +38,86 @@
        ↓
 7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2, script v1
        ↓
-8. PrismQ.T.Review.Title.ByScript (v2) ←──────────┐
-       ↓                                           │
-9. PrismQ.T.Title.Refinement (v3)                 │
-       ↓                                           │
-10. PrismQ.T.Review.Script.ByTitle (v2) ←─────┐   │
-        ↓                                      │   │
-11. PrismQ.T.Script.Refinement (v3)            │   │
-        ↓                                      │   │
-12. Title Acceptance Check ─NO─────────────────┘   │
-        ↓ YES                                      │
-13. Script Acceptance Check ─NO────────────────────┘
+8. PrismQ.T.Review.Title.ByScript (v2) ←──────────────────────┐
+       ↓                                                       │
+9. PrismQ.T.Title.Refinement (v3) ← Improve by review         │
+       ↓                                                       │
+10. PrismQ.T.Review.Script.ByTitle (v2) ←─────────────┐       │
+        ↓                                              │       │
+11. PrismQ.T.Script.Refinement (v3) ← Improve by review       │
+        ↓                                              │       │
+12. Check: Is Title Accepted? ─NO──────────────────────┘       │
+        ↓ YES                                                  │
+13. Check: Is Script Accepted? ─NO─────────────────────────────┘
         ↓ YES
-14. PrismQ.T.Review.Title.Readability (Voiceover) ←──────┐
-        ↓                                                │
-        ├─FAILS─→ Return to step 9 ──────────────────────┘
+        
+    ━━━━ Local AI Reviews (Stages 14-20) ━━━━
+        
+14. PrismQ.T.Review.Script.Grammar ←──────────────┐
+        ↓                                         │
+        ├─FAILS─→ Return to Script.Refinement ───┘
         ↓ PASSES
-15. PrismQ.T.Review.Script.Readability (Voiceover) ←─────┐
+15. PrismQ.T.Review.Script.Tone ←────────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+16. PrismQ.T.Review.Script.Content ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+17. PrismQ.T.Review.Script.Consistency ←─────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+18. PrismQ.T.Review.Script.Editing ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+19. PrismQ.T.Review.Title.Readability ←──────────┐
+        ↓                                         │
+        ├─FAILS─→ Return to Title.Refinement ────┘
+        ↓ PASSES
+20. PrismQ.T.Review.Script.Readability (Voiceover) ←─┐
+        ↓                                             │
+        ├─FAILS─→ Return to Script.Refinement ───────┘
+        ↓ PASSES (All Local AI Reviews Complete)
+        
+    ━━━━ GPT Expert Review Loop (Stages 21-22) ━━━━
+        
+21. PrismQ.T.Story.ExpertReview (GPT-based) ←────────────┐
         ↓                                                 │
-        ├─FAILS─→ Return to step 11 ─────────────────────┘
-        ↓ PASSES
-16. PrismQ.T.Publishing.Finalization
+        ├─ Improvements Needed ─→ 22. Story.ExpertPolish ┘
+        ↓ Ready for Publishing
+23. PrismQ.T.Publishing.Finalization
 ```
 
 **Key Innovations**:
 - **Co-dependent improvement**: Title reviewed by script context, script by title context
 - **Version tracking**: v1 (initial), v2 (first improvements), v3+ (refinements - can reach v4, v5, v6, v7, etc.)
 - **Explicit acceptance gates**: Must pass checks before proceeding (steps 12-13)
-- **Final readability validation**: Ensures publishing quality (steps 14-15)
-- **Context preservation**: Original versions kept for reference throughout
+- **Local AI quality reviews**: Grammar, Tone, Content, Consistency, Editing, Readability (steps 14-20)
+- **GPT Expert review**: Final expert-level review and polish using GPT-4/GPT-5 (steps 21-22)
+- **Context preservation**: Original versions preserved throughout
 - **Latest version principle**: All loops use the newest/latest version of title and script, not hardcoded versions
 
 **Folder Paths:**
-- `T/Idea/Creation/` - Idea creation
-- `T/Title/FromIdea/` - Title v1 drafting
-- `T/Script/FromIdeaAndTitle/` - Script v1 drafting
-- `T/Review/Idea/` - Title reviews (steps 4, 8, 12, 14)
-- `T/Review/Script/` - Script reviews (steps 5, 10, 13, 15)
+- `T/Idea/Creation/` - Idea creation (step 1)
+- `T/Title/FromIdea/` - Title v1 drafting (step 2)
+- `T/Script/FromIdeaAndTitle/` - Script v1 drafting (step 3)
+- `T/Review/Idea/` - Title reviews (steps 4, 8, 12, 19)
+- `T/Review/Script/` - Script reviews (steps 5, 10, 13, 20)
 - `T/Title/Improvements/` - Title v2 improvements (step 6)
 - `T/Script/Improvements/` - Script v2 improvements + v3 refinements (steps 7, 11)
 - `T/Title/Refinement/` - Title v3+ refinements (step 9)
-- `T/Review/Readability/` - Readability validation (steps 14-15)
-- `T/Publishing/Finalization/` - Publishing (step 16)
+- `T/Review/Grammar/` - Grammar review (step 14)
+- `T/Review/Tone/` - Tone review (step 15)
+- `T/Review/Content/` - Content review (step 16)
+- `T/Review/Consistency/` - Consistency review (step 17)
+- `T/Review/Editing/` - Editing review (step 18)
+- `T/Review/Readability/` - Readability validation (steps 19-20)
+- `T/Story/ExpertReview/` - GPT expert review (step 21)
+- `T/Story/ExpertPolish/` - GPT expert polish (step 22)
+- `T/Publishing/Finalization/` - Publishing (step 23)
 
 ---
 
@@ -244,20 +283,20 @@ Worker02: Implement #MVP-011 in T/Script/Improvements/
 
 ---
 
-## Sprint 3: Validation & Publishing (Weeks 5-6)
+## Sprint 3: Validation & Quality Reviews (Weeks 5-8)
 
-### Week 5: Acceptance Gates + Readability Checks
+### Week 5: Acceptance Gates + Quality Reviews (Part 1)
 
-**Goal**: Validate quality through acceptance gates and readability checks  
+**Goal**: Validate through acceptance gates and begin comprehensive AI quality reviews  
 **Active Workers**: 2-3
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
 | **Worker10** | #MVP-012 | 0.5d | Title Acceptance Gate |
 | **Worker10** | #MVP-013 | 0.5d | Script Acceptance Gate |
-| **Worker10** | #MVP-014 | 0.5d | Title Readability Review |
-| **Worker10** | #MVP-015 | 0.5d | Script Readability/Voiceover Review |
-| **Worker04** | E2E Tests | 3d | Test all paths including loops |
+| **Worker10** | #MVP-014 | 0.5d | Script Grammar Review |
+| **Worker10** | #MVP-015 | 0.5d | Script Tone Review |
+| **Worker10** | #MVP-016 | 0.5d | Script Content Review |
 
 **Commands**:
 ```
@@ -281,92 +320,183 @@ Worker10: Implement #MVP-013 in T/Review/Script/
   - If NOT ACCEPTED: loop back to #MVP-010 (review newest version → refine to next version)
   - **Always uses newest script version**
 
-Worker10: Implement #MVP-014 in T/Review/Readability/
-- Module: PrismQ.T.Review.Title.Readability
-- Dependencies: #MVP-013 (both must be accepted)
-- Priority: Critical
-- Effort: 0.5 days
-- Deliverable: Readability check for title (accepted version - latest)
-  - If PASSES: proceed to #MVP-015
-  - If FAILS: return to #MVP-009 (refine with readability feedback - creates next version)
-  - **Uses newest accepted title**
-
-Worker10: Implement #MVP-015 in T/Review/Readability/
-- Module: PrismQ.T.Review.Script.Readability
-- Dependencies: #MVP-014 (title readability passed)
-- Priority: Critical
-- Effort: 0.5 days
-- Deliverable: Readability/voiceover check for script (accepted version - latest)
-  - If PASSES: proceed to #MVP-016
-  - If FAILS: return to #MVP-011 (refine with readability feedback - creates next version)
-  - **Uses newest accepted script**
-
-Worker04: Complete E2E testing with all iteration paths
-- Dependencies: All MVP features
+Worker10: Implement #MVP-014 in T/Review/Grammar/
+- Module: PrismQ.T.Review.Script.Grammar
+- Dependencies: #MVP-013 (script must be accepted)
 - Priority: High
-- Effort: 3 days
-- Deliverable: Full test suite covering:
-  - Happy path (all pass first time)
-  - Title acceptance loop (fails once, then passes)
-  - Script acceptance loop (fails once, then passes)
-  - Readability loops (title fails, script fails)
-  - Multiple iterations (v4, v5, v6, v7, v8, etc. - test that version numbering works correctly)
-  - **Verify newest versions always used in loops**
+- Effort: 0.5 days
+- Deliverable: Grammar and technical correctness review
+  - Check grammar, punctuation, spelling, syntax, tense
+  - If PASSES: proceed to #MVP-015
+  - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
+
+Worker10: Implement #MVP-015 in T/Review/Tone/
+- Module: PrismQ.T.Review.Script.Tone
+- Dependencies: #MVP-014 (grammar must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Emotional and stylistic tone review
+  - Check emotional intensity, style alignment, voice consistency
+  - If PASSES: proceed to #MVP-016
+  - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
+
+Worker10: Implement #MVP-016 in T/Review/Content/
+- Module: PrismQ.T.Review.Script.Content
+- Dependencies: #MVP-015 (tone must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Narrative logic and story coherence review
+  - Check for logic gaps, plot issues, character motivation, pacing
+  - If PASSES: proceed to #MVP-017
+  - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
 ```
 
-**Week 5 Deliverable**: ✅ All acceptance gates and readability checks implemented + tested
-
-**Buffer**: Week 5 allows time for iteration loops if acceptance checks fail in testing
+**Week 5 Deliverable**: ✅ Acceptance gates passed + Grammar, Tone, Content reviews complete
 
 ---
 
-### Week 6: Publishing + Final Validation
+### Week 6: Quality Reviews (Part 2) + Readability
 
-**Goal**: End-to-end flow complete with published content  
+**Goal**: Complete remaining quality dimensions and readability validation  
+**Active Workers**: 2-3
+
+| Worker | Issue | Effort | Description |
+|--------|-------|--------|-------------|
+| **Worker10** | #MVP-017 | 0.5d | Script Consistency Review |
+| **Worker10** | #MVP-018 | 0.5d | Script Editing Review |
+| **Worker10** | #MVP-019 | 0.5d | Title Readability Review |
+| **Worker10** | #MVP-020 | 0.5d | Script Readability/Voiceover Review |
+| **Worker04** | Quality Tests | 2d | Test all quality review paths |
+
+**Commands**:
+```
+Worker10: Implement #MVP-017 in T/Review/Consistency/
+- Module: PrismQ.T.Review.Script.Consistency
+- Dependencies: #MVP-016 (content must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Internal continuity and logic review
+  - Check character names, timeline, locations, repeated details
+  - If PASSES: proceed to #MVP-018
+  - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
+
+Worker10: Implement #MVP-018 in T/Review/Editing/
+- Module: PrismQ.T.Review.Script.Editing
+- Dependencies: #MVP-017 (consistency must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Clarity, flow, and readability polish
+  - Sentence rewrites, structural fixes, redundancy removal
+  - If PASSES: proceed to #MVP-019
+  - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
+
+Worker10: Implement #MVP-019 in T/Review/Readability/
+- Module: PrismQ.T.Review.Title.Readability
+- Dependencies: #MVP-018 (editing must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Title readability/voiceover validation
+  - Check clarity, length, engagement
+  - If PASSES: proceed to #MVP-020
+  - If FAILS: return to Title.FromReadabilityReviewAndPreviousTitle with feedback
+
+Worker10: Implement #MVP-020 in T/Review/Readability/
+- Module: PrismQ.T.Review.Script.Readability
+- Dependencies: #MVP-019 (title readability must pass)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Script readability/voiceover validation
+  - Check natural flow, pronunciation, pacing for voiceover
+  - If PASSES: proceed to #MVP-021 (GPT Expert Review)
+  - If FAILS: return to Script.FromOriginalScriptAndReviewAndTitle with feedback
+
+Worker04: Quality review path testing
+- Dependencies: #MVP-017 through #MVP-020
+- Priority: High
+- Effort: 2 days
+- Deliverable: Test all quality review scenarios:
+  - Consistency, Editing, Readability reviews
+  - Individual review failures and recovery
+  - Multiple failures in sequence
+  - Loop back to refinement and re-review
+```
+
+**Week 6 Deliverable**: ✅ All local AI quality reviews + readability checks passing
+
+**Buffer**: Allow time for iteration loops if quality/readability checks fail
+
+---
+
+### Week 7-8: GPT Expert Review + Publishing
+
+**Goal**: GPT expert review loop and final publishing  
 **Active Workers**: 3
 
 | Worker | Issue | Effort | Description |
 |--------|-------|--------|-------------|
-| **Worker02** | #MVP-016 | 2d | Publishing |
-| **Worker15** | User Guide | 2d | Complete documentation with iteration examples |
-| **Worker04** | Final Validation | 2d | Validate all scenarios work correctly |
+| **Worker10** | #MVP-021 | 0.5d | GPT Expert Story Review |
+| **Worker10** | #MVP-022 | 0.5d | GPT Expert Story Polish |
+| **Worker02** | #MVP-023 | 2d | Publishing |
+| **Worker04** | E2E Tests | 2d | Test complete workflow paths |
+| **Worker15** | Documentation | 2d | Complete user guide with all stages |
 
 **Commands**:
 ```
-Worker02: Implement #MVP-016 in T/Publishing/Finalization/
+Worker10: Implement #MVP-021 in T/Story/ExpertReview/
+- Module: PrismQ.T.Story.ExpertReview
+- Dependencies: #MVP-020 (all local AI reviews passed)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: GPT-based expert review of complete story
+  - Holistic assessment using GPT-4/GPT-5
+  - Generate structured feedback (JSON format)
+  - If READY: proceed to #MVP-023 (Publishing)
+  - If IMPROVEMENTS NEEDED: proceed to #MVP-022 (Expert Polish)
+
+Worker10: Implement #MVP-022 in T/Story/ExpertPolish/
+- Module: PrismQ.T.Story.ExpertPolish
+- Dependencies: #MVP-021 (expert review with improvements needed)
+- Priority: High
+- Effort: 0.5 days
+- Deliverable: Apply GPT-based expert improvements
+  - Surgical changes for maximum impact
+  - Return to #MVP-021 for verification (max 2 iterations)
+
+Worker02: Implement #MVP-023 in T/Publishing/Finalization/
 - Module: PrismQ.T.Publishing.Finalization
-- Dependencies: #MVP-015 (all checks passed)
+- Dependencies: #MVP-021 (expert review ready) or #MVP-020 (if skipping expert review)
 - Priority: Critical
 - Effort: 2 days
-- Deliverable: Publish approved + validated content
+- Deliverable: Publish approved and validated content
   - Mark as "published"
   - Export to output format
   - Store published version with all versions tracked
 
-Worker15: Complete user guide with iteration loop documentation
+Worker04: Complete E2E testing with all paths
+- Dependencies: All MVP features
+- Priority: High
+- Effort: 2 days
+- Deliverable: Full test suite covering:
+  - Happy path (all pass first time)
+  - Title/script acceptance loops
+  - Quality review failures and recoveries
+  - Readability loops
+  - GPT expert review loop
+  - Multiple iterations through complete workflow
+
+Worker15: Complete user guide with all stages
 - Dependencies: All MVP features
 - Priority: High
 - Effort: 2 days
 - Deliverable: Complete documentation including:
-  - How to handle review feedback
-  - How iteration loops work
-  - Examples of acceptance gate failures
-  - How to trigger readability re-checks
+  - All 26 workflow stages explained
+  - Quality review criteria and feedback handling
+  - GPT expert review process
+  - Iteration loop examples
   - Version tracking explanation (v1, v2, v3, v4, v5, v6, v7, etc.)
-  - **Important**: Clarify that loops always use newest versions, not hardcoded v3
-
-Worker04: Final MVP validation of all paths
-- Dependencies: All MVP features
-- Priority: High
-- Effort: 2 days
-- Deliverable: Validate that:
-  - Happy path works (no loops)
-  - All loop paths work (acceptance gates, readability)
-  - Version tracking works correctly
-  - Published content includes correct final versions
 ```
 
-**Week 6 Deliverable**: ✅ Complete MVP with iterative co-improvement workflow fully functional
+**Week 7-8 Deliverable**: ✅ Complete MVP with 26-stage iterative co-improvement workflow fully functional
 
 ---
 
@@ -387,17 +517,28 @@ Worker04: Final MVP validation of all paths
 | #MVP-011 | PrismQ.T.Script.Refinement | Script v3+ | Worker02 | 2d | Refine script to v3, v4, v5, v6, v7, etc. (newest version) |
 | #MVP-012 | PrismQ.T.Review.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title (latest version) is accepted (loop if not) |
 | #MVP-013 | PrismQ.T.Review.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script (latest version) is accepted (loop if not) |
-| #MVP-014 | PrismQ.T.Review.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability/voiceover validation |
-| #MVP-015 | PrismQ.T.Review.Script.Readability | **Readability Check** | Worker10 | 0.5d | Final script readability/voiceover validation |
-| #MVP-016 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing approved + validated content |
+| #MVP-014 | PrismQ.T.Review.Script.Grammar | **Grammar Review** | Worker10 | 0.5d | Verify grammar and technical correctness |
+| #MVP-015 | PrismQ.T.Review.Script.Tone | **Tone Review** | Worker10 | 0.5d | Verify emotional and stylistic tone |
+| #MVP-016 | PrismQ.T.Review.Script.Content | **Content Review** | Worker10 | 0.5d | Verify narrative logic and coherence |
+| #MVP-017 | PrismQ.T.Review.Script.Consistency | **Consistency Review** | Worker10 | 0.5d | Verify internal continuity |
+| #MVP-018 | PrismQ.T.Review.Script.Editing | **Editing Review** | Worker10 | 0.5d | Polish clarity and flow |
+| #MVP-019 | PrismQ.T.Review.Title.Readability | **Title Readability** | Worker10 | 0.5d | Final title readability/voiceover validation |
+| #MVP-020 | PrismQ.T.Review.Script.Readability | **Script Readability** | Worker10 | 0.5d | Final script readability/voiceover validation |
+| #MVP-021 | PrismQ.T.Story.ExpertReview | **GPT Expert Review** | Worker10 | 0.5d | GPT-based expert story review |
+| #MVP-022 | PrismQ.T.Story.ExpertPolish | **GPT Expert Polish** | Worker10 | 0.5d | Apply GPT-based expert improvements |
+| #MVP-023 | PrismQ.T.Publishing.Finalization | **Publish** | Worker02 | 2d | Publishing approved + validated content |
 
-**Total**: 16 issues, 20 days of work, 6 weeks calendar time with 3-4 workers
+**Total**: 23 issues, 24 days of work, 7-8 weeks calendar time with 3-4 workers
 
 **Key Features**:
 - **Co-dependent improvement**: Title and script reviewed against each other (steps 4-5, 8, 10)
 - **Version tracking**: v1 (initial), v2 (improved), v3+ (refined - can reach v4, v5, v6, v7, etc.)
 - **Explicit acceptance gates**: Must pass before proceeding (steps 12-13)
-- **Final readability validation**: Ensures publishing quality (steps 14-15)
+- **Local AI quality reviews**: Grammar, Tone, Content, Consistency, Editing (steps 14-18)
+- **Final readability validation**: Ensures publishing quality (steps 19-20)
+- **GPT expert review**: Holistic expert-level assessment and polish (steps 21-22)
+- **Iteration loops**: Return to refinement if any check fails
+- **Latest version principle**: All loops always use the newest version
 - **Iteration loops**: Return to refinement if acceptance/readability fails
 - **Latest version principle**: All loops always use the newest/latest version of title and script
 
@@ -405,17 +546,24 @@ Worker04: Final MVP validation of all paths
 - `T/Idea/Creation/` (step 1)
 - `T/Title/FromIdea/` (step 2)
 - `T/Script/FromIdeaAndTitle/` (step 3)
-- `T/Review/Idea/` (steps 4, 8, 12, 14)
-- `T/Review/Script/` (steps 5, 10, 13, 15)
+- `T/Review/Idea/` (steps 4, 8, 12, 19)
+- `T/Review/Script/` (steps 5, 10, 13, 20)
 - `T/Title/Improvements/` (step 6)
 - `T/Script/Improvements/` (steps 7, 11)
 - `T/Title/Refinement/` (step 9)
-- `T/Review/Readability/` (steps 14-15)
-- `T/Publishing/Finalization/` (step 16)
+- `T/Review/Grammar/` (step 14)
+- `T/Review/Tone/` (step 15)
+- `T/Review/Content/` (step 16)
+- `T/Review/Consistency/` (step 17)
+- `T/Review/Editing/` (step 18)
+- `T/Review/Readability/` (steps 19-20)
+- `T/Story/ExpertReview/` (step 21)
+- `T/Story/ExpertPolish/` (step 22)
+- `T/Publishing/Finalization/` (step 23)
 
 ---
 
-## Workflow State Machine (Iterative Co-Improvement)
+## Workflow State Machine (Enhanced Iterative Co-Improvement)
 
 ```
 [*] --> IdeaCreation
@@ -433,19 +581,34 @@ ScriptRefinement_v3 --> TitleAcceptance: Step 11-12
 TitleAcceptance --> TitleReview_v2: NOT ACCEPTED (loop to step 8)
 TitleAcceptance --> ScriptAcceptance: ACCEPTED (step 12-13)
 ScriptAcceptance --> ScriptReview_v2: NOT ACCEPTED (loop to step 10)
-ScriptAcceptance --> TitleReadability: ACCEPTED (step 13-14)
+ScriptAcceptance --> GrammarReview: ACCEPTED (step 13-14)
+GrammarReview --> ScriptRefinement_v3: FAILS (loop to step 11)
+GrammarReview --> ToneReview: PASSES (step 14-15)
+ToneReview --> ScriptRefinement_v3: FAILS (loop to step 11)
+ToneReview --> ContentReview: PASSES (step 15-16)
+ContentReview --> ScriptRefinement_v3: FAILS (loop to step 11)
+ContentReview --> ConsistencyReview: PASSES (step 16-17)
+ConsistencyReview --> ScriptRefinement_v3: FAILS (loop to step 11)
+ConsistencyReview --> EditingReview: PASSES (step 17-18)
+EditingReview --> ScriptRefinement_v3: FAILS (loop to step 11)
+EditingReview --> TitleReadability: PASSES (step 18-19)
 TitleReadability --> TitleRefinement_v3: FAILS (loop to step 9)
-TitleReadability --> ScriptReadability: PASSES (step 14-15)
+TitleReadability --> ScriptReadability: PASSES (step 19-20)
 ScriptReadability --> ScriptRefinement_v3: FAILS (loop to step 11)
-ScriptReadability --> Publishing: PASSES (step 15-16)
+ScriptReadability --> ExpertReview: PASSES (step 20-21)
+ExpertReview --> ExpertPolish: IMPROVEMENTS NEEDED (step 21-22)
+ExpertPolish --> ExpertReview: POLISHED (re-check at step 21, max 2 iterations)
+ExpertReview --> Publishing: READY (step 21-23)
 Publishing --> [*]
 ```
 
 **Loop Paths**:
 - **Title Acceptance Loop**: Steps 12 → 8 → 9 → 10 → 11 → 12 (until accepted) - versions increment: v3 → v4 → v5 → v6 → v7, etc.
 - **Script Acceptance Loop**: Steps 13 → 10 → 11 → 13 (until accepted) - versions increment: v3 → v4 → v5 → v6 → v7, etc.
-- **Title Readability Loop**: Steps 14 → 9 → ... → 14 (until passes) - creates next version each time
-- **Script Readability Loop**: Steps 15 → 11 → ... → 15 (until passes) - creates next version each time
+- **Quality Review Loops**: Steps 14-18 → 11 (script refinement) → re-test quality review (until passes)
+- **Title Readability Loop**: Steps 19 → 9 (title refinement) → ... → 19 (until passes)
+- **Script Readability Loop**: Steps 20 → 11 (script refinement) → ... → 20 (until passes)
+- **GPT Expert Loop**: Steps 21 → 22 (polish) → 21 (re-check, max 2 iterations)
 - **Important**: All loops use the newest/latest version of title and script, not hardcoded versions
 
 ---
@@ -453,17 +616,19 @@ Publishing --> [*]
 ## Success Metrics
 
 ### MVP Completion Criteria
-- ✅ All 16 MVP issues implemented
+- ✅ All 23 MVP issues implemented
 - ✅ End-to-end workflow tested with all iteration paths
 - ✅ At least one content piece published through full workflow
-- ✅ All loop scenarios validated (acceptance gates + readability)
-- ✅ Documentation complete with iteration examples
+- ✅ All loop scenarios validated (acceptance gates + quality reviews + readability + GPT expert)
+- ✅ Documentation complete with all 26 stages and iteration examples
 
 ### Quality Standards
 - **Cross-validation**: Title and script reviewed against each other at each stage
 - **Iterative refinement**: Multiple improvement cycles ensure high quality
 - **Explicit gates**: Acceptance checks ensure standards met before proceeding
-- **Final validation**: Readability checks ensure publishing-ready quality
+- **Local AI quality reviews**: Grammar, Tone, Content, Consistency, Editing validated (steps 14-18)
+- **Final validation**: Title and script readability checks ensure publishing-ready quality (steps 19-20)
+- **GPT expert review**: Holistic expert-level assessment and polish using GPT-4/GPT-5 (steps 21-22)
 - **Version tracking**: All versions (v1, v2, v3+) tracked and preserved
 - **Test coverage**: >85% for MVP features including all loop paths
 
@@ -471,20 +636,22 @@ Publishing --> [*]
 
 ## Comparison: Simple vs Iterative Workflow
 
-| Aspect | Simple (9 issues, 4 weeks) | **Iterative (16 issues, 6 weeks)** |
-|--------|----------------------------|-------------------------------------|
-| **Issues** | 9 | **16** |
-| **Timeline** | 4 weeks | **6 weeks** |
+| Aspect | Simple (9 issues, 4 weeks) | **Enhanced Iterative (23 issues, 7-8 weeks)** |
+|--------|----------------------------|------------------------------------------------|
+| **Issues** | 9 | **23** |
+| **Timeline** | 4 weeks | **7-8 weeks** |
 | **Workers** | 3-4 | 3-4 |
 | **Reviews** | Single pass per stage | **Multi-pass cross-validation** |
-| **Quality** | Basic | **High (co-improvement)** |
+| **Quality** | Basic | **Highest (co-improvement + AI + GPT expert)** |
 | **Acceptance** | Implied | **Explicit gates (steps 12-13)** |
-| **Readability** | None | **Final validation (steps 14-15)** |
+| **Quality Reviews** | None | **5 AI dimensions (Grammar, Tone, Content, Consistency, Editing)** |
+| **Readability** | None | **Final validation (steps 19-20)** |
+| **Expert Review** | None | **GPT-4/GPT-5 expert review + polish (steps 21-22)** |
 | **Versions** | v1, v2 | **v1, v2, v3, v4+** |
 | **Context** | Isolated reviews | **Cross-validated (title ↔ script)** |
-| **Loops** | Simple feedback | **4 loop types (acceptance + readability)** |
+| **Loops** | Simple feedback | **7 loop types (acceptance + 5 quality + readability + expert)** |
 
-**Trade-off**: +2 weeks (+50%) for significantly higher quality through iterative co-improvement with explicit validation gates.
+**Trade-off**: +3-4 weeks (+75-100%) for significantly higher quality through iterative co-improvement with explicit validation gates, comprehensive AI quality reviews, and GPT expert assessment.
 
 ---
 
@@ -508,7 +675,7 @@ See `ISSUE_PLAN_T_*.md` files for full feature plans (120 issues total) to be ad
 
 ## Related Documents
 
-- **MVP_WORKFLOW.md**: Detailed MVP planning with all 16 issues specifications and iteration loops
+- **MVP_WORKFLOW.md**: Detailed MVP planning with all 26 stages (23 issues) specifications and iteration loops
 - **MVP_WORKFLOW_SIMPLE.md**: Original simple 9-issue workflow (backup reference)
 - **PARALLEL_RUN_NEXT_FULL.md**: Full 120-issue plan for post-MVP
 - **ISSUE_PLAN_T_*.md**: Comprehensive feature plans for each module
@@ -517,15 +684,15 @@ See `ISSUE_PLAN_T_*.md` files for full feature plans (120 issues total) to be ad
 ---
 
 **Status**: Ready for MVP Sprint 1  
-**Next Action**: Worker01 to create 16 MVP issues in GitHub with iteration loop specifications  
-**Timeline**: 6 weeks to high-quality MVP with iterative co-improvement  
-**Approach**: Quality-focused iterative development with explicit validation gates
+**Next Action**: Worker01 to create 23 MVP issues in GitHub with complete specifications including quality review and GPT expert stages  
+**Timeline**: 7-8 weeks to highest-quality MVP with iterative co-improvement, AI quality reviews, and GPT expert assessment  
+**Approach**: Quality-focused iterative development with explicit validation gates and comprehensive review layers
 
-**Key Innovation**: Title and script improvements are co-dependent and cross-validated at each iteration, ensuring coherent high-quality output.
+**Key Innovation**: Title and script improvements are co-dependent and cross-validated at each iteration, with comprehensive AI quality reviews (Grammar, Tone, Content, Consistency, Editing), final readability validation, and GPT expert review ensuring coherent highest-quality output.
 
 ---
 
 **Owner**: Worker01  
 **Created**: 2025-11-21  
-**Last Updated**: 2025-11-21  
-**Focus**: Iterative co-improvement workflow: Idea → Title v1 ← Script v1 → Cross-Reviews → v2 Improvements → v3 Refinements → Acceptance Gates → Readability Validation → Publish
+**Last Updated**: 2025-11-22  
+**Focus**: Enhanced iterative co-improvement workflow: Idea → Title v1 ← Script v1 → Cross-Reviews → v2 Improvements → v3 Refinements → Acceptance Gates → AI Quality Reviews → Readability Validation → GPT Expert Review → Publish
