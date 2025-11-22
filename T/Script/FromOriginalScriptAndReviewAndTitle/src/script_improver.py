@@ -9,24 +9,29 @@ This module implements the script improvement logic for MVP-007 (Stage 7):
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, TYPE_CHECKING
 from datetime import datetime
 from enum import Enum
 import sys
 import os
+from pathlib import Path
 
 # Add parent directories to path for imports
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-script_v1_path = os.path.join(parent_dir, 'Script', 'FromIdeaAndTitle', 'src')
-review_script_path = os.path.join(parent_dir, 'Review', 'Script')
-sys.path.insert(0, script_v1_path)
-sys.path.insert(0, review_script_path)
+parent_dir = Path(__file__).parents[3]
+script_v1_path = parent_dir / 'Script' / 'FromIdeaAndTitle' / 'src'
+review_script_path = parent_dir / 'Review' / 'Script'
+sys.path.insert(0, str(script_v1_path))
+sys.path.insert(0, str(review_script_path))
 
+# Import dependencies if available
+# Note: These imports may fail in test environments where mock objects are used
+# The code is designed to work with any compatible object implementing the expected interface
 try:
     from script_generator import ScriptV1, ScriptSection, ScriptStructure, PlatformTarget, ScriptTone
     from script_review import ScriptReview, ReviewCategory, ImprovementPoint
 except ImportError:
-    # Fallback for testing or development
+    # Dependencies not available - will use duck typing
+    # Objects passed to this module should implement the expected interface
     pass
 
 
@@ -35,16 +40,16 @@ class ReviewFeedback:
     """Container for review feedback from multiple sources.
     
     Attributes:
-        script_review: Review of the script by title
-        title_review: Review of the title by script (contains insights for script)
+        script_review: Review of the script by title (ScriptReview object or compatible)
+        title_review: Review of the title by script (TitleReview object or compatible)
         review_type: Type of review (general, grammar, tone, etc.)
         priority_issues: List of high-priority issues to address
         suggestions: List of improvement suggestions
         metadata: Additional context
     """
     
-    script_review: Optional[Any] = None  # ScriptReview object
-    title_review: Optional[Any] = None  # TitleReview object
+    script_review: Optional[Any] = None  # Type: ScriptReview (imported if available)
+    title_review: Optional[Any] = None  # Type: TitleReview (imported if available)
     review_type: str = "general"
     priority_issues: List[str] = field(default_factory=list)
     suggestions: List[str] = field(default_factory=list)
@@ -212,7 +217,8 @@ class ScriptImprover:
             script_id = self._generate_script_id(original_script, title_v2)
         
         # Calculate new version number
-        new_version = original_script.version + 1
+        original_version = getattr(original_script, 'version', 1)
+        new_version = original_version + 1
         
         # Analyze review feedback
         analysis = self._analyze_review_feedback(review_feedback, original_script, title_v2)
@@ -258,8 +264,8 @@ class ScriptImprover:
             review_feedback_addressed=analysis.get('addressed_issues', []),
             title_alignment_notes=title_alignment_notes,
             metadata={
-                "original_script_id": original_script.script_id,
-                "original_version": original_script.version,
+                "original_script_id": getattr(original_script, 'script_id', 'unknown'),
+                "original_version": original_version,
                 "title_v2": title_v2,
                 "review_type": review_feedback.review_type,
                 "improvement_config": {
@@ -268,7 +274,7 @@ class ScriptImprover:
                     "address_critical": config.address_all_critical_issues
                 }
             },
-            notes=f"Generated v{new_version} from v{original_script.version} using {review_feedback.review_type} reviews and title '{title_v2}'"
+            notes=f"Generated v{new_version} from v{original_version} using {review_feedback.review_type} reviews and title '{title_v2}'"
         )
         
         return script_v2
@@ -285,11 +291,19 @@ class ScriptImprover:
         )
         return config
     
-    def _generate_script_id(self, original_script: ScriptV1, title_v2: str) -> str:
-        """Generate a unique script ID."""
+    def _generate_script_id(self, original_script, title_v2: str) -> str:
+        """Generate a unique script ID.
+        
+        Args:
+            original_script: Original script (ScriptV1 or compatible)
+            title_v2: New title
+            
+        Returns:
+            Unique script ID string
+        """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        version = original_script.version + 1
-        idea_id = original_script.idea_id
+        version = getattr(original_script, 'version', 1) + 1
+        idea_id = getattr(original_script, 'idea_id', 'unknown')
         return f"script_v{version}_{idea_id}_{timestamp}"
     
     def _analyze_review_feedback(
