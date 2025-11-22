@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prismq-t-review-title-byscriptandidea"
+version = "0.1.0"
+description = "PrismQ Title Review Module - AI-powered title evaluation against script and idea"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "PrismQ Team"}
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["_meta/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "_meta/tests/*",
+    "_meta/examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
