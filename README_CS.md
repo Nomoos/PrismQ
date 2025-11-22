@@ -4,6 +4,12 @@
 
 PrismQ je komplexní platforma pro tvorbu obsahu, která transformuje nápady do víceformátového obsahu prostřednictvím sekvenčního obohacovacího workflow. Každý formát staví na předchozím a umožňuje postupnou publikaci napříč textovými, audio a video platformami.
 
+## 🔄 Další kroky a paralelní spouštění
+
+Pro aktuální úkoly sprintu a příkazy pro paralelní spouštění viz:
+- **[PARALLEL_RUN_NEXT_CS.md](./_meta/issues/PARALLEL_RUN_NEXT_CS.md)** - Aktuální úkoly MVP sprintu a plán paralelního spouštění
+- **[PARALLEL_RUN_NEXT_FULL_CS.md](./_meta/issues/PARALLEL_RUN_NEXT_FULL_CS.md)** - Kompletní rozpad problémů a přiřazení workerů
+
 ## 📚 Hlavní moduly
 
 ### [T - Pipeline pro generování textu](./T/README.md)
@@ -102,7 +108,7 @@ Základní výzkumné a strategické plánovací dokumenty.
   - [Struktura modulů](./_meta/docs/MODULE_STRUCTURE.md)
 
 ### Dokumentace workflow
-- **[WORKFLOW.md](./WORKFLOW.md)** - Kompletní dokumentace stavového automatu
+- **[WORKFLOW_CS.md](./WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
   - Fáze workflow a přechody stavů
   - Model postupného obohacování
   - Kvalitní kontrolní body a osvědčené postupy
@@ -257,4 +263,4 @@ Proprietární - Všechna práva vyhrazena - Copyright (c) 2025 PrismQ
 
 ---
 
-**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./WORKFLOW.md)
+**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./WORKFLOW_CS.md)
