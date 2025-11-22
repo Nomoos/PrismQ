@@ -20,6 +20,12 @@ from .by_title_and_idea import (
 from . import ByTitle
 from . import Grammar
 
+# Import Acceptance module (MVP-013)
+from .Acceptance import (
+    check_script_acceptance,
+    ScriptAcceptanceResult
+)
+
 __all__ = [
     "ScriptReview",
     "ScriptVersion",
@@ -31,4 +37,6 @@ __all__ = [
     "AlignmentScore",
     "ByTitle",
     "Grammar"
+    "check_script_acceptance",
+    "ScriptAcceptanceResult"
 ]

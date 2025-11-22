@@ -1,12 +1,16 @@
-# PrismQ.T.Review.Script.ByTitle - MVP-005
+# PrismQ.T.Review.Script.ByTitle - MVP-005 & MVP-010
 
 **Module**: `PrismQ.T.Review.Script.ByTitle`  
 **Status**: ✅ Complete and Production Ready  
-**Version**: 1.0.0
+**Version**: 2.0.0
 
 ## Overview
 
-This module implements MVP-005: Script review against title v1 and idea. It provides comprehensive evaluation of how well a script aligns with its title and the core idea it's based on, generating structured feedback with JSON output format.
+This module implements:
+- **MVP-005**: Script review against title v1 and idea (Stage 5)
+- **MVP-010**: Script review v2 against title v3 with improvement tracking (Stage 10)
+
+It provides comprehensive evaluation of how well a script aligns with its title and the core idea it's based on, generating structured feedback with JSON output format. The v2 functionality adds improvement tracking and comparison capabilities for iterative refinement cycles.
 
 ## Purpose
 
@@ -16,14 +20,22 @@ The ByTitle review module evaluates scripts against their titles and ideas, ensu
 - **Content Quality** - Engagement, pacing, clarity, structure, and impact
 - **Gap Identification** - Identifies specific gaps between script and title promise
 - **Actionable Feedback** - Provides prioritized improvement suggestions
+- **Version Tracking** - Compares improvements across versions (v2+ only)
+- **Regression Detection** - Identifies quality decreases (v2+ only)
 
 ## Workflow Position
 
+### v1 Review (MVP-005, Stage 5)
 ```
-Idea + Title v1 → Script v1 → ByTitle Review → Feedback/Approval → Script v2
+Idea + Title v1 → Script v1 → ByTitle Review v1 → Feedback → Script v2
 ```
 
-This module bridges MVP-003 (Title generation from Idea) and script refinement stages.
+### v2 Review (MVP-010, Stage 10)
+```
+Script v2 + Title v3 + v1 Review → ByTitle Review v2 → Comparison → Script v3
+```
+
+This module bridges title generation and script refinement stages, supporting the iterative co-improvement workflow.
 
 ## Key Features
 
@@ -70,13 +82,20 @@ Weighted calculation:
 - Idea alignment: 30%
 - Content quality: 45%
 
+### 7. Version Tracking (v2+)
+- Comparison with previous review
+- Improvement and regression detection
+- Delta calculations for all metrics
+- Automated feedback on changes
+- Integration with iterative refinement workflow
+
 ## Installation
 
 No additional dependencies required. Uses only Python standard library and existing PrismQ modules.
 
 ## Usage
 
-### Basic Example
+### v1 Review - Basic Example
 
 ```python
 from T.Review.Script.ByTitle import review_script_by_title
@@ -99,7 +118,7 @@ At first, I thought it was just static, but then I recognized the voice.
 It was mine. But the words... they were warning me about tomorrow.
 """
 
-# Review the script
+# Review the script (v1)
 review = review_script_by_title(
     script_text=script,
     title=title,
@@ -120,6 +139,54 @@ for point in review.improvement_points:
     print(f"  Fix: {point.suggested_fix}")
 ```
 
+### v2 Review - With Improvement Tracking
+
+```python
+from T.Review.Script.ByTitle import (
+    review_script_by_title,
+    review_script_by_title_v2,
+    compare_reviews,
+    is_ready_to_proceed,
+    get_next_steps
+)
+
+# First, review v1 script against v1 title
+v1_review = review_script_by_title(script_v1, title_v1, idea)
+
+# Later, review v2 script against v3 title with comparison
+v2_review = review_script_by_title_v2(
+    script_text=script_v2,
+    title=title_v3,
+    idea=idea,
+    script_version="v2",
+    title_version="v3",
+    previous_review=v1_review  # Enable comparison
+)
+
+# Compare improvements
+comparisons = compare_reviews(v1_review, v2_review)
+improvements = [c for c in comparisons if c.improved]
+regressions = [c for c in comparisons if c.regression]
+
+print(f"Improvements: {len(improvements)}")
+for imp in improvements:
+    print(f"  ✓ {imp.category}: {imp.v1_score}% → {imp.v2_score}% (+{imp.delta}%)")
+
+if regressions:
+    print(f"Regressions: {len(regressions)}")
+    for reg in regressions:
+        print(f"  ✗ {reg.category}: {reg.v1_score}% → {reg.v2_score}% ({reg.delta}%)")
+
+# Check if ready to proceed
+if is_ready_to_proceed(v2_review, threshold=80):
+    print("✓ Script ready for acceptance check")
+else:
+    steps = get_next_steps(v2_review)
+    print("Next steps:")
+    for step in steps:
+        print(f"  - {step}")
+```
+
 ### JSON Output Example
 
 ```python
@@ -133,7 +200,7 @@ print(json.dumps(review_dict, indent=2))
 # - overall_score
 # - category_scores (with reasoning, strengths, weaknesses)
 # - improvement_points (prioritized with impact scores)
-# - metadata (alignment scores, genre, version)
+# - metadata (alignment scores, genre, version, comparisons)
 # - target_length and current_length_seconds
 # - primary_concern and quick_wins
 ```
@@ -164,7 +231,9 @@ for win in review.quick_wins:
 
 ## API Reference
 
-### Main Function
+### Main Functions
+
+#### review_script_by_title (v1)
 
 ```python
 def review_script_by_title(
@@ -179,7 +248,7 @@ def review_script_by_title(
 
 **Parameters:**
 - `script_text` (str): The script text to review
-- `title` (str): The title v1 for the script
+- `title` (str): The title for the script
 - `idea` (Idea): The Idea model object with core concept
 - `script_id` (str, optional): Custom script identifier
 - `target_length_seconds` (int, optional): Target duration in seconds
@@ -187,6 +256,95 @@ def review_script_by_title(
 
 **Returns:**
 - `ScriptReview`: Complete review with scores, feedback, and recommendations
+
+#### review_script_by_title_v2 (v2+)
+
+```python
+def review_script_by_title_v2(
+    script_text: str,
+    title: str,
+    idea: Idea,
+    script_id: Optional[str] = None,
+    script_version: str = "v2",
+    title_version: str = "v3",
+    target_length_seconds: Optional[int] = None,
+    previous_review: Optional[ScriptReview] = None,
+    reviewer_id: str = "AI-ScriptReviewer-ByTitle-v2-001"
+) -> ScriptReview
+```
+
+**Parameters:**
+- `script_text` (str): The script text to review (v2 or later)
+- `title` (str): The title text (v3 or later - latest version)
+- `idea` (Idea): The Idea model object
+- `script_id` (str, optional): Custom script identifier
+- `script_version` (str): Version of script being reviewed (default "v2")
+- `title_version` (str): Version of title being reviewed (default "v3")
+- `target_length_seconds` (int, optional): Target duration in seconds
+- `previous_review` (ScriptReview, optional): Previous review for comparison
+- `reviewer_id` (str): Reviewer identifier for tracking
+
+**Returns:**
+- `ScriptReview`: Complete review with scores, feedback, and version comparisons
+
+**Metadata additions (when previous_review provided):**
+- `has_comparison`: "true"/"false"
+- `comparisons`: Number of comparison metrics
+- `improvements_count`: Number of improved categories
+- `regressions_count`: Number of regressed categories
+- `improvement_summary`: Summary of key changes
+
+### Helper Functions
+
+#### compare_reviews
+
+```python
+def compare_reviews(
+    v1_review: Optional[ScriptReview],
+    v2_review: ScriptReview
+) -> List[ImprovementComparison]
+```
+
+Compare two reviews to identify improvements and regressions.
+
+**Returns:** List of `ImprovementComparison` objects with deltas and feedback
+
+#### extract_improvements_from_review
+
+```python
+def extract_improvements_from_review(
+    review: ScriptReview
+) -> List[str]
+```
+
+Extract high-priority improvements from a review.
+
+**Returns:** List of improvement descriptions with impact scores
+
+#### is_ready_to_proceed
+
+```python
+def is_ready_to_proceed(
+    review: ScriptReview,
+    threshold: int = 80
+) -> bool
+```
+
+Check if script meets quality threshold for proceeding.
+
+**Returns:** True if score >= threshold and no major revision needed
+
+#### get_next_steps
+
+```python
+def get_next_steps(
+    review: ScriptReview
+) -> List[str]
+```
+
+Generate recommended next steps based on review results.
+
+**Returns:** List of action items
 
 ### Data Classes
 
@@ -200,7 +358,26 @@ class AlignmentScore:
     reasoning: str
 ```
 
+#### ImprovementComparison
+
+```python
+@dataclass
+class ImprovementComparison:
+    category: str
+    v1_score: int
+    v2_score: int
+    delta: int
+    improved: bool
+    regression: bool
+    maintained: bool
+    feedback: str
+```
+
+Tracks comparison between two reviews for a specific category.
+
 ## Acceptance Criteria
+
+### MVP-005 (v1 Review)
 
 ✅ **All acceptance criteria met:**
 
@@ -211,9 +388,27 @@ class AlignmentScore:
 5. ✅ Output JSON format with feedback categories
 6. ✅ Tests: Review sample script/title pairs (32 tests, all passing)
 
+### MVP-010 (v2 Review)
+
+✅ **All acceptance criteria met:**
+
+1. ✅ Review script v2 against newest title v3
+2. ✅ Generate feedback for refinement
+3. ✅ Check alignment with updated title
+4. ✅ Output JSON format with feedback
+5. ✅ Tests: Review script v2 against title v3 (29 tests, all passing)
+
+**Additional v2 features:**
+- ✅ Improvement tracking from v1 to v2
+- ✅ Regression detection and warnings
+- ✅ Version metadata tracking
+- ✅ Helper functions for workflow integration
+
 ## Testing
 
-Comprehensive test suite with 32 tests covering:
+Comprehensive test suites covering both v1 and v2 functionality:
+
+### v1 Tests (32 tests)
 
 ```bash
 cd /home/runner/work/PrismQ/PrismQ
@@ -230,7 +425,30 @@ python -m pytest T/Review/Script/ByTitle/_meta/tests/test_script_review_by_title
 - Edge cases (empty scripts, special characters, etc.)
 - JSON output format validation
 
-**Test Coverage:** 100% of new functionality
+### v2 Tests (29 tests)
+
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+python -m pytest T/Review/Script/ByTitle/_meta/tests/test_by_title_v2.py -v
+```
+
+**Test Categories:**
+- v2 review with version tracking
+- Improvement comparison functionality
+- Regression detection
+- Comparison metadata tracking
+- Helper function validation (extract_improvements, is_ready_to_proceed, get_next_steps)
+- JSON output with version information
+- Edge cases for v2 reviews
+
+### Run All Tests
+
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+python -m pytest T/Review/Script/ByTitle/_meta/tests/ -v
+```
+
+**Total Coverage:** 61 tests, 100% of functionality
 
 ## Performance
 
@@ -270,6 +488,41 @@ if review.overall_score < 80:
 ```python
 from T.Idea.Model.src.idea import Idea, IdeaStatus
 
+### With Iterative Refinement Workflow (v2)
+
+```python
+from T.Review.Script.ByTitle import (
+    review_script_by_title,
+    review_script_by_title_v2,
+    is_ready_to_proceed,
+    get_next_steps
+)
+
+# Stage 5: Review v1
+v1_review = review_script_by_title(script_v1, title_v1, idea)
+
+# Stage 7: After improvements, review v2 against v3
+v2_review = review_script_by_title_v2(
+    script_v2, title_v3, idea,
+    previous_review=v1_review
+)
+
+# Check if ready for next stage
+if is_ready_to_proceed(v2_review, threshold=80):
+    # Proceed to acceptance check (Stage 12)
+    proceed_to_acceptance_check(v2_review)
+else:
+    # Get next steps for refinement
+    steps = get_next_steps(v2_review)
+    # Return to script refinement with feedback
+    refine_script(script_v2, steps)
+```
+
+### With Idea Model
+
+```python
+from T.Idea.Model.src.idea import Idea, IdeaStatus
+
 # Update idea status based on review
 if review.overall_score >= 80:
     idea.status = IdeaStatus.SCRIPT_APPROVED
@@ -285,6 +538,16 @@ The module uses configurable constants:
 # Speaking rate for length estimation
 WORDS_PER_SECOND_SPEAKING = 2.5
 WORDS_PER_MINUTE_SPEAKING = 150
+
+# Score thresholds (v2)
+SCORE_THRESHOLD_LOW = 70
+SCORE_THRESHOLD_VERY_LOW = 60
+SCORE_THRESHOLD_HIGH = 80
+
+# Comparison thresholds (v2)
+IMPROVEMENT_THRESHOLD = 0
+REGRESSION_THRESHOLD = -5
+MAINTAINED_THRESHOLD = 5
 
 # Stopwords filtered during analysis
 COMMON_STOPWORDS = {'the', 'a', 'an', 'and', 'or', ...}
@@ -304,6 +567,7 @@ EMOTIONAL_WORDS = ['fear', 'love', 'hope', 'terror', ...]
 
 ### Internal
 - `T.Review.Script.script_review` - ScriptReview data model
+- `T.Review.Script.ByTitle.script_review_by_title` - Base v1 functionality (for v2)
 - `T.Idea.Model.src.idea` - Idea model (MVP-003 dependency)
 
 ### External
@@ -331,30 +595,38 @@ Potential improvements for post-MVP:
 
 ```
 T/Review/Script/ByTitle/
-├── __init__.py                    # Module exports
-├── script_review_by_title.py      # Core implementation
+├── __init__.py                    # Module exports (v1 + v2)
+├── script_review_by_title.py      # Core v1 implementation (MVP-005)
+├── by_title_v2.py                 # v2 implementation with tracking (MVP-010)
 ├── README.md                      # This file
 └── _meta/
     ├── tests/
     │   ├── __init__.py
     │   ├── conftest.py
-    │   └── test_script_review_by_title.py
+    │   ├── test_script_review_by_title.py  # v1 tests (32 tests)
+    │   └── test_by_title_v2.py             # v2 tests (29 tests)
     └── examples/
-        └── (usage examples)
+        ├── example_usage.py        # v1 usage examples
+        └── example_usage_v2.py     # v2 usage examples
 ```
 
 ## Examples
 
-Example scripts demonstrating usage will be added to:
-```
-T/Review/Script/ByTitle/_meta/examples/
+Example scripts demonstrating usage:
+- `_meta/examples/example_usage.py` - v1 basic review examples
+- `_meta/examples/example_usage_v2.py` - v2 improvement tracking examples
+
+Run examples:
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+python T/Review/Script/ByTitle/_meta/examples/example_usage_v2.py
 ```
 
 ## Support
 
 For issues, questions, or contributions:
 - File issues in the PrismQ repository
-- Reference: MVP-005
+- Reference: MVP-005 (v1) or MVP-010 (v2)
 - Module: `PrismQ.T.Review.Script.ByTitle`
 
 ## License
@@ -362,6 +634,16 @@ For issues, questions, or contributions:
 Part of the PrismQ project. See repository license.
 
 ## Changelog
+
+### Version 2.0.0 (2025-11-22)
+- ✅ Added MVP-010: Script review v2 against title v3
+- ✅ Implemented `review_script_by_title_v2()` function
+- ✅ Added improvement comparison functionality
+- ✅ Added regression detection
+- ✅ Added helper functions (extract_improvements, is_ready_to_proceed, get_next_steps)
+- ✅ Version tracking in metadata
+- ✅ Comprehensive test suite (29 v2 tests)
+- ✅ Example usage script for v2
 
 ### Version 1.0.0 (2025-11-22)
 - ✅ Initial implementation of MVP-005
