@@ -380,6 +380,34 @@ class ScriptConsistencyChecker:
     - Detail consistency
     """
     
+    # Common words to filter out when detecting character names
+    COMMON_NON_NAME_WORDS = {
+        'The', 'A', 'An', 'I', 'He', 'She', 'It', 'They', 'We',
+        'This', 'That', 'These', 'Those', 'What', 'Where', 'When',
+        'Why', 'How', 'There', 'Here', 'Then', 'Now', 'But', 'Yet',
+        'Suddenly', 'After', 'Before'
+    }
+    
+    # Timeline indicators
+    TIMELINE_INDICATORS = [
+        'earlier', 'later', 'before', 'after', 'yesterday', 'tomorrow',
+        'morning', 'afternoon', 'evening', 'night', 'day', 'week', 'month', 'year',
+        'first', 'then', 'next', 'finally', 'meanwhile', 'simultaneously'
+    ]
+    
+    # Location keywords
+    LOCATION_KEYWORDS = [
+        'at', 'in', 'inside', 'outside', 'near', 'location', 'place',
+        'building', 'house', 'room', 'office', 'street', 'city', 'town'
+    ]
+    
+    # Contradiction patterns (pattern, type)
+    CONTRADICTION_PATTERNS = [
+        (r'\b(never|no|not|nobody|nothing)\b.*\b(always|yes|everyone|everything)\b', 'opposite_statements'),
+        (r'\b(alive)\b.*\b(dead)\b', 'life_state_contradiction'),
+        (r'\b(married)\b.*\b(single)\b', 'relationship_contradiction'),
+    ]
+    
     def __init__(self, pass_threshold: int = 80):
         """Initialize the consistency checker.
         
@@ -387,24 +415,6 @@ class ScriptConsistencyChecker:
             pass_threshold: Minimum score (0-100) required to pass review
         """
         self.pass_threshold = pass_threshold
-        
-        # Common name variations that might indicate inconsistency
-        self.name_patterns = [
-            (r'\b([A-Z][a-z]+)\b', 'character_name'),  # Capitalized words (likely names)
-        ]
-        
-        # Timeline indicators
-        self.timeline_indicators = [
-            'earlier', 'later', 'before', 'after', 'yesterday', 'tomorrow',
-            'morning', 'afternoon', 'evening', 'night', 'day', 'week', 'month', 'year',
-            'first', 'then', 'next', 'finally', 'meanwhile', 'simultaneously'
-        ]
-        
-        # Location indicators
-        self.location_keywords = [
-            'at', 'in', 'inside', 'outside', 'near', 'location', 'place',
-            'building', 'house', 'room', 'office', 'street', 'city', 'town'
-        ]
     
     def review_script(
         self,
@@ -490,15 +500,8 @@ class ScriptConsistencyChecker:
         # Find capitalized words (potential character names)
         words = re.findall(r'\b([A-Z][a-z]+)\b', line)
         
-        # Filter out common non-name words
-        common_words = {
-            'The', 'A', 'An', 'I', 'He', 'She', 'It', 'They', 'We',
-            'This', 'That', 'These', 'Those', 'What', 'Where', 'When',
-            'Why', 'How', 'There', 'Here', 'Then', 'Now'
-        }
-        
         for word in words:
-            if word not in common_words and len(word) > 2:
+            if word not in self.COMMON_NON_NAME_WORDS and len(word) > 2:
                 character_mentions[word].append(line_num)
     
     def _track_locations(
@@ -511,7 +514,7 @@ class ScriptConsistencyChecker:
         line_lower = line.lower()
         
         # Look for location patterns
-        for keyword in self.location_keywords:
+        for keyword in self.LOCATION_KEYWORDS:
             if keyword in line_lower:
                 # Extract potential location (simplified)
                 words_after = line_lower.split(keyword, 1)
@@ -531,7 +534,7 @@ class ScriptConsistencyChecker:
         """Check for timeline markers and record them."""
         line_lower = line.lower()
         
-        for indicator in self.timeline_indicators:
+        for indicator in self.TIMELINE_INDICATORS:
             if indicator in line_lower:
                 review.timeline_events.append(f"Line {line_num}: {indicator}")
     
@@ -589,16 +592,9 @@ class ScriptConsistencyChecker:
         review: ConsistencyReview
     ) -> None:
         """Check for internal contradictions in the script."""
-        # Look for explicit contradictions (simplified heuristic)
-        contradiction_patterns = [
-            (r'\b(never|no|not|nobody|nothing)\b.*\b(always|yes|everyone|everything)\b', 'opposite_statements'),
-            (r'\b(alive)\b.*\b(dead)\b', 'life_state_contradiction'),
-            (r'\b(married)\b.*\b(single)\b', 'relationship_contradiction'),
-        ]
-        
         full_text = ' '.join(lines).lower()
         
-        for pattern, contradiction_type in contradiction_patterns:
+        for pattern, contradiction_type in self.CONTRADICTION_PATTERNS:
             matches = re.finditer(pattern, full_text, re.IGNORECASE)
             for match in matches:
                 # Find approximate line number
