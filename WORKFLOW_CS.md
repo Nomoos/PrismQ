@@ -2,6 +2,8 @@
 
 **Kompletní stavový automat pro produkci obsahu od inspirace po archivaci**
 
+> 📖 **Viz také**: [Dokumentace MVP Workflow](./MVP_WORKFLOW_DOCUMENTATION_CS.md) pro podrobnou implementaci 26fázového workflow s příklady a API referencí.
+
 ## Přehled
 
 Tento dokument definuje kompletní stavový automat workflow pro produkci obsahu v PrismQ, od počáteční inspirace přes publikaci a analytiku až po finální archivaci.
@@ -488,6 +490,7 @@ Sledujte zdraví workflow pomocí klíčových indikátorů:
 
 ## Související dokumentace
 
+- **[Dokumentace MVP Workflow](./MVP_WORKFLOW_DOCUMENTATION_CS.md)** - Kompletní 26fázové MVP workflow s příklady a API referencí
 - **[Modul IdeaInspiration](./T/Idea/Inspiration/README.md)** - Inspirace a sběr
 - **[Model Idea](./T/Idea/Model/README.md)** - Základní datový model
 - **[Výzkum stavů workflow produkce obsahu](./_meta/research/content-production-workflow-states.md)** - Detailní výzkum

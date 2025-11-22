@@ -2,6 +2,8 @@
 
 **Complete State Machine for Content Production from Inspiration to Archive**
 
+> 📖 **See also**: [MVP Workflow Documentation](./MVP_WORKFLOW_DOCUMENTATION.md) for detailed 26-stage workflow implementation with examples and API reference.
+
 ## Overview
 
 This document defines the complete workflow state machine for PrismQ content production, from initial inspiration through publication and analytics to final archival.
@@ -488,6 +490,7 @@ Track workflow health with key indicators:
 
 ## Related Documentation
 
+- **[MVP Workflow Documentation](./MVP_WORKFLOW_DOCUMENTATION.md)** - Complete 26-stage MVP workflow with examples and API reference
 - **[IdeaInspiration Module](./T/Idea/Inspiration/README.md)** - Inspiration and collection
 - **[Idea Model](./T/Idea/Model/README.md)** - Core data model
 - **[Content Production Workflow States Research](./_ meta/research/content-production-workflow-states.md)** - Detailed research
