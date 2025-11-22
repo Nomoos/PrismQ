@@ -9,22 +9,34 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 ## Complete Workflow Path
 
 ```
-IdeaInspiration (External)
+┌─────────────────────────────────────────────────────────────┐
+│              Idea Generation (Two Sources)                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Path 1: Automated from Inspiration                         │
+│  Idea.Inspiration → Idea.Fusion → List of Candidate Ideas   │
+│  (combines multiple inspirations)                           │
+│                                                              │
+│  Path 2: Manual Creation                                    │
+│  Idea.Creation → List of Candidate Ideas                    │
+│  (direct manual input)                                      │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+        ↓
+    AI Scoring & Selection
+    (picks best idea from list)
         ↓
     ┌───────────────────────────────────┐
-    │   Idea Module (Composite State)   │
+    │   Idea Processing Module          │
     │                                   │
-    │   1. Creation                     │
-    │      └─→ Idea formation           │
+    │   1. Model                        │
+    │      └─→ Data structure & storage │
     │           ↓                       │
     │   2. Outline                      │
     │      └─→ Structure development    │
     │           ↓                       │
-    │   3. Skeleton                     │
-    │      └─→ Basic framework          │
-    │           ↓                       │
-    │   4. Title                        │
-    │      └─→ Title finalization       │
+    │   3. Title                        │
+    │      └─→ Title creation           │
     └───────────────────────────────────┘
         ↓
     ScriptDraft
@@ -40,30 +52,70 @@ IdeaInspiration (External)
 
 ## Detailed Workflow Stages
 
-### Stage 0: IdeaInspiration (Entry Point)
-**External State** - Before entering the T module workflow
+### Stage 0A: Idea.Inspiration (Entry Point - Automated Path)
+**Location:** `T/Idea/Inspiration`  
+**Purpose:** Collect and manage content ideas from various sources
 
-- Content idea collection from various sources
+**Activities:**
+- Content idea collection from external sources
 - Initial concept scoring and classification
 - Platform and audience targeting
+- Source tracking and attribution
 
-**Transitions to:** Idea.Creation
+**Key Deliverables:**
+- Raw inspiration data
+- Source metadata
+- Initial scoring metrics
+- Platform tags
+
+**Quality Gates:**
+- Source is valid and reliable
+- Concept has potential value
+- Metadata is complete
+
+**Transitions to:** Idea.Fusion
 
 ---
 
-### Stage 1: Idea.Creation
-**Location:** `T/Idea` (via Model)  
-**Purpose:** Transform inspiration into concrete idea concept
+### Stage 0B: Idea.Fusion (Automated Path)
+**Location:** `T/Idea/Fusion`  
+**Purpose:** Combine multiple inspirations into candidate ideas
+
+**Activities:**
+- Analyze multiple Idea.Inspiration sources
+- Identify common themes and patterns
+- Merge complementary concepts
+- Generate fusion variants
+- Create list of candidate ideas
+
+**Key Deliverables:**
+- List of fused idea candidates
+- Fusion rationale for each candidate
+- Combined metadata
+- Scoring for each candidate
+
+**Quality Gates:**
+- Fused ideas are coherent
+- Multiple inspirations properly integrated
+- Each candidate is viable
+
+**Transitions to:** AI Scoring & Selection
+
+---
+
+### Stage 0C: Idea.Creation (Entry Point - Manual Path)
+**Location:** `T/Idea/Creation`  
+**Purpose:** Manually create idea concepts
 
 **Activities:**
 - Define the core concept and purpose
 - Identify theme and emotional impact
 - Specify target audience and demographics
 - Clarify content goals and objectives
-- Initialize the Idea data model
+- Create list of candidate ideas
 
 **Key Deliverables:**
-- Idea concept statement
+- Manually created idea candidates
 - Purpose definition
 - Target audience profile
 - Initial idea metadata
@@ -72,6 +124,56 @@ IdeaInspiration (External)
 - Concept is clearly defined
 - Purpose aligns with content strategy
 - Target audience is identified
+
+**Transitions to:** AI Scoring & Selection
+
+---
+
+### Stage 0D: AI Scoring & Selection
+**Purpose:** Select the best idea from candidate list for processing
+
+**Activities:**
+- Score all candidate ideas using AI
+- Evaluate viability, potential, and alignment
+- Compare candidates against criteria
+- Select top-ranked idea for processing
+- Archive non-selected candidates
+
+**Key Deliverables:**
+- Selected idea for processing
+- Scoring report for all candidates
+- Selection rationale
+
+**Quality Gates:**
+- Scoring algorithm executed successfully
+- Selection criteria met
+- Selected idea has highest score
+
+**Transitions to:** Idea.Model
+
+---
+
+### Stage 1: Idea.Model
+**Location:** `T/Idea/Model`  
+**Purpose:** Store and structure the selected idea
+
+**Activities:**
+- Initialize the Idea data model
+- Store idea in database
+- Structure metadata and attributes
+- Link to source inspirations (if applicable)
+- Prepare for outline development
+
+**Key Deliverables:**
+- Structured idea data model
+- Database record
+- Linked metadata
+- Unique identifier
+
+**Quality Gates:**
+- Data model is complete
+- All required fields populated
+- Database integrity maintained
 
 **Transitions to:** Idea.Outline
 
@@ -99,68 +201,36 @@ IdeaInspiration (External)
 - Logical flow established
 - Depth appropriate for target audience
 
-**Transitions to:** Idea.Skeleton
+**Transitions to:** Title Creation (T/Title)
 
 ---
 
-### Stage 3: Idea.Skeleton
-**Location:** `T/Idea` (conceptual sub-state)  
-**Purpose:** Create basic structural framework
+### Stage 3: Title Creation
+**Location:** `T/Title/FromIdea`  
+**Purpose:** Create initial title from idea (v1)
 
 **Activities:**
-- Define section templates
-- Establish content patterns
-- Set structural guidelines
-- Create framework for script development
+- Generate title options from idea
+- Consider SEO and engagement factors
+- Create multiple title variants
+- Store variants with idea reference
 
 **Key Deliverables:**
-- Structural framework
-- Section templates
-- Content patterns
-- Development guidelines
-
-**Quality Gates:**
-- Framework supports outline structure
-- Templates are reusable
-- Structure is production-ready
-
-**Transitions to:** Idea.Title
-
----
-
-### Stage 4: Idea.Title
-**Location:** `T/Title`  
-**Purpose:** Create and optimize final title
-
-**Activities:**
-- Generate title options (Title/Draft)
-- Test and optimize titles (Title/Optimization)
-- Refine based on testing (Title/Refinement)
-- Finalize SEO-optimized title
-
-**Sub-workflow:**
-```
-Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
-```
-
-**Key Deliverables:**
-- Finalized title
-- Title alternatives
-- SEO metadata
-- Click-through optimization data
+- Title v1 variants (3-5 options)
+- Associated metadata (length, keywords, style)
+- Link to source idea
 
 **Quality Gates:**
 - Title is compelling and clear
 - SEO keywords integrated
 - Length appropriate for target platforms
-- A/B testing completed (if applicable)
 
-**Transitions to:** ScriptDraft (exits Idea composite state)
+**Transitions to:** Script Creation (T/Script)
 
 ---
 
-### Stage 5: ScriptDraft
-**Location:** `T/Script/Draft`  
+### Stage 4: Script Creation
+**Location:** `T/Script/FromIdeaAndTitle`  
 **Purpose:** Write initial script from structured idea
 
 **Activities:**
@@ -186,7 +256,7 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 
 ---
 
-### Stage 6: ScriptReview
+### Stage 5: ScriptReview
 **Location:** `T/Review` (various review modules)  
 **Purpose:** Review and enhance script quality
 
@@ -218,7 +288,7 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 
 ---
 
-### Stage 7: ScriptApproved
+### Stage 6: ScriptApproved
 **Location:** `T/Script` (approved state)  
 **Purpose:** Lock approved script for publishing
 
@@ -242,7 +312,7 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 
 ---
 
-### Stage 8: TextPublishing
+### Stage 7: TextPublishing
 **Location:** `T/Publishing`  
 **Purpose:** Prepare and publish text content
 
@@ -270,7 +340,7 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 
 ---
 
-### Stage 9: PublishedText (End State)
+### Stage 8: PublishedText (End State)
 **Status:** ✓ Published  
 **Purpose:** Live text content available to audience
 
@@ -290,35 +360,50 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 
 ## Quick Reference Paths
 
-### Text-Only Path (Complete)
+### Automated Path (From Inspiration)
 ```
-Idea.Creation → Outline → Skeleton → Title → 
-ScriptDraft → ScriptReview → ScriptApproved → 
+Idea.Inspiration → Idea.Fusion → [Candidate List] → 
+AI Scoring → Idea.Model → Idea.Outline → 
+Title.FromIdea → Script.FromIdeaAndTitle → 
+ScriptReview → ScriptApproved → TextPublishing → PublishedText ✓
+```
+
+### Manual Path (Direct Creation)
+```
+Idea.Creation → [Candidate List] → AI Scoring → 
+Idea.Model → Idea.Outline → Title.FromIdea → 
+Script.FromIdeaAndTitle → ScriptReview → ScriptApproved → 
 TextPublishing → PublishedText ✓
 ```
 
 ### With Script Revisions
 ```
-Idea.Creation → ... → Title → ScriptDraft → 
-ScriptReview → ScriptDraft (revision) → 
+... → Title.FromIdea → Script.FromIdeaAndTitle → 
+ScriptReview → Script.FromOriginalScriptAndReviewAndTitle (v2) → 
 ScriptReview → ScriptApproved → TextPublishing → PublishedText ✓
 ```
 
-### With Idea Refinement
+### With Title & Script Improvements
 ```
-Idea.Creation → ... → ScriptDraft → 
-ScriptReview → Idea (refinement) → 
-Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
+... → Title.FromIdea (v1) → Script.FromIdeaAndTitle (v1) → 
+Reviews → Title.FromOriginalTitleAndReviewAndScript (v2) → 
+Script.FromOriginalScriptAndReviewAndTitle (v2) → 
+ScriptApproved → TextPublishing → PublishedText ✓
 ```
 
 ## State Characteristics
 
 ### Entry Points
-- **Idea.Creation** - Primary entry into T module workflow
-- **IdeaInspiration** - External inspiration collection (feeds into Creation)
+- **Idea.Inspiration** - Automated entry via inspiration collection (feeds into Fusion)
+- **Idea.Creation** - Manual entry via direct idea creation
 
-### Composite States
-- **Idea** - Contains sequential sub-states (Creation → Outline → Skeleton → Title)
+### Fusion & Selection
+- **Idea.Fusion** - Combines multiple inspirations into candidate list
+- **AI Scoring** - Selects best idea from candidate list for processing
+
+### Idea Processing States
+- **Idea.Model** - Data structure and storage
+- **Idea.Outline** - Content structure development
 
 ### Review Gates
 - **ScriptReview** - Major quality checkpoint with multiple review dimensions
@@ -329,21 +414,20 @@ Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
 ## Module Cross-References
 
 ### T/Idea Module
-- **Creation**: Initial idea formation (uses Model structure)
-- **Model**: Core data structure for ideas
+- **Inspiration**: External idea collection from various sources
+- **Fusion**: Combines multiple inspirations into candidate ideas
+- **Creation**: Manual idea creation
+- **Model**: Core data structure for selected ideas
 - **Outline**: Content structure development
-- **Review**: Idea validation and assessment
 
 ### T/Title Module
-- **Draft**: Initial title creation
-- **Optimization**: A/B testing and optimization
-- **Refinement**: Final title polish
+- **FromIdea**: Initial title creation from idea (v1)
+- **FromOriginalTitleAndReviewAndScript**: Title improvements (v2+)
 
 ### T/Script Module
-- **Draft**: Initial script writing
-- **Writer**: AI-powered script optimization
-- **Improvements**: Script enhancement
-- **Optimization**: Final script optimization
+- **FromIdeaAndTitle**: Initial script creation from idea and title (v1)
+- **FromOriginalScriptAndReviewAndTitle**: Script improvements (v2+)
+- **Writer**: AI-powered script optimization support
 
 ### T/Review Module
 - **Grammar**: Grammar and syntax review
@@ -361,10 +445,11 @@ Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
 ## Best Practices
 
 ### Starting the Workflow
-1. Begin with clear idea formation in **Idea.Creation**
-2. Take time to develop comprehensive outline
-3. Create solid skeleton before finalizing title
-4. Finalize title before moving to script
+1. **Automated Path**: Collect quality inspirations in **Idea.Inspiration**, let **Idea.Fusion** combine them
+2. **Manual Path**: Create well-defined ideas in **Idea.Creation**
+3. Trust **AI Scoring** to select the best candidate from the list
+4. Develop comprehensive outline in **Idea.Outline**
+5. Create initial title in **Title.FromIdea** before moving to script
 
 ### During Script Development
 1. Use outline as guide for script structure
@@ -405,7 +490,10 @@ Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
 ## Workflow Automation
 
 ### Automated Transitions
-- Idea sub-states (Creation → Outline → Skeleton → Title)
+- Idea.Inspiration → Idea.Fusion
+- Idea.Fusion → AI Scoring & Selection
+- AI Scoring → Idea.Model
+- Idea.Model → Idea.Outline
 - Publishing to PublishedText
 
 ### Manual Approvals Required
