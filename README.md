@@ -155,11 +155,7 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
 │                    PrismQ State Machine                          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publishing)       │
-│     ↓              ↓             ↓              ↓                │
-│     └──────────────┴─────────────┴──────────────┘                │
-│                          ↓                                       │
-│                   M (Metrics/Analytics)                          │
+│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publishing) -> M (Metrics/Analytics)                          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -172,6 +168,7 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **Key States**: Idea.Creation → Title.Draft → Script.Draft → Reviews → Improvements → Refinements → Publishing
    - **Quality Gates**: Title acceptance, script acceptance, readability validation
    - **Output**: SEO-optimized published text
+   - **structure inside working directory** T/{id}/{Platform}, T/{id}/Text (there will live finished text)
    - **[📄 View T State Machine Documentation](./T/STATE_MACHINE.md)** *(Coming Soon)*
 
 2. **A (Audio Generation)**
@@ -179,6 +176,7 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **State Machine**: Voice generation, enhancement, and podcast publishing *(To Be Implemented)*
    - **Input**: Published text from T module
    - **Output**: Professional audio files, podcast episodes
+   - **structure inside working directory** A/{id}/{Platform}, A/{id}/Audio
    - **[📄 View A State Machine Documentation](./A/STATE_MACHINE.md)** *(Coming Soon)*
 
 3. **V (Video Generation)**
@@ -186,6 +184,7 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **State Machine**: Scene planning, keyframe generation, video assembly *(To Be Implemented)*
    - **Input**: Published audio from A module
    - **Output**: Platform-optimized videos (YouTube, TikTok, Instagram)
+   - **structure inside working directory** V/{id}/{Platform}, V/{id}/Video
    - **[📄 View V State Machine Documentation](./V/STATE_MACHINE.md)** *(Coming Soon)*
 
 4. **P (Publishing)**
@@ -193,6 +192,7 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **State Machine**: Multi-platform publishing, scheduling, cross-posting *(To Be Implemented)*
    - **Input**: Completed content from T, A, V modules
    - **Output**: Published content across all target platforms
+   - **structure inside working directory** P/{Year}/{Month}/{00-10/10-20/20-end}/{day}/{hour}/{id}/{platform}
    - **[📄 View P State Machine Documentation](./P/STATE_MACHINE.md)** *(Coming Soon)*
 
 5. **M (Metrics/Analytics)**
@@ -200,6 +200,9 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **Type**: Meta-module (monitors published content from T/A/V/P)
    - **Functions**: Performance tracking of published content, KPI collection, engagement metrics, A/B testing results
    - **Output**: Insights feeding back to idea generation
+   - **Feedback loop for Inspiration** 
+    - **Collect performance data from published things** 
+   - **structure inside working directory** M/{Year}/{Month}/{00-10/10-20/20-end}/{day}/{hour}/{id}/Metrics/{platform}
    - **[📄 View M State Machine Documentation](./M/STATE_MACHINE.md)** *(Coming Soon)*
 
 ### State Machine Principles
