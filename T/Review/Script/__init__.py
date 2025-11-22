@@ -16,8 +16,9 @@ from .by_title_and_idea import (
     AlignmentScore
 )
 
-# Import ByTitle submodule
+# Import submodules
 from . import ByTitle
+from . import Grammar
 
 # Import Acceptance module (MVP-013)
 from .Acceptance import (
@@ -35,6 +36,7 @@ __all__ = [
     "review_script_by_title_and_idea",
     "AlignmentScore",
     "ByTitle",
+    "Grammar"
     "check_script_acceptance",
     "ScriptAcceptanceResult"
 ]
