@@ -30,6 +30,29 @@ Title v1 + Script v1 + Idea → Review (Stage 4) → Title v2 (Stage 6)
 **[→ View ByScriptAndIdea Documentation](./ByScriptAndIdea/README.md)**
 **[→ View ByScriptAndIdea Metadata](./ByScriptAndIdea/_meta/)**
 
+### [Acceptance](./Acceptance/)
+**Stage 12 (MVP-012): Title Acceptance Gate**
+
+Acceptance gate that determines whether a title (at any version) is ready to proceed or needs further refinement.
+
+**Key Features:**
+- Three-criterion evaluation (clarity, engagement, script alignment)
+- Automatic threshold checking
+- Detailed feedback and recommendations
+- Version tracking (v3, v4, v5, etc.)
+- JSON-compatible output
+
+**Workflow Position:**
+```
+Title (vN) + Script (vN) → Acceptance Gate (Stage 12) → {
+    ACCEPTED: Proceed to Script Acceptance (Stage 13)
+    NOT ACCEPTED: Loop to Title Review (Stage 8) → Title Refinement
+}
+```
+
+**[→ View Acceptance Documentation](./Acceptance/README.md)**
+**[→ View Acceptance Tests](./Acceptance/_meta/tests/)**
+
 ## Module Metadata
 
 **[→ View Title/_meta/docs/](./_meta/docs/)**
