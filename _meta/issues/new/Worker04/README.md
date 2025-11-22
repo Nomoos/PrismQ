@@ -15,7 +15,7 @@
 - E2E testing
 - Performance testing
 - Test automation
-- CI/CD integration
+- Test infrastructure (CI/CD integration deferred to Worker05)
 
 ### Key Areas
 - **Unit Testing**: pytest, Jest, PHPUnit
@@ -23,7 +23,7 @@
 - **E2E**: Playwright, Cypress, Selenium
 - **Performance**: Load testing, benchmarking
 - **Coverage**: Code coverage analysis
-- **CI/CD**: GitHub Actions, test automation
+- **Automation**: Test automation frameworks and tools
 
 ---
 
@@ -33,7 +33,7 @@
 - **Python**: pytest, unittest, coverage, hypothesis
 - **JavaScript**: Jest, Vitest, Playwright
 - **PHP**: PHPUnit
-- **Tools**: GitHub Actions, Docker for testing
+- **Tools**: Test automation tools, Docker for testing
 - **Performance**: k6, pytest-benchmark, JMeter
 - **Security**: Security testing, penetration testing basics
 
@@ -53,7 +53,7 @@
 - **Worker02**: Python test infrastructure
 - **Worker03**: Frontend/API testing
 - **Worker10**: Quality validation
-- **Worker05**: CI/CD pipeline integration
+- **Worker05**: CI/CD pipeline integration (future collaboration)
 
 ---
 
@@ -62,7 +62,7 @@
 ### Active Projects
 - Test coverage improvement
 - Automated test suites
-- CI/CD pipeline optimization
+- Test framework for iterative workflow
 - Performance benchmarking
 - Cross-platform testing
 

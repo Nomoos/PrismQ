@@ -92,7 +92,7 @@ Worker04: Nastavit testovací framework pro iterativní workflow
   * Nakonfigurován unit test framework
   * Podpora integračních testů
   * Testovací pomocníci pro sledování verzí
-  * Nakonfigurován CI/CD pipeline
+  * Kompletní testovací dokumentace
 ```
 
 ---
