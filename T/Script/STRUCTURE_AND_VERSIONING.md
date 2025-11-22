@@ -27,7 +27,7 @@ T/
     └── _meta/                       # Script module metadata
 ```
 
-**Note on Folder Structure**: The AI script writer (ScriptWriter class) is located in `T/Script/src/` and is imported as `from PrismQ.T.Script import ScriptWriter`. The documentation previously referenced a non-existent `T/Script/Writer/` folder, which has been corrected to `T/Script/src/`.
+**Note**: The ScriptWriter class is located in `T/Script/src/` and imported as `from PrismQ.T.Script import ScriptWriter`.
 
 **Why T/Review/Script?**
 

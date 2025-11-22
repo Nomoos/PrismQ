@@ -2,8 +2,6 @@
 
 **Namespace**: `PrismQ.T.Script`
 
-**Folder**: `T/Script/src/`
-
 AI-powered script writer with iterative optimization based on review feedback from the AI Script Reviewer.
 
 ## Purpose
@@ -250,7 +248,7 @@ T/Script/src/
     └── tests/               # Test suites
 ```
 
-**Note**: The ScriptWriter is located in `T/Script/src/` but exported through the parent module as `PrismQ.T.Script.ScriptWriter` for cleaner imports.
+**Note**: The ScriptWriter class is located in `T/Script/src/` and is imported directly as `from PrismQ.T.Script import ScriptWriter`.
 
 ## Integration Points
 
