@@ -21,20 +21,22 @@ T/
 │   └── Editing/         # Final editing pass
 │
 └── Script/
-    ├── Draft/           # Initial script writing
-    ├── Improvements/    # Script enhancements
-    ├── Optimization/    # Script optimization
-    └── Writer/          # AI script writer with feedback loop ⭐ NEW
+    ├── FromIdeaAndTitle/           # Initial script draft from idea and title (v1)
+    ├── FromOriginalScriptAndReviewAndTitle/  # All script improvements (v2, v3+)
+    ├── src/                         # AI script writer with feedback loop ⭐ NEW
+    └── _meta/                       # Script module metadata
 ```
+
+**Note**: The ScriptWriter class is located in `T/Script/src/` and imported as `from PrismQ.T.Script import ScriptWriter`.
 
 **Why T/Review/Script?**
 
 Now grouped with other automated review modules (Grammar, Tone, Readability, etc.) as all are automated review steps.
 
 **Key Characteristics**:
-- **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with Writer
+- **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with ScriptWriter
 - **T/Review/Grammar, Tone, etc.**: Dimensional review focusing on specific quality aspects
-- **T/Script/Writer**: Pairs with T/Review/Script in feedback loop during script development
+- **T/Script/src**: Contains ScriptWriter which pairs with T/Review/Script in feedback loop during script development
 
 ### 2. Script Versioning for Comparison and Research
 

@@ -22,7 +22,7 @@ from T.Review.Script import (
     ImprovementPoint,
     CategoryScore
 )
-from T.Script.Writer import (
+from T.Script import (
     ScriptWriter,
     OptimizationStrategy
 )

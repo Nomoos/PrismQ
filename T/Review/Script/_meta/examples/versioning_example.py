@@ -19,7 +19,7 @@ from T.Review.Script import (
     ContentLength,
     ImprovementPoint
 )
-from T.Script.Writer import ScriptWriter
+from T.Script import ScriptWriter
 
 
 def example_version_tracking():

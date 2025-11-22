@@ -2,7 +2,7 @@
 
 import pytest
 from T.Review.Script import ScriptReview, ScriptVersion, ContentLength
-from T.Script.Writer import ScriptWriter
+from T.Script import ScriptWriter
 
 
 class TestScriptVersioning:
