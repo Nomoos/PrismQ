@@ -110,8 +110,8 @@ def compare_reviews(
     ))
     
     # Compare title alignment if available
-    v1_title_score = int(v1_review.metadata.get("title_alignment_score", "0"))
-    v2_title_score = int(v2_review.metadata.get("title_alignment_score", "0"))
+    v1_title_score = int(v1_review.metadata.get("title_alignment_score", "0") or "0")
+    v2_title_score = int(v2_review.metadata.get("title_alignment_score", "0") or "0")
     title_delta = v2_title_score - v1_title_score
     comparisons.append(ImprovementComparison(
         category="title_alignment",
@@ -125,8 +125,8 @@ def compare_reviews(
     ))
     
     # Compare idea alignment if available
-    v1_idea_score = int(v1_review.metadata.get("idea_alignment_score", "0"))
-    v2_idea_score = int(v2_review.metadata.get("idea_alignment_score", "0"))
+    v1_idea_score = int(v1_review.metadata.get("idea_alignment_score", "0") or "0")
+    v2_idea_score = int(v2_review.metadata.get("idea_alignment_score", "0") or "0")
     idea_delta = v2_idea_score - v1_idea_score
     comparisons.append(ImprovementComparison(
         category="idea_alignment",
@@ -255,7 +255,6 @@ def review_script_by_title_v2(
         ... )
         >>> print(f"Overall improvement: {v2_review.overall_score - v1_review.overall_score}%")
     """
-    import uuid
     
     # Generate script ID if not provided
     if script_id is None:
