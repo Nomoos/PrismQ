@@ -1,17 +1,25 @@
 # MVP Workflow - Minimal Viable Product Issue Plan
 
 **Created**: 2025-11-21  
-**Updated**: 2025-11-21  
+**Updated**: 2025-11-22  
 **Status**: Planning  
-**Approach**: Iterative MVP Development
+**Approach**: Enhanced Iterative MVP Development with Quality Reviews
+
+**Note**: This document describes a simplified MVP workflow. For the **complete enhanced workflow with 26 stages including AI quality reviews and GPT expert review**, see `MVP_WORKFLOW.md` and `PARALLEL_RUN_NEXT.md`.
 
 ---
 
 ## MVP Workflow Overview
 
-This document defines the **Minimum Viable Product (MVP)** workflow for the Text (T) pipeline, focusing on a streamlined, iterative approach to content creation.
+This document defines a **simplified Minimum Viable Product (MVP)** workflow for the Text (T) pipeline, focusing on a streamlined approach to content creation.
 
-**Reference**: See `T/TITLE_SCRIPT_WORKFLOW.md` for complete detailed workflow documentation.
+**For Enhanced Workflow**: See `MVP_WORKFLOW.md` for the complete 26-stage workflow with:
+- Local AI Quality Reviews (Grammar, Tone, Content, Consistency, Editing)
+- GPT Expert Review and Polish
+- Comprehensive readability validation
+- All 23 MVP issues detailed
+
+**Reference**: See `PARALLEL_RUN_NEXT.md` for sprint execution plan.
 
 ### MVP Workflow Sequence
 
@@ -108,9 +116,12 @@ Based on `T/TITLE_SCRIPT_WORKFLOW.md`, the MVP simplifies:
    - Deferred: Idea.Outline and Idea.Skeleton stages
 
 2. **Review Stages**:
-   - Full: Multiple review modules (Grammar, Readability, Tone, Content, Consistency, Editing)
-   - MVP: ✅ **NOW INCLUDED** - Granular review dimensions after acceptance gates (Stages 14-20)
-   - Script quality reviews (Grammar, Tone, Content, Consistency, Editing) + Final Readability
+   - Full: Multiple review modules (Grammar, Readability, Tone, Content, Consistency, Editing) + GPT Expert Review
+   - MVP Simple: Basic review loop only
+   - ✅ **Enhanced MVP (MVP_WORKFLOW.md)**: All granular review dimensions included (Stages 14-22)
+   - Script quality reviews (Grammar, Tone, Content, Consistency, Editing)
+   - Title and Script readability validation
+   - GPT-4/GPT-5 expert review and polish
 
 3. **Script Approval**:
    - Full: ScriptDraft → ScriptReview → ScriptApproved → TextPublishing
@@ -123,12 +134,14 @@ Based on `T/TITLE_SCRIPT_WORKFLOW.md`, the MVP simplifies:
    - Deferred: Comprehensive SEO optimization modules
 
 **Post-MVP Enhancement Path**:
-After MVP validates the basic workflow, expand with:
-- Idea.Outline creation for better structure
-- Idea.Skeleton framework development
-- Granular review modules (T/Review/Grammar, Readability, Tone, etc.)
-- Formal approval states and version locking
-- Comprehensive SEO optimization (T/Publishing/SEO with Keywords, Tags, Categories)
+This simplified MVP provides basic workflow. The **Enhanced MVP (see `MVP_WORKFLOW.md`)** includes:
+- ✅ All granular review modules (T/Review/Grammar, Tone, Content, Consistency, Editing, Readability)
+- ✅ GPT Expert Review (T/Story/ExpertReview) and Polish (T/Story/ExpertPolish)
+- Future additions:
+  - Idea.Outline creation for better structure
+  - Idea.Skeleton framework development
+  - Formal approval states and version locking
+  - Comprehensive SEO optimization (T/Publishing/SEO with Keywords, Tags, Categories)
 
 ---
 

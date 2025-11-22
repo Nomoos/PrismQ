@@ -717,24 +717,36 @@ Stage 23: Published! 🎉
 
 ---
 
-### Sprint 3: Validation & Publishing (2 weeks)
+### Sprint 3: Validation & Quality Reviews (3-4 weeks)
 
-#### Week 5: Acceptance Gates + Readability
+#### Week 5: Acceptance Gates + Quality Reviews (Part 1)
 - #MVP-012: Title Acceptance Check (Worker10, 0.5d)
 - #MVP-013: Script Acceptance Check (Worker10, 0.5d)
-- #MVP-014: Title Readability (Worker10, 0.5d)
-- #MVP-015: Script Readability/Voiceover (Worker10, 0.5d)
+- #MVP-014: Script Grammar Review (Worker10, 0.5d)
+- #MVP-015: Script Tone Review (Worker10, 0.5d)
+- #MVP-016: Script Content Review (Worker10, 0.5d)
 
-**Deliverable**: All acceptance gates + readability checks passing
+**Deliverable**: Acceptance gates passed + Grammar, Tone, Content reviews complete
 
-**Buffer**: Allow time for iteration loops if acceptance checks fail
+#### Week 6: Quality Reviews (Part 2) + Readability
+- #MVP-017: Script Consistency Review (Worker10, 0.5d)
+- #MVP-018: Script Editing Review (Worker10, 0.5d)
+- #MVP-019: Title Readability (Worker10, 0.5d)
+- #MVP-020: Script Readability/Voiceover (Worker10, 0.5d)
+- Testing: Quality review paths (Worker04, 2d)
 
-#### Week 6: Publishing
-- #MVP-016: Publishing (Worker02, 2d)
+**Deliverable**: All local AI quality reviews + readability checks passing
+
+**Buffer**: Allow time for iteration loops if quality/readability checks fail
+
+#### Week 7-8: GPT Expert Review + Publishing
+- #MVP-021: GPT Expert Story Review (Worker10, 0.5d)
+- #MVP-022: GPT Expert Story Polish (Worker10, 0.5d)
+- #MVP-023: Publishing (Worker02, 2d)
 - Testing: E2E validation of all paths (Worker04, 2d)
-- Documentation: Complete user guide (Worker15, 2d)
+- Documentation: Complete user guide with all 26 stages (Worker15, 2d)
 
-**Deliverable**: Complete MVP with published content
+**Deliverable**: Complete MVP with published content through all quality gates
 
 ---
 
@@ -792,40 +804,44 @@ Stage 16: Publishing
 | **Worker04** | QA/Testing | Testing all paths | 4d |
 | **Worker15** | Documentation | User guide, API docs | 4d |
 
-**Total**: 30 days of work, ~6 weeks calendar time with 3-4 active workers
+**Total**: 30 days of work, ~7-8 weeks calendar time with 3-4 active workers
 
 ---
 
 ## Success Metrics
 
 ### MVP Completion Criteria
-- ✅ All 16 MVP issues implemented
+- ✅ All 23 MVP issues implemented (26 stages including decision points)
 - ✅ At least one content piece through complete workflow
-- ✅ All iteration loops tested (acceptance gates + readability)
-- ✅ Documentation complete with loop examples
+- ✅ All iteration loops tested (acceptance gates + quality reviews + readability + GPT expert)
+- ✅ Documentation complete with all stages and loop examples
 
 ### Quality Standards
 - Title and script validated against each other at each stage
 - Multiple improvement cycles ensure high quality
-- Acceptance gates ensure standards met
-- Readability checks ensure publishing-ready quality
+- Acceptance gates ensure standards met before proceeding
+- Local AI quality reviews validate 5 dimensions (Grammar, Tone, Content, Consistency, Editing)
+- Readability checks ensure publishing-ready quality (Title + Script voiceover validation)
+- GPT expert review provides holistic assessment and polish using GPT-4/GPT-5
 
 ---
 
 ## Comparison: Simple vs Iterative Workflow
 
-| Aspect | Simple (9 issues) | Iterative (16 issues) |
-|--------|-------------------|------------------------|
-| **Issues** | 9 | 16 |
-| **Timeline** | 4 weeks | 6 weeks |
+| Aspect | Simple (9 issues) | Enhanced Iterative (23 issues) |
+|--------|-------------------|----------------------------------|
+| **Issues** | 9 | 23 |
+| **Timeline** | 4 weeks | 7-8 weeks |
 | **Reviews** | Single pass | Multi-pass cross-validation |
-| **Quality** | Basic | High (co-improvement) |
+| **Quality** | Basic | Highest (co-improvement + AI + GPT expert) |
 | **Acceptance** | Implied | Explicit gates |
-| **Readability** | None | Final validation |
+| **Quality Reviews** | None | 5 AI dimensions (Grammar, Tone, Content, Consistency, Editing) |
+| **Readability** | None | Final validation (Title + Script) |
+| **Expert Review** | None | GPT-4/GPT-5 review + polish |
 | **Versions** | v1, v2 | v1, v2, v3, v4+ |
 | **Context** | Isolated | Cross-validated |
 
-**Trade-off**: +2 weeks for significantly higher quality through iterative co-improvement.
+**Trade-off**: +3-4 weeks for significantly higher quality through iterative co-improvement, comprehensive AI quality reviews, and GPT expert assessment.
 
 ---
 
