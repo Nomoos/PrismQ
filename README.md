@@ -196,9 +196,9 @@ PrismQ implements a **comprehensive state machine workflow** across five core mo
    - **[📄 View P State Machine Documentation](./P/STATE_MACHINE.md)** *(Coming Soon)*
 
 5. **M (Metrics/Analytics)**
-   - **Purpose**: Cross-cutting observability across all modules
-   - **Type**: Meta-module (observes T/A/V/P, not sequential)
-   - **Functions**: Performance tracking, KPI collection, engagement metrics, A/B testing results
+   - **Purpose**: Monitor published content performance
+   - **Type**: Meta-module (monitors published content from T/A/V/P)
+   - **Functions**: Performance tracking of published content, KPI collection, engagement metrics, A/B testing results
    - **Output**: Insights feeding back to idea generation
    - **[📄 View M State Machine Documentation](./M/STATE_MACHINE.md)** *(Coming Soon)*
 
