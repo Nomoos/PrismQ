@@ -374,7 +374,6 @@ class TestTitleImprovementStrategies:
         insights = self.improver._extract_script_insights(review)
         
         # Should only extract title-relevant insights
-        assert len(insights) >= 0
         if insights:
             assert any('title' in ins['description'].lower() for ins in insights)
     

@@ -241,7 +241,7 @@ class TitleImprover:
         
         for point in title_review.improvement_points:
             improvements.append({
-                'category': point.category.value if hasattr(point.category, 'value') else str(point.category),
+                'category': point.category.value,
                 'title': point.title,
                 'description': point.description,
                 'priority': point.priority,
@@ -277,7 +277,7 @@ class TitleImprover:
             if any(keyword in point.description.lower() for keyword in 
                    ['title', 'promise', 'expectation', 'hook', 'opening']):
                 insights.append({
-                    'category': point.category.value if hasattr(point.category, 'value') else str(point.category),
+                    'category': point.category.value,
                     'title': point.title,
                     'description': point.description,
                     'priority': point.priority,
@@ -419,7 +419,7 @@ class TitleImprover:
         ]
         
         # If title is missing key elements, try to add the most important one
-        if missing_elements and len(missing_elements) > 0:
+        if missing_elements:
             # Add first missing element if it would improve alignment
             key_element = missing_elements[0]
             
@@ -509,9 +509,8 @@ class TitleImprover:
         # For now, basic cleanup
         title = title.strip()
         
-        # Remove double spaces
-        while '  ' in title:
-            title = title.replace('  ', ' ')
+        # Remove multiple spaces
+        title = ' '.join(title.split())
         
         return title
     
