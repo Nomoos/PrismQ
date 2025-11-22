@@ -3,18 +3,18 @@
 > **Note**: This is a streamlined sprint-focused document containing only sprints and commands.  
 > **Full detailed version**: See `PARALLEL_RUN_NEXT_FULL.md` for comprehensive workflow explanations.  
 > **Current state**: See `CURRENT_STATE.md` for implementation status assessment.  
-> **Refactored**: 2025-11-22 - Simplified to 22 issues (from 26 stages), applied SOLID principles, MVP-focused
+> **Refactored**: 2025-11-22 - Simplified to 24 issues (from 26 stages), applied SOLID principles, MVP-focused with smaller work chunks
 
 **Sprint**: Sprint 1-3 (7-8 weeks) - MVP Development  
 **Date**: 2025-11-22 (Updated)  
-**Status**: Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Partial (5/11)  
-**Goal**: Build MVP with 22-stage iterative co-improvement workflow (simplified from 26)
+**Status**: Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Partial (5/13)  
+**Goal**: Build MVP with 24-stage iterative co-improvement workflow (simplified from 26, optimized for smaller chunks)
 
 **Sprint 1 Achievement**: Foundation complete - Idea → Title v1 → Script v1 → Cross-reviews working ✅  
 **Sprint 2 Achievement**: Improvement cycle complete - v2 and v3 generation working ✅  
-**Sprint 3 Progress**: Acceptance gates + 3 quality reviews complete (5/11 - 45%) ⚠️  
+**Sprint 3 Progress**: Acceptance gates + 3 quality reviews complete (5/13 - 38%) ⚠️  
 **Completed Issues**: MVP-001 through MVP-016 (16 issues) → reviews in _meta/issues/done/  
-**Remaining**: MVP-017 through MVP-022 (6 issues) - Quality reviews, Readability, Final review, Publishing
+**Remaining**: MVP-017 through MVP-024 (8 issues) - Quality reviews, Readability, Final review, Publishing (3 phases)
 
 ---
 
@@ -136,9 +136,9 @@ Worker02: Implement PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle (v3)
 
 ---
 
-## Sprint 3: Validation & Quality (Weeks 5-8) ⚠️ PARTIAL (5/11 Complete)
+## Sprint 3: Validation & Quality (Weeks 5-8) ⚠️ PARTIAL (5/13 Complete)
 
-**Goal**: Acceptance gates + comprehensive quality reviews + final review + publishing  
+**Goal**: Acceptance gates + comprehensive quality reviews + final review + publishing (3 phases)  
 **Timeline**: 4 weeks  
 **Active Workers**: Worker02, Worker10, Worker04, Worker15  
 **Status**: IN PROGRESS - Acceptance gates + 3 quality reviews complete
@@ -163,7 +163,7 @@ Sprint 3 issues completed so far:
 
 ---
 
-### Remaining Sprint 3 Work (6 issues)
+### Remaining Sprint 3 Work (8 issues)
 
 #### Quality Reviews (2 remaining)
 
@@ -243,7 +243,7 @@ Worker10: Implement PrismQ.T.Review.Script.Readability in T/Review/Readability/
   * Tests: Natural-flow and awkward-flow script scenarios
 ```
 
-#### Final Review & Publishing (2 remaining)
+#### Final Review & Publishing (4 remaining)
 
 ```bash
 # MVP-021: Final Story Review (0.5 days) - NOT STARTED ❌
@@ -263,21 +263,53 @@ Worker10: Implement PrismQ.T.Story.FinalReview in T/Story/FinalReview/
   * Pass/Fail decision: PASS → MVP-022 (publishing), FAIL → targeted refinement
   * Tests: Ready-to-publish and needs-improvement scenarios
 
-# MVP-022: Publishing (1.5 days) - NOT STARTED ❌
-Worker02: Implement PrismQ.T.Publishing.Finalization in T/Publishing/Finalization/
-- Module: PrismQ.T.Publishing.Finalization
+# MVP-022: Publishing - Database Marking (0.5 days) - NOT STARTED ❌
+Worker02: Implement PrismQ.T.Publishing.DatabaseMarking in T/Publishing/DatabaseMarking/
+- Module: PrismQ.T.Publishing.DatabaseMarking
 - Dependencies: MVP-021 (final review must pass)
 - Priority: HIGH
-- Effort: 1.5 days
+- Effort: 0.5 days
 - Status: NOT STARTED
-- Purpose: Mark as published, export formats, generate publishing report
+- Purpose: Mark content as published in database with metadata
 - Acceptance Criteria:
   * Mark content status as "published" in database
-  * Export to multiple formats (JSON, Markdown, HTML)
-  * Generate comprehensive publishing report
-  * Store final version with complete version history
   * Record publication timestamp and metadata
-  * Output publishing confirmation with export paths
+  * Store final version with complete version history
+  * Update workflow status indicators
+  * Output confirmation with publication ID
+  * Tests: Database state verification, metadata validation
+
+# MVP-023: Publishing - Content Export (0.5 days) - NOT STARTED ❌
+Worker02: Implement PrismQ.T.Publishing.ContentExport in T/Publishing/ContentExport/
+- Module: PrismQ.T.Publishing.ContentExport
+- Dependencies: MVP-022 (database must be marked)
+- Priority: HIGH
+- Effort: 0.5 days
+- Status: NOT STARTED
+- Purpose: Export content to multiple formats
+- Acceptance Criteria:
+  * Export to JSON format with complete data structure
+  * Export to Markdown format for documentation
+  * Export to HTML format for web display
+  * Validate all export formats
+  * Output export paths for each format
+  * Tests: Format validation, content integrity checks
+
+# MVP-024: Publishing - Report Generation (0.5 days) - NOT STARTED ❌
+Worker02: Implement PrismQ.T.Publishing.ReportGeneration in T/Publishing/ReportGeneration/
+- Module: PrismQ.T.Publishing.ReportGeneration
+- Dependencies: MVP-023 (exports must be complete)
+- Priority: HIGH
+- Effort: 0.5 days
+- Status: NOT STARTED
+- Purpose: Generate comprehensive publishing report
+- Acceptance Criteria:
+  * Generate comprehensive publishing report with all metrics
+  * Include workflow statistics (versions, reviews, iterations)
+  * Document all quality gates passed
+  * List all export locations and formats
+  * Summary of content metadata
+  * Output publishing completion confirmation
   * Tests: End-to-end publishing workflow with various content types
 ```
 
@@ -379,23 +411,6 @@ Worker10: Implement PrismQ.T.Story.FinalReview in T/Story/FinalReview/
   * Pass/Fail decision: PASS → MVP-022 (publishing), FAIL → targeted refinement
   * Tests: Ready-to-publish and needs-improvement scenarios
 
-# MVP-022: Publishing (1.5 days) - NOT STARTED ❌
-Worker02: Implement PrismQ.T.Publishing.Finalization in T/Publishing/Finalization/
-- Module: PrismQ.T.Publishing.Finalization
-- Dependencies: MVP-021 (final review must pass)
-- Priority: HIGH
-- Effort: 1.5 days
-- Status: NOT STARTED
-- Purpose: Mark as published, export formats, generate publishing report
-- Acceptance Criteria:
-  * Mark content status as "published" in database
-  * Export to multiple formats (JSON, Markdown, HTML)
-  * Generate comprehensive publishing report
-  * Store final version with complete version history
-  * Record publication timestamp and metadata
-  * Output publishing confirmation with export paths
-  * Tests: End-to-end publishing workflow with various content types
-```
 
 ---
 
@@ -417,6 +432,8 @@ MVP-019 → blocked by MVP-018
 MVP-020 → blocked by MVP-019
 MVP-021 → blocked by MVP-020
 MVP-022 → blocked by MVP-021
+MVP-023 → blocked by MVP-022
+MVP-024 → blocked by MVP-023
 ```
 
 ### No Parallel Opportunities
@@ -511,28 +528,30 @@ Each issue is designed following SOLID principles:
 - **Progress**: 100% complete (6 of 6 done)
 - **Reviews**: All issues reviewed in _meta/issues/done/
 
-### Sprint 3 (Weeks 5-8) ⚠️ PARTIAL (5/11 Complete)
-- **Issues**: MVP-012 through MVP-022 (11 issues)
+### Sprint 3 (Weeks 5-8) ⚠️ PARTIAL (5/13 Complete)
+- **Issues**: MVP-012 through MVP-024 (13 issues)
 - **Completed**: 5 issues ✅
   - MVP-012: Title Acceptance Gate ✅
   - MVP-013: Script Acceptance Gate ✅
   - MVP-014: Grammar Review ✅
   - MVP-015: Tone Review ✅
   - MVP-016: Content Review ✅ (merged from main)
-- **Remaining**: 6 issues ❌
+- **Remaining**: 8 issues ❌
   - MVP-017: Consistency Review (HIGH priority - NEXT)
   - MVP-018: Editing Review (HIGH priority)
   - MVP-019: Title Readability (MEDIUM priority)
   - MVP-020: Script Readability (MEDIUM priority)
   - MVP-021: Final Story Review (HIGH priority)
-  - MVP-022: Publishing (HIGH priority)
-- **Progress**: 45% complete (5 of 11 done)
+  - MVP-022: Publishing - Database Marking (HIGH priority)
+  - MVP-023: Publishing - Content Export (HIGH priority)
+  - MVP-024: Publishing - Report Generation (HIGH priority)
+- **Progress**: 38% complete (5 of 13 done)
 - **Reviews**: Completed issues reviewed in _meta/issues/done/
 
 ### Overall
-- **Total Issues**: 22 MVP issues (reduced from 23 - combined expert review into final review)
-- **Completed**: 16 issues (73%) ✅
-- **Remaining**: 6 issues (27%)
+- **Total Issues**: 24 MVP issues (broken down from 22 - split publishing into 3 smaller chunks)
+- **Completed**: 16 issues (67%) ✅
+- **Remaining**: 8 issues (33%)
 - **Current Sprint**: Sprint 3 (partial progress)
 - **Estimated Remaining Time**: ~4-5 days of work, 1.5-2 weeks calendar time
 
@@ -541,11 +560,11 @@ Each issue is designed following SOLID principles:
 ## Critical Path
 
 ```
-Sprint 1 ✅ → Sprint 2 ✅ → MVP-017 (next) → Quality Reviews → Publishing
+Sprint 1 ✅ → Sprint 2 ✅ → MVP-017 (next) → Quality Reviews → Publishing (3 phases)
   DONE         DONE        0.5 days      2 days           1.5 days
 ```
 
-**Current Status**: Sprint 1 COMPLETE ✅ | Sprint 2 COMPLETE ✅ | Sprint 3 IN PROGRESS (45%)
+**Current Status**: Sprint 1 COMPLETE ✅ | Sprint 2 COMPLETE ✅ | Sprint 3 IN PROGRESS (38%)
 
 **Next Priority**: MVP-017 (Consistency Review) - HIGH priority, blocks remaining quality reviews
 

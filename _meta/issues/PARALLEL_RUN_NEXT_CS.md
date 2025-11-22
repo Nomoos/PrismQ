@@ -3,18 +3,18 @@
 > **Poznámka**: Toto je zjednodušený dokument zaměřený na sprinty obsahující pouze sprinty a příkazy.  
 > **Plná detailní verze**: Viz `PARALLEL_RUN_NEXT_FULL_CS.md` pro kompletní vysvětlení workflow.  
 > **Aktuální stav**: Viz `CURRENT_STATE.md` pro hodnocení stavu implementace.  
-> **Refaktorováno**: 2025-11-22 - Zjednodušeno na 22 issues (z 26 fází), aplikovány SOLID principy, zaměřeno na MVP
+> **Refaktorováno**: 2025-11-22 - Zjednodušeno na 24 issues (z 26 fází), aplikovány SOLID principy, zaměřeno na MVP s menšími kusy práce
 
 **Sprint**: Sprint 1-3 (7-8 týdnů) - Vývoj MVP  
 **Datum**: 2025-11-22 (Aktualizováno)  
-**Stav**: Sprint 1 Dokončen ✅ | Sprint 2 Dokončen ✅ | Sprint 3 Částečně (5/11)  
-**Cíl**: Vybudovat MVP s 22-fázovým iterativním workflow společného vylepšování (zjednodušeno z 26)
+**Stav**: Sprint 1 Dokončen ✅ | Sprint 2 Dokončen ✅ | Sprint 3 Částečně (5/13)  
+**Cíl**: Vybudovat MVP s 24-fázovým iterativním workflow společného vylepšování (zjednodušeno z 26, optimalizováno pro menší kusy)
 
 **Úspěch Sprint 1**: Základy dokončeny - Nápad → Titulek v1 → Skript v1 → Křížové revize fungují ✅  
 **Úspěch Sprint 2**: Cyklus vylepšování dokončen - generování v2 a v3 funguje ✅  
-**Pokrok Sprint 3**: Brány přijetí + 3 kontroly kvality dokončeny (5/11 - 45%) ⚠️  
+**Pokrok Sprint 3**: Brány přijetí + 3 kontroly kvality dokončeny (5/13 - 38%) ⚠️  
 **Dokončené Issues**: MVP-001 až MVP-016 (16 issues) → revize v _meta/issues/done/  
-**Zbývající**: MVP-017 až MVP-022 (6 issues) - Kontroly kvality, Čitelnost, Finální revize, Publikování
+**Zbývající**: MVP-017 až MVP-024 (8 issues) - Kontroly kvality, Čitelnost, Finální revize, Publikování (3 fáze)
 
 ---
 
@@ -329,9 +329,9 @@ Worker02: Implementovat PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle (v3)
 
 ---
 
-## Sprint 3: Validace a kvalita (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/11 Dokončeno)
+## Sprint 3: Validace a kvalita (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/13 Dokončeno)
 
-**Cíl**: Brány přijetí + komplexní kontroly kvality + finální revize + publikování  
+**Cíl**: Brány přijetí + komplexní kontroly kvality + finální revize + publikování (3 fáze)  
 **Časový horizont**: 4 týdny  
 **Aktivní workeři**: Worker02, Worker10, Worker04, Worker15  
 **Stav**: PROBÍHÁ - Brány přijetí + 3 kontroly kvality dokončeny
@@ -356,7 +356,7 @@ Sprint 3 issues dokončené dosud:
 
 ---
 
-### Zbývající práce Sprint 3 (6 issues)
+### Zbývající práce Sprint 3 (8 issues)
 
 #### Kontroly kvality (2 zbývající)
 
@@ -436,7 +436,7 @@ Worker10: Implementovat PrismQ.T.Review.Script.Readability v T/Review/Readabilit
   * Testy: Scénáře přirozeného a neohrabaného toku skriptu
 ```
 
-#### Finální revize a publikování (2 zbývající)
+#### Finální revize a publikování (4 zbývající)
 
 ```bash
 # MVP-021: Finální revize příběhu (0.5 dne) - NEZAHÁJENO ❌
@@ -456,21 +456,53 @@ Worker10: Implementovat PrismQ.T.Story.FinalReview v T/Story/FinalReview/
   * Rozhodnutí Projde/Selže: PROJDE → MVP-022 (publikování), SELŽE → cílené vybrušování
   * Testy: Scénáře připraveno k publikování a vyžaduje vylepšení
 
-# MVP-022: Publikování (1.5 dne) - NEZAHÁJENO ❌
-Worker02: Implementovat PrismQ.T.Publishing.Finalization v T/Publishing/Finalization/
-- Modul: PrismQ.T.Publishing.Finalization
+# MVP-022: Publikování - Označení v databázi (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.DatabaseMarking v T/Publishing/DatabaseMarking/
+- Modul: PrismQ.T.Publishing.DatabaseMarking
 - Závislosti: MVP-021 (finální revize musí projít)
 - Priorita: VYSOKÁ
-- Úsilí: 1.5 dne
+- Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
-- Účel: Označit jako publikováno, exportovat formáty, generovat zprávu o publikování
+- Účel: Označit obsah jako publikovaný v databázi s metadaty
 - Kritéria přijetí:
   * Označit stav obsahu jako "publikováno" v databázi
-  * Exportovat do více formátů (JSON, Markdown, HTML)
-  * Generovat kompletní zprávu o publikování
-  * Uložit finální verzi s kompletní historií verzí
   * Zaznamenat časové razítko publikování a metadata
-  * Výstup potvrzení publikování s cestami exportu
+  * Uložit finální verzi s kompletní historií verzí
+  * Aktualizovat indikátory stavu workflow
+  * Výstup potvrzení s ID publikace
+  * Testy: Ověření stavu databáze, validace metadat
+
+# MVP-023: Publikování - Export obsahu (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.ContentExport v T/Publishing/ContentExport/
+- Modul: PrismQ.T.Publishing.ContentExport
+- Závislosti: MVP-022 (databáze musí být označena)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
+- Stav: NEZAHÁJENO
+- Účel: Exportovat obsah do více formátů
+- Kritéria přijetí:
+  * Exportovat do JSON formátu s kompletní datovou strukturou
+  * Exportovat do Markdown formátu pro dokumentaci
+  * Exportovat do HTML formátu pro webové zobrazení
+  * Validovat všechny exportní formáty
+  * Výstup cest exportu pro každý formát
+  * Testy: Validace formátu, kontroly integrity obsahu
+
+# MVP-024: Publikování - Generování zprávy (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.ReportGeneration v T/Publishing/ReportGeneration/
+- Modul: PrismQ.T.Publishing.ReportGeneration
+- Závislosti: MVP-023 (exporty musí být dokončeny)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
+- Stav: NEZAHÁJENO
+- Účel: Generovat kompletní zprávu o publikování
+- Kritéria přijetí:
+  * Generovat kompletní zprávu o publikování se všemi metrikami
+  * Zahrnout statistiky workflow (verze, revize, iterace)
+  * Dokumentovat všechny prošlé brány kvality
+  * Seznam všech umístění a formátů exportu
+  * Shrnutí metadat obsahu
+  * Výstup potvrzení dokončení publikování
   * Testy: End-to-end workflow publikování s různými typy obsahu
 ```
 
@@ -495,6 +527,8 @@ MVP-019 → blokováno MVP-018
 MVP-020 → blokováno MVP-019
 MVP-021 → blokováno MVP-020
 MVP-022 → blokováno MVP-021
+MVP-023 → blokováno MVP-022
+MVP-024 → blokováno MVP-023
 ```
 
 ### Žádné příležitosti pro paralelní provádění
@@ -589,28 +623,30 @@ Každá issue je navržena podle SOLID principů:
 - **Pokrok**: 100% dokončeno (6 z 6 hotovo)
 - **Revize**: Všechny issues revidovány v _meta/issues/done/
 
-### Sprint 3 (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/11 Dokončeno)
-- **Issues**: MVP-012 až MVP-022 (11 issues)
+### Sprint 3 (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/13 Dokončeno)
+- **Issues**: MVP-012 až MVP-024 (13 issues)
 - **Dokončeno**: 5 issues ✅
   - MVP-012: Brána přijetí titulku ✅
   - MVP-013: Brána přijetí skriptu ✅
   - MVP-014: Kontrola gramatiky ✅
   - MVP-015: Kontrola tónu ✅
   - MVP-016: Kontrola obsahu ✅ (sloučeno z main)
-- **Zbývající**: 6 issues ❌
+- **Zbývající**: 8 issues ❌
   - MVP-017: Kontrola konzistence (VYSOKÁ priorita - DALŠÍ)
   - MVP-018: Kontrola editace (VYSOKÁ priorita)
   - MVP-019: Čitelnost titulku (STŘEDNÍ priorita)
   - MVP-020: Čitelnost skriptu (STŘEDNÍ priorita)
   - MVP-021: Finální revize příběhu (VYSOKÁ priorita)
-  - MVP-022: Publikování (VYSOKÁ priorita)
-- **Pokrok**: 45% dokončeno (5 z 11 hotovo)
+  - MVP-022: Publikování - Označení v databázi (VYSOKÁ priorita)
+  - MVP-023: Publikování - Export obsahu (VYSOKÁ priorita)
+  - MVP-024: Publikování - Generování zprávy (VYSOKÁ priorita)
+- **Pokrok**: 38% dokončeno (5 z 13 hotovo)
 - **Revize**: Dokončené issues revidovány v _meta/issues/done/
 
 ### Celkově
-- **Celkem issues**: 22 MVP issues (sníženo z 23 - sloučena expert review do finální revize)
-- **Dokončeno**: 16 issues (73%) ✅
-- **Zbývá**: 6 issues (27%)
+- **Celkem issues**: 24 MVP issues (rozděleno z 22 - publikování rozděleno na 3 menší kusy)
+- **Dokončeno**: 16 issues (67%) ✅
+- **Zbývá**: 8 issues (33%)
 - **Aktuální sprint**: Sprint 3 (částečný pokrok)
 - **Odhadovaný zbývající čas**: ~4-5 dní práce, 1.5-2 týdny kalendářního času
 
@@ -619,11 +655,11 @@ Každá issue je navržena podle SOLID principů:
 ## Kritická cesta
 
 ```
-Sprint 1 ✅ → Sprint 2 ✅ → MVP-017 (další) → Kontroly kvality → Publikování
+Sprint 1 ✅ → Sprint 2 ✅ → MVP-017 (další) → Kontroly kvality → Publikování (3 fáze)
   HOTOVO       HOTOVO        0.5 dne          2 dny             1.5 dne
 ```
 
-**Aktuální stav**: Sprint 1 DOKONČEN ✅ | Sprint 2 DOKONČEN ✅ | Sprint 3 PROBÍHÁ (45%)
+**Aktuální stav**: Sprint 1 DOKONČEN ✅ | Sprint 2 DOKONČEN ✅ | Sprint 3 PROBÍHÁ (38%)
 
 **Další priorita**: MVP-017 (Kontrola konzistence) - VYSOKÁ priorita, blokuje zbývající kontroly kvality
 
