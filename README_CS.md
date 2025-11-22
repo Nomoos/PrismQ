@@ -204,9 +204,9 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **[📄 Zobrazit dokumentaci P stavového automatu](./P/STATE_MACHINE.md)** *(Připravuje se)*
 
 5. **M (Metriky/Analytika)**
-   - **Účel**: Průřezová observabilita napříč všemi moduly
-   - **Typ**: Meta-modul (pozoruje T/A/V/P, není sekvenční)
-   - **Funkce**: Sledování výkonu, sběr KPI, metriky zapojení, výsledky A/B testování
+   - **Účel**: Monitorování výkonu publikovaného obsahu
+   - **Typ**: Meta-modul (monitoruje publikovaný obsah z T/A/V/P)
+   - **Funkce**: Sledování výkonu publikovaného obsahu, sběr KPI, metriky zapojení, výsledky A/B testování
    - **Výstup**: Poznatky zpětně směřující do generování nápadů
    - **[📄 Zobrazit dokumentaci M stavového automatu](./M/STATE_MACHINE.md)** *(Připravuje se)*
 

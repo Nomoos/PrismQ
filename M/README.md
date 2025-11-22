@@ -2,11 +2,11 @@
 
 **Namespace**: `PrismQ.M`
 
-This module provides cross-cutting observability and analytics across all content production stages (T, A, V, P).
+This module monitors performance metrics of **published content** across all formats (text, audio, video).
 
 ## Purpose
 
-The Metrics & Analytics module is a **meta-module** that observes and measures performance across the entire content production pipeline. It collects metrics, tracks KPIs, and provides insights that feed back into the ideation process for continuous improvement.
+The Metrics & Analytics module is a **meta-module** that monitors and measures performance of published content. It collects metrics from published text, audio, and video content, tracks KPIs, and provides insights that feed back into the ideation process for continuous improvement.
 
 ## Architecture Type
 
@@ -30,14 +30,16 @@ Unlike T→A→V→P which are sequential stages, the **M module is cross-cuttin
 
 ## Data Sources
 
-This module collects data from all stages:
+This module collects metrics from **published content only**:
 
 ```
-PrismQ.T.PublishedText → PrismQ.M.Analytics (text metrics)
-PrismQ.A.PublishedAudio → PrismQ.M.Analytics (audio metrics)
-PrismQ.V.PublishedVideo → PrismQ.M.Analytics (video metrics)
-PrismQ.P.Published → PrismQ.M.Analytics (cross-platform metrics)
+PrismQ.T.PublishedText → PrismQ.M.Analytics (published text metrics)
+PrismQ.A.PublishedAudio → PrismQ.M.Analytics (published audio metrics)
+PrismQ.V.PublishedVideo → PrismQ.M.Analytics (published video metrics)
+PrismQ.P.Published → PrismQ.M.Analytics (cross-platform published metrics)
 ```
+
+**Note**: M module monitors only published content performance, not production-stage metrics.
 
 ## 📁 Modules
 
@@ -122,18 +124,18 @@ Test suites and test data.
 
 ## Data Flow
 
-Metrics module observes all stages and feeds insights back to ideation:
+Metrics module monitors published content and feeds insights back to ideation:
 
 ```
-┌─ T.Text Metrics ───┐
-├─ A.Audio Metrics ──┤
-├─ V.Video Metrics ──┼→ M.Analytics → M.Insights → T.IdeaInspiration
-└─ P.Platform Metrics┘
+┌─ T.Published Text Metrics ───┐
+├─ A.Published Audio Metrics ──┤
+├─ V.Published Video Metrics ──┼→ M.Analytics → M.Insights → T.IdeaInspiration
+└─ P.Published Platform Metrics┘
 ```
 
 ## Key Features
 
-- **Cross-Module Observability**: Track metrics from all production stages
+- **Published Content Monitoring**: Track metrics from published content only
 - **Platform Integration**: Native analytics from all major platforms
 - **Real-Time Tracking**: Monitor performance as content goes live
 - **Historical Analysis**: Trend tracking and performance over time
@@ -267,11 +269,11 @@ inspiration = IdeaInspiration.create_from_insights(insights)
 
 ## Related Modules
 
-- **Observed Modules**: 
-  - [PrismQ.T](../T/README.md) (Text Generation) - Text metrics
-  - [PrismQ.A](../A/README.md) (Audio Generation) - Audio metrics
-  - [PrismQ.V](../V/README.md) (Video Generation) - Video metrics
-  - [PrismQ.P](../P/README.md) (Publishing) - Platform metrics
+- **Monitored Published Content**: 
+  - [PrismQ.T](../T/README.md) (Text Generation) - Published text metrics
+  - [PrismQ.A](../A/README.md) (Audio Generation) - Published audio metrics
+  - [PrismQ.V](../V/README.md) (Video Generation) - Published video metrics
+  - [PrismQ.P](../P/README.md) (Publishing) - Published platform metrics
 - **Feedback Target**: [PrismQ.T.Idea.Inspiration](../T/Idea/Inspiration/README.md) - Informs ideation
 
 ---

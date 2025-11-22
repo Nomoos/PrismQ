@@ -62,9 +62,9 @@ PrismQ follows a **sequential progressive enrichment model** where content evolv
 - **Status**: Planning phase
 
 ### M - Metrics/Analytics (Cross-Cutting)
-- **Purpose**: Observe and measure performance across all stages
+- **Purpose**: Monitor published content performance
 - **Type**: Meta-module (not sequential)
-- **Input**: Metrics from T, A, V, P modules
+- **Input**: Published content metrics from T, A, V, P modules
 - **Output**: Performance insights, recommendations
 - **Feedback**: Insights inform future content ideation
 - **Namespace**: `PrismQ.M`
@@ -97,8 +97,8 @@ Clear module boundaries with defined interfaces:
 - No tight coupling between modules
 
 ### 5. Observability
-M module provides cross-cutting metrics:
-- Performance tracking across all stages
+M module monitors published content metrics:
+- Performance tracking of published content
 - Analytics from all platforms
 - Insights feed back to ideation
 
