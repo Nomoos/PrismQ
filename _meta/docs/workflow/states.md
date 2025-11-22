@@ -1,6 +1,5 @@
 # State Characteristics
 
-## State Characteristics
 
 ### Entry States
 - **IdeaInspiration** - Initial entry point for new content

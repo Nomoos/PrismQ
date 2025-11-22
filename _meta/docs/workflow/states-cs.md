@@ -1,6 +1,5 @@
 # Charakteristiky stavů
 
-## Charakteristiky stavů
 
 ### Vstupní stavy
 - **IdeaInspiration** - Počáteční vstupní bod pro nový obsah

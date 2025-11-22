@@ -1,6 +1,5 @@
 # State Transitions
 
-## State Transitions
 
 ### Forward Progression (Sequential Format Enrichment)
 

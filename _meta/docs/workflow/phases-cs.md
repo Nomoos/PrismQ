@@ -1,6 +1,5 @@
 # Fáze workflow
 
-## Fáze workflow
 
 Workflow je organizováno do **fází postupného obohacování**, kde každý formát staví na předchozím:
 

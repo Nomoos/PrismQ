@@ -1,6 +1,5 @@
 # Workflow Phases
 
-## Workflow Phases
 
 The workflow is organized into **progressive enrichment phases** where each format builds on the previous:
 

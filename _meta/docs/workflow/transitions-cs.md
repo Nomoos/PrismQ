@@ -1,6 +1,5 @@
 # Přechody stavů
 
-## Přechody stavů
 
 ### Dopředná progrese (Postupné obohacování formátů)
 
