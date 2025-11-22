@@ -283,11 +283,11 @@ Worker02: Implement #MVP-011 in T/Script/Improvements/
 
 ---
 
-## Sprint 3: Validation & Quality Reviews (Weeks 5-6)
+## Sprint 3: Validation & Quality Reviews (Weeks 5-8)
 
-### Week 5: Acceptance Gates + Local AI Quality Reviews
+### Week 5: Acceptance Gates + Quality Reviews (Part 1)
 
-**Goal**: Validate quality through acceptance gates and comprehensive AI quality reviews  
+**Goal**: Validate through acceptance gates and begin comprehensive AI quality reviews  
 **Active Workers**: 2-3
 
 | Worker | Issue | Effort | Description |
@@ -297,11 +297,6 @@ Worker02: Implement #MVP-011 in T/Script/Improvements/
 | **Worker10** | #MVP-014 | 0.5d | Script Grammar Review |
 | **Worker10** | #MVP-015 | 0.5d | Script Tone Review |
 | **Worker10** | #MVP-016 | 0.5d | Script Content Review |
-| **Worker10** | #MVP-017 | 0.5d | Script Consistency Review |
-| **Worker10** | #MVP-018 | 0.5d | Script Editing Review |
-| **Worker10** | #MVP-019 | 0.5d | Title Readability Review |
-| **Worker10** | #MVP-020 | 0.5d | Script Readability/Voiceover Review |
-| **Worker04** | Quality Tests | 2d | Test all quality review paths |
 
 **Commands**:
 ```
@@ -354,7 +349,27 @@ Worker10: Implement #MVP-016 in T/Review/Content/
   - Check for logic gaps, plot issues, character motivation, pacing
   - If PASSES: proceed to #MVP-017
   - If FAILS: return to Script.FromQualityReviewAndPreviousScript with feedback
+```
 
+**Week 5 Deliverable**: ✅ Acceptance gates passed + Grammar, Tone, Content reviews complete
+
+---
+
+### Week 6: Quality Reviews (Part 2) + Readability
+
+**Goal**: Complete remaining quality dimensions and readability validation  
+**Active Workers**: 2-3
+
+| Worker | Issue | Effort | Description |
+|--------|-------|--------|-------------|
+| **Worker10** | #MVP-017 | 0.5d | Script Consistency Review |
+| **Worker10** | #MVP-018 | 0.5d | Script Editing Review |
+| **Worker10** | #MVP-019 | 0.5d | Title Readability Review |
+| **Worker10** | #MVP-020 | 0.5d | Script Readability/Voiceover Review |
+| **Worker04** | Quality Tests | 2d | Test all quality review paths |
+
+**Commands**:
+```
 Worker10: Implement #MVP-017 in T/Review/Consistency/
 - Module: PrismQ.T.Review.Script.Consistency
 - Dependencies: #MVP-016 (content must pass)
@@ -396,21 +411,23 @@ Worker10: Implement #MVP-020 in T/Review/Readability/
   - If FAILS: return to Script.FromOriginalScriptAndReviewAndTitle with feedback
 
 Worker04: Quality review path testing
-- Dependencies: #MVP-014 through #MVP-020
+- Dependencies: #MVP-017 through #MVP-020
 - Priority: High
 - Effort: 2 days
 - Deliverable: Test all quality review scenarios:
-  - All reviews pass (happy path)
+  - Consistency, Editing, Readability reviews
   - Individual review failures and recovery
   - Multiple failures in sequence
   - Loop back to refinement and re-review
 ```
 
-**Week 5 Deliverable**: ✅ All acceptance gates and local AI quality reviews implemented + tested
+**Week 6 Deliverable**: ✅ All local AI quality reviews + readability checks passing
+
+**Buffer**: Allow time for iteration loops if quality/readability checks fail
 
 ---
 
-### Week 6: GPT Expert Review + Publishing
+### Week 7-8: GPT Expert Review + Publishing
 
 **Goal**: GPT expert review loop and final publishing  
 **Active Workers**: 3
@@ -479,7 +496,7 @@ Worker15: Complete user guide with all stages
   - Version tracking explanation (v1, v2, v3, v4, v5, v6, v7, etc.)
 ```
 
-**Week 6 Deliverable**: ✅ Complete MVP with 26-stage iterative co-improvement workflow fully functional
+**Week 7-8 Deliverable**: ✅ Complete MVP with 26-stage iterative co-improvement workflow fully functional
 
 ---
 
