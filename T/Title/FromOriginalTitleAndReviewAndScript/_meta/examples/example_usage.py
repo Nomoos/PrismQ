@@ -233,9 +233,17 @@ def example_complete_workflow():
 
 
 def example_iteration_v2_to_v3():
-    """Example: Iterative refinement (v2 → v3)."""
+    """Example: Iterative refinement (v2 → v3) - MVP-009.
+    
+    This example demonstrates the MVP-009 acceptance criteria:
+    1. Refine title from v2 to v3 using v2 review feedback
+    2. Polish for clarity and engagement
+    3. Store v3 with reference to v2
+    4. Support versioning (v3, v4, v5, v6, v7, etc.)
+    5. Verify v3 incorporates v2 feedback
+    """
     print("\n\n" + "=" * 80)
-    print("Example: Iterative Refinement (v2 → v3)")
+    print("Example: MVP-009 - Iterative Refinement (v2 → v3)")
     print("Stage 9: Further refinement based on v2 reviews")
     print("=" * 80)
     
