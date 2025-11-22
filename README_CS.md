@@ -122,7 +122,7 @@ PrismQ/
 │   ├── Script/        # Tvorba a revize skriptů
 │   ├── Title/         # Optimalizace titulků
 │   ├── Publishing/    # Publikace textu
-│   ├── Rewiew/        # Revize a editace
+│   ├── Review/        # Revize a editace
 │   └── _meta/         # Metadata modulu
 ├── A/                  # Pipeline pro generování audia
 │   ├── Voiceover/     # Nahrávání hlasu

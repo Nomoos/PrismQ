@@ -12,7 +12,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
 
-from T.Rewiew.Script import (
+from T.Review.Script import (
     ScriptReview,
     ScriptVersion,
     ReviewCategory,

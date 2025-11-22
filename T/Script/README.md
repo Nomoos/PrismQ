@@ -10,8 +10,6 @@ Transform structured ideas into polished scripts ready for review and publicatio
 
 ## Submodules
 
-### MVP Workflow States
-
 #### [FromIdeaAndTitle](./FromIdeaAndTitle/)
 **Stage 3: Initial script draft from idea and title** (v1)
 
@@ -34,20 +32,10 @@ This state handles:
 **[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
 **[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
 
-### Legacy and Support Modules
-
-#### [Draft](./Draft/)
-**Initial script writing** (Legacy)
-
-First draft creation from idea outlines.
-
-**[→ View Draft Documentation](./Draft/README.md)**
-**[→ View Draft Metadata](./Draft/_meta/)**
-
 #### [Writer](./Writer/)
 **AI script writer with feedback loop** ⭐ NEW
 
-AI-powered script writer that optimizes content based on review feedback from **[T/Rewiew/Script](../Rewiew/Script/)**.
+AI-powered script writer that optimizes content based on review feedback from **[T/Review/Script](../Review/Script/)**.
 
 - Iterative optimization (review → write → review cycle)
 - Multiple optimization strategies
@@ -57,22 +45,6 @@ AI-powered script writer that optimizes content based on review feedback from **
 **[→ View Writer Documentation](./Writer/README.md)**
 **[→ View Writer Metadata](./Writer/_meta/)**
 
-#### [Improvements](./Improvements/)
-**Script enhancement** (Legacy)
-
-Iterative improvements and refinements.
-
-**[→ View Improvements Documentation](./Improvements/README.md)**
-**[→ View Improvements Metadata](./Improvements/_meta/)**
-
-#### [Optimization](./Optimization/)
-**Script optimization**
-
-Final optimization for flow, readability, and impact.
-
-**[→ View Optimization Documentation](./Optimization/README.md)**
-**[→ View Optimization Metadata](./Optimization/_meta/)**
-
 ## Module Metadata
 
 **[→ View Script/_meta/docs/](./_meta/docs/)**
@@ -81,7 +53,7 @@ Final optimization for flow, readability, and impact.
 
 ## AI-Powered Feedback Loop Workflow
 
-The **[T/Rewiew/Script](../Rewiew/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
+The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
 
 ```
 1. Draft → Original Script (145 seconds)
@@ -121,7 +93,7 @@ The **[T/Rewiew/Script](../Rewiew/Script/)** (AI Script Reviewer) and Writer mod
 ### Quick Start
 
 ```python
-from PrismQ.T.Rewiew.Script import ScriptReview, ContentLength
+from PrismQ.T.Review.Script import ScriptReview, ContentLength
 from PrismQ.T.Script.Writer import ScriptWriter
 
 # AI Reviewer evaluates
@@ -147,7 +119,7 @@ if writer.should_continue_iteration():
     pass
 ```
 
-See **[Feedback Loop Example](../Rewiew/Script/_meta/examples/feedback_loop_example.py)** for complete implementation.
+See **[Feedback Loop Example](../Review/Script/_meta/examples/feedback_loop_example.py)** for complete implementation.
 
 ## Navigation
 

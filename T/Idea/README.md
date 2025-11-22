@@ -115,7 +115,7 @@ Structured content outline creation and refinement.
 ## Related Modules
 
 ### Idea Review
-For idea validation and review, see **[T/Rewiew/Idea](../Rewiew/Idea/)** - validates ideas for viability, potential, and alignment with content strategy.
+For idea validation and review, see **[T/Review/Idea](../Review/Idea/)** - validates ideas for viability, potential, and alignment with content strategy.
 
 ---
 
@@ -185,7 +185,7 @@ Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
     └─ Outline (organization)
     ↓
-[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
+[Exit Idea Module] → Review/Idea (validation) → Title → ScriptDraft
 ```
 ```
 Inspiration (multiple sources)
@@ -204,7 +204,7 @@ Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
     └─ Outline (organization)
     ↓
-[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
+[Exit Idea Module] → Review/Idea (validation) → Title → ScriptDraft
 ```
 
 **New Workflows:**
@@ -270,19 +270,19 @@ summary = idea.generate_summary(max_length=500)
 ```
 
 ### Traditional Model Example
-Inspiration → Model (Creation) → Outline → [Exit to Rewiew/Idea for validation] → Title
+Inspiration → Model (Creation) → Outline → [Exit to Review/Idea for validation] → Title
 ```
 
 **Note**: 
 - Title is a separate module at `T/Title/`, not a sub-state of Idea
-- Idea validation/review is handled by `T/Rewiew/Idea/`, which is part of the review pipeline
-- After completing Outline, the workflow exits the Idea module and proceeds to Rewiew/Idea for validation
+- Idea validation/review is handled by `T/Review/Idea/`, which is part of the review pipeline
+- After completing Outline, the workflow exits the Idea module and proceeds to Review/Idea for validation
 
 ## Usage Example
 
 ```python
 from PrismQ.T.Idea import Model, Outline
-from PrismQ.T.Rewiew.Idea import Review
+from PrismQ.T.Review.Idea import Review
 
 # Create new idea
 idea = Model.create(

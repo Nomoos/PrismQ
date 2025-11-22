@@ -45,7 +45,7 @@ PrismQ.T.Script.Draft (v1)
 
 After title variants are created, they are used in:
 - **Stage 3**: Script.FromIdea (uses Title v1 as context)
-- **Stage 4**: Rewiew.Title.ByScript (reviews Title v1 against Script v1)
+- **Stage 4**: Review.Title.ByScript (reviews Title v1 against Script v1)
 
 ## Module Metadata
 

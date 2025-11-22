@@ -50,7 +50,7 @@ _To be implemented_
 
 ## Navigation
 
-**[← Back to Idea](../README.md)** | **[Previous: Model](../Model/README.md)** | **[Next: Rewiew/Idea →](../../Rewiew/Idea/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
+**[← Back to Idea](../README.md)** | **[Previous: Model](../Model/README.md)** | **[Next: Review/Idea →](../../Review/Idea/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 

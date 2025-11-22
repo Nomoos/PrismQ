@@ -1,6 +1,6 @@
-# T/Rewiew - Content Review Module
+# T/Review - Content Review Module
 
-**Namespace**: `PrismQ.T.Rewiew`
+**Namespace**: `PrismQ.T.Review`
 
 Multi-dimensional content quality review and enhancement.
 
@@ -88,9 +88,9 @@ Final comprehensive editing review.
 
 ## Module Metadata
 
-**[→ View Rewiew/_meta/docs/](./_meta/docs/)**
-**[→ View Rewiew/_meta/examples/](./_meta/examples/)**
-**[→ View Rewiew/_meta/tests/](./_meta/tests/)**
+**[→ View Review/_meta/docs/](./_meta/docs/)**
+**[→ View Review/_meta/examples/](./_meta/examples/)**
+**[→ View Review/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 

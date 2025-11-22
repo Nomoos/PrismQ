@@ -25,23 +25,23 @@
 ```
 1. PrismQ.T.Idea.Creation
        ↓
-2. PrismQ.T.Title.Draft (v1) ← z Nápadu
+2. PrismQ.T.Title.FromIdea (v1) ← z Nápadu
        ↓
-3. PrismQ.T.Script.Draft (v1) ← z Nápadu + Titulku v1
+3. PrismQ.T.Script.FromIdeaAndTitle (v1) ← z Nápadu + Titulku v1
        ↓
-4. PrismQ.T.Rewiew.Title.ByScript ← Revize Titulku v1 podle Skriptu v1 + Nápadu
+4. PrismQ.T.Review.Title.ByScript ← Revize Titulku v1 podle Skriptu v1 + Nápadu
        ↓
-5. PrismQ.T.Rewiew.Script.ByTitle ← Revize Skriptu v1 podle Titulku v1 + Nápadu
+5. PrismQ.T.Review.Script.ByTitle ← Revize Skriptu v1 podle Titulku v1 + Nápadu
        ↓
 6. PrismQ.T.Title.Improvements (v2) ← Použití revizí + titulek v1, skript v1
        ↓
 7. PrismQ.T.Script.Improvements (v2) ← Použití revizí + nový titulek v2, skript v1
        ↓
-8. PrismQ.T.Rewiew.Title.ByScript (v2) ←──────────┐
+8. PrismQ.T.Review.Title.ByScript (v2) ←──────────┐
        ↓                                           │
 9. PrismQ.T.Title.Refinement (v3)                 │
        ↓                                           │
-10. PrismQ.T.Rewiew.Script.ByTitle (v2) ←─────┐   │
+10. PrismQ.T.Review.Script.ByTitle (v2) ←─────┐   │
         ↓                                      │   │
 11. PrismQ.T.Script.Refinement (v3)            │   │
         ↓                                      │   │
@@ -49,11 +49,11 @@
         ↓ ANO                                      │
 13. Kontrola přijetí skriptu ─NE────────────────────┘
         ↓ ANO
-14. PrismQ.T.Rewiew.Title.Readability (Voiceover) ←──────┐
+14. PrismQ.T.Review.Title.Readability (Voiceover) ←──────┐
         ↓                                                │
         ├─SELHÁNÍ─→ Návrat ke kroku 9 ──────────────────────┘
         ↓ ÚSPĚCH
-15. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─────┐
+15. PrismQ.T.Review.Script.Readability (Voiceover) ←─────┐
         ↓                                                 │
         ├─SELHÁNÍ─→ Návrat ke kroku 11 ─────────────────────┘
         ↓ ÚSPĚCH
@@ -70,14 +70,14 @@
 
 **Cesty ke složkám:**
 - `T/Idea/Creation/` - Vytváření nápadu
-- `T/Title/Draft/` - Návrh titulku v1
-- `T/Script/Draft/` - Návrh skriptu v1
-- `T/Rewiew/Idea/` - Revize titulku (kroky 4, 8, 12, 14)
-- `T/Rewiew/Script/` - Revize skriptu (kroky 5, 10, 13, 15)
+- `T/Title/FromIdea/` - Návrh titulku v1
+- `T/Script/FromIdeaAndTitle/` - Návrh skriptu v1
+- `T/Review/Idea/` - Revize titulku (kroky 4, 8, 12, 14)
+- `T/Review/Script/` - Revize skriptu (kroky 5, 10, 13, 15)
 - `T/Title/Improvements/` - Vylepšení titulku v2 (krok 6)
 - `T/Script/Improvements/` - Vylepšení skriptu v2 + vybrušování v3 (kroky 7, 11)
 - `T/Title/Refinement/` - Vybrušování titulku v3+ (krok 9)
-- `T/Rewiew/Readability/` - Validace čitelnosti (kroky 14-15)
+- `T/Review/Readability/` - Validace čitelnosti (kroky 14-15)
 - `T/Publishing/Finalization/` - Publikování (krok 16)
 
 ---
@@ -106,15 +106,15 @@ Worker02: Implementovat #MVP-001 v T/Idea/Creation/
 - Úsilí: 2 dny
 - Výstup: Základní zachycení a uložení nápadu
 
-Worker13: Implementovat #MVP-002 v T/Title/Draft/
-- Modul: PrismQ.T.Title.Draft
+Worker13: Implementovat #MVP-002 v T/Title/FromIdea/
+- Modul: PrismQ.T.Title.FromIdea
 - Závislosti: #MVP-001 (může začít paralelně)
 - Priorita: Kritická
 - Úsilí: 2 dny
 - Výstup: Generovat 3-5 variant titulku (v1) pouze z nápadu
 
-Worker02: Implementovat #MVP-003 v T/Script/Draft/
-- Modul: PrismQ.T.Script.Draft
+Worker02: Implementovat #MVP-003 v T/Script/FromIdeaAndTitle/
+- Modul: PrismQ.T.Script.FromIdeaAndTitle
 - Závislosti: #MVP-002
 - Priorita: Kritická
 - Úsilí: 3 dny
@@ -137,15 +137,15 @@ Worker02: Implementovat #MVP-003 v T/Script/Draft/
 
 **Příkazy**:
 ```
-Worker10: Implementovat #MVP-004 v T/Rewiew/Idea/
-- Modul: PrismQ.T.Rewiew.Title.ByScript
+Worker10: Implementovat #MVP-004 v T/Review/Idea/
+- Modul: PrismQ.T.Review.Title.ByScript
 - Závislosti: #MVP-003 (potřeba titulku v1 i skriptu v1)
 - Priorita: Kritická
 - Úsilí: 1 den
 - Výstup: Revidovat titulek v1 proti skriptu v1 a nápadu - generovat zpětnou vazbu
 
-Worker10: Implementovat #MVP-005 v T/Rewiew/Script/
-- Modul: PrismQ.T.Rewiew.Script.ByTitle
+Worker10: Implementovat #MVP-005 v T/Review/Script/
+- Modul: PrismQ.T.Review.Script.ByTitle
 - Závislosti: #MVP-003
 - Priorita: Kritická
 - Úsilí: 1 den
@@ -193,8 +193,8 @@ Worker02: Implementovat #MVP-007 v T/Script/Improvements/
   - Skript v1
   - **Nový titulek v2** (z kroku 6)
 
-Worker10: Implementovat #MVP-008 v T/Rewiew/Idea/
-- Modul: PrismQ.T.Rewiew.Title.ByScript (v2)
+Worker10: Implementovat #MVP-008 v T/Review/Idea/
+- Modul: PrismQ.T.Review.Title.ByScript (v2)
 - Závislosti: #MVP-007 (potřeba obou verzí v2)
 - Priorita: Kritická
 - Úsilí: 1 den
@@ -225,8 +225,8 @@ Worker13: Implementovat #MVP-009 v T/Title/Refinement/
 - Úsilí: 1 den
 - Výstup: Vybrousit titulek z v2 na v3 pomocí zpětné vazby z kroku 8
 
-Worker10: Implementovat #MVP-010 v T/Rewiew/Script/
-- Modul: PrismQ.T.Rewiew.Script.ByTitle (v2)
+Worker10: Implementovat #MVP-010 v T/Review/Script/
+- Modul: PrismQ.T.Review.Script.ByTitle (v2)
 - Závislosti: #MVP-009 (potřeba titulku v3)
 - Priorita: Kritická
 - Úsilí: 1 den
@@ -261,8 +261,8 @@ Worker02: Implementovat #MVP-011 v T/Script/Improvements/
 
 **Příkazy**:
 ```
-Worker10: Implementovat #MVP-012 v T/Rewiew/Idea/
-- Modul: PrismQ.T.Rewiew.Title.Acceptance
+Worker10: Implementovat #MVP-012 v T/Review/Idea/
+- Modul: PrismQ.T.Review.Title.Acceptance
 - Závislosti: #MVP-011 (potřeba nejnovější verze titulku)
 - Priorita: Kritická
 - Úsilí: 0.5 dne
@@ -271,8 +271,8 @@ Worker10: Implementovat #MVP-012 v T/Rewiew/Idea/
   - Pokud NEPŘIJATO: smyčka zpět na #MVP-008 (revize nejnovější verze → vybrousit na další verzi)
   - **Vždy používá nejnovější verzi titulku**
 
-Worker10: Implementovat #MVP-013 v T/Rewiew/Script/
-- Modul: PrismQ.T.Rewiew.Script.Acceptance
+Worker10: Implementovat #MVP-013 v T/Review/Script/
+- Modul: PrismQ.T.Review.Script.Acceptance
 - Závislosti: #MVP-012 (titulek musí být přijat jako první)
 - Priorita: Kritická
 - Úsilí: 0.5 dne
@@ -281,8 +281,8 @@ Worker10: Implementovat #MVP-013 v T/Rewiew/Script/
   - Pokud NEPŘIJATO: smyčka zpět na #MVP-010 (revize nejnovější verze → vybrousit na další verzi)
   - **Vždy používá nejnovější verzi skriptu**
 
-Worker10: Implementovat #MVP-014 v T/Rewiew/Readability/
-- Modul: PrismQ.T.Rewiew.Title.Readability
+Worker10: Implementovat #MVP-014 v T/Review/Readability/
+- Modul: PrismQ.T.Review.Title.Readability
 - Závislosti: #MVP-013 (oba musí být přijaty)
 - Priorita: Kritická
 - Úsilí: 0.5 dne
@@ -291,8 +291,8 @@ Worker10: Implementovat #MVP-014 v T/Rewiew/Readability/
   - Pokud SELŽE: návrat na #MVP-009 (vybrousit se zpětnou vazbou čitelnosti - vytvoří další verzi)
   - **Používá nejnovější přijatý titulek**
 
-Worker10: Implementovat #MVP-015 v T/Rewiew/Readability/
-- Modul: PrismQ.T.Rewiew.Script.Readability
+Worker10: Implementovat #MVP-015 v T/Review/Readability/
+- Modul: PrismQ.T.Review.Script.Readability
 - Závislosti: #MVP-014 (čitelnost titulku prošla)
 - Priorita: Kritická
 - Úsilí: 0.5 dne
@@ -375,20 +375,20 @@ Worker04: Finální MVP validace všech cest
 | Issue | Modul | Fáze | Worker | Úsilí | Popis |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Nápad | Worker02 | 2d | Základní zachycení nápadu |
-| #MVP-002 | PrismQ.T.Title.Draft | Titulek v1 | Worker13 | 2d | Generování titulku z nápadu |
-| #MVP-003 | PrismQ.T.Script.Draft | Skript v1 | Worker02 | 3d | Generování skriptu z nápadu + titulku v1 |
-| #MVP-004 | PrismQ.T.Rewiew.Title.ByScript | **Revize titulku podle skriptu** | Worker10 | 1d | Revize titulku v1 proti skriptu v1 + nápadu |
-| #MVP-005 | PrismQ.T.Rewiew.Script.ByTitle | **Revize skriptu podle titulku** | Worker10 | 1d | Revize skriptu v1 proti titulku v1 + nápadu |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Titulek v1 | Worker13 | 2d | Generování titulku z nápadu |
+| #MVP-003 | PrismQ.T.Script.FromIdeaAndTitle | Skript v1 | Worker02 | 3d | Generování skriptu z nápadu + titulku v1 |
+| #MVP-004 | PrismQ.T.Review.Title.ByScript | **Revize titulku podle skriptu** | Worker10 | 1d | Revize titulku v1 proti skriptu v1 + nápadu |
+| #MVP-005 | PrismQ.T.Review.Script.ByTitle | **Revize skriptu podle titulku** | Worker10 | 1d | Revize skriptu v1 proti titulku v1 + nápadu |
 | #MVP-006 | PrismQ.T.Title.Improvements | Titulek v2 | Worker13 | 2d | Titulek v2 použitím křížových revizí + titulek v1, skript v1 |
 | #MVP-007 | PrismQ.T.Script.Improvements | Skript v2 | Worker02 | 2d | Skript v2 použitím křížových revizí + nový titulek v2, skript v1 |
-| #MVP-008 | PrismQ.T.Rewiew.Title.ByScript | **Revize titulku v2** | Worker10 | 1d | Revize titulku v2 proti skriptu v2 |
+| #MVP-008 | PrismQ.T.Review.Title.ByScript | **Revize titulku v2** | Worker10 | 1d | Revize titulku v2 proti skriptu v2 |
 | #MVP-009 | PrismQ.T.Title.Refinement | Titulek v3+ | Worker13 | 1d | Vybrousit titulek na v3, v4, v5, v6, v7, atd. (nejnovější verze) |
-| #MVP-010 | PrismQ.T.Rewiew.Script.ByTitle | **Revize skriptu v2+** | Worker10 | 1d | Revize skriptu (nejnovější) proti titulku (nejnovější) |
+| #MVP-010 | PrismQ.T.Review.Script.ByTitle | **Revize skriptu v2+** | Worker10 | 1d | Revize skriptu (nejnovější) proti titulku (nejnovější) |
 | #MVP-011 | PrismQ.T.Script.Refinement | Skript v3+ | Worker02 | 2d | Vybrousit skript na v3, v4, v5, v6, v7, atd. (nejnovější verze) |
-| #MVP-012 | PrismQ.T.Rewiew.Title.Acceptance | **Brána přijetí** | Worker10 | 0.5d | Zkontrolovat, zda je titulek (nejnovější verze) přijat (smyčka pokud ne) |
-| #MVP-013 | PrismQ.T.Rewiew.Script.Acceptance | **Brána přijetí** | Worker10 | 0.5d | Zkontrolovat, zda je skript (nejnovější verze) přijat (smyčka pokud ne) |
-| #MVP-014 | PrismQ.T.Rewiew.Title.Readability | **Kontrola čitelnosti** | Worker10 | 0.5d | Finální validace čitelnosti/hlasu titulku |
-| #MVP-015 | PrismQ.T.Rewiew.Script.Readability | **Kontrola čitelnosti** | Worker10 | 0.5d | Finální validace čitelnosti/hlasu skriptu |
+| #MVP-012 | PrismQ.T.Review.Title.Acceptance | **Brána přijetí** | Worker10 | 0.5d | Zkontrolovat, zda je titulek (nejnovější verze) přijat (smyčka pokud ne) |
+| #MVP-013 | PrismQ.T.Review.Script.Acceptance | **Brána přijetí** | Worker10 | 0.5d | Zkontrolovat, zda je skript (nejnovější verze) přijat (smyčka pokud ne) |
+| #MVP-014 | PrismQ.T.Review.Title.Readability | **Kontrola čitelnosti** | Worker10 | 0.5d | Finální validace čitelnosti/hlasu titulku |
+| #MVP-015 | PrismQ.T.Review.Script.Readability | **Kontrola čitelnosti** | Worker10 | 0.5d | Finální validace čitelnosti/hlasu skriptu |
 | #MVP-016 | PrismQ.T.Publishing.Finalization | Publikovat | Worker02 | 2d | Publikování schváleného + validovaného obsahu |
 
 **Celkem**: 16 issues, 20 dní práce, 6 týdnů kalendářního času s 3-4 workery
@@ -403,14 +403,14 @@ Worker04: Finální MVP validace všech cest
 
 **Cesty ke složkám:**
 - `T/Idea/Creation/` (krok 1)
-- `T/Title/Draft/` (krok 2)
-- `T/Script/Draft/` (krok 3)
-- `T/Rewiew/Idea/` (kroky 4, 8, 12, 14)
-- `T/Rewiew/Script/` (kroky 5, 10, 13, 15)
+- `T/Title/FromIdea/` (krok 2)
+- `T/Script/FromIdeaAndTitle/` (krok 3)
+- `T/Review/Idea/` (kroky 4, 8, 12, 14)
+- `T/Review/Script/` (kroky 5, 10, 13, 15)
 - `T/Title/Improvements/` (krok 6)
 - `T/Script/Improvements/` (kroky 7, 11)
 - `T/Title/Refinement/` (krok 9)
-- `T/Rewiew/Readability/` (kroky 14-15)
+- `T/Review/Readability/` (kroky 14-15)
 - `T/Publishing/Finalization/` (krok 16)
 
 ---

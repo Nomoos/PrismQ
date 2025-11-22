@@ -22,7 +22,7 @@ This document provides answers to the research questions about creating script d
 - Title's emotional quality guides script voice
 - Title keywords should appear naturally in script
 
-**Documentation**: See `T/Title/Draft/README.md` and related Title module docs
+**Documentation**: See `T/Title/FromIdea/README.md` and related Title module docs
 
 ### Script Draft (Second Requirement)
 
@@ -75,12 +75,12 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
    - Associate draft with Idea record
 
 3. **Route to Multi-Dimensional Review**
-   - `T/Rewiew/Grammar` - Grammar and syntax
-   - `T/Rewiew/Readability` - Reading level and flow
-   - `T/Rewiew/Tone` - Voice consistency and appropriateness
-   - `T/Rewiew/Content` - Factual accuracy and completeness
-   - `T/Rewiew/Consistency` - Terminology and style
-   - `T/Rewiew/Editing` - Redundancy removal and polish
+   - `T/Review/Grammar` - Grammar and syntax
+   - `T/Review/Readability` - Reading level and flow
+   - `T/Review/Tone` - Voice consistency and appropriateness
+   - `T/Review/Content` - Factual accuracy and completeness
+   - `T/Review/Consistency` - Terminology and style
+   - `T/Review/Editing` - Redundancy removal and polish
 
 4. **Gather Review Feedback**
    - All review dimensions provide feedback
@@ -244,7 +244,7 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
 4. Verify improvements don't break natural flow
 5. Re-check against quality gates
 
-### For Reviewing (T/Rewiew modules)
+### For Reviewing (T/Review modules)
 
 **What's Needed:**
 
@@ -312,7 +312,7 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
 
 ### Module Documentation
 - **[T/Script README](T/Script/README.md)** - Script module overview
-- **[T/Script/Draft README](T/Script/Draft/README.md)** - Draft module specifics
+- **[T/Script/Draft README](T/Script/FromIdeaAndTitle/README.md)** - Draft module specifics
 - **[T/Idea README](T/Idea/README.md)** - Idea development context
 - **[T/Title README](T/Title/README.md)** - Title creation context
 

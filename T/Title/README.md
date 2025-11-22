@@ -10,8 +10,6 @@ Develop attention-grabbing titles that maximize click-through rates while mainta
 
 ## Submodules
 
-### MVP Workflow States
-
 #### [FromIdea](./FromIdea/)
 **Stage 2: Initial title draft from idea** (v1)
 
@@ -32,32 +30,6 @@ This state handles:
 
 **[→ View FromOriginalTitleAndReviewAndScript Documentation](./FromOriginalTitleAndReviewAndScript/README.md)**
 **[→ View FromOriginalTitleAndReviewAndScript Metadata](./FromOriginalTitleAndReviewAndScript/_meta/)**
-
-### Legacy Modules
-
-#### [Draft](./Draft/)
-**Initial title creation** (Legacy)
-
-Brainstorm and create initial title options.
-
-**[→ View Draft Documentation](./Draft/README.md)**
-**[→ View Draft Metadata](./Draft/_meta/)**
-
-#### [Optimization](./Optimization/)
-**Title A/B testing**
-
-Test title variations for performance.
-
-**[→ View Optimization Documentation](./Optimization/README.md)**
-**[→ View Optimization Metadata](./Optimization/_meta/)**
-
-#### [Refinement](./Refinement/)
-**Final title polish** (Legacy)
-
-Final refinement based on test results.
-
-**[→ View Refinement Documentation](./Refinement/README.md)**
-**[→ View Refinement Metadata](./Refinement/_meta/)**
 
 ## Module Metadata
 

@@ -1,6 +1,6 @@
-# T/Rewiew/Idea - Idea Review and Validation
+# T/Review/Idea - Idea Review and Validation
 
-**Namespace**: `PrismQ.T.Rewiew.Idea`
+**Namespace**: `PrismQ.T.Review.Idea`
 
 Review and validate the initial Idea concept before proceeding to detailed outline.
 
@@ -55,7 +55,7 @@ _To be implemented_
 
 ## Navigation
 
-**[← Back to Rewiew](../README.md)** | **[Next: Script →](../Script/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
+**[← Back to Review](../README.md)** | **[Next: Script →](../Script/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
 
 ---
 

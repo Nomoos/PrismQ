@@ -72,7 +72,7 @@ Loop continues until:
 ### Basic Feedback Loop
 
 ```python
-from PrismQ.T.Rewiew.Script import ScriptReview, ReviewCategory
+from PrismQ.T.Review.Script import ScriptReview, ReviewCategory
 from PrismQ.T.Script.Writer import ScriptWriter, OptimizationStrategy
 
 # Original script
@@ -128,7 +128,7 @@ print(f"\nOptimized script:\n{result.optimized_text}")
 ### Complete Feedback Loop
 
 ```python
-from PrismQ.T.Rewiew.Script import ScriptReview
+from PrismQ.T.Review.Script import ScriptReview
 from PrismQ.T.Script.Writer import ScriptWriter
 
 # Initialize writer

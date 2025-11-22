@@ -309,7 +309,7 @@ Want: Mark version 3 as "published", keep version 4 as "draft"
 Want: Version 2 "pending review" → "approved" → "published"
 ```
 **Status**: ❌ No workflow state tracking  
-**Impact**: Cannot integrate with existing T/Rewiew modules
+**Impact**: Cannot integrate with existing T/Review modules
 
 #### UC10: Find All Draft Versions Across All Stories
 ```sql
@@ -361,7 +361,7 @@ model Story {
   basedOnVersionId String?  // ID of previous version (lineage)
   changeDescription String? // What changed (structured)
   changeType String? // typo_fix, content_update, major_rewrite
-  reviewScore Int?    // Integration with T/Rewiew
+  reviewScore Int?    // Integration with T/Review
   isLatest   Boolean  @default(false) // Performance optimization
   
   // Multi-platform publication tracking (PrismQ workflow integration)
@@ -1281,7 +1281,7 @@ FROM legacy_script_versions;
 1. **Add Status Workflow Integration**
    - Map to existing PrismQ workflow states
    - Add state transition validation
-   - Integration with T/Rewiew modules
+   - Integration with T/Review modules
 
 2. **Implement Change Tracking**
    - Add changesSummary JSON field
@@ -2687,7 +2687,7 @@ CREATE TABLE stories (
     -- Workflow integration
     status ENUM('draft', 'review', 'approved', 'published') DEFAULT 'draft',
     workflow_state VARCHAR(100) NULL COMMENT 'PrismQ workflow state',
-    review_score INT NULL COMMENT 'Score from T/Rewiew (0-100)',
+    review_score INT NULL COMMENT 'Score from T/Review (0-100)',
     
     -- Multi-platform publication tracking (PrismQ progressive enrichment)
     published_text TIMESTAMP NULL COMMENT 'Text publication (blog, Medium, Substack, LinkedIn, Twitter)',

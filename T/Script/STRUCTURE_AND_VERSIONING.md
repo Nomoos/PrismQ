@@ -2,16 +2,16 @@
 
 ## Addressing @Nomoos Comments
 
-### 1. Module Structure: T/Rewiew/Script (MOVED)
+### 1. Module Structure: T/Review/Script (MOVED)
 
 **Original Question**: "How this fit into existing structure isn't there T.Reviewer.Script or something like that?"
 
-**Resolution**: Moved `T/Script/Review/` → `T/Rewiew/Script/` as requested.
+**Resolution**: Moved `T/Script/Review/` → `T/Review/Script/` as requested.
 
 **Updated Structure**:
 ```
 T/
-├── Rewiew/               # Automated content review (various aspects)
+├── Review/               # Automated content review (various aspects)
 │   ├── Script/          # AI-powered script review with scoring ⭐ MOVED HERE
 │   ├── Grammar/         # Grammar and syntax checking
 │   ├── Readability/     # Reading level optimization
@@ -27,14 +27,14 @@ T/
     └── Writer/          # AI script writer with feedback loop ⭐ NEW
 ```
 
-**Why T/Rewiew/Script?**
+**Why T/Review/Script?**
 
 Now grouped with other automated review modules (Grammar, Tone, Readability, etc.) as all are automated review steps.
 
 **Key Characteristics**:
-- **T/Rewiew/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with Writer
-- **T/Rewiew/Grammar, Tone, etc.**: Dimensional review focusing on specific quality aspects
-- **T/Script/Writer**: Pairs with T/Rewiew/Script in feedback loop during script development
+- **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with Writer
+- **T/Review/Grammar, Tone, etc.**: Dimensional review focusing on specific quality aspects
+- **T/Script/Writer**: Pairs with T/Review/Script in feedback loop during script development
 
 ### 2. Script Versioning for Comparison and Research
 
@@ -139,7 +139,7 @@ versions = data['script_versions_history']
 
 Both concerns addressed:
 
-1. **Structure**: Clarified why `T/Script/Review` is separate from `T/Rewiew` (AI vs. manual, feedback loop integration)
+1. **Structure**: Clarified why `T/Script/Review` is separate from `T/Review` (AI vs. manual, feedback loop integration)
 2. **Versioning**: Fully implemented script version tracking for comparison and research with comprehensive tests and examples
 
 The versioning feature enables:
