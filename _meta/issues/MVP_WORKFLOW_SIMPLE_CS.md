@@ -1,9 +1,11 @@
 # MVP Workflow - Plán minimálního životaschopného produktu
 
+**⚠️ POZNÁMKA**: Tento dokument vyžaduje aktualizaci na rozšířený workflow. Viz anglická verze `MVP_WORKFLOW.md` a `MVP_WORKFLOW_SIMPLE.md` pro aktuální specifikaci s 23 MVP issues.
+
 **Vytvořeno**: 2025-11-21  
-**Aktualizováno**: 2025-11-21  
-**Stav**: Plánování  
-**Přístup**: Iterativní vývoj MVP
+**Aktualizováno**: 2025-11-22  
+**Stav**: Plánování - Vyžaduje aktualizaci  
+**Přístup**: Vylepšený iterativní vývoj MVP s kontrolami kvality
 
 ---
 
