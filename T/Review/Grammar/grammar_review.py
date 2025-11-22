@@ -147,8 +147,8 @@ class GrammarReview:
         if self.reviewed_at is None:
             self.reviewed_at = datetime.now().isoformat()
         
-        # Determine pass/fail based on score
-        self.passes = self.overall_score >= self.pass_threshold
+        # Calculate pass/fail status
+        self._recalculate_pass_status()
     
     def add_issue(self, issue: GrammarIssue) -> None:
         """Add a grammar issue to the review.
