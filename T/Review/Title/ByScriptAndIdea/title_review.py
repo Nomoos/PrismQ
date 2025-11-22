@@ -213,8 +213,8 @@ class TitleReview:
         if self.reviewed_at is None:
             self.reviewed_at = datetime.now().isoformat()
         
-        # Add current score to trajectory
-        if self.overall_score not in self.improvement_trajectory:
+        # Add current score to trajectory if not already initialized
+        if not self.improvement_trajectory or self.improvement_trajectory[-1] != self.overall_score:
             self.improvement_trajectory.append(self.overall_score)
         
         # Auto-calculate current length if not set
@@ -253,7 +253,11 @@ class TitleReview:
         Returns:
             Dictionary with alignment metrics and assessment
         """
-        avg_alignment = (self.script_alignment_score + self.idea_alignment_score) / 2
+        # Calculate average alignment with safe division
+        if self.script_alignment_score > 0 or self.idea_alignment_score > 0:
+            avg_alignment = (self.script_alignment_score + self.idea_alignment_score) / 2
+        else:
+            avg_alignment = 0
         
         alignment_status = "poor"
         if avg_alignment >= 80:
