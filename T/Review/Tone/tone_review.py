@@ -132,7 +132,7 @@ class ToneReview:
     script_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
-    pass_threshold: int = 80  # Minimum score to pass
+    pass_threshold: int = 80  # Minimum score to pass (lower than Grammar's 85 due to subjective nature)
     passes: bool = True  # Whether review passes
     
     # Tone Metrics
@@ -269,6 +269,10 @@ class ToneReview:
             
         Returns:
             ToneReview instance
+            
+        Note:
+            Explicit parameter passing ensures type safety and clear data mapping,
+            following the same pattern as GrammarReview for consistency.
         """
         # Convert issues
         issues = []
