@@ -22,17 +22,17 @@ PrismQ.T.Idea.Creation
     ↓
 PrismQ.T.Title.Draft
     ↓
-PrismQ.T.Rewiew.Title (Title Review) ←────┐
+PrismQ.T.Review.Title (Title Review) ←────┐
     ↓                                      │
     ├─→ If changes needed ─────────────────┘
     ↓ (Flag as ready)
 PrismQ.T.Script.Draft
     ↓
-PrismQ.T.Rewiew.Script (Script Review) ←──┐
+PrismQ.T.Review.Script (Script Review) ←──┐
     ↓                                      │
     ├─→ If changes needed → T.Script.Improvements ─┘
     ↓ (Flag as ready)
-PrismQ.T.Rewiew.Content (Final Content Review) ←─┐
+PrismQ.T.Review.Content (Final Content Review) ←─┐
     ↓                                             │
     ├─→ If changes needed → T.Script.Improvements ─┘
     │   (or back to T.Title.Refinement if title needs update)
@@ -43,19 +43,19 @@ PrismQ.T.Publishing.Finalization
 **Feedback Loop Details:**
 
 1. **Title Review Loop**: 
-   - Title.Draft → Rewiew.Title
+   - Title.Draft → Review.Title
    - If changes needed: return to Title.Draft
    - If ready: proceed to Script.Draft
 
 2. **Script Review Loop**:
-   - Script.Draft → Rewiew.Script
-   - If changes needed: Script.Improvements → Rewiew.Script (loop)
-   - If ready: proceed to Rewiew.Content
+   - Script.Draft → Review.Script
+   - If changes needed: Script.Improvements → Review.Script (loop)
+   - If ready: proceed to Review.Content
 
 3. **Final Content Review Loop**:
-   - Rewiew.Content reviews both script and title together
-   - If script changes needed: Script.Improvements → Rewiew.Content (loop)
-   - If title changes needed: Title.Refinement → Rewiew.Content (loop)
+   - Review.Content reviews both script and title together
+   - If script changes needed: Script.Improvements → Review.Content (loop)
+   - If title changes needed: Title.Refinement → Review.Content (loop)
    - If ready: proceed to Publishing.Finalization
 
 **Relationship to Full Workflow:**
@@ -74,12 +74,12 @@ The MVP simplifies the full workflow documented in `T/TITLE_SCRIPT_WORKFLOW.md`:
 **Folder Structure:**
 - `T/Idea/Creation/` - Idea creation and capture
 - `T/Title/Draft/` - Title generation
-- `T/Rewiew/Idea/` - Title review (reviews title quality)
+- `T/Review/Idea/` - Title review (reviews title quality)
 - `T/Script/Draft/` - Script drafting
-- `T/Rewiew/Script/` - Script review (reviews script quality)
+- `T/Review/Script/` - Script review (reviews script quality)
 - `T/Script/Improvements/` - Script improvements
 - `T/Title/Refinement/` - Title refinement
-- `T/Rewiew/Content/` - Final content review (script + title together)
+- `T/Review/Content/` - Final content review (script + title together)
 - `T/Publishing/Finalization/` - Publishing
 
 ---
@@ -126,7 +126,7 @@ Based on `T/TITLE_SCRIPT_WORKFLOW.md`, the MVP simplifies:
 After MVP validates the basic workflow, expand with:
 - Idea.Outline creation for better structure
 - Idea.Skeleton framework development
-- Granular review modules (T/Rewiew/Grammar, Readability, Tone, etc.)
+- Granular review modules (T/Review/Grammar, Readability, Tone, etc.)
 - Formal approval states and version locking
 - Comprehensive SEO optimization (T/Publishing/SEO with Keywords, Tags, Categories)
 
@@ -189,9 +189,9 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 3: PrismQ.T.Rewiew.Idea (Title Review)
+### Stage 3: PrismQ.T.Review.Idea (Title Review)
 **Goal**: Review title quality and flag as ready or request changes  
-**Folder**: `T/Rewiew/Idea/`  
+**Folder**: `T/Review/Idea/`  
 **Owner**: Worker10, Worker12  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 1
@@ -199,7 +199,7 @@ After MVP validates the basic workflow, expand with:
 #### MVP Issue: #MVP-003 - Title Review with Feedback Loop
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 1 day
-- **Module**: PrismQ.T.Rewiew.Idea
+- **Module**: PrismQ.T.Review.Idea
 - **Description**: Review title and provide feedback loop
 - **Acceptance Criteria**:
   - Input: Title variants from Title.Draft
@@ -210,8 +210,8 @@ After MVP validates the basic workflow, expand with:
   - Track review iterations
 
 **Feedback Loop**:
-- **Return path**: Rewiew.Idea → Title.Draft (if changes needed)
-- **Forward path**: Rewiew.Idea → Script.Draft (if approved)
+- **Return path**: Review.Idea → Title.Draft (if changes needed)
+- **Forward path**: Review.Idea → Script.Draft (if approved)
 
 **Deferred to Post-MVP**:
 - SEO scoring
@@ -249,9 +249,9 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 5: PrismQ.T.Rewiew.Script (Script Review with Feedback Loop)
+### Stage 5: PrismQ.T.Review.Script (Script Review with Feedback Loop)
 **Goal**: Review script quality and flag as ready or request improvements  
-**Folder**: `T/Rewiew/Script/`  
+**Folder**: `T/Review/Script/`  
 **Owner**: Worker10, Worker12  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 2
@@ -259,19 +259,19 @@ After MVP validates the basic workflow, expand with:
 #### MVP Issue: #MVP-005 - Script Review with Feedback Loop
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 2 days
-- **Module**: PrismQ.T.Rewiew.Script
+- **Module**: PrismQ.T.Review.Script
 - **Description**: Review script with feedback loop for improvements
 - **Acceptance Criteria**:
   - Input: Script from Script.Draft
   - Review for: grammar, readability, tone, accuracy
   - Status: approved / changes_requested
   - If changes_requested: send to Script.Improvements with feedback
-  - If approved: flag as ready, proceed to Rewiew.Content
+  - If approved: flag as ready, proceed to Review.Content
   - Track review iterations
 
 **Feedback Loop**:
-- **Return path**: Rewiew.Script → Script.Improvements → Rewiew.Script (loop until approved)
-- **Forward path**: Rewiew.Script → Rewiew.Content (if approved)
+- **Return path**: Review.Script → Script.Improvements → Review.Script (loop until approved)
+- **Forward path**: Review.Script → Review.Content (if approved)
 
 **Deferred to Post-MVP**:
 - Automated quality checks
@@ -300,10 +300,10 @@ After MVP validates the basic workflow, expand with:
   - Save changes as new version
   - Link to review feedback
   - Mark as "ready for re-review"
-  - Return to Rewiew.Script for re-approval
+  - Return to Review.Script for re-approval
 
 **Feedback Loop**:
-- **Return path**: Script.Improvements → Rewiew.Script (for re-review)
+- **Return path**: Script.Improvements → Review.Script (for re-review)
 
 **Deferred to Post-MVP**:
 - AI-powered improvements
@@ -314,9 +314,9 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 7: PrismQ.T.Rewiew.Content (Final Content Review)
+### Stage 7: PrismQ.T.Review.Content (Final Content Review)
 **Goal**: Final review of script and title together before publishing  
-**Folder**: `T/Rewiew/Content/`  
+**Folder**: `T/Review/Content/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 1
@@ -324,7 +324,7 @@ After MVP validates the basic workflow, expand with:
 #### MVP Issue: #MVP-007 - Final Content Review with Feedback Loops
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 1 day
-- **Module**: PrismQ.T.Rewiew.Content
+- **Module**: PrismQ.T.Review.Content
 - **Description**: Final approval gate with feedback loops
 - **Acceptance Criteria**:
   - Input: Approved script + approved title
@@ -336,9 +336,9 @@ After MVP validates the basic workflow, expand with:
   - Final quality checklist (quality, completeness, consistency)
 
 **Feedback Loops**:
-- **Script changes**: Rewiew.Content → Script.Improvements → Rewiew.Script → Rewiew.Content
-- **Title changes**: Rewiew.Content → Title.Refinement → Rewiew.Idea → Rewiew.Content
-- **Forward path**: Rewiew.Content → Publishing.Finalization (if approved)
+- **Script changes**: Review.Content → Script.Improvements → Review.Script → Review.Content
+- **Title changes**: Review.Content → Title.Refinement → Review.Idea → Review.Content
+- **Forward path**: Review.Content → Publishing.Finalization (if approved)
 
 **Deferred to Post-MVP**:
 - Multi-level approvals
@@ -361,15 +361,15 @@ After MVP validates the basic workflow, expand with:
 - **Module**: PrismQ.T.Title.Refinement
 - **Description**: Update title based on final review feedback
 - **Acceptance Criteria**:
-  - Input: Current title + feedback from Rewiew.Content
+  - Input: Current title + feedback from Review.Content
   - Generate new title variants
   - Keep previous titles for comparison
   - Select best title
-  - Return to Rewiew.Idea for approval
-  - Then to Rewiew.Content for final check
+  - Return to Review.Idea for approval
+  - Then to Review.Content for final check
 
 **Feedback Loop**:
-- **Return path**: Title.Refinement → Rewiew.Idea → Rewiew.Content
+- **Return path**: Title.Refinement → Review.Idea → Review.Content
 
 **Deferred to Post-MVP**:
 - Advanced optimization
@@ -385,9 +385,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9A: PrismQ.T.Rewiew.Script.Grammar
+### Stage 9A: PrismQ.T.Review.Script.Grammar
 **Goal**: Verify script grammar and technical correctness  
-**Folder**: `T/Rewiew/Grammar/`  
+**Folder**: `T/Review/Grammar/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -395,7 +395,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009A - Script Grammar Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Grammar
+- **Module**: PrismQ.T.Review.Grammar
 - **Description**: Grammar and language correctness check
 - **Acceptance Criteria**:
   - Input: Accepted script
@@ -404,9 +404,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9B: PrismQ.T.Rewiew.Script.Tone
+### Stage 9B: PrismQ.T.Review.Script.Tone
 **Goal**: Verify emotional and stylistic tone consistency  
-**Folder**: `T/Rewiew/Tone/`  
+**Folder**: `T/Review/Tone/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -414,7 +414,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009B - Script Tone Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Tone
+- **Module**: PrismQ.T.Review.Tone
 - **Description**: Tone and emotional consistency check
 - **Acceptance Criteria**:
   - Input: Grammar-approved script
@@ -423,9 +423,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9C: PrismQ.T.Rewiew.Script.Content
+### Stage 9C: PrismQ.T.Review.Script.Content
 **Goal**: Verify narrative logic and story coherence  
-**Folder**: `T/Rewiew/Content/`  
+**Folder**: `T/Review/Content/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -433,7 +433,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009C - Script Content Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Content
+- **Module**: PrismQ.T.Review.Content
 - **Description**: Content logic and narrative quality check
 - **Acceptance Criteria**:
   - Input: Tone-approved script
@@ -442,9 +442,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9D: PrismQ.T.Rewiew.Script.Consistency
+### Stage 9D: PrismQ.T.Review.Script.Consistency
 **Goal**: Verify internal continuity and logic  
-**Folder**: `T/Rewiew/Consistency/`  
+**Folder**: `T/Review/Consistency/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -452,7 +452,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009D - Script Consistency Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Consistency
+- **Module**: PrismQ.T.Review.Consistency
 - **Description**: Internal consistency and continuity check
 - **Acceptance Criteria**:
   - Input: Content-approved script
@@ -461,9 +461,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9E: PrismQ.T.Rewiew.Script.Editing
+### Stage 9E: PrismQ.T.Review.Script.Editing
 **Goal**: Polish clarity, flow, and readability  
-**Folder**: `T/Rewiew/Editing/`  
+**Folder**: `T/Review/Editing/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -471,7 +471,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009E - Script Editing Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Editing
+- **Module**: PrismQ.T.Review.Editing
 - **Description**: Clarity and flow improvements check
 - **Acceptance Criteria**:
   - Input: Consistency-approved script
@@ -480,9 +480,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9F: PrismQ.T.Rewiew.Title.Readability
+### Stage 9F: PrismQ.T.Review.Title.Readability
 **Goal**: Final readability validation for title  
-**Folder**: `T/Rewiew/Readability/`  
+**Folder**: `T/Review/Readability/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -490,7 +490,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009F - Title Readability Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Readability
+- **Module**: PrismQ.T.Review.Readability
 - **Description**: Title readability and voiceover validation
 - **Acceptance Criteria**:
   - Input: Accepted title
@@ -499,9 +499,9 @@ After content passes acceptance checks (Title and Script), it goes through multi
 
 ---
 
-### Stage 9G: PrismQ.T.Rewiew.Script.Readability
+### Stage 9G: PrismQ.T.Review.Script.Readability
 **Goal**: Final voiceover readability validation for script  
-**Folder**: `T/Rewiew/Readability/`  
+**Folder**: `T/Review/Readability/`  
 **Owner**: Worker10  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
@@ -509,7 +509,7 @@ After content passes acceptance checks (Title and Script), it goes through multi
 #### MVP Issue: #MVP-009G - Script Readability Review
 - **Worker**: Worker10 (Review Master)
 - **Effort**: 0.5 days
-- **Module**: PrismQ.T.Rewiew.Readability
+- **Module**: PrismQ.T.Review.Readability
 - **Description**: Script voiceover readability validation
 - **Acceptance Criteria**:
   - Input: Editing-approved script
@@ -621,8 +621,8 @@ After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT
 - Worker04: Setup test framework
 
 **Feedback Loop Testing**:
-- Test Title.Draft → Rewiew.Idea → Title.Draft (revision cycle)
-- Test Title.Draft → Rewiew.Idea → Approved (happy path)
+- Test Title.Draft → Review.Idea → Title.Draft (revision cycle)
+- Test Title.Draft → Review.Idea → Approved (happy path)
 
 #### Week 2: Script Generation + Script Review Loop
 **Active Workers**: 3-4  
@@ -640,8 +640,8 @@ After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT
 - Worker04: Integration tests for review loops
 
 **Feedback Loop Testing**:
-- Test Script.Draft → Rewiew.Script → Script.Improvements → Rewiew.Script (revision cycle)
-- Test Script.Draft → Rewiew.Script → Approved (happy path)
+- Test Script.Draft → Review.Script → Script.Improvements → Review.Script (revision cycle)
+- Test Script.Draft → Review.Script → Approved (happy path)
 
 ---
 
@@ -661,9 +661,9 @@ After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT
 - Worker04: E2E tests with full feedback loops
 
 **Feedback Loop Testing**:
-- Test Rewiew.Content → Script.Improvements → Rewiew.Script → Rewiew.Content (script revision)
-- Test Rewiew.Content → Title.Refinement → Rewiew.Idea → Rewiew.Content (title revision)
-- Test Rewiew.Content → Approved → Publishing (happy path)
+- Test Review.Content → Script.Improvements → Review.Script → Review.Content (script revision)
+- Test Review.Content → Title.Refinement → Review.Idea → Review.Content (title revision)
+- Test Review.Content → Approved → Publishing (happy path)
 
 #### Week 2: Publishing
 **Active Workers**: 2-3  
@@ -745,10 +745,10 @@ After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT
 5. **Data Persistence**: Content saved and retrieved correctly through revisions
 
 ### Critical Test Scenarios
-1. **Title Review Loop**: Title.Draft → Rewiew.Idea (changes) → Title.Draft → Rewiew.Idea (approved)
-2. **Script Review Loop**: Script.Draft → Rewiew.Script (changes) → Script.Improvements → Rewiew.Script (approved)
-3. **Final Review - Script Path**: Rewiew.Content (script changes) → Script.Improvements → Rewiew.Script → Rewiew.Content (approved)
-4. **Final Review - Title Path**: Rewiew.Content (title changes) → Title.Refinement → Rewiew.Idea → Rewiew.Content (approved)
+1. **Title Review Loop**: Title.Draft → Review.Idea (changes) → Title.Draft → Review.Idea (approved)
+2. **Script Review Loop**: Script.Draft → Review.Script (changes) → Script.Improvements → Review.Script (approved)
+3. **Final Review - Script Path**: Review.Content (script changes) → Script.Improvements → Review.Script → Review.Content (approved)
+4. **Final Review - Title Path**: Review.Content (title changes) → Title.Refinement → Review.Idea → Review.Content (approved)
 5. **Happy Path**: All stages approved on first review
 
 ### Test Coverage Goal
@@ -903,7 +903,7 @@ Worker02: Implement #MVP-003 - Basic Script Generator
 - Deliverable: Script generation from idea+title working
 
 Worker10: Implement #MVP-004 - Simple Review System
-- Context: T/Rewiew/
+- Context: T/Review/
 - Dependencies: #MVP-003 (can start in parallel on design)
 - Priority: Critical
 - Effort: 2 days

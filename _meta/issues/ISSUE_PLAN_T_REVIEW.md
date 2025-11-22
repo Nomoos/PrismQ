@@ -1,6 +1,6 @@
 # T.Review Module - Issue Creation Plan
 
-**Module**: T.Rewiew (Text Pipeline - Review & Editing)  
+**Module**: T.Review (Text Pipeline - Review & Editing)  
 **Created**: 2025-11-21  
 **Owner**: Worker01, Worker10, Worker12  
 **Status**: Planning
@@ -9,7 +9,7 @@
 
 ## Module Overview
 
-**Note**: The module directory is currently spelled "Rewiew" in the repository. This is a known typo that should be corrected in a future refactoring, but all documentation uses "Review" for clarity while acknowledging the actual directory path as T/Rewiew/.
+**Note**: The module directory is currently spelled "Review" in the repository. This is a known typo that should be corrected in a future refactoring, but all documentation uses "Review" for clarity while acknowledging the actual directory path as T/Review/.
 
 The T.Review module is responsible for:
 - Content review and editing
@@ -19,7 +19,7 @@ The T.Review module is responsible for:
 
 **Current Structure**:
 ```
-T/Rewiew/
+T/Review/
 └── _meta/          Metadata and documentation
 ```
 

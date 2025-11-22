@@ -93,7 +93,7 @@ The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer mod
 ### Quick Start
 
 ```python
-from PrismQ.T.Rewiew.Script import ScriptReview, ContentLength
+from PrismQ.T.Review.Script import ScriptReview, ContentLength
 from PrismQ.T.Script.Writer import ScriptWriter
 
 # AI Reviewer evaluates
@@ -119,7 +119,7 @@ if writer.should_continue_iteration():
     pass
 ```
 
-See **[Feedback Loop Example](../Rewiew/Script/_meta/examples/feedback_loop_example.py)** for complete implementation.
+See **[Feedback Loop Example](../Review/Script/_meta/examples/feedback_loop_example.py)** for complete implementation.
 
 ## Navigation
 

@@ -50,14 +50,14 @@ All modules now have standardized `_meta/` directories with:
 
 #### 3. Hierarchical Module Organization
 Each pipeline has logical submodules:
-- **T**: Idea → Script → Title → Rewiew → Publishing
+- **T**: Idea → Script → Title → Review → Publishing
 - **A**: Voiceover → Narrator → Normalized → Enhancement → Publishing
 - **V**: Scene → Keyframe → Video
 
 **Rating**: ⭐⭐⭐⭐ (4/5)
 - Good workflow alignment
 - Clear progression through stages
-- Minor naming inconsistency (Rewiew vs Review)
+- Minor naming inconsistency (Review vs Review)
 
 #### 4. Sequential Workflow Model
 Progressive enrichment: Text → Audio → Video
@@ -70,7 +70,7 @@ Progressive enrichment: Text → Audio → Video
 ### ⚠️ Areas for Improvement
 
 #### 1. Naming Consistency
-**Issue**: `T/Rewiew` uses non-standard spelling
+**Issue**: `T/Review` uses non-standard spelling
 
 **Rating**: ⭐⭐⭐ (3/5)
 

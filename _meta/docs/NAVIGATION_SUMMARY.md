@@ -49,7 +49,7 @@ T/
 │   ├── Draft/ (with _meta)
 │   ├── Optimization/ (with _meta)
 │   └── Refinement/ (with _meta)
-├── Rewiew/
+├── Review/
 │   ├── Grammar/ (with _meta)
 │   ├── Readability/ (with _meta)
 │   ├── Tone/ (with _meta)

@@ -75,12 +75,12 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
    - Associate draft with Idea record
 
 3. **Route to Multi-Dimensional Review**
-   - `T/Rewiew/Grammar` - Grammar and syntax
-   - `T/Rewiew/Readability` - Reading level and flow
-   - `T/Rewiew/Tone` - Voice consistency and appropriateness
-   - `T/Rewiew/Content` - Factual accuracy and completeness
-   - `T/Rewiew/Consistency` - Terminology and style
-   - `T/Rewiew/Editing` - Redundancy removal and polish
+   - `T/Review/Grammar` - Grammar and syntax
+   - `T/Review/Readability` - Reading level and flow
+   - `T/Review/Tone` - Voice consistency and appropriateness
+   - `T/Review/Content` - Factual accuracy and completeness
+   - `T/Review/Consistency` - Terminology and style
+   - `T/Review/Editing` - Redundancy removal and polish
 
 4. **Gather Review Feedback**
    - All review dimensions provide feedback
@@ -244,7 +244,7 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
 4. Verify improvements don't break natural flow
 5. Re-check against quality gates
 
-### For Reviewing (T/Rewiew modules)
+### For Reviewing (T/Review modules)
 
 **What's Needed:**
 

@@ -282,7 +282,7 @@ Worker10: Create review workflow issues for T.Review module
 - Dependencies: None
 - Priority: High
 - Effort: 4 days
-- Context: T/Rewiew/_meta/issues/new/
+- Context: T/Review/_meta/issues/new/
 - Deliverables:
   - 10+ review automation issues
   - Review criteria definitions
@@ -416,7 +416,7 @@ Worker10: Implement issue #T.Review-001 - Review workflow engine
 - Dependencies: None
 - Priority: High
 - Effort: 3 days
-- Context: T/Rewiew/src/
+- Context: T/Review/src/
 - Acceptance Criteria:
   - State machine implementation
   - Review criteria enforcement

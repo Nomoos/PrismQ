@@ -185,7 +185,7 @@ Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
     └─ Outline (organization)
     ↓
-[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
+[Exit Idea Module] → Review/Idea (validation) → Title → ScriptDraft
 ```
 ```
 Inspiration (multiple sources)
@@ -204,7 +204,7 @@ Idea Module (Composite State)
     ├─ Model/Creation (idea formation) ← Starting sub-state
     └─ Outline (organization)
     ↓
-[Exit Idea Module] → Rewiew/Idea (validation) → Title → ScriptDraft
+[Exit Idea Module] → Review/Idea (validation) → Title → ScriptDraft
 ```
 
 **New Workflows:**
@@ -276,13 +276,13 @@ Inspiration → Model (Creation) → Outline → [Exit to Review/Idea for valida
 **Note**: 
 - Title is a separate module at `T/Title/`, not a sub-state of Idea
 - Idea validation/review is handled by `T/Review/Idea/`, which is part of the review pipeline
-- After completing Outline, the workflow exits the Idea module and proceeds to Rewiew/Idea for validation
+- After completing Outline, the workflow exits the Idea module and proceeds to Review/Idea for validation
 
 ## Usage Example
 
 ```python
 from PrismQ.T.Idea import Model, Outline
-from PrismQ.T.Rewiew.Idea import Review
+from PrismQ.T.Review.Idea import Review
 
 # Create new idea
 idea = Model.create(

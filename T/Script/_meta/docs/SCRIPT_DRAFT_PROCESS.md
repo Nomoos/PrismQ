@@ -464,34 +464,34 @@ Document all marked issues:
 ### Step 10: Handoff to Review
 
 **Package Delivery:**
-Transfer to `T/Rewiew` modules for multi-dimensional review:
+Transfer to `T/Review` modules for multi-dimensional review:
 
-1. **Grammar Review** (`T/Rewiew/Grammar`)
+1. **Grammar Review** (`T/Review/Grammar`)
    - Syntax and grammar check
    - Punctuation review
    - Sentence structure analysis
 
-2. **Readability Review** (`T/Rewiew/Readability`)
+2. **Readability Review** (`T/Review/Readability`)
    - Reading level assessment
    - Clarity evaluation
    - Flow and pacing review
 
-3. **Tone Review** (`T/Rewiew/Tone`)
+3. **Tone Review** (`T/Review/Tone`)
    - Voice consistency check
    - Tone appropriateness
    - Brand alignment
 
-4. **Content Review** (`T/Rewiew/Content`)
+4. **Content Review** (`T/Review/Content`)
    - Fact verification
    - Accuracy check
    - Completeness review
 
-5. **Consistency Review** (`T/Rewiew/Consistency`)
+5. **Consistency Review** (`T/Review/Consistency`)
    - Terminology consistency
    - Style guideline compliance
    - Format consistency
 
-6. **Editing Review** (`T/Rewiew/Editing`)
+6. **Editing Review** (`T/Review/Editing`)
    - Redundancy removal
    - Efficiency improvements
    - Final polish

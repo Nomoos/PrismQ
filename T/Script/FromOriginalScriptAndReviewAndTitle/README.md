@@ -15,8 +15,8 @@ This state is used in **multiple stages** throughout the workflow:
 ### Stage 7: First Improvements (v1 → v2)
 **Using reviews from both title and script v1, plus new title v2**
 ```
-Stage 4: Rewiew.Title.ByScript (v1) ← Title review
-Stage 5: Rewiew.Script.ByTitle (v1) ← Script review
+Stage 4: Review.Title.ByScript (v1) ← Title review
+Stage 5: Review.Script.ByTitle (v1) ← Script review
 Stage 6: Title improved to v2
     ↓
 Stage 7: Script.FromOriginalScriptAndReviewAndTitle (v1 → v2) ← THIS STATE
@@ -25,7 +25,7 @@ Stage 7: Script.FromOriginalScriptAndReviewAndTitle (v1 → v2) ← THIS STATE
 ### Stage 11: Iterative Refinements (v2 → v3, v3 → v4, v4 → v5...)
 **Using latest review feedback and current title**
 ```
-Stage 10: Rewiew.Script.ByTitle (vN) ← Review latest
+Stage 10: Review.Script.ByTitle (vN) ← Review latest
     ↓
 Stage 11: Script.FromOriginalScriptAndReviewAndTitle (vN → vN+1) ← THIS STATE
     ↓
@@ -36,23 +36,23 @@ Stage 13: Script Acceptance Check
 ### Stages 14-18: Quality Review Refinements
 **Using specific quality dimension feedback**
 ```
-Stage 14: Rewiew.Script.Grammar ← Grammar check
+Stage 14: Review.Script.Grammar ← Grammar check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (grammar fix) ← THIS STATE
 
-Stage 15: Rewiew.Script.Tone ← Tone check
+Stage 15: Review.Script.Tone ← Tone check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (tone fix) ← THIS STATE
 
-Stage 16: Rewiew.Script.Content ← Content check
+Stage 16: Review.Script.Content ← Content check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (content fix) ← THIS STATE
 
-Stage 17: Rewiew.Script.Consistency ← Consistency check
+Stage 17: Review.Script.Consistency ← Consistency check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (consistency fix) ← THIS STATE
 
-Stage 18: Rewiew.Script.Editing ← Editing check
+Stage 18: Review.Script.Editing ← Editing check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (editing fix) ← THIS STATE
 ```
@@ -60,7 +60,7 @@ Script.FromOriginalScriptAndReviewAndTitle (editing fix) ← THIS STATE
 ### Stage 20 Feedback: Readability Polish (final version refinement)
 **Using readability review feedback**
 ```
-Stage 20: Rewiew.Script.Readability (Voiceover) ← Final quality check
+Stage 20: Review.Script.Readability (Voiceover) ← Final quality check
     ↓ if FAILS
 Script.FromOriginalScriptAndReviewAndTitle (voiceover polish) ← THIS STATE
 ```

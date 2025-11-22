@@ -187,16 +187,16 @@ Title.Draft → Title.Optimization → Title.Refinement → Finalized Title
 ---
 
 ### Stage 6: ScriptReview
-**Location:** `T/Rewiew` (various review modules)  
+**Location:** `T/Review` (various review modules)  
 **Purpose:** Review and enhance script quality
 
 **Activities:**
-- Grammar and spelling review (Rewiew/Grammar)
-- Readability optimization (Rewiew/Readability)
-- Tone and voice consistency (Rewiew/Tone)
-- Content accuracy validation (Rewiew/Content)
-- Style consistency check (Rewiew/Consistency)
-- Final editing pass (Rewiew/Editing)
+- Grammar and spelling review (Review/Grammar)
+- Readability optimization (Review/Readability)
+- Tone and voice consistency (Review/Tone)
+- Content accuracy validation (Review/Content)
+- Style consistency check (Review/Consistency)
+- Final editing pass (Review/Editing)
 
 **Key Deliverables:**
 - Reviewed script
@@ -345,7 +345,7 @@ Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
 - **Improvements**: Script enhancement
 - **Optimization**: Final script optimization
 
-### T/Rewiew Module
+### T/Review Module
 - **Grammar**: Grammar and syntax review
 - **Readability**: Reading level optimization
 - **Tone**: Voice consistency
@@ -414,7 +414,7 @@ Idea.Outline → ... → ScriptDraft → ... → PublishedText ✓
 
 ### AI-Assisted Stages
 - Script/Writer (AI optimization)
-- Rewiew modules (AI-powered review)
+- Review modules (AI-powered review)
 - Publishing/SEO (keyword research)
 
 ## Related Documentation

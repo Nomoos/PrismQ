@@ -26,19 +26,19 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
        ↓
 3. PrismQ.T.Script.Draft (v1) ← from Idea + Title v1
        ↓
-4. PrismQ.T.Rewiew.Title.ByScript ← Review Title v1 by Script v1 + Idea
+4. PrismQ.T.Review.Title.ByScript ← Review Title v1 by Script v1 + Idea
        ↓
-5. PrismQ.T.Rewiew.Script.ByTitle ← Review Script v1 by Title v1 + Idea
+5. PrismQ.T.Review.Script.ByTitle ← Review Script v1 by Title v1 + Idea
        ↓
 6. PrismQ.T.Title.Improvements (v2) ← Using reviews + title v1, script v1
        ↓
 7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2, script v1
        ↓
-8. PrismQ.T.Rewiew.Title.ByScript (v2) ←──────────────────────┐
+8. PrismQ.T.Review.Title.ByScript (v2) ←──────────────────────┐
        ↓                                                       │
 9. PrismQ.T.Title.Refinement (v3) ← Improve by review         │
        ↓                                                       │
-10. PrismQ.T.Rewiew.Script.ByTitle (v2) ←─────────────┐       │
+10. PrismQ.T.Review.Script.ByTitle (v2) ←─────────────┐       │
         ↓                                              │       │
 11. PrismQ.T.Script.Refinement (v3) ← Improve by review       │
         ↓                                              │       │
@@ -49,31 +49,31 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
         
     ━━━━ Local AI Reviews (Stages 14-20) ━━━━
         
-14. PrismQ.T.Rewiew.Script.Grammar ←──────────────┐
+14. PrismQ.T.Review.Script.Grammar ←──────────────┐
         ↓                                         │
         ├─FAILS─→ Return to Script.Refinement ───┘
         ↓ PASSES
-15. PrismQ.T.Rewiew.Script.Tone ←────────────────┐
+15. PrismQ.T.Review.Script.Tone ←────────────────┐
         ↓                                        │
         ├─FAILS─→ Return to Script.Refinement ──┘
         ↓ PASSES
-16. PrismQ.T.Rewiew.Script.Content ←─────────────┐
+16. PrismQ.T.Review.Script.Content ←─────────────┐
         ↓                                        │
         ├─FAILS─→ Return to Script.Refinement ──┘
         ↓ PASSES
-17. PrismQ.T.Rewiew.Script.Consistency ←─────────┐
+17. PrismQ.T.Review.Script.Consistency ←─────────┐
         ↓                                        │
         ├─FAILS─→ Return to Script.Refinement ──┘
         ↓ PASSES
-18. PrismQ.T.Rewiew.Script.Editing ←─────────────┐
+18. PrismQ.T.Review.Script.Editing ←─────────────┐
         ↓                                        │
         ├─FAILS─→ Return to Script.Refinement ──┘
         ↓ PASSES
-19. PrismQ.T.Rewiew.Title.Readability ←──────────┐
+19. PrismQ.T.Review.Title.Readability ←──────────┐
         ↓                                         │
         ├─FAILS─→ Return to Title.Refinement ────┘
         ↓ PASSES
-20. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
+20. PrismQ.T.Review.Script.Readability (Voiceover) ←─┐
         ↓                                             │
         ├─FAILS─→ Return to Script.Refinement ───────┘
         ↓ PASSES (All Local AI Reviews Complete)
@@ -162,9 +162,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 4: PrismQ.T.Rewiew.Title.ByScript (v1)
+### Stage 4: PrismQ.T.Review.Title.ByScript (v1)
 **Goal**: Review title v1 against script v1 and original idea  
-**Folder**: `T/Rewiew/Idea/`  
+**Folder**: `T/Review/Idea/`  
 **Worker**: Worker10 (Review Master)  
 **Effort**: 1 day
 
@@ -182,9 +182,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 5: PrismQ.T.Rewiew.Script.ByTitle (v1)
+### Stage 5: PrismQ.T.Review.Script.ByTitle (v1)
 **Goal**: Review script v1 against title v1 and original idea  
-**Folder**: `T/Rewiew/Script/`  
+**Folder**: `T/Review/Script/`  
 **Worker**: Worker10 (Review Master)  
 **Effort**: 1 day
 
@@ -248,9 +248,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 8: PrismQ.T.Rewiew.Title.ByScript (v2)
+### Stage 8: PrismQ.T.Review.Title.ByScript (v2)
 **Goal**: Review title v2 against script v2  
-**Folder**: `T/Rewiew/Idea/`  
+**Folder**: `T/Review/Idea/`  
 **Worker**: Worker10  
 **Effort**: 1 day
 
@@ -280,9 +280,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 10: PrismQ.T.Rewiew.Script.ByTitle (v2)
+### Stage 10: PrismQ.T.Review.Script.ByTitle (v2)
 **Goal**: Review script v2 against newest title (v3)  
-**Folder**: `T/Rewiew/Script/`  
+**Folder**: `T/Review/Script/`  
 **Worker**: Worker10  
 **Effort**: 1 day
 
@@ -314,7 +314,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ### Stage 12: Title Acceptance Check
 **Goal**: Verify title is ready to proceed  
-**Folder**: `T/Rewiew/Idea/` (acceptance gate)  
+**Folder**: `T/Review/Idea/` (acceptance gate)  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -334,7 +334,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ### Stage 13: Script Acceptance Check
 **Goal**: Verify script is ready to proceed  
-**Folder**: `T/Rewiew/Script/` (acceptance gate)  
+**Folder**: `T/Review/Script/` (acceptance gate)  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -352,9 +352,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 14: PrismQ.T.Rewiew.Script.Grammar
+### Stage 14: PrismQ.T.Review.Script.Grammar
 **Goal**: Verify script grammar and technical correctness  
-**Folder**: `T/Rewiew/Grammar/`  
+**Folder**: `T/Review/Grammar/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -374,9 +374,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 15: PrismQ.T.Rewiew.Script.Tone
+### Stage 15: PrismQ.T.Review.Script.Tone
 **Goal**: Verify emotional and stylistic tone consistency  
-**Folder**: `T/Rewiew/Tone/`  
+**Folder**: `T/Review/Tone/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -397,9 +397,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 16: PrismQ.T.Rewiew.Script.Content
+### Stage 16: PrismQ.T.Review.Script.Content
 **Goal**: Verify narrative logic and story coherence  
-**Folder**: `T/Rewiew/Content/`  
+**Folder**: `T/Review/Content/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -420,9 +420,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 17: PrismQ.T.Rewiew.Script.Consistency
+### Stage 17: PrismQ.T.Review.Script.Consistency
 **Goal**: Verify internal continuity and logic  
-**Folder**: `T/Rewiew/Consistency/`  
+**Folder**: `T/Review/Consistency/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -443,9 +443,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 18: PrismQ.T.Rewiew.Script.Editing
+### Stage 18: PrismQ.T.Review.Script.Editing
 **Goal**: Polish clarity, flow, and readability  
-**Folder**: `T/Rewiew/Editing/`  
+**Folder**: `T/Review/Editing/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -466,9 +466,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 19: PrismQ.T.Rewiew.Title.Readability
+### Stage 19: PrismQ.T.Review.Title.Readability
 **Goal**: Final readability/voiceover validation for title  
-**Folder**: `T/Rewiew/Readability/`  
+**Folder**: `T/Review/Readability/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -487,9 +487,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 20: PrismQ.T.Rewiew.Script.Readability (Voiceover)
+### Stage 20: PrismQ.T.Review.Script.Readability (Voiceover)
 **Goal**: Final readability validation for script (voiceover quality)  
-**Folder**: `T/Rewiew/Readability/`  
+**Folder**: `T/Review/Readability/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
@@ -835,12 +835,12 @@ All stages use real verified folders:
 - ✅ `T/Idea/Creation/`
 - ✅ `T/Title/Draft/` (v1)
 - ✅ `T/Script/Draft/` (v1)
-- ✅ `T/Rewiew/Idea/` (title reviews + acceptance)
-- ✅ `T/Rewiew/Script/` (script reviews + acceptance)
+- ✅ `T/Review/Idea/` (title reviews + acceptance)
+- ✅ `T/Review/Script/` (script reviews + acceptance)
 - ✅ `T/Title/Improvements/` (v2)
 - ✅ `T/Script/Improvements/` (v2, v3+)
 - ✅ `T/Title/Refinement/` (v3+)
-- ✅ `T/Rewiew/Readability/` (final quality gates)
+- ✅ `T/Review/Readability/` (final quality gates)
 - ✅ `T/Publishing/Finalization/`
 
 ---

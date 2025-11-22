@@ -24,7 +24,7 @@ PrismQ/
 │   ├── Script/         Script drafting and review
 │   ├── Title/          Title optimization
 │   ├── Publishing/     Text publishing and SEO
-│   └── Rewiew/         Review and editing
+│   └── Review/         Review and editing
 ├── A/          Audio Generation Pipeline (Second Stage)
 │   ├── Voiceover/      Voice recording
 │   ├── Narrator/       Narrator selection
