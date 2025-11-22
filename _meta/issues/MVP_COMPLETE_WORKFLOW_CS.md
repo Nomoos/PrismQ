@@ -12,12 +12,18 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 
 **Klíčové vlastnosti:**
 - ✅ 24 stavů rozdělených do 3 sprintů
-- ✅ Iterativní vylepšování (v1 → v2 → v3 → v4+)
+- ✅ Dynamické verzování - každý nový titulek nebo skript zvýší číslo verze o 1
 - ✅ Křížová validace titulku a skriptu
 - ✅ Více kvalitních kontrol (Grammar, Tone, Content, Consistency, Editing)
 - ✅ Kontroly čitelnosti pro voiceover
 - ✅ Expertní revize a vybrušování
 - ✅ Export a reportování publikování
+
+**DŮLEŽITÉ - Verzování:**
+- ⚠️ Čísla verzí (v1, v2, v3...) v tomto dokumentu jsou **pouze ilustrativní příklady**
+- ⚠️ Ve skutečnosti se verze **inkrementují dynamicky** - při každé změně titulku nebo skriptu se číslo verze zvýší o 1
+- ⚠️ Workflow **není fixované na konkrétní čísla verzí** - MVP-002 nevytváří vždy "v1", může vytvořit jakoukoliv verzi podle historie
+- ⚠️ Například: Pokud titulek prošel 10 iteracemi, aktuální verze může být v11, v12, atd.
 
 ---
 
@@ -40,7 +46,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 
 ---
 
-### ✅ MVP-002: T.Title.FromIdea (v1)
+### ✅ MVP-002: T.Title.FromIdea
 **Modul**: `PrismQ.T.Title.FromIdea`  
 **Účel**: Generování prvního titulku z nápadu
 
@@ -48,38 +54,40 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 - Objekt Idea (z MVP-001)
 
 **Výstupy:**
-- 3-5 variant titulku (verze v1)
+- 3-5 variant titulku (první verze)
 - Jeden vybraný titulek pro pokračování
+- 💡 Číslo verze závisí na historii (může být v1, v5, v10...)
 
 **Podmínky přechodu:**
-- ✅ ÚSPĚCH → Pokračuje na **MVP-003** (Script v1)
+- ✅ ÚSPĚCH → Pokračuje na **MVP-003** (Script - první verze)
 
 ---
 
-### ✅ MVP-003: T.Script.FromIdeaAndTitle (v1)
+### ✅ MVP-003: T.Script.FromIdeaAndTitle
 **Modul**: `PrismQ.T.Script.FromIdeaAndTitle`  
 **Účel**: Generování prvního skriptu z nápadu a titulku
 
 **Vstupy:**
 - Objekt Idea (z MVP-001)
-- Titulek v1 (z MVP-002)
+- Titulek (z MVP-002)
 
 **Výstupy:**
-- Kompletní skript verze v1
+- Kompletní skript - první verze
 - Strukturovaný text připravený k revizi
+- 💡 Číslo verze závisí na historii (může být v1, v5, v10...)
 
 **Podmínky přechodu:**
 - ✅ ÚSPĚCH → Pokračuje na **MVP-004** (Revize titulku)
 
 ---
 
-### ✅ MVP-004: T.Review.Title.ByScript (v1)
+### ✅ MVP-004: T.Review.Title.ByScript
 **Modul**: `PrismQ.T.Review.Title.ByScript`  
-**Účel**: Revize titulku v1 v kontextu skriptu v1
+**Účel**: Revize aktuálního titulku v kontextu aktuálního skriptu
 
 **Vstupy:**
-- Titulek v1 (z MVP-002)
-- Skript v1 (z MVP-003)
+- Titulek (z MVP-002)
+- Skript (z MVP-003)
 - Původní Idea (z MVP-001)
 
 **Výstupy:**
@@ -93,9 +101,9 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 
 ---
 
-### ✅ MVP-005: T.Review.Script.ByTitle (v1)
+### ✅ MVP-005: T.Review.Script.ByTitle
 **Modul**: `PrismQ.T.Review.Script.ByTitle`  
-**Účel**: Revize skriptu v1 v kontextu titulku v1
+**Účel**: Revize aktuálního skriptu v kontextu aktuálního titulku
 
 **Vstupy:**
 - Skript v1 (z MVP-003)
@@ -108,118 +116,122 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 - Návrhy na vylepšení
 
 **Podmínky přechodu:**
-- ✅ VŽDY → Pokračuje na **MVP-006** (Title v2)
+- ✅ VŽDY → Pokračuje na **MVP-006** (Title Improvements)
 - 📝 Zpětná vazba se používá v MVP-007
 
 ---
 
 ## Sprint 2: Cyklus Vylepšování (MVP-006 až MVP-011)
 
-### ✅ MVP-006: T.Title.Improvements (v2)
+### ✅ MVP-006: T.Title.Improvements
 **Modul**: `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`  
-**Účel**: Vylepšení titulku z v1 na v2 pomocí zpětné vazby
+**Účel**: Vylepšení titulku pomocí zpětné vazby (verze +1)
 
 **Vstupy:**
-- Titulek v1 (z MVP-002)
+- Aktuální titulek (z MVP-002)
 - Review titulku (z MVP-004)
-- Skript v1 (z MVP-003)
+- Aktuální skript (z MVP-003)
 
 **Výstupy:**
-- Vylepšený titulek verze v2
-- Reference na v1 pro sledování změn
+- Vylepšený titulek (nová verze = aktuální +1)
+- Reference na předchozí verzi pro sledování změn
+- 💡 Např: pokud vstupní titulek byl v3, výstup bude v4
 
 **Podmínky přechodu:**
-- ✅ ÚSPĚCH → Pokračuje na **MVP-007** (Script v2)
+- ✅ ÚSPĚCH → Pokračuje na **MVP-007** (Script Improvements)
 
 ---
 
-### ✅ MVP-007: T.Script.Improvements (v2)
+### ✅ MVP-007: T.Script.Improvements
 **Modul**: `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle`  
-**Účel**: Vylepšení skriptu z v1 na v2 pomocí zpětné vazby
+**Účel**: Vylepšení skriptu pomocí zpětné vazby (verze +1)
 
 **Vstupy:**
-- Skript v1 (z MVP-003)
+- Aktuální skript (z MVP-003)
 - Review skriptu (z MVP-005)
-- Titulek v2 (z MVP-006) - POUŽÍVÁ NOVÝ TITULEK!
+- Nejnovější titulek (z MVP-006) - POUŽÍVÁ NOVÝ TITULEK!
 
 **Výstupy:**
-- Vylepšený skript verze v2
-- Reference na v1 pro sledování změn
+- Vylepšený skript (nová verze = aktuální +1)
+- Reference na předchozí verzi pro sledování změn
+- 💡 Např: pokud vstupní skript byl v5, výstup bude v6
 
 **Podmínky přechodu:**
-- ✅ ÚSPĚCH → Pokračuje na **MVP-008** (Revize titulku v2)
+- ✅ ÚSPĚCH → Pokračuje na **MVP-008** (Revize titulku)
 
 ---
 
-### ✅ MVP-008: T.Review.Title.ByScript (v2)
+### ✅ MVP-008: T.Review.Title.ByScript
 **Modul**: `PrismQ.T.Review.Title.ByScript`  
-**Účel**: Revize titulku v2 proti skriptu v2
+**Účel**: Revize aktuálního titulku proti aktuálnímu skriptu
 
 **Vstupy:**
-- Titulek v2 (z MVP-006)
-- Skript v2 (z MVP-007)
+- Aktuální titulek (z MVP-006)
+- Aktuální skript (z MVP-007)
 - Původní Idea (z MVP-001)
 
 **Výstupy:**
 - Review JSON s novou zpětnou vazbou
-- Porovnání vylepšení (v1 → v2)
+- Porovnání vylepšení oproti předchozí verzi
 
 **Podmínky přechodu:**
-- ✅ VŽDY → Pokračuje na **MVP-009** (Title v3)
-- 📝 Zpětná vazba se používá pro vybrušování v3
+- ✅ VŽDY → Pokračuje na **MVP-009** (Title Refinement)
+- 📝 Zpětná vazba se používá pro další vybrušování
 
 ---
 
-### ✅ MVP-009: T.Title.Refinement (v3)
+### ✅ MVP-009: T.Title.Refinement
 **Modul**: `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`  
-**Účel**: Vybrušování titulku z v2 na v3
+**Účel**: Vybrušování titulku pomocí zpětné vazby (verze +1)
 
 **Vstupy:**
-- Titulek v2 (z MVP-006)
-- Review titulku v2 (z MVP-008)
-- Skript v2 (z MVP-007)
+- Aktuální titulek (z MVP-006)
+- Review titulku (z MVP-008)
+- Aktuální skript (z MVP-007)
 
 **Výstupy:**
-- Vybroušený titulek verze v3
-- Podporuje neomezené verze (v3, v4, v5, v6, v7+)
+- Vybroušený titulek (nová verze = aktuální +1)
+- Podporuje neomezené verze - vždy jen +1 od aktuální
+- 💡 Např: pokud vstupní titulek byl v7, výstup bude v8
 
 **Podmínky přechodu:**
-- ✅ ÚSPĚCH → Pokračuje na **MVP-010** (Revize skriptu v2)
+- ✅ ÚSPĚCH → Pokračuje na **MVP-010** (Revize skriptu)
 
 ---
 
-### ✅ MVP-010: T.Review.Script.ByTitle (v2)
+### ✅ MVP-010: T.Review.Script.ByTitle
 **Modul**: `PrismQ.T.Review.Script.ByTitle`  
-**Účel**: Revize skriptu v2 proti nejnovějšímu titulku v3
+**Účel**: Revize aktuálního skriptu proti nejnovějšímu titulku
 
 **Vstupy:**
-- Skript v2 (z MVP-007)
-- Titulek v3 (z MVP-009) - POUŽÍVÁ NEJNOVĚJŠÍ TITULEK!
+- Aktuální skript (z MVP-007)
+- Nejnovější titulek (z MVP-009) - POUŽÍVÁ NEJNOVĚJŠÍ TITULEK!
 - Původní Idea (z MVP-001)
 
 **Výstupy:**
 - Review JSON s novou zpětnou vazbou
-- Porovnání s v1 verzí
+- Porovnání s předchozí verzí skriptu
 
 **Podmínky přechodu:**
-- ✅ VŽDY → Pokračuje na **MVP-011** (Script v3)
-- 📝 Zpětná vazba se používá pro vybrušování v3
+- ✅ VŽDY → Pokračuje na **MVP-011** (Script Refinement)
+- 📝 Zpětná vazba se používá pro vybrušování
 
 ---
 
-### ✅ MVP-011: T.Script.Refinement (v3)
+### ✅ MVP-011: T.Script.Refinement
 **Modul**: `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle`  
-**Účel**: Vybrušování skriptu z v2 na v3
+**Účel**: Vybrušování skriptu pomocí zpětné vazby (verze +1)
 
 **Vstupy:**
-- Skript v2 (z MVP-007)
-- Review skriptu v2 (z MVP-010)
-- Titulek v3 (z MVP-009)
+- Aktuální skript (z MVP-007)
+- Review skriptu (z MVP-010)
+- Nejnovější titulek (z MVP-009)
 
 **Výstupy:**
-- Vybroušený skript verze v3
-- Podporuje neomezené verze (v3, v4, v5, v6, v7+)
+- Vybroušený skript (nová verze = aktuální +1)
+- Podporuje neomezené verze - vždy jen +1 od aktuální
 - Zajišťuje sladění s nejnovější verzí titulku
+- 💡 Např: pokud vstupní skript byl v12, výstup bude v13
 
 **Podmínky přechodu:**
 - ✅ ÚSPĚCH → Pokračuje na **MVP-012** (Akceptace titulku)
@@ -233,7 +245,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Brána akceptace - Je titulek připraven?
 
 **Vstupy:**
-- Titulek v3+ (nejnovější verze)
+- Nejnovější titulek (aktuální verze)
 - Historie všech revizí
 
 **Výstupy:**
@@ -244,7 +256,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Podmínky přechodu:**
 - ✅ PASS (skóre ≥85) → Pokračuje na **MVP-013** (Akceptace skriptu)
 - ❌ FAIL (skóre <85) → Smyčka zpět na **MVP-009** (Title Refinement)
-  - Vytvoří v4, v5, v6... dokud neprojde
+  - Vytvoří novou verzi (aktuální +1) dokud neprojde
   - POUŽÍVÁ vždy nejnovější verze
 
 ---
@@ -254,7 +266,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Brána akceptace - Je skript připraven?
 
 **Vstupy:**
-- Skript v3+ (nejnovější verze)
+- Nejnovější skript (aktuální verze)
 - Akceptovaný titulek (z MVP-012)
 - Historie všech revizí
 
@@ -266,7 +278,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Podmínky přechodu:**
 - ✅ PASS (skóre ≥85) → Pokračuje na **MVP-014** (Grammar Review)
 - ❌ FAIL (skóre <85) → Smyčka zpět na **MVP-011** (Script Refinement)
-  - Vytvoří v4, v5, v6... dokud neprojde
+  - Vytvoří novou verzi (aktuální +1) dokud neprojde
   - Pokud titulek také potřebuje změny → zpět na MVP-009
 
 ---
@@ -276,7 +288,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola gramatiky, pravopisu, interpunkce
 
 **Vstupy:**
-- Skript v3+ (akceptovaný z MVP-013)
+- Nejnovější skript (akceptovaný z MVP-013)
 
 **Výstupy:**
 - Grammar Review JSON
@@ -297,7 +309,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola tónu, stylu, audience
 
 **Vstupy:**
-- Skript v3+ (prošel Grammar)
+- Nejnovější skript (prošel Grammar)
 
 **Výstupy:**
 - Tone Review JSON
@@ -318,7 +330,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola logiky, zápletky, motivace postav, tempa
 
 **Vstupy:**
-- Skript v3+ (prošel Grammar a Tone)
+- Nejnovější skript (prošel Grammar a Tone)
 
 **Výstupy:**
 - Content Review JSON
@@ -339,7 +351,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola konzistence jmen postav, časové osy, lokací
 
 **Vstupy:**
-- Skript v3+ (prošel Content)
+- Nejnovější skript (prošel Content)
 
 **Výstupy:**
 - Consistency Review JSON
@@ -360,7 +372,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola jasnosti vět, struktur, redundance
 
 **Vstupy:**
-- Skript v3+ (prošel Consistency)
+- Nejnovější skript (prošel Consistency)
 
 **Výstupy:**
 - Editing Review JSON
@@ -382,7 +394,7 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola čitelnosti titulku pro voiceover
 
 **Vstupy:**
-- Titulek v3+ (akceptovaný z MVP-012)
+- Nejnovější titulek (akceptovaný z MVP-012)
 
 **Výstupy:**
 - Readability Review JSON
@@ -403,8 +415,8 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: Kontrola čitelnosti skriptu pro voiceover
 
 **Vstupy:**
-- Skript v3+ (prošel všechny předchozí kontroly)
-- Titulek v3+ (prošel Title Readability)
+- Nejnovější skript (prošel všechny předchozí kontroly)
+- Nejnovější titulek (prošel Title Readability)
 
 **Výstupy:**
 - Readability Review JSON
@@ -425,8 +437,8 @@ Tento dokument popisuje **kompletní iterativní workflow MVP** s 24 stavy včet
 **Účel**: GPT-based expertní revize celého příběhu
 
 **Vstupy:**
-- Titulek v3+ (prošel všechny kontroly)
-- Skript v3+ (prošel všechny kontroly)
+- Nejnovější titulek (prošel všechny kontroly)
+- Nejnovější skript (prošel všechny kontroly)
 - Původní Idea (z MVP-001)
 
 **Výstupy:**
@@ -641,14 +653,24 @@ NEEDS IMPROVEMENT → MVP-022 (Polish) → MVP-021 (cyklus)
 
 ## Klíčové Vlastnosti Workflow
 
-### 1. Neomezené Verze
-- Podporuje v1, v2, v3, v4, v5, v6, v7 a více
-- Žádné pevné limity verzí
+### 1. Dynamické Verzování (DŮLEŽITÉ!)
+- ⚠️ **Verze NEJSOU fixní na konkrétní MVP kroky**
+- ⚠️ **Při každé změně titulku nebo skriptu se číslo verze automaticky zvýší o 1**
+- ⚠️ **MVP-002 nevytváří vždy "v1"** - pokud už existují předchozí verze, vytvoří vyšší číslo
+- ⚠️ **Příklady v tomto dokumentu (v1, v2, v3) jsou pouze ilustrativní**
+- Podporuje neomezený počet verzí (v1, v2, v3... v50, v100...)
 - Vždy používá nejnovější verze v smyčkách
+- Verze nezávisí na MVP čísle, ale na historii změn
+
+**Příklad:**
+- První běh: Idea → Title (v1) → Script (v1)
+- Po 5 iteracích: Title (v6), Script (v7)
+- Po 15 iteracích: Title (v12), Script (v18)
+- **Čísla verzí rostou podle počtu změn, ne podle MVP kroků!**
 
 ### 2. Kontext
 - Všechny revize mají přístup k původnímu Idea
-- Verze jsou propojeny (v2 odkazuje na v1, v3 na v2)
+- Verze jsou propojeny (v2 odkazuje na v1, v3 na v2, atd.)
 - Historie revizí zachována
 
 ### 3. Kvalitní Brány
@@ -670,66 +692,95 @@ NEEDS IMPROVEMENT → MVP-022 (Polish) → MVP-021 (cyklus)
 
 ## Verzování - Jak Funguje
 
-### Příklad Scénáře s Více Iteracemi:
+### ⚠️ DŮLEŽITÉ: Verze jsou Dynamické, Ne Fixní!
+
+**Klíčové principy:**
+1. **Každá změna titulku = verze +1** (Title v1 → v2 → v3 → v4...)
+2. **Každá změna skriptu = verze +1** (Script v1 → v2 → v3 → v4...)
+3. **Verze NEJSOU vázány na MVP kroky** - MVP-002 může vytvořit v1, v5 nebo v20 podle historie
+4. **Čísla verzí v příkladech níže jsou pouze ilustrativní** - ukazují typ změny, ne skutečné číslo
+
+### Příklad Scénáře s Více Iteracemi (Ilustrativní Čísla Verzí):
+
+**POZNÁMKA:** Toto je pouze jeden možný scénář. Ve skutečnosti mohou být čísla verzí úplně jiná podle počtu iterací!
 
 ```
 START:
-Idea → Title v1 → Script v1
+Idea → Title (první verze) → Script (první verze)
 
 Sprint 1:
-Review Title v1 by Script v1 → feedback
-Review Script v1 by Title v1 → feedback
+Review Title by Script → feedback
+Review Script by Title → feedback
 
 Sprint 2:
-Title v1 + feedback → Title v2
-Script v1 + feedback + Title v2 → Script v2
+Title (první) + feedback → Title (druhá verze)
+Script (první) + feedback + Title (druhá) → Script (druhá verze)
 
-Review Title v2 by Script v2 → feedback
-Title v2 + feedback → Title v3
+Review Title (druhá) by Script (druhá) → feedback
+Title (druhá) + feedback → Title (třetí verze)
 
-Review Script v2 by Title v3 → feedback
-Script v2 + feedback + Title v3 → Script v3
+Review Script (druhá) by Title (třetí) → feedback
+Script (druhá) + feedback + Title (třetí) → Script (třetí verze)
 
 Sprint 3 - Akceptace:
-Title v3 → Acceptance Check → FAIL (skóre 82, potřebuje 85)
+Title (třetí) → Acceptance Check → FAIL (skóre 82, potřebuje 85)
   ↓
-Title v3 + feedback → Title v4 (Refinement)
-Title v4 → Acceptance Check → PASS ✅
+Title (třetí) + feedback → Title (čtvrtá verze - Refinement)
+Title (čtvrtá) → Acceptance Check → PASS ✅
 
-Script v3 → Acceptance Check → FAIL (skóre 83)
+Script (třetí) → Acceptance Check → FAIL (skóre 83)
   ↓
-Script v3 + feedback + Title v4 → Script v4 (Refinement)
-Script v4 → Acceptance Check → PASS ✅
+Script (třetí) + feedback + Title (čtvrtá) → Script (čtvrtá verze - Refinement)
+Script (čtvrtá) → Acceptance Check → PASS ✅
 
 Sprint 3 - Kontroly Kvality:
-Script v4 → Grammar → PASS ✅
-Script v4 → Tone → PASS ✅
-Script v4 → Content → FAIL (plot issues)
+Script (čtvrtá) → Grammar → PASS ✅
+Script (čtvrtá) → Tone → PASS ✅
+Script (čtvrtá) → Content → FAIL (plot issues)
   ↓
-Script v4 + feedback + Title v4 → Script v5 (Refinement)
-Script v5 → Acceptance → PASS
-Script v5 → Grammar → PASS
-Script v5 → Tone → PASS
-Script v5 → Content → PASS ✅
+Script (čtvrtá) + feedback + Title (čtvrtá) → Script (pátá verze - Refinement)
+Script (pátá) → Acceptance → PASS
+Script (pátá) → Grammar → PASS
+Script (pátá) → Tone → PASS
+Script (pátá) → Content → PASS ✅
 
-Script v5 → Consistency → PASS ✅
-Script v5 → Editing → PASS ✅
+Script (pátá) → Consistency → PASS ✅
+Script (pátá) → Editing → PASS ✅
 
-Title v4 → Readability → PASS ✅
-Script v5 → Readability → PASS ✅
+Title (čtvrtá) → Readability → PASS ✅
+Script (pátá) → Readability → PASS ✅
 
 Sprint 3 - Expert:
-Title v4 + Script v5 → Expert Review → NEEDS IMPROVEMENT
+Title (čtvrtá) + Script (pátá) → Expert Review → NEEDS IMPROVEMENT
   ↓
-Title v4 + Script v5 + expert feedback → Polish → Title v5 + Script v6
-Title v5 + Script v6 → Expert Review → READY ✅
+Title (čtvrtá) + Script (pátá) + expert feedback → Polish → Title (pátá verze) + Script (šestá verze)
+Title (pátá) + Script (šestá) → Expert Review → READY ✅
 
 Publikování:
-Title v5 + Script v6 → Export → JSON, MD, HTML ✅
+Title (pátá) + Script (šestá) → Export → JSON, MD, HTML ✅
 Export result → Report Generation → Complete Report ✅
 
-FINÁLNÍ VERZE: Title v5, Script v6
+FINÁLNÍ VERZE: Title (pátá verze), Script (šestá verze)
+
+⚠️ POZNÁMKA: V reálném scénáři mohou být čísla verzí úplně jiná!
+Např.: Title v23, Script v35 - závisí na počtu iterací!
 ```
+
+### Další Možné Scénáře (Ilustrativní):
+
+**Scénář A: Méně iterací**
+- Finální: Title (druhá verze), Script (třetí verze)
+- Workflow byl rychlejší, méně oprav
+
+**Scénář B: Více iterací**
+- Finální: Title (desátá verze), Script (patnáctá verze)
+- Více zpětných vazeb, více vylepšení
+
+**Scénář C: Velmi složitý projekt**
+- Finální: Title (dvacátá verze), Script (třicátá verze)
+- Mnoho iterací, komplexní obsah
+
+**KLÍČ: Čísla verzí jsou výsledkem procesu, ne předem dané!**
 
 ---
 
@@ -737,12 +788,12 @@ FINÁLNÍ VERZE: Title v5, Script v6
 
 ### Sprint 1: 5 stavů (MVP-001 až MVP-005)
 - Vytvoření základu
-- První verze (v1)
+- První verze titulku a skriptu (čísla závisí na historii)
 - Počáteční křížové revize
 
 ### Sprint 2: 6 stavů (MVP-006 až MVP-011)
 - Iterativní vylepšování
-- Verze v2 a v3
+- Další verze titulku a skriptu (inkrementují se podle změn)
 - Křížová validace vylepšení
 
 ### Sprint 3: 13 stavů (MVP-012 až MVP-024)
@@ -750,6 +801,14 @@ FINÁLNÍ VERZE: Title v5, Script v6
 - 7 kontrol kvality
 - 2 kontroly čitelnosti
 - 2 expertní stavy
+- 2 publikační stavy
+
+### Celkem:
+- **24 MVPs**
+- **12 zpětnovazebních smyček**
+- **Dynamické verzování** - čísla verzí se inkrementují při každé změně
+- **Neomezený počet verzí** - může být v1, v2... v50, v100, atd.
+- **100% pokrytí testy** (všechny MVPs testovány)
 - 2 publikační stavy
 
 ### Celkem:
