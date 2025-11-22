@@ -1,4 +1,4 @@
-# AI Script Review & Writer Feedback Loop Implementation
+# AI Script Review & ScriptWriter Feedback Loop Implementation
 
 ## Overview
 
@@ -11,7 +11,7 @@ This implementation adds AI-powered script review and writer optimization with a
 - Variable length support from 60 seconds to 3+ minutes
 - Length compliance checking and optimization
 
-✅ **Feedback loop from AI Script Reviewer to AI Script Writer**
+✅ **Feedback loop from AI Script Reviewer to ScriptWriter**
 - Complete iterative cycle: Review → Write → Review
 - Automatic iteration control (max 3 iterations)
 - Convergence detection (stops if improvement < 5%)
@@ -22,7 +22,7 @@ This implementation adds AI-powered script review and writer optimization with a
 - Prioritized improvement points with impact scores
 - Target audience alignment scoring
 
-✅ **AI Writer takes original text, review, and optimizes for audience**
+✅ **ScriptWriter takes original text, review, and optimizes for audience**
 - Processes review feedback and applies improvements
 - Multiple optimization strategies
 - Score-driven improvement tracking
@@ -32,8 +32,8 @@ This implementation adds AI-powered script review and writer optimization with a
 
 ### New Modules
 
-#### 1. T/Script/Review/ - AI Script Reviewer
-**File:** `T/Script/Review/script_review.py`
+#### 1. T/Review/Script/ - AI Script Reviewer
+**Files:** `T/Review/Script/src/script_review.py`, `T/Review/Script/src/script_version.py`
 
 **Core Classes:**
 - `ScriptReview` - Main review model with scoring and recommendations
@@ -41,21 +41,25 @@ This implementation adds AI-powered script review and writer optimization with a
 - `ContentLength` - Target length categories
 - `ImprovementPoint` - Individual improvement recommendation
 - `CategoryScore` - Category-specific score and analysis
+- `ScriptVersion` - Version tracking for comparison
 
 **Key Features:**
 - 0-100% scoring system
 - Category-specific evaluation
 - YouTube short readiness assessment
 - High-priority improvement extraction
+- Script version tracking for research
 - Serialization support (to_dict/from_dict)
 
 **Methods:**
 - `get_category_score(category)` - Get score for specific category
 - `get_high_priority_improvements()` - Extract high-impact improvements
 - `get_youtube_short_readiness()` - Calculate YouTube short compliance
+- `add_script_version()` - Track script versions for comparison
 
-#### 2. T/Script/Writer/ - AI Script Writer with Feedback Loop
-**File:** `T/Script/Writer/script_writer.py`
+#### 2. T/Script/src/ - ScriptWriter with Feedback Loop
+**File:** `T/Script/src/script_writer.py`
+**Namespace:** `PrismQ.T.Script` (imported as `from PrismQ.T.Script import ScriptWriter`)
 
 **Core Classes:**
 - `ScriptWriter` - Main writer with feedback loop integration
@@ -89,7 +93,7 @@ AI Script Review (IdeaStatus.SCRIPT_REVIEW)
   - Evaluates script
   - Generates score and improvement points
   ↓
-AI Script Writer
+ScriptWriter
   - Applies improvements based on review
   - Optimizes for target audience
   ↓
@@ -106,7 +110,7 @@ Text Publishing (IdeaStatus.TEXT_PUBLISHING)
 
 **Test Coverage:** 30/30 tests passing
 
-**T/Script/Review/_meta/tests/test_script_review.py:**
+**T/Review/Script/_meta/tests/test_script_review.py:**
 - 12 tests covering:
   - Basic review creation
   - YouTube short configuration
@@ -116,7 +120,7 @@ Text Publishing (IdeaStatus.TEXT_PUBLISHING)
   - Serialization (to_dict, from_dict, roundtrip)
   - String representation
 
-**T/Script/Writer/_meta/tests/test_script_writer.py:**
+**T/Script/src/_meta/tests/test_script_writer.py:**
 - 18 tests covering:
   - Basic writer creation
   - Optimization from review
@@ -131,7 +135,7 @@ Text Publishing (IdeaStatus.TEXT_PUBLISHING)
 ### Examples
 
 **1. Complete Feedback Loop Example**
-**File:** `T/Script/Review/_meta/examples/feedback_loop_example.py`
+**File:** `T/Review/Script/_meta/examples/feedback_loop_example.py`
 
 Demonstrates:
 - Original script: 145 seconds
@@ -140,7 +144,7 @@ Demonstrates:
 - Applied improvements: pacing, opening hook, length reduction
 
 **2. Idea Integration Example**
-**File:** `T/Script/Writer/_meta/examples/idea_integration_example.py`
+**File:** `T/Script/src/_meta/examples/idea_integration_example.py`
 
 Shows:
 - Complete workflow from Idea to Script Approved
@@ -151,8 +155,8 @@ Shows:
 ### Documentation
 
 **Module Documentation:**
-- `T/Script/Review/README.md` - Complete review module documentation
-- `T/Script/Writer/README.md` - Complete writer module documentation
+- `T/Review/Script/README.md` - Complete review module documentation
+- `T/Script/src/README.md` - ScriptWriter module documentation
 - `T/Script/README.md` - Updated with feedback loop workflow
 
 **Content:**
@@ -165,8 +169,8 @@ Shows:
 ## Usage Example
 
 ```python
-from T.Script.Review import ScriptReview, ContentLength
-from T.Script.Writer import ScriptWriter
+from T.Review.Script import ScriptReview, ContentLength
+from T.Script import ScriptWriter
 
 # 1. AI Reviewer evaluates
 review = ScriptReview(
@@ -179,7 +183,7 @@ review = ScriptReview(
     optimal_length_seconds=90
 )
 
-# 2. AI Writer optimizes
+# 2. ScriptWriter optimizes
 writer = ScriptWriter(target_score_threshold=80)
 result = writer.optimize_from_review(
     original_script=script_text,
@@ -236,25 +240,27 @@ print(f"Score: {summary['initial_score']}% → {summary['current_score']}%")
 ## Files Added
 
 **Core Implementation:**
-- `T/Script/Review/__init__.py`
-- `T/Script/Review/script_review.py`
-- `T/Script/Writer/__init__.py`
-- `T/Script/Writer/script_writer.py`
+- `T/Review/Script/src/script_review.py`
+- `T/Review/Script/src/script_version.py`
+- `T/Script/src/script_writer.py`
+- `T/Script/__init__.py` (exports ScriptWriter)
+- `T/Title/__init__.py` (namespace consistency)
 
 **Tests:**
-- `T/Script/Review/_meta/tests/__init__.py`
-- `T/Script/Review/_meta/tests/test_script_review.py`
-- `T/Script/Writer/_meta/tests/__init__.py`
-- `T/Script/Writer/_meta/tests/test_script_writer.py`
+- `T/Review/Script/_meta/tests/test_script_review.py`
+- `T/Review/Script/_meta/tests/test_versioning.py`
+- `T/Script/src/_meta/tests/test_script_writer.py`
 
 **Examples:**
-- `T/Script/Review/_meta/examples/feedback_loop_example.py`
-- `T/Script/Writer/_meta/examples/idea_integration_example.py`
+- `T/Review/Script/_meta/examples/feedback_loop_example.py`
+- `T/Review/Script/_meta/examples/versioning_example.py`
+- `T/Script/src/_meta/examples/idea_integration_example.py`
 
 **Documentation:**
-- `T/Script/Review/README.md`
-- `T/Script/Writer/README.md`
+- `T/Review/Script/README.md`
+- `T/Script/src/README.md`
 - `T/Script/README.md` (updated)
+- `T/Title/README.md` (updated)
 
 ## Performance Characteristics
 
@@ -279,12 +285,13 @@ The implementation is complete and ready for:
 
 ## Conclusion
 
-Successfully implemented complete AI-powered script review and writer feedback loop that:
+Successfully implemented complete AI-powered script review and ScriptWriter feedback loop that:
 - ✅ Optimizes text for YouTube shorts (< 3 minutes, variable length)
-- ✅ Implements feedback loop between AI Reviewer and AI Writer
+- ✅ Implements feedback loop between AI Reviewer and ScriptWriter
 - ✅ Provides 0-100% scoring with improvement points
 - ✅ Optimizes content for target audience based on review feedback
 - ✅ Includes comprehensive tests and documentation
 - ✅ Integrates seamlessly with existing PrismQ workflow
+- ✅ Uses correct namespace: `PrismQ.T.Script` (not `PrismQ.T.Script.Writer`)
 
 All requirements from the problem statement have been met.

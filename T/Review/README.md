@@ -95,7 +95,7 @@ Comprehensive script evaluation with scoring (0-100%) and improvement recommenda
 - YouTube short optimization (< 3 minutes, variable length)
 - Prioritized improvement points with impact scores
 - Script versioning for comparison and research
-- Feedback loop integration with **[T/Script/Writer](../Script/Writer/)**
+- Feedback loop integration with **[T/Script (ScriptWriter)](../Script/)**
 
 **[→ View Script Documentation](./Script/README.md)**
 **[→ View Script Metadata](./Script/_meta/)**
