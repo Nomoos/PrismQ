@@ -11,6 +11,10 @@ from .script_review import (
     ImprovementPoint,
     CategoryScore
 )
+from .by_title_and_idea import (
+    review_script_by_title_and_idea,
+    AlignmentScore
+)
 
 __all__ = [
     "ScriptReview",
@@ -18,5 +22,7 @@ __all__ = [
     "ReviewCategory",
     "ContentLength",
     "ImprovementPoint",
-    "CategoryScore"
+    "CategoryScore",
+    "review_script_by_title_and_idea",
+    "AlignmentScore"
 ]

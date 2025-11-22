@@ -1,9 +1,11 @@
 # PARALLEL_RUN_NEXT - Provádění MVP sprintu (Iterativní společné vylepšování)
 
+**⚠️ POZNÁMKA**: Tento dokument vyžaduje aktualizaci na rozšířený workflow s 23 MVP issues. Viz anglická verze `PARALLEL_RUN_NEXT.md` pro aktuální specifikaci.
+
 **Sprint**: Sprint 1-3 (6 týdnů) - MVP iterativní workflow  
 **Datum**: 2025-11-21  
-**Stav**: Plánování  
-**Cíl**: Vybudovat MVP s **iterativním cyklem společného vylepšování titulku a skriptu** následující: **Nápad → Titulek v1 → Skript v1 → Křížové revize → Titulek v2 ← Skript v2 → Revize v2 → Vylepšení v3 → Brány přijetí → Kontroly čitelnosti → Publikovat**
+**Stav**: Plánování - Vyžaduje aktualizaci  
+**Cíl**: Vybudovat MVP s **iterativním cyklem společného vylepšování titulku a skriptu** následující: **Nápad → Titulek v1 → Skript v1 → Křížové revize → Titulek v2 ← Skript v2 → Revize v2 → Vylepšení v3 → Brány přijetí → Kontroly kvality (Grammar, Tone, Content, Consistency, Editing) → Kontroly čitelnosti → GPT Expert Review → Publikovat**
 
 ---
 
