@@ -8,9 +8,10 @@ This module implements the script generation logic for MVP-003:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any, Literal
+from typing import List, Dict, Optional, Any
 from datetime import datetime
 from enum import Enum
+import string
 import sys
 import os
 
@@ -44,6 +45,32 @@ class PlatformTarget(Enum):
     TIKTOK = "tiktok"  # < 60 seconds
     INSTAGRAM_REEL = "instagram_reel"  # < 90 seconds
     GENERAL = "general"  # No specific constraints
+
+
+class ScriptTone(Enum):
+    """Script tone options."""
+    
+    ENGAGING = "engaging"
+    MYSTERIOUS = "mysterious"
+    EDUCATIONAL = "educational"
+    DRAMATIC = "dramatic"
+    CONVERSATIONAL = "conversational"
+
+
+# Common English stop words for keyword extraction
+STOP_WORDS = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", 
+    "of", "with", "is", "are", "was", "were", "been", "be", "have", "has", 
+    "had", "do", "does", "did", "will", "would", "could", "should", "may",
+    "might", "can", "must", "shall"
+}
+
+# Tone detection keywords mapping
+TONE_KEYWORDS = {
+    "mysterious": ["mystery", "secrets", "hidden", "unknown"],
+    "dramatic": ["shocking", "unbelievable", "terrifying"],
+    "educational": ["how", "why", "what", "explained"]
+}
 
 
 @dataclass
@@ -141,7 +168,7 @@ class ScriptGeneratorConfig:
     structure_type: ScriptStructure = ScriptStructure.HOOK_DELIVER_CTA
     words_per_second: float = 2.5  # Average speaking rate
     include_cta: bool = True
-    tone: Literal["engaging", "mysterious", "educational", "dramatic", "conversational"] = "engaging"
+    tone: ScriptTone = ScriptTone.ENGAGING
 
 
 class ScriptGenerator:
@@ -273,9 +300,8 @@ class ScriptGenerator:
         """Extract keywords from text."""
         # Simple keyword extraction (in production, would use NLP)
         words = text.lower().split()
-        # Filter out common words
-        stop_words = {"the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with"}
-        keywords = [w.strip(".,!?;:") for w in words if w not in stop_words and len(w) > 3]
+        # Filter out common words and punctuation
+        keywords = [w.strip(string.punctuation) for w in words if w not in STOP_WORDS and len(w) > 3]
         return keywords[:5]
     
     def _detect_tone(self, title: str) -> str:
@@ -283,14 +309,11 @@ class ScriptGenerator:
         title_lower = title.lower()
         
         # Simple tone detection based on keywords
-        if any(word in title_lower for word in ["mystery", "secrets", "hidden", "unknown"]):
-            return "mysterious"
-        elif any(word in title_lower for word in ["shocking", "unbelievable", "terrifying"]):
-            return "dramatic"
-        elif any(word in title_lower for word in ["how", "why", "what", "explained"]):
-            return "educational"
-        else:
-            return "engaging"
+        for tone, keywords in TONE_KEYWORDS.items():
+            if any(word in title_lower for word in keywords):
+                return tone
+        
+        return "engaging"
     
     def _generate_sections(
         self,
@@ -559,8 +582,11 @@ class ScriptGenerator:
         elif len(words) < target_words * 0.8:
             # Pad if too short (in production, AI would generate more)
             padding = " This is a fascinating topic that deserves deeper exploration."
-            while len(main_content.split()) < target_words * 0.8:
+            word_count = len(words)
+            min_words = int(target_words * 0.8)
+            while word_count < min_words:
                 main_content += padding
+                word_count += len(padding.split())
         
         return main_content
     
@@ -654,4 +680,4 @@ class ScriptGenerator:
         return "\n\n".join(section.content for section in sections)
 
 
-__all__ = ["ScriptGenerator", "ScriptGeneratorConfig", "ScriptV1", "ScriptSection", "ScriptStructure", "PlatformTarget"]
+__all__ = ["ScriptGenerator", "ScriptGeneratorConfig", "ScriptV1", "ScriptSection", "ScriptStructure", "PlatformTarget", "ScriptTone"]

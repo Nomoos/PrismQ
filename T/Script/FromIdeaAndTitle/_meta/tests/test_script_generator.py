@@ -15,7 +15,8 @@ from script_generator import (
     ScriptV1,
     ScriptSection,
     ScriptStructure,
-    PlatformTarget
+    PlatformTarget,
+    ScriptTone
 )
 
 # Import Idea model for testing
@@ -76,12 +77,12 @@ class TestScriptGeneratorBasics:
         config = ScriptGeneratorConfig(
             platform_target=PlatformTarget.YOUTUBE_SHORT,
             target_duration_seconds=60,
-            tone="mysterious"
+            tone=ScriptTone.MYSTERIOUS
         )
         generator = ScriptGenerator(config)
         assert generator.config.platform_target == PlatformTarget.YOUTUBE_SHORT
         assert generator.config.target_duration_seconds == 60
-        assert generator.config.tone == "mysterious"
+        assert generator.config.tone == ScriptTone.MYSTERIOUS
     
     def test_generate_script_v1_basic(self):
         """Test generating a basic script v1."""
@@ -435,14 +436,14 @@ class TestContentGeneration:
     
     def test_respects_tone_setting(self):
         """Test that tone setting is applied."""
-        config = ScriptGeneratorConfig(tone="educational")
+        config = ScriptGeneratorConfig(tone=ScriptTone.EDUCATIONAL)
         generator = ScriptGenerator(config)
         idea = Idea()
         
         script = generator.generate_script_v1(idea, "Test Title")
         
         # Check that tone is recorded in metadata
-        assert script.metadata["generation_config"]["tone"] == "educational"
+        assert script.metadata["generation_config"]["tone"] == ScriptTone.EDUCATIONAL
     
     def test_include_cta_setting(self):
         """Test include_cta setting."""

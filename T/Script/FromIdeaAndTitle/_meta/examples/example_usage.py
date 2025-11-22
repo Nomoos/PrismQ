@@ -15,7 +15,8 @@ from script_generator import (
     ScriptGenerator,
     ScriptGeneratorConfig,
     ScriptStructure,
-    PlatformTarget
+    PlatformTarget,
+    ScriptTone
 )
 
 try:
@@ -122,7 +123,7 @@ def example_youtube_short():
         platform_target=PlatformTarget.YOUTUBE_SHORT,
         target_duration_seconds=60,
         structure_type=ScriptStructure.HOOK_DELIVER_CTA,
-        tone="dramatic"
+        tone=ScriptTone.DRAMATIC
     )
     
     generator = ScriptGenerator(config)
@@ -165,7 +166,7 @@ def example_educational_content():
         platform_target=PlatformTarget.YOUTUBE_MEDIUM,
         target_duration_seconds=120,
         structure_type=ScriptStructure.PROBLEM_SOLUTION,
-        tone="educational",
+        tone=ScriptTone.EDUCATIONAL,
         include_cta=True
     )
     
@@ -210,7 +211,7 @@ def example_custom_configuration():
         platform_target=PlatformTarget.YOUTUBE_MEDIUM,
         target_duration_seconds=150,
         structure_type=ScriptStructure.THREE_ACT,
-        tone="conversational",
+        tone=ScriptTone.CONVERSATIONAL,
         include_cta=True,
         script_id="custom-ai-script-v1"
     )

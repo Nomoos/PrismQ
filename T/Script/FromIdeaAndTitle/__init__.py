@@ -25,7 +25,8 @@ from .src.script_generator import (
     ScriptV1,
     ScriptSection,
     ScriptStructure,
-    PlatformTarget
+    PlatformTarget,
+    ScriptTone
 )
 
 __version__ = "0.1.0"
@@ -35,5 +36,6 @@ __all__ = [
     "ScriptV1",
     "ScriptSection",
     "ScriptStructure",
-    "PlatformTarget"
+    "PlatformTarget",
+    "ScriptTone"
 ]
