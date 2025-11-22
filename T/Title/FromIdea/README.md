@@ -31,14 +31,25 @@ PrismQ.T.Script.Draft (v1)
 ## Process
 
 1. Analyze idea concept and theme
-2. Generate 3-5 title variants
+2. Generate 10 title variants using diverse strategies
 3. Consider SEO and engagement factors
 4. Store variants with idea reference
 
 ## Output
 
-- Title v1 variants (3-5 options)
-- Associated metadata (length, keywords, style)
+- Title v1 variants (10 options by default, 3-10 configurable)
+- 10 distinct title styles:
+  - **Direct**: Straightforward, clear title
+  - **Question**: Poses a question to engage readers
+  - **How-to**: Action-oriented, instructional
+  - **Curiosity**: Intriguing, creates interest
+  - **Authoritative**: Expert perspective, comprehensive
+  - **Listicle**: Number-based, digestible format
+  - **Problem-Solution**: Addresses challenges and solutions
+  - **Comparison**: Contrasts different approaches
+  - **Ultimate-Guide**: Comprehensive resource positioning
+  - **Benefit**: Value proposition, reader-focused
+- Associated metadata (length, keywords, style, score)
 - Link to source idea
 
 ## Next Stage
