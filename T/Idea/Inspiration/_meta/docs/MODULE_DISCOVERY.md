@@ -59,7 +59,7 @@ client_modules = discovery.discover_for_client()
 
 Returns top-level modules needed for environment setup:
 - Classification
-- ConfigLoad
+- EnvLoad
 - Model
 - Scoring
 - Sources
@@ -83,7 +83,7 @@ Returns modules suitable for Client UI registration:
 - Classification
 - Scoring
 - Sources (and its submodules)
-- Excludes: ConfigLoad, Model, Client itself (infrastructure)
+- Excludes: EnvLoad, Model, Client itself (infrastructure)
 
 **Use case:** Client module registration, UI module lists
 

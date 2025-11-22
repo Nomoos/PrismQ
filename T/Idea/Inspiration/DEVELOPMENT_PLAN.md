@@ -416,7 +416,7 @@ Each module maintains:
 
 ### Test Coverage
 - Classification: ✅ 48 tests passing
-- ConfigLoad: ✅ Tests passing
+- EnvLoad: ✅ Tests passing
 - Model: ✅ Tests passing
 - Scoring: ✅ Tests passing
 - Source/Video: ✅ 46 tests passing

@@ -16,13 +16,13 @@ Usage:
 Principles:
 - Stateless processing (no side effects on other modules)
 - Idempotent (can run multiple times safely)
-- Depends only on Model and ConfigLoad layers
+- Depends only on Model and EnvLoad layers
 - Returns enriched IdeaInspiration (immutable pattern)
 """
 
 from typing import Optional, Dict, Any
 from Model import IdeaInspiration
-from ConfigLoad import Config
+from EnvLoad import Config
 import logging
 
 
@@ -242,7 +242,7 @@ import pytest
 from unittest.mock import Mock, patch
 from {module}.{module_name} import {ModuleName}Processor
 from Model import IdeaInspiration
-from ConfigLoad import Config
+from EnvLoad import Config
 
 
 class Test{ModuleName}Processor:

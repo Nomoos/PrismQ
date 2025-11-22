@@ -9,7 +9,7 @@ PrismQ.IdeaInspiration is a multi-module repository that follows consistent arch
 The repository contains multiple specialized modules that work together:
 
 - **Classification** - Content categorization and story detection
-- **ConfigLoad** - Centralized configuration management
+- **EnvLoad** - Centralized configuration management
 - **Model** - Core IdeaInspiration data model
 - **Scoring** - Content scoring and evaluation engine
 - **Sources** - Content source integrations and taxonomy
@@ -39,7 +39,7 @@ graph TB
     end
     
     subgraph "Infrastructure Layer"
-        ConfigLoad[ConfigLoad Module<br/>Configuration management]
+        EnvLoad[EnvLoad Module<br/>Configuration management]
     end
     
     subgraph "External Data Sources"
@@ -64,13 +64,13 @@ graph TB
     Classification -->|enriches| Model
     Scoring -->|evaluates| Model
     
-    ConfigLoad -.provides config.- Sources
-    ConfigLoad -.provides config.- Classification
-    ConfigLoad -.provides config.- Scoring
+    EnvLoad -.provides config.- Sources
+    EnvLoad -.provides config.- Classification
+    EnvLoad -.provides config.- Scoring
     
     style Model fill:#f0e1ff
     style Sources fill:#fff4e1
-    style ConfigLoad fill:#e1ffe1
+    style EnvLoad fill:#e1ffe1
 ```
 
 ## Module Organization Patterns
@@ -140,7 +140,7 @@ ModuleName/
 └── README.md
 ```
 
-### Pattern 3: Direct Package Structure (Used in Model, ConfigLoad)
+### Pattern 3: Direct Package Structure (Used in Model, EnvLoad)
 
 Some simpler modules use a direct package structure:
 
@@ -201,7 +201,7 @@ graph LR
     end
     
     subgraph "Infrastructure"
-        ConfigLoad[ConfigLoad]
+        EnvLoad[EnvLoad]
     end
     
     Sources -->|IdeaInspiration objects| Model
@@ -210,12 +210,12 @@ graph LR
     Classification -->|enriched data| Model
     Scoring -->|scored data| Model
     
-    ConfigLoad -.configuration.- Sources
-    ConfigLoad -.configuration.- Classification
-    ConfigLoad -.configuration.- Scoring
+    EnvLoad -.configuration.- Sources
+    EnvLoad -.configuration.- Classification
+    EnvLoad -.configuration.- Scoring
     
     style Model fill:#f0e1ff
-    style ConfigLoad fill:#e1ffe1
+    style EnvLoad fill:#e1ffe1
 ```
 
 ### Data Flow Diagram
@@ -251,7 +251,7 @@ sequenceDiagram
 2. **Model** → Transform into unified IdeaInspiration structure
 3. **Classification** → Categorize and detect story potential
 4. **Scoring** → Evaluate quality and engagement metrics
-5. **ConfigLoad** → Manage configuration across all modules
+5. **EnvLoad** → Manage configuration across all modules
 
 **Note**: With the Client module now in a separate repository, these modules can be executed via:
 - Direct CLI invocation of each module

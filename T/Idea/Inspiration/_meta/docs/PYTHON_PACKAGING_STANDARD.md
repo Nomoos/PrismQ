@@ -86,7 +86,7 @@ disallow_untyped_defs = true
 
 | Module | Configuration | Status |
 |--------|---------------|--------|
-| **ConfigLoad** | `pyproject.toml` only | ✅ Standardized |
+| **EnvLoad** | `pyproject.toml` only | ✅ Standardized |
 | **Model** | `pyproject.toml` only | ✅ Standardized (setup.py removed) |
 | **Classification** | `pyproject.toml` only | ✅ Standardized (setup.py removed) |
 | **Scoring** | `pyproject.toml` only | ✅ Standardized |
@@ -95,7 +95,7 @@ disallow_untyped_defs = true
 
 Different modules use different package structures:
 
-- **ConfigLoad**: Direct module files (`config.py`, `logging_config.py`)
+- **EnvLoad**: Direct module files (`config.py`, `logging_config.py`)
 - **Model**: Direct module files (`idea_inspiration.py`, `config_manager.py`, etc.)
 - **Classification**: `src/classification/` package structure
 - **Scoring**: `src/` package structure
@@ -201,7 +201,7 @@ All tools are now configured in `pyproject.toml`:
 
 ### Changes Made
 
-1. **Created `pyproject.toml`** for ConfigLoad (previously only had `requirements.txt`)
+1. **Created `pyproject.toml`** for EnvLoad (previously only had `requirements.txt`)
 2. **Updated `pyproject.toml`** for Model, Classification, and Scoring:
    - Standardized build-system requirements
    - Updated classifiers for Python 3.10-3.12
@@ -233,7 +233,7 @@ pip install --no-build-isolation -e ".[dev]"
 pytest
 
 # Results:
-# - ConfigLoad: 37 tests passed (87% coverage)
+# - EnvLoad: 37 tests passed (87% coverage)
 # - Model: 103 tests passed (74% coverage)
 # - Classification: 85 tests passed (18 failures - pre-existing issues)
 # - Scoring: 57 tests passed (67% coverage)

@@ -192,7 +192,7 @@ Set-Location (Join-Path $ScriptDir "..\..")
 Apply the same pattern to:
 - Classification module
 - Scoring module
-- ConfigLoad module
+- EnvLoad module
 - Model module
 - Client module (already has .ps1)
 

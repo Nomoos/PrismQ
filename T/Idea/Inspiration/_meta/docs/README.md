@@ -47,7 +47,7 @@ Documentation is organized into the following categories:
 - **[DATABASE.md](./development/DATABASE.md)** - Database integration guide (consolidated)
 - **[TESTING.md](./development/TESTING.md)** - Testing and coverage guide (consolidated)
 - **[DIRENV_SETUP.md](./development/DIRENV_SETUP.md)** - direnv configuration for automatic environment activation
-- **[MIGRATION.md](./development/MIGRATION.md)** - Guide for migrating modules to use ConfigLoad
+- **[MIGRATION.md](./development/MIGRATION.md)** - Guide for migrating modules to use EnvLoad
 
 ### 🎯 SOLID Principles ([solid/](./solid/))
 
@@ -55,7 +55,7 @@ Central location for SOLID design principle resources:
 
 - **[SOLID_PRINCIPLES.md](./SOLID_PRINCIPLES.md)** - Comprehensive SOLID principles guide
 - **[solid/code_reviews/](./solid/code_reviews/)** - SOLID compliance code reviews
-  - Core Modules (Classification, ConfigLoad, Model, Scoring)
+  - Core Modules (Classification, EnvLoad, Model, Scoring)
   - Video and Text Modules
 
 ### 🎯 Architecture Decisions ([decisions/](./decisions/))

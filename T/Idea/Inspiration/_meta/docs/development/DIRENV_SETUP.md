@@ -97,7 +97,7 @@ Navigate to each project and allow direnv to load the `.envrc` file:
 cd PrismQ.IdeaInspiration/Classification
 direnv allow
 
-cd ../ConfigLoad
+cd ../EnvLoad
 direnv allow
 
 cd ../Model
@@ -251,7 +251,7 @@ python -c "import os; print(os.getenv('MODEL_PATH'))"
 The following projects have `.envrc` files configured:
 
 1. **Classification** - Content categorization
-2. **ConfigLoad** - Configuration management
+2. **EnvLoad** - Configuration management
 3. **Model** - Core data models
 4. **Scoring** - Content scoring and evaluation
 5. **Sources** - Content source integrations

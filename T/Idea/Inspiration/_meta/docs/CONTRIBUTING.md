@@ -39,7 +39,7 @@ git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
 cd PrismQ.IdeaInspiration
 
 # Choose the module you want to work on
-cd Classification  # or ConfigLoad, Model, Scoring, Sources
+cd Classification  # or EnvLoad, Model, Scoring, Sources
 
 # Create virtual environment
 python -m venv venv
@@ -297,7 +297,7 @@ Use the issue template:
 
 **Type**: Bug / Feature / Enhancement
 **Priority**: High / Medium / Low
-**Module**: Classification / ConfigLoad / Model / Scoring / Sources
+**Module**: Classification / EnvLoad / Model / Scoring / Sources
 
 ### Description
 Clear description of the issue or feature

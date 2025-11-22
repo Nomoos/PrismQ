@@ -130,6 +130,10 @@ PrismQ/
 │   ├── Backend/       # Backend API (TaskManager)
 │   ├── Frontend/      # Frontend UI (TaskManager)
 │   └── _meta/         # Module metadata
+├── EnvLoad/           # Environment & Configuration Management
+│   ├── config.py      # Centralized configuration
+│   ├── tests/         # Test suite
+│   └── README.md      # EnvLoad documentation
 ├── _meta/             # Project-wide metadata
 │   ├── docs/         # Documentation
 │   ├── research/     # Research documents
@@ -137,12 +141,43 @@ PrismQ/
 └── WORKFLOW.md        # State machine documentation
 ```
 
+## 📁 Working Directory Structure
+
+PrismQ uses a standardized working directory for all runtime data and outputs:
+
+- **Windows**: `C:\PrismQ` (permanent MVP location)
+- **Unix-like**: `~/PrismQ` (user's home directory)
+
+The working directory contains:
+
+```
+C:\PrismQ/              # Working Directory (Windows) or ~/PrismQ (Unix)
+├── .env                # Configuration (managed by EnvLoad)
+├── db.s3db             # Database
+├── T/{id}/             # Text content by ID
+│   ├── {Platform}/    # Platform-specific output
+│   └── Text/          # Final text content
+├── A/{id}/             # Audio content by ID
+│   ├── {Platform}/    # Platform-specific output
+│   └── Audio/         # Final audio files
+├── V/{id}/             # Video content by ID
+│   ├── {Platform}/    # Platform-specific output
+│   └── Video/         # Final video files
+├── P/                  # Publishing records (by date hierarchy)
+│   └── {Year}/{Month}/{day-range}/{day}/{hour}/{id}/{platform}/
+└── M/                  # Metrics data (by date hierarchy)
+    └── {Year}/{Month}/{day-range}/{day}/{hour}/{id}/Metrics/{platform}/
+```
+
+See [EnvLoad/README.md](./EnvLoad/README.md) for complete configuration documentation.
+
 ## 🚀 Quick Start
 
 1. **Explore a Pipeline**: Start with [T/README.md](./T/README.md) to understand text generation
-2. **Review Workflow**: Read [WORKFLOW.md](./WORKFLOW.md) for the complete state machine
-3. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
-4. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
+2. **Configure Environment**: See [EnvLoad/README.md](./EnvLoad/README.md) for setup
+3. **Review Workflow**: Read [WORKFLOW.md](./WORKFLOW.md) for the complete state machine
+4. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
+5. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
 
 ## 🔄 State Machine Architecture
 
