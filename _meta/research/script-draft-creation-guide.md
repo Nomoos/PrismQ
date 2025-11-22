@@ -311,7 +311,7 @@ And honestly? I'm not sure I can go back..."
 ### Immediate Next Steps
 
 1. **Save the Draft**
-   - Store in `T/Script/Draft/` directory
+   - Store in `T/Script/FromIdeaAndTitle/` directory
    - Use clear naming: `{idea_id}_script_draft_v1.md`
    - Include metadata header
 

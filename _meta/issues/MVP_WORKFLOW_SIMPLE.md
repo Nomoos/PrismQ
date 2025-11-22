@@ -20,13 +20,13 @@ This document defines the **Minimum Viable Product (MVP)** workflow for the Text
 ```
 PrismQ.T.Idea.Creation
     ↓
-PrismQ.T.Title.Draft
+PrismQ.T.Title.FromIdea
     ↓
 PrismQ.T.Review.Title (Title Review) ←────┐
     ↓                                      │
     ├─→ If changes needed ─────────────────┘
     ↓ (Flag as ready)
-PrismQ.T.Script.Draft
+PrismQ.T.Script.FromIdeaAndTitle
     ↓
 PrismQ.T.Review.Script (Script Review) ←──┐
     ↓                                      │
@@ -73,9 +73,9 @@ The MVP simplifies the full workflow documented in `T/TITLE_SCRIPT_WORKFLOW.md`:
 
 **Folder Structure:**
 - `T/Idea/Creation/` - Idea creation and capture
-- `T/Title/Draft/` - Title generation
+- `T/Title/FromIdea/` - Title generation
 - `T/Review/Idea/` - Title review (reviews title quality)
-- `T/Script/Draft/` - Script drafting
+- `T/Script/FromIdeaAndTitle/` - Script drafting
 - `T/Review/Script/` - Script review (reviews script quality)
 - `T/Script/Improvements/` - Script improvements
 - `T/Title/Refinement/` - Title refinement
@@ -161,9 +161,9 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 2: PrismQ.T.Title.Draft
+### Stage 2: PrismQ.T.Title.FromIdea
 **Goal**: Generate initial title options  
-**Folder**: `T/Title/Draft/`  
+**Folder**: `T/Title/FromIdea/`  
 **Owner**: Worker12, Worker13  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 1
@@ -171,7 +171,7 @@ After MVP validates the basic workflow, expand with:
 #### MVP Issue: #MVP-002 - Basic Title Generator
 - **Worker**: Worker13 (Prompt Master)
 - **Effort**: 2 days
-- **Module**: PrismQ.T.Title.Draft
+- **Module**: PrismQ.T.Title.FromIdea
 - **Description**: Simple AI title generation
 - **Acceptance Criteria**:
   - Input: Idea object
@@ -221,9 +221,9 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 4: PrismQ.T.Script.Draft
+### Stage 4: PrismQ.T.Script.FromIdeaAndTitle
 **Goal**: Generate initial script from idea and approved title  
-**Folder**: `T/Script/Draft/`  
+**Folder**: `T/Script/FromIdeaAndTitle/`  
 **Owner**: Worker02, Worker13  
 **Priority**: Critical  
 **Timeline**: Sprint 1, Week 2
@@ -231,7 +231,7 @@ After MVP validates the basic workflow, expand with:
 #### MVP Issue: #MVP-004 - Basic Script Generator
 - **Worker**: Worker02 (Python)
 - **Effort**: 3 days
-- **Module**: PrismQ.T.Script.Draft
+- **Module**: PrismQ.T.Script.FromIdeaAndTitle
 - **Description**: Simple script generation from idea and approved title
 - **Acceptance Criteria**:
   - Input: Idea + approved title

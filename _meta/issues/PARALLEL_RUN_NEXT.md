@@ -25,9 +25,9 @@
 ```
 1. PrismQ.T.Idea.Creation
        ↓
-2. PrismQ.T.Title.Draft (v1) ← from Idea
+2. PrismQ.T.Title.FromIdea (v1) ← from Idea
        ↓
-3. PrismQ.T.Script.Draft (v1) ← from Idea + Title v1
+3. PrismQ.T.Script.FromIdeaAndTitle (v1) ← from Idea + Title v1
        ↓
 4. PrismQ.T.Review.Title.ByScript ← Review Title v1 by Script v1 + Idea
        ↓
@@ -70,8 +70,8 @@
 
 **Folder Paths:**
 - `T/Idea/Creation/` - Idea creation
-- `T/Title/Draft/` - Title v1 drafting
-- `T/Script/Draft/` - Script v1 drafting
+- `T/Title/FromIdea/` - Title v1 drafting
+- `T/Script/FromIdeaAndTitle/` - Script v1 drafting
 - `T/Review/Idea/` - Title reviews (steps 4, 8, 12, 14)
 - `T/Review/Script/` - Script reviews (steps 5, 10, 13, 15)
 - `T/Title/Improvements/` - Title v2 improvements (step 6)
@@ -106,15 +106,15 @@ Worker02: Implement #MVP-001 in T/Idea/Creation/
 - Effort: 2 days
 - Deliverable: Basic idea capture and storage
 
-Worker13: Implement #MVP-002 in T/Title/Draft/
-- Module: PrismQ.T.Title.Draft
+Worker13: Implement #MVP-002 in T/Title/FromIdea/
+- Module: PrismQ.T.Title.FromIdea
 - Dependencies: #MVP-001 (can start in parallel)
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Generate 3-5 title variants (v1) from idea only
 
-Worker02: Implement #MVP-003 in T/Script/Draft/
-- Module: PrismQ.T.Script.Draft
+Worker02: Implement #MVP-003 in T/Script/FromIdeaAndTitle/
+- Module: PrismQ.T.Script.FromIdeaAndTitle
 - Dependencies: #MVP-002
 - Priority: Critical
 - Effort: 3 days
@@ -375,8 +375,8 @@ Worker04: Final MVP validation of all paths
 | Issue | Module | Stage | Worker | Effort | Description |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Idea | Worker02 | 2d | Basic idea capture |
-| #MVP-002 | PrismQ.T.Title.Draft | Title v1 | Worker13 | 2d | Title generation from idea |
-| #MVP-003 | PrismQ.T.Script.Draft | Script v1 | Worker02 | 3d | Script generation from idea + title v1 |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Title v1 | Worker13 | 2d | Title generation from idea |
+| #MVP-003 | PrismQ.T.Script.FromIdeaAndTitle | Script v1 | Worker02 | 3d | Script generation from idea + title v1 |
 | #MVP-004 | PrismQ.T.Review.Title.ByScript | **Title Review by Script** | Worker10 | 1d | Review title v1 against script v1 + idea |
 | #MVP-005 | PrismQ.T.Review.Script.ByTitle | **Script Review by Title** | Worker10 | 1d | Review script v1 against title v1 + idea |
 | #MVP-006 | PrismQ.T.Title.Improvements | Title v2 | Worker13 | 2d | Title v2 using cross-reviews + title v1, script v1 |
@@ -403,8 +403,8 @@ Worker04: Final MVP validation of all paths
 
 **Folder Paths:**
 - `T/Idea/Creation/` (step 1)
-- `T/Title/Draft/` (step 2)
-- `T/Script/Draft/` (step 3)
+- `T/Title/FromIdea/` (step 2)
+- `T/Script/FromIdeaAndTitle/` (step 3)
 - `T/Review/Idea/` (steps 4, 8, 12, 14)
 - `T/Review/Script/` (steps 5, 10, 13, 15)
 - `T/Title/Improvements/` (step 6)

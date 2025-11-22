@@ -22,9 +22,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 ```
 1. PrismQ.T.Idea.Creation
        ↓
-2. PrismQ.T.Title.Draft (v1) ← from Idea
+2. PrismQ.T.Title.FromIdea (v1) ← from Idea
        ↓
-3. PrismQ.T.Script.Draft (v1) ← from Idea + Title v1
+3. PrismQ.T.Script.FromIdeaAndTitle (v1) ← from Idea + Title v1
        ↓
 4. PrismQ.T.Review.Title.ByScript ← Review Title v1 by Script v1 + Idea
        ↓
@@ -132,9 +132,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 2: PrismQ.T.Title.Draft (v1)
+### Stage 2: PrismQ.T.Title.FromIdea (v1)
 **Goal**: Generate first title from idea  
-**Folder**: `T/Title/Draft/`  
+**Folder**: `T/Title/FromIdea/`  
 **Worker**: Worker13 (Prompt Master)  
 **Effort**: 2 days
 
@@ -147,9 +147,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-### Stage 3: PrismQ.T.Script.Draft (v1)
+### Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
 **Goal**: Generate first script from idea and title v1  
-**Folder**: `T/Script/Draft/`  
+**Folder**: `T/Script/FromIdeaAndTitle/`  
 **Worker**: Worker02  
 **Effort**: 3 days
 
@@ -833,8 +833,8 @@ Stage 16: Publishing
 
 All stages use real verified folders:
 - ✅ `T/Idea/Creation/`
-- ✅ `T/Title/Draft/` (v1)
-- ✅ `T/Script/Draft/` (v1)
+- ✅ `T/Title/FromIdea/` (v1)
+- ✅ `T/Script/FromIdeaAndTitle/` (v1)
 - ✅ `T/Review/Idea/` (title reviews + acceptance)
 - ✅ `T/Review/Script/` (script reviews + acceptance)
 - ✅ `T/Title/Improvements/` (v2)
