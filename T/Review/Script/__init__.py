@@ -16,8 +16,9 @@ from .by_title_and_idea import (
     AlignmentScore
 )
 
-# Import ByTitle submodule
+# Import submodules
 from . import ByTitle
+from . import Grammar
 
 __all__ = [
     "ScriptReview",
@@ -28,5 +29,6 @@ __all__ = [
     "CategoryScore",
     "review_script_by_title_and_idea",
     "AlignmentScore",
-    "ByTitle"
+    "ByTitle",
+    "Grammar"
 ]
