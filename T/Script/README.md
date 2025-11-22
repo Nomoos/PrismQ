@@ -10,7 +10,7 @@ Transform structured ideas into polished scripts ready for review and publicatio
 
 ## Submodules
 
-### MVP Workflow States (Ordered by Stage)
+### MVP Workflow States
 
 #### [FromIdeaAndTitle](./FromIdeaAndTitle/)
 **Stage 3: Initial script draft from idea and title** (v1)
@@ -20,37 +20,19 @@ Generate initial script draft from the idea and initial title.
 **[→ View FromIdeaAndTitle Documentation](./FromIdeaAndTitle/README.md)**
 **[→ View FromIdeaAndTitle Metadata](./FromIdeaAndTitle/_meta/)**
 
-#### [FromReviewAndNewTitleAndPreviousScript](./FromReviewAndNewTitleAndPreviousScript/)
-**Stage 7: Script improvements from reviews and new title** (v2)
+#### [FromOriginalScriptAndReviewAndTitle](./FromOriginalScriptAndReviewAndTitle/)
+**Stages 7, 11, 14-18, 20: All script improvements** (v2, v3, v4, v5...)
 
-Generate improved script using feedback from both reviews, new title v2, and previous script v1.
+Generate improved script versions using review feedback, original script, and title context.
 
-**[→ View FromReviewAndNewTitleAndPreviousScript Documentation](./FromReviewAndNewTitleAndPreviousScript/README.md)**
-**[→ View FromReviewAndNewTitleAndPreviousScript Metadata](./FromReviewAndNewTitleAndPreviousScript/_meta/)**
+This state handles:
+- **Stage 7**: First improvements (v1 → v2) using both reviews + new title
+- **Stage 11**: Iterative refinements (v2 → v3+) until accepted
+- **Stages 14-18**: Quality reviews (Grammar, Tone, Content, Consistency, Editing)
+- **Stage 20 Feedback**: Final voiceover readability polish
 
-#### [FromReviewAndPreviousScriptAndTitle](./FromReviewAndPreviousScriptAndTitle/)
-**Stage 11: Script refinement through iteration** (v3+)
-
-Refine script through iterative cycles using review feedback, previous version, and current title until accepted.
-
-**[→ View FromReviewAndPreviousScriptAndTitle Documentation](./FromReviewAndPreviousScriptAndTitle/README.md)**
-**[→ View FromReviewAndPreviousScriptAndTitle Metadata](./FromReviewAndPreviousScriptAndTitle/_meta/)**
-
-#### [FromQualityReviewAndPreviousScript](./FromQualityReviewAndPreviousScript/)
-**Stages 14-18 Feedback: Quality dimension refinement**
-
-Refine script based on quality review feedback (Grammar, Tone, Content, Consistency, Editing).
-
-**[→ View FromQualityReviewAndPreviousScript Documentation](./FromQualityReviewAndPreviousScript/README.md)**
-**[→ View FromQualityReviewAndPreviousScript Metadata](./FromQualityReviewAndPreviousScript/_meta/)**
-
-#### [FromReadabilityReviewAndPreviousScript](./FromReadabilityReviewAndPreviousScript/)
-**Stage 20 Feedback: Final voiceover readability polish**
-
-Polish script based on readability review - the final quality gate before publishing.
-
-**[→ View FromReadabilityReviewAndPreviousScript Documentation](./FromReadabilityReviewAndPreviousScript/README.md)**
-**[→ View FromReadabilityReviewAndPreviousScript Metadata](./FromReadabilityReviewAndPreviousScript/_meta/)**
+**[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
+**[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
 
 ### Legacy and Support Modules
 
