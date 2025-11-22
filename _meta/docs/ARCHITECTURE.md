@@ -155,7 +155,7 @@ The workflow is managed by a comprehensive state machine documented in `WORKFLOW
 
 ## Related Documentation
 
-- **[WORKFLOW.md](../../WORKFLOW.md)** - Detailed state machine documentation
+- **[WORKFLOW.md](../WORKFLOW.md)** - Detailed state machine documentation
 - **[PROGRESSIVE_ENRICHMENT.md](./PROGRESSIVE_ENRICHMENT.md)** - Multi-format content strategy
 - **[QUALITY_GATES.md](./QUALITY_GATES.md)** - Quality assurance framework
 - **[MODULE_STRUCTURE.md](./MODULE_STRUCTURE.md)** - Module organization guide

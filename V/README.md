@@ -149,7 +149,7 @@ content.status = ContentStatus.VIDEO_ASSEMBLY
 
 ## Navigation
 
-**[← Back to Main](../README.md)** | **[← Audio Pipeline](../A/README.md)** | **[← Text Pipeline](../T/README.md)** | **[Workflow](../WORKFLOW.md)**
+**[← Back to Main](../README.md)** | **[← Audio Pipeline](../A/README.md)** | **[← Text Pipeline](../T/README.md)** | **[Workflow](../_meta/WORKFLOW.md)**
 
 ---
 

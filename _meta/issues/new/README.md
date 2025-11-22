@@ -246,7 +246,7 @@ graph LR
 ### Key Documents
 1. **[CURRENT_STATE_AND_OPPORTUNITIES.md](../CURRENT_STATE_AND_OPPORTUNITIES.md)** - Project analysis
 2. **[PARALLEL_RUN_NEXT.md](../PARALLEL_RUN_NEXT.md)** - Sprint parallelization matrix
-3. **[WORKFLOW.md](../../WORKFLOW.md)** - Content production workflow
+3. **[WORKFLOW.md](../WORKFLOW.md)** - Content production workflow
 4. **[README.md](../../README.md)** - Project overview
 
 ### Worker Resources
@@ -269,7 +269,7 @@ graph LR
 2. **Review Project Structure**
    - Explore repository structure
    - Read main README.md
-   - Review WORKFLOW.md
+   - Review WORKFLOW.md (in _meta directory)
 
 3. **Check Current Sprint**
    - Read PARALLEL_RUN_NEXT.md

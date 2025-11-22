@@ -104,7 +104,7 @@ Foundational research and strategic planning documents.
   - [Storytelling Guide](./_meta/docs/STORYTELLING_GUIDE.md)
 
 ### Workflow Documentation
-- **[WORKFLOW.md](./WORKFLOW.md)** - Complete state machine documentation
+- **[WORKFLOW.md](./_meta/WORKFLOW.md)** - Complete state machine documentation
   - Workflow phases and state transitions
   - Progressive enrichment model
   - Quality gates and best practices
@@ -140,11 +140,11 @@ PrismQ/
 │   ├── config.py      # Centralized configuration
 │   ├── tests/         # Test suite
 │   └── README.md      # EnvLoad documentation
-├── _meta/             # Project-wide metadata
-│   ├── docs/         # Documentation
-│   ├── research/     # Research documents
-│   └── proposals/    # Design proposals
-└── WORKFLOW.md        # State machine documentation
+└── _meta/             # Project-wide metadata
+    ├── docs/         # Documentation
+    ├── research/     # Research documents
+    ├── proposals/    # Design proposals
+    └── WORKFLOW.md   # State machine documentation
 ```
 
 ## 📁 Working Directory Structure
@@ -181,7 +181,7 @@ See [EnvLoad/README.md](./EnvLoad/README.md) for complete configuration document
 
 1. **Explore a Pipeline**: Start with [T/README.md](./T/README.md) to understand text generation
 2. **Configure Environment**: See [EnvLoad/README.md](./EnvLoad/README.md) for setup
-3. **Review Workflow**: Read [WORKFLOW.md](./WORKFLOW.md) for the complete state machine
+3. **Review Workflow**: Read [WORKFLOW.md](./_meta/WORKFLOW.md) for the complete state machine
 4. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
 5. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
 
@@ -293,4 +293,4 @@ Proprietary - All Rights Reserved - Copyright (c) 2025 PrismQ
 
 ---
 
-**Start exploring**: [T Module](./T/README.md) | [A Module](./A/README.md) | [V Module](./V/README.md) | [Client](./Client/README.md) | [Workflow](./WORKFLOW.md)
+**Start exploring**: [T Module](./T/README.md) | [A Module](./A/README.md) | [V Module](./V/README.md) | [Client](./Client/README.md) | [Workflow](./_meta/WORKFLOW.md)

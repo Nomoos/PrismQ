@@ -236,7 +236,7 @@ Stop at any stage if:
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Overall platform architecture
 - **[QUALITY_GATES.md](./QUALITY_GATES.md)** - Quality criteria between stages
-- **[WORKFLOW.md](../../WORKFLOW.md)** - Detailed state machine
+- **[WORKFLOW.md](../WORKFLOW.md)** - Detailed state machine
 
 ---
 

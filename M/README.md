@@ -288,7 +288,7 @@ inspiration = IdeaInspiration.create_from_insights(insights)
 
 ## Navigation
 
-**[← Back to Main](../README.md)** | **[← Publishing Module](../P/README.md)** | **[← Video Pipeline](../V/README.md)** | **[Workflow](../WORKFLOW.md)**
+**[← Back to Main](../README.md)** | **[← Publishing Module](../P/README.md)** | **[← Video Pipeline](../V/README.md)** | **[Workflow](../_meta/WORKFLOW.md)**
 
 ---
 

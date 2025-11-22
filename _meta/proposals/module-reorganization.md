@@ -211,7 +211,7 @@ Analytics/               # Performance analytics
 Archive/                 # Archived content
 
 _meta/                   # Meta resources
-WORKFLOW.md             # Workflow documentation
+  WORKFLOW.md           # Workflow documentation
 README.md               # Project readme
 ```
 
