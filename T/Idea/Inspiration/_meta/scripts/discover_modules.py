@@ -178,7 +178,7 @@ class ModuleDiscovery:
         all_modules = self.discover_all(max_depth)
         
         # Exclude infrastructure modules
-        infrastructure = {'ConfigLoad', 'Model'}
+        infrastructure = {'EnvLoad', 'Model'}
         
         client_modules = [
             m for m in all_modules

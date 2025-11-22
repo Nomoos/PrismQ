@@ -1,6 +1,6 @@
-# ConfigLoad Migration Guide
+# EnvLoad Migration Guide
 
-This guide helps you migrate existing PrismQ modules to use the centralized `ConfigLoad` module for .env file loading and logging configuration.
+This guide helps you migrate existing PrismQ modules to use the centralized `EnvLoad` module for .env file loading and logging configuration.
 
 ## Benefits of Migration
 
@@ -12,7 +12,7 @@ This guide helps you migrate existing PrismQ modules to use the centralized `Con
 
 ## Before You Start
 
-1. Ensure `ConfigLoad` is available in the repository root
+1. Ensure `EnvLoad` is available in the repository root
 2. Install dependencies: `pip install python-dotenv psutil`
 
 ## Migration Steps
@@ -33,15 +33,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 ```
 
-#### After (using ConfigLoad):
+#### After (using EnvLoad):
 ```python
 import sys
 from pathlib import Path
 
-# Add ConfigLoad to path
+# Add EnvLoad to path
 sys.path.insert(0, str(Path(__file__).parent.parent))  # Adjust as needed
 
-from ConfigLoad import Config, get_module_logger
+from EnvLoad import Config, get_module_logger
 
 # Initialize configuration
 config = Config(interactive=False)
@@ -90,33 +90,33 @@ api_key = config.get_or_prompt(
 
 If your module has its own `logging_config.py`, you have two options:
 
-#### Option A: Delete it and use ConfigLoad directly
-Remove the file and update all imports to use ConfigLoad.
+#### Option A: Delete it and use EnvLoad directly
+Remove the file and update all imports to use EnvLoad.
 
 #### Option B: Create a backward compatibility shim (Recommended)
-Keep the file but re-export from ConfigLoad:
+Keep the file but re-export from EnvLoad:
 
 ```python
-"""DEPRECATED: Use ConfigLoad module instead.
+"""DEPRECATED: Use EnvLoad module instead.
 
 This file is kept for backward compatibility.
-New code should import from ConfigLoad module.
+New code should import from EnvLoad module.
 """
 
 import warnings
 warnings.warn(
-    "YourModule/logging_config is deprecated. Use ConfigLoad module instead.",
+    "YourModule/logging_config is deprecated. Use EnvLoad module instead.",
     DeprecationWarning,
     stacklevel=2
 )
 
-# Re-export from ConfigLoad
+# Re-export from EnvLoad
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ConfigLoad.logging_config import (
+from EnvLoad.logging_config import (
     ModuleLogger,
     get_module_logger,
     setup_basic_logging
@@ -160,10 +160,10 @@ def main():
 import sys
 from pathlib import Path
 
-# Add ConfigLoad to path
+# Add EnvLoad to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from ConfigLoad import Config, get_module_logger
+from EnvLoad import Config, get_module_logger
 
 # Initialize configuration
 config = Config(interactive=False)
@@ -201,7 +201,7 @@ The path adjustment depends on your module structure:
 
 ```
 PrismQ.IdeaInspiration/
-├── ConfigLoad/          # Root level
+├── EnvLoad/          # Root level
 ├── MyModule/
 │   ├── src/
 │   │   └── main.py     # Need: parent.parent.parent to reach root
@@ -217,37 +217,37 @@ Adjust the number of `.parent` calls based on how deep your file is:
 
 ## Common Issues
 
-### Issue: ModuleNotFoundError: No module named 'ConfigLoad'
+### Issue: ModuleNotFoundError: No module named 'EnvLoad'
 
 **Solution**: Adjust the sys.path.insert() to point to the correct parent directory:
 ```python
 # Check your current file location relative to root
 print(f"Current file: {Path(__file__)}")
-print(f"Looking for ConfigLoad at: {Path(__file__).parent.parent.parent}")
+print(f"Looking for EnvLoad at: {Path(__file__).parent.parent.parent}")
 ```
 
 ### Issue: .env file not found
 
-**Solution**: ConfigLoad automatically creates .env in PrismQ_WD directory. If you're in a PrismQ directory structure, it will find it. Otherwise, it uses current directory.
+**Solution**: EnvLoad automatically creates .env in PrismQ_WD directory. If you're in a PrismQ directory structure, it will find it. Otherwise, it uses current directory.
 
 ### Issue: Existing tests break
 
 **Solution**: 
-1. Update test imports to include ConfigLoad in path
+1. Update test imports to include EnvLoad in path
 2. Mock the Config initialization in tests if needed:
 ```python
 from unittest.mock import patch
 
-@patch('ConfigLoad.config.Config')
+@patch('EnvLoad.config.Config')
 def test_something(mock_config):
     # Your test code
 ```
 
 ## Need Help?
 
-- See `ConfigLoad/README.md` for full API documentation
+- See `EnvLoad/README.md` for full API documentation
 - Check `Scoring/src/main.py` for a complete example
-- Review `ConfigLoad/tests/` for usage examples
+- Review `EnvLoad/tests/` for usage examples
 
 ## Rollback
 
@@ -256,6 +256,6 @@ If you need to rollback:
 1. Restore your original imports
 2. Add back `load_dotenv()` calls
 3. Restore logging configuration
-4. Remove ConfigLoad imports
+4. Remove EnvLoad imports
 
-The old pattern will still work - ConfigLoad is an enhancement, not a requirement.
+The old pattern will still work - EnvLoad is an enhancement, not a requirement.

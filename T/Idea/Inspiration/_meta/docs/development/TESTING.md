@@ -24,7 +24,7 @@ PrismQ.IdeaInspiration maintains a comprehensive test suite with **270+ test cas
 | **Classification** | 96.1% | 78 passing, 18 failing | 🌟 Excellent |
 | **Scoring** | 79.9% | 52 passing | ⚠️ Fair |
 | **Model** | 98%* | 103 passing | ✅ Excellent |
-| **ConfigLoad** | High* | 37 passing | ✅ Good |
+| **EnvLoad** | High* | 37 passing | ✅ Good |
 
 \* Coverage measurement needs configuration verification
 
@@ -52,8 +52,8 @@ PYTHONPATH=.:$PYTHONPATH python -m pytest _meta/tests -v
 cd Model
 PYTHONPATH=.:$PYTHONPATH python -m pytest tests -v
 
-# ConfigLoad module
-cd ConfigLoad
+# EnvLoad module
+cd EnvLoad
 PYTHONPATH=.:$PYTHONPATH python -m pytest tests -v
 ```
 
@@ -72,8 +72,8 @@ PYTHONPATH=.:$PYTHONPATH python -m pytest _meta/tests --cov=prismq --cov-report=
 cd Model
 PYTHONPATH=.:$PYTHONPATH python -m pytest tests --cov=idea_inspiration --cov-report=term --cov-report=html
 
-# ConfigLoad
-cd ConfigLoad
+# EnvLoad
+cd EnvLoad
 PYTHONPATH=.:$PYTHONPATH python -m pytest tests --cov=config.py --cov=logging_config.py --cov-report=term --cov-report=html
 ```
 
@@ -138,7 +138,7 @@ pytest --cov=src --cov-fail-under=80
 | Classification | 96.1% | 95% | ✅ Met |
 | Model | 98% | 95% | ✅ Met |
 | Scoring | 79.9% | 85% | 🔴 High |
-| ConfigLoad | High | 85% | 🟡 Medium |
+| EnvLoad | High | 85% | 🟡 Medium |
 
 ## Best Practices
 
