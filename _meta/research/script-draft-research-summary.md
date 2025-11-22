@@ -317,7 +317,7 @@ Script Draft → Script Review → Script Improvements → Script Optimization �
 - **[T/Title README](T/Title/README.md)** - Title creation context
 
 ### Workflow Context
-- **[WORKFLOW.md](WORKFLOW.md)** - Complete state machine
+- **[WORKFLOW.md](../WORKFLOW.md)** - Complete state machine
 - **[Content Production Workflow States](_meta/research/content-production-workflow-states.md)** - Workflow stages explained
 
 ## Conclusion
