@@ -50,12 +50,19 @@ ENGAGEMENT_WORDS = [
     'ultimate', 'powerful', 'deadly', 'forbidden', 'lost', 'forgotten'
 ]
 
+# Words that may set unrealistic expectations
+MISLEADING_WORDS = ['ultimate', 'best', 'perfect', 'guaranteed']
+
 # SEO-friendly patterns
 SEO_PATTERNS = {
     'question': r'\b(how|what|why|when|where|who)\b',
     'number': r'\b\d+\b',
     'action': r'\b(guide|tips|ways|methods|steps|secrets)\b',
 }
+
+# Script analysis constants
+SCRIPT_INTRO_PERCENTAGE = 0.2  # First 20% of script considered as introduction
+DEFAULT_SCRIPT_SUMMARY_LENGTH = 200  # Characters for auto-generated summary
 
 
 @dataclass
@@ -140,8 +147,8 @@ def analyze_title_script_alignment(
     if script_summary and any(kw in script_summary.lower() for kw in title_keywords):
         base_score += 15
     
-    # Check if title concepts appear in first 20% of script (hook/introduction)
-    script_intro = script_lower[:len(script_lower) // 5]
+    # Check if title concepts appear in first portion of script (hook/introduction)
+    script_intro = script_lower[:int(len(script_lower) * SCRIPT_INTRO_PERCENTAGE)]
     intro_matches = sum(1 for kw in title_keywords if kw in script_intro)
     if intro_matches > 0:
         base_score += min(10, intro_matches * 5)
@@ -261,8 +268,7 @@ def analyze_engagement(title_text: str) -> Dict[str, Any]:
     engagement_score = min(100, 60 + (engagement_count * 8) + (10 if has_action else 0))
     
     # Expectation accuracy - titles with misleading words score lower
-    misleading_words = ['ultimate', 'best', 'perfect', 'guaranteed']
-    has_misleading = any(word in title_lower for word in misleading_words)
+    has_misleading = any(word in title_lower for word in MISLEADING_WORDS)
     expectation_accuracy = 85 if not has_misleading else 70
     
     return {
@@ -474,15 +480,18 @@ def review_title_by_script_and_idea(
         >>> print(f"Overall score: {review.overall_score}%")
         >>> print(f"Script alignment: {review.script_alignment_score}%")
     """
-    # Generate IDs if not provided
-    title_id = title_id or f"title-{hash(title_text) % 10000:04d}"
-    script_id = script_id or f"script-{hash(script_text) % 10000:04d}"
-    idea_id = idea_id or f"idea-{hash(idea_summary) % 10000:04d}"
+    # Generate IDs if not provided (using absolute value to ensure positive IDs)
+    title_id = title_id or f"title-{abs(hash(title_text)) % 10000:04d}"
+    script_id = script_id or f"script-{abs(hash(script_text)) % 10000:04d}"
+    idea_id = idea_id or f"idea-{abs(hash(idea_summary)) % 10000:04d}"
     
     # Extract script summary if not provided
     if not script_summary:
-        # Use first 200 characters as summary
-        script_summary = script_text[:200] + "..." if len(script_text) > 200 else script_text
+        # Use first DEFAULT_SCRIPT_SUMMARY_LENGTH characters as summary
+        if len(script_text) > DEFAULT_SCRIPT_SUMMARY_LENGTH:
+            script_summary = script_text[:DEFAULT_SCRIPT_SUMMARY_LENGTH] + "..."
+        else:
+            script_summary = script_text
     
     # Analyze alignments
     script_alignment = analyze_title_script_alignment(title_text, script_text, script_summary)
