@@ -109,8 +109,8 @@ Na základě `T/TITLE_SCRIPT_WORKFLOW.md`, MVP zjednodušuje:
 
 2. **Fáze revizí**:
    - Plné: Více revizních modulů (Gramatika, Čitelnost, Tón, Obsah, Konzistence, Editace)
-   - MVP: Zjednodušená revize ve fázích Skript a Obsah
-   - Odloženo: Granulární dimenze revize (gramatika, čitelnost, tón odděleně)
+   - MVP: ✅ **NYNÍ ZAHRNUTO** - Granulární dimenze revize po akceptačních branách (Fáze 14-20)
+   - Revize kvality skriptu (Gramatika, Tón, Obsah, Konzistence, Editace) + Finální čitelnost
 
 3. **Schválení skriptu**:
    - Plné: ScriptDraft → ScriptReview → ScriptApproved → TextPublishing
@@ -126,9 +126,10 @@ Na základě `T/TITLE_SCRIPT_WORKFLOW.md`, MVP zjednodušuje:
 Po validaci základního workflow MVP, rozšířit o:
 - Vytváření Idea.Outline pro lepší strukturu
 - Vývoj frameworku Idea.Skeleton
-- Granulární revizní moduly (T/Rewiew/Grammar, Readability, Tone, atd.)
 - Formální stavy schválení a uzamčení verzí
 - Komplexní SEO optimalizace (T/Publishing/SEO s Keywords, Tags, Categories)
+- Automatizované kontroly kvality
+- Pokročilé analytiky revizí
 
 ---
 
@@ -202,24 +203,36 @@ Po validaci základního workflow MVP, rozšířit o:
 | #MVP-006 | PrismQ.T.Script.Improvements | Vylepšení | Worker02 | 2d | Vylepšení skriptu |
 | #MVP-007 | PrismQ.T.Rewiew.Content | Finální revize | Worker10 | 1d | Finální revize obsahu |
 | #MVP-008 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
+| #MVP-009A | PrismQ.T.Rewiew.Script.Grammar | Revize gramatiky | Worker10 | 0.5d | Kontrola gramatiky skriptu |
+| #MVP-009B | PrismQ.T.Rewiew.Script.Tone | Revize tónu | Worker10 | 0.5d | Kontrola tónu skriptu |
+| #MVP-009C | PrismQ.T.Rewiew.Script.Content | Revize obsahu | Worker10 | 0.5d | Kontrola logiky obsahu |
+| #MVP-009D | PrismQ.T.Rewiew.Script.Consistency | Revize konzistence | Worker10 | 0.5d | Kontrola konzistence skriptu |
+| #MVP-009E | PrismQ.T.Rewiew.Script.Editing | Revize editace | Worker10 | 0.5d | Kontrola jasnosti a plynulosti |
+| #MVP-009F | PrismQ.T.Rewiew.Title.Readability | Revize čitelnosti titulku | Worker10 | 0.5d | Kontrola čitelnosti titulku |
+| #MVP-009G | PrismQ.T.Rewiew.Script.Readability | Revize čitelnosti skriptu | Worker10 | 0.5d | Kontrola voiceover čitelnosti |
+| #MVP-010 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
 
-**Celkem**: 8 issues, 14 dní práce, 4 týdny kalendářního času s 3-4 workery
+**Celkem**: 16 issues (8 hlavních + 7 revizí kvality + publikování), přibližně 18 dní práce, 4-5 týdnů kalendářního času s 3-4 workery
+
+**Poznámka**: Revize kvality (09A-09G) jsou nyní součástí MVP pro zajištění profesionální kvality obsahu.
 
 ---
 
 ## Metriky úspěchu
 
 ### Kritéria dokončení MVP
-- ✅ Všech 8 MVP issues implementováno
-- ✅ End-to-end workflow testován
+- ✅ Všechny MVP issues implementovány (základní + revize kvality)
+- ✅ End-to-end workflow testován včetně všech revizí
 - ✅ Alespoň jeden obsah publikován přes celý workflow
 - ✅ Všechny zpětnovazební smyčky validovány
+- ✅ Všechny fáze revizí kvality (Gramatika, Tón, Obsah, Konzistence, Editace, Čitelnost) funkční
 - ✅ Dokumentace kompletní
 
 ### Standardy kvality
 - **Zpětnovazební smyčky**: Jasné cesty pro revize a vylepšení
 - **Iterativní vylepšování**: Více cyklů před finální publikací
-- **Jednoduchost**: Pouze základní funkce, žádná složitost
+- **Revize kvality**: Profesionální kontrola přes všechny dimenze (Gramatika → Tón → Obsah → Konzistence → Editace → Čitelnost)
+- **Jednoduchost**: Základní funkce, ale s vysokou kvalitou
 - **Pokrytí testy**: >80% pro MVP vlastnosti
 - **Dokumentace**: Jasný průvodce pro každou fázi
 
