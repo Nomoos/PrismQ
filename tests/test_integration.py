@@ -279,13 +279,13 @@ class TestWorkflowStageTransitions:
         validator.transition_to('title_v1')
         
         # Cannot skip directly to v3
-        assert validator.transition_to('title_v3') is False
+        assert not validator.transition_to('title_v3')
         
         # Cannot skip script generation
-        assert validator.transition_to('title_review') is False
+        assert not validator.transition_to('title_review')
         
         # Must go through proper stages
-        assert validator.transition_to('script_v1') is True
+        assert validator.transition_to('script_v1')
 
 
 @pytest.mark.integration

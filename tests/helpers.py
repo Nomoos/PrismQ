@@ -9,26 +9,30 @@ Key Features:
 - Iteration path validation
 - Mock data generation for workflow stages
 - Integration test helpers
+
+Note: Idea model imports are optional and gracefully handled if unavailable.
 """
 
-import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 
-# Ensure T/Idea/Model is in path for imports
-_current_dir = Path(__file__).parent.parent
-_idea_model_path = _current_dir / "T" / "Idea" / "Model"
-if str(_idea_model_path) not in sys.path:
-    sys.path.insert(0, str(_idea_model_path))
-
+# Optional imports - Idea model may not be available in all test contexts
 try:
+    import sys
+    _current_dir = Path(__file__).parent.parent
+    _idea_model_path = _current_dir / "T" / "Idea" / "Model"
+    if str(_idea_model_path) not in sys.path:
+        sys.path.insert(0, str(_idea_model_path))
+    
     from src.idea import Idea, IdeaStatus, ContentGenre
+    IDEA_MODEL_AVAILABLE = True
 except ImportError:
-    # Fallback if module not available (for standalone testing)
+    # Fallback when Idea model not available
     Idea = None
     IdeaStatus = None
     ContentGenre = None
+    IDEA_MODEL_AVAILABLE = False
 
 
 @dataclass
@@ -206,10 +210,16 @@ def create_test_idea(
         **kwargs: Additional fields to set on the Idea
         
     Returns:
-        Idea instance or None if Idea class not available
+        Idea instance or None if Idea model not available
+        
+    Raises:
+        RuntimeError: If Idea model is not available
     """
-    if Idea is None or IdeaStatus is None:
-        return None
+    if not IDEA_MODEL_AVAILABLE:
+        raise RuntimeError(
+            "Idea model not available. Ensure T/Idea/Model is accessible "
+            "or skip tests that require Idea instances."
+        )
     
     status = status or IdeaStatus.DRAFT
     
