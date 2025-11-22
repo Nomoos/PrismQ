@@ -658,7 +658,7 @@ See `ISSUE_PLAN_T_*.md` files for full feature plans (120 issues total) to be ad
 
 ## Related Documents
 
-- **MVP_WORKFLOW.md**: Detailed MVP planning with all 16 issues specifications and iteration loops
+- **MVP_WORKFLOW.md**: Detailed MVP planning with all 26 stages (23 issues) specifications and iteration loops
 - **MVP_WORKFLOW_SIMPLE.md**: Original simple 9-issue workflow (backup reference)
 - **PARALLEL_RUN_NEXT_FULL.md**: Full 120-issue plan for post-MVP
 - **ISSUE_PLAN_T_*.md**: Comprehensive feature plans for each module
