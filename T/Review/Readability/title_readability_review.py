@@ -258,24 +258,28 @@ class TitleReadabilityReview:
         Returns:
             TitleReadabilityReview instance
         """
-        # Extract and convert issues
+        # Extract issues data
         issues_data = data.pop("issues", [])
-        issues = [
-            ReadabilityIssue(
-                issue_type=ReadabilityIssueType(issue["issue_type"]),
-                severity=ReadabilitySeverity(issue["severity"]),
-                text=issue["text"],
-                suggestion=issue["suggestion"],
-                explanation=issue["explanation"],
-                confidence=issue.get("confidence", 85)
-            )
-            for issue in issues_data
-        ]
+        
+        # Reset counts to 0 since we'll recalculate them
+        data["critical_count"] = 0
+        data["high_count"] = 0
+        data["medium_count"] = 0
+        data["low_count"] = 0
         
         # Create review without issues
         review = cls(**data)
         
-        # Add issues
-        review.issues = issues
+        # Add issues using add_issue to properly update counts
+        for issue_data in issues_data:
+            issue = ReadabilityIssue(
+                issue_type=ReadabilityIssueType(issue_data["issue_type"]),
+                severity=ReadabilitySeverity(issue_data["severity"]),
+                text=issue_data["text"],
+                suggestion=issue_data["suggestion"],
+                explanation=issue_data["explanation"],
+                confidence=issue_data.get("confidence", 85)
+            )
+            review.add_issue(issue)
         
         return review
