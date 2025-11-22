@@ -172,18 +172,18 @@
 
 #### Sprint 2: Improvement Cycle v2 + Refinements v3
 
-##### MVP-006: T.Title.Improvements ✗
+##### MVP-006: T.Title.FromOriginalTitleAndReviewAndScript ✗
 **Worker**: Worker13  
 **Status**: **NOT IMPLEMENTED**  
 **Dependencies**: MVP-004 ✅, MVP-005 ✅ (dependencies now met)  
-**Required**: Directory `T/Title/Improvements/` with improvement logic
+**Required**: Directory `T/Title/FromOriginalTitleAndReviewAndScript/` with improvement logic (directory exists, needs implementation)
 **Priority**: HIGH - Next critical task for Sprint 2
 
-##### MVP-007: T.Script.Improvements ✗
+##### MVP-007: T.Script.FromOriginalScriptAndReviewAndTitle ✗
 **Worker**: Worker02  
 **Status**: **NOT IMPLEMENTED**  
 **Dependencies**: MVP-006  
-**Required**: Directory `T/Script/Improvements/` with improvement logic
+**Required**: Directory `T/Script/FromOriginalScriptAndReviewAndTitle/` with improvement logic (directory exists, needs implementation)
 
 ##### MVP-008: T.Review.Title.ByScript (v2) ✗
 **Worker**: Worker10  
@@ -191,11 +191,12 @@
 **Dependencies**: MVP-007  
 **Note**: Likely extension of MVP-004 for v2 reviews
 
-##### MVP-009: T.Title.Refinement ✗
+##### MVP-009: T.Title.FromOriginalTitleAndReviewAndScript (v3) ✗
 **Worker**: Worker13  
 **Status**: **NOT IMPLEMENTED**  
 **Dependencies**: MVP-008  
-**Required**: Directory `T/Title/Refinement/` with refinement logic
+**Required**: Extension of MVP-006 module to handle v3+ refinement iterations
+**Note**: Same module as MVP-006, handles version progression v2→v3→v4+
 
 ##### MVP-010: T.Review.Script.ByTitle (v2) ✗
 **Worker**: Worker10  
@@ -203,11 +204,12 @@
 **Dependencies**: MVP-009  
 **Note**: Extension of MVP-005 for v2 reviews
 
-##### MVP-011: T.Script.Refinement ✗
+##### MVP-011: T.Script.FromOriginalScriptAndReviewAndTitle (v3) ✗
 **Worker**: Worker02  
 **Status**: **NOT IMPLEMENTED**  
 **Dependencies**: MVP-010  
-**Required**: Directory `T/Script/Improvements/` with refinement logic (may share with MVP-007)
+**Required**: Extension of MVP-007 module to handle v3+ refinement iterations
+**Note**: Same module as MVP-007, handles version progression v2→v3→v4+
 
 ---
 

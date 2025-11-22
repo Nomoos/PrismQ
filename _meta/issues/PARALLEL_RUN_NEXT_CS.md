@@ -183,8 +183,9 @@ Worker10: Implementovat PrismQ.T.Review.Script.ByTitle v T/Review/Script/ByTitle
 
 ```bash
 # MVP-006: Vylepšení titulku v2 (2 dny)
-Worker13: Implementovat PrismQ.T.Title.Improvements v T/Title/Improvements/
-- Modul: PrismQ.T.Title.Improvements
+Worker13: Implementovat PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Modul: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Umístění: T/Title/FromOriginalTitleAndReviewAndScript/
 - Závislosti: MVP-004, MVP-005 (potřeba obou revizí)
 - Priorita: Kritická
 - Úsilí: 2 dny
@@ -197,8 +198,9 @@ Worker13: Implementovat PrismQ.T.Title.Improvements v T/Title/Improvements/
   * Testy: Ověřit, že v2 řeší zpětnou vazbu z revizí v1
 
 # MVP-007: Vylepšení skriptu v2 (2 dny)
-Worker02: Implementovat PrismQ.T.Script.Improvements v T/Script/Improvements/
-- Modul: PrismQ.T.Script.Improvements
+Worker02: Implementovat PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Modul: PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Umístění: T/Script/FromOriginalScriptAndReviewAndTitle/
 - Závislosti: MVP-006 (potřebuje nový titulek v2)
 - Priorita: Kritická
 - Úsilí: 2 dny
@@ -235,8 +237,9 @@ Worker10: Implementovat PrismQ.T.Review.Title.ByScript (v2) v T/Review/Title/
 
 ```bash
 # MVP-009: Vybrušování titulku v3 (1 den)
-Worker13: Implementovat PrismQ.T.Title.Refinement v T/Title/Refinement/
-- Modul: PrismQ.T.Title.Refinement
+Worker13: Implementovat PrismQ.T.Title.FromOriginalTitleAndReviewAndScript (v3)
+- Modul: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Umístění: T/Title/FromOriginalTitleAndReviewAndScript/ (stejný modul, zpracovává v2→v3→v4+)
 - Závislosti: MVP-008 (potřeba zpětné vazby revize v2)
 - Priorita: Kritická
 - Úsilí: 1 den
@@ -263,8 +266,9 @@ Worker10: Implementovat PrismQ.T.Review.Script.ByTitle (v2) v T/Review/Script/
   * Testy: Revize skriptu v2 proti titulku v3
 
 # MVP-011: Vybrušování skriptu v3 (2 dny)
-Worker02: Implementovat PrismQ.T.Script.Refinement v T/Script/Improvements/
-- Modul: PrismQ.T.Script.Refinement
+Worker02: Implementovat PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle (v3)
+- Modul: PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Umístění: T/Script/FromOriginalScriptAndReviewAndTitle/ (stejný modul, zpracovává v2→v3→v4+)
 - Závislosti: MVP-010
 - Priorita: Kritická
 - Úsilí: 2 dny

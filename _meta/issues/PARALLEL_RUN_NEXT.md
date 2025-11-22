@@ -182,8 +182,9 @@ Worker10: Implement PrismQ.T.Review.Script.ByTitle in T/Review/Script/ByTitle/
 
 ```bash
 # MVP-006: Title Improvements v2 (2 days)
-Worker13: Implement PrismQ.T.Title.Improvements in T/Title/Improvements/
-- Module: PrismQ.T.Title.Improvements
+Worker13: Implement PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Module: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Location: T/Title/FromOriginalTitleAndReviewAndScript/
 - Dependencies: MVP-004, MVP-005 (needs both reviews)
 - Priority: Critical
 - Effort: 2 days
@@ -196,8 +197,9 @@ Worker13: Implement PrismQ.T.Title.Improvements in T/Title/Improvements/
   * Tests: Verify v2 addresses feedback from v1 reviews
 
 # MVP-007: Script Improvements v2 (2 days)
-Worker02: Implement PrismQ.T.Script.Improvements in T/Script/Improvements/
-- Module: PrismQ.T.Script.Improvements
+Worker02: Implement PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Module: PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Location: T/Script/FromOriginalScriptAndReviewAndTitle/
 - Dependencies: MVP-006 (needs new title v2)
 - Priority: Critical
 - Effort: 2 days
@@ -234,8 +236,9 @@ Worker10: Implement PrismQ.T.Review.Title.ByScript (v2) in T/Review/Title/
 
 ```bash
 # MVP-009: Title Refinement v3 (1 day)
-Worker13: Implement PrismQ.T.Title.Refinement in T/Title/Refinement/
-- Module: PrismQ.T.Title.Refinement
+Worker13: Implement PrismQ.T.Title.FromOriginalTitleAndReviewAndScript (v3)
+- Module: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- Location: T/Title/FromOriginalTitleAndReviewAndScript/ (same module, handles v2→v3→v4+)
 - Dependencies: MVP-008 (needs v2 review feedback)
 - Priority: Critical
 - Effort: 1 day
@@ -262,8 +265,9 @@ Worker10: Implement PrismQ.T.Review.Script.ByTitle (v2) in T/Review/Script/
   * Tests: Review script v2 against title v3
 
 # MVP-011: Script Refinement v3 (2 days)
-Worker02: Implement PrismQ.T.Script.Refinement in T/Script/Improvements/
-- Module: PrismQ.T.Script.Refinement
+Worker02: Implement PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle (v3)
+- Module: PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
+- Location: T/Script/FromOriginalScriptAndReviewAndTitle/ (same module, handles v2→v3→v4+)
 - Dependencies: MVP-010
 - Priority: Critical
 - Effort: 2 days
