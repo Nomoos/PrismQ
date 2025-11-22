@@ -34,9 +34,9 @@ T/
 Now grouped with other automated review modules (Grammar, Tone, Readability, etc.) as all are automated review steps.
 
 **Key Characteristics**:
-- **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with Writer
+- **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with ScriptWriter
 - **T/Review/Grammar, Tone, etc.**: Dimensional review focusing on specific quality aspects
-- **T/Script/Writer**: Pairs with T/Review/Script in feedback loop during script development
+- **T/Script/src**: Contains ScriptWriter which pairs with T/Review/Script in feedback loop during script development
 
 ### 2. Script Versioning for Comparison and Research
 
