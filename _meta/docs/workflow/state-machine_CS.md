@@ -3,7 +3,7 @@
 **Kompletní stavový automat pro produkci obsahu od inspirace po archivaci**
 
 > 📖 **Viz také**: 
-> - [Přehled MVP workflow](./mvp-overview-cs.md) pro podrobné principy 26fázového workflow
+> - [Přehled MVP workflow](./mvp-overview_CS.md) pro podrobné principy 26fázového workflow
 > - [Index dokumentace workflow](./README.md) pro kompletní navigaci
 
 ## Přehled

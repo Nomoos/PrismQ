@@ -9,25 +9,25 @@
 Veškerá dokumentace workflow je nyní organizována v adresáři [`docs/workflow/`](./docs/workflow/):
 
 ### Základní workflow
-- **[Stavový automat](./docs/workflow/state-machine-cs.md)** - Kompletní diagram stavů a přehled
-- **[Fáze workflow](./docs/workflow/phases-cs.md)** - 9 hlavních fází tvorby obsahu
-- **[Přechody stavů](./docs/workflow/transitions-cs.md)** - Pravidla pro přechody mezi stavy
-- **[Charakteristiky stavů](./docs/workflow/states-cs.md)** - Různé typy stavů
-- **[Strategie publikace](./docs/workflow/publishing-strategy-cs.md)** - Postupný víceformátový přístup
-- **[Správa workflow](./docs/workflow/management-cs.md)** - Operace, kvalitní kontrolní body a osvědčené postupy
+- **[Stavový automat](./docs/workflow/state-machine_CS.md)** - Kompletní diagram stavů a přehled
+- **[Fáze workflow](./docs/workflow/phases_CS.md)** - 9 hlavních fází tvorby obsahu
+- **[Přechody stavů](./docs/workflow/transitions_CS.md)** - Pravidla pro přechody mezi stavy
+- **[Charakteristiky stavů](./docs/workflow/states_CS.md)** - Různé typy stavů
+- **[Strategie publikace](./docs/workflow/publishing-strategy_CS.md)** - Postupný víceformátový přístup
+- **[Správa workflow](./docs/workflow/management_CS.md)** - Operace, kvalitní kontrolní body a osvědčené postupy
 
 ### Implementace MVP (26fázová tvorba textu)
-- **[Přehled MVP](./docs/workflow/mvp-overview-cs.md)** - Principy a filosofie workflow
-- **[Fáze MVP](./docs/workflow/mvp-stages-cs.md)** - Všech 26 fází podrobně
-- **[API Reference MVP](./docs/workflow/mvp-api-cs.md)** - Použití API a příklady
-- **[Osvědčené postupy MVP](./docs/workflow/mvp-best-practices-cs.md)** - Osvědčené postupy a řešení problémů
+- **[Přehled MVP](./docs/workflow/mvp-overview_CS.md)** - Principy a filosofie workflow
+- **[Fáze MVP](./docs/workflow/mvp-stages_CS.md)** - Všech 26 fází podrobně
+- **[API Reference MVP](./docs/workflow/mvp-api_CS.md)** - Použití API a příklady
+- **[Osvědčené postupy MVP](./docs/workflow/mvp-best-practices_CS.md)** - Osvědčené postupy a řešení problémů
 
 ## Rychlý start
 
-1. **Pochopte celkový obraz**: Začněte se [Stavovým automatem](./docs/workflow/state-machine-cs.md)
-2. **Naučte se fáze**: Přečtěte si [Fáze workflow](./docs/workflow/phases-cs.md)
-3. **Implementace MVP**: Zkontrolujte [Přehled MVP](./docs/workflow/mvp-overview-cs.md)
-4. **Integrace**: Použijte [API Reference MVP](./docs/workflow/mvp-api-cs.md)
+1. **Pochopte celkový obraz**: Začněte se [Stavovým automatem](./docs/workflow/state-machine_CS.md)
+2. **Naučte se fáze**: Přečtěte si [Fáze workflow](./docs/workflow/phases_CS.md)
+3. **Implementace MVP**: Zkontrolujte [Přehled MVP](./docs/workflow/mvp-overview_CS.md)
+4. **Integrace**: Použijte [API Reference MVP](./docs/workflow/mvp-api_CS.md)
 
 ## Navigace
 
