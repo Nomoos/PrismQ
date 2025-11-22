@@ -32,7 +32,7 @@ class TestTitleGenerator:
         generator = TitleGenerator()
         variants = generator.generate_from_idea(idea)
         
-        assert len(variants) == 5  # Default is 5
+        assert len(variants) == 10  # Default is now 10
         assert all(isinstance(v, TitleVariant) for v in variants)
         assert all(len(v.text) > 0 for v in variants)
     
@@ -66,6 +66,25 @@ class TestTitleGenerator:
         assert len(variants) == 5
         styles = [v.style for v in variants]
         expected_styles = {'direct', 'question', 'how-to', 'curiosity', 'authoritative'}
+        assert set(styles) == expected_styles
+    
+    def test_generate_ten_variants(self):
+        """Test generating 10 variants with all different styles."""
+        idea = Idea(
+            title="Blockchain Technology",
+            concept="Understanding decentralized systems",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        assert len(variants) == 10
+        styles = [v.style for v in variants]
+        expected_styles = {
+            'direct', 'question', 'how-to', 'curiosity', 'authoritative',
+            'listicle', 'problem-solution', 'comparison', 'ultimate-guide', 'benefit'
+        }
         assert set(styles) == expected_styles
     
     def test_generate_from_concept_only(self):
@@ -221,12 +240,12 @@ class TestTitleGenerator:
         generator = TitleGenerator()
         
         # Too few variants
-        with pytest.raises(ValueError, match="must be between 3 and 5"):
+        with pytest.raises(ValueError, match="must be between 3 and 10"):
             generator.generate_from_idea(idea, num_variants=2)
         
         # Too many variants
-        with pytest.raises(ValueError, match="must be between 3 and 5"):
-            generator.generate_from_idea(idea, num_variants=6)
+        with pytest.raises(ValueError, match="must be between 3 and 10"):
+            generator.generate_from_idea(idea, num_variants=11)
     
     def test_custom_config(self):
         """Test using custom configuration."""
@@ -368,6 +387,86 @@ class TestVariantStyles:
         auth = next(v for v in variants if v.style == "authoritative")
         assert any(word in auth.text for word in 
                   ["Analysis", "Comprehensive", "Expert", "Essential", "Guide"])
+    
+    def test_listicle_variant(self):
+        """Test listicle variant generation."""
+        idea = Idea(
+            title="Productivity Tips",
+            concept="Improving work efficiency",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        # Find listicle variant
+        listicle = next(v for v in variants if v.style == "listicle")
+        assert any(num in listicle.text for num in ["5", "7", "10", "15"])
+        assert "Essential" in listicle.text or "Ways" in listicle.text or "Key" in listicle.text
+    
+    def test_problem_solution_variant(self):
+        """Test problem-solution variant generation."""
+        idea = Idea(
+            title="Software Bugs",
+            concept="Fixing code issues",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        # Find problem-solution variant
+        problem = next(v for v in variants if v.style == "problem-solution")
+        assert any(word in problem.text for word in 
+                  ["Solving", "Problems", "Solutions", "Fixing", "Overcoming"])
+    
+    def test_comparison_variant(self):
+        """Test comparison variant generation."""
+        idea = Idea(
+            title="Cloud vs On-Premise",
+            concept="Comparing hosting solutions",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        # Find comparison variant
+        comparison = next(v for v in variants if v.style == "comparison")
+        assert any(word in comparison.text for word in 
+                  ["vs", "Comparing", "Myths", "Reality", "Old", "New"])
+    
+    def test_ultimate_guide_variant(self):
+        """Test ultimate guide variant generation."""
+        idea = Idea(
+            title="Python Programming",
+            concept="Learning Python",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        # Find ultimate guide variant
+        guide = next(v for v in variants if v.style == "ultimate-guide")
+        assert any(word in guide.text for word in 
+                  ["Ultimate", "Complete", "Everything", "Mastering"])
+    
+    def test_benefit_variant(self):
+        """Test benefit variant generation."""
+        idea = Idea(
+            title="Meditation",
+            concept="Mindfulness practices",
+            status=IdeaStatus.DRAFT
+        )
+        
+        generator = TitleGenerator()
+        variants = generator.generate_from_idea(idea, num_variants=10)
+        
+        # Find benefit variant
+        benefit = next(v for v in variants if v.style == "benefit")
+        assert any(word in benefit.text for word in 
+                  ["Why", "Matters", "Benefits", "Transform", "Unlock"])
 
 
 class TestEdgeCases:

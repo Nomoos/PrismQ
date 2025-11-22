@@ -18,7 +18,7 @@ from idea import Idea, ContentGenre, IdeaStatus
 def example_basic_usage():
     """Example: Basic title generation from idea."""
     print("=" * 80)
-    print("Example 1: Basic Title Generation")
+    print("Example 1: Basic Title Generation (10 Variants)")
     print("=" * 80)
     
     # Create an idea
@@ -31,9 +31,9 @@ def example_basic_usage():
         status=IdeaStatus.DRAFT
     )
     
-    # Generate title variants
+    # Generate title variants (default is now 10)
     generator = TitleGenerator()
-    variants = generator.generate_from_idea(idea, num_variants=5)
+    variants = generator.generate_from_idea(idea)
     
     # Display results
     print(f"\nOriginal Idea Title: {idea.title}")
@@ -140,7 +140,7 @@ def example_entertainment_genre():
 def example_variant_comparison():
     """Example: Compare different variant styles."""
     print("=" * 80)
-    print("Example 5: Variant Style Comparison")
+    print("Example 5: Variant Style Comparison (All 10 Styles)")
     print("=" * 80)
     
     # Create idea
@@ -151,24 +151,29 @@ def example_variant_comparison():
         status=IdeaStatus.DRAFT
     )
     
-    # Generate variants
+    # Generate all 10 variants
     generator = TitleGenerator()
-    variants = generator.generate_from_idea(idea, num_variants=5)
+    variants = generator.generate_from_idea(idea, num_variants=10)
     
     print(f"\nOriginal: {idea.title}\n")
-    print("Style Comparison:\n")
+    print("All 10 Style Variants:\n")
     
-    # Group by style
+    # Display all variants
     for variant in variants:
-        print(f"{variant.style.upper():15} | {variant.text}")
+        print(f"{variant.style.upper():20} | {variant.text}")
     
     print("\n" + "-" * 80)
     print("\nStyle Characteristics:")
-    print("• DIRECT:         Straightforward, clear title")
-    print("• QUESTION:       Poses a question to engage readers")
-    print("• HOW-TO:         Action-oriented, instructional")
-    print("• CURIOSITY:      Intriguing, creates interest")
-    print("• AUTHORITATIVE:  Expert perspective, comprehensive")
+    print("• DIRECT:            Straightforward, clear title")
+    print("• QUESTION:          Poses a question to engage readers")
+    print("• HOW-TO:            Action-oriented, instructional")
+    print("• CURIOSITY:         Intriguing, creates interest")
+    print("• AUTHORITATIVE:     Expert perspective, comprehensive")
+    print("• LISTICLE:          Number-based, digestible format")
+    print("• PROBLEM-SOLUTION:  Addresses challenges and solutions")
+    print("• COMPARISON:        Contrasts different approaches")
+    print("• ULTIMATE-GUIDE:    Comprehensive resource positioning")
+    print("• BENEFIT:           Value proposition, reader-focused")
 
 
 def example_to_dict_export():

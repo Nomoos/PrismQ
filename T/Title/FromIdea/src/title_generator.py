@@ -23,13 +23,13 @@ class TitleConfig:
     """Configuration for title generation.
     
     Attributes:
-        num_variants: Number of title variants to generate (3-5)
+        num_variants: Number of title variants to generate (3-10)
         min_length: Minimum title length in characters
         max_length: Maximum title length in characters
         focus: Primary focus for title generation
         include_keywords: Whether to emphasize keywords from idea
     """
-    num_variants: int = 5
+    num_variants: int = 10
     min_length: int = 20
     max_length: int = 100
     focus: Literal["engagement", "seo", "clarity", "balanced"] = "balanced"
@@ -88,7 +88,7 @@ class TitleGenerator:
         
         Args:
             idea: Idea object to generate titles from
-            num_variants: Optional override for number of variants (3-5)
+            num_variants: Optional override for number of variants (3-10)
             
         Returns:
             List of TitleVariant instances
@@ -103,8 +103,8 @@ class TitleGenerator:
         
         # Determine number of variants
         n_variants = num_variants if num_variants is not None else self.config.num_variants
-        if n_variants < 3 or n_variants > 5:
-            raise ValueError("num_variants must be between 3 and 5")
+        if n_variants < 3 or n_variants > 10:
+            raise ValueError("num_variants must be between 3 and 10")
         
         # Extract key information from idea
         base_title = idea.title or self._extract_title_from_concept(idea.concept)
@@ -132,6 +132,26 @@ class TitleGenerator:
         # Strategy 5: Authoritative - Expert perspective
         if len(variants) < n_variants:
             variants.append(self._generate_authoritative_variant(base_title, keywords, idea))
+        
+        # Strategy 6: Listicle - Number-based
+        if len(variants) < n_variants:
+            variants.append(self._generate_listicle_variant(base_title, keywords, idea))
+        
+        # Strategy 7: Problem-Solution - Address pain points
+        if len(variants) < n_variants:
+            variants.append(self._generate_problem_solution_variant(base_title, keywords, idea))
+        
+        # Strategy 8: Comparison - Versus style
+        if len(variants) < n_variants:
+            variants.append(self._generate_comparison_variant(base_title, keywords, idea))
+        
+        # Strategy 9: Ultimate Guide - Comprehensive resource
+        if len(variants) < n_variants:
+            variants.append(self._generate_ultimate_guide_variant(base_title, keywords, idea))
+        
+        # Strategy 10: Benefit-focused - Value proposition
+        if len(variants) < n_variants:
+            variants.append(self._generate_benefit_variant(base_title, keywords, idea))
         
         return variants[:n_variants]
     
@@ -374,6 +394,184 @@ class TitleGenerator:
             score=0.83
         )
     
+    def _generate_listicle_variant(
+        self,
+        base_title: str,
+        keywords: List[str],
+        idea: Idea
+    ) -> TitleVariant:
+        """Generate listicle/numbered variant.
+        
+        Args:
+            base_title: Base title to work from
+            keywords: Extracted keywords
+            idea: Original idea
+            
+        Returns:
+            TitleVariant
+        """
+        # Create numbered list title
+        numbers = ["5", "7", "10", "15"]
+        number = numbers[len(base_title) % len(numbers)]
+        
+        listicle_templates = [
+            f"{number} Essential Things About {base_title}",
+            f"{number} Ways to Understand {base_title}",
+            f"{number} Key Insights on {base_title}",
+            f"Top {number} Facts About {base_title}"
+        ]
+        
+        title = listicle_templates[0]
+        title = self._ensure_length(title)
+        
+        return TitleVariant(
+            text=title,
+            style="listicle",
+            length=len(title),
+            keywords=keywords,
+            score=0.86
+        )
+    
+    def _generate_problem_solution_variant(
+        self,
+        base_title: str,
+        keywords: List[str],
+        idea: Idea
+    ) -> TitleVariant:
+        """Generate problem-solution variant.
+        
+        Args:
+            base_title: Base title to work from
+            keywords: Extracted keywords
+            idea: Original idea
+            
+        Returns:
+            TitleVariant
+        """
+        # Create problem-solving title
+        problem_templates = [
+            f"Solving {base_title} Challenges",
+            f"Overcoming {base_title} Issues",
+            f"{base_title}: Problems and Solutions",
+            f"Fixing Common {base_title} Problems"
+        ]
+        
+        title = problem_templates[0]
+        title = self._ensure_length(title)
+        
+        return TitleVariant(
+            text=title,
+            style="problem-solution",
+            length=len(title),
+            keywords=keywords,
+            score=0.84
+        )
+    
+    def _generate_comparison_variant(
+        self,
+        base_title: str,
+        keywords: List[str],
+        idea: Idea
+    ) -> TitleVariant:
+        """Generate comparison/versus variant.
+        
+        Args:
+            base_title: Base title to work from
+            keywords: Extracted keywords
+            idea: Original idea
+            
+        Returns:
+            TitleVariant
+        """
+        # Create comparison title
+        comparison_templates = [
+            f"{base_title}: Then vs Now",
+            f"Comparing {base_title} Approaches",
+            f"{base_title}: Myths vs Reality",
+            f"Old vs New: {base_title}"
+        ]
+        
+        title = comparison_templates[0]
+        title = self._ensure_length(title)
+        
+        return TitleVariant(
+            text=title,
+            style="comparison",
+            length=len(title),
+            keywords=keywords,
+            score=0.81
+        )
+    
+    def _generate_ultimate_guide_variant(
+        self,
+        base_title: str,
+        keywords: List[str],
+        idea: Idea
+    ) -> TitleVariant:
+        """Generate ultimate guide variant.
+        
+        Args:
+            base_title: Base title to work from
+            keywords: Extracted keywords
+            idea: Original idea
+            
+        Returns:
+            TitleVariant
+        """
+        # Create comprehensive guide title
+        guide_templates = [
+            f"The Ultimate Guide to {base_title}",
+            f"{base_title}: The Complete Resource",
+            f"Everything You Need About {base_title}",
+            f"Mastering {base_title}: A Complete Guide"
+        ]
+        
+        title = guide_templates[0]
+        title = self._ensure_length(title)
+        
+        return TitleVariant(
+            text=title,
+            style="ultimate-guide",
+            length=len(title),
+            keywords=keywords,
+            score=0.87
+        )
+    
+    def _generate_benefit_variant(
+        self,
+        base_title: str,
+        keywords: List[str],
+        idea: Idea
+    ) -> TitleVariant:
+        """Generate benefit-focused variant.
+        
+        Args:
+            base_title: Base title to work from
+            keywords: Extracted keywords
+            idea: Original idea
+            
+        Returns:
+            TitleVariant
+        """
+        # Create benefit-driven title
+        benefit_templates = [
+            f"Why {base_title} Matters to You",
+            f"The Benefits of Understanding {base_title}",
+            f"How {base_title} Can Transform Your Life",
+            f"{base_title}: Unlock Your Potential"
+        ]
+        
+        title = benefit_templates[0]
+        title = self._ensure_length(title)
+        
+        return TitleVariant(
+            text=title,
+            style="benefit",
+            length=len(title),
+            keywords=keywords,
+            score=0.85
+        )
+    
     def _ensure_length(self, title: str) -> str:
         """Ensure title is within configured length bounds.
         
@@ -395,14 +593,14 @@ class TitleGenerator:
 
 def generate_titles_from_idea(
     idea: Idea,
-    num_variants: int = 5,
+    num_variants: int = 10,
     config: Optional[TitleConfig] = None
 ) -> List[TitleVariant]:
     """Convenience function to generate titles from an idea.
     
     Args:
         idea: Idea object to generate titles from
-        num_variants: Number of variants to generate (3-5)
+        num_variants: Number of variants to generate (3-10, default 10)
         config: Optional configuration
         
     Returns:
