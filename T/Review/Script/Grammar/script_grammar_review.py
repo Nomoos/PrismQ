@@ -21,7 +21,7 @@ from dataclasses import asdict
 # Import the GrammarReview model from T.Review.Grammar
 import sys
 from pathlib import Path
-project_root = Path(__file__).resolve().parents[4]
+project_root = Path(__file__).resolve().parents[3]  # Grammar -> Script -> Review -> T -> (PrismQ)
 sys.path.insert(0, str(project_root))
 
 from T.Review.Grammar import (
