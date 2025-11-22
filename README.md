@@ -118,7 +118,7 @@ PrismQ/
 │   ├── Script/        # Script drafting and review
 │   ├── Title/         # Title optimization
 │   ├── Publishing/    # Text publishing
-│   ├── Rewiew/        # Review and editing
+│   ├── Review/        # Review and editing
 │   └── _meta/         # Module metadata
 ├── A/                  # Audio Generation Pipeline
 │   ├── Voiceover/     # Voice recording

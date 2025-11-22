@@ -67,25 +67,25 @@ Create compelling, SEO-optimized titles through testing and refinement.
 
 ---
 
-### [Rewiew](./Rewiew/)
+### [Review](./Review/)
 **Content review and editing**
 
 Multi-dimensional content quality review and enhancement.
 
-- **[Grammar](./Rewiew/Grammar/)** - Grammar and syntax
-- **[Readability](./Rewiew/Readability/)** - Reading level optimization
-- **[Tone](./Rewiew/Tone/)** - Tone and voice consistency
-- **[Content](./Rewiew/Content/)** - Content accuracy and relevance
-- **[Consistency](./Rewiew/Consistency/)** - Style consistency
-- **[Editing](./Rewiew/Editing/)** - Final editing pass
+- **[Grammar](./Review/Grammar/)** - Grammar and syntax
+- **[Readability](./Review/Readability/)** - Reading level optimization
+- **[Tone](./Review/Tone/)** - Tone and voice consistency
+- **[Content](./Review/Content/)** - Content accuracy and relevance
+- **[Consistency](./Review/Consistency/)** - Style consistency
+- **[Editing](./Review/Editing/)** - Final editing pass
 
 **Submodule Navigation:**
-- [Grammar README](./Rewiew/Grammar/README.md)
-- [Readability README](./Rewiew/Readability/README.md)
-- [Tone README](./Rewiew/Tone/README.md)
-- [Content README](./Rewiew/Content/README.md)
-- [Consistency README](./Rewiew/Consistency/README.md)
-- [Editing README](./Rewiew/Editing/README.md)
+- [Grammar README](./Review/Grammar/README.md)
+- [Readability README](./Review/Readability/README.md)
+- [Tone README](./Review/Tone/README.md)
+- [Content README](./Review/Content/README.md)
+- [Consistency README](./Review/Consistency/README.md)
+- [Editing README](./Review/Editing/README.md)
 
 ---
 
@@ -134,7 +134,7 @@ Idea (Creation → Outline → Skeleton → Title)
     ↓
 ScriptDraft
     ↓
-ScriptReview (Rewiew modules)
+ScriptReview (Review modules)
     ↓
 ScriptApproved
     ↓
