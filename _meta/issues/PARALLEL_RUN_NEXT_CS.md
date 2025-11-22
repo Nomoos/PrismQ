@@ -6,8 +6,11 @@
 
 **Sprint**: Sprint 1-3 (7-8 týdnů) - Vývoj MVP  
 **Datum**: 2025-11-22  
-**Stav**: Sprint 1 probíhá  
+**Stav**: Sprint 1 Dokončen ✅ | Sprint 2 Probíhá  
 **Cíl**: Vybudovat MVP s 26-fázovým iterativním workflow společného vylepšování
+
+**Úspěch Sprint 1**: Základy dokončeny - Nápad → Titulek v1 → Skript v1 → Křížové revize fungují  
+**Zaměření Sprint 2**: Implementovat moduly vylepšování (generování v2/v3)
 
 ---
 
@@ -68,70 +71,97 @@ Worker02: Implementovat PrismQ.T.Script.FromIdeaAndTitle v T/Script/FromIdeaAndT
   * Výsledky uloženy s odkazy
   * Testy: Generování skriptů ze vzorových dvojic nápad+titulek
 
-# Dokumentace (2 dny)
+# Dokumentace (2 dny) - DOKONČENO ✓
 Worker15: Vytvořit dokumentaci MVP workflow
 - Modul: Dokumentace
 - Závislosti: MVP-001, MVP-002, MVP-003
 - Priorita: Vysoká
 - Úsilí: 2 dny
+- Stav: HOTOVO ✓
 - Výstup: Kompletní dokumentace workflow s příklady
+- Dokončené soubory:
+  * MVP_WORKFLOW_DOCUMENTATION.md (1033 řádků, EN)
+  * MVP_WORKFLOW_DOCUMENTATION_CS.md (548 řádků, CS)
+  * WORKFLOW.md a WORKFLOW_CS.md aktualizovány s křížovými odkazy
 - Kritéria přijetí:
-  * Dokumentovat všech 26 fází workflow
-  * Zahrnout příklady použití
-  * Dokumentovat iterační smyčky
-  * Kompletní API reference
+  * ✅ Dokumentovat všech 26 fází workflow
+  * ✅ Zahrnout příklady použití (4 kompletní příklady)
+  * ✅ Dokumentovat iterační smyčky (3 vzory smyček)
+  * ✅ Kompletní API reference (Workflow, Idea, Title, Script, Review, Publication)
 
-# Nastavení testů (2 dny)
+# Nastavení testů (2 dny) - DOKONČENO ✓
 Worker04: Nastavit testovací framework pro iterativní workflow
 - Modul: Testovací infrastruktura
 - Závislosti: MVP-001, MVP-002, MVP-003
 - Priorita: Vysoká
 - Úsilí: 2 dny
+- Stav: HOTOVO ✓
 - Výstup: Testovací framework podporující iterační cesty
+- Dokončené soubory:
+  * pytest.ini (kořenová konfigurace s markery)
+  * tests/helpers.py (VersionTracker, WorkflowStageValidator, IntegrationTestHelper)
+  * tests/test_helpers.py (35 unit testů)
+  * tests/test_integration_workflow.py (14 integračních testů)
+  * tests/README.md (484 řádků API reference)
+- Pokrytí testy: 49/49 testů prochází (100%)
 - Kritéria přijetí:
-  * Nakonfigurován unit test framework
-  * Podpora integračních testů
-  * Testovací pomocníci pro sledování verzí
-  * Kompletní testovací dokumentace
+  * ✅ Nakonfigurován unit test framework (pytest s markery)
+  * ✅ Podpora integračních testů (14 integračních testů)
+  * ✅ Testovací pomocníci pro sledování verzí (třída VersionTracker)
+  * ✅ Kompletní testovací dokumentace (484-řádkové README)
 ```
 
 ---
 
 ### Týden 2: Cyklus křížové revize
 
-**Výstup**: ✅ Křížově validační revize pro titulek i skript dokončeny
+**Výstup**: ✅ DOKONČENO - Křížově validační revize pro titulek i skript dokončeny
 
 #### Příkazy
 
 ```bash
-# MVP-004: Revize titulku podle skriptu (1 den) - PROBÍHÁ ~
+# MVP-004: Revize titulku podle skriptu (1 den) - DOKONČENO ✓
 Worker10: Implementovat PrismQ.T.Review.Title.ByScript v T/Review/Title/ByScriptAndIdea/
 - Modul: PrismQ.T.Review.Title.ByScript
 - Závislosti: MVP-003 (potřeba titulku v1 i skriptu v1)
 - Priorita: Kritická
 - Úsilí: 1 den
-- Stav: ČÁSTEČNÉ - VYŽADUJE VALIDACI
+- Stav: HOTOVO ✓
+- Dokončené soubory:
+  * T/Review/Title/ByScriptAndIdea/by_script_and_idea.py (700+ řádků)
+  * T/Review/Title/ByScriptAndIdea/__init__.py
+  * T/Review/Title/ByScriptAndIdea/_meta/tests/test_by_script_and_idea.py (34 testů)
+  * T/Review/Title/ByScriptAndIdea/_meta/tests/test_acceptance_criteria.py (8 testů)
+  * T/Review/Title/ByScriptAndIdea/README.md
+- Pokrytí testy: 42/42 testů prochází (100%)
 - Kritéria přijetí:
-  * Revidovat titulek v1 proti skriptu v1 a nápadu
-  * Generovat strukturovanou zpětnou vazbu (sladění, jasnost, poutavost)
-  * Identifikovat nesrovnalosti mezi titulkem a skriptem
-  * Navrhnout vylepšení titulku
-  * Výstup JSON formát s kategoriemi zpětné vazby
-  * Testy: Revize vzorových dvojic titulek/skript
+  * ✅ Revidovat titulek v1 proti skriptu v1 a nápadu
+  * ✅ Generovat strukturovanou zpětnou vazbu (sladění, jasnost, poutavost, SEO)
+  * ✅ Identifikovat nesrovnalosti mezi titulkem a skriptem (extrakce klíčových slov + filtrování stopwords)
+  * ✅ Navrhnout vylepšení titulku (prioritizováno podle skóre dopadu)
+  * ✅ Výstup JSON formát s kategoriemi zpětné vazby (serializace to_dict())
+  * ✅ Testy: Revize vzorových dvojic titulek/skript (34 unit + 8 akceptačních testů)
 
-# MVP-005: Revize skriptu podle titulku (1 den) - NEZAHÁJENO ❌
-Worker10: Implementovat PrismQ.T.Review.Script.ByTitle v T/Review/Script/
+# MVP-005: Revize skriptu podle titulku (1 den) - DOKONČENO ✓
+Worker10: Implementovat PrismQ.T.Review.Script.ByTitle v T/Review/Script/ByTitle/
 - Modul: PrismQ.T.Review.Script.ByTitle
 - Závislosti: MVP-003
 - Priorita: Kritická
 - Úsilí: 1 den
-- Stav: NEZAHÁJENO
+- Stav: HOTOVO ✓
+- Dokončené soubory:
+  * T/Review/Script/ByTitle/script_review_by_title.py (hlavní logika)
+  * T/Review/Script/ByTitle/__init__.py
+  * T/Review/Script/ByTitle/_meta/tests/test_script_review_by_title.py (32 testů)
+  * T/Review/Script/ByTitle/README.md
+- Pokrytí testy: 32/32 testů prochází (100%)
 - Kritéria přijetí:
-  * Revidovat skript v1 proti titulku v1 a nápadu
-  * Generovat strukturovanou zpětnou vazbu (sladění, tok, úplnost)
-  * Identifikovat mezery mezi obsahem skriptu a slibem titulku
-  * Navrhnout vylepšení skriptu
-  * Výstup JSON formát s kategoriemi zpětné vazby
+  * ✅ Revidovat skript v1 proti titulku v1 a nápadu
+  * ✅ Generovat strukturovanou zpětnou vazbu (sladění: titulek 25% + nápad 30%, kvalita obsahu 45%)
+  * ✅ Identifikovat mezery mezi obsahem skriptu a slibem titulku (regex matching, filtrování stopwords)
+  * ✅ Navrhnout vylepšení skriptu (prioritizováno podle odhadů dopadu)
+  * ✅ Výstup JSON formát s kategoriemi zpětné vazby (ScriptReview.to_dict())
+  * ✅ Testy: Revize vzorových dvojic skript/titulek (32 unit testů, všechny scénáře)
   * Testy: Revize vzorových dvojic skript/titulek
 ```
 
