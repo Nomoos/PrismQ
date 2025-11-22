@@ -45,6 +45,12 @@ class ScriptEditingChecker:
     Provides line-by-line improvement suggestions with specific rewrites.
     """
     
+    # Scoring penalties (configurable)
+    PENALTY_CRITICAL = 15
+    PENALTY_HIGH = 10
+    PENALTY_MEDIUM = 5
+    PENALTY_LOW = 2
+    
     def __init__(self, pass_threshold: int = 85):
         """Initialize the editing checker.
         
@@ -83,8 +89,8 @@ class ScriptEditingChecker:
             "has the ability to": "can",
             "in a timely manner": "promptly",
             "is able to": "can",
-            "it is important to note that": "",
-            "it should be noted that": "",
+            "it is important to note that": " ",  # Will be cleaned up
+            "it should be noted that": " ",  # Will be cleaned up
             "as a matter of fact": "in fact",
             "the fact that": "that",
             "very unique": "unique",
@@ -174,6 +180,29 @@ class ScriptEditingChecker:
         
         return review
     
+    def _preserve_case(self, original: str, replacement: str) -> str:
+        """Preserve the case of the original word in the replacement.
+        
+        Args:
+            original: Original word with case to preserve
+            replacement: Replacement word to adjust case
+            
+        Returns:
+            Replacement word with preserved case
+        """
+        if not original or not replacement:
+            return replacement
+        
+        # If original is all uppercase, make replacement uppercase
+        if original.isupper():
+            return replacement.upper()
+        # If original starts with uppercase, capitalize replacement
+        elif original[0].isupper():
+            return replacement.capitalize()
+        # Otherwise, keep replacement lowercase
+        else:
+            return replacement.lower()
+    
     def _check_wordiness(self, line: str, line_num: int, review: EditingReview) -> None:
         """Check for wordy phrases that can be simplified."""
         line_lower = line.lower()
@@ -215,12 +244,13 @@ class ScriptEditingChecker:
                 # Suggest removing the redundant part
                 parts = redundant.split()
                 if len(parts) == 2:
-                    suggestion = line_lower.replace(redundant, parts[1])
-                    # Preserve original case
+                    # Preserve original case using pattern matching
                     pattern = re.compile(re.escape(redundant), re.IGNORECASE)
                     match = pattern.search(line)
                     if match:
-                        suggestion = line.replace(match.group(), parts[1].capitalize() if match.group()[0].isupper() else parts[1])
+                        # Preserve case of the replacement word
+                        replacement = self._preserve_case(match.group(), parts[1])
+                        suggestion = line.replace(match.group(), replacement)
                         
                         issue = EditingIssue(
                             issue_type=EditingIssueType.REDUNDANCY,
@@ -360,11 +390,11 @@ class ScriptEditingChecker:
         # Start with perfect score
         score = 100
         
-        # Deduct points based on severity
-        score -= review.critical_count * 15  # Critical: -15 points each
-        score -= review.high_count * 10      # High: -10 points each
-        score -= review.medium_count * 5     # Medium: -5 points each
-        score -= review.low_count * 2        # Low: -2 points each
+        # Deduct points based on severity using class constants
+        score -= review.critical_count * self.PENALTY_CRITICAL
+        score -= review.high_count * self.PENALTY_HIGH
+        score -= review.medium_count * self.PENALTY_MEDIUM
+        score -= review.low_count * self.PENALTY_LOW
         
         # Ensure score doesn't go below 0
         return max(0, score)
