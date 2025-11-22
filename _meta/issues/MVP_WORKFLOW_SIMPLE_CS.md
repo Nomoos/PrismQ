@@ -272,7 +272,7 @@ Po úspěšné validaci MVP přidat:
 
 - **[MVP_WORKFLOW.md](./MVP_WORKFLOW.md)** - Detailní MVP workflow s kompletními specifikacemi
 - **[PARALLEL_RUN_NEXT_CS.md](./PARALLEL_RUN_NEXT_CS.md)** - Plán provádění sprintu s přiřazením workerů
-- **[WORKFLOW_CS.md](../../WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
+- **[WORKFLOW_CS.md](../WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
 
 ---
 

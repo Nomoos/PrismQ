@@ -393,4 +393,4 @@ The module successfully supports:
 - **Tests**: [_meta/tests/test_script_improver.py](./_meta/tests/test_script_improver.py)
 - **Examples**: [_meta/examples/example_usage.py](./_meta/examples/example_usage.py)
 - **README**: [README.md](./README.md)
-- **Workflow**: [../../MVP_WORKFLOW_DOCUMENTATION.md](../../MVP_WORKFLOW_DOCUMENTATION.md)
+- **Workflow**: [../../../_meta/MVP_WORKFLOW_DOCUMENTATION.md](../../../_meta/MVP_WORKFLOW_DOCUMENTATION.md)

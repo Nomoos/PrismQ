@@ -108,7 +108,7 @@ Základní výzkumné a strategické plánovací dokumenty.
   - [Struktura modulů](./_meta/docs/MODULE_STRUCTURE.md)
 
 ### Dokumentace workflow
-- **[WORKFLOW_CS.md](./WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
+- **[WORKFLOW_CS.md](./_meta/WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
   - Fáze workflow a přechody stavů
   - Model postupného obohacování
   - Kvalitní kontrolní body a osvědčené postupy
@@ -147,14 +147,14 @@ PrismQ/
 ├── _meta/             # Celoplošná metadata projektu
 │   ├── docs/         # Dokumentace
 │   ├── research/     # Výzkumné dokumenty
-│   └── proposals/    # Designové návrhy
-└── WORKFLOW.md        # Dokumentace stavového automatu
+│   ├── proposals/    # Designové návrhy
+│   └── WORKFLOW_CS.md # Dokumentace stavového automatu
 ```
 
 ## 🚀 Rychlý start
 
 1. **Prozkoumejte pipeline**: Začněte s [T/README.md](./T/README.md) pro pochopení generování textu
-2. **Prohlédněte si workflow**: Přečtěte si [WORKFLOW.md](./WORKFLOW.md) pro kompletní stavový automat
+2. **Prohlédněte si workflow**: Přečtěte si [WORKFLOW_CS.md](./_meta/WORKFLOW_CS.md) pro kompletní stavový automat
 3. **Prostudujte výzkum**: Procházejte [_meta/research/](./_meta/research/) pro strategické poznatky
 4. **Použijte Client**: Podívejte se na [Client/README.md](./Client/README.md) pro nastavení webového rozhraní
 
@@ -263,4 +263,4 @@ Proprietární - Všechna práva vyhrazena - Copyright (c) 2025 PrismQ
 
 ---
 
-**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./WORKFLOW_CS.md)
+**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./_meta/WORKFLOW_CS.md)
