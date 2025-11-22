@@ -38,32 +38,30 @@ Transform inspiration into structured content concepts with clear outlines and t
 ### [Script](./Script/)
 **Script drafting and refinement**
 
-Develop and refine scripts through iterative drafting and optimization.
+Develop and refine scripts through state-based workflow.
 
-- **[Draft](./Script/Draft/)** - Initial script writing
-- **[Improvements](./Script/Improvements/)** - Script enhancement
-- **[Optimization](./Script/Optimization/)** - Script optimization
+- **[FromIdeaAndTitle](./Script/FromIdeaAndTitle/)** - Initial script draft (v1)
+- **[FromOriginalScriptAndReviewAndTitle](./Script/FromOriginalScriptAndReviewAndTitle/)** - Script improvements (v2+)
+- **[Writer](./Script/Writer/)** - AI-powered script writer
 
 **Submodule Navigation:**
-- [Draft README](./Script/Draft/README.md)
-- [Improvements README](./Script/Improvements/README.md)
-- [Optimization README](./Script/Optimization/README.md)
+- [FromIdeaAndTitle README](./Script/FromIdeaAndTitle/README.md)
+- [FromOriginalScriptAndReviewAndTitle README](./Script/FromOriginalScriptAndReviewAndTitle/README.md)
+- [Writer README](./Script/Writer/README.md)
 
 ---
 
 ### [Title](./Title/)
 **Title creation and optimization**
 
-Create compelling, SEO-optimized titles through testing and refinement.
+Create compelling, SEO-optimized titles through state-based workflow.
 
-- **[Draft](./Title/Draft/)** - Initial title creation
-- **[Optimization](./Title/Optimization/)** - Title A/B testing
-- **[Refinement](./Title/Refinement/)** - Final title polish
+- **[FromIdea](./Title/FromIdea/)** - Initial title draft (v1)
+- **[FromOriginalTitleAndReviewAndScript](./Title/FromOriginalTitleAndReviewAndScript/)** - Title improvements (v2+)
 
 **Submodule Navigation:**
-- [Draft README](./Title/Draft/README.md)
-- [Optimization README](./Title/Optimization/README.md)
-- [Refinement README](./Title/Refinement/README.md)
+- [FromIdea README](./Title/FromIdea/README.md)
+- [FromOriginalTitleAndReviewAndScript README](./Title/FromOriginalTitleAndReviewAndScript/README.md)
 
 ---
 

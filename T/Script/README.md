@@ -10,8 +10,6 @@ Transform structured ideas into polished scripts ready for review and publicatio
 
 ## Submodules
 
-### MVP Workflow States
-
 #### [FromIdeaAndTitle](./FromIdeaAndTitle/)
 **Stage 3: Initial script draft from idea and title** (v1)
 
@@ -34,16 +32,6 @@ This state handles:
 **[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
 **[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
 
-### Legacy and Support Modules
-
-#### [Draft](./Draft/)
-**Initial script writing** (Legacy)
-
-First draft creation from idea outlines.
-
-**[→ View Draft Documentation](./Draft/README.md)**
-**[→ View Draft Metadata](./Draft/_meta/)**
-
 #### [Writer](./Writer/)
 **AI script writer with feedback loop** ⭐ NEW
 
@@ -56,22 +44,6 @@ AI-powered script writer that optimizes content based on review feedback from **
 
 **[→ View Writer Documentation](./Writer/README.md)**
 **[→ View Writer Metadata](./Writer/_meta/)**
-
-#### [Improvements](./Improvements/)
-**Script enhancement** (Legacy)
-
-Iterative improvements and refinements.
-
-**[→ View Improvements Documentation](./Improvements/README.md)**
-**[→ View Improvements Metadata](./Improvements/_meta/)**
-
-#### [Optimization](./Optimization/)
-**Script optimization**
-
-Final optimization for flow, readability, and impact.
-
-**[→ View Optimization Documentation](./Optimization/README.md)**
-**[→ View Optimization Metadata](./Optimization/_meta/)**
 
 ## Module Metadata
 
