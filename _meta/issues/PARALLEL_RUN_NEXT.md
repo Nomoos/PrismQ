@@ -6,163 +6,41 @@
 
 **Sprint**: Sprint 1-3 (7-8 weeks) - MVP Development  
 **Date**: 2025-11-22  
-**Status**: Sprint 1 Complete ✅ | Sprint 2 In Progress  
+**Status**: Sprint 1 Complete ✅ | Sprint 2 Ready to Start  
 **Goal**: Build MVP with 26-stage iterative co-improvement workflow
 
-**Sprint 1 Achievement**: Foundation complete - Idea → Title v1 → Script v1 → Cross-reviews working  
-**Sprint 2 Focus**: Implement improvement modules (v2/v3 generation)
+**Sprint 1 Achievement**: Foundation complete - Idea → Title v1 → Script v1 → Cross-reviews working ✅  
+**Sprint 2 Focus**: Implement improvement modules (v2/v3 generation)  
+**Completed Issues Moved**: MVP-001 through MVP-005 + Documentation + Tests → moved to _meta/issues/done/
 
 ---
 
-## Sprint 1: Foundation & Cross-Reviews (Weeks 1-2)
+## Sprint 1: Foundation & Cross-Reviews (Weeks 1-2) ✅ COMPLETE
 
 **Goal**: Idea → Title v1 → Script v1 → Cross-validation reviews  
 **Timeline**: 2 weeks  
-**Active Workers**: Worker02, Worker10, Worker13, Worker15, Worker04
+**Active Workers**: Worker02, Worker10, Worker13, Worker15, Worker04  
+**Status**: ✅ ALL ISSUES COMPLETE (7/7)
 
----
+### Completed Issues (Moved to _meta/issues/done/)
 
-### Week 1: Foundation - Initial Drafts
+All Sprint 1 issues have been completed, reviewed, and moved to the done directory:
 
-**Deliverable**: ✅ COMPLETE - Idea → Title v1 → Script v1 pipeline working
+- ✅ **MVP-001**: T.Idea.Creation (Worker02) - Review: `done/MVP-001-REVIEW.md`
+- ✅ **MVP-002**: T.Title.FromIdea (Worker13) - Review: `done/MVP-002-REVIEW.md`
+- ✅ **MVP-003**: T.Script.FromIdeaAndTitle (Worker02) - Review: `done/MVP-003-REVIEW.md`
+- ✅ **MVP-004**: T.Review.Title.ByScript (Worker10) - Review: `done/MVP-004-REVIEW.md`
+- ✅ **MVP-005**: T.Review.Script.ByTitle (Worker10) - Review: `done/MVP-005-REVIEW.md`
+- ✅ **MVP-DOCS**: MVP Workflow Documentation (Worker15) - Review: `done/MVP-DOCS-REVIEW.md`
+- ✅ **MVP-TEST**: Test Framework (Worker04) - Review: `done/MVP-TEST-REVIEW.md`
 
-#### Commands
-
-```bash
-# MVP-001: Idea Creation (2 days) - COMPLETED ✓
-Worker02: Implement PrismQ.T.Idea.Creation in T/Idea/Creation/
-- Module: PrismQ.T.Idea.Creation
-- Dependencies: None
-- Priority: Critical
-- Effort: 2 days
-- Status: DONE ✓
-- Acceptance Criteria:
-  * Basic idea capture and storage working
-  * Ideas can be created from user input
-  * Ideas can be retrieved by ID
-  * Data persisted to database
-  * Tests: Create, retrieve, list ideas
-
-# MVP-002: Title Generation (2 days) - COMPLETED ✓
-Worker13: Implement PrismQ.T.Title.FromIdea in T/Title/FromIdea/
-- Module: PrismQ.T.Title.FromIdea
-- Dependencies: MVP-001 (can start in parallel)
-- Priority: Critical
-- Effort: 2 days
-- Status: DONE ✓
-- Acceptance Criteria:
-  * Generate 3-5 title variants from idea
-  * Each variant includes rationale
-  * Titles are engaging and accurate
-  * Results stored with idea reference
-  * Tests: Generate titles from sample ideas
-
-# MVP-003: Script Generation (3 days) - COMPLETED ✓
-Worker02: Implement PrismQ.T.Script.FromIdeaAndTitle in T/Script/FromIdeaAndTitle/
-- Module: PrismQ.T.Script.FromIdeaAndTitle
-- Dependencies: MVP-002
-- Priority: Critical
-- Effort: 3 days
-- Status: DONE ✓
-- Acceptance Criteria:
-  * Generate script from idea + title v1
-  * Script includes narrative structure
-  * Script aligns with title and idea
-  * Results stored with references
-  * Tests: Generate scripts from sample idea+title pairs
-
-# Documentation (2 days) - COMPLETED ✓
-Worker15: Create MVP workflow documentation
-- Module: Documentation
-- Dependencies: MVP-001, MVP-002, MVP-003
-- Priority: High
-- Effort: 2 days
-- Status: DONE ✓
-- Deliverable: Complete workflow docs with examples
-- Completed Files:
-  * MVP_WORKFLOW_DOCUMENTATION.md (1033 lines, EN)
-  * MVP_WORKFLOW_DOCUMENTATION_CS.md (548 lines, CS)
-  * WORKFLOW.md and WORKFLOW_CS.md updated with cross-references
-- Acceptance Criteria:
-  * ✅ Document all 26 workflow stages
-  * ✅ Include usage examples (4 complete examples)
-  * ✅ Document iteration loops (3 loop patterns)
-  * ✅ API reference complete (Workflow, Idea, Title, Script, Review, Publication)
-
-# Test Setup (2 days) - COMPLETED ✓
-Worker04: Set up test framework for iterative workflow
-- Module: Testing Infrastructure
-- Dependencies: MVP-001, MVP-002, MVP-003
-- Priority: High
-- Effort: 2 days
-- Status: DONE ✓
-- Deliverable: Test framework supporting iteration paths
-- Completed Files:
-  * pytest.ini (root configuration with markers)
-  * tests/helpers.py (VersionTracker, WorkflowStageValidator, IntegrationTestHelper)
-  * tests/test_helpers.py (35 unit tests)
-  * tests/test_integration_workflow.py (14 integration tests)
-  * tests/README.md (484 lines API reference)
-- Test Coverage: 49/49 tests passing (100%)
-- Acceptance Criteria:
-  * ✅ Unit test framework configured (pytest with markers)
-  * ✅ Integration test support (14 integration tests)
-  * ✅ Test helpers for version tracking (VersionTracker class)
-  * ✅ Comprehensive test documentation (484-line README)
-```
-
----
-
-### Week 2: Cross-Review Cycle
-
-**Deliverable**: ✅ COMPLETE - Cross-validation reviews for title and script complete
-
-#### Commands
-
-```bash
-# MVP-004: Title Review by Script (1 day) - COMPLETED ✓
-Worker10: Implement PrismQ.T.Review.Title.ByScript in T/Review/Title/ByScriptAndIdea/
-- Module: PrismQ.T.Review.Title.ByScript
-- Dependencies: MVP-003 (needs both title v1 and script v1)
-- Priority: Critical
-- Effort: 1 day
-- Status: DONE ✓
-- Completed Files:
-  * T/Review/Title/ByScriptAndIdea/by_script_and_idea.py (700+ lines)
-  * T/Review/Title/ByScriptAndIdea/__init__.py
-  * T/Review/Title/ByScriptAndIdea/_meta/tests/test_by_script_and_idea.py (34 tests)
-  * T/Review/Title/ByScriptAndIdea/_meta/tests/test_acceptance_criteria.py (8 tests)
-  * T/Review/Title/ByScriptAndIdea/README.md
-- Test Coverage: 42/42 tests passing (100%)
-- Acceptance Criteria:
-  * ✅ Review title v1 against script v1 and idea
-  * ✅ Generate structured feedback (alignment, clarity, engagement, SEO)
-  * ✅ Identify mismatches between title and script (keyword extraction + stopword filtering)
-  * ✅ Suggest improvements for title (prioritized by impact score)
-  * ✅ Output JSON format with feedback categories (to_dict() serialization)
-  * ✅ Tests: Review sample title/script pairs (34 unit + 8 acceptance tests)
-
-# MVP-005: Script Review by Title (1 day) - COMPLETED ✓
-Worker10: Implement PrismQ.T.Review.Script.ByTitle in T/Review/Script/ByTitle/
-- Module: PrismQ.T.Review.Script.ByTitle
-- Dependencies: MVP-003
-- Priority: Critical
-- Effort: 1 day
-- Status: DONE ✓
-- Completed Files:
-  * T/Review/Script/ByTitle/script_review_by_title.py (main logic)
-  * T/Review/Script/ByTitle/__init__.py
-  * T/Review/Script/ByTitle/_meta/tests/test_script_review_by_title.py (32 tests)
-  * T/Review/Script/ByTitle/README.md
-- Test Coverage: 32/32 tests passing (100%)
-- Acceptance Criteria:
-  * ✅ Review script v1 against title v1 and idea
-  * ✅ Generate structured feedback (alignment: title 25% + idea 30%, content quality 45%)
-  * ✅ Identify gaps between script content and title promise (regex matching, stopword filtering)
-  * ✅ Suggest improvements for script (prioritized by impact estimates)
-  * ✅ Output JSON format with feedback categories (ScriptReview.to_dict())
-  * ✅ Tests: Review sample script/title pairs (32 unit tests, all scenarios)
-```
+**Achievement Summary**:
+- Foundation pipeline working: Idea → Title v1 → Script v1
+- Cross-review system complete: Title ↔ Script mutual reviews
+- Comprehensive documentation (1033 lines EN + 548 lines CS)
+- Test framework ready (49/49 tests passing, 100%)
+- All acceptance criteria met
+- Sprint 2 unblocked and ready to start
 
 ---
 
@@ -170,25 +48,26 @@ Worker10: Implement PrismQ.T.Review.Script.ByTitle in T/Review/Script/ByTitle/
 
 **Goal**: Create improved v2 versions using cross-reviews, then refine to v3  
 **Timeline**: 2 weeks  
-**Active Workers**: Worker02, Worker10, Worker13
+**Active Workers**: Worker02, Worker10, Worker13  
+**Status**: READY TO START - All Sprint 1 dependencies met ✅
 
 ---
 
 ### Week 3: Generate v2 Versions
 
-**Deliverable**: ✅ Title v2 and script v2 generated with cross-context
+**Deliverable**: Title v2 and script v2 generated with cross-context
 
 #### Commands
 
 ```bash
-# MVP-006: Title Improvements v2 (2 days)
+# MVP-006: Title Improvements v2 (2 days) - READY TO START ✅
 Worker13: Implement PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
 - Module: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
 - Location: T/Title/FromOriginalTitleAndReviewAndScript/
-- Dependencies: MVP-004, MVP-005 (needs both reviews)
+- Dependencies: MVP-004 ✅, MVP-005 ✅ (needs both reviews - COMPLETE)
 - Priority: Critical
 - Effort: 2 days
-- Status: NOT STARTED
+- Status: READY TO START (All dependencies met)
 - Acceptance Criteria:
   * Generate title v2 using feedback from both reviews
   * Use title v1, script v1, and both review feedbacks
@@ -199,11 +78,11 @@ Worker13: Implement PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
 # MVP-007: Script Improvements v2 (2 days)
 Worker02: Implement PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
 - Module: PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle
-- Location: T/Script/FromOriginalScriptAndReviewAndTitle/
+- Location: T/Script/FromOriginalScriptAndReviewAndScript/
 - Dependencies: MVP-006 (needs new title v2)
 - Priority: Critical
 - Effort: 2 days
-- Status: NOT STARTED
+- Status: BLOCKED (waiting for MVP-006)
 - Acceptance Criteria:
   * Generate script v2 using both reviews + new title v2
   * Improve alignment with title v2
@@ -576,43 +455,51 @@ All issues must meet these criteria:
 
 ## Sprint Summary
 
-### Sprint 1 (Weeks 1-2)
-- **Issues**: MVP-001 through MVP-005 (5 issues)
-- **Completed**: MVP-001, MVP-002, MVP-003 (3 issues) ✓
-- **In Progress**: MVP-004 (partial) ~
-- **Not Started**: MVP-005 (1 issue) ❌
-- **Progress**: 60% complete (3 of 5 done)
+### Sprint 1 (Weeks 1-2) ✅ COMPLETE
+- **Issues**: MVP-001 through MVP-005 + Documentation + Tests (7 issues)
+- **Completed**: All 7 issues ✅
+  - MVP-001: Idea Creation ✅
+  - MVP-002: Title Generation ✅
+  - MVP-003: Script Generation ✅
+  - MVP-004: Title Review by Script ✅
+  - MVP-005: Script Review by Title ✅
+  - MVP-DOCS: Workflow Documentation ✅
+  - MVP-TEST: Test Framework ✅
+- **Progress**: 100% complete (7 of 7 done)
+- **Reviews**: All issues reviewed and moved to _meta/issues/done/
 
 ### Sprint 2 (Weeks 3-4)
 - **Issues**: MVP-006 through MVP-011 (6 issues)
-- **Status**: NOT STARTED (blocked by MVP-005)
-- **Dependencies**: Requires MVP-005 complete
+- **Status**: READY TO START ✅ (MVP-006 unblocked)
+- **Dependencies**: All Sprint 1 dependencies met ✅
+- **Next Issue**: MVP-006 (Title v2) ready for Worker13
 
 ### Sprint 3 (Weeks 5-8)
 - **Issues**: MVP-012 through MVP-023 (12 issues)
-- **Status**: NOT STARTED (blocked by Sprint 2)
+- **Status**: BLOCKED (waiting for Sprint 2)
 - **Dependencies**: Requires all Sprint 2 issues complete
 
 ### Overall
 - **Total Issues**: 23 MVP issues
-- **Completed**: 3 issues (13%)
-- **Remaining**: 20 issues (87%)
-- **Estimated Time**: 24 days of work, 7-8 weeks calendar time
+- **Completed**: 7 issues (30%) ✅
+- **Remaining**: 16 issues (70%)
+- **Current Sprint**: Sprint 2 ready to begin
+- **Estimated Remaining Time**: ~18 days of work, 5-6 weeks calendar time
 
 ---
 
 ## Critical Path
 
 ```
-MVP-004 (validate) → MVP-005 (implement) → Sprint 2 → Sprint 3
-        0.5 days          1 day           2 weeks    4 weeks
+Sprint 1 ✅ → MVP-006 (ready) → MVP-007 → Sprint 2 complete → Sprint 3
+  DONE         2 days            2 days      2 weeks         4 weeks
 ```
 
-**Current Blocker**: MVP-005 must be completed to unblock Sprint 2
+**Current Status**: Sprint 1 COMPLETE ✅ - Sprint 2 READY TO START ✅
 
 ---
 
-**Status**: Sprint 1 Week 2 (In Progress)  
-**Next Action**: Worker10 complete MVP-004 validation and MVP-005 implementation  
+**Status**: Sprint 1 Complete | Sprint 2 Ready  
+**Next Action**: Worker13 begin MVP-006 (Title v2 generation)  
 **Updated**: 2025-11-22  
 **Owner**: Worker01
