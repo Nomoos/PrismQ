@@ -183,6 +183,7 @@ The workflow is managed by a comprehensive state machine documented in `WORKFLOW
 - Multi-platform coordination
 
 ### M Module (Metrics/Analytics)
+- **Scope**: Published content monitoring only
 - Analytics API integrations
 - Data processing and insights
 - ML-powered recommendations

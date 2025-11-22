@@ -106,7 +106,7 @@ PrismQ.V.PublishedVideo ─┘
 Performance metrics feed back to analytics:
 
 ```
-PrismQ.P.Published → PrismQ.M.Analytics
+PrismQ.P.Published → PrismQ.M.Analytics (published content metrics)
 ```
 
 ## Key Features
@@ -191,7 +191,7 @@ content.status = ContentStatus.PUBLISHED
   - [PrismQ.T](../T/README.md) (Text Generation) - Text content source
   - [PrismQ.A](../A/README.md) (Audio Generation) - Audio content source
   - [PrismQ.V](../V/README.md) (Video Generation) - Video content source
-- **Next Stage**: [PrismQ.M](../M/README.md) (Metrics/Analytics) - Performance tracking
+- **Next Stage**: [PrismQ.M](../M/README.md) (Metrics/Analytics) - Published content performance tracking
 
 ---
 

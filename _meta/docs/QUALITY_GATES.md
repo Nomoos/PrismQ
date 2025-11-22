@@ -235,8 +235,10 @@ Quality gates are **explicit checkpoints** where content must meet defined crite
 
 ### M Module (Metrics/Analytics)
 
+**Note**: M module monitors **published content metrics only**, not production-stage metrics.
+
 #### Gate 13: Data Quality
-**Entry**: Metrics Collection  
+**Entry**: Published Content Metrics Collection  
 **Exit**: Validated Data → Analytics
 
 **Criteria**:
