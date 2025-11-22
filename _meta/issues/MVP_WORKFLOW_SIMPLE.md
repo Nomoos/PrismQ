@@ -516,18 +516,70 @@ After content passes acceptance checks (Title and Script), it goes through multi
   - Check: Voiceover flow, pronunciation, natural speech, pacing, dramatic delivery
   - Output: PASS → Publishing / FAIL → Script.FromOriginalScriptAndReviewAndTitle
 
-**Final Quality Gate**: This is the LAST review before publishing!
+**Final Quality Gate**: This is the LAST review before GPT expert review!
 
 ---
 
-### Stage 10: PrismQ.T.Publishing.Finalization
+### GPT Expert Review & Polish (Post Local-AI)
+
+After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT-based expert review and polish cycle:
+
+---
+
+### Stage 10A: PrismQ.T.Story.ExpertReview
+**Goal**: GPT-based expert review of complete story  
+**Folder**: `T/Story/ExpertReview/`  
+**Owner**: Worker10 (GPT-4/GPT-5)  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-010A - GPT Expert Story Review
+- **Worker**: Worker10 (with GPT Expert)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Story.ExpertReview
+- **Description**: Holistic GPT-based expert review of complete story
+- **Acceptance Criteria**:
+  - Input: Title + Script + Audience + All local review results
+  - GPT expert review (GPT-4 or GPT-5)
+  - Holistic assessment: story coherence, audience fit, professional quality
+  - Output: JSON with scores and improvement suggestions
+  - Decision: Ready for publish OR needs expert polish
+
+**GPT Expert Loop**: Uses advanced AI for final expert-level assessment.
+
+---
+
+### Stage 10B: PrismQ.T.Story.ExpertPolish
+**Goal**: Apply GPT-based expert improvements  
+**Folder**: `T/Story/ExpertPolish/`  
+**Owner**: Worker10 (GPT-4/GPT-5)  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2 (if needed)
+
+#### MVP Issue: #MVP-010B - GPT Expert Story Polish
+- **Worker**: Worker10 (with GPT Expert)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Story.ExpertPolish
+- **Description**: Apply expert-level improvements using GPT
+- **Acceptance Criteria**:
+  - Input: Current title/script + Expert review JSON
+  - Apply high-priority improvements via GPT
+  - Generate polished versions
+  - Return to Stage 10A for verification
+  - Max 2 iterations
+
+**GPT Expert Polish**: Surgical improvements for professional quality.
+
+---
+
+### Stage 11: PrismQ.T.Publishing.Finalization
 **Goal**: Publish approved content  
 **Folder**: `T/Publishing/Finalization/`  
 **Owner**: Worker02, Worker14  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
 
-#### MVP Issue: #MVP-010 - Basic Publishing
+#### MVP Issue: #MVP-011 - Basic Publishing
 - **Worker**: Worker02 (Python)
 - **Effort**: 2 days
 - **Module**: PrismQ.T.Publishing.Finalization
@@ -665,11 +717,13 @@ After content passes acceptance checks (Title and Script), it goes through multi
 - ✅ Update title if needed (during final review)
 - ✅ **Quality review stages** (NEW - Grammar, Tone, Content, Consistency, Editing)
 - ✅ **Final readability reviews** (NEW - Title and Script voiceover validation)
+- ✅ **GPT expert review and polish** (NEW - Final professional-level quality gate)
 - ✅ Publish content
 
 **Key MVP Features**: 
-- Feedback loops at each review stage allow iterative improvement before proceeding
-- Comprehensive quality reviews ensure professional content (Grammar → Tone → Content → Consistency → Editing → Readability)
+- **Local AI Loop**: Fast iterations through comprehensive quality reviews (Grammar → Tone → Content → Consistency → Editing → Readability)
+- **GPT Expert Loop**: Final professional-level review and polish using GPT-4/GPT-5
+- **Two-Tier Quality**: Cost-effective local AI for most improvements, premium GPT for final polish
 
 ### Nice to Have (Post-MVP)
 - ⏳ AI-powered idea expansion

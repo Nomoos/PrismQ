@@ -210,29 +210,33 @@ Po validaci základního workflow MVP, rozšířit o:
 | #MVP-009E | PrismQ.T.Rewiew.Script.Editing | Revize editace | Worker10 | 0.5d | Kontrola jasnosti a plynulosti |
 | #MVP-009F | PrismQ.T.Rewiew.Title.Readability | Revize čitelnosti titulku | Worker10 | 0.5d | Kontrola čitelnosti titulku |
 | #MVP-009G | PrismQ.T.Rewiew.Script.Readability | Revize čitelnosti skriptu | Worker10 | 0.5d | Kontrola voiceover čitelnosti |
-| #MVP-010 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
+| #MVP-010A | PrismQ.T.Story.ExpertReview | GPT expertní revize | Worker10 | 0.5d | GPT-based expertní revize příběhu |
+| #MVP-010B | PrismQ.T.Story.ExpertPolish | GPT expertní leštění | Worker10 | 0.5d | GPT-based expertní vylepšení |
+| #MVP-011 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
 
-**Celkem**: 16 issues (8 hlavních + 7 revizí kvality + publikování), přibližně 18 dní práce, 4-5 týdnů kalendářního času s 3-4 workery
+**Celkem**: 18 issues (8 hlavních + 7 revizí kvality + 2 GPT expertní + publikování), přibližně 19 dní práce, 4-5 týdnů kalendářního času s 3-4 workery
 
-**Poznámka**: Revize kvality (09A-09G) jsou nyní součástí MVP pro zajištění profesionální kvality obsahu.
+**Poznámka**: Revize kvality (09A-09G) jsou lokální AI. GPT expertní revize (10A-10B) používají GPT-4/GPT-5 pro finální profesionální leštění.
 
 ---
 
 ## Metriky úspěchu
 
 ### Kritéria dokončení MVP
-- ✅ Všechny MVP issues implementovány (základní + revize kvality)
+- ✅ Všechny MVP issues implementovány (základní + revize kvality + GPT expertní)
 - ✅ End-to-end workflow testován včetně všech revizí
 - ✅ Alespoň jeden obsah publikován přes celý workflow
 - ✅ Všechny zpětnovazební smyčky validovány
 - ✅ Všechny fáze revizí kvality (Gramatika, Tón, Obsah, Konzistence, Editace, Čitelnost) funkční
+- ✅ GPT expertní revize a leštění funkční
 - ✅ Dokumentace kompletní
 
 ### Standardy kvality
 - **Zpětnovazební smyčky**: Jasné cesty pro revize a vylepšení
 - **Iterativní vylepšování**: Více cyklů před finální publikací
-- **Revize kvality**: Profesionální kontrola přes všechny dimenze (Gramatika → Tón → Obsah → Konzistence → Editace → Čitelnost)
-- **Jednoduchost**: Základní funkce, ale s vysokou kvalitou
+- **Revize kvality (Lokální AI)**: Profesionální kontrola přes všechny dimenze (Gramatika → Tón → Obsah → Konzistence → Editace → Čitelnost)
+- **GPT Expertní smyčka**: Finální profesionální leštění pomocí GPT-4/GPT-5
+- **Dvoustupňová kvalita**: Efektivní lokální AI pro většinu vylepšení, prémiové GPT pro finální leštění
 - **Pokrytí testy**: >80% pro MVP vlastnosti
 - **Dokumentace**: Jasný průvodce pro každou fázi
 

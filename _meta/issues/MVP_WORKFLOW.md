@@ -15,7 +15,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-## MVP Workflow Sequence (24 Stages + Loops)
+## MVP Workflow Sequence (26 Stages + Loops)
 
 ### Using Real Folder Names with Iterative Co-Improvement:
 
@@ -46,6 +46,9 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
         ↓ YES                                                  │
 13. Check: Is Script Accepted? ─NO─────────────────────────────┘
         ↓ YES
+        
+    ━━━━ Local AI Reviews (Stages 14-20) ━━━━
+        
 14. PrismQ.T.Rewiew.Script.Grammar ←──────────────┐
         ↓                                         │
         ├─FAILS─→ Return to Script.Refinement ───┘
@@ -73,8 +76,15 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 20. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
         ↓                                             │
         ├─FAILS─→ Return to Script.Refinement ───────┘
-        ↓ PASSES
-21. PrismQ.T.Publishing.Finalization
+        ↓ PASSES (All Local AI Reviews Complete)
+        
+    ━━━━ GPT Expert Review Loop (Stages 21-22) ━━━━
+        
+21. PrismQ.T.Story.ExpertReview (GPT-based) ←────────────┐
+        ↓                                                 │
+        ├─ Improvements Needed ─→ 22. Story.ExpertPolish ┘
+        ↓ Ready for Publishing
+23. PrismQ.T.Publishing.Finalization
 ```
 
 ---
@@ -494,20 +504,81 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
   - Natural speech patterns
   - Dramatic pauses and delivery
 - **Output**:
-  - **PASSES**: Proceed to stage 21 (Publishing)
-  - **FAILS**: Return to Script.FromReadabilityReviewAndPreviousScript with readability feedback
+  - **PASSES**: Proceed to stage 21 (GPT Expert Review)
+  - **FAILS**: Return to Script.FromOriginalScriptAndReviewAndTitle with readability feedback
 
-**Final Quality Gate for Script**: This is the LAST review before publishing! **Uses the newest accepted script version.**
+**Final Local AI Quality Gate**: All local AI reviews complete. Ready for GPT expert review.
 
 ---
 
-### Stage 21: PrismQ.T.Publishing.Finalization
+### Stage 21: PrismQ.T.Story.ExpertReview
+**Goal**: GPT-based expert review of complete story  
+**Folder**: `T/Story/ExpertReview/`  
+**Worker**: Worker10 (with GPT-4/GPT-5)  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-021 - GPT Expert Story Review**
+- **Input**: 
+  - Title (final version from all local reviews)
+  - Script (final version from all local reviews)
+  - Audience context (target demographic, platform)
+  - Original idea (for intent verification)
+  - All local review results
+- **Process**:
+  - Compile complete story package
+  - Execute GPT expert review with specialized prompt
+  - Holistic assessment of story coherence, audience fit, professional quality
+  - Generate structured feedback (JSON format)
+  - Make decision: publish or polish
+- **Output**:
+  - **Ready for Publishing**: Proceed to stage 23 (Publishing)
+  - **Improvements Needed**: Proceed to stage 22 (ExpertPolish) with improvement suggestions
+  - Expert review JSON with scores and actionable feedback
+
+**GPT Expert Gate**: Final expert-level quality assessment using GPT-4 or GPT-5.
+
+**Key Differentiator**: Holistic review of complete story (not individual dimensions) with expert-level judgment.
+
+---
+
+### Stage 22: PrismQ.T.Story.ExpertPolish
+**Goal**: Apply GPT-based expert improvements  
+**Folder**: `T/Story/ExpertPolish/`  
+**Worker**: Worker10 (with GPT-4/GPT-5)  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-022 - GPT Expert Story Polish**
+- **Input**: 
+  - Current title and script
+  - Expert review JSON from stage 21
+  - Improvement suggestions (prioritized)
+  - Audience context
+- **Process**:
+  - Analyze expert feedback
+  - Apply high-priority improvements using GPT
+  - Surgical changes for maximum impact
+  - Validate changes align with suggestions
+  - Generate polished versions
+- **Output**:
+  - Title (polished by GPT)
+  - Script (polished by GPT)
+  - Change log with improvements applied
+  - Quality delta (expected improvement)
+  - Return to stage 21 for verification
+
+**GPT Expert Polish**: Final expert-level improvements using GPT-4 or GPT-5.
+
+**Iteration Limit**: Maximum 2 polish iterations (diminishing returns after that).
+
+---
+
+### Stage 23: PrismQ.T.Publishing.Finalization
 **Goal**: Publish approved and validated content  
 **Folder**: `T/Publishing/Finalization/`  
 **Worker**: Worker02, Worker14  
 **Effort**: 1 day
 
-**MVP Issue: #MVP-021 - Content Publishing**
+**MVP Issue: #MVP-023 - Content Publishing**
 - **Input**: 
   - Title (final version - passed all reviews including readability)
   - Script (final version - passed all reviews including readability)
@@ -555,29 +626,44 @@ Stage 17: Consistency Review ✓ PASSES
 Stage 18: Editing Review ✓ PASSES
 Stage 19: Title Readability ✓ PASSES
 Stage 20: Script Readability ✓ PASSES
-Stage 21: Published! 🎉
+Stage 21: GPT Expert Review ✓ READY
+Stage 23: Published! 🎉
 ```
 
-### With Quality Review Failures
+### With Quality Review Failures and GPT Polish
 
 ```
 ...
 Stage 13: Script Accepted ✓
 Stage 14: Grammar Review ✗ FAILS
-   → Script.FromQualityReviewAndPreviousScript (fix grammar)
+   → Script.FromOriginalScriptAndReviewAndTitle (fix grammar)
 Stage 14: Grammar Review ✓ PASSES (retry)
 Stage 15: Tone Review ✓ PASSES
 Stage 16: Content Review ✗ FAILS
-   → Script.FromQualityReviewAndPreviousScript (fix content logic)
+   → Script.FromOriginalScriptAndReviewAndTitle (fix content logic)
 Stage 16: Content Review ✓ PASSES (retry)
 Stage 17: Consistency Review ✓ PASSES
 Stage 18: Editing Review ✓ PASSES
 Stage 19: Title Readability ✓ PASSES
 Stage 20: Script Readability ✗ FAILS
-   → Script.FromReadabilityReviewAndPreviousScript (fix voiceover)
+   → Script.FromOriginalScriptAndReviewAndTitle (fix voiceover)
 Stage 20: Script Readability ✓ PASSES (retry)
-Stage 21: Published! 🎉
+Stage 21: GPT Expert Review → Improvements Suggested
+Stage 22: GPT Expert Polish (apply improvements)
+Stage 21: GPT Expert Review ✓ READY (re-check)
+Stage 23: Published! 🎉
 ```
+
+### Workflow Stages Summary
+
+**Total Stages**: 26 (23 main stages + 3 decision points)
+
+**Stage Groups**:
+1. **Creation** (1-3): Idea, Title v1, Script v1
+2. **Initial Review & Improvement** (4-13): Local AI review loops, acceptance gates
+3. **Quality Reviews** (14-20): Local AI quality dimensions (Grammar → Tone → Content → Consistency → Editing → Readability)
+4. **GPT Expert Loop** (21-22): GPT-based expert review and polish
+5. **Publishing** (23): Final publication
 **Folder**: `T/Publishing/Finalization/`  
 **Worker**: Worker02  
 **Effort**: 2 days
