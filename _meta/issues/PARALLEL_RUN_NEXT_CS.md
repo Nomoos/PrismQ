@@ -2,23 +2,48 @@
 
 > **Poznámka**: Toto je zjednodušený dokument zaměřený na sprinty obsahující pouze sprinty a příkazy.  
 > **Plná detailní verze**: Viz `PARALLEL_RUN_NEXT_FULL_CS.md` pro kompletní vysvětlení workflow.  
-> **Aktuální stav**: Viz `CURRENT_STATE.md` pro hodnocení stavu implementace.
+> **Aktuální stav**: Viz `CURRENT_STATE.md` pro hodnocení stavu implementace.  
+> **Refaktorováno**: 2025-11-22 - Zjednodušeno na 24 issues (z 26 fází), aplikovány SOLID principy, zaměřeno na MVP s menšími kusy práce
 
 **Sprint**: Sprint 1-3 (7-8 týdnů) - Vývoj MVP  
-**Datum**: 2025-11-22  
-**Stav**: Sprint 1 Dokončen ✅ | Sprint 2 Probíhá  
-**Cíl**: Vybudovat MVP s 26-fázovým iterativním workflow společného vylepšování
+**Datum**: 2025-11-22 (Aktualizováno)  
+**Stav**: Sprint 1 Dokončen ✅ | Sprint 2 Dokončen ✅ | Sprint 3 Částečně (5/13)  
+**Cíl**: Vybudovat MVP s 24-fázovým iterativním workflow společného vylepšování (zjednodušeno z 26, optimalizováno pro menší kusy)
 
-**Úspěch Sprint 1**: Základy dokončeny - Nápad → Titulek v1 → Skript v1 → Křížové revize fungují  
-**Zaměření Sprint 2**: Implementovat moduly vylepšování (generování v2/v3)
+**Úspěch Sprint 1**: Základy dokončeny - Nápad → Titulek v1 → Skript v1 → Křížové revize fungují ✅  
+**Úspěch Sprint 2**: Cyklus vylepšování dokončen - generování v2 a v3 funguje ✅  
+**Pokrok Sprint 3**: Brány přijetí + 3 kontroly kvality dokončeny (5/13 - 38%) ⚠️  
+**Dokončené Issues**: MVP-001 až MVP-016 (16 issues) → revize v _meta/issues/done/  
+**Zbývající**: MVP-017 až MVP-024 (8 issues) - Kontroly kvality, Čitelnost, Finální revize, Publikování (3 fáze)
 
 ---
 
-## Sprint 1: Základy a křížové revize (Týdny 1-2)
+## Sprint 1: Základy a křížové revize (Týdny 1-2) ✅ DOKONČENO
 
 **Cíl**: Nápad → Titulek v1 → Skript v1 → Křížové validační revize  
 **Časový horizont**: 2 týdny  
-**Aktivní workeři**: Worker02, Worker10, Worker13, Worker15, Worker04
+**Aktivní workeři**: Worker02, Worker10, Worker13, Worker15, Worker04  
+**Stav**: ✅ VŠECHNY ISSUES DOKONČENY (7/7)
+
+### Dokončené Issues (Přesunuty do _meta/issues/done/)
+
+Všechny Sprint 1 issues byly dokončeny, revidovány a přesunuty do adresáře done:
+
+- ✅ **MVP-001**: T.Idea.Creation (Worker02) - Revize: `done/MVP-001-REVIEW.md`
+- ✅ **MVP-002**: T.Title.FromIdea (Worker13) - Revize: `done/MVP-002-REVIEW.md`
+- ✅ **MVP-003**: T.Script.FromIdeaAndTitle (Worker02) - Revize: `done/MVP-003-REVIEW.md`
+- ✅ **MVP-004**: T.Review.Title.ByScript (Worker10) - Revize: `done/MVP-004-REVIEW.md`
+- ✅ **MVP-005**: T.Review.Script.ByTitle (Worker10) - Revize: `done/MVP-005-REVIEW.md`
+- ✅ **MVP-DOCS**: Dokumentace MVP Workflow (Worker15) - Revize: `done/MVP-DOCS-REVIEW.md`
+- ✅ **MVP-TEST**: Testovací Framework (Worker04) - Revize: `done/MVP-TEST-REVIEW.md`
+
+**Shrnutí úspěchů**:
+- Základní pipeline funguje: Nápad → Titulek v1 → Skript v1
+- Systém křížových revizí dokončen: Titulek ↔ Skript vzájemné revize
+- Kompletní dokumentace (1033 řádků EN + 548 řádků CS)
+- Testovací framework připraven (49/49 testů prochází, 100%)
+- Všechna kritéria přijetí splněna
+- Sprint 2 odblokován a připraven ke spuštění
 
 ---
 
@@ -167,11 +192,31 @@ Worker10: Implementovat PrismQ.T.Review.Script.ByTitle v T/Review/Script/ByTitle
 
 ---
 
-## Sprint 2: Cyklus vylepšování (Týdny 3-4)
+## Sprint 2: Cyklus vylepšování (Týdny 3-4) ✅ DOKONČENO
 
 **Cíl**: Vytvořit vylepšené verze v2 pomocí křížových revizí, pak vybrousit na v3  
 **Časový horizont**: 2 týdny  
-**Aktivní workeři**: Worker02, Worker10, Worker13
+**Aktivní workeři**: Worker02, Worker10, Worker13  
+**Stav**: ✅ VŠECHNY ISSUES DOKONČENY (6/6)
+
+### Dokončené Issues (Přesunuty do _meta/issues/done/)
+
+Všechny Sprint 2 issues byly dokončeny a revidovány:
+
+- ✅ **MVP-006**: Generování Titulku v2 (Worker13) - Revize: `done/MVP-006-REVIEW.md`
+- ✅ **MVP-007**: Generování Skriptu v2 (Worker02) - Revize: `done/MVP-007-REVIEW.md`
+- ✅ **MVP-008**: T.Review.Title.ByScript v2 (Worker10) - Revize: `done/MVP-008-REVIEW.md`
+- ✅ **MVP-009**: Vybrušování Titulku v3 (Worker13) - Revize: `done/MVP-009-REVIEW.md`
+- ✅ **MVP-010**: T.Review.Script.ByTitle v2 (Worker10) - Revize: `done/MVP-010-REVIEW.md`
+- ✅ **MVP-011**: Vybrušování Skriptu v3 (Worker02) - Revize: `done/MVP-011-REVIEW.md`
+
+**Shrnutí úspěchů**:
+- Pipeline generování v2 dokončena: Titulek v2 + Skript v2
+- Vybrušování v3 funguje: Titulek v3 + Skript v3
+- Systém křížových revizí v2 funkční
+- Iterační cyklus vylepšování (v1→v2→v3→v4+) ověřen
+- Všechna kritéria přijetí splněna
+- Sprint 3 odblokován
 
 ---
 
@@ -284,263 +329,210 @@ Worker02: Implementovat PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle (v3)
 
 ---
 
-## Sprint 3: Validace a kvalita (Týdny 5-8)
+## Sprint 3: Validace a kvalita (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/13 Dokončeno)
 
-**Cíl**: Brány přijetí + komplexní kontroly kvality + GPT expert review + publikování  
+**Cíl**: Brány přijetí + komplexní kontroly kvality + finální revize + publikování (3 fáze)  
 **Časový horizont**: 4 týdny  
-**Aktivní workeři**: Worker02, Worker10, Worker04, Worker15
+**Aktivní workeři**: Worker02, Worker10, Worker04, Worker15  
+**Stav**: PROBÍHÁ - Brány přijetí + 3 kontroly kvality dokončeny
+
+### Dokončené Issues (Přesunuty do _meta/issues/done/)
+
+Sprint 3 issues dokončené dosud:
+
+- ✅ **MVP-012**: T.Review.Title.Acceptance (Worker10) - Revize: `done/MVP-012-REVIEW.md`
+- ✅ **MVP-013**: T.Review.Script.Acceptance (Worker10) - Revize: `done/MVP-013-REVIEW.md`
+- ✅ **MVP-014**: T.Review.Script.Grammar (Worker10) - Revize: `done/MVP-014-REVIEW.md`
+- ✅ **MVP-015**: T.Review.Script.Tone (Worker10) - Revize: `done/MVP-015-REVIEW.md`
+- ✅ **MVP-016**: T.Review.Script.Content (Worker10) - Revize: `done/MVP-016-REVIEW.md` (sloučeno z main)
+
+**Shrnutí úspěchů**:
+- Systém bran přijetí funguje (titulek + skript)
+- Kontrola gramatiky operační
+- Kontrola tónu operační
+- Kontrola obsahu operační (sloučeno z main)
+- Implementována logika smyčky zpět
+- 5 z 11 Sprint 3 issues dokončeno (45%)
 
 ---
 
-### Týden 5: Brány přijetí + kontroly kvality (část 1)
+### Zbývající práce Sprint 3 (8 issues)
 
-**Výstup**: ✅ Brány přijetí prošly + kontroly Grammar, Tone, Content dokončeny
-
-#### Příkazy
+#### Kontroly kvality (2 zbývající)
 
 ```bash
-# MVP-012: Brána přijetí titulku (0.5 dne)
-Worker10: Implementovat PrismQ.T.Review.Title.Acceptance v T/Review/Title/
-- Modul: PrismQ.T.Review.Title.Acceptance
-- Závislosti: MVP-011 (potřeba nejnovější verze titulku)
-- Priorita: Kritická
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Zkontrolovat, zda titulek (nejnovější verze) splňuje kritéria přijetí
-  * Kritéria: jasnost, poutavost, sladění se skriptem
-  * Pokud PŘIJATO: pokračovat na MVP-013
-  * Pokud NEPŘIJATO: smyčka zpět na MVP-008 (revize → vybrousit na další verzi)
-  * Vždy používá nejnovější verzi titulku
-  * Testy: Testovat scénáře přijetí a odmítnutí
-
-# MVP-013: Brána přijetí skriptu (0.5 dne)
-Worker10: Implementovat PrismQ.T.Review.Script.Acceptance v T/Review/Script/
-- Modul: PrismQ.T.Review.Script.Acceptance
-- Závislosti: MVP-012 (titulek musí být přijat jako první)
-- Priorita: Kritická
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Zkontrolovat, zda skript (nejnovější verze) splňuje kritéria přijetí
-  * Kritéria: úplnost, koherence, sladění s titulkem
-  * Pokud PŘIJATO: pokračovat na MVP-014
-  * Pokud NEPŘIJATO: smyčka zpět na MVP-010 (revize → vybrousit na další verzi)
-  * Vždy používá nejnovější verzi skriptu
-  * Testy: Testovat scénáře přijetí a odmítnutí
-
-# MVP-014: Kontrola gramatiky (0.5 dne)
-Worker10: Implementovat PrismQ.T.Review.Script.Grammar v T/Review/Grammar/
-- Modul: PrismQ.T.Review.Script.Grammar
-- Závislosti: MVP-013 (skript musí být přijat)
-- Priorita: Vysoká
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Zkontrolovat gramatiku, interpunkci, pravopis, syntaxi, čas
-  * Generovat specifické opravy s odkazy na řádky
-  * Pokud PROJDE: pokračovat na MVP-015
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON s problémy a navrhovanými opravami
-  * Testy: Testovat s gramaticky správnými a nesprávnými skripty
-
-# MVP-015: Kontrola tónu (0.5 dne)
-Worker10: Implementovat PrismQ.T.Review.Script.Tone v T/Review/Tone/
-- Modul: PrismQ.T.Review.Script.Tone
-- Závislosti: MVP-014 (gramatika musí projít)
-- Priorita: Vysoká
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Zkontrolovat emocionální intenzitu, sladění stylu, konzistenci hlasu
-  * Vyhodnotit přiměřenost tónu pro typ obsahu
-  * Pokud PROJDE: pokračovat na MVP-016
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON s analýzou tónu
-  * Testy: Testovat s různými styly tónu
-
-# MVP-016: Kontrola obsahu (0.5 dne)
-Worker10: Implementovat PrismQ.T.Review.Script.Content v T/Review/Content/
-- Modul: PrismQ.T.Review.Script.Content
-- Závislosti: MVP-015 (tón musí projít)
-- Priorita: Vysoká
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Zkontrolovat logické mezery, problémy zápletky, motivaci postav, tempo
-  * Ověřit narativní koherenci
-  * Pokud PROJDE: pokračovat na MVP-017
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON s problémy obsahu
-  * Testy: Testovat s koherentními a nekoherentními skripty
-```
-
----
-
-### Týden 6: Kontroly kvality (část 2) + čitelnost
-
-**Výstup**: ✅ Všechny kontroly kvality + kontroly čitelnosti prošly
-
-#### Příkazy
-
-```bash
-# MVP-017: Kontrola konzistence (0.5 dne)
+# MVP-017: Kontrola konzistence (0.5 dne) - NEZAHÁJENO ❌ (DALŠÍ PRIORITA)
 Worker10: Implementovat PrismQ.T.Review.Script.Consistency v T/Review/Consistency/
 - Modul: PrismQ.T.Review.Script.Consistency
-- Závislosti: MVP-016 (obsah musí projít)
-- Priorita: Vysoká
+- Závislosti: MVP-016 ✅ (obsah musí projít - DOKONČENO)
+- Priorita: VYSOKÁ
 - Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
+- Účel: Zkontrolovat jména postav, časovou osu, lokace, rozpory
 - Kritéria přijetí:
-  * Zkontrolovat jména postav, časovou osu, lokace, opakované detaily
-  * Identifikovat vnitřní rozpory
-  * Pokud PROJDE: pokračovat na MVP-018
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON s problémy konzistence
-  * Testy: Testovat s konzistentními a nekonzistentními skripty
+  * Validovat konzistenci jmen postav v celém skriptu
+  * Zkontrolovat časovou osu na logickou posloupnost a rozpory
+  * Ověřit, že zmínky o lokacích jsou konzistentní
+  * Detekovat opakované detaily a rozpory
+  * Výstup JSON s nalezenými konkrétními problémy konzistence
+  * Rozhodnutí Projde/Selže: PROJDE → MVP-018, SELŽE → smyčka vybrušování
+  * Testy: Scénáře konzistentního a nekonzistentního skriptu
 
-# MVP-018: Kontrola editace (0.5 dne)
+# MVP-018: Kontrola editace (0.5 dne) - NEZAHÁJENO ❌
 Worker10: Implementovat PrismQ.T.Review.Script.Editing v T/Review/Editing/
 - Modul: PrismQ.T.Review.Script.Editing
 - Závislosti: MVP-017 (konzistence musí projít)
-- Priorita: Vysoká
+- Priorita: VYSOKÁ
 - Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
+- Účel: Přepisy vět, strukturální opravy, odstranění redundance
 - Kritéria přijetí:
-  * Přepisy vět, strukturální opravy, odstranění redundance
-  * Zlepšit jasnost a tok
-  * Pokud PROJDE: pokračovat na MVP-019
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON s návrhy úprav
-  * Testy: Testovat zlepšení kvality editace
+  * Identifikovat věty vyžadující přepsání pro jasnost
+  * Detekovat strukturální problémy v organizaci skriptu
+  * Najít a označit redundantní obsah
+  * Navrhnout konkrétní vylepšení editace
+  * Výstup JSON s doporučeními pro editaci
+  * Rozhodnutí Projde/Selže: PROJDE → MVP-019, SELŽE → smyčka vybrušování
+  * Testy: Scénáře dobře a špatně editovaného skriptu
+```
 
-# MVP-019: Kontrola čitelnosti titulku (0.5 dne)
+#### Kontroly čitelnosti (2 zbývající)
+
+```bash
+# MVP-019: Kontrola čitelnosti titulku (0.5 dne) - NEZAHÁJENO ❌
 Worker10: Implementovat PrismQ.T.Review.Title.Readability v T/Review/Readability/
 - Modul: PrismQ.T.Review.Title.Readability
 - Závislosti: MVP-018 (editace musí projít)
-- Priorita: Vysoká
+- Priorita: STŘEDNÍ
 - Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
+- Účel: Zkontrolovat jasnost, délku, poutavost pro voiceover
 - Kritéria přijetí:
-  * Zkontrolovat jasnost, délku, poutavost pro voiceover
-  * Vyhodnotit výslovnost a tok
-  * Pokud PROJDE: pokračovat na MVP-020
-  * Pokud SELŽE: návrat k vybrušování titulku se zpětnou vazbou
-  * Výstup JSON se skóre čitelnosti a problémy
-  * Testy: Testovat s čitelnými a obtížnými titulky
+  * Vyhodnotit jasnost a srozumitelnost titulku
+  * Zkontrolovat délku titulku (optimální pro voiceover a platformy)
+  * Posoudit poutavost a efektivitu háčku
+  * Ověřit obtížnost výslovnosti
+  * Vypočítat skóre čitelnosti
+  * Výstup JSON s metrikami čitelnosti a problémy
+  * Rozhodnutí Projde/Selže: PROJDE → MVP-020, SELŽE → smyčka vybrušování titulku
+  * Testy: Scénáře čitelných a obtížně čitelných titulků
 
-# MVP-020: Kontrola čitelnosti skriptu (0.5 dne)
+# MVP-020: Kontrola čitelnosti skriptu (0.5 dne) - NEZAHÁJENO ❌
 Worker10: Implementovat PrismQ.T.Review.Script.Readability v T/Review/Readability/
 - Modul: PrismQ.T.Review.Script.Readability
 - Závislosti: MVP-019 (čitelnost titulku musí projít)
-- Priorita: Vysoká
+- Priorita: STŘEDNÍ
 - Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
+- Účel: Zkontrolovat přirozený tok, výslovnost, tempo pro voiceover
 - Kritéria přijetí:
-  * Zkontrolovat přirozený tok, výslovnost, tempo pro voiceover
-  * Identifikovat obtížné pasáže
-  * Pokud PROJDE: pokračovat na MVP-021
-  * Pokud SELŽE: návrat k vybrušování skriptu se zpětnou vazbou
-  * Výstup JSON se skóre čitelnosti a problémy
-  * Testy: Testovat s různými styly skriptů
+  * Vyhodnotit přirozený tok pro mluvení/voiceover
+  * Identifikovat obtížně vyslovitelná slova nebo fráze
+  * Zkontrolovat tempo (příliš rychlé/pomalé sekce)
+  * Vypočítat skóre čitelnosti pro audio
+  * Detekovat neohrabané konstrukce vět
+  * Výstup JSON s metrikami čitelnosti a problematickými sekcemi
+  * Rozhodnutí Projde/Selže: PROJDE → MVP-021, SELŽE → smyčka vybrušování skriptu
+  * Testy: Scénáře přirozeného a neohrabaného toku skriptu
+```
 
-# Testování cest kvality (2 dny)
-Worker04: Testovat všechny cesty kontrol kvality
-- Závislosti: MVP-017 až MVP-020
-- Priorita: Vysoká
-- Úsilí: 2 dny
+#### Finální revize a publikování (4 zbývající)
+
+```bash
+# MVP-021: Finální revize příběhu (0.5 dne) - NEZAHÁJENO ❌
+Worker10: Implementovat PrismQ.T.Story.FinalReview v T/Story/FinalReview/
+- Modul: PrismQ.T.Story.FinalReview
+- Závislosti: MVP-020 (všechny kontroly kvality prošly)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
 - Stav: NEZAHÁJENO
-- Výstup: Komplexní testovací sada pro kontroly kvality
+- Účel: Holistické finální hodnocení před publikováním
 - Kritéria přijetí:
-  * Testovat všechny scénáře kontrol kvality
-  * Testovat selhání jednotlivých kontrol a obnovení
-  * Testovat více selhání v řadě
-  * Testovat smyčku zpět k vybrušování a re-kontrole
-  * Ověřit sledování verzí skrze smyčky
+  * Provést komplexní hodnocení příběhu (titulek + skript společně)
+  * Zkontrolovat celkové sladění mezi titulkem a skriptem
+  * Ověřit, že všechny brány kvality úspěšně prošly
+  * Generovat finální hodnocení připravenosti
+  * Výstup JSON s finálním stavem schválení a případnými doporučeními
+  * Rozhodnutí Projde/Selže: PROJDE → MVP-022 (publikování), SELŽE → cílené vybrušování
+  * Testy: Scénáře připraveno k publikování a vyžaduje vylepšení
+
+# MVP-022: Publikování - Označení v databázi (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.DatabaseMarking v T/Publishing/DatabaseMarking/
+- Modul: PrismQ.T.Publishing.DatabaseMarking
+- Závislosti: MVP-021 (finální revize musí projít)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
+- Stav: NEZAHÁJENO
+- Účel: Označit obsah jako publikovaný v databázi s metadaty
+- Kritéria přijetí:
+  * Označit stav obsahu jako "publikováno" v databázi
+  * Zaznamenat časové razítko publikování a metadata
+  * Uložit finální verzi s kompletní historií verzí
+  * Aktualizovat indikátory stavu workflow
+  * Výstup potvrzení s ID publikace
+  * Testy: Ověření stavu databáze, validace metadat
+
+# MVP-023: Publikování - Export obsahu (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.ContentExport v T/Publishing/ContentExport/
+- Modul: PrismQ.T.Publishing.ContentExport
+- Závislosti: MVP-022 (databáze musí být označena)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
+- Stav: NEZAHÁJENO
+- Účel: Exportovat obsah do více formátů
+- Kritéria přijetí:
+  * Exportovat do JSON formátu s kompletní datovou strukturou
+  * Exportovat do Markdown formátu pro dokumentaci
+  * Exportovat do HTML formátu pro webové zobrazení
+  * Validovat všechny exportní formáty
+  * Výstup cest exportu pro každý formát
+  * Testy: Validace formátu, kontroly integrity obsahu
+
+# MVP-024: Publikování - Generování zprávy (0.5 dne) - NEZAHÁJENO ❌
+Worker02: Implementovat PrismQ.T.Publishing.ReportGeneration v T/Publishing/ReportGeneration/
+- Modul: PrismQ.T.Publishing.ReportGeneration
+- Závislosti: MVP-023 (exporty musí být dokončeny)
+- Priorita: VYSOKÁ
+- Úsilí: 0.5 dne
+- Stav: NEZAHÁJENO
+- Účel: Generovat kompletní zprávu o publikování
+- Kritéria přijetí:
+  * Generovat kompletní zprávu o publikování se všemi metrikami
+  * Zahrnout statistiky workflow (verze, revize, iterace)
+  * Dokumentovat všechny prošlé brány kvality
+  * Seznam všech umístění a formátů exportu
+  * Shrnutí metadat obsahu
+  * Výstup potvrzení dokončení publikování
+  * Testy: End-to-end workflow publikování s různými typy obsahu
 ```
 
 ---
 
-### Týden 7-8: GPT expert review + publikování
 
-**Výstup**: ✅ Kompletní MVP s expert review a publikováním
+## Příležitosti pro paralelní provádění
 
-#### Příkazy
-
+### Aktuálně k dispozici (Lze spustit nyní)
 ```bash
-# MVP-021: GPT expert story review (0.5 dne)
-Worker10: Implementovat PrismQ.T.Story.ExpertReview v T/Story/ExpertReview/
-- Modul: PrismQ.T.Story.ExpertReview
-- Závislosti: MVP-020 (všechny kontroly kvality prošly)
-- Priorita: Vysoká
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Holistické hodnocení pomocí GPT-4/GPT-5
-  * Generovat strukturovanou zpětnou vazbu (JSON formát)
-  * Vyhodnotit celkovou kvalitu a dopad
-  * Pokud PŘIPRAVENO: pokračovat na MVP-023 (publikování)
-  * Pokud VYŽADUJE VYLEPŠENÍ: pokračovat na MVP-022
-  * Testy: Testovat integraci GPT a parsování zpětné vazby
-
-# MVP-022: GPT expert story polish (0.5 dne)
-Worker10: Implementovat PrismQ.T.Story.ExpertPolish v T/Story/ExpertPolish/
-- Modul: PrismQ.T.Story.ExpertPolish
-- Závislosti: MVP-021 (expert review s potřebou vylepšení)
-- Priorita: Vysoká
-- Úsilí: 0.5 dne
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Aplikovat vylepšení založená na GPT
-  * Chirurgické změny pro maximální dopad
-  * Návrat na MVP-021 pro ověření (max 2 iterace)
-  * Uložit vybroušenou verzi
-  * Testy: Testovat aplikaci vybrušování a ověřovací smyčku
-
-# MVP-023: Publikování (2 dny)
-Worker02: Implementovat PrismQ.T.Publishing.Finalization v T/Publishing/Finalization/
-- Modul: PrismQ.T.Publishing.Finalization
-- Závislosti: MVP-021 (expert review připraven)
-- Priorita: Kritická
-- Úsilí: 2 dny
-- Stav: NEZAHÁJENO
-- Kritéria přijetí:
-  * Označit obsah jako "publikovaný"
-  * Export do výstupního formátu (JSON, Markdown, atd.)
-  * Uložit publikovanou verzi se všemi sledovanými verzemi
-  * Generovat zprávu o publikování
-  * Testy: Testovat workflow publikování end-to-end
-
-# E2E testování (2 dny)
-Worker04: Dokončit end-to-end testování se všemi cestami
-- Závislosti: Všechny MVP vlastnosti
-- Priorita: Vysoká
-- Úsilí: 2 dny
-- Stav: NEZAHÁJENO
-- Výstup: Plná E2E testovací sada
-- Kritéria přijetí:
-  * Testovat šťastnou cestu (vše projde napoprvé)
-  * Testovat smyčky přijetí titulku/skriptu
-  * Testovat selhání kontrol kvality a obnovení
-  * Testovat smyčky čitelnosti
-  * Testovat smyčku GPT expert review
-  * Testovat více iterací (v4, v5, v6, v7, atd.)
-  * Ověřit sledování verzí v celém workflow
-
-# Finální dokumentace (2 dny)
-Worker15: Dokončit uživatelskou příručku se všemi fázemi
-- Závislosti: Všechny MVP vlastnosti
-- Priorita: Vysoká
-- Úsilí: 2 dny
-- Stav: NEZAHÁJENO
-- Výstup: Kompletní uživatelská dokumentace
-- Kritéria přijetí:
-  * Dokumentovat všech 26 fází workflow
-  * Zahrnout kritéria kontrol kvality
-  * Dokumentovat příklady iteračních smyček
-  * Vysvětlit sledování verzí (v1-v7+)
-  * Poskytnout příklady použití a tutoriály
+# MVP-017: Kontrola konzistence - PŘIPRAVENO KE SPUŠTĚNÍ ✅
+Worker10: Implementovat Kontrolu konzistence
+- Všechny závislosti splněny (MVP-016 dokončeno)
+- Odhadováno: 0.5 dne
+- Lze spustit okamžitě
 ```
+
+### Blokováno (Čeká na závislosti)
+```
+MVP-018 → blokováno MVP-017
+MVP-019 → blokováno MVP-018
+MVP-020 → blokováno MVP-019
+MVP-021 → blokováno MVP-020
+MVP-022 → blokováno MVP-021
+MVP-023 → blokováno MVP-022
+MVP-024 → blokováno MVP-023
+```
+
+### Žádné příležitosti pro paralelní provádění
+Kvůli sekvenčním závislostem kontrol kvality musí být issues dokončeny v pořadí. Není možná žádná paralelní práce v aktuálním sprintu.
 
 ---
 
@@ -552,6 +544,35 @@ Všechny issues musí splňovat tato kritéria:
 - **Malé**: Maximálně 0.5-2 dny úsilí
 - **Zaměřené**: Jedna zodpovědnost na issue
 - **Testovatelné**: Lze ověřit nezávisle
+
+### Aplikace SOLID principů
+
+Každá issue je navržena podle SOLID principů:
+
+#### Princip jedné zodpovědnosti (S)
+- Každá issue se zaměřuje na JEDEN konkrétní modul nebo funkci
+- Příklad: MVP-017 se zabývá pouze kontrolou konzistence, ne editací nebo gramatikou
+- Jasné, zaměřené prohlášení o účelu pro každou issue
+
+#### Princip otevřeno/uzavřeno (O)
+- Moduly jsou rozšiřitelné bez úprav
+- Moduly revizí následují konzistentní vzory
+- Nové typy revizí lze přidat bez změny existujících
+
+#### Liskovův substituce princip (L)
+- Všechny moduly revizí následují stejný interface kontrakt
+- Jakýkoli modul revize lze použít zaměnitelně v pipeline
+- Konzistentní formáty vstupu/výstupu napříč podobnými moduly
+
+#### Princip segregace rozhraní (I)
+- Moduly vystavují pouze potřebnou funkcionalitu
+- Čistá, minimální veřejná API
+- Žádné vynucené závislosti na nepoužívané funkcionalitě
+
+#### Princip inverze závislostí (D)
+- Moduly závisí na abstrakcích (vzory rozhraní revizí)
+- Workflow vysoké úrovně nezávisí na implementačních detailech nízké úrovně
+- Volná vazba mezi fázemi pipeline
 
 ### Kritéria přijetí
 - **Specifická**: Jasné, měřitelné výsledky
@@ -577,43 +598,76 @@ Všechny issues musí splňovat tato kritéria:
 
 ## Souhrn sprintů
 
-### Sprint 1 (Týdny 1-2)
-- **Issues**: MVP-001 až MVP-005 (5 issues)
-- **Dokončeno**: MVP-001, MVP-002, MVP-003 (3 issues) ✓
-- **Probíhá**: MVP-004 (částečně) ~
-- **Nezahájeno**: MVP-005 (1 issue) ❌
-- **Pokrok**: 60% dokončeno (3 z 5 hotovo)
+### Sprint 1 (Týdny 1-2) ✅ DOKONČENO
+- **Issues**: MVP-001 až MVP-005 + Dokumentace + Testy (7 issues)
+- **Dokončeno**: Všech 7 issues ✅
+  - MVP-001: Vytvoření nápadu ✅
+  - MVP-002: Generování titulku ✅
+  - MVP-003: Generování skriptu ✅
+  - MVP-004: Revize titulku podle skriptu ✅
+  - MVP-005: Revize skriptu podle titulku ✅
+  - MVP-DOCS: Dokumentace Workflow ✅
+  - MVP-TEST: Testovací Framework ✅
+- **Pokrok**: 100% dokončeno (7 z 7 hotovo)
+- **Revize**: Všechny issues revidovány v _meta/issues/done/
 
-### Sprint 2 (Týdny 3-4)
+### Sprint 2 (Týdny 3-4) ✅ DOKONČENO
 - **Issues**: MVP-006 až MVP-011 (6 issues)
-- **Stav**: NEZAHÁJENO (blokováno MVP-005)
-- **Závislosti**: Vyžaduje dokončení MVP-005
+- **Dokončeno**: Všech 6 issues ✅
+  - MVP-006: Generování Titulku v2 ✅
+  - MVP-007: Generování Skriptu v2 ✅
+  - MVP-008: Revize Titulku v2 ✅
+  - MVP-009: Vybrušování Titulku v3 ✅
+  - MVP-010: Revize Skriptu v2 ✅
+  - MVP-011: Vybrušování Skriptu v3 ✅
+- **Pokrok**: 100% dokončeno (6 z 6 hotovo)
+- **Revize**: Všechny issues revidovány v _meta/issues/done/
 
-### Sprint 3 (Týdny 5-8)
-- **Issues**: MVP-012 až MVP-023 (12 issues)
-- **Stav**: NEZAHÁJENO (blokováno Sprintem 2)
-- **Závislosti**: Vyžaduje dokončení všech issues Sprintu 2
+### Sprint 3 (Týdny 5-8) ⚠️ ČÁSTEČNĚ (5/13 Dokončeno)
+- **Issues**: MVP-012 až MVP-024 (13 issues)
+- **Dokončeno**: 5 issues ✅
+  - MVP-012: Brána přijetí titulku ✅
+  - MVP-013: Brána přijetí skriptu ✅
+  - MVP-014: Kontrola gramatiky ✅
+  - MVP-015: Kontrola tónu ✅
+  - MVP-016: Kontrola obsahu ✅ (sloučeno z main)
+- **Zbývající**: 8 issues ❌
+  - MVP-017: Kontrola konzistence (VYSOKÁ priorita - DALŠÍ)
+  - MVP-018: Kontrola editace (VYSOKÁ priorita)
+  - MVP-019: Čitelnost titulku (STŘEDNÍ priorita)
+  - MVP-020: Čitelnost skriptu (STŘEDNÍ priorita)
+  - MVP-021: Finální revize příběhu (VYSOKÁ priorita)
+  - MVP-022: Publikování - Označení v databázi (VYSOKÁ priorita)
+  - MVP-023: Publikování - Export obsahu (VYSOKÁ priorita)
+  - MVP-024: Publikování - Generování zprávy (VYSOKÁ priorita)
+- **Pokrok**: 38% dokončeno (5 z 13 hotovo)
+- **Revize**: Dokončené issues revidovány v _meta/issues/done/
 
 ### Celkově
-- **Celkem issues**: 23 MVP issues
-- **Dokončeno**: 3 issues (13%)
-- **Zbývá**: 20 issues (87%)
-- **Odhadovaný čas**: 24 dní práce, 7-8 týdnů kalendářního času
+- **Celkem issues**: 24 MVP issues (rozděleno z 22 - publikování rozděleno na 3 menší kusy)
+- **Dokončeno**: 16 issues (67%) ✅
+- **Zbývá**: 8 issues (33%)
+- **Aktuální sprint**: Sprint 3 (částečný pokrok)
+- **Odhadovaný zbývající čas**: ~4-5 dní práce, 1.5-2 týdny kalendářního času
 
 ---
 
 ## Kritická cesta
 
 ```
-MVP-004 (validace) → MVP-005 (implementace) → Sprint 2 → Sprint 3
-        0.5 dne            1 den              2 týdny    4 týdny
+Sprint 1 ✅ → Sprint 2 ✅ → MVP-017 (další) → Kontroly kvality → Publikování (3 fáze)
+  HOTOVO       HOTOVO        0.5 dne          2 dny             1.5 dne
 ```
 
-**Aktuální bloker**: MVP-005 musí být dokončeno pro odblokování Sprintu 2
+**Aktuální stav**: Sprint 1 DOKONČEN ✅ | Sprint 2 DOKONČEN ✅ | Sprint 3 PROBÍHÁ (38%)
+
+**Další priorita**: MVP-017 (Kontrola konzistence) - VYSOKÁ priorita, blokuje zbývající kontroly kvality
 
 ---
 
-**Stav**: Sprint 1 Týden 2 (probíhá)  
-**Další akce**: Worker10 dokončit validaci MVP-004 a implementaci MVP-005  
-**Aktualizováno**: 2025-11-22  
-**Vlastník**: Worker01
+**Stav**: Sprint 3 probíhá (5/11 Dokončeno)  
+**Další akce**: Worker10 implementovat MVP-017 (Kontrola konzistence)  
+**Aktualizováno**: 2025-11-22 (Refaktorováno - SOLID principy, zaměření na MVP, zjednodušeno)  
+**Vlastník**: Worker01  
+**Dokument pokroku**: Viz `PROGRESS_ASSESSMENT_2025-11-22.md` pro detailní analýzu  
+**Kontrola integrity**: Viz `INTEGRITY_CHECK_2025-11-22.md` pro ověření po sloučení
