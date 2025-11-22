@@ -493,8 +493,8 @@ Track workflow health with key indicators:
 - **[MVP Workflow Documentation](./MVP_WORKFLOW_DOCUMENTATION.md)** - Complete 26-stage MVP workflow with examples and API reference
 - **[IdeaInspiration Module](./T/Idea/Inspiration/README.md)** - Inspiration and collection
 - **[Idea Model](./T/Idea/Model/README.md)** - Core data model
-- **[Content Production Workflow States Research](./_ meta/research/content-production-workflow-states.md)** - Detailed research
-- **[YouTube Metadata Optimization](../_meta/research/youtube-metadata-optimization-smart-strategy.md)** - Platform strategy
+- **[Content Production Workflow States Research](./_meta/research/content-production-workflow-states.md)** - Detailed research
+- **[YouTube Metadata Optimization](./_meta/research/youtube-metadata-optimization-smart-strategy.md)** - Platform strategy
 
 ## Version History
 

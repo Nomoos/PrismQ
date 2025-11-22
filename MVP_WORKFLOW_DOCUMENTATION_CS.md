@@ -209,9 +209,7 @@ idea = {
 
 ### Fáze 2-23: Další fáze workflow
 
-Pro podrobnou dokumentaci všech zbývajících fází (2-23) s kompletními API příklady, vstupy, výstupy a příklady použití, viz zdrojový soubor [MVP_WORKFLOW.md](./_meta/issues/MVP_WORKFLOW.md).
-
-**Souhrn fází**:
+Pro úplnost jsou zde shrnuty všechny zbývající fáze workflow. Každá fáze má svůj specifický účel a přispívá k celkovému procesu vytváření kvalitn obsahu.
 
 **Fáze 2**: Generování titulku v1 z nápadu  
 **Fáze 3**: Generování skriptu v1 z nápadu a titulku  
@@ -222,6 +220,8 @@ Pro podrobnou dokumentaci všech zbývajících fází (2-23) s kompletními API
 **Fáze 14-20**: Kvalitní recenze (Gramatika, Tón, Obsah, Konzistence, Editace, Čitelnost)  
 **Fáze 21-22**: GPT expertní recenze a leštění  
 **Fáze 23**: Finalizace publikace
+
+Podrobný popis každé fáze včetně API příkladů, vstupů a výstupů je k dispozici v anglické verzi tohoto dokumentu: [MVP_WORKFLOW_DOCUMENTATION.md](./MVP_WORKFLOW_DOCUMENTATION.md), nebo v původním specifikačním dokumentu [MVP_WORKFLOW.md](./_meta/issues/MVP_WORKFLOW.md).
 
 ---
 
