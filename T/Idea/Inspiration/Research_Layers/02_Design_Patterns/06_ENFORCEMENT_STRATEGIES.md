@@ -5,7 +5,7 @@
 
 ## Overview
 
-This document explores strategies for enforcing layered architecture conventions in PrismQ.IdeaInspiration, ranging from manual processes to automated tooling.
+This document explores strategies for enforcing layered architecture conventions in PrismQ.T.Idea.Inspiration, ranging from manual processes to automated tooling.
 
 ## 1. Manual Enforcement
 

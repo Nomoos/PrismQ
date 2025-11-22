@@ -279,7 +279,7 @@ script = generator.create_script(story_concept)
 - **[Full Research](./MODEL_EXTENSION_RESEARCH.md)** - Comprehensive analysis
 - **[Model README](../../Model/README.md)** - Updated architecture
 - **[Database Integration](./DATABASE_INTEGRATION_SUMMARY.md)** - Dual-save pattern
-- **[PR #69](https://github.com/Nomoos/PrismQ.IdeaInspiration/pull/69)** - Dual-save implementation
+- **[PR #69](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/pull/69)** - Dual-save implementation
 
 ---
 

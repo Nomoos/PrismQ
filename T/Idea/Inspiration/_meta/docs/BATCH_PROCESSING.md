@@ -302,7 +302,7 @@ class TextClassifier:
 ### Import Errors
 Make sure all required modules are in the Python path:
 ```bash
-export PYTHONPATH="${PYTHONPATH}:/path/to/PrismQ.IdeaInspiration"
+export PYTHONPATH="${PYTHONPATH}:/path/to/PrismQ.T.Idea.Inspiration"
 ```
 
 ### Missing Dependencies
@@ -314,7 +314,7 @@ pip install python-dotenv
 ### CLI Not Finding Modules
 Run CLI from the repository root:
 ```bash
-cd /path/to/PrismQ.IdeaInspiration
+cd /path/to/PrismQ.T.Idea.Inspiration
 python3 Scoring/src/cli.py < input.json
 ```
 

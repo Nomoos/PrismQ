@@ -1,6 +1,6 @@
 # HackerNews Source Module
 
-**HackerNews content scraping module for PrismQ.IdeaInspiration**
+**HackerNews content scraping module for PrismQ.T.Idea.Inspiration**
 
 ## Overview
 

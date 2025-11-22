@@ -594,7 +594,7 @@ For faster module execution:
 
 1. **Check Documentation**: Most questions are answered here
 2. **Review Logs**: Errors are usually explained in logs
-3. **GitHub Issues**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+3. **GitHub Issues**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 4. **API Docs**: http://localhost:8000/docs (when running)
 
 ## Next Steps

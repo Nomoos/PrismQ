@@ -690,7 +690,7 @@ signal_sources = catalog.get_by_tag("trending")
 
 ## 7. Implementation Recommendations
 
-### For PrismQ.IdeaInspiration Project
+### For PrismQ.T.Idea.Inspiration Project
 
 **Current State:**
 - 3 sources: YouTube, Reddit, HackerNews
@@ -743,7 +743,7 @@ from Source.Content import YouTubeSource
 
 ## 8. Conclusion
 
-The analysis reveals that **Variant C (Shallow Hierarchy)** offers the best balance for the PrismQ.IdeaInspiration project:
+The analysis reveals that **Variant C (Shallow Hierarchy)** offers the best balance for the PrismQ.T.Idea.Inspiration project:
 
 - ✅ Scales to 24+ sources without overwhelming complexity
 - ✅ Proven approach used in legacy codebase

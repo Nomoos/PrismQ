@@ -2,7 +2,7 @@
 
 ## Overview
 
-This implementation provides Reddit API integration with TaskManager for centralized task coordination in the PrismQ.IdeaInspiration system.
+This implementation provides Reddit API integration with TaskManager for centralized task coordination in the PrismQ.T.Idea.Inspiration system.
 
 ## Components
 
@@ -308,4 +308,4 @@ When making changes:
 
 ## License
 
-Part of the PrismQ.IdeaInspiration project.
+Part of the PrismQ.T.Idea.Inspiration project.

@@ -1,6 +1,6 @@
 # PrismQ Source Module
 
-**Modern, scalable source integration architecture for PrismQ.IdeaInspiration**
+**Modern, scalable source integration architecture for PrismQ.T.Idea.Inspiration**
 
 ## Overview
 

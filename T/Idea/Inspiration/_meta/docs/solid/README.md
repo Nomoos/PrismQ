@@ -8,7 +8,7 @@
 
 ## 📋 Overview
 
-This directory contains all documentation related to SOLID design principles and their application in the PrismQ.IdeaInspiration repository.
+This directory contains all documentation related to SOLID design principles and their application in the PrismQ.T.Idea.Inspiration repository.
 
 ---
 

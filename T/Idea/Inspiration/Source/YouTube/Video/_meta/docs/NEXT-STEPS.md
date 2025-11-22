@@ -53,7 +53,7 @@ The **YouTube Video Worker** MVP is complete and production-ready!
 **CORRECTION**: The current MVP implementation includes a local SQLite task queue (`schema.sql`) which was used for initial development and testing. However, per PrismQ architecture:
 
 - **Task Management**: Should use **PrismQ.Client.Backend.TaskManager API** (not local SQLite queue)
-- **Result Storage**: Should use **IdeaInspiration model** (PrismQ.IdeaInspiration.Model) ✅ Correct
+- **Result Storage**: Should use **IdeaInspiration model** (PrismQ.T.Idea.Inspiration.Model) ✅ Correct
 
 **Status**: 
 - ✅ Result storage via IdeaInspiration model is correctly implemented

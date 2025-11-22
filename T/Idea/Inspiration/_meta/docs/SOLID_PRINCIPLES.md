@@ -1,6 +1,6 @@
 # SOLID Principles Guide
 
-**Purpose**: Guide for applying SOLID design principles in PrismQ.IdeaInspiration  
+**Purpose**: Guide for applying SOLID design principles in PrismQ.T.Idea.Inspiration  
 **Last Updated**: 2025-11-17  
 **Version**: 1.0
 

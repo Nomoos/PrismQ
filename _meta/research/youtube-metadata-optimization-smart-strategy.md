@@ -250,4 +250,4 @@ The SMART Strategy provides a balanced, data-driven approach to YouTube metadata
 
 ---
 
-*This research document is part of the PrismQ.IdeaInspiration project and should be considered living documentation, subject to updates based on platform changes and empirical findings.*
+*This research document is part of the PrismQ.T.Idea.Inspiration project and should be considered living documentation, subject to updates based on platform changes and empirical findings.*

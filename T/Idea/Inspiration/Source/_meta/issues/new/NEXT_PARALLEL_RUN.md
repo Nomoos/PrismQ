@@ -35,7 +35,7 @@ Choose the execution batch based on current project phase:
 
 ```bash
 # Terminal 1 - Video Infrastructure (Developer02) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video
 # Status: ✅ Implementation complete
 # Completed: src/core/base_video_worker.py, src/schemas/video_schema.py
 # Tests: _meta/tests/test_base_video_worker.py (16 tests passing)
@@ -43,7 +43,7 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video
 # Next: Completed - all Video Batch 1 items done
 
 # Terminal 2 - Text Infrastructure (Developer02) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Text
 # Status: ✅ Implementation complete (verified existing infrastructure)
 # Completed: src/core/base_text_worker.py, src/core/text_processor.py
 # Tests: _meta/tests/test_base_text.py (19+ tests passing)
@@ -51,7 +51,7 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
 # Next: Proceed with Phase 2 Batch 2 (Reddit, HackerNews integrations)
 
 # Terminal 3 - YouTube Planning (Developer01) ✅ COMPLETE
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video
 # Read: _meta/issues/new/Developer01/004-youtube-integration-planning.md
 # Status: ✅ Planning complete - coordination document updated
 # Read: _meta/docs/YOUTUBE_SUBTITLE_OPTIONS_ANALYSIS.md
@@ -77,21 +77,21 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video
 # - Text #004: Content Storage/Mapping ✅
 
 # Terminal 1 - Reddit Integration (Developer08) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Text
 # Status: ✅ Implementation complete
 # Files: Reddit/Posts/src/core/oauth.py, scripts/register_task_types.py
 # Tests: OAuth tests (4/4 passing), Worker tests (all passing)
 # Docs: README.md, config.example.env, scripts/README.md
 
 # Terminal 2 - HackerNews Integration (Developer08) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Text
 # Status: ✅ Implementation complete
 # Files: HackerNews/Stories (worker and registration pre-existing)
 # Tests: All tests passing (9/9)
 # Docs: README.md, config.example.env, scripts/README.md
 
 # Terminal 3 - Text Storage (Developer06) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Text
 # Status: ✅ Implementation complete (pre-existing from Issue #001)
 # Files: src/mappers/reddit_mapper.py, hackernews_mapper.py
 # Tests: Mapper tests (13/13 passing)
@@ -111,13 +111,13 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Text
 # SOLID principles validated
 
 # Terminal 1 - Testing (Developer04) ✅ COMPLETE
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source
 # Text tests: 50+ passing
 # Video tests: All passing
 # CodeQL: 0 vulnerabilities
 
 # Terminal 2 - Documentation (Developer09) ✅ COMPLETE
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source
 # Text: README.md, config examples, scripts docs - All complete
 # Video: API docs complete
 # Audio: README.md complete
@@ -138,19 +138,19 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source
 # ALL AUDIO ISSUES COMPLETE ✅ (2025-11-13)
 
 # Terminal 1 - Audio Infrastructure (Developer02) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Audio
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Audio
 # Status: ✅ Implementation complete
 # Files: src/clients/base_client.py, utils.py
 # Tests: 14/14 passing
 # Docs: README.md with usage examples
 
 # Terminal 2 - Audio APIs (Developer08) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Audio
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Audio
 # Status: ✅ Implementation complete
 # Completed via separate branch merge
 
 # Terminal 3 - Audio Mapping (Developer06) ✅ COMPLETE (2025-11-13)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Audio
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Audio
 # Status: ✅ Implementation complete
 # Completed via separate branch merge
 ```
@@ -169,17 +169,17 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Audio
 
 ```bash
 # Terminal 1 - Commerce Planning (Developer01)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Other
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Other
 # Read: _meta/issues/new/Developer01/001-commerce-sources-coordination.md
 # Create: Commerce sources coordination document
 
 # Terminal 2 - Events Planning (Developer01)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Other
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Other
 # Read: _meta/issues/new/Developer01/002-events-sources-coordination.md
 # Create: Events sources coordination document
 
 # Terminal 3 - Community Planning (Developer01)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Other
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Other
 # Read: _meta/issues/new/Developer01/003-community-sources-coordination.md
 # Create: Community sources coordination document
 ```
@@ -192,7 +192,7 @@ cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Other
 
 ```bash
 # Terminal 1 - Comprehensive Testing (Developer04)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source
 pytest _meta/tests/ -v --cov=. --cov-report=html
 # Run integration tests across all modules
 
@@ -213,20 +213,20 @@ pytest _meta/tests/ -v --cov=. --cov-report=html
 
 ```bash
 # Terminal 1 - Integration Testing (Developer04)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration
 pytest Source/_meta/tests/integration/ -v
 pytest Source/_meta/tests/e2e/ -v
 python Source/_meta/scripts/performance_test.py
 python Source/_meta/scripts/load_test.py
 
 # Terminal 2 - Documentation (Developer09)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source
 # Finalize all documentation
 # Create user guides and tutorials
 # Update architecture documentation
 
 # Terminal 3 - Deployment (Developer05)
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration
 # Setup production environment
 # Configure monitoring and alerting
 # Deploy all modules

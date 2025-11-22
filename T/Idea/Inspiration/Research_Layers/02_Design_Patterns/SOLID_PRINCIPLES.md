@@ -1,6 +1,6 @@
-# SOLID Principles for PrismQ.IdeaInspiration
+# SOLID Principles for PrismQ.T.Idea.Inspiration
 
-This document provides comprehensive guidelines on applying SOLID principles to the PrismQ.IdeaInspiration codebase. These principles are fundamental to maintaining a clean, maintainable, and extensible architecture.
+This document provides comprehensive guidelines on applying SOLID principles to the PrismQ.T.Idea.Inspiration codebase. These principles are fundamental to maintaining a clean, maintainable, and extensible architecture.
 
 ## Overview
 
@@ -92,7 +92,7 @@ class ContentProcessor:
 - Database schema changes
 - Notification system changes
 
-### Application in PrismQ.IdeaInspiration
+### Application in PrismQ.T.Idea.Inspiration
 
 Examples from the codebase:
 
@@ -161,7 +161,7 @@ class IdeaInspiration:
 
 ## Overview
 
-SOLID is an acronym for five design principles that help create maintainable, flexible, and scalable software. These principles are fundamental to the architecture of PrismQ.IdeaInspiration and should be applied throughout the codebase.
+SOLID is an acronym for five design principles that help create maintainable, flexible, and scalable software. These principles are fundamental to the architecture of PrismQ.T.Idea.Inspiration and should be applied throughout the codebase.
 
 ## Table of Contents
 
@@ -407,7 +407,7 @@ class TextScorer:
         # Adding more types requires modifying this method
 ```
 
-### Application in PrismQ.IdeaInspiration
+### Application in PrismQ.T.Idea.Inspiration
 
 - **CategoryClassifier**: New categories can be added to `CATEGORY_KEYWORDS` without modifying classification logic
 - **IdeaInspiration**: Factory methods allow new content types without changing core model
@@ -514,7 +514,7 @@ class RestrictedSource(ContentSource):
         return self._do_fetch(query)
 ```
 
-### Application in PrismQ.IdeaInspiration
+### Application in PrismQ.T.Idea.Inspiration
 
 - **Factory Methods**: All factory methods return `IdeaInspiration` instances with consistent behavior
 - **Enum Types**: `ContentType` and `PrimaryCategory` enum values are interchangeable
@@ -638,7 +638,7 @@ class Logger:
     # ... Must implement all other methods even though they don't make sense
 ```
 
-### Application in PrismQ.IdeaInspiration
+### Application in PrismQ.T.Idea.Inspiration
 
 - **CategoryClassifier**: Only 2 methods (`classify`, `classify_from_metadata`)
 - **StoryDetector**: Only 2 methods (`detect`, `detect_from_metadata`)
@@ -857,7 +857,7 @@ class TextClassifier:
 - Hard to mock dependencies
 - Violates SRP by mixing classification and persistence
 
-### Application in PrismQ.IdeaInspiration
+### Application in PrismQ.T.Idea.Inspiration
 
 Current implementation:
 
@@ -1014,7 +1014,7 @@ def test_text_classifier_with_mocks():
     mock_detector.detect.assert_called_once()
 ```
 
-## Applying SOLID to PrismQ.IdeaInspiration
+## Applying SOLID to PrismQ.T.Idea.Inspiration
 
 ### Module Guidelines
 
@@ -1079,7 +1079,7 @@ Following SOLID principles leads to:
 ---
 
 **Last Updated**: 2025-11-14  
-**Maintained By**: PrismQ.IdeaInspiration Team
+**Maintained By**: PrismQ.T.Idea.Inspiration Team
     """Interface for content scoring strategies."""
     
     def calculate_score(self, content: dict) -> float:

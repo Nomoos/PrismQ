@@ -1,11 +1,11 @@
-# Coding Conventions - PrismQ.IdeaInspiration
+# Coding Conventions - PrismQ.T.Idea.Inspiration
 
 **Last Updated**: 2025-11-14  
 **Status**: Active
 
 ## Purpose
 
-This document defines coding conventions for PrismQ.IdeaInspiration to ensure consistency, maintainability, and adherence to our layered architecture.
+This document defines coding conventions for PrismQ.T.Idea.Inspiration to ensure consistency, maintainability, and adherence to our layered architecture.
 
 ## Table of Contents
 

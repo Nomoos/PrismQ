@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-Refactor the YouTube Shorts Source module (PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube) to implement worker-based architecture following PrismQ.Client patterns. This will enable:
+Refactor the YouTube Shorts Source module (PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube) to implement worker-based architecture following PrismQ.Client patterns. This will enable:
 
 - **Persistent task execution** via SQLite queue
 - **State management** via TaskManager API

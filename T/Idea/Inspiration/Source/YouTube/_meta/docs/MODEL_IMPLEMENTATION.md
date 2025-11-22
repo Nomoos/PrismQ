@@ -8,7 +8,7 @@ This document summarizes the implementation of the SQLAlchemy ORM-based model la
 
 The issue requested:
 1. ✅ Create folder Model where you define DB model for scraped data from YouTube
-2. ✅ Make init db script same as in PrismQ.IdeaInspiration.Model
+2. ✅ Make init db script same as in PrismQ.T.Idea.Inspiration.Model
 3. ✅ When scraping YouTube videos and model doesn't exist, create one
 4. ✅ Check if venv setup is resilient to errors (e.g., if .env is not set up, interactive questions)
 
@@ -61,7 +61,7 @@ Created `scripts/init_db.py`:
 - Supports custom database paths
 - Verbose and quiet modes
 - Reports current database statistics
-- Similar structure to PrismQ.IdeaInspiration.Model
+- Similar structure to PrismQ.T.Idea.Inspiration.Model
 
 Usage:
 ```bash

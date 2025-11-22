@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains the simplified YouTube Shorts detection approach implemented in the PrismQ.IdeaInspiration YouTube Shorts module.
+This document explains the simplified YouTube Shorts detection approach implemented in the PrismQ.T.Idea.Inspiration YouTube Shorts module.
 
 ## Change Summary
 

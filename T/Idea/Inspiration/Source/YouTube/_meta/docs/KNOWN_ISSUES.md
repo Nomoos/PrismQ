@@ -610,4 +610,4 @@ If you encounter an issue not listed here:
 **Last Updated**: 2025-11-04
 
 **Issue Tracking**: `_meta/issues/`  
-**GitHub Issues**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+**GitHub Issues**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues

@@ -1,6 +1,6 @@
-# PrismQ.IdeaInspiration Roadmap
+# PrismQ.T.Idea.Inspiration Roadmap
 
-This document outlines the development roadmap for the PrismQ.IdeaInspiration ecosystem.
+This document outlines the development roadmap for the PrismQ.T.Idea.Inspiration ecosystem.
 
 ## Target Platform
 
@@ -11,7 +11,7 @@ This document outlines the development roadmap for the PrismQ.IdeaInspiration ec
 
 ## Purpose
 
-PrismQ.IdeaInspiration is a comprehensive ecosystem for AI-powered content idea collection, classification, scoring, and processing. It consists of multiple interconnected modules that work together to power the PrismQ content generation pipeline.
+PrismQ.T.Idea.Inspiration is a comprehensive ecosystem for AI-powered content idea collection, classification, scoring, and processing. It consists of multiple interconnected modules that work together to power the PrismQ content generation pipeline.
 
 ## Related Projects
 

@@ -90,7 +90,7 @@ Workers require:
    ```
    REDDIT_CLIENT_ID=your_client_id
    REDDIT_CLIENT_SECRET=your_secret
-   REDDIT_USER_AGENT=PrismQ.IdeaInspiration:Reddit:v1.0.0
+   REDDIT_USER_AGENT=PrismQ.T.Idea.Inspiration:Reddit:v1.0.0
    ```
 3. **IdeaInspiration Database** - Path to save scraped ideas
 

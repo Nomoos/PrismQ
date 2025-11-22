@@ -205,7 +205,7 @@ curl https://your-domain.com/api/task-types?active_only=true
       },
       {
         "id": 2,
-        "name": "PrismQ.IdeaInspiration.Research",
+        "name": "PrismQ.T.Idea.Inspiration.Research",
         "version": "1.0.0",
         "is_active": true,
         "created_at": "2025-01-02 10:00:00",

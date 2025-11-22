@@ -1,4 +1,4 @@
-# PrismQ.IdeaInspiration - Next Steps Summary
+# PrismQ.T.Idea.Inspiration - Next Steps Summary
 
 > ⚠️ **NOTICE**: This document is **superseded** by the unified [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
 > 
@@ -21,7 +21,7 @@
 
 ## Executive Summary
 
-This document provides a clear roadmap of what needs to be implemented next in the PrismQ.IdeaInspiration ecosystem. It identifies tasks that can be done in parallel vs. those requiring sequential completion, making it easy for multiple developers to work simultaneously without conflicts.
+This document provides a clear roadmap of what needs to be implemented next in the PrismQ.T.Idea.Inspiration ecosystem. It identifies tasks that can be done in parallel vs. those requiring sequential completion, making it easy for multiple developers to work simultaneously without conflicts.
 
 **Key Achievements:**
 - **✅ Phase 0 Complete**: Web Client Control Panel fully functional (all 12 issues #101-#112)
@@ -786,7 +786,7 @@ For detailed specifications, see `_meta/docs/FUTURE_ENHANCEMENTS.md`
 
 ## Contact & Support
 
-- **Repository**: https://github.com/Nomoos/PrismQ.IdeaInspiration
+- **Repository**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration
 - **Issue Tracker**: GitHub Issues
 - **Project Documentation**: `_meta/` directory
 - **Related Projects**:

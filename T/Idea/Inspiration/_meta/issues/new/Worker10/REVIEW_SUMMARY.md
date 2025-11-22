@@ -266,4 +266,4 @@
 - 🎯 [Issue #011](011-review-solid-compliance.md)
 - 📂 [Worker10 Folder](./)
 
-**Repository**: https://github.com/Nomoos/PrismQ.IdeaInspiration
+**Repository**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration

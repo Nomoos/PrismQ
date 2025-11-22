@@ -1,4 +1,4 @@
-# PrismQ.IdeaInspiration Scripts
+# PrismQ.T.Idea.Inspiration Scripts
 
 Utility scripts for repository maintenance and development automation.
 

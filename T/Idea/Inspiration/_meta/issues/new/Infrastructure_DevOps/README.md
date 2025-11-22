@@ -5,7 +5,7 @@
 
 ## Overview
 
-Infrastructure, development operations, and tooling improvements for the PrismQ.IdeaInspiration monorepo.
+Infrastructure, development operations, and tooling improvements for the PrismQ.T.Idea.Inspiration monorepo.
 
 ## Active Initiatives
 

@@ -29,7 +29,7 @@ The PrismQ Web Client discovers and runs modules defined in `Backend/configs/mod
 
 Find the Python script for your module:
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Sources/
 │   └── Content/
 │       └── Shorts/

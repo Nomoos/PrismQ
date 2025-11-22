@@ -1,6 +1,6 @@
 # Research
 
-This directory contains research materials, experiments, and exploratory work for the PrismQ.IdeaInspiration project.
+This directory contains research materials, experiments, and exploratory work for the PrismQ.T.Idea.Inspiration project.
 
 ## Purpose
 

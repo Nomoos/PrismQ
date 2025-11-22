@@ -29,16 +29,16 @@ class TaskTypeRegistry:
     
     @classmethod
     def build_task_type_name(cls, media_type, platform, source_type):
-        """Build task type name: PrismQ.IdeaInspiration.Source.{MediaType}.{Platform}.{SourceType}"""
-        return f"PrismQ.IdeaInspiration.Source.{media_type}.{platform}.{source_type}"
+        """Build task type name: PrismQ.T.Idea.Inspiration.Source.{MediaType}.{Platform}.{SourceType}"""
+        return f"PrismQ.T.Idea.Inspiration.Source.{media_type}.{platform}.{source_type}"
 ```
 
 ### Convenience Functions
 
 ```python
-task_type_youtube_video()      # "PrismQ.IdeaInspiration.Source.Video.YouTube.Video"
-task_type_youtube_channel()    # "PrismQ.IdeaInspiration.Source.Video.YouTube.Channel"
-task_type_reddit_posts()       # "PrismQ.IdeaInspiration.Source.Text.Reddit.Posts"
+task_type_youtube_video()      # "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video"
+task_type_youtube_channel()    # "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Channel"
+task_type_reddit_posts()       # "PrismQ.T.Idea.Inspiration.Source.Text.Reddit.Posts"
 # ... and more
 ```
 
@@ -221,7 +221,7 @@ TaskManager API → Coordinates multiple workers
 ```python
 # 1. Register task type
 client.register_task_type(
-    name="PrismQ.IdeaInspiration.Source.Video.YouTube.Video",
+    name="PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video",
     version="1.0.0",
     param_schema={
         "type": "object",
@@ -234,13 +234,13 @@ client.register_task_type(
 
 # 2. Create task
 task = client.create_task(
-    task_type="PrismQ.IdeaInspiration.Source.Video.YouTube.Video",
+    task_type="PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video",
     params={"video_id": "abc123"}
 )
 
 # 3. Worker claims and processes
 task_type_info = client.get_task_type(
-    "PrismQ.IdeaInspiration.Source.Video.YouTube.Video"
+    "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video"
 )
 task = client.claim_task(
     worker_id="youtube-worker-001",

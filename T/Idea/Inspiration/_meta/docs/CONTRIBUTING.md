@@ -1,6 +1,6 @@
-# Contributing to PrismQ.IdeaInspiration
+# Contributing to PrismQ.T.Idea.Inspiration
 
-Thank you for your interest in contributing to PrismQ.IdeaInspiration! This document provides guidelines for contributing to this ecosystem.
+Thank you for your interest in contributing to PrismQ.T.Idea.Inspiration! This document provides guidelines for contributing to this ecosystem.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ Thank you for your interest in contributing to PrismQ.IdeaInspiration! This docu
 
 ## Getting Started
 
-PrismQ.IdeaInspiration is a multi-module ecosystem. Before contributing:
+PrismQ.T.Idea.Inspiration is a multi-module ecosystem. Before contributing:
 
 1. **Familiarize yourself with the modules**: Read the main [README.md](../../README.md) and individual module READMEs
 2. **Review the roadmap**: Check [_meta/issues/ROADMAP.md](../issues/ROADMAP.md) for planned work
@@ -35,8 +35,8 @@ PrismQ.IdeaInspiration is a multi-module ecosystem. Before contributing:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-cd PrismQ.IdeaInspiration
+git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+cd PrismQ.T.Idea.Inspiration
 
 # Choose the module you want to work on
 cd Classification  # or EnvLoad, Model, Scoring, Sources
@@ -285,7 +285,7 @@ When adding a new module:
 
 Issues are tracked in two places:
 
-1. **GitHub Issues**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+1. **GitHub Issues**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 2. **Local Issues**: `_meta/issues/new/`, `wip/`, `done/`
 
 ### Creating Issues
@@ -351,4 +351,4 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 ---
 
-Thank you for contributing to PrismQ.IdeaInspiration! 🚀
+Thank you for contributing to PrismQ.T.Idea.Inspiration! 🚀

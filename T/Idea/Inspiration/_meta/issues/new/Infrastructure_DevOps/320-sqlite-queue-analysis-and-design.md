@@ -10,7 +10,7 @@
 
 ## Overview
 
-This issue analyzes the proposed SQLite-based task queue system for PrismQ.IdeaInspiration, evaluates its pros and cons, identifies research topics, and creates a comprehensive implementation plan with worker allocation for parallel development.
+This issue analyzes the proposed SQLite-based task queue system for PrismQ.T.Idea.Inspiration, evaluates its pros and cons, identifies research topics, and creates a comprehensive implementation plan with worker allocation for parallel development.
 
 ---
 
@@ -110,7 +110,7 @@ The issue proposes a **SQLite 3 + WAL** based task queue with:
 
 ### Verdict
 
-**RECOMMENDED** for PrismQ.IdeaInspiration because:
+**RECOMMENDED** for PrismQ.T.Idea.Inspiration because:
 - ✅ Fits "simple architecture" principle (agent instructions)
 - ✅ Good match for single Windows host with moderate throughput
 - ✅ Zero infrastructure overhead

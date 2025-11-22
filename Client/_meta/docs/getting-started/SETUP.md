@@ -54,8 +54,8 @@ Complete installation and configuration guide for the PrismQ Web Client.
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-cd PrismQ.IdeaInspiration/Client
+git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+cd PrismQ.T.Idea.Inspiration/Client
 ```
 
 ### Step 2: Backend Setup
@@ -143,7 +143,7 @@ python -c "import fastapi; import uvicorn; import pydantic; print('Backend depen
 Open a new terminal and navigate:
 
 ```bash
-cd PrismQ.IdeaInspiration/Client/Frontend
+cd PrismQ.T.Idea.Inspiration/Client/Frontend
 ```
 
 #### 3.2. Install Node Dependencies
@@ -492,7 +492,7 @@ CORS_ORIGINS=http://localhost:3000
    - [Troubleshooting Guide](TROUBLESHOOTING.md)
 
 4. **Open an Issue:**
-   Visit https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+   Visit https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 
 ## Next Steps
 

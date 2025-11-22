@@ -263,7 +263,7 @@ Test suites and test data.
 ---
 
 *Part of the PrismQ.T.Idea module in the sequential progressive enrichment workflow*
-# PrismQ.IdeaInspiration
+# PrismQ.T.Idea.Inspiration
 
 Central hub for AI-powered content idea collection, classification, scoring, and processing.
 
@@ -325,8 +325,8 @@ All modules are configured with `requires-python = ">=3.10,<3.11"` to ensure com
 
 ```powershell
 # Clone repository
-git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-cd PrismQ.IdeaInspiration
+git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+cd PrismQ.T.Idea.Inspiration
 
 # Setup virtual environments
 .\_meta\_scripts\setup_all_envs.ps1  # Windows

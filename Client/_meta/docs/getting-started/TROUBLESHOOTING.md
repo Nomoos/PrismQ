@@ -714,7 +714,7 @@ When reporting issues, include:
    - [Development Guide](DEVELOPMENT.md)
 
 2. **GitHub Issues:**
-   - Search existing issues: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+   - Search existing issues: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
    - Open new issue with template
 
 3. **API Documentation:**
@@ -759,4 +759,4 @@ Restart both servers after enabling debug mode.
 **Last Updated**: 2025-10-31  
 **Maintained by**: PrismQ Development Team
 
-**Need more help?** Open an issue at https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+**Need more help?** Open an issue at https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues

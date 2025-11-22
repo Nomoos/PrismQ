@@ -13,7 +13,7 @@
 
 ## Overview
 
-PrismQ.IdeaInspiration maintains a comprehensive test suite with **270+ test cases** across core modules. The repository demonstrates strong test coverage at 88.7% overall, with excellent module-specific coverage.
+PrismQ.T.Idea.Inspiration maintains a comprehensive test suite with **270+ test cases** across core modules. The repository demonstrates strong test coverage at 88.7% overall, with excellent module-specific coverage.
 
 ## Coverage Summary
 

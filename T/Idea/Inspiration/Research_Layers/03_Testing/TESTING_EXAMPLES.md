@@ -1,6 +1,6 @@
 # Testing and Mocking Examples - Practical Patterns
 
-This document provides concrete, copy-paste-ready examples of testing patterns used throughout PrismQ.IdeaInspiration. Each example demonstrates proper layer isolation, dependency injection, and mocking strategies.
+This document provides concrete, copy-paste-ready examples of testing patterns used throughout PrismQ.T.Idea.Inspiration. Each example demonstrates proper layer isolation, dependency injection, and mocking strategies.
 
 ## Table of Contents
 

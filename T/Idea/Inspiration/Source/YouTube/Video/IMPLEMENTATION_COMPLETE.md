@@ -9,7 +9,7 @@
 From the original issue:
 ```
 # Command 5: Developer02 - Video Scraping Infrastructure
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 git checkout -b feature/video-scraping
 # Implement: Video scraping logic, YouTube API client
 # Register task type: youtube_video_scrape

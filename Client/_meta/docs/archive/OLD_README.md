@@ -58,8 +58,8 @@ Client/
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-   cd PrismQ.IdeaInspiration/Client
+   git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+   cd PrismQ.T.Idea.Inspiration/Client
    ```
 
 2. **Set up Backend**:

@@ -610,7 +610,7 @@ find _meta/issues/done -name "*.md" | wc -l # Complete
 
 ```bash
 # Start work on issue
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration
 git checkout -b feature/issue-401-worker-base
 # ... implement ...
 git add .
