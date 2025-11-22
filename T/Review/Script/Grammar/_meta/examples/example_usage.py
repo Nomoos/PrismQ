@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).resolve().parents[5]
+project_root = Path(__file__).resolve().parents[6]  # examples -> _meta -> Grammar -> Script -> Review -> T -> PrismQ
 sys.path.insert(0, str(project_root))
 
 from T.Review.Script.Grammar import (
