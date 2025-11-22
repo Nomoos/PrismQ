@@ -38,7 +38,7 @@ t_module_dir = current_file.parent.parent.parent.parent
 
 # Import review models
 review_title_path = t_module_dir / 'Review' / 'Title' / 'ByScriptAndIdea'
-review_script_path = t_module_dir / 'Review' / 'Script' / 'ByTitle'
+review_script_path = t_module_dir / 'Review' / 'Script'
 idea_model_path = t_module_dir / 'Idea' / 'Model' / 'src'
 
 sys.path.insert(0, str(review_title_path))
