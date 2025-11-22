@@ -1,11 +1,22 @@
 # MVP Workflow - Plán minimálního životaschopného produktu
 
-**⚠️ POZNÁMKA**: Tento dokument vyžaduje aktualizaci na rozšířený workflow. Viz anglická verze `MVP_WORKFLOW.md` a `MVP_WORKFLOW_SIMPLE.md` pro aktuální specifikaci s 23 MVP issues.
+> **⚠️ UPOZORNĚNÍ**: Pro aktuální a kompletní specifikaci viz:
+> - **PARALLEL_RUN_NEXT_CS.md** - Aktuální dokument se všemi 22 MVP issues
+> - **PARALLEL_RUN_NEXT.md** - Anglická verze
+> - **MVP_WORKFLOW_SIMPLE.md** - Anglická verze zjednodušeného workflow
+>
+> Tento dokument popisuje základní zjednodušené workflow. Pro rozšířené workflow s 22 fázemi včetně AI kontrol kvality a finální revize viz výše uvedené dokumenty.
 
 **Vytvořeno**: 2025-11-21  
 **Aktualizováno**: 2025-11-22  
-**Stav**: Plánování - Vyžaduje aktualizaci  
+**Stav**: Základní workflow - Pro úplnou specifikaci viz PARALLEL_RUN_NEXT_CS.md  
 **Přístup**: Vylepšený iterativní vývoj MVP s kontrolami kvality
+
+**Aktuální stav projektu**:
+- Sprint 1: DOKONČENO ✅ (7/7 issues)
+- Sprint 2: DOKONČENO ✅ (6/6 issues) 
+- Sprint 3: PROBÍHÁ ⚠️ (5/11 issues dokončeno)
+- Celkem: 16/22 MVP issues dokončeno (73%)
 
 ---
 

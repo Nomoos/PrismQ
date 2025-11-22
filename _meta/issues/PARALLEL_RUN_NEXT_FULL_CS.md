@@ -1,10 +1,33 @@
 # PARALLEL_RUN_NEXT_FULL - Plán provádění MVP sprintu (Rozšířená verze)
 
-**Sprint**: Sprint 1 (Týden 1-2) - Základní workflow MVP  
-**Datum**: 2025-11-21  
-**Aktualizováno**: 2025-11-21  
-**Stav**: Plánování  
-**Cíl**: Vybudovat end-to-end workflow MVP (Nápad → Titulek → Skript → Revize → Vylepšení → Publikovat)
+> **⚠️ UPOZORNĚNÍ**: Tento dokument je zastaralý. Pro aktuální specifikaci viz:
+> - **PARALLEL_RUN_NEXT_CS.md** - Aktuální streamovaný dokument se všemi 22 issues
+> - **PARALLEL_RUN_NEXT.md** - Anglická verze
+>
+> Tento dokument zůstává pro historické odkazy, ale měl by být aktualizován tak, aby odpovídal aktuálnímu stavu projektu.
+
+**Sprint**: Sprint 1-3 (7-8 týdnů) - Vývoj MVP  
+**Datum**: 2025-11-22 (Poznámka o zastaralosti)  
+**Aktualizováno**: 2025-11-22  
+**Stav**: ZASTARALÉ - Viz PARALLEL_RUN_NEXT_CS.md pro aktuální stav  
+**Cíl**: [ZASTARALÉ] Původně: Vybudovat end-to-end workflow MVP
+
+**Aktuální stav projektu**:
+- Sprint 1: DOKONČENO ✅ (7/7 issues)
+- Sprint 2: DOKONČENO ✅ (6/6 issues)
+- Sprint 3: PROBÍHÁ ⚠️ (5/11 issues dokončeno, 6 zbývá)
+- Celkem: 16/22 issues dokončeno (73%)
+
+---
+
+## Pro aktuální informace
+
+Viz **PARALLEL_RUN_NEXT_CS.md** pro:
+- Aktuální stav všech sprintů
+- Zbývající 6 issues (MVP-017 až MVP-022)
+- SOLID principy aplikované na issues
+- Detailní kritéria přijetí
+- Paralelní příležitosti provádění
 
 ---
 
