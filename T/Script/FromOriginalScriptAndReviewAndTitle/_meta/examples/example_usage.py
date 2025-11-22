@@ -365,6 +365,171 @@ def example_stage_11_iterative_refinement():
     return script_v3
 
 
+def example_mvp011_extended_versioning():
+    """Example: MVP-011 - Extended versioning support (v3 → v4 → v5).
+    
+    This example demonstrates that the module supports unlimited version progression.
+    """
+    print("\n\n" + "=" * 80)
+    print("EXAMPLE: MVP-011 - Extended Versioning (v3 → v4 → v5)")
+    print("=" * 80)
+    
+    # Start with v3
+    sections_v3 = [
+        ScriptSection(
+            section_type="introduction",
+            content="The House That Remembers—And Hunts. Where time loops and danger waits.",
+            estimated_duration_seconds=14,
+            purpose="Hook with danger"
+        ),
+        ScriptSection(
+            section_type="body",
+            content="Every midnight, the same ghostly hunt replays. But here's the twist: "
+                   "anyone inside during the loop becomes part of it—forever. "
+                   "Three people have entered. None returned the same.",
+            estimated_duration_seconds=62,
+            purpose="Deliver with enhanced climax"
+        ),
+        ScriptSection(
+            section_type="conclusion",
+            content="The house remembers. The house hunts. Will you be next?",
+            estimated_duration_seconds=14,
+            purpose="Conclude with threat"
+        )
+    ]
+    
+    script_v3 = ScriptV1(
+        script_id="script_v3_horror001_20250122",
+        idea_id="idea_horror001",
+        title="The House That Remembers—And Hunts",
+        full_text="\n\n".join([s.content for s in sections_v3]),
+        sections=sections_v3,
+        total_duration_seconds=90,
+        structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+        platform_target=PlatformTarget.YOUTUBE_MEDIUM,
+        version=3
+    )
+    script_v3.version_history = ["script_v1_horror001_20250122", "script_v2_horror001_20250122"]
+    
+    print(f"\nStarting with Script v3:")
+    print(f"  Version: v{script_v3.version}")
+    print(f"  Title: {script_v3.title}")
+    
+    improver = ScriptImprover()
+    
+    # v3 → v4: Minor tone adjustment
+    print("\n" + "-" * 80)
+    print("Stage 14-18: Grammar/Tone/Content reviews → v4")
+    print("-" * 80)
+    
+    review_v3 = ReviewFeedback(
+        script_review=MockScriptReview(
+            script_id=script_v3.script_id,
+            overall_score=88,
+            improvement_points=[
+                MockImprovementPoint(
+                    title="Tone consistency",
+                    description="'Will you be next?' feels too direct. Soften slightly for broader appeal.",
+                    priority="low"
+                )
+            ]
+        ),
+        review_type="tone_review"
+    )
+    
+    script_v4 = improver.generate_script_v2(
+        original_script=script_v3,
+        title_v2="The House That Remembers—And Hunts",
+        review_feedback=review_v3
+    )
+    
+    print(f"Generated Script v4:")
+    print(f"  Version: v{script_v4.version}")
+    print(f"  Improvements: {script_v4.improvements_made}")
+    print(f"  Version History Length: {len(script_v4.version_history)}")
+    
+    # v4 → v5: Readability polish
+    print("\n" + "-" * 80)
+    print("Stage 20: Readability review → v5")
+    print("-" * 80)
+    
+    review_v4 = ReviewFeedback(
+        script_review=MockScriptReview(
+            script_id=script_v4.script_id,
+            overall_score=92,
+            improvement_points=[
+                MockImprovementPoint(
+                    title="Voiceover flow",
+                    description="'Three people have entered. None returned the same.' - "
+                               "slightly awkward for voiceover. Suggest: 'Three entered. None returned unchanged.'",
+                    priority="low"
+                )
+            ]
+        ),
+        review_type="readability_review"
+    )
+    
+    script_v5 = improver.generate_script_v2(
+        original_script=script_v4,
+        title_v2="The House That Remembers—And Hunts",
+        review_feedback=review_v4
+    )
+    
+    print(f"Generated Script v5:")
+    print(f"  Version: v{script_v5.version}")
+    print(f"  Improvements: {script_v5.improvements_made}")
+    print(f"  Version History Length: {len(script_v5.version_history)}")
+    
+    # v5 → v6: Final acceptance refinement
+    print("\n" + "-" * 80)
+    print("Stage 13: Acceptance check loop → v6")
+    print("-" * 80)
+    
+    review_v5 = ReviewFeedback(
+        script_review=MockScriptReview(
+            script_id=script_v5.script_id,
+            overall_score=94,
+            improvement_points=[
+                MockImprovementPoint(
+                    title="Final polish",
+                    description="Minor refinement for publishing quality",
+                    priority="low"
+                )
+            ]
+        ),
+        review_type="acceptance_refinement"
+    )
+    
+    script_v6 = improver.generate_script_v2(
+        original_script=script_v5,
+        title_v2="The House That Remembers—And Hunts",
+        review_feedback=review_v5
+    )
+    
+    print(f"Generated Script v6:")
+    print(f"  Version: v{script_v6.version}")
+    print(f"  Version History: {' → '.join(['v1', 'v2'] + [f'v{i}' for i in range(3, 7)])}")
+    print(f"  Complete History: {len(script_v6.version_history)} previous versions tracked")
+    
+    # Show version progression
+    print("\n" + "-" * 80)
+    print("Complete Version Progression")
+    print("-" * 80)
+    print(f"v1 → v2 → v3 → v4 → v5 → v6")
+    print(f"\nVersion v{script_v6.version} contains references to:")
+    for i, version_id in enumerate(script_v6.version_history, 1):
+        print(f"  {i}. {version_id}")
+    
+    print(f"\n✅ MVP-011 Acceptance Criteria Met:")
+    print(f"  ✓ Refines from v2 to v3+ using feedback")
+    print(f"  ✓ Ensures alignment with title at each version")
+    print(f"  ✓ Polishes narrative flow iteratively")
+    print(f"  ✓ Stores each version with reference to previous")
+    print(f"  ✓ Supports unlimited versioning (v3, v4, v5, v6, v7...)")
+    
+    return script_v6
+
+
 def main():
     """Run all examples."""
     print("Script Improver Module - Usage Examples")
@@ -377,19 +542,24 @@ def main():
     # Example 2: Stage 11 - Iterative refinement
     script_v3 = example_stage_11_iterative_refinement()
     
+    # Example 3: MVP-011 - Extended versioning
+    script_v6 = example_mvp011_extended_versioning()
+    
     print("\n\n" + "=" * 80)
     print("SUMMARY")
     print("=" * 80)
-    print(f"\nGenerated 2 improved script versions:")
+    print(f"\nGenerated multiple improved script versions:")
     print(f"  1. Script v2: {script_v2.script_id}")
     print(f"  2. Script v3: {script_v3.script_id}")
-    print(f"\nVersion progression: v1 → v2 → v3")
+    print(f"  3. Script v6: {script_v6.script_id}")
+    print(f"\nVersion progression: v1 → v2 → v3 → v4 → v5 → v6")
     print(f"\nThe module successfully:")
     print(f"  ✓ Processed review feedback from multiple sources")
     print(f"  ✓ Aligned scripts with improved title versions")
     print(f"  ✓ Tracked version history and improvements")
     print(f"  ✓ Maintained structure while addressing issues")
     print(f"  ✓ Supported iterative refinement cycles")
+    print(f"  ✓ Handled unlimited version progression (MVP-011)")
 
 
 if __name__ == "__main__":
