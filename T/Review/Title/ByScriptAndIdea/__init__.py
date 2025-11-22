@@ -9,10 +9,16 @@ from .title_review import (
     TitleImprovementPoint,
     TitleCategoryScore
 )
+from .by_script_and_idea import (
+    review_title_by_script_and_idea,
+    AlignmentAnalysis
+)
 
 __all__ = [
     "TitleReview",
     "TitleReviewCategory",
     "TitleImprovementPoint",
-    "TitleCategoryScore"
+    "TitleCategoryScore",
+    "review_title_by_script_and_idea",
+    "AlignmentAnalysis"
 ]
