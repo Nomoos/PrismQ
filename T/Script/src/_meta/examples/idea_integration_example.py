@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..
 
 from src.idea import Idea, IdeaStatus, ContentGenre
 from T.Review.Script import ScriptReview, ReviewCategory, ContentLength, ImprovementPoint, CategoryScore
-from T.Script.Writer import ScriptWriter, OptimizationStrategy
+from T.Script import ScriptWriter, OptimizationStrategy
 
 
 def example_idea_to_script_workflow():

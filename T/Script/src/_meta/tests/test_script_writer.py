@@ -2,7 +2,7 @@
 
 import pytest
 from datetime import datetime
-from T.Script.Writer import (
+from T.Script import (
     ScriptWriter,
     OptimizationStrategy,
     OptimizationResult,
