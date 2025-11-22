@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines PrismQ.IdeaInspiration's comprehensive testing and mocking strategy, focusing on layer isolation, dependency injection, and testability-first design. A layered architecture simplifies testing by allowing each module to be tested in isolation with dependencies mocked.
+This document outlines PrismQ.T.Idea.Inspiration's comprehensive testing and mocking strategy, focusing on layer isolation, dependency injection, and testability-first design. A layered architecture simplifies testing by allowing each module to be tested in isolation with dependencies mocked.
 
 ## Core Principles
 

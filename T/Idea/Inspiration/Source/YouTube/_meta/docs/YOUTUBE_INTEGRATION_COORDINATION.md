@@ -1,6 +1,6 @@
 # YouTube Integration Coordination Document
 
-**Project**: PrismQ.IdeaInspiration - YouTube Integration  
+**Project**: PrismQ.T.Idea.Inspiration - YouTube Integration  
 **Owner**: Developer01 (SCRUM Master & Planning Expert)  
 **Created**: 2025-11-12  
 **Status**: 🟢 Active Planning  
@@ -48,7 +48,7 @@ This document coordinates the integration of all YouTube sub-modules (Channel, S
 
 ```
 ┌─────────────────────────────────────────────────┐
-│           PrismQ.IdeaInspiration                │
+│           PrismQ.T.Idea.Inspiration                │
 │         (IdeaInspiration Model)                 │
 └────────────────┬────────────────────────────────┘
                  │

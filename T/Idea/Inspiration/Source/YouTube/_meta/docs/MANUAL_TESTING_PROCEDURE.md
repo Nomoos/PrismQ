@@ -2,7 +2,7 @@
 # Manual Testing Procedure for YouTube Scraping
 
 **Poslední aktualizace / Last Updated**: 2025-11-03  
-**Modul / Module**: PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube  
+**Modul / Module**: PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube  
 **Účel / Purpose**: Komplexní návod pro manuální testování YouTube scraping funkcionality krok za krokem
 
 > 💡 **Pro rychlou referenci / For quick reference**: Viz [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
@@ -29,9 +29,9 @@
 **Navigate to Module Directory**
 
 ```bash
-cd /cesta/k/PrismQ.IdeaInspiration/Sources/Content/Shorts/YouTube
+cd /cesta/k/PrismQ.T.Idea.Inspiration/Sources/Content/Shorts/YouTube
 # Windows příklad:
-# cd C:\Projects\PrismQ.IdeaInspiration\Sources\Content\Shorts\YouTube
+# cd C:\Projects\PrismQ.T.Idea.Inspiration\Sources\Content\Shorts\YouTube
 ```
 
 ### Krok 1.2: Vytvořit Virtuální Prostředí (Doporučeno)
@@ -469,9 +469,9 @@ Total saved to central DB: 33
 ### Krok 6.2: Ověření v Centrální Databázi
 **Verify in Central Database**
 
-**Poznámka / Note:** Cesta k centrální databázi je spravována Model modulem (PrismQ.IdeaInspiration.Model). Centrální databáze ukládá všechny IdeaInspiration záznamy ze všech zdrojů.
+**Poznámka / Note:** Cesta k centrální databázi je spravována Model modulem (PrismQ.T.Idea.Inspiration.Model). Centrální databáze ukládá všechny IdeaInspiration záznamy ze všech zdrojů.
 
-**Note:** The central database path is managed by the Model module (PrismQ.IdeaInspiration.Model). The central database stores all IdeaInspiration records from all sources.
+**Note:** The central database path is managed by the Model module (PrismQ.T.Idea.Inspiration.Model). The central database stores all IdeaInspiration records from all sources.
 
 ```bash
 # ✅ DOPORUČENÝ ZPŮSOB / RECOMMENDED METHOD:
@@ -480,7 +480,7 @@ Total saved to central DB: 33
 python -m src.cli process --env-file .env.test
 
 # Výstup ukáže cestu typu / Output will show path like:
-# "Saving to central database: /full/path/to/PrismQ.IdeaInspiration/Model/idea_inspiration.db"
+# "Saving to central database: /full/path/to/PrismQ.T.Idea.Inspiration/Model/idea_inspiration.db"
 # Tuto cestu pak použijte pro SQL dotazy / Use this path for SQL queries
 ```
 

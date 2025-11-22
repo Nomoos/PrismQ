@@ -83,7 +83,7 @@ Week 1                          Week 2
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     PrismQ.IdeaInspiration                      │
+│                     PrismQ.T.Idea.Inspiration                      │
 │                     Issue Distribution                          │
 └─────────────────────────────────────────────────────────────────┘
 
@@ -135,7 +135,7 @@ Week 1                          Week 2
 ### No Overlap = No Conflicts ✅
 
 ```
-PrismQ.IdeaInspiration Repository
+PrismQ.T.Idea.Inspiration Repository
 │
 ├─ Sources/Content/Shorts/YouTube/
 │  ├─ src/plugins/

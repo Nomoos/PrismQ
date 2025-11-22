@@ -26,7 +26,7 @@ Before running these commands, ensure:
 
 2. **Dependencies Installed**:
    ```bash
-   cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+   cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
    pip install -r requirements.txt
    ```
 
@@ -43,7 +43,7 @@ Before running these commands, ensure:
 Set up the production database and verify configuration:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Initialize production databases
 python scripts/init_production.py
@@ -68,7 +68,7 @@ python scripts/init_production.py
 Verify that all task types are registered in the worker factory:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Verify local registration
 python scripts/verify_task_type.py
@@ -92,7 +92,7 @@ python scripts/verify_task_type.py
 Register task types with the central TaskManager API:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Register with TaskManager API
 python scripts/register_task_types.py
@@ -131,7 +131,7 @@ python scripts/register_task_types.py
 Run a test worker to verify functionality:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Run worker in test mode (processes 5 tasks then exits)
 python scripts/run_worker.py --worker-id test-worker-1 --max-iterations 5
@@ -161,7 +161,7 @@ Deploy workers for production use:
 ### Option A: Single Worker (Development)
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Run a single worker indefinitely
 python scripts/run_worker.py --worker-id youtube-worker-01
@@ -176,15 +176,15 @@ For higher throughput, run multiple workers in parallel:
 
 ```bash
 # Terminal 1 - Worker 1
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 python scripts/run_worker.py --worker-id youtube-worker-01
 
 # Terminal 2 - Worker 2
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 python scripts/run_worker.py --worker-id youtube-worker-02
 
 # Terminal 3 - Worker 3
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 python scripts/run_worker.py --worker-id youtube-worker-03
 
 # Add more workers as needed
@@ -193,7 +193,7 @@ python scripts/run_worker.py --worker-id youtube-worker-03
 ### Option C: Background Deployment (Linux/Production)
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Run workers in background with nohup
 nohup python scripts/run_worker.py --worker-id youtube-worker-01 > logs/worker-01.log 2>&1 &
@@ -268,7 +268,7 @@ for task in tasks:
 Check that videos are being stored correctly:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Check IdeaInspiration database
 python -c "
@@ -295,7 +295,7 @@ for video in videos:
 Monitor YouTube API quota usage:
 
 ```bash
-cd /home/runner/work/PrismQ.IdeaInspiration/PrismQ.IdeaInspiration/Source/Video/YouTube/Video
+cd /home/runner/work/PrismQ.T.Idea.Inspiration/PrismQ.T.Idea.Inspiration/Source/Video/YouTube/Video
 
 # Check today's quota usage
 python -c "

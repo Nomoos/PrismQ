@@ -6,7 +6,7 @@
 
 ## Overview
 
-PrismQ.IdeaInspiration uses a **single database architecture** where all sources save their data to a central SQLite database with platform identification via the `source_platform` field.
+PrismQ.T.Idea.Inspiration uses a **single database architecture** where all sources save their data to a central SQLite database with platform identification via the `source_platform` field.
 
 ## Current Architecture
 

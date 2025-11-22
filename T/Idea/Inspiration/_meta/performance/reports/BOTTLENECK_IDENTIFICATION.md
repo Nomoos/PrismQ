@@ -2,7 +2,7 @@
 ## Phase A of Issue #111
 
 **Date**: 2025-10-31  
-**Purpose**: Identify performance bottlenecks across PrismQ.IdeaInspiration modules
+**Purpose**: Identify performance bottlenecks across PrismQ.T.Idea.Inspiration modules
 
 ---
 

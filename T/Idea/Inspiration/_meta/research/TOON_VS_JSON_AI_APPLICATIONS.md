@@ -2,7 +2,7 @@
 
 **Research Date**: 2025-11-17  
 **Status**: Complete  
-**Related Project**: PrismQ.IdeaInspiration  
+**Related Project**: PrismQ.T.Idea.Inspiration  
 **Context**: AI-powered content generation and processing pipeline
 
 ---
@@ -514,7 +514,7 @@ logger.info(json.dumps({
 
 ## Use Case Analysis
 
-### PrismQ.IdeaInspiration Specific Use Cases
+### PrismQ.T.Idea.Inspiration Specific Use Cases
 
 #### 1. Classification Module: Batch Classification ✅ TOON for LLM Input
 
@@ -825,7 +825,7 @@ else:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     PrismQ.IdeaInspiration                   │
+│                     PrismQ.T.Idea.Inspiration                   │
 │                                                              │
 │  Internal Processing        →    JSON                       │
 │  (APIs, storage, ML frameworks, data interchange)           │
@@ -1519,7 +1519,7 @@ print(f"Token count: {len(tokens)}")
 | **Logging** | ✅ Standard | Not designed | ✅ **JSON** |
 | **LLM Output Validation** | Schema needed | ✅ Built-in structure | ✅ **TOON** |
 
-### Key Recommendations for PrismQ.IdeaInspiration
+### Key Recommendations for PrismQ.T.Idea.Inspiration
 
 1. **Use JSON as default** for all internal processing, storage, and APIs
 2. **Convert to TOON** specifically for LLM prompts with structured tabular data

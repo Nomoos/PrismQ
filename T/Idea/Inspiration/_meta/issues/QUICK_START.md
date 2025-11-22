@@ -339,8 +339,8 @@ STRETCH GOAL: Implement 2-4 Signals sources
 
 ## 🔗 Quick Links
 
-- **Repository**: https://github.com/Nomoos/PrismQ.IdeaInspiration
-- **Issues**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+- **Repository**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration
+- **Issues**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 - **Client Backend**: `/Client/Backend/`
 - **Client Frontend**: `/Client/Frontend/`
 - **Sources**: `/Sources/`

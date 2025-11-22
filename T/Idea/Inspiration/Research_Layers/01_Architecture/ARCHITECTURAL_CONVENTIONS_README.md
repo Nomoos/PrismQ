@@ -1,6 +1,6 @@
 # Research: Layered Architecture
 
-This directory contains research materials and analysis related to the layered architecture implementation for PrismQ.IdeaInspiration.
+This directory contains research materials and analysis related to the layered architecture implementation for PrismQ.T.Idea.Inspiration.
 
 ## Contents
 

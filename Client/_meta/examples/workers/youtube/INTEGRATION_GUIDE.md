@@ -1,6 +1,6 @@
 # YouTube Shorts Scraper Worker - Integration Guide
 
-Complete guide for implementing and deploying the YouTube Shorts Scraper worker in the [PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube](https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube) repository.
+Complete guide for implementing and deploying the YouTube Shorts Scraper worker in the [PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube) repository.
 
 ## Table of Contents
 
@@ -95,8 +95,8 @@ The YouTube Shorts Scraper Worker is a Python-based distributed task processor t
 
 ```bash
 # Clone the repository
-git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube
-cd PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube
+git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube
+cd PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube
 
 # Copy worker example from PrismQ.Client
 cp -r path/to/PrismQ.Client/_meta/examples/workers/youtube ./worker

@@ -239,7 +239,7 @@ This project includes an `.nvmrc` file that specifies the recommended Node.js ve
 
 ```bash
 # Navigate to project directory
-cd PrismQ.IdeaInspiration/Client/Frontend
+cd PrismQ.T.Idea.Inspiration/Client/Frontend
 
 # Install and use the version specified in .nvmrc
 nvm install
@@ -437,7 +437,7 @@ For the best development experience with PrismQ:
 nvm install 24.11.0
 nvm use 24.11.0
 nvm alias default 24.11.0
-cd PrismQ.IdeaInspiration/Client/Frontend
+cd PrismQ.T.Idea.Inspiration/Client/Frontend
 npm install
 npm run dev
 ```
@@ -454,7 +454,7 @@ npm run dev
 
 - Check [SETUP.md](SETUP.md) for general setup instructions
 - See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues
-- Open an issue: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+- Open an issue: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 
 ---
 

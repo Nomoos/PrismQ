@@ -6,13 +6,13 @@
 
 ## Executive Summary
 
-This document provides comprehensive research on extending the PrismQ.IdeaInspiration.Model to better support collecting content inspirations from various sources. Based on analysis of the single database architecture (migrated November 2025) and industry best practices, we examine how Sources can be optimally transformed into IdeaInspiration objects, which are then consumed by downstream modules like **PrismQ.Idea.Model** for story generation.
+This document provides comprehensive research on extending the PrismQ.T.Idea.Inspiration.Model to better support collecting content inspirations from various sources. Based on analysis of the single database architecture (migrated November 2025) and industry best practices, we examine how Sources can be optimally transformed into IdeaInspiration objects, which are then consumed by downstream modules like **PrismQ.Idea.Model** for story generation.
 
 ## Architecture Context
 
 **Important Clarification:**
 
-- **This Repository (PrismQ.IdeaInspiration)**: Collection layer - Sources → IdeaInspiration objects
+- **This Repository (PrismQ.T.Idea.Inspiration)**: Collection layer - Sources → IdeaInspiration objects
 - **PrismQ.Idea.Model**: Content generation layer - takes IdeaInspiration(s) → creates story suggestions/scripts
 - **PrismQ.Idea.Extractor**: Blending/mixing layer - combines multiple IdeaInspiration objects before story creation
 
@@ -313,8 +313,8 @@ Stage 2: TRANSFORM
 └─ Use appropriate factory method (from_text, from_video, from_audio)
 
 Stage 3: ENRICH (Optional)
-├─ Run scoring (PrismQ.IdeaInspiration.Scoring)
-├─ Run classification (PrismQ.IdeaInspiration.Classification)
+├─ Run scoring (PrismQ.T.Idea.Inspiration.Scoring)
+├─ Run classification (PrismQ.T.Idea.Inspiration.Classification)
 ├─ Add contextual scores
 └─ Compute relevance scores
 
@@ -370,7 +370,7 @@ These trend IdeaInspiration objects are then available to **PrismQ.Idea.Extracto
 
 ```
 ┌─────────────────────────────────┐
-│  PrismQ.IdeaInspiration         │
+│  PrismQ.T.Idea.Inspiration         │
 │  (This Repository)              │
 │                                 │
 │  Sources → IdeaInspiration      │
@@ -632,7 +632,7 @@ extractor.blend(
 
 ## Conclusion
 
-The PrismQ.IdeaInspiration repository serves as the **collection layer** in the content generation pipeline. Key takeaways:
+The PrismQ.T.Idea.Inspiration repository serves as the **collection layer** in the content generation pipeline. Key takeaways:
 
 1. **Current IdeaInspiration model works well** - Handles most Sources without modification
 2. **Use general model first** - Only extend with Signal type when truly needed

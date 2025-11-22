@@ -17,7 +17,7 @@
 
 ## Overview
 
-This document describes the progressive enrichment pattern used for workers in PrismQ.IdeaInspiration.
+This document describes the progressive enrichment pattern used for workers in PrismQ.T.Idea.Inspiration.
 Workers are organized in a hierarchical inheritance structure where each level adds specific functionality
 without modifying parent classes, following the **Open/Closed Principle** and **Template Method Pattern**.
 
@@ -373,4 +373,4 @@ def test_youtube_video_worker_scraping():
 ---
 
 **Last Updated**: 2025-11-16  
-**Maintained By**: PrismQ.IdeaInspiration Team
+**Maintained By**: PrismQ.T.Idea.Inspiration Team

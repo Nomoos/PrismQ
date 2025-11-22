@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This report documents the baseline performance characteristics of the PrismQ.IdeaInspiration ecosystem, identifying current performance metrics and bottlenecks across three major modules:
+This report documents the baseline performance characteristics of the PrismQ.T.Idea.Inspiration ecosystem, identifying current performance metrics and bottlenecks across three major modules:
 
 1. **Client Backend** - FastAPI-based control panel
 2. **Scoring** - Content scoring and evaluation

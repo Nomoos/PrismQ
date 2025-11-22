@@ -8,7 +8,7 @@
 
 ## Overview
 
-This index tracks all issues related to implementing the SQLite-based task queue system for PrismQ.IdeaInspiration. The system provides persistent, distributed task processing with multiple scheduling strategies on Windows.
+This index tracks all issues related to implementing the SQLite-based task queue system for PrismQ.T.Idea.Inspiration. The system provides persistent, distributed task processing with multiple scheduling strategies on Windows.
 
 ---
 

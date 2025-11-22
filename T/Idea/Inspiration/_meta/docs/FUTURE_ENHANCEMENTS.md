@@ -15,7 +15,7 @@ This document consolidates future enhancement ideas previously tracked in the is
 **Estimated Effort**: 4-6 weeks
 
 ### Description
-Create a unified pipeline that integrates all PrismQ.IdeaInspiration modules (Sources, Model, Classification, Scoring) into a single, cohesive workflow for end-to-end content idea processing.
+Create a unified pipeline that integrates all PrismQ.T.Idea.Inspiration modules (Sources, Model, Classification, Scoring) into a single, cohesive workflow for end-to-end content idea processing.
 
 ### Key Features
 - Seamless data flow between modules
@@ -116,7 +116,7 @@ Implement an SQLAlchemy ORM layer as an alternative repository implementation, p
 **Estimated Effort**: 3-4 weeks
 
 ### Description
-Create a dedicated Builder module (`PrismQ.IdeaInspiration.Builder`) to handle platform-specific transformations from raw source data (YouTube, Reddit, Genius, etc.) into clean IdeaInspiration domain objects.
+Create a dedicated Builder module (`PrismQ.T.Idea.Inspiration.Builder`) to handle platform-specific transformations from raw source data (YouTube, Reddit, Genius, etc.) into clean IdeaInspiration domain objects.
 
 ### Current Issues
 - Transformation logic scattered across plugins

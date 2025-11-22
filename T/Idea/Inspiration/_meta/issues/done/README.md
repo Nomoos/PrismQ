@@ -8,7 +8,7 @@
 
 ## Overview
 
-This directory contains all completed and archived work from the PrismQ.IdeaInspiration project. All items have been verified against actual code implementation to ensure documentation matches reality.
+This directory contains all completed and archived work from the PrismQ.T.Idea.Inspiration project. All items have been verified against actual code implementation to ensure documentation matches reality.
 
 ---
 

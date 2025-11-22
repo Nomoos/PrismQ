@@ -1,6 +1,6 @@
 # Performance Profiling and Benchmarking
 
-This directory contains performance profiling tools, benchmark tests, and baseline reports for the PrismQ.IdeaInspiration ecosystem.
+This directory contains performance profiling tools, benchmark tests, and baseline reports for the PrismQ.T.Idea.Inspiration ecosystem.
 
 ## Overview
 

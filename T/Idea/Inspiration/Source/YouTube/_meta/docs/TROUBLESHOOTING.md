@@ -778,7 +778,7 @@ Logs: [attach terminal output]
 ### Community Resources
 
 - **Documentation**: `docs/` directory
-- **GitHub Issues**: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+- **GitHub Issues**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 - **Known Issues**: `docs/KNOWN_ISSUES.md`
 - **Architecture**: `docs/ARCHITECTURE.md`
 

@@ -1,8 +1,8 @@
-# PrismQ.IdeaInspiration - Architecture
+# PrismQ.T.Idea.Inspiration - Architecture
 
 ## Overview
 
-PrismQ.IdeaInspiration is a multi-module repository that follows consistent architectural patterns across its components. This document describes the overall architecture and module organization patterns used throughout the repository.
+PrismQ.T.Idea.Inspiration is a multi-module repository that follows consistent architectural patterns across its components. This document describes the overall architecture and module organization patterns used throughout the repository.
 
 ## Repository Structure
 
@@ -186,7 +186,7 @@ See [SOLID_PRINCIPLES.md](./SOLID_PRINCIPLES.md) for detailed explanations and e
 
 ### Integration Architecture
 
-The modules in PrismQ.IdeaInspiration work together in a coordinated workflow:
+The modules in PrismQ.T.Idea.Inspiration work together in a coordinated workflow:
 
 ```mermaid
 graph LR

@@ -60,7 +60,7 @@ All major sections now include practical Python examples:
 Each layer can have its own virtual environment with specific dependencies:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Source/
 │   ├── Audio/
 │   │   ├── venv/              # Audio-specific dependencies

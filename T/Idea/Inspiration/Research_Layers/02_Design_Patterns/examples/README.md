@@ -1,6 +1,6 @@
 # Design Patterns - Python Examples
 
-This directory contains practical, runnable Python examples demonstrating SOLID principles and design patterns used in PrismQ.IdeaInspiration.
+This directory contains practical, runnable Python examples demonstrating SOLID principles and design patterns used in PrismQ.T.Idea.Inspiration.
 
 ## 📂 Contents
 

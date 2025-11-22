@@ -1,6 +1,6 @@
 # Setup Guide
 
-This guide covers setting up the PrismQ.IdeaInspiration development environment.
+This guide covers setting up the PrismQ.T.Idea.Inspiration development environment.
 
 ## Prerequisites
 
@@ -47,8 +47,8 @@ Benefits:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-   cd PrismQ.IdeaInspiration
+   git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+   cd PrismQ.T.Idea.Inspiration
    ```
 
 2. **Set up virtual environments (recommended):**
@@ -157,4 +157,4 @@ After setup, refer to:
 
 For issues and questions:
 - Check module-specific troubleshooting guides
-- See [GitHub Issues](https://github.com/Nomoos/PrismQ.IdeaInspiration/issues)
+- See [GitHub Issues](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues)

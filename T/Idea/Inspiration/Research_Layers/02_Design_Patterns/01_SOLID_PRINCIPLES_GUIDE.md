@@ -1,6 +1,6 @@
-# SOLID Principles - PrismQ.IdeaInspiration
+# SOLID Principles - PrismQ.T.Idea.Inspiration
 
-This document explains SOLID design principles with concrete examples from the PrismQ.IdeaInspiration codebase. These principles guide our architecture and code design decisions.
+This document explains SOLID design principles with concrete examples from the PrismQ.T.Idea.Inspiration codebase. These principles guide our architecture and code design decisions.
 
 ## Table of Contents
 

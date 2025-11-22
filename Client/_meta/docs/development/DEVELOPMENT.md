@@ -27,8 +27,8 @@ Guide for developers contributing to the PrismQ Web Client.
 
 1. **Fork and Clone:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/PrismQ.IdeaInspiration.git
-   cd PrismQ.IdeaInspiration/Client
+   git clone https://github.com/YOUR_USERNAME/PrismQ.T.Idea.Inspiration.git
+   cd PrismQ.T.Idea.Inspiration/Client
    ```
 
 2. **Install Backend Dependencies:**

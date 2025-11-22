@@ -2,11 +2,11 @@
 
 **Date:** 2025-10-31  
 **Status:** Recommended  
-**Scope:** All PrismQ.IdeaInspiration modules
+**Scope:** All PrismQ.T.Idea.Inspiration modules
 
 ## Executive Summary
 
-For the PrismQ.IdeaInspiration repository, **PowerShell (.ps1)** is recommended as the primary scripting format for Windows automation scripts, with batch scripts (.bat) maintained for legacy support.
+For the PrismQ.T.Idea.Inspiration repository, **PowerShell (.ps1)** is recommended as the primary scripting format for Windows automation scripts, with batch scripts (.bat) maintained for legacy support.
 
 ## Problem Statement
 
@@ -261,7 +261,7 @@ This is documented in the README with clear instructions.
 
 ## Conclusion
 
-PowerShell is the recommended scripting format for PrismQ.IdeaInspiration because:
+PowerShell is the recommended scripting format for PrismQ.T.Idea.Inspiration because:
 
 1. ✅ **Better for AI assistants** (GitHub Copilot, ChatGPT)
 2. ✅ **Modern Windows standard**

@@ -126,7 +126,7 @@ Deployment and release management
 - [Frontend Directory](./Frontend/) - Frontend modules index
 
 ### Project
-- [Main Repository](../) - PrismQ.IdeaInspiration overview
+- [Main Repository](../) - PrismQ.T.Idea.Inspiration overview
 
 ## 📄 License
 

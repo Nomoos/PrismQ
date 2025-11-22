@@ -1,6 +1,6 @@
 # _meta
 
-This directory contains project-level metadata, documentation, and organizational materials for the PrismQ.IdeaInspiration repository.
+This directory contains project-level metadata, documentation, and organizational materials for the PrismQ.T.Idea.Inspiration repository.
 
 ## Structure
 

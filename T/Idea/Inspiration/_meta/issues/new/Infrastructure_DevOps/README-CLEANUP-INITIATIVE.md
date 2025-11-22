@@ -1,7 +1,7 @@
 # Repository Cleanup Initiative
 
 ## Overview
-This directory contains a set of issues focused on cleaning up and standardizing the PrismQ.IdeaInspiration repository. These issues address documentation organization, code structure, and development workflow improvements.
+This directory contains a set of issues focused on cleaning up and standardizing the PrismQ.T.Idea.Inspiration repository. These issues address documentation organization, code structure, and development workflow improvements.
 
 ## Issues Created
 

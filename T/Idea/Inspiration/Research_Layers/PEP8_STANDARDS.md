@@ -244,7 +244,7 @@ x = x + 1  # Increment x (obvious!)
 ```python
 # ✅ GOOD: Module-level docstring
 """
-Video processing module for PrismQ.IdeaInspiration.
+Video processing module for PrismQ.T.Idea.Inspiration.
 
 This module provides functionality for processing video content
 from various sources including YouTube, TikTok, and Vimeo.

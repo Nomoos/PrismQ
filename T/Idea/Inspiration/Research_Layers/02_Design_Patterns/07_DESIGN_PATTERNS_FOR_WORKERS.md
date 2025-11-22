@@ -1,7 +1,7 @@
 # Design Patterns for Workers - Research
 
 **Date**: 2025-11-14  
-**Purpose**: Research design patterns applicable to worker implementations in PrismQ.IdeaInspiration
+**Purpose**: Research design patterns applicable to worker implementations in PrismQ.T.Idea.Inspiration
 
 ## Table of Contents
 
@@ -19,14 +19,14 @@
 
 ## Overview
 
-Workers in PrismQ.IdeaInspiration follow a layered, modular architecture where specificity increases at each level:
+Workers in PrismQ.T.Idea.Inspiration follow a layered, modular architecture where specificity increases at each level:
 
 ```
-PrismQ.IdeaInspiration.Source.Video             ← General (Video content handling)
+PrismQ.T.Idea.Inspiration.Source.Video             ← General (Video content handling)
     ↓
-PrismQ.IdeaInspiration.Source.Video.YouTube     ← Platform-specific (YouTube operations)
+PrismQ.T.Idea.Inspiration.Source.Video.YouTube     ← Platform-specific (YouTube operations)
     ↓
-PrismQ.IdeaInspiration.Source.Video.YouTube.Video ← Endpoint-specific (Video scraping)
+PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video ← Endpoint-specific (Video scraping)
 ```
 
 This hierarchy enables:

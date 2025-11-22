@@ -73,7 +73,7 @@ task_manager:
   api_key: "${TASKMANAGER_API_KEY}"
 
 workers:
-  - name: "PrismQ.IdeaInspiration.Source.Video.YouTube.VideoScraper"
+  - name: "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.VideoScraper"
     project_path: "./Source/Video/YouTube/Video"
     venv_python: "./Source/Video/YouTube/Video/venv/bin/python"
     module: "src.workers.video_scraper"
@@ -449,7 +449,7 @@ curl http://localhost:8080/workers/YouTube/health
 ## File Structure
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Client/
 │   └── WorkerHost/
 │       ├── src/

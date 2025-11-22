@@ -49,8 +49,8 @@ python --version
 ### 1. Clone Repository (if not already done)
 
 ```bash
-git clone https://github.com/Nomoos/PrismQ.IdeaInspiration.git
-cd PrismQ.IdeaInspiration
+git clone https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.git
+cd PrismQ.T.Idea.Inspiration
 ```
 
 ### 2. Setup Virtual Environment

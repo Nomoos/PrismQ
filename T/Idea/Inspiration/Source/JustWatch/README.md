@@ -168,4 +168,4 @@ pytest _meta/tests/
 
 ## License
 
-Part of PrismQ.IdeaInspiration project - Proprietary
+Part of PrismQ.T.Idea.Inspiration project - Proprietary

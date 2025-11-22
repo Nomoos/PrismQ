@@ -9,7 +9,7 @@
 
 ## Overview
 
-[direnv](https://direnv.net/) is a shell extension that automatically loads and unloads environment variables based on the current directory. In PrismQ.IdeaInspiration, direnv automatically:
+[direnv](https://direnv.net/) is a shell extension that automatically loads and unloads environment variables based on the current directory. In PrismQ.T.Idea.Inspiration, direnv automatically:
 
 - **Activates** the correct virtual environment when you `cd` into a project
 - **Deactivates** the environment when you leave the project
@@ -94,7 +94,7 @@ source ~/.bashrc  # or ~/.zshrc, etc.
 Navigate to each project and allow direnv to load the `.envrc` file:
 
 ```bash
-cd PrismQ.IdeaInspiration/Classification
+cd PrismQ.T.Idea.Inspiration/Classification
 direnv allow
 
 cd ../EnvLoad
@@ -119,7 +119,7 @@ direnv allow
 
 ```bash
 # Navigate to a project
-cd PrismQ.IdeaInspiration/Classification
+cd PrismQ.T.Idea.Inspiration/Classification
 # Output: ✅ Activated Classification environment
 # Your virtual environment is now active!
 
@@ -182,7 +182,7 @@ direnv requires explicit approval (`direnv allow`) before executing any `.envrc`
 direnv works with nested directories:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Classification/
 │   ├── .envrc          ← Activates when you cd here
 │   └── venv/
@@ -410,7 +410,7 @@ You need to do this:
 # Check which Python is active
 which python
 
-# Should be: .../PrismQ.IdeaInspiration/<project>/venv/bin/python
+# Should be: .../PrismQ.T.Idea.Inspiration/<project>/venv/bin/python
 
 # If wrong, recreate the venv
 cd <project>
@@ -495,7 +495,7 @@ fi
 You can create a `.envrc` at the repository root for global settings:
 
 ```bash
-# PrismQ.IdeaInspiration/.envrc (optional)
+# PrismQ.T.Idea.Inspiration/.envrc (optional)
 
 # Global environment variables for all projects
 export PRISMQ_ROOT="$(pwd)"
@@ -508,7 +508,7 @@ PATH_add "_meta/_scripts"
 
 Then allow it:
 ```bash
-cd PrismQ.IdeaInspiration
+cd PrismQ.T.Idea.Inspiration
 direnv allow
 ```
 
@@ -643,7 +643,7 @@ You can configure direnv to auto-allow trusted directories:
 ```bash
 # ~/.config/direnv/direnv.toml
 [whitelist]
-prefix = [ "/home/user/projects/PrismQ.IdeaInspiration" ]
+prefix = [ "/home/user/projects/PrismQ.T.Idea.Inspiration" ]
 ```
 
 **Use with caution!** Only whitelist directories you fully control.
