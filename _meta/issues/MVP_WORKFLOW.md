@@ -15,7 +15,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-## MVP Workflow Sequence (14 Stages + Loops)
+## MVP Workflow Sequence (24 Stages + Loops)
 
 ### Using Real Folder Names with Iterative Co-Improvement:
 
@@ -46,15 +46,35 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
         ↓ YES                                                  │
 13. Check: Is Script Accepted? ─NO─────────────────────────────┘
         ↓ YES
-14. PrismQ.T.Rewiew.Title.Readability ←──────────┐
+14. PrismQ.T.Rewiew.Script.Grammar ←──────────────┐
+        ↓                                         │
+        ├─FAILS─→ Return to Script.Refinement ───┘
+        ↓ PASSES
+15. PrismQ.T.Rewiew.Script.Tone ←────────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+16. PrismQ.T.Rewiew.Script.Content ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+17. PrismQ.T.Rewiew.Script.Consistency ←─────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+18. PrismQ.T.Rewiew.Script.Editing ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+19. PrismQ.T.Rewiew.Title.Readability ←──────────┐
         ↓                                         │
         ├─FAILS─→ Return to Title.Refinement ────┘
         ↓ PASSES
-15. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
+20. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
         ↓                                             │
         ├─FAILS─→ Return to Script.Refinement ───────┘
         ↓ PASSES
-16. PrismQ.T.Publishing.Finalization
+21. PrismQ.T.Publishing.Finalization
 ```
 
 ---
