@@ -13,7 +13,7 @@ If ACCEPTED: Proceed to MVP-014 (Quality Reviews)
 The acceptance check always uses the newest/latest script version.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, asdict
 
 
@@ -38,8 +38,8 @@ class ScriptAcceptanceResult:
     coherence_score: int
     alignment_score: int
     overall_score: int
-    issues: list[str]
-    suggestions: list[str]
+    issues: List[str]
+    suggestions: List[str]
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary format."""
