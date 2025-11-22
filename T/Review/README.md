@@ -38,6 +38,26 @@ Comprehensive script evaluation with scoring (0-100%) and improvement recommenda
 **[→ View Script Documentation](./Script/README.md)**
 **[→ View Script Metadata](./Script/_meta/)**
 
+### [Title](./Title/)
+**AI-powered title review** ⭐ NEW
+
+Title evaluation against script content and original idea intent.
+
+#### [Title/ByScriptAndIdea](./Title/ByScriptAndIdea/)
+**Stage 4 (MVP-004): Review title v1 against script v1 and idea**
+
+Comprehensive title evaluation with dual alignment assessment:
+- Script alignment scoring (title matches script content)
+- Idea alignment verification (title reflects idea intent)
+- Engagement and clickthrough potential assessment
+- Expectation setting validation
+- SEO optimization recommendations
+- Prioritized improvement suggestions
+- Feedback for title v2 generation
+
+**[→ View Title/ByScriptAndIdea Documentation](./Title/ByScriptAndIdea/README.md)**
+**[→ View Title/ByScriptAndIdea Metadata](./Title/ByScriptAndIdea/_meta/)**
+
 ### [Grammar](./Grammar/)
 **Grammar and syntax**
 
