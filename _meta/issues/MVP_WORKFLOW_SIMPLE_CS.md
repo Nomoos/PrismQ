@@ -20,19 +20,19 @@ Tento dokument definuje **Minimální životaschopný produkt (MVP)** workflow p
 ```
 PrismQ.T.Idea.Creation (Vytváření nápadu)
     ↓
-PrismQ.T.Title.Draft (Návrh titulku)
+PrismQ.T.Title.FromIdea (Návrh titulku)
     ↓
-PrismQ.T.Rewiew.Title (Revize titulku) ←────┐
+PrismQ.T.Review.Title (Revize titulku) ←────┐
     ↓                                         │
     ├─→ Pokud jsou potřeba změny ────────────┘
     ↓ (Označit jako připraveno)
-PrismQ.T.Script.Draft (Návrh skriptu)
+PrismQ.T.Script.FromIdeaAndTitle (Návrh skriptu)
     ↓
-PrismQ.T.Rewiew.Script (Revize skriptu) ←──┐
+PrismQ.T.Review.Script (Revize skriptu) ←──┐
     ↓                                       │
     ├─→ Pokud jsou potřeba změny → T.Script.Improvements ─┘
     ↓ (Označit jako připraveno)
-PrismQ.T.Rewiew.Content (Finální revize obsahu) ←─┐
+PrismQ.T.Review.Content (Finální revize obsahu) ←─┐
     ↓                                              │
     ├─→ Pokud jsou potřeba změny → T.Script.Improvements ─┘
     │   (nebo zpět na T.Title.Refinement pokud titulek potřebuje aktualizaci)
@@ -43,19 +43,19 @@ PrismQ.T.Publishing.Finalization (Finalizace publikování)
 **Detaily zpětnovazebních smyček:**
 
 1. **Smyčka revize titulku**: 
-   - Title.Draft → Rewiew.Title
+   - Title.Draft → Review.Title
    - Pokud jsou potřeba změny: návrat na Title.Draft
    - Pokud připraveno: pokračovat na Script.Draft
 
 2. **Smyčka revize skriptu**:
-   - Script.Draft → Rewiew.Script
-   - Pokud jsou potřeba změny: Script.Improvements → Rewiew.Script (smyčka)
-   - Pokud připraveno: pokračovat na Rewiew.Content
+   - Script.Draft → Review.Script
+   - Pokud jsou potřeba změny: Script.Improvements → Review.Script (smyčka)
+   - Pokud připraveno: pokračovat na Review.Content
 
 3. **Smyčka finální revize obsahu**:
-   - Rewiew.Content reviduje skript i titulek společně
-   - Pokud jsou potřeba změny skriptu: Script.Improvements → Rewiew.Content (smyčka)
-   - Pokud jsou potřeba změny titulku: Title.Refinement → Rewiew.Content (smyčka)
+   - Review.Content reviduje skript i titulek společně
+   - Pokud jsou potřeba změny skriptu: Script.Improvements → Review.Content (smyčka)
+   - Pokud jsou potřeba změny titulku: Title.Refinement → Review.Content (smyčka)
    - Pokud připraveno: pokračovat na Publishing.Finalization
 
 **Vztah k plnému workflow:**
@@ -73,13 +73,13 @@ MVP zjednodušuje plné workflow dokumentované v `T/TITLE_SCRIPT_WORKFLOW.md`:
 
 **Struktura složek:**
 - `T/Idea/Creation/` - Vytváření a zachycení nápadu
-- `T/Title/Draft/` - Generování titulku
-- `T/Rewiew/Idea/` - Revize titulku (reviduje kvalitu titulku)
-- `T/Script/Draft/` - Tvorba návrhu skriptu
-- `T/Rewiew/Script/` - Revize skriptu (reviduje kvalitu skriptu)
+- `T/Title/FromIdea/` - Generování titulku
+- `T/Review/Idea/` - Revize titulku (reviduje kvalitu titulku)
+- `T/Script/FromIdeaAndTitle/` - Tvorba návrhu skriptu
+- `T/Review/Script/` - Revize skriptu (reviduje kvalitu skriptu)
 - `T/Script/Improvements/` - Vylepšení skriptu
 - `T/Title/Refinement/` - Vybrušování titulku
-- `T/Rewiew/Content/` - Finální revize obsahu (skript + titulek společně)
+- `T/Review/Content/` - Finální revize obsahu (skript + titulek společně)
 - `T/Publishing/Finalization/` - Publikování
 
 ---
@@ -162,9 +162,9 @@ Po validaci základního workflow MVP, rozšířit o:
 
 ---
 
-### Fáze 2: PrismQ.T.Title.Draft
+### Fáze 2: PrismQ.T.Title.FromIdea
 **Cíl**: Generovat počáteční varianty titulku  
-**Složka**: `T/Title/Draft/`  
+**Složka**: `T/Title/FromIdea/`  
 **Vlastník**: Worker12, Worker13  
 **Priorita**: Kritická  
 **Časový horizont**: Sprint 1, Týden 1
@@ -172,7 +172,7 @@ Po validaci základního workflow MVP, rozšířit o:
 #### MVP Issue: #MVP-002 - Základní generátor titulků
 - **Worker**: Worker13 (Mistr promptů)
 - **Úsilí**: 2 dny
-- **Modul**: PrismQ.T.Title.Draft
+- **Modul**: PrismQ.T.Title.FromIdea
 - **Popis**: Jednoduché generování titulků pomocí AI
 - **Akceptační kritéria**:
   - Vstup: Objekt nápadu
@@ -196,20 +196,20 @@ Po validaci základního workflow MVP, rozšířit o:
 | Issue | Modul | Fáze | Worker | Úsilí | Popis |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Nápad | Worker02 | 2d | Základní zachycení nápadu |
-| #MVP-002 | PrismQ.T.Title.Draft | Titulek | Worker13 | 2d | Generování titulku |
-| #MVP-003 | PrismQ.T.Rewiew.Idea | Revize titulku | Worker10 | 1d | Revize titulku se zpětnou vazbou |
-| #MVP-004 | PrismQ.T.Script.Draft | Skript | Worker02 | 3d | Generování skriptu |
-| #MVP-005 | PrismQ.T.Rewiew.Script | Revize skriptu | Worker10 | 1d | Revize skriptu se zpětnou vazbou |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Titulek | Worker13 | 2d | Generování titulku |
+| #MVP-003 | PrismQ.T.Review.Idea | Revize titulku | Worker10 | 1d | Revize titulku se zpětnou vazbou |
+| #MVP-004 | PrismQ.T.Script.FromIdeaAndTitle | Skript | Worker02 | 3d | Generování skriptu |
+| #MVP-005 | PrismQ.T.Review.Script | Revize skriptu | Worker10 | 1d | Revize skriptu se zpětnou vazbou |
 | #MVP-006 | PrismQ.T.Script.Improvements | Vylepšení | Worker02 | 2d | Vylepšení skriptu |
-| #MVP-007 | PrismQ.T.Rewiew.Content | Finální revize | Worker10 | 1d | Finální revize obsahu |
+| #MVP-007 | PrismQ.T.Review.Content | Finální revize | Worker10 | 1d | Finální revize obsahu |
 | #MVP-008 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
-| #MVP-009A | PrismQ.T.Rewiew.Script.Grammar | Revize gramatiky | Worker10 | 0.5d | Kontrola gramatiky skriptu |
-| #MVP-009B | PrismQ.T.Rewiew.Script.Tone | Revize tónu | Worker10 | 0.5d | Kontrola tónu skriptu |
-| #MVP-009C | PrismQ.T.Rewiew.Script.Content | Revize obsahu | Worker10 | 0.5d | Kontrola logiky obsahu |
-| #MVP-009D | PrismQ.T.Rewiew.Script.Consistency | Revize konzistence | Worker10 | 0.5d | Kontrola konzistence skriptu |
-| #MVP-009E | PrismQ.T.Rewiew.Script.Editing | Revize editace | Worker10 | 0.5d | Kontrola jasnosti a plynulosti |
-| #MVP-009F | PrismQ.T.Rewiew.Title.Readability | Revize čitelnosti titulku | Worker10 | 0.5d | Kontrola čitelnosti titulku |
-| #MVP-009G | PrismQ.T.Rewiew.Script.Readability | Revize čitelnosti skriptu | Worker10 | 0.5d | Kontrola voiceover čitelnosti |
+| #MVP-009A | PrismQ.T.Review.Script.Grammar | Revize gramatiky | Worker10 | 0.5d | Kontrola gramatiky skriptu |
+| #MVP-009B | PrismQ.T.Review.Script.Tone | Revize tónu | Worker10 | 0.5d | Kontrola tónu skriptu |
+| #MVP-009C | PrismQ.T.Review.Script.Content | Revize obsahu | Worker10 | 0.5d | Kontrola logiky obsahu |
+| #MVP-009D | PrismQ.T.Review.Script.Consistency | Revize konzistence | Worker10 | 0.5d | Kontrola konzistence skriptu |
+| #MVP-009E | PrismQ.T.Review.Script.Editing | Revize editace | Worker10 | 0.5d | Kontrola jasnosti a plynulosti |
+| #MVP-009F | PrismQ.T.Review.Title.Readability | Revize čitelnosti titulku | Worker10 | 0.5d | Kontrola čitelnosti titulku |
+| #MVP-009G | PrismQ.T.Review.Script.Readability | Revize čitelnosti skriptu | Worker10 | 0.5d | Kontrola voiceover čitelnosti |
 | #MVP-010A | PrismQ.T.Story.ExpertReview | GPT expertní revize | Worker10 | 0.5d | GPT-based expertní revize příběhu |
 | #MVP-010B | PrismQ.T.Story.ExpertPolish | GPT expertní leštění | Worker10 | 0.5d | GPT-based expertní vylepšení |
 | #MVP-011 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |

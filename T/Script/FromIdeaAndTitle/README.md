@@ -19,7 +19,7 @@ Stage 2: PrismQ.T.Title.FromIdea (v1)
     ↓
 Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1) ← THIS STATE
     ↓
-Stage 4: PrismQ.T.Rewiew.Title.ByScript
+Stage 4: PrismQ.T.Review.Title.ByScript
 ```
 
 ## Input Components
@@ -100,8 +100,8 @@ Creates script that **delivers on title promises** while **staying true to idea 
 ## Next Stage
 
 Script v1 flows to:
-- **Stage 4**: Rewiew.Title.ByScript (reviews Title v1 against Script v1)
-- **Stage 5**: Rewiew.Script.ByTitle (reviews Script v1 against Title v1)
+- **Stage 4**: Review.Title.ByScript (reviews Title v1 against Script v1)
+- **Stage 5**: Review.Script.ByTitle (reviews Script v1 against Title v1)
 
 ## Example Creation
 

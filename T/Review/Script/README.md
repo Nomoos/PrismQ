@@ -1,6 +1,6 @@
-# T/Rewiew/Script - AI Script Review Module
+# T/Review/Script - AI Script Review Module
 
-**Namespace**: `PrismQ.T.Rewiew.Script`
+**Namespace**: `PrismQ.T.Review.Script`
 
 AI-powered script evaluation with comprehensive scoring system (0-100%) and detailed improvement recommendations for target audience optimization.
 
@@ -63,7 +63,7 @@ ScriptDraft → ScriptReview (AI Reviewer) → ScriptWriter (with feedback) → 
 ## Usage Example
 
 ```python
-from PrismQ.T.Rewiew.Script import (
+from PrismQ.T.Review.Script import (
     ScriptReview,
     ReviewCategory,
     ContentLength,
@@ -172,7 +172,7 @@ if comparison["comparison_available"]:
 ## Module Structure
 
 ```
-T/Rewiew/Script/
+T/Review/Script/
 ├── __init__.py              # Module exports
 ├── script_review.py         # Core review model
 ├── README.md                # This file
@@ -188,7 +188,7 @@ T/Rewiew/Script/
 The Review module feeds directly into the Script Writer's feedback loop:
 
 ```python
-from PrismQ.T.Rewiew.Script import ScriptReview
+from PrismQ.T.Review.Script import ScriptReview
 from PrismQ.T.Script.Writer import ScriptWriter
 
 # AI Reviewer evaluates script
@@ -213,7 +213,7 @@ Reviews can reference and update the Idea status:
 
 ```python
 from PrismQ.T.Idea.Model import Idea, IdeaStatus
-from PrismQ.T.Rewiew.Script import ScriptReview
+from PrismQ.T.Review.Script import ScriptReview
 
 idea = Idea(...)
 review = ScriptReview(script_id=f"script-{idea.title}")

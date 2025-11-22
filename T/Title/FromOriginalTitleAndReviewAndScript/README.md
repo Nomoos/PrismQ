@@ -15,8 +15,8 @@ This state is used in **multiple stages** throughout the workflow:
 ### Stage 6: First Improvements (v1 → v2)
 **Using reviews from both title and script v1**
 ```
-Stage 4: Rewiew.Title.ByScript (v1) ← Title review
-Stage 5: Rewiew.Script.ByTitle (v1) ← Script review
+Stage 4: Review.Title.ByScript (v1) ← Title review
+Stage 5: Review.Script.ByTitle (v1) ← Script review
     ↓
 Stage 6: Title.FromOriginalTitleAndReviewAndScript (v1 → v2) ← THIS STATE
 ```
@@ -24,7 +24,7 @@ Stage 6: Title.FromOriginalTitleAndReviewAndScript (v1 → v2) ← THIS STATE
 ### Stage 9: Iterative Refinements (v2 → v3, v3 → v4, v4 → v5...)
 **Using latest review feedback**
 ```
-Stage 8: Rewiew.Title.ByScript (vN) ← Review latest
+Stage 8: Review.Title.ByScript (vN) ← Review latest
     ↓
 Stage 9: Title.FromOriginalTitleAndReviewAndScript (vN → vN+1) ← THIS STATE
     ↓
@@ -35,7 +35,7 @@ Stage 12: Title Acceptance Check
 ### Stage 19 Feedback: Readability Polish (final version refinement)
 **Using readability review feedback**
 ```
-Stage 19: Rewiew.Title.Readability ← Final quality check
+Stage 19: Review.Title.Readability ← Final quality check
     ↓ if FAILS
 Title.FromOriginalTitleAndReviewAndScript (polish) ← THIS STATE
 ```

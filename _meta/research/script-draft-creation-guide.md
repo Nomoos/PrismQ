@@ -289,7 +289,7 @@ And honestly? I'm not sure I can go back..."
 
 ### Script Draft → Next Stages
 
-**To Script Review (T/Rewiew):**
+**To Script Review (T/Review):**
 - Complete draft becomes source for multi-dimensional review
 - Grammar, readability, tone, content accuracy checks
 - Improvements suggested but not yet implemented
@@ -311,7 +311,7 @@ And honestly? I'm not sure I can go back..."
 ### Immediate Next Steps
 
 1. **Save the Draft**
-   - Store in `T/Script/Draft/` directory
+   - Store in `T/Script/FromIdeaAndTitle/` directory
    - Use clear naming: `{idea_id}_script_draft_v1.md`
    - Include metadata header
 
@@ -327,7 +327,7 @@ And honestly? I'm not sure I can go back..."
    - Flag any [CHECK] or [RESEARCH NEEDED] items
 
 4. **Enter Script Review Phase**
-   - Route to T/Rewiew modules for multi-dimensional review
+   - Route to T/Review modules for multi-dimensional review
    - Grammar and syntax check
    - Readability analysis
    - Tone consistency verification
@@ -467,7 +467,7 @@ Remove:
 The Script Review phase involves systematic evaluation across multiple dimensions. Each dimension has specific criteria and improvement targets.
 
 #### 1. **Grammar and Syntax Review**
-**Module**: `T/Rewiew/Grammar`
+**Module**: `T/Review/Grammar`
 
 **Checklist:**
 - [ ] No sentence fragments (unless intentional for style)
@@ -482,7 +482,7 @@ The Script Review phase involves systematic evaluation across multiple dimension
 - Run-on sentences: Usually should be split for breathing
 
 #### 2. **Readability Review**
-**Module**: `T/Rewiew/Readability`
+**Module**: `T/Review/Readability`
 
 **Metrics:**
 - Reading level appropriate for target audience
@@ -498,7 +498,7 @@ The Script Review phase involves systematic evaluation across multiple dimension
 - [ ] No overly long sentences that cause breathlessness
 
 #### 3. **Tone and Voice Review**
-**Module**: `T/Rewiew/Tone`
+**Module**: `T/Review/Tone`
 
 **Checklist:**
 - [ ] Consistent voice throughout (first/third person)
@@ -514,7 +514,7 @@ The Script Review phase involves systematic evaluation across multiple dimension
 - Voice that doesn't match brand/creator
 
 #### 4. **Content Accuracy Review**
-**Module**: `T/Rewiew/Content`
+**Module**: `T/Review/Content`
 
 **Checklist:**
 - [ ] All factual claims are accurate
@@ -530,7 +530,7 @@ The Script Review phase involves systematic evaluation across multiple dimension
 - Validate examples and case studies
 
 #### 5. **Consistency Review**
-**Module**: `T/Rewiew/Consistency`
+**Module**: `T/Review/Consistency`
 
 **Checklist:**
 - [ ] Terminology used consistently throughout
@@ -540,7 +540,7 @@ The Script Review phase involves systematic evaluation across multiple dimension
 - [ ] Brand voice guidelines followed
 
 #### 6. **Final Editing Review**
-**Module**: `T/Rewiew/Editing`
+**Module**: `T/Review/Editing`
 
 **Checklist:**
 - [ ] Redundancies removed

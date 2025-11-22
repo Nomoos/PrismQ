@@ -25,23 +25,23 @@
 ```
 1. PrismQ.T.Idea.Creation
        ↓
-2. PrismQ.T.Title.Draft (v1) ← from Idea
+2. PrismQ.T.Title.FromIdea (v1) ← from Idea
        ↓
-3. PrismQ.T.Script.Draft (v1) ← from Idea + Title v1
+3. PrismQ.T.Script.FromIdeaAndTitle (v1) ← from Idea + Title v1
        ↓
-4. PrismQ.T.Rewiew.Title.ByScript ← Review Title v1 by Script v1 + Idea
+4. PrismQ.T.Review.Title.ByScript ← Review Title v1 by Script v1 + Idea
        ↓
-5. PrismQ.T.Rewiew.Script.ByTitle ← Review Script v1 by Title v1 + Idea
+5. PrismQ.T.Review.Script.ByTitle ← Review Script v1 by Title v1 + Idea
        ↓
 6. PrismQ.T.Title.Improvements (v2) ← Using reviews + title v1, script v1
        ↓
 7. PrismQ.T.Script.Improvements (v2) ← Using reviews + new title v2, script v1
        ↓
-8. PrismQ.T.Rewiew.Title.ByScript (v2) ←──────────┐
+8. PrismQ.T.Review.Title.ByScript (v2) ←──────────┐
        ↓                                           │
 9. PrismQ.T.Title.Refinement (v3)                 │
        ↓                                           │
-10. PrismQ.T.Rewiew.Script.ByTitle (v2) ←─────┐   │
+10. PrismQ.T.Review.Script.ByTitle (v2) ←─────┐   │
         ↓                                      │   │
 11. PrismQ.T.Script.Refinement (v3)            │   │
         ↓                                      │   │
@@ -49,11 +49,11 @@
         ↓ YES                                      │
 13. Script Acceptance Check ─NO────────────────────┘
         ↓ YES
-14. PrismQ.T.Rewiew.Title.Readability (Voiceover) ←──────┐
+14. PrismQ.T.Review.Title.Readability (Voiceover) ←──────┐
         ↓                                                │
         ├─FAILS─→ Return to step 9 ──────────────────────┘
         ↓ PASSES
-15. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─────┐
+15. PrismQ.T.Review.Script.Readability (Voiceover) ←─────┐
         ↓                                                 │
         ├─FAILS─→ Return to step 11 ─────────────────────┘
         ↓ PASSES
@@ -70,14 +70,14 @@
 
 **Folder Paths:**
 - `T/Idea/Creation/` - Idea creation
-- `T/Title/Draft/` - Title v1 drafting
-- `T/Script/Draft/` - Script v1 drafting
-- `T/Rewiew/Idea/` - Title reviews (steps 4, 8, 12, 14)
-- `T/Rewiew/Script/` - Script reviews (steps 5, 10, 13, 15)
+- `T/Title/FromIdea/` - Title v1 drafting
+- `T/Script/FromIdeaAndTitle/` - Script v1 drafting
+- `T/Review/Idea/` - Title reviews (steps 4, 8, 12, 14)
+- `T/Review/Script/` - Script reviews (steps 5, 10, 13, 15)
 - `T/Title/Improvements/` - Title v2 improvements (step 6)
 - `T/Script/Improvements/` - Script v2 improvements + v3 refinements (steps 7, 11)
 - `T/Title/Refinement/` - Title v3+ refinements (step 9)
-- `T/Rewiew/Readability/` - Readability validation (steps 14-15)
+- `T/Review/Readability/` - Readability validation (steps 14-15)
 - `T/Publishing/Finalization/` - Publishing (step 16)
 
 ---
@@ -106,15 +106,15 @@ Worker02: Implement #MVP-001 in T/Idea/Creation/
 - Effort: 2 days
 - Deliverable: Basic idea capture and storage
 
-Worker13: Implement #MVP-002 in T/Title/Draft/
-- Module: PrismQ.T.Title.Draft
+Worker13: Implement #MVP-002 in T/Title/FromIdea/
+- Module: PrismQ.T.Title.FromIdea
 - Dependencies: #MVP-001 (can start in parallel)
 - Priority: Critical
 - Effort: 2 days
 - Deliverable: Generate 3-5 title variants (v1) from idea only
 
-Worker02: Implement #MVP-003 in T/Script/Draft/
-- Module: PrismQ.T.Script.Draft
+Worker02: Implement #MVP-003 in T/Script/FromIdeaAndTitle/
+- Module: PrismQ.T.Script.FromIdeaAndTitle
 - Dependencies: #MVP-002
 - Priority: Critical
 - Effort: 3 days
@@ -137,15 +137,15 @@ Worker02: Implement #MVP-003 in T/Script/Draft/
 
 **Commands**:
 ```
-Worker10: Implement #MVP-004 in T/Rewiew/Idea/
-- Module: PrismQ.T.Rewiew.Title.ByScript
+Worker10: Implement #MVP-004 in T/Review/Idea/
+- Module: PrismQ.T.Review.Title.ByScript
 - Dependencies: #MVP-003 (need both title v1 and script v1)
 - Priority: Critical
 - Effort: 1 day
 - Deliverable: Review title v1 against script v1 and idea - generate feedback
 
-Worker10: Implement #MVP-005 in T/Rewiew/Script/
-- Module: PrismQ.T.Rewiew.Script.ByTitle
+Worker10: Implement #MVP-005 in T/Review/Script/
+- Module: PrismQ.T.Review.Script.ByTitle
 - Dependencies: #MVP-003
 - Priority: Critical
 - Effort: 1 day
@@ -193,8 +193,8 @@ Worker02: Implement #MVP-007 in T/Script/Improvements/
   - Script v1
   - **New title v2** (from step 6)
 
-Worker10: Implement #MVP-008 in T/Rewiew/Idea/
-- Module: PrismQ.T.Rewiew.Title.ByScript (v2)
+Worker10: Implement #MVP-008 in T/Review/Idea/
+- Module: PrismQ.T.Review.Title.ByScript (v2)
 - Dependencies: #MVP-007 (need both v2 versions)
 - Priority: Critical
 - Effort: 1 day
@@ -225,8 +225,8 @@ Worker13: Implement #MVP-009 in T/Title/Refinement/
 - Effort: 1 day
 - Deliverable: Refine title from v2 to v3 using feedback from step 8
 
-Worker10: Implement #MVP-010 in T/Rewiew/Script/
-- Module: PrismQ.T.Rewiew.Script.ByTitle (v2)
+Worker10: Implement #MVP-010 in T/Review/Script/
+- Module: PrismQ.T.Review.Script.ByTitle (v2)
 - Dependencies: #MVP-009 (need title v3)
 - Priority: Critical
 - Effort: 1 day
@@ -261,8 +261,8 @@ Worker02: Implement #MVP-011 in T/Script/Improvements/
 
 **Commands**:
 ```
-Worker10: Implement #MVP-012 in T/Rewiew/Idea/
-- Module: PrismQ.T.Rewiew.Title.Acceptance
+Worker10: Implement #MVP-012 in T/Review/Idea/
+- Module: PrismQ.T.Review.Title.Acceptance
 - Dependencies: #MVP-011 (need latest title version)
 - Priority: Critical
 - Effort: 0.5 days
@@ -271,8 +271,8 @@ Worker10: Implement #MVP-012 in T/Rewiew/Idea/
   - If NOT ACCEPTED: loop back to #MVP-008 (review newest version → refine to next version)
   - **Always uses newest title version**
 
-Worker10: Implement #MVP-013 in T/Rewiew/Script/
-- Module: PrismQ.T.Rewiew.Script.Acceptance
+Worker10: Implement #MVP-013 in T/Review/Script/
+- Module: PrismQ.T.Review.Script.Acceptance
 - Dependencies: #MVP-012 (title must be accepted first)
 - Priority: Critical
 - Effort: 0.5 days
@@ -281,8 +281,8 @@ Worker10: Implement #MVP-013 in T/Rewiew/Script/
   - If NOT ACCEPTED: loop back to #MVP-010 (review newest version → refine to next version)
   - **Always uses newest script version**
 
-Worker10: Implement #MVP-014 in T/Rewiew/Readability/
-- Module: PrismQ.T.Rewiew.Title.Readability
+Worker10: Implement #MVP-014 in T/Review/Readability/
+- Module: PrismQ.T.Review.Title.Readability
 - Dependencies: #MVP-013 (both must be accepted)
 - Priority: Critical
 - Effort: 0.5 days
@@ -291,8 +291,8 @@ Worker10: Implement #MVP-014 in T/Rewiew/Readability/
   - If FAILS: return to #MVP-009 (refine with readability feedback - creates next version)
   - **Uses newest accepted title**
 
-Worker10: Implement #MVP-015 in T/Rewiew/Readability/
-- Module: PrismQ.T.Rewiew.Script.Readability
+Worker10: Implement #MVP-015 in T/Review/Readability/
+- Module: PrismQ.T.Review.Script.Readability
 - Dependencies: #MVP-014 (title readability passed)
 - Priority: Critical
 - Effort: 0.5 days
@@ -375,20 +375,20 @@ Worker04: Final MVP validation of all paths
 | Issue | Module | Stage | Worker | Effort | Description |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Idea | Worker02 | 2d | Basic idea capture |
-| #MVP-002 | PrismQ.T.Title.Draft | Title v1 | Worker13 | 2d | Title generation from idea |
-| #MVP-003 | PrismQ.T.Script.Draft | Script v1 | Worker02 | 3d | Script generation from idea + title v1 |
-| #MVP-004 | PrismQ.T.Rewiew.Title.ByScript | **Title Review by Script** | Worker10 | 1d | Review title v1 against script v1 + idea |
-| #MVP-005 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review by Title** | Worker10 | 1d | Review script v1 against title v1 + idea |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Title v1 | Worker13 | 2d | Title generation from idea |
+| #MVP-003 | PrismQ.T.Script.FromIdeaAndTitle | Script v1 | Worker02 | 3d | Script generation from idea + title v1 |
+| #MVP-004 | PrismQ.T.Review.Title.ByScript | **Title Review by Script** | Worker10 | 1d | Review title v1 against script v1 + idea |
+| #MVP-005 | PrismQ.T.Review.Script.ByTitle | **Script Review by Title** | Worker10 | 1d | Review script v1 against title v1 + idea |
 | #MVP-006 | PrismQ.T.Title.Improvements | Title v2 | Worker13 | 2d | Title v2 using cross-reviews + title v1, script v1 |
 | #MVP-007 | PrismQ.T.Script.Improvements | Script v2 | Worker02 | 2d | Script v2 using cross-reviews + new title v2, script v1 |
-| #MVP-008 | PrismQ.T.Rewiew.Title.ByScript | **Title Review v2** | Worker10 | 1d | Review title v2 against script v2 |
+| #MVP-008 | PrismQ.T.Review.Title.ByScript | **Title Review v2** | Worker10 | 1d | Review title v2 against script v2 |
 | #MVP-009 | PrismQ.T.Title.Refinement | Title v3+ | Worker13 | 1d | Refine title to v3, v4, v5, v6, v7, etc. (newest version) |
-| #MVP-010 | PrismQ.T.Rewiew.Script.ByTitle | **Script Review v2+** | Worker10 | 1d | Review script (latest) against title (latest) |
+| #MVP-010 | PrismQ.T.Review.Script.ByTitle | **Script Review v2+** | Worker10 | 1d | Review script (latest) against title (latest) |
 | #MVP-011 | PrismQ.T.Script.Refinement | Script v3+ | Worker02 | 2d | Refine script to v3, v4, v5, v6, v7, etc. (newest version) |
-| #MVP-012 | PrismQ.T.Rewiew.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title (latest version) is accepted (loop if not) |
-| #MVP-013 | PrismQ.T.Rewiew.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script (latest version) is accepted (loop if not) |
-| #MVP-014 | PrismQ.T.Rewiew.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability/voiceover validation |
-| #MVP-015 | PrismQ.T.Rewiew.Script.Readability | **Readability Check** | Worker10 | 0.5d | Final script readability/voiceover validation |
+| #MVP-012 | PrismQ.T.Review.Title.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if title (latest version) is accepted (loop if not) |
+| #MVP-013 | PrismQ.T.Review.Script.Acceptance | **Acceptance Gate** | Worker10 | 0.5d | Check if script (latest version) is accepted (loop if not) |
+| #MVP-014 | PrismQ.T.Review.Title.Readability | **Readability Check** | Worker10 | 0.5d | Final title readability/voiceover validation |
+| #MVP-015 | PrismQ.T.Review.Script.Readability | **Readability Check** | Worker10 | 0.5d | Final script readability/voiceover validation |
 | #MVP-016 | PrismQ.T.Publishing.Finalization | Publish | Worker02 | 2d | Publishing approved + validated content |
 
 **Total**: 16 issues, 20 days of work, 6 weeks calendar time with 3-4 workers
@@ -403,14 +403,14 @@ Worker04: Final MVP validation of all paths
 
 **Folder Paths:**
 - `T/Idea/Creation/` (step 1)
-- `T/Title/Draft/` (step 2)
-- `T/Script/Draft/` (step 3)
-- `T/Rewiew/Idea/` (steps 4, 8, 12, 14)
-- `T/Rewiew/Script/` (steps 5, 10, 13, 15)
+- `T/Title/FromIdea/` (step 2)
+- `T/Script/FromIdeaAndTitle/` (step 3)
+- `T/Review/Idea/` (steps 4, 8, 12, 14)
+- `T/Review/Script/` (steps 5, 10, 13, 15)
 - `T/Title/Improvements/` (step 6)
 - `T/Script/Improvements/` (steps 7, 11)
 - `T/Title/Refinement/` (step 9)
-- `T/Rewiew/Readability/` (steps 14-15)
+- `T/Review/Readability/` (steps 14-15)
 - `T/Publishing/Finalization/` (step 16)
 
 ---

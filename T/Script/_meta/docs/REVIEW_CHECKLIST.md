@@ -1,6 +1,6 @@
 # Script Review Checklist
 
-**Module**: `PrismQ.T.Rewiew` (applies to all review dimensions)
+**Module**: `PrismQ.T.Review` (applies to all review dimensions)
 
 ## Purpose
 
@@ -35,7 +35,7 @@ Before starting detailed review, verify:
 
 ## 1. Grammar and Syntax Review
 
-**Module**: `T/Rewiew/Grammar`
+**Module**: `T/Review/Grammar`
 
 ### Purpose
 Ensure grammatical correctness while respecting conversational script style.
@@ -145,7 +145,7 @@ OR
 
 ## 2. Readability Review
 
-**Module**: `T/Rewiew/Readability`
+**Module**: `T/Review/Readability`
 
 ### Purpose
 Ensure script can be easily read aloud and understood by target audience.
@@ -274,7 +274,7 @@ Weak → Strong:
 
 ## 3. Tone and Voice Review
 
-**Module**: `T/Rewiew/Tone`
+**Module**: `T/Review/Tone`
 
 ### Purpose
 Ensure consistent, appropriate tone and voice that matches brand and audience expectations.
@@ -376,7 +376,7 @@ Academic: "We propose a framework for optimizing task allocation efficiency"
 
 ## 4. Content Accuracy Review
 
-**Module**: `T/Rewiew/Content`
+**Module**: `T/Review/Content`
 
 ### Purpose
 Verify factual accuracy, logical coherence, and content completeness.
@@ -504,7 +504,7 @@ Expand: Claims without sufficient support
 
 ## 5. Consistency Review
 
-**Module**: `T/Rewiew/Consistency`
+**Module**: `T/Review/Consistency`
 
 ### Purpose
 Ensure consistent terminology, style, formatting, and voice throughout the script.
@@ -616,7 +616,7 @@ For Text:
 
 ## 6. Final Editing Review
 
-**Module**: `T/Rewiew/Editing`
+**Module**: `T/Review/Editing`
 
 ### Purpose
 Final polish pass to eliminate redundancy, improve efficiency, and ensure maximum impact.
@@ -908,7 +908,7 @@ Review completed: [timestamp]
 - [Script Draft Creation Guide](/_meta/research/script-draft-creation-guide.md)
 - [Script Draft Process](./SCRIPT_DRAFT_PROCESS.md)
 - [Optimization Strategies](./OPTIMIZATION_STRATEGIES.md)
-- [T/Rewiew Module](../../Rewiew/README.md)
+- [T/Review Module](../../Review/README.md)
 
 ---
 

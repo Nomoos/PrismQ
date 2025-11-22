@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'T', 'Idea', 'Model'))
 
 from src.idea import Idea, IdeaStatus, ContentGenre
-from T.Rewiew.Script import ScriptReview, ReviewCategory, ContentLength, ImprovementPoint, CategoryScore
+from T.Review.Script import ScriptReview, ReviewCategory, ContentLength, ImprovementPoint, CategoryScore
 from T.Script.Writer import ScriptWriter, OptimizationStrategy
 
 
