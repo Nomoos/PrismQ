@@ -106,7 +106,7 @@ class TestScriptGeneratorBasics:
         assert isinstance(script, ScriptV1)
         assert script.title == title
         assert script.idea_id == "test-001"
-        assert script.version == "v1"
+        assert script.version == 1
         assert len(script.sections) > 0
         assert script.full_text is not None
         assert len(script.full_text) > 0
@@ -329,7 +329,7 @@ class TestScriptMetadata:
         assert "full_text" in script_dict
         assert "sections" in script_dict
         assert "version" in script_dict
-        assert script_dict["version"] == "v1"
+        assert script_dict["version"] == 1
     
     def test_script_has_timestamps(self):
         """Test that script includes creation timestamp."""

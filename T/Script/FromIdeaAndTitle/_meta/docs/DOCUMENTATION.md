@@ -194,7 +194,7 @@ Generated script object.
 - `platform_target` (PlatformTarget): Target platform
 - `metadata` (Dict): Additional metadata
 - `created_at` (str): Creation timestamp
-- `version` (str): Version number (always "v1")
+- `version` (int): Version number (1 for initial draft)
 - `notes` (str): Additional notes
 
 **Methods**:

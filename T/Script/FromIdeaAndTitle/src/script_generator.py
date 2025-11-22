@@ -99,7 +99,7 @@ class ScriptV1:
         platform_target: Target platform
         metadata: Additional metadata
         created_at: Creation timestamp
-        version: Version number (always "v1" for initial)
+        version: Version number (integer, 1 for initial draft)
         notes: Additional notes or context
     """
     
@@ -113,7 +113,7 @@ class ScriptV1:
     platform_target: PlatformTarget
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    version: str = "v1"
+    version: int = 1
     notes: str = ""
     
     def get_section(self, section_type: str) -> Optional[ScriptSection]:
