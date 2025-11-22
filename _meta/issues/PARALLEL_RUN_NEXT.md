@@ -243,7 +243,7 @@ Worker10: Implement PrismQ.T.Review.Script.Readability in T/Review/Readability/
   * Calculate readability scores for audio
   * Detect awkward sentence constructions
   * Output JSON with readability metrics and problematic sections
-  * Pass/Fail decision: PASS → MVP-019, FAIL → script refinement loop
+  * Pass/Fail decision: PASS → MVP-023 (Publishing), FAIL → script refinement loop
   * Tests: Natural-flow and awkward-flow script scenarios
 ```
 
