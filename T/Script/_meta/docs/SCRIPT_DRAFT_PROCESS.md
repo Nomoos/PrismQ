@@ -1,6 +1,6 @@
 # Script Draft Process
 
-**Module**: `PrismQ.T.Script.Draft`
+**Module**: `PrismQ.T.Script.FromIdeaAndTitle`
 
 ## Purpose
 
@@ -36,7 +36,7 @@ Before beginning script draft creation, ensure these inputs are available and ap
   - Content style guidelines
   - Length requirements
 
-#### 2. From Title Module (PrismQ.T.Title.Draft)
+#### 2. From Title Module (PrismQ.T.Title.FromIdea)
 - **Working Title**: At least one title draft
   - Provides hook direction
   - Establishes angle
@@ -386,7 +386,7 @@ Quick verification:
 
 **1. Save the Script Draft**
 ```
-Location: T/Script/Draft/
+Location: T/Script/FromIdeaAndTitle/
 Filename: {idea_id}_script_draft_v1.md
 Format: Markdown with metadata header
 ```

@@ -25,9 +25,9 @@
 ```
 1. PrismQ.T.Idea.Creation
        ↓
-2. PrismQ.T.Title.Draft (v1) ← z Nápadu
+2. PrismQ.T.Title.FromIdea (v1) ← z Nápadu
        ↓
-3. PrismQ.T.Script.Draft (v1) ← z Nápadu + Titulku v1
+3. PrismQ.T.Script.FromIdeaAndTitle (v1) ← z Nápadu + Titulku v1
        ↓
 4. PrismQ.T.Review.Title.ByScript ← Revize Titulku v1 podle Skriptu v1 + Nápadu
        ↓
@@ -70,8 +70,8 @@
 
 **Cesty ke složkám:**
 - `T/Idea/Creation/` - Vytváření nápadu
-- `T/Title/Draft/` - Návrh titulku v1
-- `T/Script/Draft/` - Návrh skriptu v1
+- `T/Title/FromIdea/` - Návrh titulku v1
+- `T/Script/FromIdeaAndTitle/` - Návrh skriptu v1
 - `T/Review/Idea/` - Revize titulku (kroky 4, 8, 12, 14)
 - `T/Review/Script/` - Revize skriptu (kroky 5, 10, 13, 15)
 - `T/Title/Improvements/` - Vylepšení titulku v2 (krok 6)
@@ -106,15 +106,15 @@ Worker02: Implementovat #MVP-001 v T/Idea/Creation/
 - Úsilí: 2 dny
 - Výstup: Základní zachycení a uložení nápadu
 
-Worker13: Implementovat #MVP-002 v T/Title/Draft/
-- Modul: PrismQ.T.Title.Draft
+Worker13: Implementovat #MVP-002 v T/Title/FromIdea/
+- Modul: PrismQ.T.Title.FromIdea
 - Závislosti: #MVP-001 (může začít paralelně)
 - Priorita: Kritická
 - Úsilí: 2 dny
 - Výstup: Generovat 3-5 variant titulku (v1) pouze z nápadu
 
-Worker02: Implementovat #MVP-003 v T/Script/Draft/
-- Modul: PrismQ.T.Script.Draft
+Worker02: Implementovat #MVP-003 v T/Script/FromIdeaAndTitle/
+- Modul: PrismQ.T.Script.FromIdeaAndTitle
 - Závislosti: #MVP-002
 - Priorita: Kritická
 - Úsilí: 3 dny
@@ -375,8 +375,8 @@ Worker04: Finální MVP validace všech cest
 | Issue | Modul | Fáze | Worker | Úsilí | Popis |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Nápad | Worker02 | 2d | Základní zachycení nápadu |
-| #MVP-002 | PrismQ.T.Title.Draft | Titulek v1 | Worker13 | 2d | Generování titulku z nápadu |
-| #MVP-003 | PrismQ.T.Script.Draft | Skript v1 | Worker02 | 3d | Generování skriptu z nápadu + titulku v1 |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Titulek v1 | Worker13 | 2d | Generování titulku z nápadu |
+| #MVP-003 | PrismQ.T.Script.FromIdeaAndTitle | Skript v1 | Worker02 | 3d | Generování skriptu z nápadu + titulku v1 |
 | #MVP-004 | PrismQ.T.Review.Title.ByScript | **Revize titulku podle skriptu** | Worker10 | 1d | Revize titulku v1 proti skriptu v1 + nápadu |
 | #MVP-005 | PrismQ.T.Review.Script.ByTitle | **Revize skriptu podle titulku** | Worker10 | 1d | Revize skriptu v1 proti titulku v1 + nápadu |
 | #MVP-006 | PrismQ.T.Title.Improvements | Titulek v2 | Worker13 | 2d | Titulek v2 použitím křížových revizí + titulek v1, skript v1 |
@@ -403,8 +403,8 @@ Worker04: Finální MVP validace všech cest
 
 **Cesty ke složkám:**
 - `T/Idea/Creation/` (krok 1)
-- `T/Title/Draft/` (krok 2)
-- `T/Script/Draft/` (krok 3)
+- `T/Title/FromIdea/` (krok 2)
+- `T/Script/FromIdeaAndTitle/` (krok 3)
 - `T/Review/Idea/` (kroky 4, 8, 12, 14)
 - `T/Review/Script/` (kroky 5, 10, 13, 15)
 - `T/Title/Improvements/` (krok 6)

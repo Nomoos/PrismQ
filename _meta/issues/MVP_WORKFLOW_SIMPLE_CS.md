@@ -20,13 +20,13 @@ Tento dokument definuje **Minimální životaschopný produkt (MVP)** workflow p
 ```
 PrismQ.T.Idea.Creation (Vytváření nápadu)
     ↓
-PrismQ.T.Title.Draft (Návrh titulku)
+PrismQ.T.Title.FromIdea (Návrh titulku)
     ↓
 PrismQ.T.Review.Title (Revize titulku) ←────┐
     ↓                                         │
     ├─→ Pokud jsou potřeba změny ────────────┘
     ↓ (Označit jako připraveno)
-PrismQ.T.Script.Draft (Návrh skriptu)
+PrismQ.T.Script.FromIdeaAndTitle (Návrh skriptu)
     ↓
 PrismQ.T.Review.Script (Revize skriptu) ←──┐
     ↓                                       │
@@ -73,9 +73,9 @@ MVP zjednodušuje plné workflow dokumentované v `T/TITLE_SCRIPT_WORKFLOW.md`:
 
 **Struktura složek:**
 - `T/Idea/Creation/` - Vytváření a zachycení nápadu
-- `T/Title/Draft/` - Generování titulku
+- `T/Title/FromIdea/` - Generování titulku
 - `T/Review/Idea/` - Revize titulku (reviduje kvalitu titulku)
-- `T/Script/Draft/` - Tvorba návrhu skriptu
+- `T/Script/FromIdeaAndTitle/` - Tvorba návrhu skriptu
 - `T/Review/Script/` - Revize skriptu (reviduje kvalitu skriptu)
 - `T/Script/Improvements/` - Vylepšení skriptu
 - `T/Title/Refinement/` - Vybrušování titulku
@@ -162,9 +162,9 @@ Po validaci základního workflow MVP, rozšířit o:
 
 ---
 
-### Fáze 2: PrismQ.T.Title.Draft
+### Fáze 2: PrismQ.T.Title.FromIdea
 **Cíl**: Generovat počáteční varianty titulku  
-**Složka**: `T/Title/Draft/`  
+**Složka**: `T/Title/FromIdea/`  
 **Vlastník**: Worker12, Worker13  
 **Priorita**: Kritická  
 **Časový horizont**: Sprint 1, Týden 1
@@ -172,7 +172,7 @@ Po validaci základního workflow MVP, rozšířit o:
 #### MVP Issue: #MVP-002 - Základní generátor titulků
 - **Worker**: Worker13 (Mistr promptů)
 - **Úsilí**: 2 dny
-- **Modul**: PrismQ.T.Title.Draft
+- **Modul**: PrismQ.T.Title.FromIdea
 - **Popis**: Jednoduché generování titulků pomocí AI
 - **Akceptační kritéria**:
   - Vstup: Objekt nápadu
@@ -196,9 +196,9 @@ Po validaci základního workflow MVP, rozšířit o:
 | Issue | Modul | Fáze | Worker | Úsilí | Popis |
 |-------|--------|-------|--------|--------|-------------|
 | #MVP-001 | PrismQ.T.Idea.Creation | Nápad | Worker02 | 2d | Základní zachycení nápadu |
-| #MVP-002 | PrismQ.T.Title.Draft | Titulek | Worker13 | 2d | Generování titulku |
+| #MVP-002 | PrismQ.T.Title.FromIdea | Titulek | Worker13 | 2d | Generování titulku |
 | #MVP-003 | PrismQ.T.Review.Idea | Revize titulku | Worker10 | 1d | Revize titulku se zpětnou vazbou |
-| #MVP-004 | PrismQ.T.Script.Draft | Skript | Worker02 | 3d | Generování skriptu |
+| #MVP-004 | PrismQ.T.Script.FromIdeaAndTitle | Skript | Worker02 | 3d | Generování skriptu |
 | #MVP-005 | PrismQ.T.Review.Script | Revize skriptu | Worker10 | 1d | Revize skriptu se zpětnou vazbou |
 | #MVP-006 | PrismQ.T.Script.Improvements | Vylepšení | Worker02 | 2d | Vylepšení skriptu |
 | #MVP-007 | PrismQ.T.Review.Content | Finální revize | Worker10 | 1d | Finální revize obsahu |
