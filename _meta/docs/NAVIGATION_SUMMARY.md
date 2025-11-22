@@ -26,7 +26,7 @@ README.md
 ├── Client - Web Management Interface
 ├── _meta/research/ - Research documents
 ├── _meta/docs/ - Project documentation
-└── WORKFLOW.md - State machine documentation
+└── _meta/WORKFLOW.md - State machine documentation
 ```
 
 ## Pipeline Navigation
@@ -149,7 +149,7 @@ Users can navigate to:
 - Main pipelines (T, A, V, Client)
 - Project documentation (_meta/docs)
 - Research documents (_meta/research)
-- Workflow documentation (WORKFLOW.md)
+- Workflow documentation (_meta/WORKFLOW.md)
 
 ### From Pipeline README
 
@@ -174,7 +174,7 @@ Users can navigate to:
 1. Start at [README.md](../../README.md)
 2. Navigate to a pipeline (e.g., [T/README.md](../../T/README.md))
 3. Explore submodules and their _meta content
-4. Check [WORKFLOW.md](../../WORKFLOW.md) for process understanding
+4. Check [WORKFLOW.md](../WORKFLOW.md) for process understanding
 
 ### For Developers
 
@@ -247,7 +247,7 @@ To maintain this structure:
 
 For questions about navigation structure:
 - Review [STRUCTURE_RATING.md](./STRUCTURE_RATING.md)
-- Check [WORKFLOW.md](../../WORKFLOW.md)
+- Check [WORKFLOW.md](../WORKFLOW.md)
 - See pipeline READMEs for module-specific info
 
 ---

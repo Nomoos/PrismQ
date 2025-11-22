@@ -205,7 +205,7 @@ content.status = ContentStatus.PUBLISHED
 
 ## Navigation
 
-**[← Back to Main](../README.md)** | **[← Video Pipeline](../V/README.md)** | **[Metrics Module →](../M/README.md)** | **[Workflow](../WORKFLOW.md)**
+**[← Back to Main](../README.md)** | **[← Video Pipeline](../V/README.md)** | **[Metrics Module →](../M/README.md)** | **[Workflow](../_meta/WORKFLOW.md)**
 
 ---
 

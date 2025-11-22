@@ -507,7 +507,7 @@ ScriptApproved → TextPublishing → PublishedText ✓
 
 ## Related Documentation
 
-- **[Main Workflow](../WORKFLOW.md)** - Complete PrismQ state machine
+- **[Main Workflow](../_meta/WORKFLOW.md)** - Complete PrismQ state machine
 - **[T Module Overview](./README.md)** - Text pipeline documentation
 - **[T/Idea README](./Idea/README.md)** - Idea module details
 - **[T/Title README](./Title/README.md)** - Title creation details

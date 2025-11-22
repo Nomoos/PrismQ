@@ -258,7 +258,7 @@ Test suites and test data.
 
 ## Navigation
 
-**[← Back to Idea Module](../README.md)** | **[Next: Model →](../Model/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../WORKFLOW.md)**
+**[← Back to Idea Module](../README.md)** | **[Next: Model →](../Model/README.md)** | **[T Pipeline](../../README.md)** | **[Workflow](../../../_meta/WORKFLOW.md)**
 
 ---
 

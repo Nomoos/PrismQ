@@ -194,7 +194,7 @@ content.status = ContentStatus.TEXT_PUBLISHING
 
 ## Navigation
 
-**[← Back to Main](../README.md)** | **[Audio Pipeline →](../A/README.md)** | **[Video Pipeline →](../V/README.md)** | **[Workflow](../WORKFLOW.md)**
+**[← Back to Main](../README.md)** | **[Audio Pipeline →](../A/README.md)** | **[Video Pipeline →](../V/README.md)** | **[Workflow](../_meta/WORKFLOW.md)**
 
 ---
 

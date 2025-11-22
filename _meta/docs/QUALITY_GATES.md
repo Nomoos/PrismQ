@@ -340,7 +340,7 @@ Each gate has a detailed checklist:
 
 ## Related Documentation
 
-- **[WORKFLOW.md](../../WORKFLOW.md)** - State machine and transitions
+- **[WORKFLOW.md](../WORKFLOW.md)** - State machine and transitions
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Overall system design
 - **[PROGRESSIVE_ENRICHMENT.md](./PROGRESSIVE_ENRICHMENT.md)** - Multi-format strategy
 

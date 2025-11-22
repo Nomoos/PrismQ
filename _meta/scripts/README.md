@@ -173,7 +173,7 @@ _meta/scripts/
 
 ## Related Documentation
 
-- [WORKFLOW.md](../../WORKFLOW.md) - Complete state machine documentation
+- [WORKFLOW.md](../WORKFLOW.md) - Complete state machine documentation
 - [Content Production Workflow Research](../research/content-production-workflow-states.md)
 
 ---

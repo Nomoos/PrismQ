@@ -585,7 +585,7 @@ If version tracking tests fail:
 
 - [pytest Documentation](https://docs.pytest.org/)
 - [pytest Markers](https://docs.pytest.org/en/stable/how-to/mark.html)
-- [WORKFLOW.md](../WORKFLOW.md) - Complete workflow documentation
+- [WORKFLOW.md](../_meta/WORKFLOW.md) - Complete workflow documentation
 - [T/README.md](../T/README.md) - Text pipeline documentation
 
 ## Summary
