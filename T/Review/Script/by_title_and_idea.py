@@ -15,6 +15,7 @@ Workflow Position:
 
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from dataclasses import dataclass
+import re
 
 from T.Review.Script.script_review import (
     ScriptReview,
@@ -30,6 +31,34 @@ if TYPE_CHECKING:
 else:
     # At runtime, we'll accept any object with the right attributes
     Idea = Any
+
+
+# Constants for scoring and analysis
+WORDS_PER_SECOND_SPEAKING = 2.5  # Average speaking rate: 150 words per minute
+WORDS_PER_MINUTE_SPEAKING = 150
+
+# Common stopwords to filter out in analysis
+COMMON_STOPWORDS = {
+    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+    'of', 'with', 'from', 'by', 'as', 'is', 'was', 'are', 'be', 'been',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should',
+    'could', 'may', 'might', 'can', 'this', 'that', 'these', 'those', 'it'
+}
+
+# Genre indicators for content analysis
+GENRE_INDICATORS = {
+    'horror': ['fear', 'scared', 'dark', 'terror', 'nightmare', 'scream', 'shadow'],
+    'mystery': ['clue', 'secret', 'discover', 'mystery', 'hidden', 'reveal', 'puzzle'],
+    'science_fiction': ['future', 'technology', 'space', 'science', 'alien', 'robot'],
+    'educational': ['learn', 'understand', 'explain', 'teach', 'knowledge', 'how', 'why'],
+}
+
+# Emotional words for impact scoring
+EMOTIONAL_WORDS = [
+    'fear', 'love', 'hope', 'terror', 'joy', 'pain', 'realize', 'discover',
+    'wonder', 'amazed', 'shocked', 'surprised', 'angry', 'sad', 'happy',
+    'excited', 'worried', 'anxious', 'proud', 'ashamed', 'grateful'
+]
 
 
 @dataclass
@@ -172,13 +201,22 @@ def _analyze_title_alignment(script_text: str, title: str) -> AlignmentScore:
     matches = []
     mismatches = []
     
-    # Extract key words from title (simplified approach)
-    title_words = set(title.lower().split())
+    # Extract key words from title (using word boundaries)
+    title_words = set(word.lower() for word in re.findall(r'\b\w+\b', title))
+    # Filter out stopwords
+    title_words = title_words - COMMON_STOPWORDS
+    
     script_lower = script_text.lower()
     
-    # Check for title word presence in script
-    words_present = sum(1 for word in title_words if word in script_lower)
-    word_coverage = (words_present / len(title_words) * 100) if title_words else 0
+    # Check for title word presence in script with word boundaries
+    if title_words:
+        words_present = sum(
+            1 for word in title_words
+            if re.search(r'\b' + re.escape(word) + r'\b', script_lower)
+        )
+        word_coverage = (words_present / len(title_words) * 100)
+    else:
+        word_coverage = 0
     
     # Basic alignment scoring
     if word_coverage >= 50:
@@ -246,14 +284,16 @@ def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
     
     # Check premise alignment
     if idea.premise:
-        premise_words = set(idea.premise.lower().split())
+        premise_words = set(word.lower() for word in re.findall(r'\b\w+\b', idea.premise))
         # Filter out common words
-        common_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for'}
-        premise_words = premise_words - common_words
+        premise_words = premise_words - COMMON_STOPWORDS
         
         if premise_words:
-            premise_present = sum(1 for word in premise_words if word in script_lower)
-            premise_coverage = (premise_present / len(premise_words) * 100) if premise_words else 0
+            premise_present = sum(
+                1 for word in premise_words
+                if re.search(r'\b' + re.escape(word) + r'\b', script_lower)
+            )
+            premise_coverage = (premise_present / len(premise_words) * 100)
             
             if premise_coverage >= 30:
                 matches.append("Premise elements present in script")
@@ -274,16 +314,12 @@ def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
             mismatches.append("Hook from idea not reflected in script")
     
     # Check genre consistency
-    genre_indicators = {
-        'horror': ['fear', 'scared', 'dark', 'terror', 'nightmare'],
-        'mystery': ['clue', 'secret', 'discover', 'mystery', 'hidden'],
-        'science_fiction': ['future', 'technology', 'space', 'science'],
-        'educational': ['learn', 'understand', 'explain', 'teach'],
-    }
-    
-    if idea.genre.value in genre_indicators:
-        indicators = genre_indicators[idea.genre.value]
-        has_indicators = any(indicator in script_lower for indicator in indicators)
+    if idea.genre.value in GENRE_INDICATORS:
+        indicators = GENRE_INDICATORS[idea.genre.value]
+        has_indicators = any(
+            re.search(r'\b' + re.escape(indicator) + r'\b', script_lower)
+            for indicator in indicators
+        )
         
         if has_indicators:
             matches.append(f"Script tone matches {idea.genre.value} genre")
@@ -379,8 +415,10 @@ def _calculate_content_scores(
     
     # IMPACT score
     # Check for emotional words and powerful endings
-    emotional_words = ['fear', 'love', 'hope', 'terror', 'joy', 'pain', 'realize', 'discover']
-    emotion_count = sum(1 for word in emotional_words if word in script_text.lower())
+    emotion_count = sum(
+        1 for word in EMOTIONAL_WORDS
+        if re.search(r'\b' + re.escape(word) + r'\b', script_text.lower())
+    )
     
     impact_score = 60 + min(20, emotion_count * 3)
     scores['impact'] = impact_score
@@ -419,7 +457,7 @@ def _determine_target_length(
             return ContentLength.SHORT_FORM
     
     # Check platforms
-    if 'tiktok' in idea.target_platforms or 'youtube shorts' in [p.lower() for p in idea.target_platforms]:
+    if any(platform.lower() in ['tiktok', 'youtube shorts'] for platform in idea.target_platforms):
         return ContentLength.YOUTUBE_SHORT
     
     # Default
@@ -429,7 +467,7 @@ def _determine_target_length(
 def _estimate_script_length(script_text: str) -> int:
     """Estimate script duration in seconds.
     
-    Uses approximate speaking rate of 150 words per minute.
+    Uses average speaking rate defined in WORDS_PER_SECOND_SPEAKING constant.
     
     Args:
         script_text: The script text
@@ -438,8 +476,7 @@ def _estimate_script_length(script_text: str) -> int:
         Estimated duration in seconds
     """
     words = len(script_text.split())
-    # 150 words per minute = 2.5 words per second
-    seconds = int(words / 2.5)
+    seconds = int(words / WORDS_PER_SECOND_SPEAKING)
     return seconds
 
 
