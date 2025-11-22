@@ -135,6 +135,7 @@ class ContentReview:
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 75  # Minimum score to pass
+    max_high_severity_issues: int = 3  # Maximum high severity issues before failing
     passes: bool = True  # Whether review passes
     
     # Issue Tracking
@@ -196,8 +197,8 @@ class ContentReview:
         # Fail if any critical issues
         if self.critical_count > 0:
             self.passes = False
-        # Fail if multiple high severity issues
-        elif self.high_count >= 3:
+        # Fail if too many high severity issues
+        elif self.high_count >= self.max_high_severity_issues:
             self.passes = False
         else:
             self.passes = self.overall_score >= self.pass_threshold
@@ -324,6 +325,7 @@ class ContentReview:
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 75),
+            max_high_severity_issues=data.get("max_high_severity_issues", 3),
             passes=data.get("passes", True),
             issues=issues,
             critical_count=data.get("critical_count", 0),

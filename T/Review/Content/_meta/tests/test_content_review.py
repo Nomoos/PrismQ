@@ -195,6 +195,47 @@ class TestContentReviewMethods:
         assert review.passes is False
         assert review.high_count == 3
     
+    def test_configurable_max_high_severity(self):
+        """Test configurable max high severity threshold."""
+        # Default threshold is 3
+        review = ContentReview(
+            script_id="script-001",
+            overall_score=85
+        )
+        
+        # Add 2 high severity issues (below default threshold)
+        for i in range(2):
+            review.add_issue(ContentIssue(
+                issue_type=ContentIssueType.LOGIC_GAP,
+                severity=ContentSeverity.HIGH,
+                section=f"Act {i+1}",
+                description=f"Issue {i+1}",
+                suggestion="Fix it",
+                impact="Impact"
+            ))
+        
+        assert review.passes is True  # Still passes with 2 high severity
+        
+        # Now test with custom threshold of 2
+        review2 = ContentReview(
+            script_id="script-002",
+            overall_score=85,
+            max_high_severity_issues=2
+        )
+        
+        # Add 2 high severity issues (at threshold)
+        for i in range(2):
+            review2.add_issue(ContentIssue(
+                issue_type=ContentIssueType.LOGIC_GAP,
+                severity=ContentSeverity.HIGH,
+                section=f"Act {i+1}",
+                description=f"Issue {i+1}",
+                suggestion="Fix it",
+                impact="Impact"
+            ))
+        
+        assert review2.passes is False  # Should fail with threshold of 2
+    
     def test_get_issues_by_severity(self):
         """Test filtering issues by severity."""
         review = ContentReview(script_id="script-001")
