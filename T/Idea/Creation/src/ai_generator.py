@@ -11,7 +11,6 @@ from typing import List, Dict, Any, Optional, Literal
 from dataclasses import dataclass
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -377,4 +376,5 @@ Return ONLY the JSON array, no additional text."""
         return idea
 
 
+# Export public classes for the module
 __all__ = ["AIIdeaGenerator", "AIConfig"]

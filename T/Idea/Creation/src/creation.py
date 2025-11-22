@@ -23,7 +23,6 @@ sys.path.insert(0, model_path)
 from idea import Idea, ContentGenre, IdeaStatus
 from ai_generator import AIIdeaGenerator, AIConfig
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -98,7 +97,7 @@ class IdeaCreator:
     def create_from_title(
         self,
         title: str,
-        num_ideas: int = None,  # Changed to None to use default from config
+        num_ideas: Optional[int] = None,  # Use default from config if None
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[ContentGenre] = None,
@@ -174,7 +173,7 @@ class IdeaCreator:
     def create_from_description(
         self,
         description: str,
-        num_ideas: int = None,  # Changed to None to use default from config
+        num_ideas: Optional[int] = None,  # Use default from config if None
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[ContentGenre] = None,
