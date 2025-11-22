@@ -1,0 +1,1 @@
+"""Tests for ReportGeneration module."""
