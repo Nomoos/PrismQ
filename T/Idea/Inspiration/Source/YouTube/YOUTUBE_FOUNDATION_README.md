@@ -259,4 +259,4 @@ For issues or questions about the YouTube Foundation:
 
 ## License
 
-Part of PrismQ.IdeaInspiration project.
+Part of PrismQ.T.Idea.Inspiration project.

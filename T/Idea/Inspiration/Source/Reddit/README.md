@@ -1,6 +1,6 @@
 # Reddit Source Module
 
-**Reddit content scraping module for PrismQ.IdeaInspiration**
+**Reddit content scraping module for PrismQ.T.Idea.Inspiration**
 
 ## Overview
 

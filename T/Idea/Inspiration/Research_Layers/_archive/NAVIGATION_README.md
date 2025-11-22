@@ -1,7 +1,7 @@
 # Research_Layers - Architecture Research Hub
 
 **Last Updated**: 2025-11-14  
-**Purpose**: Comprehensive research on software architecture, design patterns, and SOLID principles for PrismQ.IdeaInspiration
+**Purpose**: Comprehensive research on software architecture, design patterns, and SOLID principles for PrismQ.T.Idea.Inspiration
 
 ---
 
@@ -323,7 +323,7 @@ Endpoint (Video, Channel, Search)
 ## 🔗 External Resources
 
 ### Related Documentation
-- PrismQ.IdeaInspiration main README
+- PrismQ.T.Idea.Inspiration main README
 - Individual module READMEs
 - GitHub wiki (if exists)
 

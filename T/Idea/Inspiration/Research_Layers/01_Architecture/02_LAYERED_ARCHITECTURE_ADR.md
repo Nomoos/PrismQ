@@ -1,4 +1,4 @@
-# ADR-001: Layered Architecture for PrismQ.IdeaInspiration
+# ADR-001: Layered Architecture for PrismQ.T.Idea.Inspiration
 
 **Status**: Accepted  
 **Date**: 2025-11-14  
@@ -7,7 +7,7 @@
 
 ## Context
 
-PrismQ.IdeaInspiration is a multi-module ecosystem for AI-powered content idea collection, classification, scoring, and processing. As the system grows, we need a clear architectural pattern that:
+PrismQ.T.Idea.Inspiration is a multi-module ecosystem for AI-powered content idea collection, classification, scoring, and processing. As the system grows, we need a clear architectural pattern that:
 
 - Maintains separation of concerns
 - Enables independent module development

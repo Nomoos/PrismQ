@@ -1,6 +1,6 @@
 # Worker Implementation Plan
 
-Strategic plan for implementing distributed workers in external repositories (e.g., PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube) to process tasks from the TaskManager system.
+Strategic plan for implementing distributed workers in external repositories (e.g., PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube) to process tasks from the TaskManager system.
 
 ## Executive Summary
 
@@ -87,7 +87,7 @@ This document outlines the implementation strategy for creating distributed work
 
 **Example Structure**:
 ```
-PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube/
+PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube/
 ├── worker/
 │   ├── youtube_worker.py       # Main worker script
 │   ├── requirements.txt        # Python dependencies

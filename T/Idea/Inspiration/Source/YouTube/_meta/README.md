@@ -21,4 +21,4 @@ The `_meta` folder serves as a centralized location for module metadata that doe
 
 ## Note
 
-This structure follows the same pattern as the repository-level `_meta` directory at the root of PrismQ.IdeaInspiration.
+This structure follows the same pattern as the repository-level `_meta` directory at the root of PrismQ.T.Idea.Inspiration.

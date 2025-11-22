@@ -1,6 +1,6 @@
 # YouTube Channel Scraping Module
 
-Part of the PrismQ.IdeaInspiration.Sources ecosystem.
+Part of the PrismQ.T.Idea.Inspiration.Sources ecosystem.
 
 ## Overview
 

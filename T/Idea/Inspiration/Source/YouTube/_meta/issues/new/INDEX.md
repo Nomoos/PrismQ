@@ -10,7 +10,7 @@
 
 ## Overview
 
-This directory contains the complete issue breakdown for refactoring the YouTube Shorts Source module (PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube) to implement a worker-based architecture following PrismQ.Client patterns.
+This directory contains the complete issue breakdown for refactoring the YouTube Shorts Source module (PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube) to implement a worker-based architecture following PrismQ.Client patterns.
 
 ---
 

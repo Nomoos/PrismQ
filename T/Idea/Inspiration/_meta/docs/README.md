@@ -1,6 +1,6 @@
 # Project Documentation
 
-This directory contains project-level documentation for the PrismQ.IdeaInspiration repository.
+This directory contains project-level documentation for the PrismQ.T.Idea.Inspiration repository.
 
 ## Purpose
 

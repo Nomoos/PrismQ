@@ -1,6 +1,6 @@
 # Quick Reference - Project Organization
 
-**Purpose**: Quick reference for navigating the PrismQ.IdeaInspiration project  
+**Purpose**: Quick reference for navigating the PrismQ.T.Idea.Inspiration project  
 **Last Updated**: 2025-11-13
 
 ---
@@ -26,7 +26,7 @@
 ## 📂 Key Directories
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── README.md                    # Project overview (START HERE)
 ├── DEVELOPMENT_PLAN.md          # Current development plan ⭐
 │
@@ -181,7 +181,7 @@ echo "  Done: $(find Source/_meta/issues/done -name "*.md" -type f | wc -l)"
 
 ## 🔗 External Links
 
-- **Repository**: https://github.com/Nomoos/PrismQ.IdeaInspiration
+- **Repository**: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration
 - **Related Projects**:
   - [PrismQ.IdeaCollector](https://github.com/Nomoos/PrismQ.IdeaCollector)
   - [StoryGenerator](https://github.com/Nomoos/StoryGenerator)

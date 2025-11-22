@@ -1,6 +1,6 @@
 # Quick Reference: Task Database Writing
 
-**For**: PrismQ.IdeaInspiration  
+**For**: PrismQ.T.Idea.Inspiration  
 **Date**: November 6, 2025  
 **Status**: ✅ Production Ready
 

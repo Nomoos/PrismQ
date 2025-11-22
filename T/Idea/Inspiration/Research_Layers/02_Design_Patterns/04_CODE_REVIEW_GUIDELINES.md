@@ -1,11 +1,11 @@
-# Code Review Guidelines - PrismQ.IdeaInspiration
+# Code Review Guidelines - PrismQ.T.Idea.Inspiration
 
 **Last Updated**: 2025-11-14  
 **Status**: Active
 
 ## Purpose
 
-This document provides guidelines for conducting effective code reviews that enforce architectural conventions and maintain code quality in PrismQ.IdeaInspiration.
+This document provides guidelines for conducting effective code reviews that enforce architectural conventions and maintain code quality in PrismQ.T.Idea.Inspiration.
 
 ## Table of Contents
 

@@ -1,6 +1,6 @@
 # 05_Templates - Code Templates & Examples
 
-**Purpose**: Ready-to-use code templates for common components in the PrismQ.IdeaInspiration project
+**Purpose**: Ready-to-use code templates for common components in the PrismQ.T.Idea.Inspiration project
 
 ---
 

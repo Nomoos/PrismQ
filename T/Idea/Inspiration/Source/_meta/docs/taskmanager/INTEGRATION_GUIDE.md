@@ -20,7 +20,7 @@
 
 ## Overview
 
-This guide explains how to integrate PrismQ.IdeaInspiration workers with the external TaskManager API to enable centralized task coordination, monitoring, and distributed work management.
+This guide explains how to integrate PrismQ.T.Idea.Inspiration workers with the external TaskManager API to enable centralized task coordination, monitoring, and distributed work management.
 
 ### What is TaskManager API?
 
@@ -63,7 +63,7 @@ This guide explains how to integrate PrismQ.IdeaInspiration workers with the ext
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                PrismQ.IdeaInspiration Workers                    │
+│                PrismQ.T.Idea.Inspiration Workers                    │
 │                                                                   │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
 │  │   YouTube    │  │   Reddit     │  │    Other     │          │

@@ -10,7 +10,7 @@
 
 ## Overview
 
-Create a Python client library to integrate PrismQ.IdeaInspiration workers with the existing external TaskManager API at https://api.prismq.nomoos.cz/api/. This client will enable centralized task coordination, monitoring, and distributed work management across all Source modules.
+Create a Python client library to integrate PrismQ.T.Idea.Inspiration workers with the existing external TaskManager API at https://api.prismq.nomoos.cz/api/. This client will enable centralized task coordination, monitoring, and distributed work management across all Source modules.
 
 ---
 
@@ -30,7 +30,7 @@ Create a Python client library to integrate PrismQ.IdeaInspiration workers with 
 - Provides: Task type registration, task creation, claiming, completion, deduplication
 
 **What We Need:**
-A Python client library that allows PrismQ.IdeaInspiration workers to:
+A Python client library that allows PrismQ.T.Idea.Inspiration workers to:
 1. Register task types with the external API
 2. Create tasks that need to be processed
 3. Claim tasks for processing
@@ -54,7 +54,7 @@ The actual requirement is to **consume an existing external API** by creating a 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ PrismQ.IdeaInspiration Workers (Python)                     │
+│ PrismQ.T.Idea.Inspiration Workers (Python)                     │
 │                                                               │
 │  ┌────────────┐  ┌────────────┐  ┌────────────┐            │
 │  │  YouTube   │  │  Reddit    │  │   Other    │            │
@@ -129,7 +129,7 @@ Source/TaskManager/
 ### 2. TaskManagerClient Class
 
 ```python
-"""TaskManager API Client for PrismQ.IdeaInspiration workers."""
+"""TaskManager API Client for PrismQ.T.Idea.Inspiration workers."""
 
 import requests
 from typing import Dict, Any, Optional, List

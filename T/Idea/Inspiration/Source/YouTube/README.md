@@ -229,7 +229,7 @@ See [Worker Documentation](_meta/docs/YOUTUBE_VIDEO_WORKER.md) for complete guid
 - **Engagement Analytics**: Views per day/hour, engagement rates, ratios
 - **Deduplication**: Prevents duplicate entries using (source, source_id) constraint
 - **SQLite Storage**: Persistent storage with complete metadata
-- **IdeaInspiration Transform**: Compatible with PrismQ.IdeaInspiration.Model
+- **IdeaInspiration Transform**: Compatible with PrismQ.T.Idea.Inspiration.Model
 
 ## Installation
 
@@ -478,9 +478,9 @@ pytest tests/test_youtube_channel_plugin.py -v
 
 This module integrates with:
 
-- **[PrismQ.IdeaInspiration.Model](../../Model/)** - Data model for IdeaInspiration
-- **[PrismQ.IdeaInspiration.Classification](../../Classification/)** - Content classification
-- **[PrismQ.IdeaInspiration.Scoring](../../Scoring/)** - Content scoring
+- **[PrismQ.T.Idea.Inspiration.Model](../../Model/)** - Data model for IdeaInspiration
+- **[PrismQ.T.Idea.Inspiration.Classification](../../Classification/)** - Content classification
+- **[PrismQ.T.Idea.Inspiration.Scoring](../../Scoring/)** - Content scoring
 
 Use `IdeaProcessor` to transform scraped data to the standardized format.
 
@@ -510,4 +510,4 @@ This repository is proprietary software. All Rights Reserved - Copyright (c) 202
 
 ---
 
-**Part of the PrismQ.IdeaInspiration Ecosystem** - AI-powered content generation platform
+**Part of the PrismQ.T.Idea.Inspiration Ecosystem** - AI-powered content generation platform

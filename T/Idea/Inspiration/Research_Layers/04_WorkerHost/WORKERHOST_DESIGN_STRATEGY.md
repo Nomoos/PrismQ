@@ -375,7 +375,7 @@ from pathlib import Path
 @dataclass
 class WorkerConfig:
     """Configuration for a single worker"""
-    name: str  # e.g., "PrismQ.IdeaInspiration.Source.Video.YouTube.VideoScraper"
+    name: str  # e.g., "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.VideoScraper"
     project_path: Path
     venv_python: Path
     module: str
@@ -704,7 +704,7 @@ task_manager:
 
 # Worker Definitions
 workers:
-  - name: "PrismQ.IdeaInspiration.Source.Video.YouTube.VideoScraper"
+  - name: "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.VideoScraper"
     project_path: "./Source/Video/YouTube/Video"
     venv_python: "./Source/Video/YouTube/Video/venv/bin/python"
     module: "src.workers.video_scraper"
@@ -719,7 +719,7 @@ workers:
       version: "1.0.0"
       python_version: "3.10"
   
-  - name: "PrismQ.IdeaInspiration.Source.Text.Reddit.PostScraper"
+  - name: "PrismQ.T.Idea.Inspiration.Source.Text.Reddit.PostScraper"
     project_path: "./Source/Text/Reddit/Posts"
     venv_python: "./Source/Text/Reddit/Posts/venv/Scripts/python.exe"  # Windows
     module: "src.workers.reddit_scraper"
@@ -734,7 +734,7 @@ workers:
       version: "1.0.0"
       python_version: "3.11"
   
-  - name: "PrismQ.IdeaInspiration.Classification.ContentClassifier"
+  - name: "PrismQ.T.Idea.Inspiration.Classification.ContentClassifier"
     project_path: "./Classification"
     venv_python: "./Classification/venv/bin/python"
     module: "src.workers.classifier"
@@ -778,7 +778,7 @@ monitoring:
   },
   "workers": [
     {
-      "name": "PrismQ.IdeaInspiration.Source.Video.YouTube.VideoScraper",
+      "name": "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.VideoScraper",
       "project_path": "./Source/Video/YouTube/Video",
       "venv_python": "./Source/Video/YouTube/Video/venv/bin/python",
       "module": "src.workers.video_scraper",

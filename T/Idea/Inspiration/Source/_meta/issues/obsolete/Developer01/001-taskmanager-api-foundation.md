@@ -23,7 +23,7 @@ See **Issue #008** for the correct implementation approach (Python client librar
 
 ~~Create the foundational infrastructure for the TaskManager API, a lightweight PHP-based task queue system designed for shared hosting environments. This API will serve as the central coordination point for all PrismQ developers across modules.~~
 
-**Actual Requirement**: Create a Python client library to integrate PrismQ.IdeaInspiration workers with the **existing external TaskManager API**.
+**Actual Requirement**: Create a Python client library to integrate PrismQ.T.Idea.Inspiration workers with the **existing external TaskManager API**.
 
 ---
 

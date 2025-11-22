@@ -11,7 +11,7 @@
 
 From problem statement:
 > Worker10: Review issues that are created update NEXT-STEPS, allocation matrix and other docs in:
-> https://github.com/Nomoos/PrismQ.IdeaInspiration/tree/main/Sources/Content/Shorts/YouTube/_meta/issues/new
+> https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/tree/main/Sources/Content/Shorts/YouTube/_meta/issues/new
 
 ---
 

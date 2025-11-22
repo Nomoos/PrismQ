@@ -62,7 +62,7 @@ This creates an unnatural dependency on the YouTube module.
 Move generic worker infrastructure to a top-level shared location:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Sources/
 │   ├── Workers/                          # 🆕 Shared worker infrastructure
 │   │   ├── __init__.py                   # Worker protocols, Task, TaskResult
@@ -111,7 +111,7 @@ PrismQ.IdeaInspiration/
 Move to a platform/infrastructure directory:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Infrastructure/                       # 🆕 Cross-cutting infrastructure
 │   └── Workers/
 │       ├── base_worker.py

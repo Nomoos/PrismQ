@@ -2,7 +2,7 @@
 
 ## Overview
 
-This implementation adds comprehensive YouTube Data API v3 integration with intelligent quota management to the PrismQ.IdeaInspiration module.
+This implementation adds comprehensive YouTube Data API v3 integration with intelligent quota management to the PrismQ.T.Idea.Inspiration module.
 
 ## What Was Implemented
 

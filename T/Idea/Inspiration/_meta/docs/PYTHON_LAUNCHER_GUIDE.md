@@ -225,4 +225,4 @@ This ensures you're always using Python 3.10, even if other versions are install
 ---
 
 **Last Updated**: 2025-11-04  
-**Repository**: PrismQ.IdeaInspiration
+**Repository**: PrismQ.T.Idea.Inspiration

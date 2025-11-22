@@ -2,7 +2,7 @@
 
 ## Overview
 
-The YouTube API Quota Management system tracks and limits YouTube Data API v3 usage to prevent quota exhaustion and enable efficient API monitoring. This system is integrated into the PrismQ.IdeaInspiration YouTube Video module.
+The YouTube API Quota Management system tracks and limits YouTube Data API v3 usage to prevent quota exhaustion and enable efficient API monitoring. This system is integrated into the PrismQ.T.Idea.Inspiration YouTube Video module.
 
 ## YouTube API Quota Basics
 

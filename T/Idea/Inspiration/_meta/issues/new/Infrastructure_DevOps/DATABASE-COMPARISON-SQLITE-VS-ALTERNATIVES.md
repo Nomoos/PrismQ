@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-**DECISION: Use SQLite 3 with WAL mode** for the PrismQ.IdeaInspiration task queue system.
+**DECISION: Use SQLite 3 with WAL mode** for the PrismQ.T.Idea.Inspiration task queue system.
 
 This document provides a comprehensive comparison of database options to answer the question: **"Would it be better to have local MySQL or another database?"** including cloud-hosted options (AWS RDS, Neon, PlanetScale, Supabase).
 
@@ -780,7 +780,7 @@ Even with free tier cloud options (AWS RDS free year, Neon generous free tier), 
 
 ---
 
-## Decision Rationale for PrismQ.IdeaInspiration
+## Decision Rationale for PrismQ.T.Idea.Inspiration
 
 ### Project Requirements
 1. **Platform**: Single Windows 10/11 host with RTX 5090

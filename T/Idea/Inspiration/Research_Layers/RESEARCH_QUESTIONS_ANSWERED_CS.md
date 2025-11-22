@@ -51,7 +51,7 @@ Všechny hlavní sekce nyní obsahují praktické Python příklady:
 Každá vrstva může mít své vlastní virtuální prostředí se specifickými závislostmi:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Source/
 │   ├── Audio/
 │   │   ├── venv/              # Závislosti specifické pro Audio

@@ -1,6 +1,6 @@
 # Clean Code Checklist
 
-A practical checklist for writing clean, maintainable Python code in PrismQ.IdeaInspiration.
+A practical checklist for writing clean, maintainable Python code in PrismQ.T.Idea.Inspiration.
 
 ## Before You Write Code
 

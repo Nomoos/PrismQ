@@ -5,11 +5,11 @@
 
 ## Summary
 
-All PrismQ.IdeaInspiration modules are now restricted to **Python 3.10.x only** for compatibility with DaVinci Resolve and the Client module.
+All PrismQ.T.Idea.Inspiration modules are now restricted to **Python 3.10.x only** for compatibility with DaVinci Resolve and the Client module.
 
 ## Problem Statement
 
-The user needs to run PrismQ.IdeaInspiration modules on the same PC as DaVinci Resolve. However:
+The user needs to run PrismQ.T.Idea.Inspiration modules on the same PC as DaVinci Resolve. However:
 
 1. **DaVinci Resolve** works best with Python 3.10
 2. **Client module** has compatibility issues with Python 3.11+

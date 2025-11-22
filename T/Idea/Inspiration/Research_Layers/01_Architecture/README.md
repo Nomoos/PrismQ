@@ -51,7 +51,7 @@
 - Separation of concerns and module isolation
 - Testability and extensibility
 
-**Real-world applications**: PrismQ.IdeaInspiration module examples
+**Real-world applications**: PrismQ.T.Idea.Inspiration module examples
 
 **When to Read**: Deep dive into architectural principles
 

@@ -7,7 +7,7 @@
 
 ## What Is This?
 
-Analysis and implementation plan for a **SQLite-based task queue system** for PrismQ.IdeaInspiration, providing:
+Analysis and implementation plan for a **SQLite-based task queue system** for PrismQ.T.Idea.Inspiration, providing:
 - ✅ Persistent task storage (survives restarts)
 - ✅ Distributed worker support (multiple processes)
 - ✅ 4 scheduling strategies (FIFO, LIFO, Priority, Weighted Random)

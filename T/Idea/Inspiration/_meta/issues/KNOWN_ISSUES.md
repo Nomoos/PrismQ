@@ -1,6 +1,6 @@
 # Known Issues
 
-This document tracks known issues across the PrismQ.IdeaInspiration ecosystem.
+This document tracks known issues across the PrismQ.T.Idea.Inspiration ecosystem.
 
 ## Current Issues
 
@@ -120,7 +120,7 @@ This document tracks known issues across the PrismQ.IdeaInspiration ecosystem.
 
 ### GitHub Issues
 
-Report new issues at: https://github.com/Nomoos/PrismQ.IdeaInspiration/issues
+Report new issues at: https://github.com/Nomoos/PrismQ.T.Idea.Inspiration/issues
 
 ### Hardware-Specific Issues
 

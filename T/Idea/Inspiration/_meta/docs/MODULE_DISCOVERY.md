@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `discover_modules.py` script provides a **single source of truth** for discovering modules in the PrismQ.IdeaInspiration repository. This shared discovery core ensures consistency across different tools that need to know about repository modules.
+The `discover_modules.py` script provides a **single source of truth** for discovering modules in the PrismQ.T.Idea.Inspiration repository. This shared discovery core ensures consistency across different tools that need to know about repository modules.
 
 ## Purpose
 

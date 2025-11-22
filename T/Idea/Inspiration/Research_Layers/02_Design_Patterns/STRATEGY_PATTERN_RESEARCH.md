@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive research on the Strategy Pattern and Composition-Based design principles, with practical applications for the PrismQ.IdeaInspiration project. These patterns are essential for building flexible, maintainable, and extensible layered systems.
+This document provides comprehensive research on the Strategy Pattern and Composition-Based design principles, with practical applications for the PrismQ.T.Idea.Inspiration project. These patterns are essential for building flexible, maintainable, and extensible layered systems.
 
 ## Table of Contents
 
@@ -603,7 +603,7 @@ class DataPipeline:
 
 ### Application 1: Source Data Extraction
 
-The PrismQ.IdeaInspiration project has multiple source integrations (YouTube, TikTok, Reddit, etc.). Using Strategy Pattern:
+The PrismQ.T.Idea.Inspiration project has multiple source integrations (YouTube, TikTok, Reddit, etc.). Using Strategy Pattern:
 
 ```python
 from typing import Protocol, List

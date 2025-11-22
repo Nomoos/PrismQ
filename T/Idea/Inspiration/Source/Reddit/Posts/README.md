@@ -358,4 +358,4 @@ When adding new features:
 
 ## License
 
-Part of PrismQ.IdeaInspiration project.
+Part of PrismQ.T.Idea.Inspiration project.

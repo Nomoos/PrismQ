@@ -1,7 +1,7 @@
 # Research_Layers - Architecture & Design Research Hub
 
 **Last Updated**: 2025-11-15  
-**Purpose**: Comprehensive research documentation with **runnable Python examples** on software architecture, design patterns, and best practices for PrismQ.IdeaInspiration
+**Purpose**: Comprehensive research documentation with **runnable Python examples** on software architecture, design patterns, and best practices for PrismQ.T.Idea.Inspiration
 
 **Jazyky / Languages**: 🇬🇧 English | 🇨🇿 [Čeština](#-české-zdroje--czech-resources)
 

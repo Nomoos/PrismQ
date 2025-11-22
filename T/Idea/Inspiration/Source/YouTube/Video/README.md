@@ -4,7 +4,7 @@
 **Version**: 1.0.0  
 **Last Updated**: 2025-11-13
 
-Part of the PrismQ.IdeaInspiration.Sources ecosystem.
+Part of the PrismQ.T.Idea.Inspiration.Sources ecosystem.
 
 ---
 
@@ -41,7 +41,7 @@ python scripts/run_worker.py
 - ⚠️ **Do NOT use local SQLite task queue** - all task management goes through the external REST API
 - Workers claim tasks from TaskManager API, not from local database
 
-**Result Storage**: Uses IdeaInspiration model (PrismQ.IdeaInspiration.Model) ✅ Correct architecture.
+**Result Storage**: Uses IdeaInspiration model (PrismQ.T.Idea.Inspiration.Model) ✅ Correct architecture.
 
 ---
 

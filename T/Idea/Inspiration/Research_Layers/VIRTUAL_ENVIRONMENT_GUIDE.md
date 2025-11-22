@@ -7,7 +7,7 @@ Each major layer/module can have its own virtual environment with isolated depen
 ## Directory Structure
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Source/
 │   ├── Audio/
 │   │   ├── venv/              # Audio-specific dependencies

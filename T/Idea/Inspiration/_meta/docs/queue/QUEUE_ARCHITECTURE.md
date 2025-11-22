@@ -106,7 +106,7 @@ The system follows these core design principles:
 
 ```mermaid
 graph TB
-    subgraph "PrismQ.IdeaInspiration"
+    subgraph "PrismQ.T.Idea.Inspiration"
         Client[Client/Backend<br/>Web Control Panel]
         Sources[Sources Module<br/>24 Integrations]
         Classification[Classification Module<br/>8 Categories]

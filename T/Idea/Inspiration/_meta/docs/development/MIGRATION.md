@@ -200,7 +200,7 @@ def main():
 The path adjustment depends on your module structure:
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── EnvLoad/          # Root level
 ├── MyModule/
 │   ├── src/

@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document summarizes the analysis, research, and implementation plan for a **SQLite-based task queue system** for PrismQ.IdeaInspiration. The system will provide persistent, distributed task processing with multiple scheduling strategies, optimized for Windows deployment.
+This document summarizes the analysis, research, and implementation plan for a **SQLite-based task queue system** for PrismQ.T.Idea.Inspiration. The system will provide persistent, distributed task processing with multiple scheduling strategies, optimized for Windows deployment.
 
 ---
 

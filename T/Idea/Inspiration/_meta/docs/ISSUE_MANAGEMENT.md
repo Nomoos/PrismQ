@@ -1,6 +1,6 @@
 # Issue Management Guide
 
-**Purpose**: Guide for managing issues across the PrismQ.IdeaInspiration repository  
+**Purpose**: Guide for managing issues across the PrismQ.T.Idea.Inspiration repository  
 **Last Updated**: 2025-11-13  
 **Version**: 1.0
 

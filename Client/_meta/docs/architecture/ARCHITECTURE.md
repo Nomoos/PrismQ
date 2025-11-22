@@ -812,11 +812,11 @@ Client/
 
 ## Integration with PrismQ Ecosystem
 
-The Web Client integrates with the broader PrismQ.IdeaInspiration ecosystem:
+The Web Client integrates with the broader PrismQ.T.Idea.Inspiration ecosystem:
 
 ```mermaid
 graph TB
-    subgraph "PrismQ.IdeaInspiration Repository"
+    subgraph "PrismQ.T.Idea.Inspiration Repository"
         Client[Web Client]
         
         subgraph "Data Collection"

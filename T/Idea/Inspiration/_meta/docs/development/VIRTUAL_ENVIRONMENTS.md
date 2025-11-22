@@ -8,7 +8,7 @@
 
 **IMPLEMENTED STRATEGY: Per-Project Virtual Environments (Full Isolation)**
 
-This decision is driven by the technical requirement that each project in the PrismQ.IdeaInspiration ecosystem uses AI libraries with potentially different versions. Python cannot install multiple versions of the same package (e.g., PyTorch 2.0.0 and PyTorch 2.1.0) in a single environment, making full isolation the only viable approach.
+This decision is driven by the technical requirement that each project in the PrismQ.T.Idea.Inspiration ecosystem uses AI libraries with potentially different versions. Python cannot install multiple versions of the same package (e.g., PyTorch 2.0.0 and PyTorch 2.1.0) in a single environment, making full isolation the only viable approach.
 
 ## The Decision
 
@@ -56,7 +56,7 @@ Problem in Shared Environment:
 ## Project Structure
 
 ```
-PrismQ.IdeaInspiration/
+PrismQ.T.Idea.Inspiration/
 ├── Classification/
 │   └── venv/          # ~4-5GB (PyTorch + BERT models)
 ├── Model/
@@ -79,15 +79,15 @@ Total: ~20-30GB
 
 ```bash
 # Linux/macOS/WSL
-cd PrismQ.IdeaInspiration
+cd PrismQ.T.Idea.Inspiration
 ./_meta/_scripts/setup_all_envs.sh
 
 # Windows PowerShell
-cd PrismQ.IdeaInspiration
+cd PrismQ.T.Idea.Inspiration
 .\_meta\_scripts\setup_all_envs.ps1
 
 # Windows CMD
-cd PrismQ.IdeaInspiration
+cd PrismQ.T.Idea.Inspiration
 .\_meta\_scripts\setup_all_envs.bat
 ```
 
