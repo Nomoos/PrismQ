@@ -418,27 +418,27 @@ Worker04: Finální MVP validace všech cest
 ## Stavový automat workflow (Iterativní společné vylepšování)
 
 ```
-[*] --> VytváříníNápadu
-VytváříníNápadu --> NávrhTitulku_v1: Krok 1-2
-NávrhTitulku_v1 --> NávrhSkriptu_v1: Krok 2-3
-NávrhSkriptu_v1 --> RevizeTitulku_v1: Krok 3-4 (revize titulku podle kontextu skriptu)
-RevizeTitulku_v1 --> RevizeSkriptu_v1: Krok 4-5 (revize skriptu podle kontextu titulku)
-RevizeSkriptu_v1 --> VylepšeníTitulku_v2: Krok 5-6 (použít obě revize + titulek v1, skript v1)
-VylepšeníTitulku_v2 --> VylepšeníSkriptu_v2: Krok 6-7 (použít revize + nový titulek v2, skript v1)
-VylepšeníSkriptu_v2 --> RevizeTitulku_v2: Krok 7-8 (revize titulku v2 podle skriptu v2)
-RevizeTitulku_v2 --> VybroušeníTitulku_v3: Krok 8-9
-VybroušeníTitulku_v3 --> RevizeSkriptu_v2: Krok 9-10 (revize skriptu v2 podle titulku v3)
-RevizeSkriptu_v2 --> VybroušeníSkriptu_v3: Krok 10-11
-VybroušeníSkriptu_v3 --> PřijetíTitulku: Krok 11-12
-PřijetíTitulku --> RevizeTitulku_v2: NEPŘIJATO (smyčka na krok 8)
-PřijetíTitulku --> PřijetíSkriptu: PŘIJATO (krok 12-13)
-PřijetíSkriptu --> RevizeSkriptu_v2: NEPŘIJATO (smyčka na krok 10)
-PřijetíSkriptu --> ČitelnostTitulku: PŘIJATO (krok 13-14)
-ČitelnostTitulku --> VybroušeníTitulku_v3: SELŽE (smyčka na krok 9)
-ČitelnostTitulku --> ČitelnostSkriptu: PROJDE (krok 14-15)
-ČitelnostSkriptu --> VybroušeníSkriptu_v3: SELŽE (smyčka na krok 11)
-ČitelnostSkriptu --> Publikování: PROJDE (krok 15-16)
-Publikování --> [*]
+[*] --> IdeaCreation
+IdeaCreation --> TitleDraft_v1: Krok 1-2
+TitleDraft_v1 --> ScriptDraft_v1: Krok 2-3
+ScriptDraft_v1 --> TitleReview_v1: Krok 3-4 (revize titulku podle kontextu skriptu)
+TitleReview_v1 --> ScriptReview_v1: Krok 4-5 (revize skriptu podle kontextu titulku)
+ScriptReview_v1 --> TitleImprovement_v2: Krok 5-6 (použít obě revize + titulek v1, skript v1)
+TitleImprovement_v2 --> ScriptImprovement_v2: Krok 6-7 (použít revize + nový titulek v2, skript v1)
+ScriptImprovement_v2 --> TitleReview_v2: Krok 7-8 (revize titulku v2 podle skriptu v2)
+TitleReview_v2 --> TitleRefinement_v3: Krok 8-9
+TitleRefinement_v3 --> ScriptReview_v2: Krok 9-10 (revize skriptu v2 podle titulku v3)
+ScriptReview_v2 --> ScriptRefinement_v3: Krok 10-11
+ScriptRefinement_v3 --> TitleAcceptance: Krok 11-12
+TitleAcceptance --> TitleReview_v2: NEPŘIJATO (smyčka na krok 8)
+TitleAcceptance --> ScriptAcceptance: PŘIJATO (krok 12-13)
+ScriptAcceptance --> ScriptReview_v2: NEPŘIJATO (smyčka na krok 10)
+ScriptAcceptance --> TitleReadability: PŘIJATO (krok 13-14)
+TitleReadability --> TitleRefinement_v3: SELŽE (smyčka na krok 9)
+TitleReadability --> ScriptReadability: PROJDE (krok 14-15)
+ScriptReadability --> ScriptRefinement_v3: SELŽE (smyčka na krok 11)
+ScriptReadability --> Publishing: PROJDE (krok 15-16)
+Publishing --> [*]
 ```
 
 **Cesty smyček**:
