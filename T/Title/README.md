@@ -10,15 +10,40 @@ Develop attention-grabbing titles that maximize click-through rates while mainta
 
 ## Submodules
 
-### [Draft](./Draft/)
-**Initial title creation**
+### MVP Workflow States
+
+#### [FromIdea](./FromIdea/)
+**Stage 2: Initial title draft from idea** (v1)
+
+Generate initial title variants directly from the idea concept.
+
+**[→ View FromIdea Documentation](./FromIdea/README.md)**
+**[→ View FromIdea Metadata](./FromIdea/_meta/)**
+
+#### [FromOriginalTitleAndReviewAndScript](./FromOriginalTitleAndReviewAndScript/)
+**Stages 6, 9, 19: All title improvements** (v2, v3, v4, v5...)
+
+Generate improved title versions using review feedback, original title, and script context.
+
+This state handles:
+- **Stage 6**: First improvements (v1 → v2) using both reviews
+- **Stage 9**: Iterative refinements (v2 → v3+) until accepted
+- **Stage 19 Feedback**: Final readability polish
+
+**[→ View FromOriginalTitleAndReviewAndScript Documentation](./FromOriginalTitleAndReviewAndScript/README.md)**
+**[→ View FromOriginalTitleAndReviewAndScript Metadata](./FromOriginalTitleAndReviewAndScript/_meta/)**
+
+### Legacy Modules
+
+#### [Draft](./Draft/)
+**Initial title creation** (Legacy)
 
 Brainstorm and create initial title options.
 
 **[→ View Draft Documentation](./Draft/README.md)**
 **[→ View Draft Metadata](./Draft/_meta/)**
 
-### [Optimization](./Optimization/)
+#### [Optimization](./Optimization/)
 **Title A/B testing**
 
 Test title variations for performance.
@@ -26,8 +51,8 @@ Test title variations for performance.
 **[→ View Optimization Documentation](./Optimization/README.md)**
 **[→ View Optimization Metadata](./Optimization/_meta/)**
 
-### [Refinement](./Refinement/)
-**Final title polish**
+#### [Refinement](./Refinement/)
+**Final title polish** (Legacy)
 
 Final refinement based on test results.
 

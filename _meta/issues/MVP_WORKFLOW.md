@@ -15,7 +15,7 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
 
 ---
 
-## MVP Workflow Sequence (14 Stages + Loops)
+## MVP Workflow Sequence (26 Stages + Loops)
 
 ### Using Real Folder Names with Iterative Co-Improvement:
 
@@ -46,15 +46,45 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
         ↓ YES                                                  │
 13. Check: Is Script Accepted? ─NO─────────────────────────────┘
         ↓ YES
-14. PrismQ.T.Rewiew.Title.Readability ←──────────┐
+        
+    ━━━━ Local AI Reviews (Stages 14-20) ━━━━
+        
+14. PrismQ.T.Rewiew.Script.Grammar ←──────────────┐
+        ↓                                         │
+        ├─FAILS─→ Return to Script.Refinement ───┘
+        ↓ PASSES
+15. PrismQ.T.Rewiew.Script.Tone ←────────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+16. PrismQ.T.Rewiew.Script.Content ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+17. PrismQ.T.Rewiew.Script.Consistency ←─────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+18. PrismQ.T.Rewiew.Script.Editing ←─────────────┐
+        ↓                                        │
+        ├─FAILS─→ Return to Script.Refinement ──┘
+        ↓ PASSES
+19. PrismQ.T.Rewiew.Title.Readability ←──────────┐
         ↓                                         │
         ├─FAILS─→ Return to Title.Refinement ────┘
         ↓ PASSES
-15. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
+20. PrismQ.T.Rewiew.Script.Readability (Voiceover) ←─┐
         ↓                                             │
         ├─FAILS─→ Return to Script.Refinement ───────┘
-        ↓ PASSES
-16. PrismQ.T.Publishing.Finalization
+        ↓ PASSES (All Local AI Reviews Complete)
+        
+    ━━━━ GPT Expert Review Loop (Stages 21-22) ━━━━
+        
+21. PrismQ.T.Story.ExpertReview (GPT-based) ←────────────┐
+        ↓                                                 │
+        ├─ Improvements Needed ─→ 22. Story.ExpertPolish ┘
+        ↓ Ready for Publishing
+23. PrismQ.T.Publishing.Finalization
 ```
 
 ---
@@ -318,17 +348,131 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
   - **ACCEPTED**: Proceed to stage 14
   - **NOT ACCEPTED**: Return to stage 10 (review latest version → refine to next version)
 
-**Critical Gate**: Must pass before readability checks. **Always checks the newest script version.**
+**Critical Gate**: Must pass before quality reviews. **Always checks the newest script version.**
 
 ---
 
-### Stage 14: PrismQ.T.Rewiew.Title.Readability
+### Stage 14: PrismQ.T.Rewiew.Script.Grammar
+**Goal**: Verify script grammar and technical correctness  
+**Folder**: `T/Rewiew/Grammar/`  
+**Worker**: Worker10  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-014 - Script Grammar Review**
+- **Input**: Script (accepted version from stage 13)
+- **Check**: Grammar and language correctness
+  - Grammar corrections
+  - Punctuation adjustments
+  - Spelling fixes
+  - Syntax improvements
+  - Consistent tense and person
+- **Output**:
+  - **PASSES**: Proceed to stage 15 (Tone Review)
+  - **FAILS**: Return to Script.FromQualityReviewAndPreviousScript with grammar feedback
+
+**First Quality Gate**: Technical correctness must be verified before deeper reviews.
+
+---
+
+### Stage 15: PrismQ.T.Rewiew.Script.Tone
+**Goal**: Verify emotional and stylistic tone consistency  
+**Folder**: `T/Rewiew/Tone/`  
+**Worker**: Worker10  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-015 - Script Tone Review**
+- **Input**: Script (grammar-approved version from stage 14)
+- **Check**: Tone and emotional consistency
+  - Emotional intensity appropriateness
+  - Style alignment (dark, suspense, dramatic, etc.)
+  - Voice and POV consistency
+  - Audience-specific tone (e.g., US female 14-29)
+  - Balance of mystery/creepiness/drama
+  - No tonal mismatches
+- **Output**:
+  - **PASSES**: Proceed to stage 16 (Content Review)
+  - **FAILS**: Return to Script.FromQualityReviewAndPreviousScript with tone feedback
+
+**Tone Quality Gate**: Emotional and stylistic consistency verified.
+
+---
+
+### Stage 16: PrismQ.T.Rewiew.Script.Content
+**Goal**: Verify narrative logic and story coherence  
+**Folder**: `T/Rewiew/Content/`  
+**Worker**: Worker10  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-016 - Script Content Review**
+- **Input**: Script (tone-approved version from stage 15)
+- **Check**: Content logic and narrative quality
+  - No missing logic or gaps
+  - No plot issues or contradictions
+  - Character motivation clarity
+  - Pacing appropriateness
+  - Structural soundness
+  - Scene ordering effectiveness
+- **Output**:
+  - **PASSES**: Proceed to stage 17 (Consistency Review)
+  - **FAILS**: Return to Script.FromQualityReviewAndPreviousScript with content feedback
+
+**Content Quality Gate**: Story must work narratively before checking details.
+
+---
+
+### Stage 17: PrismQ.T.Rewiew.Script.Consistency
+**Goal**: Verify internal continuity and logic  
+**Folder**: `T/Rewiew/Consistency/`  
+**Worker**: Worker10  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-017 - Script Consistency Review**
+- **Input**: Script (content-approved version from stage 16)
+- **Check**: Internal consistency and continuity
+  - Character name consistency
+  - Timeline alignment
+  - Location/scene continuity
+  - Repeated details matching
+  - Lore or fact alignment
+  - No contradictions after edits
+- **Output**:
+  - **PASSES**: Proceed to stage 18 (Editing Review)
+  - **FAILS**: Return to Script.FromQualityReviewAndPreviousScript with consistency feedback
+
+**Consistency Quality Gate**: Script must behave as coherent single story.
+
+---
+
+### Stage 18: PrismQ.T.Rewiew.Script.Editing
+**Goal**: Polish clarity, flow, and readability  
+**Folder**: `T/Rewiew/Editing/`  
+**Worker**: Worker10  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-018 - Script Editing Review**
+- **Input**: Script (consistency-approved version from stage 17)
+- **Check**: Clarity and flow improvements
+  - Sentence rewrites for clarity
+  - Structural paragraph fixes
+  - Confusing lines clarified
+  - Redundancy removed
+  - Transition improvements
+  - Overall smooth readability
+- **Output**:
+  - **PASSES**: Proceed to stage 19 (Title Readability Review)
+  - **FAILS**: Return to Script.FromQualityReviewAndPreviousScript with editing feedback
+
+**Editing Quality Gate**: Script must be smooth and clear before final readability.
+
+---
+
+### Stage 19: PrismQ.T.Rewiew.Title.Readability
 **Goal**: Final readability/voiceover validation for title  
 **Folder**: `T/Rewiew/Readability/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
-**MVP Issue: #MVP-014 - Title Readability/Voiceover Review**
+**MVP Issue: #MVP-019 - Title Readability/Voiceover Review**
 - **Input**: Title (accepted version - latest that passed stage 12)
 - **Check**: Readability and voiceover validation
   - Clear and understandable
@@ -336,48 +480,190 @@ This document defines the **enhanced MVP workflow** with **iterative title-scrip
   - No grammar/spelling issues
   - Engaging and scannable
 - **Output**:
-  - **PASSES**: Proceed to stage 15
-  - **FAILS**: Return to stage 9 (Title Refinement) with readability feedback (creates next version)
+  - **PASSES**: Proceed to stage 20 (Script Readability)
+  - **FAILS**: Return to Title.FromReadabilityReviewAndPreviousTitle with readability feedback
 
-**Final Quality Gate** for title before publishing. **Uses the newest accepted title version.**
+**Final Quality Gate for Title**: Must pass before script readability. **Uses the newest accepted title version.**
 
 ---
 
-### Stage 15: PrismQ.T.Rewiew.Script.Readability (Voiceover)
+### Stage 20: PrismQ.T.Rewiew.Script.Readability (Voiceover)
 **Goal**: Final readability validation for script (voiceover quality)  
 **Folder**: `T/Rewiew/Readability/`  
 **Worker**: Worker10  
 **Effort**: 0.5 days
 
-**MVP Issue: #MVP-015 - Script Readability/Voiceover Review**
-- **Input**: Script (accepted version - latest that passed stage 13)
+**MVP Issue: #MVP-020 - Script Readability/Voiceover Review**
+- **Input**: Script (accepted version - latest that passed all quality reviews from stages 14-18)
 - **Check**: Readability and voiceover quality validation
+  - Flows naturally when read aloud
   - Clear pronunciation
   - Natural flow for voiceover
-  - No grammar/spelling issues
-  - Appropriate pacing
-- **Output**:
-  - **PASSES**: Proceed to stage 16 (Publishing)
-  - **FAILS**: Return to stage 11 (Script Refinement) with readability feedback (creates next version)
-
-**Final Quality Gate** for script before publishing. **Uses the newest accepted script version.**
-- **Input**: Script v3 (accepted version)
-- **Check**: Readability and voiceover validation
-  - Flows naturally when read aloud
-  - Appropriate pacing
   - No tongue-twisters or awkward phrasing
-  - Clear pronunciation
+  - Appropriate pacing
   - Natural speech patterns
+  - Dramatic pauses and delivery
 - **Output**:
-  - **PASSES**: Proceed to stage 16
-  - **FAILS**: Return to stage 11 (Script Refinement) with readability feedback
+  - **PASSES**: Proceed to stage 21 (GPT Expert Review)
+  - **FAILS**: Return to Script.FromOriginalScriptAndReviewAndTitle with readability feedback
 
-**Final Quality Gate** for script before publishing.
+**Final Local AI Quality Gate**: All local AI reviews complete. Ready for GPT expert review.
 
 ---
 
-### Stage 16: PrismQ.T.Publishing.Finalization
+### Stage 21: PrismQ.T.Story.ExpertReview
+**Goal**: GPT-based expert review of complete story  
+**Folder**: `T/Story/ExpertReview/`  
+**Worker**: Worker10 (with GPT-4/GPT-5)  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-021 - GPT Expert Story Review**
+- **Input**: 
+  - Title (final version from all local reviews)
+  - Script (final version from all local reviews)
+  - Audience context (target demographic, platform)
+  - Original idea (for intent verification)
+  - All local review results
+- **Process**:
+  - Compile complete story package
+  - Execute GPT expert review with specialized prompt
+  - Holistic assessment of story coherence, audience fit, professional quality
+  - Generate structured feedback (JSON format)
+  - Make decision: publish or polish
+- **Output**:
+  - **Ready for Publishing**: Proceed to stage 23 (Publishing)
+  - **Improvements Needed**: Proceed to stage 22 (ExpertPolish) with improvement suggestions
+  - Expert review JSON with scores and actionable feedback
+
+**GPT Expert Gate**: Final expert-level quality assessment using GPT-4 or GPT-5.
+
+**Key Differentiator**: Holistic review of complete story (not individual dimensions) with expert-level judgment.
+
+---
+
+### Stage 22: PrismQ.T.Story.ExpertPolish
+**Goal**: Apply GPT-based expert improvements  
+**Folder**: `T/Story/ExpertPolish/`  
+**Worker**: Worker10 (with GPT-4/GPT-5)  
+**Effort**: 0.5 days
+
+**MVP Issue: #MVP-022 - GPT Expert Story Polish**
+- **Input**: 
+  - Current title and script
+  - Expert review JSON from stage 21
+  - Improvement suggestions (prioritized)
+  - Audience context
+- **Process**:
+  - Analyze expert feedback
+  - Apply high-priority improvements using GPT
+  - Surgical changes for maximum impact
+  - Validate changes align with suggestions
+  - Generate polished versions
+- **Output**:
+  - Title (polished by GPT)
+  - Script (polished by GPT)
+  - Change log with improvements applied
+  - Quality delta (expected improvement)
+  - Return to stage 21 for verification
+
+**GPT Expert Polish**: Final expert-level improvements using GPT-4 or GPT-5.
+
+**Iteration Limit**: Maximum 2 polish iterations (diminishing returns after that).
+
+---
+
+### Stage 23: PrismQ.T.Publishing.Finalization
 **Goal**: Publish approved and validated content  
+**Folder**: `T/Publishing/Finalization/`  
+**Worker**: Worker02, Worker14  
+**Effort**: 1 day
+
+**MVP Issue: #MVP-023 - Content Publishing**
+- **Input**: 
+  - Title (final version - passed all reviews including readability)
+  - Script (final version - passed all reviews including readability)
+  - Original idea (for reference)
+- **Process**:
+  - Mark content as "published"
+  - Record publication timestamp
+  - Generate output format (markdown, video script, etc.)
+  - Store published version with full version history
+  - Link to idea source
+- **Output**:
+  - Published content package
+  - Publication metadata
+  - Version snapshot (all v1, v2, v3... versions preserved)
+  - Ready for distribution
+
+**Final Stage**: Content has passed ALL quality gates and is ready for public distribution.
+
+**Status Transition**: draft → reviewed → accepted → quality-checked → published
+
+---
+
+## Example Workflow Execution with All Reviews
+
+### Happy Path (Minimal Iterations)
+
+```
+Stage 1: Idea Created
+Stage 2: Title v1 Generated
+Stage 3: Script v1 Generated
+Stage 4: Title v1 Reviewed (GOOD)
+Stage 5: Script v1 Reviewed (GOOD)
+Stage 6: Title v2 Improved
+Stage 7: Script v2 Improved
+Stage 8: Title v2 Reviewed (GOOD)
+Stage 9: Title v3 Refined
+Stage 10: Script v2 Reviewed (GOOD)
+Stage 11: Script v3 Refined
+Stage 12: Title Accepted ✓
+Stage 13: Script Accepted ✓
+Stage 14: Grammar Review ✓ PASSES
+Stage 15: Tone Review ✓ PASSES
+Stage 16: Content Review ✓ PASSES
+Stage 17: Consistency Review ✓ PASSES
+Stage 18: Editing Review ✓ PASSES
+Stage 19: Title Readability ✓ PASSES
+Stage 20: Script Readability ✓ PASSES
+Stage 21: GPT Expert Review ✓ READY
+Stage 23: Published! 🎉
+```
+
+### With Quality Review Failures and GPT Polish
+
+```
+...
+Stage 13: Script Accepted ✓
+Stage 14: Grammar Review ✗ FAILS
+   → Script.FromOriginalScriptAndReviewAndTitle (fix grammar)
+Stage 14: Grammar Review ✓ PASSES (retry)
+Stage 15: Tone Review ✓ PASSES
+Stage 16: Content Review ✗ FAILS
+   → Script.FromOriginalScriptAndReviewAndTitle (fix content logic)
+Stage 16: Content Review ✓ PASSES (retry)
+Stage 17: Consistency Review ✓ PASSES
+Stage 18: Editing Review ✓ PASSES
+Stage 19: Title Readability ✓ PASSES
+Stage 20: Script Readability ✗ FAILS
+   → Script.FromOriginalScriptAndReviewAndTitle (fix voiceover)
+Stage 20: Script Readability ✓ PASSES (retry)
+Stage 21: GPT Expert Review → Improvements Suggested
+Stage 22: GPT Expert Polish (apply improvements)
+Stage 21: GPT Expert Review ✓ READY (re-check)
+Stage 23: Published! 🎉
+```
+
+### Workflow Stages Summary
+
+**Total Stages**: 26 (23 main stages + 3 decision points)
+
+**Stage Groups**:
+1. **Creation** (1-3): Idea, Title v1, Script v1
+2. **Initial Review & Improvement** (4-13): Local AI review loops, acceptance gates
+3. **Quality Reviews** (14-20): Local AI quality dimensions (Grammar → Tone → Content → Consistency → Editing → Readability)
+4. **GPT Expert Loop** (21-22): GPT-based expert review and polish
+5. **Publishing** (23): Final publication
 **Folder**: `T/Publishing/Finalization/`  
 **Worker**: Worker02  
 **Effort**: 2 days

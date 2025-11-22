@@ -10,15 +10,41 @@ Transform structured ideas into polished scripts ready for review and publicatio
 
 ## Submodules
 
-### [Draft](./Draft/)
-**Initial script writing**
+### MVP Workflow States
+
+#### [FromIdeaAndTitle](./FromIdeaAndTitle/)
+**Stage 3: Initial script draft from idea and title** (v1)
+
+Generate initial script draft from the idea and initial title.
+
+**[→ View FromIdeaAndTitle Documentation](./FromIdeaAndTitle/README.md)**
+**[→ View FromIdeaAndTitle Metadata](./FromIdeaAndTitle/_meta/)**
+
+#### [FromOriginalScriptAndReviewAndTitle](./FromOriginalScriptAndReviewAndTitle/)
+**Stages 7, 11, 14-18, 20: All script improvements** (v2, v3, v4, v5...)
+
+Generate improved script versions using review feedback, original script, and title context.
+
+This state handles:
+- **Stage 7**: First improvements (v1 → v2) using both reviews + new title
+- **Stage 11**: Iterative refinements (v2 → v3+) until accepted
+- **Stages 14-18**: Quality reviews (Grammar, Tone, Content, Consistency, Editing)
+- **Stage 20 Feedback**: Final voiceover readability polish
+
+**[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
+**[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
+
+### Legacy and Support Modules
+
+#### [Draft](./Draft/)
+**Initial script writing** (Legacy)
 
 First draft creation from idea outlines.
 
 **[→ View Draft Documentation](./Draft/README.md)**
 **[→ View Draft Metadata](./Draft/_meta/)**
 
-### [Writer](./Writer/)
+#### [Writer](./Writer/)
 **AI script writer with feedback loop** ⭐ NEW
 
 AI-powered script writer that optimizes content based on review feedback from **[T/Rewiew/Script](../Rewiew/Script/)**.
@@ -31,15 +57,15 @@ AI-powered script writer that optimizes content based on review feedback from **
 **[→ View Writer Documentation](./Writer/README.md)**
 **[→ View Writer Metadata](./Writer/_meta/)**
 
-### [Improvements](./Improvements/)
-**Script enhancement**
+#### [Improvements](./Improvements/)
+**Script enhancement** (Legacy)
 
 Iterative improvements and refinements.
 
 **[→ View Improvements Documentation](./Improvements/README.md)**
 **[→ View Improvements Metadata](./Improvements/_meta/)**
 
-### [Optimization](./Optimization/)
+#### [Optimization](./Optimization/)
 **Script optimization**
 
 Final optimization for flow, readability, and impact.

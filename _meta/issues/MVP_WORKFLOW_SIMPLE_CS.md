@@ -109,8 +109,8 @@ Na základě `T/TITLE_SCRIPT_WORKFLOW.md`, MVP zjednodušuje:
 
 2. **Fáze revizí**:
    - Plné: Více revizních modulů (Gramatika, Čitelnost, Tón, Obsah, Konzistence, Editace)
-   - MVP: Zjednodušená revize ve fázích Skript a Obsah
-   - Odloženo: Granulární dimenze revize (gramatika, čitelnost, tón odděleně)
+   - MVP: ✅ **NYNÍ ZAHRNUTO** - Granulární dimenze revize po akceptačních branách (Fáze 14-20)
+   - Revize kvality skriptu (Gramatika, Tón, Obsah, Konzistence, Editace) + Finální čitelnost
 
 3. **Schválení skriptu**:
    - Plné: ScriptDraft → ScriptReview → ScriptApproved → TextPublishing
@@ -126,9 +126,10 @@ Na základě `T/TITLE_SCRIPT_WORKFLOW.md`, MVP zjednodušuje:
 Po validaci základního workflow MVP, rozšířit o:
 - Vytváření Idea.Outline pro lepší strukturu
 - Vývoj frameworku Idea.Skeleton
-- Granulární revizní moduly (T/Rewiew/Grammar, Readability, Tone, atd.)
 - Formální stavy schválení a uzamčení verzí
 - Komplexní SEO optimalizace (T/Publishing/SEO s Keywords, Tags, Categories)
+- Automatizované kontroly kvality
+- Pokročilé analytiky revizí
 
 ---
 
@@ -202,24 +203,40 @@ Po validaci základního workflow MVP, rozšířit o:
 | #MVP-006 | PrismQ.T.Script.Improvements | Vylepšení | Worker02 | 2d | Vylepšení skriptu |
 | #MVP-007 | PrismQ.T.Rewiew.Content | Finální revize | Worker10 | 1d | Finální revize obsahu |
 | #MVP-008 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
+| #MVP-009A | PrismQ.T.Rewiew.Script.Grammar | Revize gramatiky | Worker10 | 0.5d | Kontrola gramatiky skriptu |
+| #MVP-009B | PrismQ.T.Rewiew.Script.Tone | Revize tónu | Worker10 | 0.5d | Kontrola tónu skriptu |
+| #MVP-009C | PrismQ.T.Rewiew.Script.Content | Revize obsahu | Worker10 | 0.5d | Kontrola logiky obsahu |
+| #MVP-009D | PrismQ.T.Rewiew.Script.Consistency | Revize konzistence | Worker10 | 0.5d | Kontrola konzistence skriptu |
+| #MVP-009E | PrismQ.T.Rewiew.Script.Editing | Revize editace | Worker10 | 0.5d | Kontrola jasnosti a plynulosti |
+| #MVP-009F | PrismQ.T.Rewiew.Title.Readability | Revize čitelnosti titulku | Worker10 | 0.5d | Kontrola čitelnosti titulku |
+| #MVP-009G | PrismQ.T.Rewiew.Script.Readability | Revize čitelnosti skriptu | Worker10 | 0.5d | Kontrola voiceover čitelnosti |
+| #MVP-010A | PrismQ.T.Story.ExpertReview | GPT expertní revize | Worker10 | 0.5d | GPT-based expertní revize příběhu |
+| #MVP-010B | PrismQ.T.Story.ExpertPolish | GPT expertní leštění | Worker10 | 0.5d | GPT-based expertní vylepšení |
+| #MVP-011 | PrismQ.T.Publishing.Finalization | Publikování | Worker02 | 2d | Publikování obsahu |
 
-**Celkem**: 8 issues, 14 dní práce, 4 týdny kalendářního času s 3-4 workery
+**Celkem**: 18 issues (8 hlavních + 7 revizí kvality + 2 GPT expertní + publikování), přibližně 19 dní práce, 4-5 týdnů kalendářního času s 3-4 workery
+
+**Poznámka**: Revize kvality (09A-09G) jsou lokální AI. GPT expertní revize (10A-10B) používají GPT-4/GPT-5 pro finální profesionální leštění.
 
 ---
 
 ## Metriky úspěchu
 
 ### Kritéria dokončení MVP
-- ✅ Všech 8 MVP issues implementováno
-- ✅ End-to-end workflow testován
+- ✅ Všechny MVP issues implementovány (základní + revize kvality + GPT expertní)
+- ✅ End-to-end workflow testován včetně všech revizí
 - ✅ Alespoň jeden obsah publikován přes celý workflow
 - ✅ Všechny zpětnovazební smyčky validovány
+- ✅ Všechny fáze revizí kvality (Gramatika, Tón, Obsah, Konzistence, Editace, Čitelnost) funkční
+- ✅ GPT expertní revize a leštění funkční
 - ✅ Dokumentace kompletní
 
 ### Standardy kvality
 - **Zpětnovazební smyčky**: Jasné cesty pro revize a vylepšení
 - **Iterativní vylepšování**: Více cyklů před finální publikací
-- **Jednoduchost**: Pouze základní funkce, žádná složitost
+- **Revize kvality (Lokální AI)**: Profesionální kontrola přes všechny dimenze (Gramatika → Tón → Obsah → Konzistence → Editace → Čitelnost)
+- **GPT Expertní smyčka**: Finální profesionální leštění pomocí GPT-4/GPT-5
+- **Dvoustupňová kvalita**: Efektivní lokální AI pro většinu vylepšení, prémiové GPT pro finální leštění
 - **Pokrytí testy**: >80% pro MVP vlastnosti
 - **Dokumentace**: Jasný průvodce pro každou fázi
 

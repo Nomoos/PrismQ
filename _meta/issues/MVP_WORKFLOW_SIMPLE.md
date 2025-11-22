@@ -109,8 +109,8 @@ Based on `T/TITLE_SCRIPT_WORKFLOW.md`, the MVP simplifies:
 
 2. **Review Stages**:
    - Full: Multiple review modules (Grammar, Readability, Tone, Content, Consistency, Editing)
-   - MVP: Simplified review at Script and Content stages
-   - Deferred: Granular review dimensions (grammar, readability, tone separately)
+   - MVP: ✅ **NOW INCLUDED** - Granular review dimensions after acceptance gates (Stages 14-20)
+   - Script quality reviews (Grammar, Tone, Content, Consistency, Editing) + Final Readability
 
 3. **Script Approval**:
    - Full: ScriptDraft → ScriptReview → ScriptApproved → TextPublishing
@@ -274,10 +274,11 @@ After MVP validates the basic workflow, expand with:
 - **Forward path**: Rewiew.Script → Rewiew.Content (if approved)
 
 **Deferred to Post-MVP**:
-- Granular review dimensions (separate Grammar, Readability, Tone modules)
 - Automated quality checks
 - Multi-reviewer support
 - Review analytics
+
+**MVP Enhancement**: Granular review dimensions (Grammar, Readability, Tone, Content, Consistency, Editing) are now INCLUDED in MVP after acceptance gates.
 
 ---
 
@@ -378,14 +379,207 @@ After MVP validates the basic workflow, expand with:
 
 ---
 
-### Stage 9: PrismQ.T.Publishing.Finalization
+### Quality Review Stages (After Acceptance Gates)
+
+After content passes acceptance checks (Title and Script), it goes through multiple quality dimensions before final readability and publishing.
+
+---
+
+### Stage 9A: PrismQ.T.Rewiew.Script.Grammar
+**Goal**: Verify script grammar and technical correctness  
+**Folder**: `T/Rewiew/Grammar/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009A - Script Grammar Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Grammar
+- **Description**: Grammar and language correctness check
+- **Acceptance Criteria**:
+  - Input: Accepted script
+  - Check: Grammar, punctuation, spelling, syntax
+  - Output: PASS → Tone Review / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+---
+
+### Stage 9B: PrismQ.T.Rewiew.Script.Tone
+**Goal**: Verify emotional and stylistic tone consistency  
+**Folder**: `T/Rewiew/Tone/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009B - Script Tone Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Tone
+- **Description**: Tone and emotional consistency check
+- **Acceptance Criteria**:
+  - Input: Grammar-approved script
+  - Check: Emotional intensity, style alignment, voice consistency
+  - Output: PASS → Content Review / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+---
+
+### Stage 9C: PrismQ.T.Rewiew.Script.Content
+**Goal**: Verify narrative logic and story coherence  
+**Folder**: `T/Rewiew/Content/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009C - Script Content Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Content
+- **Description**: Content logic and narrative quality check
+- **Acceptance Criteria**:
+  - Input: Tone-approved script
+  - Check: Logic gaps, plot issues, character motivation, pacing, structure
+  - Output: PASS → Consistency Review / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+---
+
+### Stage 9D: PrismQ.T.Rewiew.Script.Consistency
+**Goal**: Verify internal continuity and logic  
+**Folder**: `T/Rewiew/Consistency/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009D - Script Consistency Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Consistency
+- **Description**: Internal consistency and continuity check
+- **Acceptance Criteria**:
+  - Input: Content-approved script
+  - Check: Character names, timeline, locations, detail matching, fact alignment
+  - Output: PASS → Editing Review / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+---
+
+### Stage 9E: PrismQ.T.Rewiew.Script.Editing
+**Goal**: Polish clarity, flow, and readability  
+**Folder**: `T/Rewiew/Editing/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009E - Script Editing Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Editing
+- **Description**: Clarity and flow improvements check
+- **Acceptance Criteria**:
+  - Input: Consistency-approved script
+  - Check: Sentence clarity, structure, redundancy, transitions, smooth readability
+  - Output: PASS → Title Readability / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+---
+
+### Stage 9F: PrismQ.T.Rewiew.Title.Readability
+**Goal**: Final readability validation for title  
+**Folder**: `T/Rewiew/Readability/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009F - Title Readability Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Readability
+- **Description**: Title readability and voiceover validation
+- **Acceptance Criteria**:
+  - Input: Accepted title
+  - Check: Clarity, scannability, grammar, length, engagement
+  - Output: PASS → Script Readability / FAIL → Title.FromOriginalTitleAndReviewAndScript
+
+---
+
+### Stage 9G: PrismQ.T.Rewiew.Script.Readability
+**Goal**: Final voiceover readability validation for script  
+**Folder**: `T/Rewiew/Readability/`  
+**Owner**: Worker10  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-009G - Script Readability Review
+- **Worker**: Worker10 (Review Master)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Rewiew.Readability
+- **Description**: Script voiceover readability validation
+- **Acceptance Criteria**:
+  - Input: Editing-approved script
+  - Check: Voiceover flow, pronunciation, natural speech, pacing, dramatic delivery
+  - Output: PASS → Publishing / FAIL → Script.FromOriginalScriptAndReviewAndTitle
+
+**Final Quality Gate**: This is the LAST review before GPT expert review!
+
+---
+
+### GPT Expert Review & Polish (Post Local-AI)
+
+After all local AI reviews pass (Stages 9A-9G), content goes through a final GPT-based expert review and polish cycle:
+
+---
+
+### Stage 10A: PrismQ.T.Story.ExpertReview
+**Goal**: GPT-based expert review of complete story  
+**Folder**: `T/Story/ExpertReview/`  
+**Owner**: Worker10 (GPT-4/GPT-5)  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2
+
+#### MVP Issue: #MVP-010A - GPT Expert Story Review
+- **Worker**: Worker10 (with GPT Expert)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Story.ExpertReview
+- **Description**: Holistic GPT-based expert review of complete story
+- **Acceptance Criteria**:
+  - Input: Title + Script + Audience + All local review results
+  - GPT expert review (GPT-4 or GPT-5)
+  - Holistic assessment: story coherence, audience fit, professional quality
+  - Output: JSON with scores and improvement suggestions
+  - Decision: Ready for publish OR needs expert polish
+
+**GPT Expert Loop**: Uses advanced AI for final expert-level assessment.
+
+---
+
+### Stage 10B: PrismQ.T.Story.ExpertPolish
+**Goal**: Apply GPT-based expert improvements  
+**Folder**: `T/Story/ExpertPolish/`  
+**Owner**: Worker10 (GPT-4/GPT-5)  
+**Priority**: Critical  
+**Timeline**: Sprint 2, Week 2 (if needed)
+
+#### MVP Issue: #MVP-010B - GPT Expert Story Polish
+- **Worker**: Worker10 (with GPT Expert)
+- **Effort**: 0.5 days
+- **Module**: PrismQ.T.Story.ExpertPolish
+- **Description**: Apply expert-level improvements using GPT
+- **Acceptance Criteria**:
+  - Input: Current title/script + Expert review JSON
+  - Apply high-priority improvements via GPT
+  - Generate polished versions
+  - Return to Stage 10A for verification
+  - Max 2 iterations
+
+**GPT Expert Polish**: Surgical improvements for professional quality.
+
+---
+
+### Stage 11: PrismQ.T.Publishing.Finalization
 **Goal**: Publish approved content  
 **Folder**: `T/Publishing/Finalization/`  
 **Owner**: Worker02, Worker14  
 **Priority**: Critical  
 **Timeline**: Sprint 2, Week 2
 
-#### MVP Issue: #MVP-009 - Basic Publishing
+#### MVP Issue: #MVP-011 - Basic Publishing
 - **Worker**: Worker02 (Python)
 - **Effort**: 2 days
 - **Module**: PrismQ.T.Publishing.Finalization
@@ -521,14 +715,19 @@ After MVP validates the basic workflow, expand with:
 - ✅ Edit script based on feedback
 - ✅ **Final content review with multi-path feedback** (NEW)
 - ✅ Update title if needed (during final review)
+- ✅ **Quality review stages** (NEW - Grammar, Tone, Content, Consistency, Editing)
+- ✅ **Final readability reviews** (NEW - Title and Script voiceover validation)
+- ✅ **GPT expert review and polish** (NEW - Final professional-level quality gate)
 - ✅ Publish content
 
-**Key MVP Feature**: Feedback loops at each review stage allow iterative improvement before proceeding.
+**Key MVP Features**: 
+- **Local AI Loop**: Fast iterations through comprehensive quality reviews (Grammar → Tone → Content → Consistency → Editing → Readability)
+- **GPT Expert Loop**: Final professional-level review and polish using GPT-4/GPT-5
+- **Two-Tier Quality**: Cost-effective local AI for most improvements, premium GPT for final polish
 
 ### Nice to Have (Post-MVP)
 - ⏳ AI-powered idea expansion
 - ⏳ SEO optimization
-- ⏳ Automated quality checks
 - ⏳ Multi-platform publishing
 - ⏳ Analytics and tracking
 - ⏳ Collaboration features
