@@ -47,7 +47,7 @@ First draft creation from idea outlines.
 #### [Writer](./Writer/)
 **AI script writer with feedback loop** ⭐ NEW
 
-AI-powered script writer that optimizes content based on review feedback from **[T/Rewiew/Script](../Rewiew/Script/)**.
+AI-powered script writer that optimizes content based on review feedback from **[T/Review/Script](../Review/Script/)**.
 
 - Iterative optimization (review → write → review cycle)
 - Multiple optimization strategies
@@ -81,7 +81,7 @@ Final optimization for flow, readability, and impact.
 
 ## AI-Powered Feedback Loop Workflow
 
-The **[T/Rewiew/Script](../Rewiew/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
+The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
 
 ```
 1. Draft → Original Script (145 seconds)
