@@ -1,22 +1,28 @@
 """Title Improvement module for generating improved title versions.
 
-This module implements MVP-006: Generate improved title v2 using feedback 
-from both title review (MVP-004) and script review (MVP-005).
+This module implements MVP-006 and MVP-009: Generate improved title versions 
+using feedback from both title review (MVP-004) and script review (MVP-005).
 
 The module takes:
-- Original title v1
-- Script v1
+- Original title (any version: v1, v2, v3, etc.)
+- Script (corresponding version)
 - Title review feedback (from ByScriptAndIdea)
 - Script review feedback (from ByTitle)
 - Original idea (for context)
 
 And generates:
-- Improved title v2 that addresses review feedback
+- Improved title (next version) that addresses review feedback
 - Maintains engagement while improving alignment
 - Documents changes and rationale
+- Supports iterative refinement (v1→v2, v2→v3, v3→v4, etc.)
 
 Workflow Position:
-    Title v1 + Script v1 + Reviews (Title & Script) → Title v2 (improved)
+    Title vN + Script vN + Reviews → Title v(N+1) (improved)
+    
+    Examples:
+    - MVP-006: Title v1 + Script v1 + Reviews → Title v2
+    - MVP-009: Title v2 + Script v2 + Reviews → Title v3
+    - Iteration: Title v3 + Script v3 + Reviews → Title v4, v5, v6, v7, etc.
 """
 
 from typing import List, Dict, Any, Optional
@@ -115,13 +121,14 @@ class ImprovedTitle:
 class TitleImprover:
     """Generate improved title versions based on review feedback.
     
-    This class implements the core logic for MVP-006, taking feedback from
-    both title and script reviews to generate an improved title v2 that:
+    This class implements the core logic for MVP-006 (v1→v2) and MVP-009 (v2→v3+), 
+    taking feedback from both title and script reviews to generate improved titles:
     - Addresses specific review concerns
     - Improves script-title alignment
     - Improves idea-title alignment
     - Maintains or enhances engagement
     - Sets appropriate expectations
+    - Supports iterative refinement through multiple versions (v1→v2→v3→v4→v5→v6→v7, etc.)
     """
     
     def __init__(self):

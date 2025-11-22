@@ -563,3 +563,278 @@ class TestIterativeImprovement:
         assert script_v3.previous_script_id == "script_v2_001"
         assert "script_v1_001" in script_v3.version_history
         assert "script_v2_001" in script_v3.version_history
+
+
+class TestMVP011AcceptanceCriteria:
+    """Tests specifically for MVP-011: Script Refinement v3 acceptance criteria."""
+    
+    def setup_method(self):
+        """Set up test data for MVP-011 tests."""
+        # Create a v2 script with comprehensive sections
+        sections = [
+            ScriptSection(
+                section_type="introduction",
+                content="In a small forgotten town, there stands a house that locals avoid. "
+                        "What if I told you this house remembers everything?",
+                estimated_duration_seconds=20,
+                purpose="Hook the audience with mystery"
+            ),
+            ScriptSection(
+                section_type="body",
+                content="The house was built in 1892. Strange occurrences have been reported. "
+                        "People claim to hear voices from the past. Time seems to loop inside.",
+                estimated_duration_seconds=70,
+                purpose="Deliver main narrative"
+            ),
+            ScriptSection(
+                section_type="conclusion",
+                content="The mystery deepens with each visitor. Will you dare to find out?",
+                estimated_duration_seconds=20,
+                purpose="Conclude and engage"
+            )
+        ]
+        
+        self.script_v2 = ScriptV1(
+            script_id="script_v2_mvp011",
+            idea_id="idea_mvp011",
+            title="The Haunted House Mystery",
+            full_text="\n\n".join([s.content for s in sections]),
+            sections=sections,
+            total_duration_seconds=110,
+            structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+            platform_target=PlatformTarget.YOUTUBE_MEDIUM,
+            version=2
+        )
+        # Add version_history attribute for testing
+        self.script_v2.version_history = ["script_v1_mvp011"]
+        
+        # Create review feedback emphasizing narrative flow improvements
+        self.review_feedback = ReviewFeedback(
+            script_review=MockScriptReview(
+                script_id="script_v2_mvp011",
+                overall_score=75,
+                improvement_points=[
+                    MockImprovementPoint(
+                        title="Strengthen time-loop theme",
+                        description="Title v3 emphasizes memory/time-loop aspect, script should amplify this",
+                        priority="high"
+                    ),
+                    MockImprovementPoint(
+                        title="Polish narrative transitions",
+                        description="Body to conclusion transition feels abrupt",
+                        priority="medium"
+                    ),
+                    MockImprovementPoint(
+                        title="Enhance atmospheric build-up",
+                        description="Middle section needs more tension",
+                        priority="medium"
+                    )
+                ],
+                strengths=["Strong hook", "Clear mystery setup"],
+                optimal_length_seconds=110,
+                current_length_seconds=110
+            ),
+            title_review=MockTitleReview(
+                title_id="title_v3_mvp011",
+                notes="Title v3 emphasizes temporal recursion - script should highlight time-loop mechanics"
+            ),
+            review_type="comprehensive_v3_refinement",
+            priority_issues=["Strengthen time-loop theme"]
+        )
+        
+        self.title_v3 = "The House That Remembers—Forever"
+    
+    def test_v3_refines_from_v2_using_feedback(self):
+        """Acceptance: Refine script from v2 to v3 using feedback."""
+        improver = ScriptImprover()
+        
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        # Verify it's v3 and builds on v2
+        assert script_v3.version == 3
+        assert script_v3.previous_script_id == "script_v2_mvp011"
+        
+        # Verify feedback was incorporated
+        assert len(script_v3.review_feedback_addressed) > 0
+        # Check that high-priority issues were addressed
+        feedback_text = "\n".join(script_v3.review_feedback_addressed)
+        assert "time-loop" in feedback_text.lower() or "loop" in feedback_text.lower()
+        
+        # Verify improvements were documented
+        assert script_v3.improvements_made != ""
+        assert "critical" in script_v3.improvements_made.lower() or "issue" in script_v3.improvements_made.lower()
+    
+    def test_v3_aligns_with_title_v3(self):
+        """Acceptance: Ensure alignment with title v3."""
+        improver = ScriptImprover()
+        
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        # Verify title alignment
+        assert script_v3.title == self.title_v3
+        assert script_v3.title_alignment_notes != ""
+        assert self.title_v3 in script_v3.title_alignment_notes
+        
+        # Verify metadata tracks title alignment
+        assert "title_v2" in script_v3.metadata
+        assert script_v3.metadata["title_v2"] == self.title_v3
+    
+    def test_v3_polishes_narrative_flow(self):
+        """Acceptance: Polish narrative flow."""
+        improver = ScriptImprover()
+        
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        # Verify sections were processed (narrative flow consideration)
+        assert len(script_v3.sections) == len(self.script_v2.sections)
+        
+        # Verify each section has been considered for improvement
+        for section in script_v3.sections:
+            assert section.content is not None and section.content != ""
+            assert section.purpose is not None
+            
+        # Verify full text was assembled (part of narrative flow)
+        assert script_v3.full_text != ""
+        assert len(script_v3.full_text) > 0
+    
+    def test_v3_stores_reference_to_v2(self):
+        """Acceptance: Store v3 with reference to v2."""
+        improver = ScriptImprover()
+        
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        # Verify direct reference to v2
+        assert script_v3.previous_script_id == "script_v2_mvp011"
+        
+        # Verify version history includes both v1 and v2
+        assert "script_v1_mvp011" in script_v3.version_history
+        assert "script_v2_mvp011" in script_v3.version_history
+        
+        # Verify version progression
+        assert script_v3.version == 3
+        
+        # Verify metadata tracks original
+        assert script_v3.metadata["original_script_id"] == self.script_v2.script_id
+        assert script_v3.metadata["original_version"] == 2
+    
+    def test_supports_versioning_beyond_v3(self):
+        """Acceptance: Support versioning (v3, v4, v5, v6, v7, etc.)."""
+        improver = ScriptImprover()
+        
+        # Create v3 from v2
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        assert script_v3.version == 3
+        
+        # Create v4 from v3
+        review_v3 = ReviewFeedback(
+            script_review=MockScriptReview(
+                script_id=script_v3.script_id,
+                overall_score=80,
+                improvement_points=[
+                    MockImprovementPoint(
+                        title="Minor polish",
+                        description="Small refinements needed",
+                        priority="low"
+                    )
+                ]
+            )
+        )
+        
+        script_v4 = improver.generate_script_v2(
+            original_script=script_v3,
+            title_v2="Title v4",
+            review_feedback=review_v3
+        )
+        
+        assert script_v4.version == 4
+        assert script_v4.previous_script_id == script_v3.script_id
+        assert script_v3.script_id in script_v4.version_history
+        
+        # Create v5 from v4
+        review_v4 = ReviewFeedback(
+            script_review=MockScriptReview(
+                script_id=script_v4.script_id,
+                overall_score=85
+            )
+        )
+        
+        script_v5 = improver.generate_script_v2(
+            original_script=script_v4,
+            title_v2="Title v5",
+            review_feedback=review_v4
+        )
+        
+        assert script_v5.version == 5
+        assert script_v5.previous_script_id == script_v4.script_id
+        
+        # Verify complete version history (v1 → v2 → v3 → v4 → v5)
+        assert "script_v1_mvp011" in script_v5.version_history
+        assert "script_v2_mvp011" in script_v5.version_history
+        assert script_v3.script_id in script_v5.version_history
+        assert script_v4.script_id in script_v5.version_history
+    
+    def test_v3_comprehensive_acceptance(self):
+        """Comprehensive test: Verify v3 incorporates feedback and aligns with title v3."""
+        improver = ScriptImprover()
+        
+        script_v3 = improver.generate_script_v2(
+            original_script=self.script_v2,
+            title_v2=self.title_v3,
+            review_feedback=self.review_feedback
+        )
+        
+        # Version verification
+        assert script_v3.version == 3
+        assert script_v3.previous_script_id == self.script_v2.script_id
+        
+        # Feedback incorporation verification
+        assert len(script_v3.review_feedback_addressed) > 0
+        assert script_v3.improvements_made != ""
+        
+        # Title alignment verification
+        assert script_v3.title == self.title_v3
+        assert script_v3.title_alignment_notes != ""
+        
+        # Structure preservation
+        assert script_v3.structure_type == self.script_v2.structure_type
+        assert script_v3.platform_target == self.script_v2.platform_target
+        assert script_v3.idea_id == self.script_v2.idea_id
+        
+        # Content quality
+        assert script_v3.full_text != ""
+        assert len(script_v3.sections) > 0
+        assert script_v3.total_duration_seconds > 0
+        
+        # Metadata completeness
+        assert script_v3.created_at != ""
+        assert script_v3.notes != ""
+        assert "v3" in script_v3.notes or "3" in script_v3.notes
+        
+        # Version history completeness
+        assert len(script_v3.version_history) == 2  # Contains v1 and v2
+        
+        # Serialization support
+        data_dict = script_v3.to_dict()
+        assert data_dict["version"] == 3
+        assert data_dict["previous_script_id"] == self.script_v2.script_id

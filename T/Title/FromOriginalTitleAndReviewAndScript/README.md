@@ -2,6 +2,8 @@
 
 **Namespace**: `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`
 
+**MVP Coverage**: MVP-006 (v1→v2), MVP-009 (v2→v3+)
+
 Generate improved title versions (v2, v3, v4, v5...) using review feedback, original title, and script context.
 
 ## Purpose
@@ -21,12 +23,12 @@ Stage 5: Review.Script.ByTitle (v1) ← Script review
 Stage 6: Title.FromOriginalTitleAndReviewAndScript (v1 → v2) ← THIS STATE
 ```
 
-### Stage 9: Iterative Refinements (v2 → v3, v3 → v4, v4 → v5...)
+### Stage 9: Iterative Refinements (v2 → v3, v3 → v4, v4 → v5...) - MVP-009
 **Using latest review feedback**
 ```
-Stage 8: Review.Title.ByScript (vN) ← Review latest
+Stage 8: Review.Title.ByScript (vN) ← Review latest (MVP-008)
     ↓
-Stage 9: Title.FromOriginalTitleAndReviewAndScript (vN → vN+1) ← THIS STATE
+Stage 9: Title.FromOriginalTitleAndReviewAndScript (vN → vN+1) ← THIS STATE (MVP-009)
     ↓
 Stage 12: Title Acceptance Check
     ↓ if NOT ACCEPTED, loop back to Stage 8 → Stage 9
