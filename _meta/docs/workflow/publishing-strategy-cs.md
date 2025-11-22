@@ -1,7 +1,5 @@
 # Strategie postupné publikace ve více formátech
 
-## Strategie postupné publikace ve více formátech
-
 ### Postupné obohacování formátů
 
 Workflow následuje **model postupného obohacování**, kde každý formát staví na předchozím:

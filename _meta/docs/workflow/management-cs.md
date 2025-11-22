@@ -1,7 +1,5 @@
 # Správa workflow
 
-## Správa workflow
-
 ### Sledování pokroku
 
 **Indikátory stavu**

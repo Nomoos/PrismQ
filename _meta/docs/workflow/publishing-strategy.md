@@ -1,5 +1,4 @@
 # Progressive Multi-Format Publishing Strategy
-## Progressive Multi-Format Publishing Strategy
 
 ### Sequential Format Enrichment
 

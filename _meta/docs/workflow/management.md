@@ -1,108 +1,138 @@
-# State Transitions
-## State Transitions
+# Workflow Management
 
-### Forward Progression (Sequential Format Enrichment)
+### Progress Tracking
 
-The workflow follows a **progressive enrichment model**:
+**Status Indicators**
+- ⏳ Not Started
+- 🔄 In Progress
+- ⏸️ Blocked/Waiting
+- ✅ Complete
+- ⚠️ Issues/Review Needed
+- 🗄️ Archived
 
-**Text-Only Path (Fastest - Stop after text):**
-```
-IdeaInspiration → Idea (Creation → Outline → Title) → ScriptDraft → 
-ScriptReview → ScriptApproved → TextPublishing → PublishedText → 
-AnalyticsReviewText → Archived
-```
-
-**Text + Audio Path (Medium - Stop after audio):**
-```
-... → ScriptApproved → TextPublishing → PublishedText → Voiceover → 
-VoiceoverReview → VoiceoverApproved → AudioPublishing → PublishedAudio → 
-AnalyticsReviewAudio → Archived
-```
-
-**Full Production Path (Complete - All formats):**
-```
-... → PublishedText → Voiceover → ... → PublishedAudio → ScenePlanning → 
-KeyframePlanning → KeyframeGeneration → VideoAssembly → VideoReview → 
-VideoFinalized → PublishPlanning → PublishedVideo → AnalyticsReviewVideo → 
-Archived
-```
-
-**Key Data Flow:**
-```
-ScriptApproved
-    ↓
-TextPublishing → PublishedText (text is published)
-    ↓
-Voiceover (uses published text as source)
-    ↓
-VoiceoverApproved → AudioPublishing → PublishedAudio (audio is published)
-    ↓
-ScenePlanning (uses published audio as foundation)
-    ↓
-... → PublishedVideo (video is published)
+**Metadata Tracking**
+```json
+{
+  "project_id": "PQ001",
+  "current_state": "ScriptReview",
+  "state_history": [
+    {"state": "IdeaInspiration", "entered": "2025-01-01", "exited": "2025-01-02"},
+    {"state": "Idea", "entered": "2025-01-02", "exited": "2025-01-03"},
+    {"state": "ScriptDraft", "entered": "2025-01-03", "exited": "2025-01-05"},
+    {"state": "ScriptReview", "entered": "2025-01-05", "exited": null}
+  ],
+  "revision_count": 2,
+  "days_in_production": 5,
+  "team_assigned": ["Writer A", "Editor B", "Reviewer C"]
+}
 ```
 
-### Backward Transitions (Revision Loops)
+### Quality Gates
 
-Quality issues or improvements trigger backward movement:
+Each state has defined quality criteria that must be met before progression:
 
-**Script Phase Revisions**
-- `ScriptReview → ScriptDraft` - Major script revisions needed
-- `ScriptReview → Idea` - Fundamental concept changes required
-- `ScriptApproved → ScriptReview` - Issues found after approval
+**Documentation Gates**
+- All required fields completed
+- Metadata accurate and complete
+- Version control updated
 
-**Text Publishing Revisions**
-- `TextPublishing → ScriptApproved` - Text formatting issues, need script revision
-- `Voiceover → PublishedText` - Voiceover issues with published text source
+**Review Gates**
+- Peer review completed
+- Stakeholder approval received
+- Quality standards verified
 
-**Voiceover Phase Revisions**
-- `VoiceoverReview → Voiceover` - Re-recording needed
-- `VoiceoverReview → PublishedText` - Need to revise published text source
-- `Voiceover → PublishedText` - Published text has errors discovered during recording
+**Technical Gates**
+- File formats correct
+- Technical specifications met
+- No critical errors present
 
-**Audio Publishing Revisions**
-- `AudioPublishing → VoiceoverApproved` - Audio file issues, need re-export
-- `ScenePlanning → PublishedAudio` - Video planning issues with audio source
+### Automation Opportunities
 
-**Visual Phase Revisions**
-- `KeyframePlanning → ScenePlanning` - Scene structure needs revision
-- `KeyframeGeneration → KeyframePlanning` - Keyframe specs need adjustment
-- `ScenePlanning → PublishedAudio` - Audio timing issues affect visuals
+**Automated Transitions**
+- File upload triggers state change
+- Approval workflows trigger progression
+- Scheduled tasks (e.g., publication timing)
+- Analytics collection and reporting
 
-**Video Phase Revisions**
-- `VideoReview → VideoAssembly` - Assembly/editing issues
-- `VideoReview → KeyframeGeneration` - Visual asset problems
-- `VideoFinalized → VideoReview` - Post-approval issues discovered
+**Manual Transitions**
+- Creative decisions
+- Quality assessments
+- Strategic pivots
+- Resource allocation
 
-**Publishing Phase Revisions**
-- `PublishPlanning → VideoFinalized` - Video changes needed before publish
+## Best Practices
 
-### Feedback Loops
+### General Principles
 
-**Format-Specific Learning Loops**
-- `AnalyticsReviewText → IdeaInspiration` - Text performance insights
-- `AnalyticsReviewAudio → IdeaInspiration` - Audio performance insights  
-- `AnalyticsReviewVideo → IdeaInspiration` - Video performance insights
-- Cross-format insights inform future content strategy
-- Early format analytics inform production decisions for later formats
-- Performance data feeds back to improve future content
+1. **Complete Each State** - Don't skip quality gates
+2. **Document Everything** - Track decisions and changes
+3. **Iterate When Needed** - Use backward transitions to improve
+4. **Archive Promptly** - Don't let dead projects linger
+5. **Learn Continuously** - Feed insights back to ideation
 
-**Concept Refinement Loop**
-- `ScriptDraft → Idea` - Concept needs fundamental rework
-- `Idea → IdeaInspiration` - Return to inspiration sources
+### State-Specific Tips
 
-### Early Termination
+**Idea Phase**
+- Invest time in outline and skeleton
+- Clear title before moving to script
+- Validate concept with stakeholders early
 
-Content can be archived from any stage:
-```
-[Any State] → Archived
-```
+**Script Phase**
+- Multiple review passes prevent downstream issues
+- Lock approved scripts to prevent scope creep
+- Keep revision history for learning
 
-**Reasons for Early Archive:**
-- Concept no longer viable
-- Resource constraints
-- Strategic pivot
-- Quality issues unresolvable
-- Duplicate content
-- External factors
+**Production Phase**
+- Audio and visual quality gates are critical
+- Test on target platforms early
+- Build in buffer time for revisions
+
+**Publishing Phase**
+- Plan timing strategically
+- Monitor early performance closely
+- Engage with audience actively
+
+**Analytics Phase**
+- Collect comprehensive data
+- Extract actionable insights
+- Feed learnings back to ideation
+
+## Metrics & Monitoring
+
+### Workflow Efficiency Metrics
+
+**Time Metrics**
+- Average time per state
+- Total production time
+- Bottleneck identification
+- Revision cycle time
+
+**Quality Metrics**
+- Revision frequency per state
+- Defect escape rate
+- Final quality scores
+- Stakeholder satisfaction
+
+**Resource Metrics**
+- Team utilization
+- Cost per state
+- Asset reuse rate
+- Automation savings
+
+### Performance Dashboards
+
+Track workflow health with key indicators:
+- Projects by state (distribution)
+- Average time in each state
+- Revision/rework rate
+- Completion rate
+- Archive reasons breakdown
+
+## Related Documentation
+
+- **[MVP Workflow Documentation](./MVP_WORKFLOW_DOCUMENTATION.md)** - Complete 26-stage MVP workflow with examples and API reference
+- **[IdeaInspiration Module](./T/Idea/Inspiration/README.md)** - Inspiration and collection
+- **[Idea Model](./T/Idea/Model/README.md)** - Core data model
+- **[Content Production Workflow States Research](./_meta/research/content-production-workflow-states.md)** - Detailed research
+- **[YouTube Metadata Optimization](./_meta/research/youtube-metadata-optimization-smart-strategy.md)** - Platform strategy
 
