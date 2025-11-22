@@ -38,6 +38,23 @@ from T.Review.Title.ByScriptAndIdea.by_script_and_idea import (
 )
 
 
+# Score thresholds
+SCORE_THRESHOLD_LOW = 70  # Scores below this need improvement
+SCORE_THRESHOLD_VERY_LOW = 60  # Scores below this need major revision
+SCORE_THRESHOLD_HIGH = 80  # Scores above this are ready to proceed
+EXPECTATION_THRESHOLD = 80  # Expectation accuracy threshold
+
+# Length thresholds
+OPTIMAL_LENGTH_MIN = 30
+OPTIMAL_LENGTH_MAX = 75
+OPTIMAL_LENGTH_TARGET = 60
+
+# Comparison thresholds
+IMPROVEMENT_THRESHOLD = 0  # Score increase > 0 means improved
+REGRESSION_THRESHOLD = -5  # Score decrease > 5 means regression
+MAINTAINED_THRESHOLD = 5  # Score change within ±5 means maintained
+
+
 @dataclass
 class ImprovementComparison:
     """Comparison of improvements between v1 and v2."""
@@ -77,9 +94,9 @@ def compare_reviews(
         v1_score=v1_review.overall_score,
         v2_score=v2_review.overall_score,
         delta=overall_delta,
-        improved=overall_delta > 0,
-        regression=overall_delta < -5,  # Significant drop
-        maintained=abs(overall_delta) <= 5,
+        improved=overall_delta > IMPROVEMENT_THRESHOLD,
+        regression=overall_delta < REGRESSION_THRESHOLD,
+        maintained=abs(overall_delta) <= MAINTAINED_THRESHOLD,
         feedback=_generate_overall_feedback(overall_delta)
     ))
     
@@ -90,9 +107,9 @@ def compare_reviews(
         v1_score=v1_review.script_alignment_score,
         v2_score=v2_review.script_alignment_score,
         delta=script_delta,
-        improved=script_delta > 0,
-        regression=script_delta < -5,
-        maintained=abs(script_delta) <= 5,
+        improved=script_delta > IMPROVEMENT_THRESHOLD,
+        regression=script_delta < REGRESSION_THRESHOLD,
+        maintained=abs(script_delta) <= MAINTAINED_THRESHOLD,
         feedback=_generate_alignment_feedback(script_delta, "script")
     ))
     
@@ -103,9 +120,9 @@ def compare_reviews(
         v1_score=v1_review.engagement_score,
         v2_score=v2_review.engagement_score,
         delta=engagement_delta,
-        improved=engagement_delta > 0,
-        regression=engagement_delta < -5,
-        maintained=abs(engagement_delta) <= 5,
+        improved=engagement_delta > IMPROVEMENT_THRESHOLD,
+        regression=engagement_delta < REGRESSION_THRESHOLD,
+        maintained=abs(engagement_delta) <= MAINTAINED_THRESHOLD,
         feedback=_generate_engagement_feedback(engagement_delta)
     ))
     
@@ -116,9 +133,9 @@ def compare_reviews(
         v1_score=v1_review.seo_score,
         v2_score=v2_review.seo_score,
         delta=seo_delta,
-        improved=seo_delta > 0,
-        regression=seo_delta < -5,
-        maintained=abs(seo_delta) <= 5,
+        improved=seo_delta > IMPROVEMENT_THRESHOLD,
+        regression=seo_delta < REGRESSION_THRESHOLD,
+        maintained=abs(seo_delta) <= MAINTAINED_THRESHOLD,
         feedback=_generate_seo_feedback(seo_delta)
     ))
     
@@ -129,11 +146,11 @@ def _generate_overall_feedback(delta: int) -> str:
     """Generate feedback for overall score change."""
     if delta > 10:
         return "Significant improvement in overall quality"
-    elif delta > 0:
+    elif delta > IMPROVEMENT_THRESHOLD:
         return "Modest improvement in overall quality"
     elif delta == 0:
         return "Overall quality maintained"
-    elif delta > -5:
+    elif delta > REGRESSION_THRESHOLD:
         return "Slight decrease in overall quality"
     else:
         return "Significant regression in overall quality - review changes"
@@ -143,11 +160,11 @@ def _generate_alignment_feedback(delta: int, alignment_type: str) -> str:
     """Generate feedback for alignment score change."""
     if delta > 10:
         return f"Much better alignment with {alignment_type}"
-    elif delta > 0:
+    elif delta > IMPROVEMENT_THRESHOLD:
         return f"Improved alignment with {alignment_type}"
     elif delta == 0:
         return f"Alignment with {alignment_type} maintained"
-    elif delta > -5:
+    elif delta > REGRESSION_THRESHOLD:
         return f"Slight decrease in {alignment_type} alignment"
     else:
         return f"Significant drop in {alignment_type} alignment - needs attention"
@@ -157,11 +174,11 @@ def _generate_engagement_feedback(delta: int) -> str:
     """Generate feedback for engagement score change."""
     if delta > 10:
         return "Much more engaging title"
-    elif delta > 0:
+    elif delta > IMPROVEMENT_THRESHOLD:
         return "More engaging than previous version"
     elif delta == 0:
         return "Engagement level maintained"
-    elif delta > -5:
+    elif delta > REGRESSION_THRESHOLD:
         return "Slightly less engaging"
     else:
         return "Engagement significantly decreased - reconsider changes"
@@ -171,11 +188,11 @@ def _generate_seo_feedback(delta: int) -> str:
     """Generate feedback for SEO score change."""
     if delta > 10:
         return "SEO optimization significantly improved"
-    elif delta > 0:
+    elif delta > IMPROVEMENT_THRESHOLD:
         return "Better SEO optimization"
     elif delta == 0:
         return "SEO optimization maintained"
-    elif delta > -5:
+    elif delta > REGRESSION_THRESHOLD:
         return "Minor SEO optimization loss"
     else:
         return "SEO optimization significantly worse"
@@ -278,28 +295,28 @@ def review_title_by_script_v2(
             score=engagement_data['engagement_score'],
             reasoning=f"Engagement score based on title structure and emotional appeal",
             strengths=[f"Uses {engagement_data.get('engagement_words', 0)} engagement words"],
-            weaknesses=[f"Low expectation accuracy"] if engagement_data.get('expectation_accuracy', 100) < 80 else []
+            weaknesses=["Low expectation accuracy"] if engagement_data.get('expectation_accuracy', 100) < EXPECTATION_THRESHOLD else []
         ),
         TitleCategoryScore(
             category=TitleReviewCategory.SEO_OPTIMIZATION,
             score=seo_data['seo_score'],
             reasoning="SEO evaluation based on keywords and patterns",
-            strengths=["Good keyword relevance"] if seo_data.get('keyword_relevance', 0) > 70 else [],
+            strengths=["Good keyword relevance"] if seo_data.get('keyword_relevance', 0) > SCORE_THRESHOLD_LOW else [],
             weaknesses=[]
         ),
         TitleCategoryScore(
             category=TitleReviewCategory.LENGTH,
             score=seo_data['length_score'],
-            reasoning=f"Length assessment: {len(title_text)} chars (optimal: ~60)",
-            strengths=["Appropriate length"] if abs(len(title_text) - 60) <= 15 else [],
-            weaknesses=["Too long" if len(title_text) > 75 else "Too short" if len(title_text) < 30 else ""]
+            reasoning=f"Length assessment: {len(title_text)} chars (optimal: ~{OPTIMAL_LENGTH_TARGET})",
+            strengths=["Appropriate length"] if abs(len(title_text) - OPTIMAL_LENGTH_TARGET) <= 15 else [],
+            weaknesses=["Too long"] if len(title_text) > OPTIMAL_LENGTH_MAX else (["Too short"] if len(title_text) < OPTIMAL_LENGTH_MIN else [])
         )
     ]
     
     # Generate improvement points based on scores
     improvement_points = []
     
-    if script_alignment.score < 70:
+    if script_alignment.score < SCORE_THRESHOLD_LOW:
         improvement_points.append(TitleImprovementPoint(
             category=TitleReviewCategory.SCRIPT_ALIGNMENT,
             title="Improve script alignment",
@@ -310,7 +327,7 @@ def review_title_by_script_v2(
             suggested_fix=f"Include key script elements: {', '.join(script_alignment.key_elements[:3])}"
         ))
     
-    if engagement_data['engagement_score'] < 70:
+    if engagement_data['engagement_score'] < SCORE_THRESHOLD_LOW:
         improvement_points.append(TitleImprovementPoint(
             category=TitleReviewCategory.ENGAGEMENT,
             title="Enhance engagement",
@@ -389,7 +406,7 @@ def review_title_by_script_v2(
         confidence_score=85,
         
         # Feedback Loop
-        needs_major_revision=overall_score < 60,
+        needs_major_revision=overall_score < SCORE_THRESHOLD_VERY_LOW,
         iteration_number=iteration_number,
         previous_review_id=previous_review_id,
         improvement_trajectory=improvement_trajectory,
@@ -493,15 +510,15 @@ def _generate_next_steps(review: TitleReview, comparisons: List[ImprovementCompa
         steps.append(f"Address regressions in: {', '.join([c.category for c in regressions])}")
     
     # Check for low scores
-    if review.script_alignment_score < 70:
+    if review.script_alignment_score < SCORE_THRESHOLD_LOW:
         steps.append("Improve script alignment by incorporating more script keywords")
     
-    if review.engagement_score < 70:
+    if review.engagement_score < SCORE_THRESHOLD_LOW:
         steps.append("Enhance engagement with more compelling language")
     
-    if review.overall_score >= 80:
+    if review.overall_score >= SCORE_THRESHOLD_HIGH:
         steps.append("Ready for v3 refinement or acceptance check")
-    elif review.overall_score >= 70:
+    elif review.overall_score >= SCORE_THRESHOLD_LOW:
         steps.append("Consider minor adjustments before proceeding")
     else:
         steps.append("Significant improvements needed before proceeding")
