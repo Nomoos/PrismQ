@@ -19,7 +19,7 @@ class TestIdeaCreatorFromTitle:
     def test_create_single_idea_from_title(self):
         """Test creating a single idea from a title."""
         creator = IdeaCreator()
-        ideas = creator.create_from_title("The Future of AI")
+        ideas = creator.create_from_title("The Future of AI", num_ideas=1)
         
         assert len(ideas) == 1
         assert ideas[0].title == "The Future of AI"
@@ -155,7 +155,7 @@ class TestIdeaCreatorFromDescription:
         """Test creating a single idea from a description."""
         creator = IdeaCreator()
         description = "A story about a detective solving mysteries in virtual reality"
-        ideas = creator.create_from_description(description)
+        ideas = creator.create_from_description(description, num_ideas=1)
         
         assert len(ideas) == 1
         assert ideas[0].concept is not None
@@ -357,8 +357,99 @@ class TestFieldPopulation:
         )
         creator = IdeaCreator(config)
         
-        ideas = creator.create_from_title("Variable Length Story")
+        ideas = creator.create_from_title("Variable Length Story", num_ideas=1)
         
         # Synopsis should be within reasonable bounds
         synopsis_word_count = len(ideas[0].synopsis.split())
         assert synopsis_word_count >= 10  # At least some content
+
+
+class TestDefaultBehavior:
+    """Tests for default behavior with 10 ideas."""
+    
+    def test_default_creates_ten_ideas_from_title(self):
+        """Test that default behavior creates 10 ideas from title."""
+        creator = IdeaCreator()
+        ideas = creator.create_from_title("AI and Machine Learning")
+        
+        assert len(ideas) == 10
+        assert all(isinstance(idea, Idea) for idea in ideas)
+        # Each idea should have unique title
+        titles = [idea.title for idea in ideas]
+        assert len(set(titles)) >= 3  # At least some variation
+    
+    def test_default_creates_ten_ideas_from_description(self):
+        """Test that default behavior creates 10 ideas from description."""
+        creator = IdeaCreator()
+        description = "Exploring the impact of artificial intelligence on society"
+        ideas = creator.create_from_description(description)
+        
+        assert len(ideas) == 10
+        assert all(isinstance(idea, Idea) for idea in ideas)
+    
+    def test_custom_default_num_ideas(self):
+        """Test that custom default_num_ideas config works."""
+        config = CreationConfig(default_num_ideas=5)
+        creator = IdeaCreator(config)
+        ideas = creator.create_from_title("Custom Default")
+        
+        assert len(ideas) == 5
+    
+    def test_explicit_overrides_default(self):
+        """Test that explicit num_ideas overrides default."""
+        creator = IdeaCreator()  # Default is 10
+        ideas = creator.create_from_title("Explicit Override", num_ideas=3)
+        
+        assert len(ideas) == 3
+
+
+class TestAIConfiguration:
+    """Tests for AI configuration and fallback behavior."""
+    
+    def test_ai_disabled_by_config(self):
+        """Test that AI can be disabled via config."""
+        config = CreationConfig(use_ai=False)
+        creator = IdeaCreator(config)
+        
+        assert creator.ai_generator is None
+        ideas = creator.create_from_title("No AI Test", num_ideas=2)
+        assert len(ideas) == 2
+    
+    def test_ai_enabled_but_unavailable(self):
+        """Test fallback when AI is enabled but Ollama unavailable."""
+        config = CreationConfig(use_ai=True)
+        creator = IdeaCreator(config)
+        
+        # AI should be unavailable (no Ollama running in test environment)
+        if creator.ai_generator:
+            assert not creator.ai_generator.available
+        
+        ideas = creator.create_from_title("Fallback Test", num_ideas=2)
+        assert len(ideas) == 2
+    
+    def test_custom_ai_model_config(self):
+        """Test custom AI model configuration."""
+        config = CreationConfig(
+            use_ai=True,
+            ai_model="qwen2.5:72b-q4_K_M",
+            ai_temperature=0.9
+        )
+        creator = IdeaCreator(config)
+        
+        # Config should be set
+        assert config.ai_model == "qwen2.5:72b-q4_K_M"
+        assert config.ai_temperature == 0.9
+    
+    def test_fallback_creates_valid_ideas(self):
+        """Test that fallback generation creates valid ideas."""
+        config = CreationConfig(use_ai=False)
+        creator = IdeaCreator(config)
+        
+        ideas = creator.create_from_title("Fallback Valid Test", num_ideas=3)
+        
+        for idea in ideas:
+            assert idea.title
+            assert idea.concept
+            assert idea.synopsis
+            assert len(idea.keywords) > 0
+            assert idea.status == IdeaStatus.DRAFT
