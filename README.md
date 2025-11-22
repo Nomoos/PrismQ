@@ -4,6 +4,12 @@
 
 PrismQ is a comprehensive content production platform that transforms ideas into multi-format content through a sequential enrichment workflow. Each format builds on the previous one, enabling progressive publication across text, audio, and video platforms.
 
+## 🔄 Next Steps & Parallel Execution
+
+For the current sprint tasks and parallel execution commands, see:
+- **[PARALLEL_RUN_NEXT.md](./_meta/issues/PARALLEL_RUN_NEXT.md)** - Current MVP sprint tasks and parallel execution plan
+- **[PARALLEL_RUN_NEXT_FULL.md](./_meta/issues/PARALLEL_RUN_NEXT_FULL.md)** - Complete issue breakdown and worker assignments
+
 ## 📚 Main Modules
 
 ### [T - Text Generation Pipeline](./T/README.md)
