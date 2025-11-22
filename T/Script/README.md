@@ -4,6 +4,14 @@
 
 Develop and refine scripts through iterative drafting, improvement, and optimization.
 
+## Current State Note
+
+This module implements a comprehensive script development workflow with the following structure:
+- **Namespace**: All scripts in this module use the `PrismQ.T.Script` namespace
+- **Submodules**: `FromIdeaAndTitle` (initial drafts) and `FromOriginalScriptAndReviewAndTitle` (improvements)
+- **ScriptWriter**: The AI-powered ScriptWriter is located in `T/Script/src/` but imported as `from PrismQ.T.Script import ScriptWriter` for cleaner usage
+- **Integration**: Works with `PrismQ.T.Review.Script` for feedback loop optimization
+
 ## Purpose
 
 Transform structured ideas into polished scripts ready for review and publication.
@@ -32,7 +40,7 @@ This state handles:
 **[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
 **[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
 
-#### [Writer](./Writer/)
+#### [src](./src/)
 **AI script writer with feedback loop** ⭐ NEW
 
 AI-powered script writer that optimizes content based on review feedback from **[T/Review/Script](../Review/Script/)**.
@@ -42,8 +50,8 @@ AI-powered script writer that optimizes content based on review feedback from **
 - Score-driven improvement (target: 80%+)
 - YouTube short content generation
 
-**[→ View Writer Documentation](./Writer/README.md)**
-**[→ View Writer Metadata](./Writer/_meta/)**
+**[→ View Script Writer Documentation](./src/README.md)**
+**[→ View Script Writer Metadata](./src/_meta/)**
 
 ## Module Metadata
 
@@ -53,7 +61,7 @@ AI-powered script writer that optimizes content based on review feedback from **
 
 ## AI-Powered Feedback Loop Workflow
 
-The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer modules work together in an iterative feedback loop:
+The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and ScriptWriter modules work together in an iterative feedback loop:
 
 ```
 1. Draft → Original Script (145 seconds)
@@ -63,7 +71,7 @@ The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer mod
    - Pacing: Middle section drags
    - Engagement: Strong hook, weak middle
               ↓
-3. AI Writer → Optimizes (applies improvements)
+3. ScriptWriter → Optimizes (applies improvements)
    - Cuts 30 seconds from investigation
    - Strengthens opening hook
    - Improves pacing
@@ -73,7 +81,7 @@ The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer mod
    - Pacing: Much improved
    - Engagement: Excellent
               ↓
-5. AI Writer → Final optimization
+5. ScriptWriter → Final optimization
    - Fine-tunes climax sequence
    - Removes remaining padding
               ↓
@@ -94,7 +102,7 @@ The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and Writer mod
 
 ```python
 from PrismQ.T.Review.Script import ScriptReview, ContentLength
-from PrismQ.T.Script.Writer import ScriptWriter
+from PrismQ.T.Script import ScriptWriter
 
 # AI Reviewer evaluates
 review = ScriptReview(
@@ -106,7 +114,7 @@ review = ScriptReview(
     optimal_length_seconds=90
 )
 
-# AI Writer optimizes
+# ScriptWriter optimizes
 writer = ScriptWriter(target_score_threshold=80)
 result = writer.optimize_from_review(
     original_script=script_text,

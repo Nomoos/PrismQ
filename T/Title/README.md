@@ -4,6 +4,14 @@
 
 Create compelling, SEO-optimized titles through testing, optimization, and refinement.
 
+## Current State Note
+
+This module implements a comprehensive title development workflow with the following structure:
+- **Namespace**: All titles in this module use the `PrismQ.T.Title` namespace
+- **Submodules**: `FromIdea` (initial drafts) and `FromOriginalTitleAndReviewAndScript` (improvements)
+- **Integration**: Works with `PrismQ.T.Review.Title` for review-based optimization
+- **Workflow**: Titles are co-improved with scripts through iterative review cycles
+
 ## Purpose
 
 Develop attention-grabbing titles that maximize click-through rates while maintaining SEO value.

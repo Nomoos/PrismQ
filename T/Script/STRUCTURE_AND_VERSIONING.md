@@ -21,11 +21,13 @@ T/
 │   └── Editing/         # Final editing pass
 │
 └── Script/
-    ├── Draft/           # Initial script writing
-    ├── Improvements/    # Script enhancements
-    ├── Optimization/    # Script optimization
-    └── Writer/          # AI script writer with feedback loop ⭐ NEW
+    ├── FromIdeaAndTitle/           # Initial script draft from idea and title (v1)
+    ├── FromOriginalScriptAndReviewAndTitle/  # All script improvements (v2, v3+)
+    ├── src/                         # AI script writer with feedback loop ⭐ NEW
+    └── _meta/                       # Script module metadata
 ```
+
+**Note on Folder Structure**: The AI script writer (ScriptWriter class) is located in `T/Script/src/` and is imported as `from PrismQ.T.Script import ScriptWriter`. The documentation previously referenced a non-existent `T/Script/Writer/` folder, which has been corrected to `T/Script/src/`.
 
 **Why T/Review/Script?**
 
