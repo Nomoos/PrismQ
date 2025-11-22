@@ -1,0 +1,1 @@
+local AI idea scoring 0-100% 
