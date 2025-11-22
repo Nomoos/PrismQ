@@ -18,7 +18,7 @@ This directory contains all documentation related to SOLID design principles and
 - **[SOLID_PRINCIPLES.md](../SOLID_PRINCIPLES.md)** - Comprehensive guide to SOLID principles with Python examples
 
 ### Code Reviews
-- **[SOLID Review: Core Modules](./code_reviews/SOLID_REVIEW_CORE_MODULES.md)** - Review of Classification, ConfigLoad, Model, and Scoring modules
+- **[SOLID Review: Core Modules](./code_reviews/SOLID_REVIEW_CORE_MODULES.md)** - Review of Classification, EnvLoad, Model, and Scoring modules
 - **[SOLID Review: Video and Text Modules](./code_reviews/SOLID_REVIEW_VIDEO_TEXT_MODULES.md)** - Review of Video and Text source modules
 
 ---

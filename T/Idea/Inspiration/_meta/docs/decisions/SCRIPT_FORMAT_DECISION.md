@@ -157,7 +157,7 @@ _meta\_scripts\run.bat
 Consider applying the same pattern to other modules:
 - Classification
 - Scoring
-- ConfigLoad
+- EnvLoad
 - Model
 
 Each module can have:

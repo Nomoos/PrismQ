@@ -20,7 +20,7 @@ Create a unified pipeline that integrates all PrismQ.IdeaInspiration modules (So
 ### Key Features
 - Seamless data flow between modules
 - Batch processing capabilities for multiple content sources
-- Automatic configuration management via ConfigLoad
+- Automatic configuration management via EnvLoad
 - Standardized output format for downstream consumption
 - Performance optimization for RTX 5090 GPU
 

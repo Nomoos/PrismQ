@@ -254,6 +254,6 @@ if __name__ == "__main__":
     # Note: This example requires:
     # 1. TaskManager module installed: pip install -e Source/TaskManager
     # 2. Environment configured with TASKMANAGER_API_URL and TASKMANAGER_API_KEY
-    # 3. ConfigLoad module available
+    # 3. EnvLoad module available
     
     main()

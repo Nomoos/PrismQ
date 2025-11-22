@@ -61,7 +61,7 @@ PrismQ.IdeaInspiration/
 │   └── venv/          # ~4-5GB (PyTorch + BERT models)
 ├── Model/
 │   └── venv/          # ~180MB (no AI, pure Python)
-├── ConfigLoad/
+├── EnvLoad/
 │   └── venv/          # ~200MB (no AI, config only)
 ├── Sources/
 │   └── venv/          # ~4-5GB (PyTorch + GPT models)

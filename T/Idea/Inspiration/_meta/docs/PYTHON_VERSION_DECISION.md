@@ -86,7 +86,7 @@ py -3.10 -m pip install -e .
 
 Updated all `pyproject.toml` files:
 - Classification
-- ConfigLoad
+- EnvLoad
 - Model
 - Scoring
 - Sources (all source modules)

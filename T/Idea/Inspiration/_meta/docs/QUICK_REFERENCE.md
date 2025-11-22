@@ -31,7 +31,7 @@ PrismQ.IdeaInspiration/
 ├── DEVELOPMENT_PLAN.md          # Current development plan ⭐
 │
 ├── Classification/              # Content classification module
-├── ConfigLoad/                  # Configuration management
+├── EnvLoad/                  # Configuration management
 ├── Model/                       # Core data model (IdeaInspiration)
 ├── Scoring/                     # Content scoring module
 ├── Source/                      # Source modules (Video, Text, Audio, etc.)
