@@ -1,19 +1,23 @@
 """Title Generation module for creating title variants from Ideas.
 
-This module provides functionality to generate 3-5 compelling title variants
+This module provides functionality to generate 3-10 compelling title variants
 from an Idea object, focusing on engagement, clarity, and SEO optimization.
+Default is 10 variants using diverse generation strategies.
 """
 
 from typing import List, Dict, Any, Optional, Literal
 from dataclasses import dataclass
 import sys
 import os
+from pathlib import Path
 
 # Add parent directories to path for imports
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-model_path = os.path.join(parent_dir, 'Idea', 'Model')
-sys.path.insert(0, os.path.join(model_path, 'src'))
-sys.path.insert(0, model_path)
+# Navigate up to T/ directory and then to Idea/Model
+current_file = Path(__file__)
+t_module_dir = current_file.parent.parent.parent.parent
+model_path = t_module_dir / 'Idea' / 'Model'
+sys.path.insert(0, str(model_path / 'src'))
+sys.path.insert(0, str(model_path))
 
 from idea import Idea, ContentGenre
 
@@ -293,8 +297,9 @@ class TitleGenerator:
         if base_title.lower().startswith("how to"):
             title = base_title
         elif base_title.lower().startswith("the"):
-            # Remove "The" and add "How to Understand"
-            clean = base_title[4:] if base_title.startswith("The ") else base_title
+            # Remove "The " prefix and add "How to Understand"
+            the_prefix = "The "
+            clean = base_title[len(the_prefix):] if base_title.startswith(the_prefix) else base_title
             title = f"How to Understand {clean}"
         else:
             title = f"How to Master {base_title}"
