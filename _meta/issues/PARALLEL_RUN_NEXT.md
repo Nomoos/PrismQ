@@ -511,7 +511,7 @@ Worker15: Complete user guide with all stages
 | #MVP-022 | PrismQ.T.Story.ExpertPolish | **GPT Expert Polish** | Worker10 | 0.5d | Apply GPT-based expert improvements |
 | #MVP-023 | PrismQ.T.Publishing.Finalization | **Publish** | Worker02 | 2d | Publishing approved + validated content |
 
-**Total**: 23 issues, 24 days of work, 6-7 weeks calendar time with 3-4 workers
+**Total**: 23 issues, 24 days of work, 7-8 weeks calendar time with 3-4 workers
 
 **Key Features**:
 - **Co-dependent improvement**: Title and script reviewed against each other (steps 4-5, 8, 10)
