@@ -328,12 +328,14 @@ grep -r "TODO" ./_meta/ --include="*.md"
 
 echo "Checking documentation links..."
 
-# Find all markdown files
-find . -name "*.md" -type f | grep -v ".git" | while read file; do
+broken_count=0
+
+# Find all markdown files (handling filenames with spaces and special characters)
+find . -name "*.md" -type f -print0 | grep -zv ".git" | while IFS= read -r -d '' file; do
     echo "Checking: $file"
     
     # Extract markdown links [text](path)
-    grep -o '\[.*\]([^)]*)' "$file" | while read link; do
+    grep -o '\[.*\]([^)]*)' "$file" | while IFS= read -r link; do
         path=$(echo "$link" | sed 's/.*(\(.*\))/\1/')
         
         # Check if it's a relative link
@@ -343,12 +345,14 @@ find . -name "*.md" -type f | grep -v ".git" | while read file; do
             
             if [ ! -f "$target" ] && [ ! -d "$target" ]; then
                 echo "  BROKEN: $link in $file"
+                ((broken_count++))
             fi
         fi
     done
 done
 
-echo "Link check complete!"
+echo "Link check complete! Found $broken_count broken links."
+exit $broken_count
 ```
 
 ### Example Validator Script
@@ -359,10 +363,12 @@ echo "Link check complete!"
 import re
 import ast
 import sys
+import os
+from pathlib import Path
 
 def extract_python_code(markdown_file):
     """Extract Python code blocks from markdown."""
-    with open(markdown_file, 'r') as f:
+    with open(markdown_file, 'r', encoding='utf-8') as f:
         content = f.read()
     
     # Find Python code blocks
@@ -379,13 +385,41 @@ def validate_syntax(code):
         return False, str(e)
 
 def main():
-    # Check all markdown files for Python examples
+    """Check all markdown files for Python examples."""
     print("Validating Python examples in documentation...")
-    # Implementation here
-    pass
+    
+    errors = []
+    validated = 0
+    
+    # Find all markdown files
+    for md_file in Path('.').rglob('*.md'):
+        if '.git' in str(md_file):
+            continue
+            
+        code_blocks = extract_python_code(md_file)
+        
+        for i, code in enumerate(code_blocks, 1):
+            validated += 1
+            is_valid, error = validate_syntax(code)
+            
+            if not is_valid:
+                errors.append({
+                    'file': str(md_file),
+                    'block': i,
+                    'error': error
+                })
+                print(f"  ❌ {md_file} - Block {i}: {error}")
+            else:
+                print(f"  ✅ {md_file} - Block {i}: Valid")
+    
+    print(f"\nValidation complete!")
+    print(f"  Total blocks validated: {validated}")
+    print(f"  Errors found: {len(errors)}")
+    
+    return len(errors)
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
 ```
 
 ---
