@@ -17,6 +17,7 @@ Features:
 """
 
 import json
+import re
 import requests
 import logging
 from typing import Dict, List, Optional, Any
@@ -621,7 +622,6 @@ OG Description:"""
             Rule-based meta description
         """
         # Simple extraction from first sentences
-        import re
         sentences = re.split(r'[.!?]+', script)
         
         description = ""
