@@ -48,7 +48,10 @@ from .category_classifier import (
 from .taxonomy_config import (
     TaxonomyConfig,
     load_taxonomy_config,
-    DEFAULT_TAXONOMY
+    create_custom_taxonomy,
+    DEFAULT_TAXONOMY,
+    TECH_FOCUSED_TAXONOMY,
+    LIFESTYLE_FOCUSED_TAXONOMY
 )
 
 from typing import Dict, List, Optional, Any
@@ -212,7 +215,10 @@ __all__ = [
     'classify_categories',
     'process_taxonomy',
     'load_taxonomy_config',
+    'create_custom_taxonomy',
     
     # Constants
     'DEFAULT_TAXONOMY',
+    'TECH_FOCUSED_TAXONOMY',
+    'LIFESTYLE_FOCUSED_TAXONOMY',
 ]
