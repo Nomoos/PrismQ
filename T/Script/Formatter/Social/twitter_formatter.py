@@ -4,7 +4,7 @@ This module transforms scripts into Twitter/X thread format with optimal
 tweet breaks, thread numbering, and engagement optimization.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from .base_formatter import BaseSocialFormatter, SocialMediaContent, SocialMediaMetadata
 
 
@@ -211,7 +211,7 @@ class TwitterFormatter(BaseSocialFormatter):
         
         return numbered
     
-    def _validate_tweets(self, tweets: List[str]) -> tuple[bool, Optional[str]]:
+    def _validate_tweets(self, tweets: List[str]) -> Tuple[bool, Optional[str]]:
         """Validate all tweets meet character limit.
         
         Args:
