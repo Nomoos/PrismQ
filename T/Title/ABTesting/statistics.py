@@ -14,7 +14,10 @@ class VariantMetrics:
         variant_id: Variant identifier (A, B, C, etc.)
         views: Total views/impressions
         clicks: Total clicks
-        engagement_score: Engagement metric (0-1)
+        engagement_score: Normalized engagement metric (0.0 to 1.0).
+            Represents user engagement level where 0 = no engagement,
+            1 = maximum engagement. Can be calculated from time-on-page,
+            scroll depth, interactions, or other engagement signals.
     """
     variant_id: str
     views: int
@@ -159,10 +162,15 @@ def _calculate_engagement_significance(
     variant_a: VariantMetrics,
     variant_b: VariantMetrics
 ) -> SignificanceResult:
-    """Calculate engagement significance (simplified t-test approximation).
+    """Calculate engagement significance (simplified approximation).
     
-    For MVP, uses a simplified comparison. Future versions could implement
-    proper t-test or z-test with actual engagement data distributions.
+    NOTE: This is a SIMPLIFIED APPROXIMATION for MVP purposes.
+    The hardcoded p-values (0.03, 0.15, 0.5) are placeholder estimates
+    based on rough z-score thresholds and should not be interpreted as
+    precise statistical calculations.
+    
+    Future versions should implement proper t-test or z-test with actual
+    engagement data distributions using scipy.stats.ttest_ind or similar.
     
     Args:
         variant_a: First variant metrics
@@ -183,16 +191,17 @@ def _calculate_engagement_significance(
     se = math.sqrt(2 / combined_n)  # Simplified standard error
     z_score = diff / se if se > 0 else 0
     
-    # Convert z-score to p-value (very rough approximation)
+    # Convert z-score to p-value (PLACEHOLDER APPROXIMATION)
+    # These hardcoded values are rough estimates, not precise calculations
     # For z > 1.96, p < 0.05
     if z_score > 1.96:
-        p_value = 0.03  # Significant
+        p_value = 0.03  # Placeholder for significant result
         is_significant = True
     elif z_score > 1.0:
-        p_value = 0.15  # Marginally significant
+        p_value = 0.15  # Placeholder for marginally significant
         is_significant = False
     else:
-        p_value = 0.5  # Not significant
+        p_value = 0.5  # Placeholder for not significant
         is_significant = False
     
     confidence = (1 - p_value) * 100
@@ -229,7 +238,8 @@ def _calculate_views_significance(
     """Calculate views significance (chi-square test for counts).
     
     Compares view counts between variants to determine if the difference
-    is statistically significant.
+    is statistically significant. Uses manual chi-square calculation which
+    is mathematically equivalent to scipy.stats methods for this simple case.
     
     Args:
         variant_a: First variant metrics
@@ -244,6 +254,7 @@ def _calculate_views_significance(
     expected_b = total_views / 2
     
     # Chi-square calculation for observed vs expected
+    # This is mathematically equivalent to scipy.stats.chisquare
     chi2 = (
         ((variant_a.views - expected_a) ** 2 / expected_a) +
         ((variant_b.views - expected_b) ** 2 / expected_b)
@@ -252,7 +263,7 @@ def _calculate_views_significance(
     # For df=1, chi2 > 3.841 means p < 0.05
     is_significant = chi2 > 3.841
     
-    # Rough p-value estimation
+    # Convert chi2 to p-value using standard thresholds (df=1)
     if chi2 > 10.83:  # p < 0.001
         p_value = 0.001
     elif chi2 > 6.635:  # p < 0.01

@@ -17,6 +17,10 @@ def assign_variant(user_id: str, variants: List[Any]) -> Any:
     1. Consistent assignment - same user always gets same variant
     2. Even distribution - variants receive traffic matching their percentages
     
+    Note: MD5 is used here for non-cryptographic purposes (traffic distribution).
+    The hash is used only to generate a deterministic number from user_id, not
+    for security. MD5's speed and consistent output are suitable for this use case.
+    
     Algorithm:
     1. Hash user_id to get deterministic number
     2. Convert to 0-100 range using modulo
