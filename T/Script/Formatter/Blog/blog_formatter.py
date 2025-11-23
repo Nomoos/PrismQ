@@ -63,6 +63,7 @@ class BlogFormattedContent:
     metadata: BlogMetadata
     format_type: str = "markdown"
     platform: str = "generic"
+    # Note: Lambda in default_factory is called at instance creation, not field definition
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     success: bool = True
     errors: List[str] = field(default_factory=list)
@@ -237,6 +238,14 @@ class BlogFormatter:
     def _split_into_sentences(self, text: str) -> List[str]:
         """Split text into sentences.
         
+        Uses basic regex for sentence splitting. Known limitations:
+        - May split incorrectly on abbreviations (e.g., 'Dr.', 'Mr.', 'U.S.')
+        - May not handle decimal numbers correctly (e.g., '3.14')
+        - Does not handle ellipses as sentence boundaries
+        
+        For production use with complex content, consider using
+        an NLP library like spaCy or NLTK for more robust sentence detection.
+        
         Args:
             text: Text to split
         
@@ -244,7 +253,6 @@ class BlogFormatter:
             List of sentences
         """
         # Simple sentence splitter (handles . ! ?)
-        # This is basic and could be improved with NLP libraries
         sentences = re.split(r'(?<=[.!?])\s+', text)
         return [s.strip() for s in sentences if s.strip()]
     
@@ -376,7 +384,7 @@ class BlogFormatter:
         char_count = len(all_text)
         reading_time = self._calculate_reading_time(word_count)
         excerpt = self._generate_excerpt(content)
-        heading_count = len([s for s in content['sections'] if s.get('heading')])
+        heading_count = sum(1 for s in content['sections'] if s.get('heading'))
         
         return BlogMetadata(
             excerpt=excerpt,

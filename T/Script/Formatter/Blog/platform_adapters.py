@@ -32,8 +32,7 @@ class MediumAdapter:
         
         # Add Medium-specific styling hints in comments
         if content.format_type == "markdown":
-            # Ensure proper quote formatting for Medium
-            optimized_text = optimized_text.replace('> ', '> ')  # Already correct
+            # Medium quote formatting is already compatible with standard Markdown
             
             # Add note about importing to Medium
             optimized_text = (
