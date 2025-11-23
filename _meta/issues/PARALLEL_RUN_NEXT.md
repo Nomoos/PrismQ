@@ -1,195 +1,282 @@
-# PARALLEL_RUN_NEXT - MVP Sprint Execution
+# PARALLEL_RUN_NEXT - Active Sprint Execution
 
-> **Note**: This is a streamlined sprint-focused document containing only sprints and commands.  
-> **Full detailed version**: See `PARALLEL_RUN_NEXT_FULL.md` for comprehensive workflow explanations.  
-> **Current state**: See `CURRENT_STATE.md` for implementation status assessment.  
-> **Refactored**: 2025-11-22 - Simplified to 24 issues (from 26 stages), applied SOLID principles, MVP-focused with smaller work chunks
+> **Purpose**: This document tracks **ONLY** Work In Progress (WIP) and unblocked issues that can run in parallel.  
+> **Completed Work**: See `_meta/issues/done/` for completed issues (MVP-001 through MVP-024 ✅)  
+> **Full Roadmap**: See `PARALLEL_RUN_NEXT_FULL.md` for complete Post-MVP roadmap (POST-001 through POST-048)  
+> **Post-MVP Issues**: See `T/_meta/issues/new/POST-MVP-Enhancements/` for detailed Text Pipeline issue specifications
 
-**Sprint**: Sprint 1-3 (7-8 weeks) - MVP Development  
-**Date**: 2025-11-22 (Updated)  
-**Status**: Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ (13/13 - 100%)  
-**Goal**: Build MVP with 24-stage iterative co-improvement workflow (simplified from 26, optimized for smaller chunks)
-
-**Sprint 1 Achievement**: Foundation complete - Idea → Title v1 → Script v1 → Cross-reviews working ✅  
-**Sprint 2 Achievement**: Improvement cycle complete - v2 and v3 generation working ✅  
-**Sprint 3 Achievement**: All quality reviews, readability checks, and publishing complete ✅  
-**Completed Issues**: MVP-001 through MVP-024 (all 24 issues complete) ✅  
-**Status**: ALL MVPs COMPLETE - Ready for Post-MVP enhancements
+**Date**: 2025-11-23 (Updated)  
+**Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1  
+**Status**: 🎯 READY FOR EXECUTION  
+**Timeline**: Weeks 9-10 (2 weeks)
 
 ---
 
-## Sprint 1: Foundation & Cross-Reviews (Weeks 1-2) ✅ COMPLETE
+## 🎉 MVP Complete: All 24 Issues Done!
 
-**Goal**: Idea → Title v1 → Script v1 → Cross-validation reviews  
-**Timeline**: 2 weeks  
-**Active Workers**: Worker02, Worker10, Worker13, Worker15, Worker04  
-**Status**: ✅ ALL ISSUES COMPLETE (7/7)
+**MVP Status**: ✅ ALL COMPLETE (MVP-001 through MVP-024)  
+**Location**: All MVP issues moved to `_meta/issues/done/`
 
-### Completed Issues
+**Foundation Built**:
+- ✅ Idea Creation (MVP-001)
+- ✅ Title Generation v1, v2, v3 (MVP-002, MVP-006)
+- ✅ Script Generation v1, v2, v3 (MVP-003, MVP-007)
+- ✅ Cross-Review System (MVP-004, MVP-005)
+- ✅ Acceptance Gates (MVP-012, MVP-013)
+- ✅ Quality Reviews: Grammar, Tone, Content, Consistency, Editing (MVP-014-018)
+- ✅ Readability Checks (MVP-019, MVP-020)
+- ✅ Expert Review & Polish (MVP-021, MVP-022)
+- ✅ Publishing Pipeline (MVP-023, MVP-024)
 
-All Sprint 1 issues (MVP-001 through MVP-005, plus MVP-DOCS and MVP-TEST) have been completed, reviewed, and moved to `_meta/issues/done/`.
-
-**Achievement Summary**:
-- Foundation pipeline working: Idea → Title v1 → Script v1
-- Cross-review system complete: Title ↔ Script mutual reviews
-- Comprehensive documentation (1033 lines EN + 548 lines CS)
-- Test framework ready (49/49 tests passing, 100%)
-- All acceptance criteria met
-- Sprint 2 unblocked and ready to start
-
----
-
-## Sprint 2: Improvement Cycle (Weeks 3-4) ✅ COMPLETE
-
-**Goal**: Create improved v2 versions using cross-reviews, then refine to v3  
-**Timeline**: 2 weeks  
-**Active Workers**: Worker02, Worker10, Worker13  
-**Status**: ✅ ALL ISSUES COMPLETE (6/6)
-
-### Completed Issues
-
-All Sprint 2 issues (MVP-006 through MVP-011) have been completed, reviewed, and moved to `_meta/issues/done/`.
-
-**Achievement Summary**:
-- v2 generation pipeline complete: Title v2 + Script v2
-- v3 refinement working: Title v3 + Script v3
-- Cross-review v2 system functional
-- Iterative improvement cycle (v1→v2→v3→v4+) proven
-- All acceptance criteria met
-- Sprint 3 unblocked
+**Next Phase**: Post-MVP Enhancements (48 issues across Sprints 4-11)
 
 ---
 
-## Sprint 3: Validation & Quality (Weeks 5-8) ✅ COMPLETE
+## Sprint 4: Text Pipeline Enhancement - Part 1 (CURRENT)
 
-**Goal**: Acceptance gates + comprehensive quality reviews + expert review/polish + publishing (3 phases)  
-**Timeline**: 4 weeks  
-**Active Workers**: Worker02, Worker10, Worker04, Worker15  
-**Status**: ✅ ALL ISSUES COMPLETE (13/13)
+**Goal**: Add SEO optimization, multi-format support, and batch processing to T module  
+**Timeline**: Weeks 9-10 (2 weeks)  
+**Active Workers**: Worker02, Worker12, Worker13, Worker17  
+**Status**: 🎯 READY FOR EXECUTION
 
-### Completed Issues
+### Unblocked Issues Ready to Start
 
-All Sprint 3 issues (MVP-012 through MVP-024) have been completed, tested, and moved to `_meta/issues/done/`.
+#### POST-001: T.Publishing.SEO - Keyword Research & Optimization
+**Worker**: Worker17 (Analytics) + Worker13 (Prompt Master)  
+**Priority**: High | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
 
-**Achievement Summary**:
-- All 13 Sprint 3 issues complete (100%)
-- All quality reviews operational (Grammar, Tone, Content, Consistency, Editing)
-- All readability checks complete (Title and Script)
-- Expert review and polish implemented
-- Publishing pipeline complete (Export + Reports)
-- Sprint 3 complete
+**Quick Summary**: Implement automated SEO keyword research and optimization for published content.
 
----
+**Acceptance Criteria**:
+- Extract relevant keywords from title and script
+- Generate SEO-optimized metadata (title tags, meta descriptions)
+- Keyword density analysis
+- Store SEO data with published content
 
-## 🎉 MVP Development Complete - All 24 Issues Implemented! 🎉
-
-**Status**: ✅ ALL COMPLETE - No remaining work
-
-All quality reviews, readability checks, and publishing features have been implemented and tested.
+**Dependencies**: MVP-024 ✅ (Complete)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md)
 
 ---
 
-## Issue Quality Standards
+#### POST-003: T.Script.MultiFormat - Blog Format Optimization
+**Worker**: Worker12 (Content Specialist)  
+**Priority**: High | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
 
-All issues must meet these criteria:
+**Quick Summary**: Transform scripts into blog-optimized format with heading hierarchy, sections, and formatting.
 
-### Size
-- **Small**: 0.5-2 days maximum effort
-- **Focused**: Single responsibility per issue
-- **Testable**: Can be verified independently
+**Acceptance Criteria**:
+- Convert script to blog structure (H1, H2, H3 hierarchy)
+- Add paragraph breaks and formatting
+- Platform-specific optimizations (Medium, WordPress, Ghost)
+- Generate blog metadata (excerpt, reading time)
 
-### SOLID Principles Application
-
-Each issue is designed following SOLID principles:
-
-#### Single Responsibility Principle (S)
-- Each issue focuses on ONE specific module or feature
-- Example: MVP-017 only handles consistency checking, not editing or grammar
-- Clear, focused purpose statement for each issue
-
-#### Open/Closed Principle (O)
-- Modules are extensible without modification
-- Review modules follow consistent patterns
-- New review types can be added without changing existing ones
-
-#### Liskov Substitution Principle (L)
-- All review modules follow same interface contract
-- Any review module can be used interchangeably in the pipeline
-- Consistent input/output formats across similar modules
-
-#### Interface Segregation Principle (I)
-- Modules expose only necessary functionality
-- Clean, minimal public APIs
-- No forced dependencies on unused functionality
-
-#### Dependency Inversion Principle (D)
-- Modules depend on abstractions (review interface patterns)
-- High-level workflow doesn't depend on low-level implementation details
-- Loose coupling between pipeline stages
-
-### Acceptance Criteria
-- **Specific**: Clear, measurable outcomes
-- **Complete**: All requirements listed
-- **Verifiable**: Tests can validate success
-
-### Input/Output
-- **Input**: Clearly defined data structures
-- **Output**: Expected results documented
-- **Examples**: Sample inputs and outputs provided
-
-### Dependencies
-- **Explicit**: All dependencies listed
-- **Blocking**: Blocked by listed clearly
-- **Order**: Execution sequence defined
-
-### Tests
-- **Unit Tests**: Test individual components
-- **Integration Tests**: Test component interactions
-- **E2E Tests**: Test complete workflows
+**Dependencies**: MVP-024 ✅ (Complete)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md)
 
 ---
 
-## Sprint Summary
+#### POST-005: T.Idea.Batch - Batch Idea Processing
+**Worker**: Worker02 (Python Specialist)  
+**Priority**: Medium | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
 
-### Sprint 1 (Weeks 1-2) ✅ COMPLETE
-- **Issues**: MVP-001 through MVP-005 + Documentation + Tests (7 issues)
-- **Progress**: 100% complete (7 of 7 done)
-- **Reviews**: All issues reviewed in `_meta/issues/done/`
+**Quick Summary**: Process multiple ideas in parallel for efficient content pipeline scaling.
 
-### Sprint 2 (Weeks 3-4) ✅ COMPLETE
-- **Issues**: MVP-006 through MVP-011 (6 issues)
-- **Progress**: 100% complete (6 of 6 done)
-- **Reviews**: All issues reviewed in `_meta/issues/done/`
+**Acceptance Criteria**:
+- Accept list of ideas as input (10-100+ ideas)
+- Process ideas concurrently using async/parallel execution
+- Track batch processing status
+- Handle failures gracefully with retry logic
 
-### Sprint 3 (Weeks 5-8) ✅ COMPLETE
-- **Issues**: MVP-012 through MVP-024 (13 issues)
-- **Progress**: 100% complete (13 of 13 done) ✅
-- **Status**: ALL SPRINT 3 MVPS COMPLETE
-
-### Overall
-- **Total Issues**: 24 MVP issues (simplified from original 26 stages)
-- **Completed**: 24 issues (100%) ✅
-- **Remaining**: 0 issues
-- **Current Sprint**: All sprints complete ✅
-- **Status**: MVP PHASE COMPLETE - Ready for Post-MVP enhancements
+**Dependencies**: MVP-001 ✅ (Complete)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md)
 
 ---
 
-## Critical Path
+### Blocked Issues (Ready Next)
 
-```
-Sprint 1 ✅ → Sprint 2 ✅ → Sprint 3 ✅ → Post-MVP Enhancements
-  DONE         DONE         DONE       (Define Next Phase)
+#### POST-002: T.Publishing.SEO - Tags & Categories
+**Worker**: Worker17 (Analytics)  
+**Priority**: High | **Effort**: 1.5 days | **Status**: 🔒 BLOCKED
+
+**Blocked By**: POST-001 (SEO Keywords must complete first)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-002-SEO-Taxonomy.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-002-SEO-Taxonomy.md)
+
+---
+
+#### POST-004: T.Script.MultiFormat - Social Media Adaptation
+**Worker**: Worker12 (Content Specialist)  
+**Priority**: High | **Effort**: 2 days | **Status**: 🔒 BLOCKED
+
+**Blocked By**: POST-003 (Blog Format - using shared formatting infrastructure)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-004-Social-Media-Format.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-004-Social-Media-Format.md)
+
+---
+
+#### POST-006: T.Title.ABTesting - A/B Testing Framework
+**Worker**: Worker17 (Analytics)  
+**Priority**: Medium | **Effort**: 2 days | **Status**: 🔒 BLOCKED
+
+**Blocked By**: POST-001, POST-002 (SEO infrastructure needed)  
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-006-ABTesting.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-006-ABTesting.md)
+
+---
+
+## Sprint 4 Execution Plan
+
+### Week 1: Parallel Track (3 workers)
+```bash
+# Track A: SEO Foundation
+Worker17: POST-001 (SEO Keywords) [2 days]
+Worker13: Support POST-001 with prompt engineering [2 days]
+
+# Track B: Multi-Format Content
+Worker12: POST-003 (Blog Format) [2 days]
+
+# Track C: Scalability
+Worker02: POST-005 (Batch Processing) [2 days]
 ```
 
-**Current Status**: ALL SPRINTS COMPLETE ✅ | ALL 24 MVPs IMPLEMENTED ✅
+### Week 2: Sequential Completion (2-3 workers)
+```bash
+# After POST-001 completes
+Worker17: POST-002 (Tags & Categories) [1.5 days] → POST-006 (A/B Testing) [0.5 days]
 
-**Next Priority**: Define Post-MVP enhancements and priorities
+# After POST-003 completes
+Worker12: POST-004 (Social Media) [2 days]
+
+# Support/Testing
+Worker04: Integration testing [2 days]
+Worker15: Documentation updates [2 days]
+```
+
+**Total Calendar Time**: ~10 days (with weekends: 2 weeks)
 
 ---
 
-**Status**: All Sprints Complete (24/24 MVPs)  
-**Next Action**: Determine Post-MVP priorities and next phase  
-**Updated**: 2025-11-22 (All MVPs Complete)  
-**Owner**: Worker01  
-**Achievement**: MVP Development Phase Complete - 100% Implementation
+## Sprint 5: Text Pipeline Enhancement - Part 2 (NEXT)
+
+**Goal**: Add inspiration sources, versioning, and collaboration features  
+**Timeline**: Weeks 11-12 (2 weeks)  
+**Status**: 🔜 UPCOMING
+
+### Planned Issues (Not Yet Unblocked)
+- POST-007: YouTube API Inspiration (Worker08) - 2 days
+- POST-008: RSS Feed Inspiration (Worker08) - 1.5 days
+- POST-009: Twitter/X API Inspiration (Worker08) - 1.5 days
+- POST-010: Script Versioning (Worker06) - 2 days
+- POST-011: Multi-Reviewer Workflow (Worker18) - 2 days
+- POST-012: Inline Comments (Worker18) - 2 days
+
+**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md](../../T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md)
+
+---
+
+## Issue State Management
+
+### Issue States
+- 🆕 **UNBLOCKED**: Ready to start immediately (no blocking dependencies)
+- 🔒 **BLOCKED**: Waiting on dependency completion
+- 🔄 **WIP**: Currently being worked on
+- ✅ **COMPLETE**: Done and moved to `_meta/issues/done/`
+
+### Moving Issues
+
+**When starting work**:
+```bash
+# Move issue to WIP folder (when Worker begins)
+mv _meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md _meta/issues/wip/
+```
+
+**When completing work**:
+```bash
+# Move issue to done folder (after PR merge and review)
+mv _meta/issues/wip/POST-001-SEO-Keywords.md _meta/issues/done/
+```
+
+**Unblocking issues**:
+```bash
+# When POST-001 completes, POST-002 becomes unblocked
+# Update this file to move POST-002 to "Unblocked Issues" section
+```
+
+---
+
+## Sprint 4 Success Criteria
+
+### Must Complete (Unblocked Issues)
+- [ ] POST-001: SEO Keywords functional
+- [ ] POST-003: Blog format working for 3+ platforms
+- [ ] POST-005: Batch processing handles 50+ ideas
+
+### Should Complete (Blocked Issues)
+- [ ] POST-002: Tags & Categories integrated
+- [ ] POST-004: Social media formatting for 4+ platforms
+- [ ] POST-006: A/B Testing framework operational
+
+### Quality Gates
+- [ ] All new code has >80% test coverage
+- [ ] Integration tests pass for new features
+- [ ] Documentation updated
+- [ ] Code review completed by Worker10
+- [ ] No security vulnerabilities introduced
+
+---
+
+## Commands for Workers
+
+### Worker17 + Worker13: Start POST-001
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-001-seo-keywords
+# Create implementation in T/Publishing/SEO/Keywords/
+# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md
+```
+
+### Worker12: Start POST-003
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-003-blog-format
+# Create implementation in T/Script/Formatter/Blog/
+# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md
+```
+
+### Worker02: Start POST-005
+```bash
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-005-batch-processing
+# Create implementation in T/Idea/Batch/
+# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md
+```
+
+---
+
+## Progress Tracking
+
+### Sprint 4 Progress
+**Week 1**: 0/3 unblocked issues started  
+**Week 2**: 0/3 blocked issues started  
+**Overall**: 0/6 issues complete
+
+**Last Updated**: 2025-11-23
+
+---
+
+## Related Documents
+
+### Issue References
+- **Completed MVPs**: `_meta/issues/done/MVP-*.md` (001-024)
+- **Text Pipeline POST Issues**: `T/_meta/issues/new/POST-MVP-Enhancements/` (POST-001 to POST-012)
+- **POST Issue Index**: `T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md`
+- **POST Issue Reference**: `_meta/issues/new/POST-MVP-ENHANCEMENTS.md`
+
+### Planning Documents
+- **Full Roadmap**: `_meta/issues/PARALLEL_RUN_NEXT_FULL.md` (All 48 POST issues)
+- **Current State**: `_meta/issues/CURRENT_STATE.md`
+- **MVP Workflow**: `_meta/issues/MVP_WORKFLOW_SIMPLE.md`
+
+---
+
+**Status**: Sprint 4 Ready - 3 Issues Unblocked  
+**Next Action**: Worker17, Worker12, Worker02 begin execution  
+**Updated**: 2025-11-23  
+**Owner**: Worker01 (Project Manager)
