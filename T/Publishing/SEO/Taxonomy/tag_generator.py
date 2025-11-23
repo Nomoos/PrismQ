@@ -91,13 +91,16 @@ class TagGenerator:
         Returns:
             TagGenerationResult with tags and relevance scores
         """
+        # Normalize keywords
+        keywords = base_keywords or []
+        
         # Initialize tracking
         all_tags: Dict[str, float] = {}
         source_breakdown = {"keywords": 0, "content": 0, "semantic": 0}
         
         # Step 1: Extract tags from keywords
-        if base_keywords:
-            keyword_tags = self._extract_from_keywords(base_keywords)
+        if keywords:
+            keyword_tags = self._extract_from_keywords(keywords)
             for tag, score in keyword_tags.items():
                 all_tags[tag] = max(all_tags.get(tag, 0), score)
                 source_breakdown["keywords"] += 1
@@ -106,9 +109,9 @@ class TagGenerator:
         content_tags = self._extract_from_content(title, script)
         for tag, score in content_tags.items():
             # Boost score if tag also appears in keywords
-            boost = 1.2 if tag in (base_keywords or []) else 1.0
+            boost = 1.2 if tag in keywords else 1.0
             all_tags[tag] = max(all_tags.get(tag, 0), score * boost)
-            if tag not in (base_keywords or []):
+            if tag not in keywords:
                 source_breakdown["content"] += 1
         
         # Step 3: Semantic expansion (related terms)

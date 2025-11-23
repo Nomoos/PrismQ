@@ -112,17 +112,17 @@ class CategoryClassifier:
                 parent_score = max(parent_score, max_subcat_score * 0.9)
                 
                 # Store parent category with score
-                if parent_score >= 0.5:  # Minimum threshold (lowered for better recall)
+                if parent_score >= self.config.min_category_score:
                     category_scores[parent_category] = parent_score
                 
                 # Store top subcategories with full paths
                 for subcat, score in subcategory_scores.items():
-                    if score >= 0.55:  # Slightly higher threshold for subcategories
+                    if score >= self.config.min_subcategory_score:
                         category_path = f"{parent_category}/{subcat}"
                         category_scores[category_path] = score
             else:
                 # Only parent category (no matching subcategories)
-                if parent_score >= 0.5:
+                if parent_score >= self.config.min_category_score:
                     category_scores[parent_category] = parent_score
         
         # Sort by confidence and limit to max_categories

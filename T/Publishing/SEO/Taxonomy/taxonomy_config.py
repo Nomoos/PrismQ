@@ -21,6 +21,8 @@ class TaxonomyConfig:
         max_categories: Maximum number of categories to assign
         tag_similarity_threshold: Threshold for deduplication (0.0-1.0)
         enable_hierarchical: Whether to support hierarchical categories
+        min_category_score: Minimum score for category assignment (0.0-1.0)
+        min_subcategory_score: Minimum score for subcategory assignment (0.0-1.0)
         custom_rules: Additional custom rules
     """
     
@@ -30,6 +32,8 @@ class TaxonomyConfig:
     max_categories: int = 3
     tag_similarity_threshold: float = 0.85
     enable_hierarchical: bool = True
+    min_category_score: float = 0.5
+    min_subcategory_score: float = 0.55
     custom_rules: Dict = field(default_factory=dict)
     
     def to_dict(self) -> Dict:

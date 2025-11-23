@@ -195,8 +195,8 @@ class TestCategoryClassifier:
         # All scores should be between 0 and 1
         for category, score in result.confidence_scores.items():
             assert 0 <= score <= 1
-            # All returned categories should have reasonable confidence (lowered threshold)
-            assert score >= 0.5
+            # All returned categories should have reasonable confidence
+            assert score >= classifier.config.min_category_score
     
     def test_hierarchical_categories(self, tech_content):
         """Test hierarchical category structure."""

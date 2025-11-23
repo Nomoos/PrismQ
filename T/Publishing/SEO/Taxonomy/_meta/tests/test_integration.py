@@ -138,26 +138,31 @@ class TestTagAndCategoryIntegration:
     
     def test_tags_influence_categories(self, sample_content):
         """Test that tags influence category classification."""
+        # Extract content for clarity
+        title = sample_content["title"]
+        script = sample_content["script"]
+        keywords = sample_content["keywords"]
+        
         # Generate tags first
         tag_gen = TagGenerator()
         tag_result = tag_gen.generate_tags(
-            title=sample_content["title"],
-            script=sample_content["script"],
-            base_keywords=sample_content["keywords"]
+            title=title,
+            script=script,
+            base_keywords=keywords
         )
         
         # Classify with tags
         cat_classifier = CategoryClassifier()
         with_tags = cat_classifier.classify_categories(
-            title=sample_content["title"],
-            script=sample_content["script"],
+            title=title,
+            script=script,
             tags=tag_result.tags
         )
         
         # Classify without tags
         without_tags = cat_classifier.classify_categories(
-            title=sample_content["title"],
-            script=sample_content["script"],
+            title=title,
+            script=script,
             tags=None
         )
         
