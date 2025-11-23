@@ -15,13 +15,6 @@ from enum import Enum
 import sys
 import os
 
-# Add parent directories to path for imports
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-creation_path = os.path.join(parent_dir, 'Creation', 'src')
-model_path = os.path.join(parent_dir, 'Model', 'src')
-sys.path.insert(0, creation_path)
-sys.path.insert(0, model_path)
-
 from .retry_handler import RetryHandler, RetryConfig
 from .report_generator import ReportGenerator, BatchReport
 from .queue_manager import QueueManager, QueueConfig

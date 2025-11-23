@@ -27,7 +27,11 @@ class BatchDatabase:
         """Establish database connection."""
         self.conn = sqlite3.connect(self.db_path)
         self.conn.row_factory = sqlite3.Row
-        # Enable foreign key constraints
+        self._configure_connection()
+    
+    def _configure_connection(self):
+        """Configure connection settings."""
+        # Enable foreign key constraints in SQLite
         self.conn.execute("PRAGMA foreign_keys = ON")
     
     def close(self):

@@ -57,6 +57,8 @@ class QueueManager:
         self.current_chunk: List[Dict[str, Any]] = []
         self.total_items = 0
         self.processed_count = 0
+        self._pause_event = asyncio.Event()
+        self._pause_event.set()  # Start in non-paused state
     
     def add_items(self, items: List[Dict[str, Any]]) -> None:
         """Add items to the processing queue.
@@ -116,6 +118,7 @@ class QueueManager:
         """Pause queue processing."""
         if self.status == QueueStatus.RUNNING:
             self.status = QueueStatus.PAUSED
+            self._pause_event.clear()
             logger.info("Queue processing paused")
             
             if self.config.enable_persistence:
@@ -125,6 +128,7 @@ class QueueManager:
         """Resume queue processing."""
         if self.status == QueueStatus.PAUSED:
             self.status = QueueStatus.RUNNING
+            self._pause_event.set()
             logger.info("Queue processing resumed")
     
     def is_complete(self) -> bool:
@@ -229,9 +233,8 @@ class QueueManager:
                 results = await process_chunk_func(chunk, max_concurrent)
                 self.mark_chunk_processed(results)
                 
-                # Check if paused
-                while self.status == QueueStatus.PAUSED:
-                    await asyncio.sleep(1)
+                # Wait if paused (using event for efficient waiting)
+                await self._pause_event.wait()
             
             if self.is_complete():
                 self.status = QueueStatus.COMPLETED
