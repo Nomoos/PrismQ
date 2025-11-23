@@ -669,9 +669,8 @@ class TestEdgeCasesIntegration:
             """Process with tolerance for varying quality."""
             await asyncio.sleep(0.01)
             
-            blog = format_blog(script=idea['script'], title=idea['title'])
-            seo = process_content_seo(title=idea['title'], script=idea['script']),
-            content_id="test-017",
+            blog = format_blog(script=idea['script'], title=idea['title'], content_id=idea['id'])
+            seo = process_content_seo(title=idea['title'], script=idea['script'])
             
             return {'id': idea['id'], 'success': True}
         
