@@ -10,10 +10,6 @@ This module serves as a quality gate in the workflow:
 """
 
 from .review import (
-- If NEEDS POLISH: proceed to Stage 22 (Story.ExpertPolish) with improvement suggestions
-"""
-
-from .expert_review import (
     ExpertReview,
     OverallAssessment,
     StoryCoherence,
