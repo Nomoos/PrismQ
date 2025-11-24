@@ -131,7 +131,9 @@ The pattern demonstrates the co-dependent improvement methodology:
 
 ## Mapping to Full Workflow
 
-The Ultra-Clean Pipeline is a simplified view. Here's how it maps to the complete 26-stage MVP workflow:
+The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how it maps to the complete 26-stage MVP workflow:
+
+**Note**: The "Ultra-Clean Stage" numbers (1-9) represent the sequential stages in the simplified pattern, which may map to multiple or non-sequential stages in the full MVP workflow.
 
 | Ultra-Clean Stage | MVP Stages | Description |
 |-------------------|------------|-------------|

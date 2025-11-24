@@ -131,7 +131,9 @@ Vzor demonstruje metodologii vzájemně závislého vylepšování:
 
 ## Mapování na kompletní workflow
 
-Ultra-Clean Pipeline je zjednodušený pohled. Zde je mapování na kompletní 26fázové MVP workflow:
+Ultra-Clean Pipeline je zjednodušený pohled na 9 koncepčních fází. Zde je mapování na kompletní 26fázové MVP workflow:
+
+**Poznámka**: Čísla "Fáze Ultra-Clean" (1-9) reprezentují sekvenční fáze v zjednodušeném vzoru, které se mohou mapovat na více nebo nesekvenčních fází v kompletním MVP workflow.
 
 | Fáze Ultra-Clean | Fáze MVP | Popis |
 |------------------|----------|-------|
