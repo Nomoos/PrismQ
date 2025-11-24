@@ -204,7 +204,9 @@ Each quality review can:
 → 10(pass) → 11(pass) → 12(pass) → 13(pass) → 14(pass) 
 → 15(pass) → 16(pass) → 17(accept) → Publishing
 ```
-**Total Stages**: 13
+**Total Stages**: 15 (stages 7 and 8 are skipped when all reviews pass)
+
+**Note**: In the ideal flow, refinement stages 7 and 8 are not executed because all reviews accept on the first attempt.
 
 ### Pattern 2: Typical Flow (Some Refinements)
 ```

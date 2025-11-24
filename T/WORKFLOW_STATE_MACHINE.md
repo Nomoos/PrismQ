@@ -102,10 +102,10 @@ stateDiagram-v2
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/FromIdea/ |
 | ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/FromIdeaAndTitle/ |
 | ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | T/Review/Title/ByScriptIdea/ |
-| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 5 | T/Title/FromOriginalTitleAndReviewAndScript/ |
-| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 6 | T/Review/Script/ByTitleIdea/ |
-| ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 7 | T/Script/FromOriginalScriptAndReviewAndTitle/ |
-| ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 8 | T/Review/Title/ByScript/ |
+| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 5 | T/Review/Script/ByTitleIdea/ |
+| ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 6 | T/Review/Title/ByScript/ |
+| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | T/Title/FromOriginalTitleAndReviewAndScript/ |
+| ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 8 | T/Script/FromOriginalScriptAndReviewAndTitle/ |
 | ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | T/Review/Script/ByTitle/ |
 
 ### Quality Review States
