@@ -32,31 +32,35 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │          ╔══════════════════════════════════════════╗            │
-│          ║  Title-Script Alignment Loop (4-10)     ║            │
+│          ║  Title-Script Alignment Loop (4-9)      ║            │
 │          ╚══════════════════════════════════════════╝            │
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 4: Review Title by Script + Idea                    │  │
-│  │   ├─ Accepted? → Skip to Stage 6                          │  │
-│  │   └─ Not Accepted? → Stage 5: Refine Title               │  │
+│  │   (Always proceeds to Stage 5 - no conditional)           │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 6: Review Script by Title + Idea                    │  │
-│  │   ├─ Accepted? → Skip to Stage 8                          │  │
-│  │   └─ Not Accepted? → Stage 7: Refine Script              │  │
+│  │ Stage 5: Review Script by Title + Idea                    │  │
+│  │   (Always proceeds to Stage 6 - no conditional)           │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 8: Review Title by Script                           │  │
-│  │   ├─ Accepted? → Skip to Stage 10                         │  │
-│  │   └─ Not Accepted? → Stage 5: Refine Title (repeat)      │  │
+│  │ Stage 6: Review Title by Script                           │  │
+│  │   ├─ Not Accepted? → Stage 7: Refine Title               │  │
+│  │   │                  ↓                                     │  │
+│  │   │               Stage 8: Refine Script                  │  │
+│  │   │                  ↓                                     │  │
+│  │   │               Return to Stage 6                       │  │
+│  │   └─ Accepted? → Continue to Stage 9                      │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 10: Review Script by Title                          │  │
-│  │   ├─ Accepted? → Continue to Quality Reviews              │  │
-│  │   └─ Not Accepted? → Stage 7: Refine Script (repeat)     │  │
+│  │ Stage 9: Review Script by Title                           │  │
+│  │   ├─ Not Accepted? → Stage 8: Refine Script              │  │
+│  │   │                  ↓                                     │  │
+│  │   │               Return to Stage 6 (Title Review)        │  │
+│  │   └─ Accepted? → Continue to Quality Reviews              │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                  │
 └────────────────────────────┬────────────────────────────────────┘
@@ -71,37 +75,38 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 10: Grammar Review                                  │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 11: Tone Review                                     │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 12: Content Review                                  │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 13: Consistency Review                              │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 14: Editing Review                                  │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 15: Title Readability Review                        │  │
-│  │   └─ Fails? → Back to Title Refinement (Stage 5)         │  │
+│  │   └─ Fails? → Title Refine (7) → Script Refine (8)       │  │
+│  │                  → Title Review (6)                        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │ Stage 16: Script Readability Review                       │  │
-│  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
+│  │   └─ Fails? → Script Refine (8) → Title Review (6)       │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                  │
 └────────────────────────────┬────────────────────────────────────┘
@@ -151,12 +156,12 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ### Alignment Loop (4-9)
 | Stage | Name | Purpose |
 |-------|------|---------|
-| 4 | Review.Title.By.Script.Idea | Review title against script and idea |
-| 5 | Title.From.Script.Review.Title | Refine title (conditional) |
-| 6 | Review.Script.By.Title.Idea | Review script against title and idea |
-| 7 | Script.From.Title.Review.Script | Refine script (conditional) |
-| 8 | Review.Title.By.Script | Re-review title against script |
-| 9 | Review.Script.By.Title | Final script review against title |
+| 4 | Review.Title.By.Script.Idea | Review title (always proceeds to Stage 5) |
+| 5 | Review.Script.By.Title.Idea | Review script (always proceeds to Stage 6) |
+| 6 | Review.Title.By.Script | Re-review title (may loop through 7→8→6) |
+| 7 | Title.From.Script.Review.Title | Refine title (conditional) |
+| 8 | Script.From.Title.Review.Script | Refine script (conditional, used extensively) |
+| 9 | Review.Script.By.Title | Final script review (may loop through 8→6) |
 
 ### Quality Reviews (10-16)
 | Stage | Name | Focus |
@@ -195,42 +200,45 @@ Each quality review can:
 
 ### Pattern 1: Ideal Flow (Minimal Iterations)
 ```
-1 → 2 → 3 → 4(accept) → 6(accept) → 8(accept) → 9(accept) 
+1 → 2 → 3 → 4 → 5 → 6(accept) → 9(accept) 
 → 10(pass) → 11(pass) → 12(pass) → 13(pass) → 14(pass) 
 → 15(pass) → 16(pass) → 17(accept) → Publishing
 ```
-**Total Stages**: 14
+**Total Stages**: 13
 
 ### Pattern 2: Typical Flow (Some Refinements)
 ```
-1 → 2 → 3 → 4(reject) → 5 → 6(accept) → 8(accept) 
-→ 9(reject) → 7 → 9(accept) 
-→ 10(pass) → 11(fail) → 7 → 9(accept) → 10(pass) → 11(pass)
-→ 12(pass) → 13(pass) → 14(pass) → 15(pass) → 16(pass)
-→ 17(reject) → 18 → 17(accept) → Publishing
+1 → 2 → 3 → 4 → 5 → 6(reject) → 7 → 8 → 6(accept) 
+→ 9(reject) → 8 → 6 → 9(accept) 
+→ 10(pass) → 11(fail) → 8 → 6 → 9(accept) → 10(pass) → 11(pass)
+→ 12(pass) → 13(pass) → 14(pass) 
+→ 15(fail) → 7 → 8 → 6 → 9(accept) → 10 → 11 → 12 → 13 → 14 → 15(pass)
+→ 16(pass) → 17(reject) → 18 → 17(accept) → Publishing
 ```
-**Total Stages**: ~21
+**Total Stages**: ~27
 
 ### Pattern 3: High-Iteration Flow
 Multiple rejections lead to more refinement cycles, but the workflow eventually converges to acceptable quality.
 
 ## Refinement Stages
 
-### Stage 5: Title Refinement
+### Stage 7: Title Refinement
 **Called from**:
-- Stage 4 (if title review fails)
-- Stage 8 (if title re-review fails)
-- Stage 16 (if title readability fails)
+- Stage 6 (Review.Title.By.Script fails)
+- Stage 15 (Review.Title.Readability fails)
 
-**Returns to**: Next review stage in sequence
+**Returns to**: Stage 8 (Script Refinement) → Stage 6 (Review.Title.By.Script)
 
-### Stage 7: Script Refinement
+### Stage 8: Script Refinement
 **Called from**:
-- Stage 6 (if script review fails)
-- Stage 10 (if script final review fails)
-- Stages 10-14, 16 (if any quality review fails)
+- Stage 6 (as part of title failure loop, after Stage 7)
+- Stage 9 (Review.Script.By.Title fails)
+- Stages 10-14, 16 (if any script quality review fails)
+- Stage 15 (as part of title readability failure loop, after Stage 7)
 
-**Returns to**: Next review stage in sequence
+**Returns to**: Stage 6 (Review.Title.By.Script)
+
+**Note**: This is the most frequently used refinement stage, serving as the central hub for all script improvements
 
 ### Stage 18: Story Polish
 **Called from**: Stage 17 (if expert review rejects)
@@ -239,17 +247,22 @@ Multiple rejections lead to more refinement cycles, but the workflow eventually 
 
 ## Quality Gates
 
-### Gate 1: Title-Script Mutual Alignment
-**Stages**: 4-10  
-**Purpose**: Ensure title and script are coherent and aligned with idea  
-**Iterations**: 1-3 typical
+### Gate 1: Initial Reviews
+**Stages**: 4-5  
+**Purpose**: Collect initial feedback on title and script alignment with idea  
+**Iterations**: Always executed once (no conditional branching)
 
-### Gate 2: Local AI Quality
+### Gate 2: Title-Script Mutual Alignment
+**Stages**: 6-9  
+**Purpose**: Ensure title and script are coherent through iterative refinement  
+**Iterations**: 1-4 typical
+
+### Gate 3: Local AI Quality
 **Stages**: 10-16  
 **Purpose**: Automated quality checks on multiple dimensions  
-**Iterations**: 1-2 typical per dimension
+**Iterations**: 1-3 typical per dimension (all loop through Script Refinement → Title Review)
 
-### Gate 3: Expert Review
+### Gate 4: Expert Review
 **Stages**: 17-18  
 **Purpose**: Professional-grade holistic review  
 **Iterations**: 1-2 typical
