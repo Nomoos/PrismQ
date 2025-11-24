@@ -128,12 +128,25 @@ class WorkflowStageValidator:
         'idea_creation': ['title_v1'],
         'title_v1': ['script_v1', 'title_v2'],
         'script_v1': ['title_review', 'script_v2', 'script_review'],
-        'title_review': ['title_v2'],
-        'script_review': ['script_v2'],
+        'title_review': ['title_v2', 'title_v3'],
+        'script_review': ['script_v2', 'script_v3'],
         'title_v2': ['script_v2', 'script_review', 'title_v3'],
-        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3'],
-        'title_v3': ['script_v3', 'script_review', 'refinement'],
-        'script_v3': ['title_v3', 'title_review', 'refinement'],
+        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3', 'review_script_grammar'],
+        'title_v3': ['script_v3', 'script_review', 'refinement', 'review_script_grammar'],
+        'script_v3': ['title_v3', 'title_review', 'refinement', 'review_script_grammar'],
+        # Quality review stages
+        'review_script_grammar': ['review_script_tone'],
+        'review_script_tone': ['review_script_content'],
+        'review_script_content': ['review_script_consistency'],
+        'review_script_consistency': ['review_script_editing'],
+        'review_script_editing': ['review_title_readability'],
+        'review_title_readability': ['review_script_readability'],
+        'review_script_readability': ['story_expert_review'],
+        # Story stages
+        'story_expert_review': ['story_polish'],
+        'story_polish': ['refinement', 'publishing'],
+        'refinement': ['publishing'],
+        'publishing': [],
     }
     
     def __init__(self):

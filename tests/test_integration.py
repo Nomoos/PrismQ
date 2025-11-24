@@ -725,3 +725,135 @@ class TestManualCreationPipeline:
         # Verify title and script progressed together
         assert title_tracker.get_current_version() == 2
         assert script_tracker.get_current_version() == 2
+    
+    def test_extended_manual_creation_pipeline_with_quality_reviews(self):
+        """Test the extended manual creation pipeline with full feedback loops and quality reviews.
+        
+        This test verifies the complete extended pipeline as specified:
+        1. Initial creation (v1)
+        2. First co-improvement cycle (v1 → v2) 
+        3. Second co-improvement cycle (v2 → v3)
+        4. Quality review stages (Grammar, Tone, Content, Consistency, Editing)
+        5. Readability reviews (Title and Script)
+        6. Story review stages (ExpertReview and Polish)
+        """
+        helper = IntegrationTestHelper()
+        
+        # === STAGE 1-7: Initial creation and first co-improvement cycle ===
+        # Stage 1: Idea.Creation
+        assert helper.stage_validator.transition_to('idea_creation')
+        idea_tracker = helper.start_workflow("Idea")
+        idea_tracker.add_version(1, {"stage": "creation", "method": "manual"})
+        
+        # Stage 2: Title.From.Idea (v1)
+        assert helper.stage_validator.transition_to('title_v1')
+        title_tracker = helper.start_workflow("Title")
+        title_tracker.add_version(1, {"stage": "from_idea", "from_idea": 1})
+        
+        # Stage 3: Script.From.Title.Idea (v1)
+        assert helper.stage_validator.transition_to('script_v1')
+        script_tracker = helper.start_workflow("Script")
+        script_tracker.add_version(1, {"stage": "from_title_and_idea"})
+        
+        # Stage 4: Review.Title.By.Script.Idea (Feedback loop)
+        assert helper.stage_validator.transition_to('title_review')
+        
+        # Stage 5: Title.From.Script.Review.Title (v2)
+        assert helper.stage_validator.transition_to('title_v2')
+        title_tracker.add_version(2, {"stage": "from_review"})
+        
+        # Stage 6: Review.Script.By.Title.Idea (Feedback loop)
+        assert helper.stage_validator.transition_to('script_review')
+        
+        # Stage 7: Script.From.Title.Review.Script (v2)
+        assert helper.stage_validator.transition_to('script_v2')
+        script_tracker.add_version(2, {"stage": "from_review"})
+        
+        # === STAGE 8-11: Second co-improvement cycle (v2 → v3) ===
+        # Stage 8: Review.Title.By.Script (Feedback loop)
+        assert helper.stage_validator.transition_to('title_review')
+        
+        # Stage 9: Title.From.Script.Review.Title (v3)
+        assert helper.stage_validator.transition_to('title_v3')
+        title_tracker.add_version(3, {"stage": "from_review", "iteration": 2})
+        
+        # Stage 10: Review.Script.By.Title (Feedback loop)
+        assert helper.stage_validator.transition_to('script_review')
+        
+        # Stage 11: Script.From.Title.Review.Script (v3)
+        assert helper.stage_validator.transition_to('script_v3')
+        script_tracker.add_version(3, {"stage": "from_review", "iteration": 2})
+        
+        # === STAGE 12-20: Quality review stages ===
+        # Stage 12: Review.Script.Grammar
+        assert helper.stage_validator.transition_to('review_script_grammar')
+        
+        # Stage 13: Review.Script.Tone
+        assert helper.stage_validator.transition_to('review_script_tone')
+        
+        # Stage 14: Review.Script.Content
+        assert helper.stage_validator.transition_to('review_script_content')
+        
+        # Stage 15: Review.Script.Consistency
+        assert helper.stage_validator.transition_to('review_script_consistency')
+        
+        # Stage 16: Review.Script.Editing
+        assert helper.stage_validator.transition_to('review_script_editing')
+        
+        # Stage 17: Review.Title.Readability
+        assert helper.stage_validator.transition_to('review_title_readability')
+        
+        # Stage 18: Review.Script.Readability
+        assert helper.stage_validator.transition_to('review_script_readability')
+        
+        # === STAGE 19-20: Story review stages ===
+        # Stage 19: Story.ExpertReview
+        assert helper.stage_validator.transition_to('story_expert_review')
+        
+        # Stage 20: Story.Polish
+        assert helper.stage_validator.transition_to('story_polish')
+        
+        # Verify version sequences are valid
+        assert_version_sequence(idea_tracker.versions), "Idea version sequence invalid"
+        assert_version_sequence(title_tracker.versions), "Title version sequence invalid"
+        assert_version_sequence(script_tracker.versions), "Script version sequence invalid"
+        
+        # Verify final versions
+        assert idea_tracker.get_current_version() == 1, "Idea should stay at v1"
+        assert title_tracker.get_current_version() == 3, "Title should be at v3"
+        assert script_tracker.get_current_version() == 3, "Script should be at v3"
+        
+        # Verify the complete stage history
+        stage_history = helper.stage_validator.get_stage_history()
+        expected_stages = [
+            # Initial creation and first cycle (v1 → v2)
+            'idea_creation',
+            'title_v1',
+            'script_v1',
+            'title_review',
+            'title_v2',
+            'script_review',
+            'script_v2',
+            # Second cycle (v2 → v3)
+            'title_review',
+            'title_v3',
+            'script_review',
+            'script_v3',
+            # Quality reviews
+            'review_script_grammar',
+            'review_script_tone',
+            'review_script_content',
+            'review_script_consistency',
+            'review_script_editing',
+            'review_title_readability',
+            'review_script_readability',
+            # Story stages
+            'story_expert_review',
+            'story_polish'
+        ]
+        assert stage_history == expected_stages, (
+            f"Stage history doesn't match.\nExpected: {expected_stages}\nActual: {stage_history}"
+        )
+        
+        # Verify the workflow path is valid
+        assert helper.stage_validator.is_valid_path(), "Workflow path is not valid"
