@@ -1,9 +1,9 @@
 """PrismQ.T.Story.Polish - GPT-Based Expert Story Polishing
 
-Apply expert-level improvements to title and script based on ExpertReview feedback (Stage 22 / MVP-022).
+Apply expert-level improvements to title and script based on Review feedback (Stage 22 / MVP-022).
 Implements surgical, high-impact changes while preserving the story's essence.
 
-This module applies improvements suggested by ExpertReview (Stage 21):
+This module applies improvements suggested by Review (Stage 21):
 - Analyzes improvement suggestions and priorities
 - Applies title improvements (capitalization, word choice, SEO)
 - Applies script improvements (opening hook, relatability, pacing)
@@ -181,7 +181,7 @@ class StoryPolisher:
     """GPT-based story polisher that applies expert improvements.
     
     This class implements the core logic for applying expert-level improvements
-    to title and script based on ExpertReview feedback. It uses GPT to make
+    to title and script based on Review feedback. It uses GPT to make
     surgical, high-impact changes while preserving the story's essence.
     """
     

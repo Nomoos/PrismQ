@@ -1,4 +1,4 @@
-"""PrismQ.T.Story.ExpertReview - GPT-Based Expert Story Review Module
+"""PrismQ.T.Story.Review - GPT-Based Expert Story Review Module
 
 AI-powered expert-level review of complete story using GPT (Stage 21 / MVP-021).
 Provides holistic assessment of title + script + audience context after all local
@@ -9,7 +9,7 @@ This module serves as a quality gate in the workflow:
 - If NEEDS POLISH: proceed to Stage 22 (Story.Polish) with improvement suggestions
 """
 
-from .expert_review import (
+from .review import (
     ExpertReview,
     OverallAssessment,
     StoryCoherence,

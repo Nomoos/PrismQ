@@ -405,7 +405,7 @@ These stages use GPT-based expert review for final quality assurance before publ
 
 **Purpose**: Expert-level review of complete story (Title + Script + Context)
 
-**Location**: `T/Story/ExpertReview/`
+**Location**: `T/Story/Review/`
 
 **Input**:
 - Final Title

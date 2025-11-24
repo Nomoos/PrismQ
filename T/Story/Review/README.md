@@ -1,6 +1,6 @@
-# T/Story/ExpertReview - GPT-Based Expert Story Review
+# T/Story/Review - GPT-Based Expert Story Review
 
-**Namespace**: `PrismQ.T.Story.ExpertReview`
+**Namespace**: `PrismQ.T.Story.Review`
 
 Final expert-level review of the complete story using GPT (GPT-4/GPT-5).
 
@@ -15,7 +15,7 @@ Provide a holistic, expert-level review of the complete story package (title + s
 ```
 Stage 20: Script Readability (Local AI) ✓ PASSES
     ↓
-Stage 21: Story.ExpertReview (GPT-based) ← THIS STAGE
+Stage 21: Story.Review (GPT-based) ← THIS STAGE
     ↓
     ├─ If improvements needed → Stage 22: Story.Polish
     ↓ If ready for publishing
@@ -203,9 +203,9 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 
 ## Module Metadata
 
-**[→ View ExpertReview/_meta/docs/](./_meta/docs/)**
-**[→ View ExpertReview/_meta/examples/](./_meta/examples/)**
-**[→ View ExpertReview/_meta/tests/](./_meta/tests/)**
+**[→ View Review/_meta/docs/](./_meta/docs/)**
+**[→ View Review/_meta/examples/](./_meta/examples/)**
+**[→ View Review/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 

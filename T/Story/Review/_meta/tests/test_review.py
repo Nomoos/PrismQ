@@ -1,4 +1,4 @@
-"""Tests for ExpertReview model and StoryExpertReviewer."""
+"""Tests for Review model and StoryExpertReviewer."""
 
 import sys
 from pathlib import Path
@@ -8,7 +8,7 @@ project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
 import pytest
-from T.Story.ExpertReview import (
+from T.Story.Review import (
     ExpertReview,
     OverallAssessment,
     StoryCoherence,

@@ -2,22 +2,22 @@
 
 **Namespace**: `PrismQ.T.Story.Polish`
 
-Apply expert-level improvements to title and script based on GPT ExpertReview feedback.
+Apply expert-level improvements to title and script based on GPT Review feedback.
 
 ## Purpose
 
-Implement the expert-level improvements suggested by GPT ExpertReview (Stage 21) to achieve professional publishing quality. This is Stage 22 in the MVP workflow.
+Implement the expert-level improvements suggested by GPT Review (Stage 21) to achieve professional publishing quality. This is Stage 22 in the MVP workflow.
 
 ## Workflow Position
 
 **Stage 22** in MVP workflow: After expert review, before publishing
 
 ```
-Stage 21: Story.ExpertReview (GPT-based)
+Stage 21: Story.Review (GPT-based)
     ↓ Improvements needed
 Stage 22: Story.Polish (GPT-based) ← THIS MODULE
     ↓
-Return to Stage 21: Story.ExpertReview for verification
+Return to Stage 21: Story.Review for verification
     ↓ If ready
 Stage 23: Publishing.Finalization
 ```
@@ -116,7 +116,7 @@ polish = polisher.polish_story(...)
 ### Primary Inputs
 - **Current Title** (from local AI reviews)
 - **Current Script** (from local AI reviews)
-- **Expert Review Data** (from Stage 21: ExpertReview)
+- **Expert Review Data** (from Stage 21: Review)
   - Improvement suggestions with priorities
   - Quality score
   - Decision (polish/publish)
@@ -176,7 +176,7 @@ python3 T/Story/Polish/_meta/examples/example_usage.py
 ## Integration
 
 This module integrates with:
-- **Stage 21 (ExpertReview)**: Receives feedback
+- **Stage 21 (Review)**: Receives feedback
 - **Stage 23 (Publishing)**: Passes polished content
 
 ## Configuration Options
@@ -196,4 +196,4 @@ This module integrates with:
 
 ## Navigation
 
-**[← Back to Story](../README.md)** | **[→ ExpertReview](../ExpertReview/)**
+**[← Back to Story](../README.md)** | **[→ Review](../Review/)**
