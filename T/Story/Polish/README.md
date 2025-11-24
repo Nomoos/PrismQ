@@ -196,4 +196,4 @@ This module integrates with:
 
 ## Navigation
 
-**[← Back to Story](../README.md)** | **[→ ExpertReview](../ExpertReview/)** | **[→ ExpertPolish](../ExpertPolish/)**
+**[← Back to Story](../README.md)** | **[→ ExpertReview](../ExpertReview/)**

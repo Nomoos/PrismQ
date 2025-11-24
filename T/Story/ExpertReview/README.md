@@ -17,7 +17,7 @@ Stage 20: Script Readability (Local AI) ✓ PASSES
     ↓
 Stage 21: Story.ExpertReview (GPT-based) ← THIS STAGE
     ↓
-    ├─ If improvements needed → Stage 22: Story.ExpertPolish
+    ├─ If improvements needed → Stage 22: Story.Polish
     ↓ If ready for publishing
 Stage 23: Publishing.Finalization
 ```
@@ -137,7 +137,7 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 
 4. **Make Decision**:
    - **If ready_for_publishing = true**: Proceed to Publishing
-   - **If ready_for_publishing = false**: Send to ExpertPolish with suggestions
+   - **If ready_for_publishing = false**: Send to Polish with suggestions
 
 ## Output
 
@@ -199,7 +199,7 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 }
 ```
 
-**Decision**: Send to ExpertPolish for small improvements (92% → 95%+ target)
+**Decision**: Send to Polish for small improvements (92% → 95%+ target)
 
 ## Module Metadata
 

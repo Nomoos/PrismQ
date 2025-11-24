@@ -6,7 +6,7 @@ AI reviews have passed.
 
 This module serves as a quality gate in the workflow:
 - If READY FOR PUBLISHING: proceed to Stage 23 (Publishing)
-- If NEEDS POLISH: proceed to Stage 22 (ExpertPolish) with improvement suggestions
+- If NEEDS POLISH: proceed to Stage 22 (Polish) with improvement suggestions
 """
 
 from dataclasses import dataclass, field, asdict
@@ -543,7 +543,7 @@ def get_expert_feedback(review: ExpertReview) -> Dict[str, Any]:
         >>> review = review_story_with_gpt(title, script, audience_context)
         >>> feedback = get_expert_feedback(review)
         >>> if feedback['decision'] == 'polish':
-        ...     print("Sending to ExpertPolish with suggestions:")
+        ...     print("Sending to Polish with suggestions:")
         ...     for suggestion in feedback['high_priority_suggestions']:
         ...         print(f"  - {suggestion['suggestion']}")
         ... else:
@@ -590,7 +590,7 @@ def get_expert_feedback(review: ExpertReview) -> Dict[str, Any]:
         'next_action': (
             'Proceed to Stage 23 (Publishing.Finalization)' 
             if review.decision == ReviewDecision.PUBLISH 
-            else 'Proceed to Stage 22 (Story.ExpertPolish) with improvement suggestions'
+            else 'Proceed to Stage 22 (Story.Polish) with improvement suggestions'
         )
     }
 

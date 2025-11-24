@@ -171,7 +171,7 @@ The stories live on.
         print("   Proceeding to Stage 23: Publishing.Finalization")
     else:
         print("\n⚠️  Story needs expert polish")
-        print("   Proceeding to Stage 22: Story.ExpertPolish")
+        print("   Proceeding to Stage 22: Story.Polish")
         
         if feedback['high_priority_suggestions']:
             print("\n   High Priority Improvements:")

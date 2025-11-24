@@ -6,7 +6,7 @@ AI reviews have passed.
 
 This module serves as a quality gate in the workflow:
 - If READY FOR PUBLISHING: proceed to Stage 23 (Publishing.Finalization)
-- If NEEDS POLISH: proceed to Stage 22 (Story.ExpertPolish) with improvement suggestions
+- If NEEDS POLISH: proceed to Stage 22 (Story.Polish) with improvement suggestions
 """
 
 from .expert_review import (

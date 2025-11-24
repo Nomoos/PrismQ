@@ -22,7 +22,7 @@ Stage 21: Story.ExpertReview (GPT-based holistic review) ⚠️ IMPLEMENTATION N
     ↓
     ├─ If PUBLISH → Stage 23: Publishing.Finalization
     │
-    └─ If POLISH → Stage 22: Story.ExpertPolish (Apply improvements)
+    └─ If POLISH → Stage 22: Story.Polish (Apply improvements)
                        ↓
                    Return to Stage 21 (Review again)
 ```

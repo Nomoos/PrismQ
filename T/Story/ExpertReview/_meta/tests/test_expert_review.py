@@ -545,7 +545,7 @@ class TestConvenienceFunctions:
         if feedback['decision'] == 'publish':
             assert 'Publishing' in feedback['next_action']
         else:
-            assert 'ExpertPolish' in feedback['next_action']
+            assert 'Polish' in feedback['next_action']
 
 
 class TestEnums:
@@ -630,7 +630,7 @@ class TestWorkflowIntegration:
         # With high threshold, should recommend polish
         if not feedback['ready_for_publishing']:
             assert feedback['decision'] == 'polish'
-            assert 'ExpertPolish' in feedback['next_action']
+            assert 'Polish' in feedback['next_action']
             # Should have suggestions
             assert len(review.improvement_suggestions) > 0
 

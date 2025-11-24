@@ -430,7 +430,7 @@ These stages use GPT-based expert review for final quality assurance before publ
 
 **Purpose**: Apply expert-level improvements based on Story.Review feedback
 
-**Location**: `T/Story/ExpertPolish/` or `T/Story/Polish/`
+**Location**: `T/Story/Polish/`
 
 **Input**:
 - Current Title
