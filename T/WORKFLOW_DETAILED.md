@@ -16,59 +16,69 @@ PrismQ.T.Title.From.Idea
 PrismQ.T.Script.From.Title.Idea
     ↓
 PrismQ.T.Review.Title.By.Script.Idea
-    ├─ if accepted → skip PrismQ.T.Title.From.Script.Review.Title
-    └─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
-    ↓
-PrismQ.T.Title.From.Script.Review.Title (conditional)
     ↓
 PrismQ.T.Review.Script.By.Title.Idea
-    ├─ if accepted → skip PrismQ.T.Script.From.Title.Review.Script
-    └─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
-    ↓
-PrismQ.T.Script.From.Title.Review.Script (conditional)
     ↓
 PrismQ.T.Review.Title.By.Script
-    ├─ if accepted → skip PrismQ.T.Title.From.Script.Review.Title
-    └─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
-    ↓
-PrismQ.T.Title.From.Script.Review.Title (conditional)
+    ├─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
+    │                      ↓
+    │                   PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.By.Title
-    ├─ if accepted → continue to PrismQ.T.Review.Script.Grammar
-    └─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
-    ↓
-PrismQ.T.Script.From.Title.Review.Script (conditional)
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Local AI Quality Reviews
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ↓
 PrismQ.T.Review.Script.Grammar
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.Tone
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.Content
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.Consistency
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.Editing
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Title.Readability
-    ├─ if not accepted → return to PrismQ.T.Title.From.Script.Review.Title
+    ├─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
+    │                      ↓
+    │                   PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Script.Readability
-    ├─ if not accepted → return to PrismQ.T.Script.From.Title.Review.Script
+    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+    │                      ↓
+    │                   PrismQ.T.Review.Title.By.Script (loop back)
     └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -77,12 +87,8 @@ GPT Expert Review and Polish Loop
     ↓
 PrismQ.T.Story.Review
     ├─ if not accepted → PrismQ.T.Story.Polish
-    └─ if accepted → continue to Publishing
-    ↓
-PrismQ.T.Story.Polish (conditional)
-    ↓
-PrismQ.T.Story.Review (loop back)
-    ├─ if not accepted → return to PrismQ.T.Story.Polish
+    │                      ↓
+    │                   PrismQ.T.Story.Review (loop back)
     └─ if accepted → continue to Publishing
 ```
 
@@ -158,36 +164,15 @@ PrismQ.T.Story.Review (loop back)
 
 **Output**:
 - Review feedback for Title
-- Acceptance/Rejection decision
+- Assessment of title quality
 
-**Decision Point**:
-- **If Accepted**: Skip to PrismQ.T.Review.Script.By.Title.Idea (Stage 6)
-- **If Not Accepted**: Proceed to PrismQ.T.Title.From.Script.Review.Title (Stage 5)
+**Transitions To**: PrismQ.T.Review.Script.By.Title.Idea (Stage 5)
 
----
-
-### Stage 5: PrismQ.T.Title.From.Script.Review.Title
-
-**Purpose**: Refine title based on script and review feedback
-
-**Location**: `T/Title/FromOriginalTitleAndReviewAndScript/`
-
-**Input**:
-- Previous Title
-- Current Script
-- Review feedback from Stage 4
-
-**Output**:
-- Title v2 (or higher version)
-- Improvements documented
-
-**Transitions To**: PrismQ.T.Review.Script.By.Title.Idea
-
-**Note**: This stage is also used later in the workflow when title refinement is needed
+**Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 6: PrismQ.T.Review.Script.By.Title.Idea
+### Stage 5: PrismQ.T.Review.Script.By.Title.Idea
 
 **Purpose**: Review script against current title and original idea
 
@@ -200,36 +185,15 @@ PrismQ.T.Story.Review (loop back)
 
 **Output**:
 - Review feedback for Script
-- Acceptance/Rejection decision
+- Assessment of script quality
 
-**Decision Point**:
-- **If Accepted**: Skip to PrismQ.T.Review.Title.By.Script (Stage 8)
-- **If Not Accepted**: Proceed to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+**Transitions To**: PrismQ.T.Review.Title.By.Script (Stage 6)
 
----
-
-### Stage 7: PrismQ.T.Script.From.Title.Review.Script
-
-**Purpose**: Refine script based on title and review feedback
-
-**Location**: `T/Script/FromOriginalScriptAndReviewAndTitle/`
-
-**Input**:
-- Previous Script
-- Current Title
-- Review feedback from Stage 6
-
-**Output**:
-- Script v2 (or higher version)
-- Improvements documented
-
-**Transitions To**: PrismQ.T.Review.Title.By.Script
-
-**Note**: This stage is used multiple times in the workflow when script refinement is needed
+**Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 8: PrismQ.T.Review.Title.By.Script
+### Stage 6: PrismQ.T.Review.Title.By.Script
 
 **Purpose**: Review title against refined script
 
@@ -244,8 +208,50 @@ PrismQ.T.Story.Review (loop back)
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Accepted**: Skip to PrismQ.T.Review.Script.By.Title (Stage 9)
-- **If Not Accepted**: Proceed to PrismQ.T.Title.From.Script.Review.Title (Stage 5)
+- **If Not Accepted**: Proceed to Title Refinement (Stage 7) → Script Refinement (Stage 8) → Return to Stage 6
+- **If Accepted**: Continue to PrismQ.T.Review.Script.By.Title (Stage 9)
+
+---
+
+### Stage 7: PrismQ.T.Title.From.Script.Review.Title
+
+**Purpose**: Refine title based on script and review feedback
+
+**Location**: `T/Title/FromOriginalTitleAndReviewAndScript/`
+
+**Input**:
+- Previous Title
+- Current Script
+- Review feedback from Stage 6
+
+**Output**:
+- Title v2 (or higher version)
+- Improvements documented
+
+**Transitions To**: PrismQ.T.Script.From.Title.Review.Script (Stage 8)
+
+**Note**: This stage is used later in the workflow when title refinement is needed (from Stage 15 Title.Readability)
+
+---
+
+### Stage 8: PrismQ.T.Script.From.Title.Review.Script
+
+**Purpose**: Refine script based on title and review feedback
+
+**Location**: `T/Script/FromOriginalScriptAndReviewAndTitle/`
+
+**Input**:
+- Previous Script
+- Current Title
+- Review feedback (from various stages)
+
+**Output**:
+- Script v2 (or higher version)
+- Improvements documented
+
+**Transitions To**: PrismQ.T.Review.Title.By.Script (Stage 6)
+
+**Note**: This stage is used extensively throughout the workflow when script refinement is needed
 
 ---
 
@@ -264,14 +270,14 @@ PrismQ.T.Story.Review (loop back)
 - Acceptance/Rejection decision
 
 **Decision Point**:
+- **If Not Accepted**: Proceed to Script Refinement (Stage 8) → Return to Review.Title.By.Script (Stage 6)
 - **If Accepted**: Continue to Grammar Review (Stage 10)
-- **If Not Accepted**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
 
 ---
 
 ### Stages 10-16: Local AI Quality Reviews
 
-These stages perform automated quality reviews on the script and title. Each review checks a specific quality dimension and can loop back to refinement stages if issues are found.
+These stages perform automated quality reviews on the script and title. Each review checks a specific quality dimension and loops back through script refinement and title review if issues are found.
 
 ---
 
@@ -286,7 +292,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Grammar review results
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 11
 
 ---
@@ -302,7 +308,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Tone review results
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 12
 
 ---
@@ -320,7 +326,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Content review results
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 13
 
 ---
@@ -336,7 +342,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Consistency review results
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 14
 
 ---
@@ -352,7 +358,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Editing review results
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 15
 
 ---
@@ -368,7 +374,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Title readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Title.From.Script.Review.Title (Stage 5)
+- **If Fails**: Return to Title Refinement (Stage 7) → Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 16
 
 ---
@@ -384,7 +390,7 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Script readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
+- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
 - **If Passes**: Continue to Stage 17
 
 ---
@@ -454,15 +460,15 @@ Several stages are conditional and only executed based on review results:
 
 The workflow contains multiple iterative loops:
 
-1. **Title-Script Alignment Loop** (Stages 4-10):
+1. **Title-Script Alignment Loop** (Stages 4-9):
    - Review Title → Refine Title → Review Script → Refine Script
    - Ensures title and script are mutually aligned
 
-2. **Quality Review Loop** (Stages 11-17):
+2. **Quality Review Loop** (Stages 10-16):
    - Each quality dimension can send back to refinement
    - Ensures all quality criteria are met
 
-3. **Expert Polish Loop** (Stages 18-19):
+3. **Expert Polish Loop** (Stages 17-18):
    - Story.Review → Story.Polish → Story.Review
    - Continues until expert review passes
 

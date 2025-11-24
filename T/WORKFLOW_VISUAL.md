@@ -148,7 +148,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 | 2 | Title.From.Idea | Generate initial title (v1) |
 | 3 | Script.From.Title.Idea | Generate initial script (v1) |
 
-### Alignment Loop (4-10)
+### Alignment Loop (4-9)
 | Stage | Name | Purpose |
 |-------|------|---------|
 | 4 | Review.Title.By.Script.Idea | Review title against script and idea |
@@ -156,7 +156,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 | 6 | Review.Script.By.Title.Idea | Review script against title and idea |
 | 7 | Script.From.Title.Review.Script | Refine script (conditional) |
 | 8 | Review.Title.By.Script | Re-review title against script |
-| 10 | Review.Script.By.Title | Final script review against title |
+| 9 | Review.Script.By.Title | Final script review against title |
 
 ### Quality Reviews (10-16)
 | Stage | Name | Focus |

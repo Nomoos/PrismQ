@@ -12,19 +12,16 @@ stateDiagram-v2
     TitleFromIdea --> ScriptFromTitleIdea
     ScriptFromTitleIdea --> ReviewTitleByScriptIdea
     
-    ReviewTitleByScriptIdea --> TitleFromScriptReviewTitle
     ReviewTitleByScriptIdea --> ReviewScriptByTitleIdea
     
-    TitleFromScriptReviewTitle --> ReviewScriptByTitleIdea
-    
-    ReviewScriptByTitleIdea --> ScriptFromTitleReviewScript
     ReviewScriptByTitleIdea --> ReviewTitleByScript
-    
-    ScriptFromTitleReviewScript --> ReviewTitleByScript
-    ScriptFromTitleReviewScript --> ReviewScriptByTitle
     
     ReviewTitleByScript --> TitleFromScriptReviewTitle
     ReviewTitleByScript --> ReviewScriptByTitle
+    
+    TitleFromScriptReviewTitle --> ScriptFromTitleReviewScript
+    
+    ScriptFromTitleReviewScript --> ReviewTitleByScript
     
     ReviewScriptByTitle --> ScriptFromTitleReviewScript
     ReviewScriptByTitle --> ReviewScriptGrammar
@@ -72,10 +69,20 @@ stateDiagram-v2
         Location: T/Script/FromIdeaAndTitle/
     end note
     
+    note right of ReviewTitleByScriptIdea
+        Stage 4: Review title (no conditional)
+        Always proceeds to Stage 5
+    end note
+    
+    note right of ReviewScriptByTitleIdea
+        Stage 5: Review script (no conditional)
+        Always proceeds to Stage 6
+    end note
+    
     note right of ReviewScriptGrammar
         Stages 10-16: Local AI reviews
-        Multiple quality dimensions
-        Each can fail back to refinement
+        All failures loop through
+        Script Refinement → Title Review
     end note
     
     note right of StoryReview
@@ -280,7 +287,7 @@ If every review initially fails, the workflow could involve significantly more i
 
 ### QualityReviews Composite State
 
-The QualityReviews state encapsulates 7 sequential review stages (11-17). This composite state:
+The QualityReviews state encapsulates 7 sequential review stages (10-16). This composite state:
 - Has a single entry point (ReviewScriptGrammar)
 - Has two exit conditions:
   - Success: All reviews pass → exits to StoryReview
@@ -290,7 +297,7 @@ The QualityReviews state encapsulates 7 sequential review stages (11-17). This c
 
 ### ExpertReviewLoop Composite State
 
-The ExpertReviewLoop state encapsulates the final expert review cycle (18-19). This composite state:
+The ExpertReviewLoop state encapsulates the final expert review cycle (17-18). This composite state:
 - Has a single entry point (StoryReview)
 - Has one exit condition: StoryReview accepted → Publishing
 - Contains an internal loop: StoryReview → StoryPolish → StoryReview
