@@ -12,6 +12,8 @@ The Text Generation Pipeline is the foundation of the PrismQ content workflow. I
 
 **[→ T Workflow State Machine](./WORKFLOW_STATE_MACHINE.md)** - Visual state diagram showing all workflow states and transitions
 
+**[→ T Workflow Visual Guide](./WORKFLOW_VISUAL.md)** - Quick visual reference with workflow diagrams and decision points
+
 ## Purpose
 
 This pipeline handles the complete text content lifecycle from inspiration through ideation, scripting, review, and publication. Published text from this pipeline serves as the **foundation** for subsequent audio and video production.

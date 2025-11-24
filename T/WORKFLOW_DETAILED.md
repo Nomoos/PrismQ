@@ -538,6 +538,8 @@ See [T/Publishing/README.md](./Publishing/README.md) for details.
 ## Related Documentation
 
 - **[T Module Overview](./README.md)** - Text pipeline overview
+- **[T Workflow Visual Guide](./WORKFLOW_VISUAL.md)** - Quick visual reference with diagrams
+- **[T Workflow State Machine](./WORKFLOW_STATE_MACHINE.md)** - Mermaid state diagram with all states and transitions
 - **[Title & Script Workflow](./TITLE_SCRIPT_WORKFLOW.md)** - Original workflow documentation
 - **[Ultra-Clean Pipeline](../_meta/docs/workflow/ultra-clean-pipeline.md)** - Simplified workflow view
 - **[MVP Stages](../_meta/docs/workflow/mvp-stages.md)** - Complete 26-stage workflow
