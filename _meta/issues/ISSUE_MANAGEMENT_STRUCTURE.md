@@ -1,7 +1,24 @@
 # Issue Management Structure - November 2025 Refactoring
 
-**Date**: 2025-11-23  
+**Date**: 2025-11-24 (Updated)  
 **Purpose**: Document the standardized issue management structure across PrismQ  
+
+---
+
+## Recent Updates (2025-11-24)
+
+### Archive Consolidation
+✅ Created consolidated archive documents to reduce redundancy:
+- **MVP_REVIEWS_CONSOLIDATED.md**: All 24 MVP implementation reviews in one document
+- **HISTORICAL_PLANNING_CONSOLIDATED.md**: All MVP phase planning documents in one document
+
+### Documentation Updates
+✅ Replaced PARALLEL_RUN_NEXT_FULL.md with actual POST-001 to POST-048 roadmap  
+✅ Updated archive README with quick access links to consolidated documents  
+✅ Created done/README.md to document completed issues structure  
+✅ Moved MVP-006 specification from new/ to done/
+
+**Impact**: Easier navigation, reduced clutter, maintained historical context
 
 ---
 
@@ -11,6 +28,7 @@ Completed comprehensive refactoring of all `_meta/issues` directories across the
 - **47 issue directories** now follow consistent structure
 - **98 historical files** archived for reference
 - **4 archive locations** with detailed documentation
+- **2 consolidated documents** for quick reference
 
 ---
 
@@ -32,11 +50,15 @@ _meta/issues/
 ## Archive Locations with Content
 
 ### 1. Main Issues Archive (`_meta/issues/archive/`)
-**42 archived files** including:
-- **mvp-reviews/**: 21 MVP implementation review documents (MVP-001 through MVP-022)
+**42 archived files** + **2 consolidated documents** including:
+- **MVP_REVIEWS_CONSOLIDATED.md**: Single comprehensive document consolidating all 24 MVP reviews
+- **HISTORICAL_PLANNING_CONSOLIDATED.md**: Single comprehensive document consolidating 20 planning files
+- **mvp-reviews/**: 21 detailed MVP implementation review documents (MVP-001 through MVP-022)
 - **planning/**: 20 historical planning documents, workflow documentation, and state snapshots
 
-[Full documentation](./_meta/issues/archive/README.md)
+**Quick Access**: The two consolidated documents provide comprehensive overviews without needing to read 42 individual files. Original files remain available for detailed reference.
+
+[Full documentation](./archive/README.md)
 
 ### 2. Client Frontend TaskManager Archive
 **32 archived files** including:
