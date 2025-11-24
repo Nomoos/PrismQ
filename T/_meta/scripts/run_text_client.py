@@ -575,11 +575,12 @@ class TextClient:
             for i, action in enumerate(self.history[-10:], 1):  # Show last 10
                 print(f"  {i}. {action['action']} - {action['timestamp']}")
     
-    def run(self) -> None:
-        """Run the interactive client."""
-        self.show_welcome()
-        self.show_menu()
+    def _run_interactive_loop(self) -> None:
+        """Run the interactive command loop.
         
+        This is the core command processing loop, separated from run() so it can
+        be reused when demo mode pre-loads data before starting the loop.
+        """
         while True:
             try:
                 choice = input(f"{Colors.BOLD}> {Colors.END}").strip().lower()
@@ -626,6 +627,12 @@ class TextClient:
             except EOFError:
                 print_info("\nGoodbye!")
                 break
+    
+    def run(self) -> None:
+        """Run the interactive client."""
+        self.show_welcome()
+        self.show_menu()
+        self._run_interactive_loop()
 
 
 def main():
@@ -668,23 +675,12 @@ Examples:
     client = TextClient()
     
     if args.demo:
+        # Pre-load demo data before starting interactive session
         client.show_welcome()
         client.load_demo_idea()
         client.show_menu()
-        
-        # Start interactive loop after loading demo
-        while True:
-            try:
-                choice = input(f"{Colors.BOLD}> {Colors.END}").strip().lower()
-                
-                if choice == 'q':
-                    print_info("Thank you for using PrismQ.T Text Client!")
-                    break
-                # Handle other commands similar to run()
-                client.run()
-                break
-            except (KeyboardInterrupt, EOFError):
-                break
+        # Continue with normal interactive loop (client.run starts its own loop)
+        client._run_interactive_loop()
     else:
         client.run()
 
