@@ -1,7 +1,7 @@
 # Issues Archive
 
 **Purpose**: Archive for completed and historical issue tracking materials  
-**Last Updated**: 2025-11-23  
+**Last Updated**: 2025-11-24  
 
 ---
 
@@ -11,25 +11,54 @@ This directory contains archived issue-related content that has served its purpo
 
 ---
 
-## Structure
+## Quick Access - Consolidated Documents
+
+### 📊 [MVP_REVIEWS_CONSOLIDATED.md](./MVP_REVIEWS_CONSOLIDATED.md)
+**Comprehensive summary of all 24 MVP implementation reviews in one document.**
+
+Includes consolidated information from:
+- MVP-001 through MVP-022 individual reviews
+- Technical metrics and achievements
+- Architecture decisions
+- Quality assessments
+
+**Use this file for**: Quick overview of MVP implementation without reading 21 separate files.
+
+### 📋 [HISTORICAL_PLANNING_CONSOLIDATED.md](./HISTORICAL_PLANNING_CONSOLIDATED.md)
+**Complete historical planning context from MVP phase in one document.**
+
+Includes consolidated information from:
+- State snapshots (2025-11-22)
+- MVP workflow documentation
+- Parallel execution plans
+- Module issue plans
+- Project summaries
+
+**Use this file for**: Understanding MVP planning history and lessons learned without reading 20 separate files.
+
+---
+
+## Detailed Archive Structure
 
 ### [mvp-reviews/](./mvp-reviews/)
 
-Completed MVP implementation review documents:
+**21 detailed implementation review files:**
 - MVP-001 through MVP-022: Individual module implementation reviews
-- MODULE_T_STORY_REVIEW.md: Comprehensive T module story review
+- MODULE_T_STORY_REVIEW.md: Comprehensive T module story review  
 - MVP-DOCS-REVIEW.md and MVP-TEST-REVIEW.md: Documentation and testing reviews
 
-These reviews documented the completion and quality assessment of the initial MVP implementation (completed 2025-11-22).
+**Status**: These reviews documented the completion and quality assessment of the initial MVP implementation (completed 2025-11-22). For a consolidated overview, see **MVP_REVIEWS_CONSOLIDATED.md** above.
 
 ### [planning/](./planning/)
 
-Archived planning documents, summaries, and coordination materials:
+**20 historical planning documents:**
 - Historical state snapshots (dated 2025-11-22)
-- MVP workflow documentation
+- MVP workflow documentation (including Czech translations)
 - Issue planning documents for T module components
 - Worker summaries and project assessments
-- Parallel execution backups and Czech (CS) translations
+- Parallel execution backups and planning variants
+
+**Status**: These documents represent the planning phase history. For a consolidated overview, see **HISTORICAL_PLANNING_CONSOLIDATED.md** above.
 
 ---
 
