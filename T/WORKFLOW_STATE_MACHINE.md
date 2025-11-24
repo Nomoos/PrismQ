@@ -73,13 +73,13 @@ stateDiagram-v2
     end note
     
     note right of ReviewScriptGrammar
-        Stages 11-17: Local AI reviews
+        Stages 10-16: Local AI reviews
         Multiple quality dimensions
         Each can fail back to refinement
     end note
     
     note right of StoryReview
-        Stages 18-19: GPT Expert Review
+        Stages 17-18: GPT Expert Review
         Final quality gate
         Iterates until accepted
     end note
@@ -99,26 +99,26 @@ stateDiagram-v2
 | ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 6 | T/Review/Script/ByTitleIdea/ |
 | ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 7 | T/Script/FromOriginalScriptAndReviewAndTitle/ |
 | ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 8 | T/Review/Title/ByScript/ |
-| ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 10 | T/Review/Script/ByTitle/ |
+| ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | T/Review/Script/ByTitle/ |
 
-### Quality Review States (Composite)
-
-| State | Full Name | Stage | Location |
-|-------|-----------|-------|----------|
-| ReviewScriptGrammar | PrismQ.T.Review.Script.Grammar | 11 | T/Review/Grammar/ |
-| ReviewScriptTone | PrismQ.T.Review.Script.Tone | 12 | T/Review/Tone/ |
-| ReviewScriptContent | PrismQ.T.Review.Script.Content | 13 | T/Review/Content/ |
-| ReviewScriptConsistency | PrismQ.T.Review.Script.Consistency | 14 | T/Review/Consistency/ |
-| ReviewScriptEditing | PrismQ.T.Review.Script.Editing | 15 | T/Review/Editing/ |
-| ReviewTitleReadability | PrismQ.T.Review.Title.Readability | 16 | T/Review/Readability/ |
-| ReviewScriptReadability | PrismQ.T.Review.Script.Readability | 17 | T/Review/Readability/ |
-
-### Expert Review Loop States (Composite)
+### Quality Review States
 
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
-| StoryReview | PrismQ.T.Story.Review | 18 | T/Story/ExpertReview/ |
-| StoryPolish | PrismQ.T.Story.Polish | 19 | T/Story/Polish/ or T/Story/ExpertPolish/ |
+| ReviewScriptGrammar | PrismQ.T.Review.Script.Grammar | 10 | T/Review/Grammar/ |
+| ReviewScriptTone | PrismQ.T.Review.Script.Tone | 11 | T/Review/Tone/ |
+| ReviewScriptContent | PrismQ.T.Review.Script.Content | 12 | T/Review/Content/ |
+| ReviewScriptConsistency | PrismQ.T.Review.Script.Consistency | 13 | T/Review/Consistency/ |
+| ReviewScriptEditing | PrismQ.T.Review.Script.Editing | 14 | T/Review/Editing/ |
+| ReviewTitleReadability | PrismQ.T.Review.Title.Readability | 15 | T/Review/Readability/ |
+| ReviewScriptReadability | PrismQ.T.Review.Script.Readability | 16 | T/Review/Readability/ |
+
+### Expert Review Loop States
+
+| State | Full Name | Stage | Location |
+|-------|-----------|-------|----------|
+| StoryReview | PrismQ.T.Story.Review | 17 | T/Story/ExpertReview/ |
+| StoryPolish | PrismQ.T.Story.Polish | 18 | T/Story/Polish/ or T/Story/ExpertPolish/ |
 
 ### Terminal State
 
@@ -238,7 +238,7 @@ IdeaCreation
 → Publishing
 ```
 
-**Total Stages**: 15 stages
+**Total Stages**: 14 stages
 
 ### Realistic Path (Some Reviews Require Refinement)
 
@@ -270,7 +270,7 @@ IdeaCreation
 → Publishing
 ```
 
-**Total Stages**: ~24 stages (including loops)
+**Total Stages**: ~22 stages (including loops)
 
 ### Maximum Iteration Path
 
@@ -336,13 +336,13 @@ States that evaluate quality and make accept/reject decisions:
 - Second iteration of mutual consistency
 - Final check before quality reviews
 
-### Gate 3: Local AI Quality Reviews (Stages 11-17)
+### Gate 3: Local AI Quality Reviews (Stages 10-16)
 - Seven-dimensional quality assessment
 - Grammar, Tone, Content, Consistency, Editing
 - Readability for both Title and Script
 - All must pass to proceed
 
-### Gate 4: Expert Review (Stages 18-19)
+### Gate 4: Expert Review (Stages 17-18)
 - GPT-based holistic review
 - Professional quality standard
 - Final gate before publishing

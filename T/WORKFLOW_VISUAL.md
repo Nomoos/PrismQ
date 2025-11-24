@@ -65,42 +65,42 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │          ╔══════════════════════════════════════════╗            │
-│          ║  Local AI Quality Reviews (11-17)       ║            │
+│          ║  Local AI Quality Reviews (10-16)       ║            │
 │          ║  Fast, automated quality checks          ║            │
 │          ╚══════════════════════════════════════════╝            │
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 11: Grammar Review                                  │  │
+│  │ Stage 10: Grammar Review                                  │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 12: Tone Review                                     │  │
+│  │ Stage 11: Tone Review                                     │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 13: Content Review                                  │  │
+│  │ Stage 12: Content Review                                  │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 14: Consistency Review                              │  │
+│  │ Stage 13: Consistency Review                              │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 15: Editing Review                                  │  │
+│  │ Stage 14: Editing Review                                  │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 16: Title Readability Review                        │  │
+│  │ Stage 15: Title Readability Review                        │  │
 │  │   └─ Fails? → Back to Title Refinement (Stage 5)         │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 17: Script Readability Review                       │  │
+│  │ Stage 16: Script Readability Review                       │  │
 │  │   └─ Fails? → Back to Script Refinement (Stage 7)        │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                  │
@@ -110,17 +110,17 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │          ╔══════════════════════════════════════════╗            │
-│          ║  GPT Expert Review Loop (18-19)         ║            │
+│          ║  GPT Expert Review Loop (17-18)         ║            │
 │          ║  Final quality gate before publishing   ║            │
 │          ╚══════════════════════════════════════════╝            │
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 18: Story Review (GPT-based)                        │  │
+│  │ Stage 17: Story Review (GPT-based)                        │  │
 │  │   ├─ Accepted? → Continue to Publishing                   │  │
-│  │   └─ Not Accepted? → Stage 19: Story Polish              │  │
+│  │   └─ Not Accepted? → Stage 18: Story Polish              │  │
 │  │                                                            │  │
-│  │ Stage 19: Story Polish                                    │  │
-│  │   └─ Returns to Stage 18 for re-review                   │  │
+│  │ Stage 18: Story Polish                                    │  │
+│  │   └─ Returns to Stage 17 for re-review                   │  │
 │  │                                                            │  │
 │  │ [Loop continues until Story Review accepts]               │  │
 │  └───────────────────────────────────────────────────────────┘  │
@@ -158,22 +158,22 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 | 8 | Review.Title.By.Script | Re-review title against script |
 | 10 | Review.Script.By.Title | Final script review against title |
 
-### Quality Reviews (11-17)
+### Quality Reviews (10-16)
 | Stage | Name | Focus |
 |-------|------|-------|
-| 11 | Review.Script.Grammar | Grammar and syntax |
-| 12 | Review.Script.Tone | Tone consistency |
-| 13 | Review.Script.Content | Content accuracy |
-| 14 | Review.Script.Consistency | Style consistency |
-| 15 | Review.Script.Editing | Editing polish |
-| 16 | Review.Title.Readability | Title clarity |
-| 17 | Review.Script.Readability | Script clarity |
+| 10 | Review.Script.Grammar | Grammar and syntax |
+| 11 | Review.Script.Tone | Tone consistency |
+| 12 | Review.Script.Content | Content accuracy |
+| 13 | Review.Script.Consistency | Style consistency |
+| 14 | Review.Script.Editing | Editing polish |
+| 15 | Review.Title.Readability | Title clarity |
+| 16 | Review.Script.Readability | Script clarity |
 
-### Expert Review (18-19)
+### Expert Review (17-18)
 | Stage | Name | Purpose |
 |-------|------|---------|
-| 18 | Story.Review | GPT-based holistic review |
-| 19 | Story.Polish | Expert-level improvements |
+| 17 | Story.Review | GPT-based holistic review |
+| 18 | Story.Polish | Expert-level improvements |
 
 ## Key Decision Points
 
@@ -182,34 +182,34 @@ Each review stage can:
 - ✅ **Accept**: Skip refinement, move to next stage
 - ❌ **Reject**: Go to refinement stage
 
-### 🔬 Quality Checks (Stages 11-17)
+### 🔬 Quality Checks (Stages 10-16)
 Each quality review can:
 - ✅ **Pass**: Continue to next quality check
 - ❌ **Fail**: Return to appropriate refinement stage
 
-### 🎓 Expert Review (Stage 18)
+### 🎓 Expert Review (Stage 17)
 - ✅ **Accepted**: Proceed to Publishing
-- 🔄 **Improvements Needed**: Go to Polish (Stage 19), then loop back
+- 🔄 **Improvements Needed**: Go to Polish (Stage 18), then loop back
 
 ## Iteration Patterns
 
 ### Pattern 1: Ideal Flow (Minimal Iterations)
 ```
-1 → 2 → 3 → 4(accept) → 6(accept) → 8(accept) → 10(accept) 
-→ 11(pass) → 12(pass) → 13(pass) → 14(pass) → 15(pass) 
-→ 16(pass) → 17(pass) → 18(accept) → Publishing
+1 → 2 → 3 → 4(accept) → 6(accept) → 8(accept) → 9(accept) 
+→ 10(pass) → 11(pass) → 12(pass) → 13(pass) → 14(pass) 
+→ 15(pass) → 16(pass) → 17(accept) → Publishing
 ```
-**Total Stages**: 15
+**Total Stages**: 14
 
 ### Pattern 2: Typical Flow (Some Refinements)
 ```
 1 → 2 → 3 → 4(reject) → 5 → 6(accept) → 8(accept) 
-→ 10(reject) → 7 → 10(accept) 
-→ 11(pass) → 12(fail) → 7 → 10(accept) → 11(pass) → 12(pass)
-→ 13(pass) → 14(pass) → 15(pass) → 16(pass) → 17(pass)
-→ 18(reject) → 19 → 18(accept) → Publishing
+→ 9(reject) → 7 → 9(accept) 
+→ 10(pass) → 11(fail) → 7 → 9(accept) → 10(pass) → 11(pass)
+→ 12(pass) → 13(pass) → 14(pass) → 15(pass) → 16(pass)
+→ 17(reject) → 18 → 17(accept) → Publishing
 ```
-**Total Stages**: ~22
+**Total Stages**: ~21
 
 ### Pattern 3: High-Iteration Flow
 Multiple rejections lead to more refinement cycles, but the workflow eventually converges to acceptable quality.
@@ -228,14 +228,14 @@ Multiple rejections lead to more refinement cycles, but the workflow eventually 
 **Called from**:
 - Stage 6 (if script review fails)
 - Stage 10 (if script final review fails)
-- Stages 11-15, 17 (if any quality review fails)
+- Stages 10-14, 16 (if any quality review fails)
 
 **Returns to**: Next review stage in sequence
 
-### Stage 19: Story Polish
-**Called from**: Stage 18 (if expert review rejects)
+### Stage 18: Story Polish
+**Called from**: Stage 17 (if expert review rejects)
 
-**Returns to**: Stage 18 (for re-review)
+**Returns to**: Stage 17 (for re-review)
 
 ## Quality Gates
 
@@ -245,12 +245,12 @@ Multiple rejections lead to more refinement cycles, but the workflow eventually 
 **Iterations**: 1-3 typical
 
 ### Gate 2: Local AI Quality
-**Stages**: 11-17  
+**Stages**: 10-16  
 **Purpose**: Automated quality checks on multiple dimensions  
 **Iterations**: 1-2 typical per dimension
 
 ### Gate 3: Expert Review
-**Stages**: 18-19  
+**Stages**: 17-18  
 **Purpose**: Professional-grade holistic review  
 **Iterations**: 1-2 typical
 
@@ -266,12 +266,12 @@ Multiple rejections lead to more refinement cycles, but the workflow eventually 
 ✅ Make targeted improvements based on feedback  
 ✅ Don't skip reviews even if content seems good  
 
-### Quality Reviews (Stages 11-17)
+### Quality Reviews (Stages 10-16)
 ✅ Fix issues early to avoid cascading problems  
 ✅ Each dimension is independent but interconnected  
 ✅ All must pass before expert review  
 
-### Expert Review (Stages 18-19)
+### Expert Review (Stages 17-18)
 ✅ Final opportunity for high-level improvements  
 ✅ GPT-based review provides professional perspective  
 ✅ Loop until publication-ready  

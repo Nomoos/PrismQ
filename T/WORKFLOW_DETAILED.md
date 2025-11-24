@@ -244,18 +244,12 @@ PrismQ.T.Story.Review (loop back)
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Accepted**: Skip to PrismQ.T.Review.Script.By.Title (Stage 10)
+- **If Accepted**: Skip to PrismQ.T.Review.Script.By.Title (Stage 9)
 - **If Not Accepted**: Proceed to PrismQ.T.Title.From.Script.Review.Title (Stage 5)
 
 ---
 
-### Stage 9: Title Refinement (Stage 5 Revisited)
-
-See Stage 5 for details. Returns to Stage 10.
-
----
-
-### Stage 10: PrismQ.T.Review.Script.By.Title
+### Stage 9: PrismQ.T.Review.Script.By.Title
 
 **Purpose**: Final review of script against finalized title
 
@@ -270,18 +264,18 @@ See Stage 5 for details. Returns to Stage 10.
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Accepted**: Continue to Grammar Review (Stage 11)
+- **If Accepted**: Continue to Grammar Review (Stage 10)
 - **If Not Accepted**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
 
 ---
 
-### Stages 11-17: Local AI Quality Reviews
+### Stages 10-16: Local AI Quality Reviews
 
 These stages perform automated quality reviews on the script and title. Each review checks a specific quality dimension and can loop back to refinement stages if issues are found.
 
 ---
 
-### Stage 11: PrismQ.T.Review.Script.Grammar
+### Stage 10: PrismQ.T.Review.Script.Grammar
 
 **Purpose**: Grammar and syntax validation
 
@@ -293,11 +287,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 12
+- **If Passes**: Continue to Stage 11
 
 ---
 
-### Stage 12: PrismQ.T.Review.Script.Tone
+### Stage 11: PrismQ.T.Review.Script.Tone
 
 **Purpose**: Tone and voice consistency check
 
@@ -309,11 +303,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 13
+- **If Passes**: Continue to Stage 12
 
 ---
 
-### Stage 13: PrismQ.T.Review.Script.Content
+### Stage 12: PrismQ.T.Review.Script.Content
 
 **Purpose**: Content accuracy and relevance validation
 
@@ -327,11 +321,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 14
+- **If Passes**: Continue to Stage 13
 
 ---
 
-### Stage 14: PrismQ.T.Review.Script.Consistency
+### Stage 13: PrismQ.T.Review.Script.Consistency
 
 **Purpose**: Style and consistency validation
 
@@ -343,11 +337,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 15
+- **If Passes**: Continue to Stage 14
 
 ---
 
-### Stage 15: PrismQ.T.Review.Script.Editing
+### Stage 14: PrismQ.T.Review.Script.Editing
 
 **Purpose**: Final editing pass for polish
 
@@ -359,11 +353,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 16
+- **If Passes**: Continue to Stage 15
 
 ---
 
-### Stage 16: PrismQ.T.Review.Title.Readability
+### Stage 15: PrismQ.T.Review.Title.Readability
 
 **Purpose**: Title readability and clarity check
 
@@ -375,11 +369,11 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Title.From.Script.Review.Title (Stage 5)
-- **If Passes**: Continue to Stage 17
+- **If Passes**: Continue to Stage 16
 
 ---
 
-### Stage 17: PrismQ.T.Review.Script.Readability
+### Stage 16: PrismQ.T.Review.Script.Readability
 
 **Purpose**: Script readability and clarity check
 
@@ -391,17 +385,17 @@ These stages perform automated quality reviews on the script and title. Each rev
 
 **Decision Point**:
 - **If Fails**: Return to PrismQ.T.Script.From.Title.Review.Script (Stage 7)
-- **If Passes**: Continue to Stage 18
+- **If Passes**: Continue to Stage 17
 
 ---
 
-### Stages 18-19: GPT Expert Review and Polish Loop
+### Stages 17-18: GPT Expert Review and Polish Loop
 
 These stages use GPT-based expert review for final quality assurance before publishing.
 
 ---
 
-### Stage 18: PrismQ.T.Story.Review
+### Stage 17: PrismQ.T.Story.Review
 
 **Purpose**: Expert-level review of complete story (Title + Script + Context)
 
@@ -419,14 +413,14 @@ These stages use GPT-based expert review for final quality assurance before publ
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Not Accepted**: Proceed to PrismQ.T.Story.Polish (Stage 19)
+- **If Not Accepted**: Proceed to PrismQ.T.Story.Polish (Stage 18)
 - **If Accepted**: Continue to Publishing
 
 **Note**: Uses GPT-4 or GPT-5 for professional-grade review
 
 ---
 
-### Stage 19: PrismQ.T.Story.Polish
+### Stage 18: PrismQ.T.Story.Polish
 
 **Purpose**: Apply expert-level improvements based on Story.Review feedback
 
@@ -435,14 +429,14 @@ These stages use GPT-based expert review for final quality assurance before publ
 **Input**:
 - Current Title
 - Current Script
-- Expert review feedback from Stage 18
+- Expert review feedback from Stage 17
 
 **Output**:
 - Polished Title
 - Polished Script
 - Improvements documented
 
-**Transitions To**: PrismQ.T.Story.Review (Stage 18) - Loop back for validation
+**Transitions To**: PrismQ.T.Story.Review (Stage 17) - Loop back for validation
 
 **Note**: This creates an iterative loop with Story.Review until the content is accepted
 
@@ -487,7 +481,7 @@ Key decision points that control workflow branching:
 - Script-Idea alignment
 - Mutual consistency
 
-### Mid Stage Gates (Stages 11-17)
+### Mid Stage Gates (Stages 10-16)
 - Grammar correctness
 - Tone consistency
 - Content accuracy
@@ -496,7 +490,7 @@ Key decision points that control workflow branching:
 - Title readability
 - Script readability
 
-### Final Gate (Stages 18-19)
+### Final Gate (Stages 17-18)
 - Expert-level holistic review
 - Professional quality standard
 - Publication readiness
@@ -514,12 +508,12 @@ Key decision points that control workflow branching:
 3. Use review feedback to make targeted improvements
 
 ### Quality Reviews
-1. Local AI reviews (Stages 11-17) are fast and cost-effective
+1. Local AI reviews (Stages 10-16) are fast and cost-effective
 2. Fix issues early to avoid rework in later stages
 3. All quality reviews must pass before expert review
 
 ### Expert Review Loop
-1. Expert review (Stage 18-19) is the final quality gate
+1. Expert review (Stage 17-18) is the final quality gate
 2. May require multiple polish iterations
 3. Only proceed to publishing when expert review passes
 
