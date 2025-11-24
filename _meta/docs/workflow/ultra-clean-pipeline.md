@@ -2,6 +2,10 @@
 
 **Simplified representation of the PrismQ execution flow**
 
+> 📚 **See also**: 
+> - [Detailed T Workflow](../../T/WORKFLOW_DETAILED.md) - Complete stage-by-stage documentation with all review cycles
+> - [T Workflow State Machine](../../T/WORKFLOW_STATE_MACHINE.md) - Visual state diagram with all workflow paths
+
 ## Overview
 
 The Ultra-Clean Pipeline is a simplified, readable representation of the core iterative workflow in PrismQ's Text Generation Pipeline (T module). It shows the essential flow of data and dependencies between stages in a clean, dot-notation format.
