@@ -127,13 +127,13 @@ class WorkflowStageValidator:
     VALID_TRANSITIONS = {
         'idea_creation': ['title_v1'],
         'title_v1': ['script_v1', 'title_v2'],
-        'script_v1': ['title_review', 'script_v2'],
+        'script_v1': ['title_review', 'script_v2', 'script_review'],
         'title_review': ['title_v2'],
         'script_review': ['script_v2'],
-        'title_v2': ['script_v2', 'title_v3'],
-        'script_v2': ['title_v2', 'script_v3', 'title_v3'],
-        'title_v3': ['script_v3', 'refinement'],
-        'script_v3': ['title_v3', 'refinement'],
+        'title_v2': ['script_v2', 'script_review', 'title_v3'],
+        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3'],
+        'title_v3': ['script_v3', 'script_review', 'refinement'],
+        'script_v3': ['title_v3', 'title_review', 'refinement'],
     }
     
     def __init__(self):
