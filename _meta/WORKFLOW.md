@@ -15,6 +15,7 @@ All workflow documentation is now organized in the [`docs/workflow/`](./docs/wor
 - **[State Characteristics](./docs/workflow/states.md)** - Different types of states
 - **[Publishing Strategy](./docs/workflow/publishing-strategy.md)** - Progressive multi-format approach
 - **[Workflow Management](./docs/workflow/management.md)** - Operations, quality gates, and best practices
+- **[Ultra-Clean Pipeline](./docs/workflow/ultra-clean-pipeline.md)** - Simplified execution flow representation
 
 ### MVP Implementation (26-Stage Text Production)
 - **[MVP Overview](./docs/workflow/mvp-overview.md)** - Principles and workflow philosophy
