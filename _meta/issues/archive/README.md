@@ -1,64 +1,54 @@
 # Issues Archive
 
 **Purpose**: Archive for completed and historical issue tracking materials  
-**Last Updated**: 2025-11-24  
+**Last Updated**: 2025-11-24 (Cleanup Complete)
 
 ---
 
 ## Overview
 
-This directory contains archived issue-related content that has served its purpose but is kept for historical reference and context.
+This directory contains archived issue-related content consolidated into single reference documents. Individual files have been merged and removed to reduce clutter while preserving all historical context.
 
 ---
 
-## Quick Access - Consolidated Documents
+## 📁 Archive Contents (2 Consolidated Documents)
 
 ### 📊 [MVP_REVIEWS_CONSOLIDATED.md](./MVP_REVIEWS_CONSOLIDATED.md)
 **Comprehensive summary of all 24 MVP implementation reviews in one document.**
 
-Includes consolidated information from:
-- MVP-001 through MVP-022 individual reviews
+Consolidates information from former `mvp-reviews/` directory:
+- MVP-001 through MVP-022 individual reviews (16 module + 2 polish + 2 comprehensive)
 - Technical metrics and achievements
 - Architecture decisions
 - Quality assessments
 
-**Use this file for**: Quick overview of MVP implementation without reading 21 separate files.
+**Use this file for**: Complete MVP implementation history and quality assessment.
+
+---
 
 ### 📋 [HISTORICAL_PLANNING_CONSOLIDATED.md](./HISTORICAL_PLANNING_CONSOLIDATED.md)
 **Complete historical planning context from MVP phase in one document.**
 
-Includes consolidated information from:
+Consolidates information from former `planning/` directory:
 - State snapshots (2025-11-22)
 - MVP workflow documentation
 - Parallel execution plans
-- Module issue plans
+- Module issue plans (T.Idea, T.Title, T.Script, T.Review)
 - Project summaries
 
-**Use this file for**: Understanding MVP planning history and lessons learned without reading 20 separate files.
+**Use this file for**: MVP planning history and lessons learned.
 
 ---
 
-## Detailed Archive Structure
+## Archive Cleanup Summary (2025-11-24)
 
-### [mvp-reviews/](./mvp-reviews/)
+| Category | Before | After | Result |
+|----------|--------|-------|--------|
+| MVP Reviews | 21 individual files | 1 consolidated | ✅ Merged |
+| Planning Docs | 20 individual files | 1 consolidated | ✅ Merged |
+| **Total** | **41 files** | **2 files** | **95% reduction** |
 
-**21 detailed implementation review files:**
-- MVP-001 through MVP-022: Individual module implementation reviews
-- MODULE_T_STORY_REVIEW.md: Comprehensive T module story review  
-- MVP-DOCS-REVIEW.md and MVP-TEST-REVIEW.md: Documentation and testing reviews
-
-**Status**: These reviews documented the completion and quality assessment of the initial MVP implementation (completed 2025-11-22). For a consolidated overview, see **MVP_REVIEWS_CONSOLIDATED.md** above.
-
-### [planning/](./planning/)
-
-**20 historical planning documents:**
-- Historical state snapshots (dated 2025-11-22)
-- MVP workflow documentation (including Czech translations)
-- Issue planning documents for T module components
-- Worker summaries and project assessments
-- Parallel execution backups and planning variants
-
-**Status**: These documents represent the planning phase history. For a consolidated overview, see **HISTORICAL_PLANNING_CONSOLIDATED.md** above.
+All historical data preserved in consolidated documents. Original individual files removed.
 
 ---
 
@@ -70,14 +60,12 @@ Documents are archived when they:
 3. Should be preserved for historical context
 4. Would clutter active directories
 
-Active references are updated to point to archived locations when needed.
-
 ---
 
 ## Active Issue Tracking
 
 For current issues and active planning, see:
-- [Active Issues](../new/) - New issues ready for work
+- [Active Issues](../new/) - New issues ready for work (including Story Generation plan)
 - [Work In Progress](../wip/) - Issues currently being worked on
 - [Completed](../done/) - Recently completed issues
 - [Blocked](../blocked/) - Issues awaiting dependencies
@@ -90,3 +78,4 @@ For current issues and active planning, see:
 
 - [Project README](../../../README.md)
 - [Meta Documentation](../../README.md)
+- [Issue Management Structure](../ISSUE_MANAGEMENT_STRUCTURE.md)
