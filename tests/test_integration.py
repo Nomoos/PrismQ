@@ -497,8 +497,9 @@ class TestManualCreationPipeline:
         helper = IntegrationTestHelper()
         
         # Stage 1: Idea.Creation (manual entry point)
-        assert helper.stage_validator.transition_to('idea_creation'), \
+        assert helper.stage_validator.transition_to('idea_creation'), (
             "Failed to start with manual Idea.Creation"
+        )
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1, {
             "stage": "creation",
@@ -507,8 +508,9 @@ class TestManualCreationPipeline:
         })
         
         # Stage 2: Title.From.Idea (v1)
-        assert helper.stage_validator.transition_to('title_v1'), \
+        assert helper.stage_validator.transition_to('title_v1'), (
             "Failed to transition from Idea.Creation to Title.From.Idea"
+        )
         title_tracker = helper.start_workflow("Title")
         title_tracker.add_version(1, {
             "stage": "from_idea",
@@ -517,8 +519,9 @@ class TestManualCreationPipeline:
         })
         
         # Stage 3: Script.From.Title.Idea (v1)
-        assert helper.stage_validator.transition_to('script_v1'), \
+        assert helper.stage_validator.transition_to('script_v1'), (
             "Failed to transition to Script.From.Title.Idea"
+        )
         script_tracker = helper.start_workflow("Script")
         script_tracker.add_version(1, {
             "stage": "from_title_and_idea",
