@@ -131,10 +131,10 @@ class WorkflowStageValidator:
         'title_review': ['title_v2', 'title_v3'],
         'script_review': ['script_v2', 'script_v3'],
         'title_v2': ['script_v2', 'script_review', 'title_v3'],
-        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3', 'review_script_grammar'],
+        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3'],
         'title_v3': ['script_v3', 'script_review', 'refinement', 'review_script_grammar'],
         'script_v3': ['title_v3', 'title_review', 'refinement', 'review_script_grammar'],
-        # Quality review stages
+        # Quality review stages (after v3)
         'review_script_grammar': ['review_script_tone'],
         'review_script_tone': ['review_script_content'],
         'review_script_content': ['review_script_consistency'],
