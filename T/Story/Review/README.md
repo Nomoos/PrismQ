@@ -1,6 +1,9 @@
 # T/Story/Review - GPT-Based Expert Story Review
 
 **Namespace**: `PrismQ.T.Story.Review`
+# T/Story/ExpertReview - GPT-Based Expert Story Review
+
+**Namespace**: `PrismQ.T.Story.ExpertReview`
 
 Final expert-level review of the complete story using GPT (GPT-4/GPT-5).
 
@@ -18,6 +21,9 @@ Stage 20: Script Readability (Local AI) ✓ PASSES
 Stage 21: Story.Review (GPT-based) ← THIS STAGE
     ↓
     ├─ If improvements needed → Stage 22: Story.Polish
+Stage 21: Story.ExpertReview (GPT-based) ← THIS STAGE
+    ↓
+    ├─ If improvements needed → Stage 22: Story.ExpertPolish
     ↓ If ready for publishing
 Stage 23: Publishing.Finalization
 ```
@@ -138,6 +144,7 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 4. **Make Decision**:
    - **If ready_for_publishing = true**: Proceed to Publishing
    - **If ready_for_publishing = false**: Send to Polish with suggestions
+   - **If ready_for_publishing = false**: Send to ExpertPolish with suggestions
 
 ## Output
 
@@ -206,6 +213,13 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 **[→ View Review/_meta/docs/](./_meta/docs/)**
 **[→ View Review/_meta/examples/](./_meta/examples/)**
 **[→ View Review/_meta/tests/](./_meta/tests/)**
+**Decision**: Send to ExpertPolish for small improvements (92% → 95%+ target)
+
+## Module Metadata
+
+**[→ View ExpertReview/_meta/docs/](./_meta/docs/)**
+**[→ View ExpertReview/_meta/examples/](./_meta/examples/)**
+**[→ View ExpertReview/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 
