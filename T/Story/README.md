@@ -17,7 +17,7 @@ Stage 20: Script Readability (Local AI) ✓ PASSES
     ↓
 Stage 21: Story.Review (GPT-based) ← Expert review
     ↓
-    ├─ Improvements needed → Stage 22: Story.ExpertPolish
+    ├─ Improvements needed → Stage 22: Story.Polish
     │                             ↓
     │                        Return to Stage 21
     ↓ Ready for publishing
@@ -49,13 +49,13 @@ Final expert-level review of the complete story package (title, script, audience
 **[→ View Review Documentation](./Review/README.md)**
 **[→ View Review Metadata](./Review/_meta/)**
 
-### [ExpertPolish](./ExpertPolish/)
+### [Polish](./Polish/)
 **Stage 22: GPT-based expert polishing**
 
 Apply expert-level improvements to title and script based on GPT review feedback.
 
-**[→ View ExpertPolish Documentation](./ExpertPolish/README.md)**
-**[→ View ExpertPolish Metadata](./ExpertPolish/_meta/)**
+**[→ View Polish Documentation](./Polish/README.md)**
+**[→ View Polish Metadata](./Polish/_meta/)**
 
 ## Module Metadata
 

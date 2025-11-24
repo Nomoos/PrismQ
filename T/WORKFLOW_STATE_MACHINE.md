@@ -124,8 +124,8 @@ stateDiagram-v2
 
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
-| StoryReview | PrismQ.T.Story.Review | 17 | T/Story/ExpertReview/ |
-| StoryPolish | PrismQ.T.Story.Polish | 18 | T/Story/Polish/ or T/Story/ExpertPolish/ |
+| StoryReview | PrismQ.T.Story.Review | 17 | T/Story/Review/ |
+| StoryPolish | PrismQ.T.Story.Polish | 18 | T/Story/Polish/ |
 
 ### Terminal State
 

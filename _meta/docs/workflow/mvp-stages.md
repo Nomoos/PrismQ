@@ -346,7 +346,7 @@ result = expert_review(
 )
 ```
 
-**Stage 22: PrismQ.T.Story.ExpertPolish**
+**Stage 22: PrismQ.T.Story.Polish**
 
 **Purpose**: Apply GPT-based expert improvements
 
@@ -357,9 +357,9 @@ result = expert_review(
 
 **API**:
 ```python
-from PrismQ.T.Story.ExpertPolish import expert_polish
+from PrismQ.T.Story.Polish import polish_story_with_gpt
 
-polished = expert_polish(title, script, expert_review_result)
+polished = polish_story_with_gpt(story_id, title, script, expert_review_result)
 ```
 
 **Stage 23: PrismQ.T.Publishing.Finalization**
