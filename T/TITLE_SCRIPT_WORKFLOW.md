@@ -6,6 +6,8 @@
 
 This document provides a clear, step-by-step workflow for creating titles and script text in the PrismQ Text Generation Pipeline (T module). The workflow starts with **Idea.Creation** (initial idea formation) and ends with **Publishing** (text publication).
 
+> 💡 **Quick Reference**: For a simplified view of the core iterative workflow, see the **[Ultra-Clean Pipeline](../_meta/docs/workflow/ultra-clean-pipeline.md)** pattern.
+
 ## Complete Workflow Path
 
 ```

@@ -112,6 +112,7 @@ Základní výzkumné a strategické plánovací dokumenty.
   - Fáze workflow a přechody stavů
   - Model postupného obohacování
   - Kvalitní kontrolní body a osvědčené postupy
+  - **[Ultra-Clean Pipeline](./_meta/docs/workflow/ultra-clean-pipeline_CS.md)** - Zjednodušená reprezentace běhu
 
 ## 🏗️ Struktura projektu
 
