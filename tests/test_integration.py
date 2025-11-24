@@ -528,12 +528,14 @@ class TestManualCreationPipeline:
         })
         
         # Stage 4: Review.Title.By.Script.Idea
-        assert helper.stage_validator.transition_to('title_review'), \
+        assert helper.stage_validator.transition_to('title_review'), (
             "Failed to transition to Review.Title.By.Script.Idea"
+        )
         
         # Stage 5: Title.From.Script.Review.Title (v2 - improved title)
-        assert helper.stage_validator.transition_to('title_v2'), \
+        assert helper.stage_validator.transition_to('title_v2'), (
             "Failed to transition to Title.From.Script.Review.Title"
+        )
         title_tracker.add_version(2, {
             "stage": "from_review",
             "from_script": 1,
@@ -542,12 +544,14 @@ class TestManualCreationPipeline:
         })
         
         # Stage 6: Review.Script.By.Title.Idea
-        assert helper.stage_validator.transition_to('script_review'), \
+        assert helper.stage_validator.transition_to('script_review'), (
             "Failed to transition to Review.Script.By.Title.Idea"
+        )
         
         # Stage 7: Script.From.Title.Review.Script (v2 - improved script)
-        assert helper.stage_validator.transition_to('script_v2'), \
+        assert helper.stage_validator.transition_to('script_v2'), (
             "Failed to transition to Script.From.Title.Review.Script"
+        )
         script_tracker.add_version(2, {
             "stage": "from_review",
             "from_title": 2,
@@ -556,24 +560,31 @@ class TestManualCreationPipeline:
         })
         
         # Verify all version sequences are valid
-        assert_version_sequence(idea_tracker.versions), \
+        assert_version_sequence(idea_tracker.versions), (
             "Idea version sequence is invalid"
-        assert_version_sequence(title_tracker.versions), \
+        )
+        assert_version_sequence(title_tracker.versions), (
             "Title version sequence is invalid"
-        assert_version_sequence(script_tracker.versions), \
+        )
+        assert_version_sequence(script_tracker.versions), (
             "Script version sequence is invalid"
+        )
         
         # Verify current versions after first improvement cycle
-        assert idea_tracker.get_current_version() == 1, \
+        assert idea_tracker.get_current_version() == 1, (
             "Idea should remain at v1"
-        assert title_tracker.get_current_version() == 2, \
+        )
+        assert title_tracker.get_current_version() == 2, (
             "Title should be at v2 after review cycle"
-        assert script_tracker.get_current_version() == 2, \
+        )
+        assert script_tracker.get_current_version() == 2, (
             "Script should be at v2 after review cycle"
+        )
         
         # Verify versions are properly aligned (within 1 version of each other)
-        assert helper.validate_cross_version_alignment(1, 2, 2), \
+        assert helper.validate_cross_version_alignment(1, 2, 2), (
             "Versions are not properly aligned"
+        )
         
         # Verify the complete stage history matches expected sequence
         stage_history = helper.stage_validator.get_stage_history()
@@ -586,12 +597,16 @@ class TestManualCreationPipeline:
             'script_review',         # Review.Script.By.Title.Idea
             'script_v2'              # Script.From.Title.Review.Script
         ]
-        assert stage_history == expected_stages, \
-            f"Stage history doesn't match expected sequence.\nExpected: {expected_stages}\nActual: {stage_history}"
+        assert stage_history == expected_stages, (
+            f"Stage history doesn't match expected sequence.\n"
+            f"Expected: {expected_stages}\n"
+            f"Actual: {stage_history}"
+        )
         
         # Verify the workflow path is valid
-        assert helper.stage_validator.is_valid_path(), \
+        assert helper.stage_validator.is_valid_path(), (
             "Workflow path is not valid according to stage transition rules"
+        )
     
     def test_manual_creation_pipeline_metadata_tracking(self):
         """Test that metadata is properly tracked through manual creation pipeline."""
@@ -675,8 +690,9 @@ class TestManualCreationPipeline:
         script_tracker.add_version(1)
         
         # Verify initial alignment
-        assert helper.validate_cross_version_alignment(1, 1, 1), \
+        assert helper.validate_cross_version_alignment(1, 1, 1), (
             "Initial versions should be aligned"
+        )
         
         # First co-improvement cycle (v1 → v2)
         helper.stage_validator.transition_to('title_review')
@@ -685,20 +701,23 @@ class TestManualCreationPipeline:
         
         # After title improvement, alignment should still be valid
         # (title is one ahead, which is acceptable during co-improvement)
-        assert helper.validate_cross_version_alignment(1, 2, 1), \
+        assert helper.validate_cross_version_alignment(1, 2, 1), (
             "Alignment should be valid with title at v2, script at v1"
+        )
         
         helper.stage_validator.transition_to('script_review')
         helper.stage_validator.transition_to('script_v2')
         script_tracker.add_version(2)
         
         # After both improvements, versions should be aligned again
-        assert helper.validate_cross_version_alignment(1, 2, 2), \
+        assert helper.validate_cross_version_alignment(1, 2, 2), (
             "Versions should be aligned after co-improvement cycle"
+        )
         
         # Verify idea remains at v1 throughout
-        assert idea_tracker.get_current_version() == 1, \
+        assert idea_tracker.get_current_version() == 1, (
             "Idea should never iterate beyond v1"
+        )
         
         # Verify title and script progressed together
         assert title_tracker.get_current_version() == 2
