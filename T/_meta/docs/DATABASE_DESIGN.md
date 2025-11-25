@@ -257,6 +257,9 @@ Story (
 )
 
 -- Future: Idea model structure
+-- Note: creation_method is inferred from idea_inspirations relation:
+--   - No entries = created via Idea.Creation (from scratch)
+--   - One or more entries = created via Idea.Fusion (from inspirations)
 Idea (
     id UUID PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -271,7 +274,6 @@ Idea (
     genre ENUM(...) NOT NULL,
     target_audience TEXT,
     status ENUM('draft', 'developed', 'approved') NOT NULL,
-    creation_method ENUM('creation', 'fusion') NOT NULL,  -- How idea was created
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_by VARCHAR(255)
 )
@@ -289,22 +291,48 @@ IdeaInspiration (
 )
 
 -- Junction table: Many-to-many relationship between Idea and IdeaInspiration
--- NULL/empty when Idea created via Idea.Creation
+-- Following naming convention: <Parent>_<Related> or <Subject>_<Object>
+-- Empty when Idea created via Idea.Creation
 -- One or more entries when Idea created via Idea.Fusion
-IdeaInspirationLink (
+idea_inspirations (
     id UUID PRIMARY KEY,
-    idea_id UUID FK NOT NULL REFERENCES Idea(id),
-    inspiration_id UUID FK NOT NULL REFERENCES IdeaInspiration(id),
+    idea_id UUID FK NOT NULL REFERENCES Idea(id) ON DELETE CASCADE,
+    inspiration_id UUID FK NOT NULL REFERENCES IdeaInspiration(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(idea_id, inspiration_id)
 )
 ```
 
-#### Idea Creation Methods
-| Method | IdeaInspirationLink Entries | Description |
-|--------|----------------------------|-------------|
-| `Idea.Creation` | None (empty) | Idea created from scratch, no inspirations |
-| `Idea.Fusion` | One or more | Idea fused from one or multiple IdeaInspirations |
+#### Idea Creation Methods (Inferred from Relation)
+| Method | idea_inspirations Entries | How to Detect |
+|--------|---------------------------|---------------|
+| `Idea.Creation` | None (empty) | `COUNT(idea_inspirations WHERE idea_id = ?) = 0` |
+| `Idea.Fusion` | One or more | `COUNT(idea_inspirations WHERE idea_id = ?) > 0` |
+
+### Relationship Naming Best Practices
+
+Following established conventions for database relation naming:
+
+#### Junction/Join Table Naming
+| Convention | Example | When to Use |
+|------------|---------|-------------|
+| `<parent>_<child>` | `idea_inspirations` | Standard many-to-many |
+| `<subject>_<verb>_<object>` | `user_follows_user` | Self-referential or action-based |
+| `<singular>_<singular>` | `story_tag` | Simple associations |
+
+#### Foreign Key Naming
+| Convention | Example | Description |
+|------------|---------|-------------|
+| `<table>_id` | `story_id`, `idea_id` | Standard FK reference |
+| `<role>_<table>_id` | `reviewed_title_version_id` | Role-specific reference |
+| `current_<table>_id` | `current_title_version_id` | Current/active reference |
+
+#### Relationship Field Naming (ORM)
+| Convention | Example | Description |
+|------------|---------|-------------|
+| Singular for belongs-to | `idea.story` | One-to-one or many-to-one |
+| Plural for has-many | `idea.inspirations` | One-to-many or many-to-many |
+| Past participle for reverse | `inspiration.ideas_inspired` | Reverse relation |
 
 ### Content Type Extensibility
 
@@ -356,31 +384,63 @@ StoryMetrics (
 
 ## Issues to Create
 
+### Planning Issue (Worker01)
+
+**📋 Create GitHub Issues for Database Models**
+- Priority: High
+- Description: Create individual GitHub issues for each model based on this design document
+- Acceptance Criteria:
+  - [ ] Issue created for Story model
+  - [ ] Issue created for TitleVersion model
+  - [ ] Issue created for ScriptVersion model
+  - [ ] Issue created for Review model
+  - [ ] Issue created for Idea model
+  - [ ] Issue created for IdeaInspiration model
+  - [ ] Issue created for idea_inspirations junction table
+  - [ ] All issues linked to this design document
+  - [ ] Issues include approach, pros/cons from this doc
+
 ### Model Implementation Issues
 
 1. **Create Story Model**
    - Implement base Story model with state machine
    - Add status transitions and validation
    - Include timestamps and audit fields
+   - Add `idea_id` FK reference (nullable)
 
 2. **Create TitleVersion Model**
    - Version tracking for titles
-   - Link to Story via foreign key
+   - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)
 
 3. **Create ScriptVersion Model**
    - Version tracking for scripts
-   - Link to Story via foreign key
+   - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)
 
 4. **Create Review Model**
    - Discriminator pattern for review types
+   - `reviewed_title_version_id` FK (nullable)
+   - `reviewed_script_version_id` FK (nullable)
    - CHECK constraints for version ID validation
    - Score range validation
 
-5. **Create Idea Model (Future)**
+5. **Create Idea Model**
    - Core idea fields from current text client
    - Link to Story for idea-to-story workflow
+   - Status tracking for idea lifecycle
+
+6. **Create IdeaInspiration Model**
+   - Source material storage
+   - title, source, content, notes fields
+   - Timestamps and audit fields
+
+7. **Create idea_inspirations Junction Table**
+   - Many-to-many between Idea and IdeaInspiration
+   - `idea_id` FK with CASCADE delete
+   - `inspiration_id` FK with CASCADE delete
+   - Unique constraint on (idea_id, inspiration_id)
+   - Note: Empty = Idea.Creation, populated = Idea.Fusion
 
 ---
 
