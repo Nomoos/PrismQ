@@ -222,8 +222,28 @@ Idea Creation → Title Generation → Script Draft → Review & Iterate (unlimi
 Each stage builds on the previous, maintaining version tracking. The next item for
 processing is picked by lowest version count, ensuring balanced workflow progression.
 
+## Database Design (Future)
+
+The system will use a **Hybrid Database Model** with the following core tables:
+
+```
+Story (id, status, current_title_version_id FK, current_script_version_id FK, idea_id FK)
+TitleVersion (id, story_id FK, version, text, created_at)
+ScriptVersion (id, story_id FK, version, text, created_at)
+Review (id, story_id FK, review_type ENUM, reviewed_title_version_id FK NULL, 
+        reviewed_script_version_id FK NULL, feedback, score)
+```
+
+### Review Types
+- **TitleReview**: `review_type='title'`, only `reviewed_title_version_id` set
+- **ScriptReview**: `review_type='script'`, only `reviewed_script_version_id` set  
+- **StoryReview**: `review_type='story'`, both version IDs set
+
+See [Database Design Document](../docs/DATABASE_DESIGN.md) for full schema and implementation details.
+
 ## Related Documentation
 
+- [Database Design](../docs/DATABASE_DESIGN.md) - Full database schema and design decisions
 - [T Module README](../../README.md) - Text Generation Pipeline overview
 - [Title & Script Workflow](../../TITLE_SCRIPT_WORKFLOW.md) - Complete workflow guide
 - [Workflow State Machine](../../WORKFLOW_STATE_MACHINE.md) - Visual state diagram
