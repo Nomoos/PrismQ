@@ -6,10 +6,96 @@
 > **Post-MVP Issues**: See `T/_meta/issues/new/POST-MVP-Enhancements/` for detailed Text Pipeline issue specifications  
 > **Story Generation**: See `_meta/issues/new/STORY_GENERATION_PLAN.md` for Story workflow implementation (STORY-001 to STORY-020)
 
-**Date**: 2025-11-24 (Updated)  
+**Date**: 2025-11-25 (Updated)  
 **Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1 + Story Generation Planning  
 **Status**: 🎯 READY FOR EXECUTION  
 **Timeline**: Weeks 9-10 (2 weeks)
+
+---
+
+## 🆕 Interactive Text Client with Independent State Processing
+
+**Status**: ✅ IMPLEMENTED  
+**Location**: `T/_meta/scripts/`
+
+### Independent State Processing Architecture
+
+Each workflow step runs as an **independent process** with state persisted between executions. This enables:
+- Parallel execution of different workflows
+- Fault tolerance (crashed steps can be rerun)
+- Distributed processing across workers
+
+### State Transformation Batch Scripts
+
+| Batch Script | State Transformation | Description |
+|--------------|---------------------|-------------|
+| `step1_create_idea.bat` | `∅ → idea_created` | Create new idea from scratch |
+| `step2_generate_title.bat` | `idea_created → title_generated` | Generate title variants from idea |
+| `step3_generate_script.bat` | `title_generated → script_generated` | Generate script draft from title + idea |
+| `step4_iterate_script.bat` | `script_generated → script_iterated` | Apply feedback loop (unlimited iterations) |
+| `step5_export.bat` | `* → exported` | Export content to file |
+| `load_demo.bat` | `∅ → idea_created` | Load demo idea for testing |
+| `show_status.bat` | N/A (read-only) | Display current workflow state |
+| `run_all_steps.bat` | `∅ → exported` | Run complete workflow sequentially |
+
+### State Persistence
+
+**State File**: `T/_meta/scripts/text_client_state.json`
+
+State is persisted after each step, enabling:
+```bash
+# Run steps independently as separate processes
+step1_create_idea.bat    # Process 1: Creates idea, saves state
+# ... time passes ...
+step2_generate_title.bat # Process 2: Loads state, generates title, saves state
+# ... time passes ...
+step3_generate_script.bat # Process 3: Loads state, generates script, saves state
+```
+
+### Version Tracking & Next-to-Process Selection
+
+The system tracks version counts for each content type:
+- **Idea Version**: Incremented on create/modify
+- **Title Version**: Incremented on generation/selection
+- **Script Version**: Incremented on generation/iteration
+
+**Next-to-Process Algorithm**: Selects item with lowest version count
+- Tie-breaking follows natural workflow order: Idea → Title → Script
+- Ensures balanced progression through the workflow
+
+### Database Integration (Future)
+
+When database models are implemented, state will be stored in the `Story` table:
+
+```sql
+Story (
+    id UUID PRIMARY KEY,
+    status ENUM('draft', 'in_progress', 'review', 'approved', 'published'),
+    -- State persisted for independent process execution
+    idea_version INTEGER DEFAULT 0,
+    title_version INTEGER DEFAULT 0,
+    script_version INTEGER DEFAULT 0,
+    current_title_version_id UUID FK NULL,
+    current_script_version_id UUID FK NULL,
+    ...
+)
+```
+
+See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) for full schema.
+
+### Command Line Actions
+
+Python script supports direct action invocation:
+```bash
+python run_text_client.py --action create_idea
+python run_text_client.py --action generate_title
+python run_text_client.py --action generate_script
+python run_text_client.py --action iterate_script
+python run_text_client.py --action export
+python run_text_client.py --action status
+python run_text_client.py --action load_demo
+python run_text_client.py --action reset
+```
 
 ---
 
