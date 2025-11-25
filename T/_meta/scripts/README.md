@@ -29,6 +29,57 @@ python run_text_client.py
 ./run_text_client.sh --check
 ```
 
+## Batch Scripts (Windows .bat)
+
+Each workflow step can be run as a separate process using batch scripts. State is persisted between steps.
+
+### Individual Step Scripts
+
+| Script | Description |
+|--------|-------------|
+| `step1_create_idea.bat` | Create a new idea interactively |
+| `step2_generate_title.bat` | Generate title from current idea |
+| `step3_generate_script.bat` | Generate script draft |
+| `step4_iterate_script.bat` | Iterate on script (run multiple times) |
+| `step5_export.bat` | Export all content to file |
+| `load_demo.bat` | Load demo idea for testing |
+| `show_status.bat` | Show workflow status and versions |
+| `run_all_steps.bat` | Run all steps sequentially |
+
+### Usage
+
+```batch
+REM Run each step as separate process
+step1_create_idea.bat
+step2_generate_title.bat
+step3_generate_script.bat
+step4_iterate_script.bat   REM Can run multiple times
+step5_export.bat
+
+REM Or run all steps at once
+run_all_steps.bat
+
+REM Quick start with demo
+load_demo.bat
+step2_generate_title.bat
+step3_generate_script.bat
+```
+
+### Command Line Actions
+
+You can also run individual actions directly with Python:
+
+```bash
+python run_text_client.py --action create_idea
+python run_text_client.py --action generate_title
+python run_text_client.py --action generate_script
+python run_text_client.py --action iterate_script
+python run_text_client.py --action export
+python run_text_client.py --action status
+python run_text_client.py --action load_demo
+python run_text_client.py --action reset
+```
+
 ## Features
 
 The Interactive Text Client allows you to:
@@ -59,6 +110,12 @@ The client tracks versions for each content type (Idea, Title, Script). The work
 - **Next to process** recommendation based on lowest version count
 
 This ensures balanced progression through the workflow by always suggesting work on the item with the least iterations.
+
+### State Persistence
+When using batch scripts or `--action` mode, state is automatically saved to `text_client_state.json`. This allows:
+- Running each step as a separate process
+- Resuming work after closing the terminal
+- Sharing state between interactive and batch modes
 
 ## Menu Commands
 
@@ -139,6 +196,14 @@ Content Status & Version Counts:
 | `run_text_client.py` | Main interactive Python client |
 | `run_text_client.sh` | Bash launcher script |
 | `run_text_client.ps1` | PowerShell launcher script |
+| `step1_create_idea.bat` | Batch: Create idea |
+| `step2_generate_title.bat` | Batch: Generate title |
+| `step3_generate_script.bat` | Batch: Generate script |
+| `step4_iterate_script.bat` | Batch: Iterate script |
+| `step5_export.bat` | Batch: Export content |
+| `load_demo.bat` | Batch: Load demo idea |
+| `show_status.bat` | Batch: Show status |
+| `run_all_steps.bat` | Batch: Run all steps |
 | `README.md` | This documentation |
 
 ## Requirements

@@ -1,0 +1,10 @@
+# PrismQ Text Client state file (generated at runtime)
+text_client_state.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Export files (user-generated content)
+prismq_export*.txt

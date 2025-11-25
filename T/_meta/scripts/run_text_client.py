@@ -20,6 +20,7 @@ the text generation workflow step by step.
 
 import sys
 import os
+import json
 from pathlib import Path
 from typing import Optional, Dict, Any
 from datetime import datetime
@@ -105,10 +106,19 @@ class TextClient:
     
     Version tracking is used to determine which item to process next,
     with the lowest version count being selected for processing.
+    
+    State can be persisted to a JSON file to allow running each step
+    as a separate process (for batch script workflows).
     """
     
-    def __init__(self):
-        """Initialize the text client."""
+    STATE_FILE = "text_client_state.json"
+    
+    def __init__(self, load_state: bool = False):
+        """Initialize the text client.
+        
+        Args:
+            load_state: If True, load state from file if it exists.
+        """
         self.current_idea: Optional[Any] = None
         self.current_title: Optional[str] = None
         self.current_script: Optional[str] = None
@@ -120,6 +130,113 @@ class TextClient:
         self.idea_version: int = 0
         self.title_version: int = 0
         self.script_version: int = 0
+        
+        # Idea data for persistence (since Idea objects may not serialize directly)
+        self._idea_data: Optional[Dict[str, Any]] = None
+        
+        if load_state:
+            self._load_state()
+    
+    def _get_state_file_path(self) -> Path:
+        """Get the path to the state file."""
+        return SCRIPT_DIR / self.STATE_FILE
+    
+    def _save_state(self) -> None:
+        """Save current state to file for persistence between processes."""
+        state = {
+            "idea_version": self.idea_version,
+            "title_version": self.title_version,
+            "script_version": self.script_version,
+            "current_title": self.current_title,
+            "current_script": self.current_script,
+            "history": self.history,
+            "session_start": self.session_start.isoformat(),
+        }
+        
+        # Save idea data if available
+        if self.current_idea is not None:
+            try:
+                state["idea_data"] = self.current_idea.to_dict()
+            except AttributeError:
+                # If to_dict() not available, save basic fields
+                genre_value = "other"
+                if IDEA_AVAILABLE:
+                    genre = getattr(self.current_idea, "genre", None)
+                    if genre is not None:
+                        genre_value = genre.value if hasattr(genre, 'value') else str(genre)
+                
+                state["idea_data"] = {
+                    "title": getattr(self.current_idea, "title", ""),
+                    "concept": getattr(self.current_idea, "concept", ""),
+                    "premise": getattr(self.current_idea, "premise", ""),
+                    "logline": getattr(self.current_idea, "logline", ""),
+                    "hook": getattr(self.current_idea, "hook", ""),
+                    "skeleton": getattr(self.current_idea, "skeleton", ""),
+                    "emotional_arc": getattr(self.current_idea, "emotional_arc", ""),
+                    "twist": getattr(self.current_idea, "twist", ""),
+                    "climax": getattr(self.current_idea, "climax", ""),
+                    "tone_guidance": getattr(self.current_idea, "tone_guidance", ""),
+                    "target_audience": getattr(self.current_idea, "target_audience", ""),
+                    "genre": genre_value,
+                }
+        
+        state_path = self._get_state_file_path()
+        with open(state_path, 'w', encoding='utf-8') as f:
+            json.dump(state, f, indent=2, default=str)
+        
+        print_info(f"State saved to {state_path.name}")
+    
+    def _load_state(self) -> bool:
+        """Load state from file if it exists.
+        
+        Returns:
+            True if state was loaded, False otherwise.
+        """
+        state_path = self._get_state_file_path()
+        if not state_path.exists():
+            return False
+        
+        try:
+            with open(state_path, 'r', encoding='utf-8') as f:
+                state = json.load(f)
+            
+            self.idea_version = state.get("idea_version", 0)
+            self.title_version = state.get("title_version", 0)
+            self.script_version = state.get("script_version", 0)
+            self.current_title = state.get("current_title")
+            self.current_script = state.get("current_script")
+            self.history = state.get("history", [])
+            
+            session_start_str = state.get("session_start")
+            if session_start_str:
+                self.session_start = datetime.fromisoformat(session_start_str)
+            
+            # Restore idea if data is available and Idea model is loaded
+            idea_data = state.get("idea_data")
+            if idea_data and IDEA_AVAILABLE:
+                try:
+                    self.current_idea = Idea.from_dict(idea_data)
+                    self._idea_data = idea_data
+                except (AttributeError, TypeError, KeyError, ValueError):
+                    # If from_dict fails, create a basic Idea
+                    self.current_idea = Idea(
+                        title=idea_data.get("title", ""),
+                        concept=idea_data.get("concept", ""),
+                    )
+                    self._idea_data = idea_data
+            
+            print_info(f"State loaded from {state_path.name}")
+            return True
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+            print_warning(f"Failed to load state: {e}")
+            return False
+    
+    def clear_state(self) -> None:
+        """Clear the saved state file."""
+        state_path = self._get_state_file_path()
+        if state_path.exists():
+            state_path.unlink()
+            print_info("State file cleared")
     
     def show_welcome(self) -> None:
         """Display welcome message and available modules."""
@@ -241,6 +358,7 @@ class TextClient:
         
         print_success(f"Idea created: '{title}' (version {self.idea_version})")
         self.show_idea()
+        self._save_state()
     
     def load_demo_idea(self) -> None:
         """Load a demo Idea for testing."""
@@ -286,6 +404,7 @@ class TextClient:
         
         print_success(f"Demo Idea loaded: 'The Echo' (version {self.idea_version})")
         self.show_idea()
+        self._save_state()
     
     def show_idea(self) -> None:
         """Display the current Idea."""
@@ -386,6 +505,7 @@ class TextClient:
         })
         
         print_success(f"Title selected: '{self.current_title}' (version {self.title_version})")
+        self._save_state()
     
     def show_title(self) -> None:
         """Display the current Title."""
@@ -466,6 +586,7 @@ class TextClient:
         
         print_success(f"Script draft generated! (version {self.script_version})")
         self.show_script()
+        self._save_state()
     
     def show_script(self) -> None:
         """Display the current Script."""
@@ -518,6 +639,7 @@ class TextClient:
         
         print_success(f"Script iteration {self.script_writer.current_iteration} recorded (version {self.script_version})")
         print_info("Unlimited iterations available - continue as needed")
+        self._save_state()
     
     def get_next_to_process(self) -> str:
         """Get the item type with lowest version count for next processing.
@@ -614,6 +736,8 @@ class TextClient:
             self.idea_version = 0
             self.title_version = 0
             self.script_version = 0
+            # Clear state file
+            self.clear_state()
             print_success("Session reset! (all versions reset to 0)")
         else:
             print_info("Reset cancelled.")
@@ -700,9 +824,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python run_text_client.py           # Start interactive client
-  python run_text_client.py --demo    # Start with demo data loaded
-  python run_text_client.py --check   # Check module availability
+  python run_text_client.py                    # Start interactive client
+  python run_text_client.py --demo             # Start with demo data loaded
+  python run_text_client.py --check            # Check module availability
+  python run_text_client.py --action create_idea    # Run create idea step
+  python run_text_client.py --action generate_title # Run generate title step
+  python run_text_client.py --action generate_script # Run generate script step
+  python run_text_client.py --action iterate_script  # Run iterate script step
+  python run_text_client.py --action export          # Export content
+  python run_text_client.py --action status          # Show workflow status
+  python run_text_client.py --action load_demo       # Load demo idea
+  python run_text_client.py --action reset           # Reset session and clear state
         """
     )
     
@@ -716,6 +848,13 @@ Examples:
         action='store_true', 
         help='Check module availability and exit'
     )
+    parser.add_argument(
+        '--action',
+        type=str,
+        choices=['create_idea', 'generate_title', 'generate_script', 
+                 'iterate_script', 'export', 'status', 'load_demo', 'reset'],
+        help='Run a specific action (for batch script workflows)'
+    )
     
     args = parser.parse_args()
     
@@ -726,6 +865,31 @@ Examples:
         print(f"ScriptWriter:  {'✓ Available' if SCRIPT_WRITER_AVAILABLE else '✗ Not available'}")
         print(f"\nRepository Root: {REPO_ROOT}")
         print(f"T Module Root:   {T_ROOT}")
+        return
+    
+    # Handle --action mode for batch scripts (each step as separate process)
+    if args.action:
+        # Load state from previous steps
+        client = TextClient(load_state=True)
+        
+        action_map = {
+            'create_idea': client.create_idea,
+            'generate_title': client.generate_title,
+            'generate_script': client.generate_script,
+            'iterate_script': client.iterate_script,
+            'export': client.export_content,
+            'status': client.show_workflow_status,
+            'load_demo': client.load_demo_idea,
+            'reset': lambda: (client.reset_session(), client.clear_state()),
+        }
+        
+        action_func = action_map.get(args.action)
+        if action_func:
+            print_header(f"PrismQ.T - {args.action.replace('_', ' ').title()}")
+            action_func()
+        else:
+            print_error(f"Unknown action: {args.action}")
+            sys.exit(1)
         return
     
     client = TextClient()
