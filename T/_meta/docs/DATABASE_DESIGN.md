@@ -271,10 +271,40 @@ Idea (
     genre ENUM(...) NOT NULL,
     target_audience TEXT,
     status ENUM('draft', 'developed', 'approved') NOT NULL,
+    creation_method ENUM('creation', 'fusion') NOT NULL,  -- How idea was created
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_by VARCHAR(255)
 )
+
+-- IdeaInspiration: Source materials that inspired an Idea
+-- Used when Idea is created via Idea.Fusion (combining multiple inspirations)
+IdeaInspiration (
+    id UUID PRIMARY KEY,
+    title VARCHAR(255),
+    source TEXT,                    -- URL, book reference, etc.
+    content TEXT,                   -- The inspiring content/snippet
+    notes TEXT,                     -- User notes about the inspiration
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255)
+)
+
+-- Junction table: Many-to-many relationship between Idea and IdeaInspiration
+-- NULL/empty when Idea created via Idea.Creation
+-- One or more entries when Idea created via Idea.Fusion
+IdeaInspirationLink (
+    id UUID PRIMARY KEY,
+    idea_id UUID FK NOT NULL REFERENCES Idea(id),
+    inspiration_id UUID FK NOT NULL REFERENCES IdeaInspiration(id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(idea_id, inspiration_id)
+)
 ```
+
+#### Idea Creation Methods
+| Method | IdeaInspirationLink Entries | Description |
+|--------|----------------------------|-------------|
+| `Idea.Creation` | None (empty) | Idea created from scratch, no inspirations |
+| `Idea.Fusion` | One or more | Idea fused from one or multiple IdeaInspirations |
 
 ### Content Type Extensibility
 
