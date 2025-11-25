@@ -46,12 +46,19 @@ The Interactive Text Client allows you to:
 ### Script Development
 - **Generate Script draft** - Create initial script structure
 - **View current Script** - Display script content with formatting
-- **Iterate on Script** - Feedback loop for script improvement (up to 3 iterations)
+- **Iterate on Script** - Unlimited feedback loop for script improvement
 
 ### Workflow Tools
-- **Show workflow status** - See progress through Idea → Title → Script stages
+- **Show workflow status** - See version counts and next item to process (lowest version)
 - **Export content** - Save your work to a file
-- **Reset session** - Start fresh
+- **Reset session** - Start fresh (resets all versions to 0)
+
+### Version Tracking & Processing Order
+The client tracks versions for each content type (Idea, Title, Script). The workflow status shows:
+- Current version count for each item
+- **Next to process** recommendation based on lowest version count
+
+This ensures balanced progression through the workflow by always suggesting work on the item with the least iterations.
 
 ## Menu Commands
 
@@ -65,8 +72,8 @@ The Interactive Text Client allows you to:
 | `6` | View current Title |
 | `7` | Generate Script draft |
 | `8` | View current Script |
-| `9` | Iterate on Script (feedback loop) |
-| `10` | Show workflow status |
+| `9` | Iterate on Script (unlimited feedback loop) |
+| `10` | Show workflow status (next to process by lowest version) |
 | `11` | Export current content |
 | `12` | Reset session |
 | `h` | Show menu |
@@ -103,13 +110,26 @@ Module Availability
 ──────────────────────────────────────────────────
 Loading Demo Idea
 ──────────────────────────────────────────────────
-✓ Demo Idea loaded: 'The Echo'
+✓ Demo Idea loaded: 'The Echo' (version 1)
 
-> 5    # Generate title
+> 10   # Show workflow status
+
+──────────────────────────────────────────────────
+Workflow Status
+──────────────────────────────────────────────────
+
+Content Status & Version Counts:
+  ✓ Idea: version 1
+  ○ Title: version 0
+  ○ Script: version 0
+
+➤ Next to process (lowest version): Title
+
+> 5    # Generate title (follows recommendation)
 
 > 7    # Generate script
 
-> 11   # Export content
+> 9    # Iterate on script (unlimited)
 ```
 
 ## Files
@@ -131,11 +151,11 @@ Loading Demo Idea
 The text client follows the PrismQ workflow:
 
 ```
-Idea Creation → Title Generation → Script Draft → Review & Iterate → Export
+Idea Creation → Title Generation → Script Draft → Review & Iterate (unlimited) → Export
 ```
 
-Each stage builds on the previous, maintaining version tracking and supporting
-the iterative co-improvement process that is central to PrismQ.
+Each stage builds on the previous, maintaining version tracking. The next item for
+processing is picked by lowest version count, ensuring balanced workflow progression.
 
 ## Related Documentation
 

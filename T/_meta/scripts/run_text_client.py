@@ -102,6 +102,9 @@ class TextClient:
     This client provides an interactive REPL interface for working with
     the text generation workflow, including Idea creation, Title generation,
     and Script development.
+    
+    Version tracking is used to determine which item to process next,
+    with the lowest version count being selected for processing.
     """
     
     def __init__(self):
@@ -112,6 +115,11 @@ class TextClient:
         self.script_writer: Optional[Any] = None
         self.history: list = []
         self.session_start = datetime.now()
+        
+        # Version tracking for each content type
+        self.idea_version: int = 0
+        self.title_version: int = 0
+        self.script_version: int = 0
     
     def show_welcome(self) -> None:
         """Display welcome message and available modules."""
@@ -153,10 +161,10 @@ class TextClient:
 {Colors.BOLD}Script Development:{Colors.END}
   7. Generate Script draft
   8. View current Script
-  9. Iterate on Script (feedback loop)
+  9. Iterate on Script (unlimited feedback loop)
 
 {Colors.BOLD}Workflow:{Colors.END}
-  10. Show workflow status
+  10. Show workflow status (next to process by lowest version)
   11. Export current content
   12. Reset session
 
@@ -221,13 +229,17 @@ class TextClient:
             created_by="text_client",
         )
         
+        # Increment idea version
+        self.idea_version += 1
+        
         self.history.append({
             "action": "create_idea",
             "timestamp": datetime.now().isoformat(),
             "title": title,
+            "version": self.idea_version,
         })
         
-        print_success(f"Idea created: '{title}'")
+        print_success(f"Idea created: '{title}' (version {self.idea_version})")
         self.show_idea()
     
     def load_demo_idea(self) -> None:
@@ -262,13 +274,17 @@ class TextClient:
             created_by="demo_loader",
         )
         
+        # Increment idea version
+        self.idea_version += 1
+        
         self.history.append({
             "action": "load_demo",
             "timestamp": datetime.now().isoformat(),
             "title": "The Echo",
+            "version": self.idea_version,
         })
         
-        print_success("Demo Idea loaded: 'The Echo'")
+        print_success(f"Demo Idea loaded: 'The Echo' (version {self.idea_version})")
         self.show_idea()
     
     def show_idea(self) -> None:
@@ -359,13 +375,17 @@ class TextClient:
         except ValueError:
             self.current_title = choice if choice else variants[0]
         
+        # Increment title version
+        self.title_version += 1
+        
         self.history.append({
             "action": "generate_title",
             "timestamp": datetime.now().isoformat(),
             "title": self.current_title,
+            "version": self.title_version,
         })
         
-        print_success(f"Title selected: '{self.current_title}'")
+        print_success(f"Title selected: '{self.current_title}' (version {self.title_version})")
     
     def show_title(self) -> None:
         """Display the current Title."""
@@ -424,21 +444,27 @@ class TextClient:
         
         self.current_script = '\n'.join(script_parts)
         
-        # Initialize script writer if available
+        # Increment script version
+        self.script_version += 1
+        
+        # Initialize script writer if available (unlimited iterations)
         if SCRIPT_WRITER_AVAILABLE:
+            # Create ScriptWriter with a very high max_iterations value to effectively allow unlimited iterations
+            # Note: ScriptWriter doesn't have a native "unlimited" mode, so we use a large integer
             self.script_writer = ScriptWriter(
                 writer_id="text_client_writer",
                 target_score_threshold=80,
-                max_iterations=3,
+                max_iterations=999999,  # Effectively unlimited
             )
-            print_info("ScriptWriter initialized for iteration support")
+            print_info("ScriptWriter initialized for unlimited iteration support")
         
         self.history.append({
             "action": "generate_script",
             "timestamp": datetime.now().isoformat(),
+            "version": self.script_version,
         })
         
-        print_success("Script draft generated!")
+        print_success(f"Script draft generated! (version {self.script_version})")
         self.show_script()
     
     def show_script(self) -> None:
@@ -450,13 +476,14 @@ class TextClient:
         print_section("Current Script")
         print(self.current_script)
         
+        print(f"\n{Colors.CYAN}Script Version:{Colors.END} {self.script_version}")
         if self.script_writer:
-            print(f"\n{Colors.CYAN}Writer Status:{Colors.END}")
-            print(f"  Iteration: {self.script_writer.current_iteration}/{self.script_writer.max_iterations}")
+            print(f"{Colors.CYAN}Writer Status:{Colors.END}")
+            print(f"  Iteration: {self.script_writer.current_iteration} (unlimited)")
             print(f"  Target Score: {self.script_writer.target_score_threshold}%")
     
     def iterate_script(self) -> None:
-        """Run feedback loop iteration on the script."""
+        """Run feedback loop iteration on the script (unlimited iterations)."""
         if self.current_script is None:
             print_warning("No Script generated. Generate one first.")
             return
@@ -465,7 +492,7 @@ class TextClient:
             print_warning("ScriptWriter not available. Cannot iterate.")
             return
         
-        print_section("Script Iteration (Feedback Loop)")
+        print_section("Script Iteration (Feedback Loop - Unlimited)")
         
         print("Provide feedback on the current script:")
         print("(Enter areas to improve, or 'skip' for auto-improvement)\n")
@@ -477,36 +504,61 @@ class TextClient:
             self.current_script += f"\n\n[USER FEEDBACK - Iteration {self.script_writer.current_iteration + 1}]\n"
             self.current_script += f"Improvements requested: {feedback}\n"
         
-        # Track iteration
+        # Track iteration and increment script version
         if self.script_writer:
             self.script_writer.current_iteration += 1
+        self.script_version += 1
         
         self.history.append({
             "action": "iterate_script",
             "timestamp": datetime.now().isoformat(),
             "feedback": feedback,
+            "version": self.script_version,
         })
         
-        print_success(f"Script iteration {self.script_writer.current_iteration} recorded")
+        print_success(f"Script iteration {self.script_writer.current_iteration} recorded (version {self.script_version})")
+        print_info("Unlimited iterations available - continue as needed")
+    
+    def get_next_to_process(self) -> str:
+        """Get the item type with lowest version count for next processing.
         
-        if self.script_writer.should_continue_iteration():
-            print_info(f"Can continue iterating ({self.script_writer.max_iterations - self.script_writer.current_iteration} remaining)")
-        else:
-            print_warning("Maximum iterations reached or target achieved")
+        The workflow prioritizes items with the lowest version count to ensure
+        balanced progression. When multiple items have the same version count,
+        the priority order is: Idea > Title > Script (following the natural
+        workflow sequence).
+        
+        Returns:
+            The name of the item type (Idea, Title, or Script) with lowest version.
+            On tie, returns in workflow order: Idea first, then Title, then Script.
+        """
+        # List in workflow priority order - when versions are equal, earlier items win
+        versions = [
+            ("Idea", self.idea_version),
+            ("Title", self.title_version),
+            ("Script", self.script_version),
+        ]
+        # Sort by version count (ascending); stable sort preserves original order on ties
+        versions.sort(key=lambda x: x[1])
+        return versions[0][0]
     
     def show_workflow_status(self) -> None:
-        """Display current workflow status."""
+        """Display current workflow status with version tracking."""
         print_section("Workflow Status")
         
         stages = [
-            ("Idea", self.current_idea is not None),
-            ("Title", self.current_title is not None),
-            ("Script", self.current_script is not None),
+            ("Idea", self.current_idea is not None, self.idea_version),
+            ("Title", self.current_title is not None, self.title_version),
+            ("Script", self.current_script is not None, self.script_version),
         ]
         
-        for stage, completed in stages:
+        print(f"\n{Colors.BOLD}Content Status & Version Counts:{Colors.END}")
+        for stage, completed, version in stages:
             status = f"{Colors.GREEN}✓{Colors.END}" if completed else f"{Colors.YELLOW}○{Colors.END}"
-            print(f"  {status} {stage}")
+            print(f"  {status} {stage}: version {version}")
+        
+        # Show recommendation for next item to process (lowest version)
+        next_item = self.get_next_to_process()
+        print(f"\n{Colors.CYAN}➤ Next to process (lowest version):{Colors.END} {next_item}")
         
         print(f"\n{Colors.BOLD}Session Duration:{Colors.END} {datetime.now() - self.session_start}")
         print(f"{Colors.BOLD}Actions Taken:{Colors.END} {len(self.history)}")
@@ -558,7 +610,11 @@ class TextClient:
             self.script_writer = None
             self.history.clear()
             self.session_start = datetime.now()
-            print_success("Session reset!")
+            # Reset version counts
+            self.idea_version = 0
+            self.title_version = 0
+            self.script_version = 0
+            print_success("Session reset! (all versions reset to 0)")
         else:
             print_info("Reset cancelled.")
     
