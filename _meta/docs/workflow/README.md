@@ -52,6 +52,14 @@ Operational aspects of workflow execution.
 - Metrics & monitoring
 - Automation opportunities
 
+### 7. [Ultra-Clean Pipeline](./ultra-clean-pipeline.md)
+Simplified representation of the PrismQ execution flow.
+- Clean dot-notation format
+- Essential workflow stages
+- Dependency clarity
+- Iterative refinement pattern
+- Quick reference for core workflow
+
 ## MVP Implementation
 
 For the detailed 26-stage MVP implementation of the text production phase, see:

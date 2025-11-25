@@ -3,12 +3,83 @@
 > **Purpose**: This document tracks **ONLY** Work In Progress (WIP) and unblocked issues that can run in parallel.  
 > **Completed Work**: See `_meta/issues/done/` for completed issues (MVP-001 through MVP-024 ✅)  
 > **Full Roadmap**: See `PARALLEL_RUN_NEXT_FULL.md` for complete Post-MVP roadmap (POST-001 through POST-048)  
-> **Post-MVP Issues**: See `T/_meta/issues/new/POST-MVP-Enhancements/` for detailed Text Pipeline issue specifications
+> **Post-MVP Issues**: See `T/_meta/issues/new/POST-MVP-Enhancements/` for detailed Text Pipeline issue specifications  
+> **Story Generation**: See `_meta/issues/new/STORY_GENERATION_PLAN.md` for Story workflow implementation (STORY-001 to STORY-020)
 
 **Date**: 2025-11-24 (Updated)  
-**Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1  
+**Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1 + Story Generation Planning  
 **Status**: 🎯 READY FOR EXECUTION  
 **Timeline**: Weeks 9-10 (2 weeks)
+
+---
+
+## 🆕 Story Generation Workflow - Implementation Planning
+
+**Status**: ✅ PLANNING COMPLETE - Awaiting Worker10 Review  
+**Documentation Package**: 83KB across 6 files  
+**Location**: `_meta/issues/new/Worker01/`
+
+### Overview
+Story Generation (Stages 21-22) serves as the final quality gate before publishing, using GPT-based expert review and polish.
+
+**Workflow Position**:
+```
+Stage 1-20: Text Pipeline (Idea → Title → Script → Local Reviews) ✅ COMPLETE
+    ↓
+Stage 21: Story.ExpertReview (GPT-based holistic review) ⚠️ PLANNING DONE
+    ↓
+    ├─ If PUBLISH → Stage 23: Publishing.Finalization
+    │
+    └─ If POLISH → Stage 22: Story.Polish (Apply improvements)
+                       ↓
+                   Return to Stage 21 (Review again)
+```
+
+### Key Documents
+
+| Document | Size | Purpose |
+|----------|------|---------|
+| [STORY_GENERATION_PLAN.md](new/STORY_GENERATION_PLAN.md) | 10KB | Master implementation plan with 20 atomic issues |
+| [STORY_GENERATION_OVERVIEW.md](new/Worker01/STORY_GENERATION_OVERVIEW.md) | 16KB | Complete planning package summary |
+| [STORY-001-GPT-Review-API-Integration.md](new/Worker01/STORY-001-GPT-Review-API-Integration.md) | 16KB | Sample atomic issue: GPT API integration |
+| [STORY-003-Prompt-Engineering.md](new/Worker01/STORY-003-Prompt-Engineering.md) | 16KB | Sample atomic issue: Prompt engineering |
+| [STORY-005-Workflow-Orchestrator.md](new/Worker01/STORY-005-Workflow-Orchestrator.md) | 21KB | Sample atomic issue: Orchestration |
+| [TASK_CHECKLIST.md](new/Worker01/TASK_CHECKLIST.md) | 8KB | Verification checklist |
+| [WORKER10_REVIEW_REQUEST.md](new/Worker01/WORKER10_REVIEW_REQUEST.md) | 8KB | Review request for Worker10 |
+
+### Story Issues Summary (20 issues across 5 phases)
+
+**Phase 1: GPT Integration (Issues STORY-001 to STORY-004)** - 4 days
+- STORY-001: GPT API Integration for ExpertReview
+- STORY-002: GPT API Integration for Polish
+- STORY-003: Prompt Engineering and Templates
+- STORY-004: Response Parsing and Validation
+
+**Phase 2: Workflow Orchestration (Issues STORY-005 to STORY-008)** - 5 days
+- STORY-005: Workflow Orchestrator
+- STORY-006: Review Loop Controller
+- STORY-007: State Management and Persistence
+- STORY-008: Error Recovery System
+
+**Phase 3: Database Integration (Issues STORY-009 to STORY-012)** - 4 days
+- STORY-009: Review History Repository
+- STORY-010: Polish Change Tracking
+- STORY-011: Analytics and Metrics
+- STORY-012: Caching Layer
+
+**Phase 4: CLI and API (Issues STORY-013 to STORY-016)** - 4 days
+- STORY-013: CLI Runner
+- STORY-014: REST API Endpoints
+- STORY-015: Status Monitoring
+- STORY-016: Configuration Management
+
+**Phase 5: Testing and Polish (Issues STORY-017 to STORY-020)** - 5 days
+- STORY-017: Integration Test Suite
+- STORY-018: Performance Testing
+- STORY-019: Documentation
+- STORY-020: Production Deployment
+
+**Next Action**: Worker10 review required before execution
 
 ---
 
@@ -28,7 +99,7 @@
 - ✅ Expert Review & Polish (MVP-021, MVP-022)
 - ✅ Publishing Pipeline (MVP-023, MVP-024)
 
-**Next Phase**: Post-MVP Enhancements (48 issues across Sprints 4-11)
+**Next Phase**: Post-MVP Enhancements (48 issues across Sprints 4-11) + Story Generation (20 issues)
 
 ---
 
@@ -268,15 +339,19 @@ git checkout -b post-005-batch-processing
 - **Text Pipeline POST Issues**: `T/_meta/issues/new/POST-MVP-Enhancements/` (POST-001 to POST-012)
 - **POST Issue Index**: `T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md`
 - **POST Issue Reference**: `_meta/issues/new/POST-MVP-ENHANCEMENTS.md`
+- **Story Generation Plan**: `_meta/issues/new/STORY_GENERATION_PLAN.md` (STORY-001 to STORY-020)
+- **Story Generation Package**: `_meta/issues/new/Worker01/` (Complete planning documentation)
 
 ### Planning Documents
 - **Full Roadmap**: `_meta/issues/PARALLEL_RUN_NEXT_FULL.md` (All 48 POST issues)
-- **Current State**: `_meta/issues/CURRENT_STATE.md`
-- **MVP Workflow**: `_meta/issues/MVP_WORKFLOW_SIMPLE.md`
+- **Archive (Consolidated)**: `_meta/issues/archive/` (MVP reviews and historical planning)
+  - `MVP_REVIEWS_CONSOLIDATED.md` - All MVP implementation reviews
+  - `HISTORICAL_PLANNING_CONSOLIDATED.md` - Historical planning documents
+- **Issue Management**: `_meta/issues/ISSUE_MANAGEMENT_STRUCTURE.md`
 
 ---
 
-**Status**: Sprint 4 Ready - 3 Issues Unblocked  
-**Next Action**: Worker17, Worker12, Worker02 begin execution  
+**Status**: Sprint 4 Ready - 3 POST Issues Unblocked + Story Generation Planning Complete  
+**Next Action**: Worker17, Worker12, Worker02 begin POST execution; Worker10 review Story Generation  
 **Updated**: 2025-11-24  
 **Owner**: Worker01 (Project Manager)

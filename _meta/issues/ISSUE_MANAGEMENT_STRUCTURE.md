@@ -1,16 +1,42 @@
 # Issue Management Structure - November 2025 Refactoring
 
-**Date**: 2025-11-23  
+**Date**: 2025-11-24 (Updated - Archive Cleanup Complete)  
 **Purpose**: Document the standardized issue management structure across PrismQ  
+
+---
+
+## Recent Updates (2025-11-24)
+
+### Archive Cleanup Complete ✅
+Individual archive files have been merged and removed:
+- **41 individual files** → **2 consolidated documents** (95% reduction)
+- `mvp-reviews/` directory removed (content in MVP_REVIEWS_CONSOLIDATED.md)
+- `planning/` directory removed (content in HISTORICAL_PLANNING_CONSOLIDATED.md)
+- All historical data preserved in consolidated documents
+
+### Story Generation Workflow Added
+New implementation planning package merged:
+- **STORY_GENERATION_PLAN.md**: Master plan with 20 atomic issues (STORY-001 to STORY-020)
+- **Worker01/** directory: Complete planning documentation (83KB across 6 files)
+- Implements Stages 21-22 (Story.ExpertReview + Story.Polish) from WORKFLOW_DETAILED.md
+
+### Previous Documentation Updates
+✅ Replaced PARALLEL_RUN_NEXT_FULL.md with actual POST-001 to POST-048 roadmap  
+✅ Updated archive README with quick access links to consolidated documents  
+✅ Created done/README.md to document completed issues structure  
+✅ Moved MVP-006 specification from new/ to done/
+
+**Impact**: Cleaner structure, faster navigation, complete historical preservation
 
 ---
 
 ## Summary
 
-Completed comprehensive refactoring of all `_meta/issues` directories across the PrismQ codebase:
-- **47 issue directories** now follow consistent structure
-- **98 historical files** archived for reference
-- **4 archive locations** with detailed documentation
+Current issue management state:
+- **47 issue directories** follow consistent structure
+- **2 consolidated archive documents** (formerly 41 individual files)
+- **Story Generation** planning package ready for Worker10 review
+- **POST-MVP roadmap** complete (48 issues across Sprints 4-11)
 
 ---
 
@@ -21,22 +47,33 @@ All `_meta/issues` directories now follow this structure:
 ```
 _meta/issues/
 ├── new/          # New issues ready for work
+│   ├── STORY_GENERATION_PLAN.md    # Story workflow implementation (STORY-001 to STORY-020)
+│   ├── Worker01/                   # Story Generation planning package
+│   └── POST-MVP-ENHANCEMENTS.md    # Text pipeline enhancements reference
 ├── wip/          # Work in progress
 ├── done/         # Recently completed (active retention)
 ├── blocked/      # Issues awaiting dependencies
-└── archive/      # Historical content (long-term storage)
+└── archive/      # Historical content (consolidated)
+    ├── MVP_REVIEWS_CONSOLIDATED.md         # All MVP reviews (21 files merged)
+    └── HISTORICAL_PLANNING_CONSOLIDATED.md # All planning docs (20 files merged)
 ```
 
 ---
 
-## Archive Locations with Content
+## Archive Contents (Consolidated)
 
-### 1. Main Issues Archive (`_meta/issues/archive/`)
-**42 archived files** including:
-- **mvp-reviews/**: 21 MVP implementation review documents (MVP-001 through MVP-022)
-- **planning/**: 20 historical planning documents, workflow documentation, and state snapshots
+### Main Issues Archive (`_meta/issues/archive/`)
 
-[Full documentation](./_meta/issues/archive/README.md)
+**2 consolidated documents** containing all historical content:
+
+| Document | Content | Original Files |
+|----------|---------|----------------|
+| MVP_REVIEWS_CONSOLIDATED.md | MVP-001 through MVP-022 reviews, MODULE_T_STORY_REVIEW, DOCS/TEST reviews | 21 files |
+| HISTORICAL_PLANNING_CONSOLIDATED.md | State snapshots, workflows, issue plans, project summaries | 20 files |
+
+**Note**: Original subdirectories (`mvp-reviews/`, `planning/`) have been removed after consolidation.
+
+[Full documentation](./archive/README.md)
 
 ### 2. Client Frontend TaskManager Archive
 **32 archived files** including:

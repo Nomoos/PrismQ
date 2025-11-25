@@ -1,6 +1,6 @@
-"""Example usage of Story ExpertReview module.
+"""Example usage of Story Review module.
 
-This example demonstrates how to use the ExpertReview module to perform
+This example demonstrates how to use the Review module to perform
 expert-level assessment of a complete story (title + script + audience context).
 """
 
@@ -11,7 +11,7 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Story.ExpertReview import (
+from T.Story.Review import (
     review_story_with_gpt,
     review_story_to_json,
     get_expert_feedback,
@@ -171,6 +171,7 @@ The stories live on.
         print("   Proceeding to Stage 23: Publishing.Finalization")
     else:
         print("\n⚠️  Story needs expert polish")
+        print("   Proceeding to Stage 22: Story.Polish")
         print("   Proceeding to Stage 22: Story.ExpertPolish")
         
         if feedback['high_priority_suggestions']:
@@ -244,7 +245,7 @@ def example_filtering_suggestions():
         print(f"  - {suggestion.suggestion}")
     
     # Get suggestions by component
-    from T.Story.ExpertReview import ComponentType
+    from T.Story.Review import ComponentType
     
     title_suggestions = review.get_suggestions_by_component(ComponentType.TITLE)
     print(f"\nTitle Improvements: {len(title_suggestions)}")
@@ -286,7 +287,7 @@ def example_custom_threshold():
 
 if __name__ == "__main__":
     print("\n" + "="*70)
-    print("PrismQ.T.Story.ExpertReview - Usage Examples")
+    print("PrismQ.T.Story.Review - Usage Examples")
     print("="*70 + "\n")
     
     # Run examples

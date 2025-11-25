@@ -15,6 +15,7 @@ Veškerá dokumentace workflow je nyní organizována v adresáři [`docs/workfl
 - **[Charakteristiky stavů](./docs/workflow/states_CS.md)** - Různé typy stavů
 - **[Strategie publikace](./docs/workflow/publishing-strategy_CS.md)** - Postupný víceformátový přístup
 - **[Správa workflow](./docs/workflow/management_CS.md)** - Operace, kvalitní kontrolní body a osvědčené postupy
+- **[Ultra-Clean Pipeline](./docs/workflow/ultra-clean-pipeline_CS.md)** - Zjednodušená reprezentace běhu
 
 ### Implementace MVP (26fázová tvorba textu)
 - **[Přehled MVP](./docs/workflow/mvp-overview_CS.md)** - Principy a filosofie workflow

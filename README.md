@@ -108,6 +108,7 @@ Foundational research and strategic planning documents.
   - Workflow phases and state transitions
   - Progressive enrichment model
   - Quality gates and best practices
+  - **[Ultra-Clean Pipeline](./_meta/docs/workflow/ultra-clean-pipeline.md)** - Simplified execution flow representation
 
 ## 🏗️ Project Structure
 
