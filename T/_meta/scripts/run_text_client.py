@@ -193,15 +193,15 @@ class TextClient:
             """)
             
             # Story: Main table with state as string (next process name) and idea_id FK
+            # Note: current_title_version_id and current_script_version_id are removed
+            # because they are implicit - filter from TitleVersion/ScriptVersion tables
+            # by highest version integer instead
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Story (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     idea_id INTEGER NULL,
                     state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
-                    current_title_version_id INTEGER NULL,
-                    current_script_version_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (idea_id) REFERENCES Idea(id)
                 )
             """)
@@ -365,8 +365,7 @@ class TextClient:
                 cursor.execute("""
                     UPDATE Story SET
                         state = ?,
-                        idea_id = ?,
-                        updated_at = datetime('now')
+                        idea_id = ?
                     WHERE id = ?
                 """, (state, idea_id, story_id))
             else:
@@ -378,6 +377,7 @@ class TextClient:
                 story_id = cursor.lastrowid
             
             # Save TitleVersion if we have a new title
+            # Note: current_title_version_id is implicit (use MAX(version) query)
             if self.current_title:
                 cursor.execute("""
                     SELECT MAX(version) FROM TitleVersion WHERE story_id = ?
@@ -389,14 +389,9 @@ class TextClient:
                         INSERT INTO TitleVersion (story_id, version, text)
                         VALUES (?, ?, ?)
                     """, (story_id, self.title_version, self.current_title))
-                    title_version_id = cursor.lastrowid
-                    
-                    # Update Story with current title version
-                    cursor.execute("""
-                        UPDATE Story SET current_title_version_id = ? WHERE id = ?
-                    """, (title_version_id, story_id))
             
             # Save ScriptVersion if we have a new script
+            # Note: current_script_version_id is implicit (use MAX(version) query)
             if self.current_script:
                 cursor.execute("""
                     SELECT MAX(version) FROM ScriptVersion WHERE story_id = ?
@@ -408,12 +403,6 @@ class TextClient:
                         INSERT INTO ScriptVersion (story_id, version, text)
                         VALUES (?, ?, ?)
                     """, (story_id, self.script_version, self.current_script))
-                    script_version_id = cursor.lastrowid
-                    
-                    # Update Story with current script version
-                    cursor.execute("""
-                        UPDATE Story SET current_script_version_id = ? WHERE id = ?
-                    """, (script_version_id, story_id))
             
             conn.commit()
         
@@ -494,45 +483,25 @@ class TextClient:
                             self._idea_data = idea_data
                             self.idea_version = 1
                 
-                # Load current TitleVersion
-                if story_row["current_title_version_id"]:
-                    cursor.execute("""
-                        SELECT text, version FROM TitleVersion WHERE id = ?
-                    """, (story_row["current_title_version_id"],))
-                    title_row = cursor.fetchone()
-                    if title_row:
-                        self.current_title = title_row["text"]
-                        self.title_version = title_row["version"]
-                else:
-                    # Get max version if no current set
-                    cursor.execute("""
-                        SELECT text, version FROM TitleVersion 
-                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
-                    """, (story_id,))
-                    title_row = cursor.fetchone()
-                    if title_row:
-                        self.current_title = title_row["text"]
-                        self.title_version = title_row["version"]
+                # Load current TitleVersion (use MAX(version) query - implicit)
+                cursor.execute("""
+                    SELECT text, version FROM TitleVersion 
+                    WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                """, (story_id,))
+                title_row = cursor.fetchone()
+                if title_row:
+                    self.current_title = title_row["text"]
+                    self.title_version = title_row["version"]
                 
-                # Load current ScriptVersion
-                if story_row["current_script_version_id"]:
-                    cursor.execute("""
-                        SELECT text, version FROM ScriptVersion WHERE id = ?
-                    """, (story_row["current_script_version_id"],))
-                    script_row = cursor.fetchone()
-                    if script_row:
-                        self.current_script = script_row["text"]
-                        self.script_version = script_row["version"]
-                else:
-                    # Get max version if no current set
-                    cursor.execute("""
-                        SELECT text, version FROM ScriptVersion 
-                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
-                    """, (story_id,))
-                    script_row = cursor.fetchone()
-                    if script_row:
-                        self.current_script = script_row["text"]
-                        self.script_version = script_row["version"]
+                # Load current ScriptVersion (use MAX(version) query - implicit)
+                cursor.execute("""
+                    SELECT text, version FROM ScriptVersion 
+                    WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                """, (story_id,))
+                script_row = cursor.fetchone()
+                if script_row:
+                    self.current_script = script_row["text"]
+                    self.script_version = script_row["version"]
             
             print_info(f"State loaded from {db_path.name} (state: {current_state})")
             return True
