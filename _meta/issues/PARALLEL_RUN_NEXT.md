@@ -336,51 +336,64 @@ Story (
     FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
 
--- Title versions with full history
+-- Review: Simple review content (no relationship tracking)
+Review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT NOT NULL,
+    score INTEGER CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+
+-- Title versions with direct review FK
 Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
+    review_id INTEGER NULL,                         -- Direct FK to Review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version),
-    FOREIGN KEY (story_id) REFERENCES Story(id)
+    FOREIGN KEY (story_id) REFERENCES Story(id),
+    FOREIGN KEY (review_id) REFERENCES Review(id)
 )
 
--- Script versions with full history
+-- Script versions with direct review FK
 Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
+    review_id INTEGER NULL,                         -- Direct FK to Review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version),
-    FOREIGN KEY (story_id) REFERENCES Story(id)
+    FOREIGN KEY (story_id) REFERENCES Story(id),
+    FOREIGN KEY (review_id) REFERENCES Review(id)
 )
 
--- Reviews with discriminator pattern (single reviewed_version field)
-Review (
+-- StoryReview: Linking table for Story reviews (many-to-many)
+-- Allows one Story to have multiple reviews with different types
+StoryReview (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
-    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_version INTEGER NULL,
-    text TEXT NOT NULL,
-    score INTEGER CHECK (score >= 0 AND score <= 100),
+    review_id INTEGER NOT NULL,
+    version INTEGER NOT NULL,                       -- Story version being reviewed
+    review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (story_id) REFERENCES Story(id)
+    FOREIGN KEY (story_id) REFERENCES Story(id),
+    FOREIGN KEY (review_id) REFERENCES Review(id),
+    UNIQUE(story_id, review_id)
 )
 ```
 
-### Implicit Version Identification for Reviews
+### Review Relationships
 
-| review_type | reviewed_version | Meaning |
-|-------------|------------------|---------|
-| `title` | 3 | Reviews Title v3 for this story |
-| `script` | 5 | Reviews Script v5 for this story |
-| `story` | NULL | Reviews current state of entire story |
+| Content Type | Review Relationship | Multiple Reviews? |
+|--------------|---------------------|-------------------|
+| Title | Direct FK (`title.review_id`) | No (1:1 per version) |
+| Script | Direct FK (`script.review_id`) | No (1:1 per version) |
+| Story | Linking table (`StoryReview`) | Yes (many per story) |
 
 **Version Lookup**: Use `ORDER BY version DESC LIMIT 1` to get current version.
-**Review Lookup**: Use `review_type + reviewed_version` to identify content being reviewed.
 
 See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) for full schema.
 

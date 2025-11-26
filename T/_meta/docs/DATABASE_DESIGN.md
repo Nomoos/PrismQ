@@ -64,39 +64,49 @@ Story (
 )
 
 -- Title versions with full history
+-- Each title version directly references its review (if any)
 Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
+    review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
 -- Script/Text versions with full history
+-- Each script version directly references its review (if any)
 Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
+    review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
--- Reviews with discriminator pattern for different review types
--- Uses single reviewed_version field for universal version tracking (max 1 field)
--- The version a review refers to is implicitly known by combining:
---   - review_type: identifies the content type (title/script/story)
---   - reviewed_version: the INTEGER version number of that content
--- Example: review_type='title', reviewed_version=3 → reviews Title v3
+-- Review: Simple review content without version tracking
+-- Title/Script reference Review directly via FK
+-- Story references Review via StoryReview linking table
 Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_version INTEGER NULL,
     text TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+
+-- StoryReview: Linking table for Story reviews (many-to-many)
+-- Allows one Story to have multiple reviews with different types
+StoryReview (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER FK NOT NULL REFERENCES Story(id),
+    review_id INTEGER FK NOT NULL REFERENCES Review(id),
+    version INTEGER NOT NULL,                          -- Story version being reviewed
+    review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(story_id, review_id)
 )
 ```
 
@@ -110,34 +120,38 @@ Review (
          ┌────────────────┼────────────────┐
          │                │                │
          ▼                ▼                ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────┐
-│    Title     │  │    Script    │  │  Review  │
-└──────────────┘  └──────────────┘  └──────────┘
+┌──────────────┐  ┌──────────────┐  ┌─────────────┐
+│    Title     │  │    Script    │  │ StoryReview │
+│  review_id───┼──┼──review_id───┼──┼──►┌────────┐│
+└──────────────┘  └──────────────┘  │   │ Review ││
+                                    │   └────────┘│
+                                    └─────────────┘
 ```
 
-### Review Types Explained
+### Review Relationship Types
 
-| Review Type | Description | reviewed_version Meaning |
-|-------------|-------------|--------------------------|
-| `title` | Reviews only the title | Version number in Title table (e.g., 3 = Title v3) |
-| `script` | Reviews only the script | Version number in Script table (e.g., 5 = Script v5) |
-| `story` | Reviews complete story (title + script) | NULL - reviews current state of entire story |
+| Content Type | Review Relationship | Multiple Reviews? |
+|--------------|---------------------|-------------------|
+| Title | Direct FK (`title.review_id → review.id`) | No (1:1 per version) |
+| Script | Direct FK (`script.review_id → review.id`) | No (1:1 per version) |
+| Story | Linking table (`StoryReview`) | Yes (many reviews per story) |
 
-### Implicit Version Identification
+### StoryReview Types (for Story-level reviews)
 
-The design uses a **single `reviewed_version` field** (max 1 field requirement) to universally identify what version a review refers to:
+| review_type | Description |
+|-------------|-------------|
+| `grammar` | Grammar and spelling review |
+| `tone` | Tone and voice consistency |
+| `content` | Content quality and accuracy |
+| `consistency` | Internal consistency check |
+| `editing` | Editorial improvements |
 
-1. **Discriminator pattern**: `review_type` tells us which content type is being reviewed
-2. **Version number**: `reviewed_version` stores the INTEGER version number from that content's version table
-3. **Implicit lookup**: To get the actual content being reviewed:
-   - For `title` reviews: `SELECT * FROM Title WHERE story_id = ? AND version = reviewed_version`
-   - For `script` reviews: `SELECT * FROM Script WHERE story_id = ? AND version = reviewed_version`
-   - For `story` reviews: Get current versions of both title and script (reviewed_version is NULL)
+### Design Benefits
 
-This approach:
-- Uses only 1 field (`reviewed_version`) instead of multiple FK fields
-- Is universal - works for any number of content types
-- Is extensible - adding new content types only requires updating the CHECK constraint
+1. **Title/Script**: Direct FK relationship is simple and efficient
+2. **Story**: Linking table allows multiple reviews with different types (grammar, tone, etc.)
+3. **Clean Review table**: Review only contains review content, no relationship tracking
+4. **Extensible**: New review types can be added to StoryReview without schema changes
 
 ---
 
