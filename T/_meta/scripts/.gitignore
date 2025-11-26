@@ -1,0 +1,16 @@
+# PrismQ Text Client state database (generated at runtime)
+text_client_state.db
+text_client_state.db-journal
+text_client_state.db-wal
+text_client_state.db-shm
+
+# Legacy JSON state file (now using SQLite)
+text_client_state.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Export files (user-generated content)
+prismq_export*.txt

@@ -1,0 +1,1220 @@
+#!/usr/bin/env python3
+"""Interactive Text Client for PrismQ.T Text Generation Pipeline.
+
+This script provides a quick, interactive way to work with the PrismQ Text
+Generation Pipeline. It allows you to:
+- Create and manage Ideas
+- Generate Titles from Ideas
+- Generate Scripts from Titles and Ideas
+- Review and iterate on content
+- Track versions through the workflow
+
+Usage:
+    python run_text_client.py
+    python run_text_client.py --demo      # Run with demo data
+    python run_text_client.py --help      # Show help
+
+The client operates in an interactive REPL mode, allowing you to explore
+the text generation workflow step by step.
+"""
+
+import sys
+import os
+import json
+import sqlite3
+from pathlib import Path
+from typing import Optional, Dict, Any
+from datetime import datetime
+
+# Add module paths for imports
+SCRIPT_DIR = Path(__file__).parent.absolute()
+REPO_ROOT = SCRIPT_DIR.parent.parent.parent  # T/_meta/scripts -> T -> repo root
+T_ROOT = SCRIPT_DIR.parent.parent  # T/_meta/scripts -> T
+
+# Add paths for imports
+sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
+sys.path.insert(0, str(T_ROOT / "Script" / "src"))
+
+# Try to import PrismQ modules
+try:
+    from src.idea import Idea, IdeaStatus, ContentGenre
+    IDEA_AVAILABLE = True
+except ImportError:
+    IDEA_AVAILABLE = False
+
+try:
+    from script_writer import ScriptWriter, OptimizationStrategy
+    SCRIPT_WRITER_AVAILABLE = True
+except ImportError:
+    SCRIPT_WRITER_AVAILABLE = False
+
+
+# ANSI color codes for terminal output
+class Colors:
+    """ANSI color codes for terminal styling."""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    END = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+def print_header(text: str) -> None:
+    """Print a styled header."""
+    print(f"\n{Colors.HEADER}{Colors.BOLD}{'═' * 70}{Colors.END}")
+    print(f"{Colors.HEADER}{Colors.BOLD}{text.center(70)}{Colors.END}")
+    print(f"{Colors.HEADER}{Colors.BOLD}{'═' * 70}{Colors.END}\n")
+
+
+def print_section(text: str) -> None:
+    """Print a styled section header."""
+    print(f"\n{Colors.CYAN}{'─' * 50}{Colors.END}")
+    print(f"{Colors.CYAN}{Colors.BOLD}{text}{Colors.END}")
+    print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
+
+
+def print_success(text: str) -> None:
+    """Print a success message."""
+    print(f"{Colors.GREEN}✓ {text}{Colors.END}")
+
+
+def print_warning(text: str) -> None:
+    """Print a warning message."""
+    print(f"{Colors.YELLOW}⚠ {text}{Colors.END}")
+
+
+def print_error(text: str) -> None:
+    """Print an error message."""
+    print(f"{Colors.RED}✗ {text}{Colors.END}")
+
+
+def print_info(text: str) -> None:
+    """Print an info message."""
+    print(f"{Colors.BLUE}ℹ {text}{Colors.END}")
+
+
+class TextClient:
+    """Interactive client for the PrismQ Text Generation Pipeline.
+    
+    This client provides an interactive REPL interface for working with
+    the text generation workflow, including Idea creation, Title generation,
+    and Script development.
+    
+    Version tracking is used to determine which item to process next,
+    with the lowest version count being selected for processing.
+    
+    State is persisted to a SQLite database to allow running each step
+    as a separate process (for batch script workflows).
+    """
+    
+    STATE_DB = "text_client_state.db"
+    
+    def __init__(self, load_state: bool = False):
+        """Initialize the text client.
+        
+        Args:
+            load_state: If True, load state from database if it exists.
+        """
+        self.current_idea: Optional[Any] = None
+        self.current_title: Optional[str] = None
+        self.current_script: Optional[str] = None
+        self.script_writer: Optional[Any] = None
+        self.history: list = []
+        self.session_start = datetime.now()
+        
+        # Version tracking for each content type
+        self.idea_version: int = 0
+        self.title_version: int = 0
+        self.script_version: int = 0
+        
+        # Idea data for persistence (since Idea objects may not serialize directly)
+        self._idea_data: Optional[Dict[str, Any]] = None
+        
+        # Initialize database
+        self._init_db()
+        
+        if load_state:
+            self._load_state()
+    
+    def _get_db_path(self) -> Path:
+        """Get the path to the SQLite database file."""
+        return SCRIPT_DIR / self.STATE_DB
+    
+    # Process state names following PrismQ naming convention (folder structure)
+    # See T/WORKFLOW_STATE_MACHINE.md for full state machine documentation
+    PROCESS_STATES = {
+        'initial': 'PrismQ.T.Idea.Creation',  # Initial state - awaiting idea creation
+        'idea_created': 'PrismQ.T.Title.FromIdea',  # After idea, next is title generation
+        'title_generated': 'PrismQ.T.Script.FromIdeaAndTitle',  # After title, next is script
+        'script_generated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Script iteration
+        'script_iterated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Continue iteration
+        'exported': 'PrismQ.T.Publishing',  # Final state
+    }
+    
+    def _init_db(self) -> None:
+        """Initialize the SQLite database with core tables.
+        
+        Tables:
+        - Idea: Idea data (referenced by Story via FK)
+        - Story: Main object with state (next process name) and idea_id FK
+        - TitleVersion: Version history for titles
+        - ScriptVersion: Version history for scripts
+        - Review: Reviews with discriminator pattern (title/script/story)
+        """
+        db_path = self._get_db_path()
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            conn.execute("PRAGMA foreign_keys=ON")
+            
+            # Idea: Idea data table (referenced by Story via FK)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Idea (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT,
+                    concept TEXT,
+                    premise TEXT,
+                    logline TEXT,
+                    hook TEXT,
+                    skeleton TEXT,
+                    emotional_arc TEXT,
+                    twist TEXT,
+                    climax TEXT,
+                    tone_guidance TEXT,
+                    target_audience TEXT,
+                    genre TEXT,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+                )
+            """)
+            
+            # Story: Main table with state as string (next process name) and idea_id FK
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Story (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    idea_id INTEGER NULL,
+                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
+                    current_title_version_id INTEGER NULL,
+                    current_script_version_id INTEGER NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (idea_id) REFERENCES Idea(id)
+                )
+            """)
+            
+            # TitleVersion: Version history for titles
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS TitleVersion (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    story_id INTEGER NOT NULL,
+                    version INTEGER NOT NULL,
+                    text TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    UNIQUE(story_id, version)
+                )
+            """)
+            
+            # ScriptVersion: Version history for scripts
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS ScriptVersion (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    story_id INTEGER NOT NULL,
+                    version INTEGER NOT NULL,
+                    text TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    UNIQUE(story_id, version)
+                )
+            """)
+            
+            # Review: Reviews with discriminator pattern
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Review (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    story_id INTEGER NOT NULL,
+                    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+                    reviewed_title_version_id INTEGER NULL,
+                    reviewed_script_version_id INTEGER NULL,
+                    feedback TEXT NOT NULL,
+                    score INTEGER CHECK (score >= 0 AND score <= 100),
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    FOREIGN KEY (reviewed_title_version_id) REFERENCES TitleVersion(id),
+                    FOREIGN KEY (reviewed_script_version_id) REFERENCES ScriptVersion(id)
+                )
+            """)
+            
+            conn.commit()
+    
+    def _save_state(self) -> None:
+        """Save current state to SQLite database for persistence between processes.
+        
+        Uses the core tables: Idea, Story, TitleVersion, ScriptVersion.
+        - Idea data is stored in Idea table
+        - Story references Idea via idea_id FK
+        - State is stored as a process name string on the Story object
+        """
+        db_path = self._get_db_path()
+        
+        with sqlite3.connect(db_path) as conn:
+            conn.execute("PRAGMA foreign_keys=ON")
+            cursor = conn.cursor()
+            
+            # Determine current state based on workflow progress
+            if self.current_script is not None:
+                if self.script_version > 1:
+                    state = self.PROCESS_STATES['script_iterated']
+                else:
+                    state = self.PROCESS_STATES['script_generated']
+            elif self.current_title is not None:
+                state = self.PROCESS_STATES['title_generated']
+            elif self.current_idea is not None:
+                state = self.PROCESS_STATES['idea_created']
+            else:
+                state = self.PROCESS_STATES['initial']
+            
+            # Extract idea data
+            idea_data = {}
+            idea_id = None
+            if self.current_idea is not None:
+                try:
+                    idea_data = self.current_idea.to_dict()
+                except AttributeError:
+                    genre_value = "other"
+                    if IDEA_AVAILABLE:
+                        genre = getattr(self.current_idea, "genre", None)
+                        if genre is not None:
+                            genre_value = genre.value if hasattr(genre, 'value') else str(genre)
+                    
+                    idea_data = {
+                        "title": getattr(self.current_idea, "title", ""),
+                        "concept": getattr(self.current_idea, "concept", ""),
+                        "premise": getattr(self.current_idea, "premise", ""),
+                        "logline": getattr(self.current_idea, "logline", ""),
+                        "hook": getattr(self.current_idea, "hook", ""),
+                        "skeleton": getattr(self.current_idea, "skeleton", ""),
+                        "emotional_arc": getattr(self.current_idea, "emotional_arc", ""),
+                        "twist": getattr(self.current_idea, "twist", ""),
+                        "climax": getattr(self.current_idea, "climax", ""),
+                        "tone_guidance": getattr(self.current_idea, "tone_guidance", ""),
+                        "target_audience": getattr(self.current_idea, "target_audience", ""),
+                        "genre": genre_value,
+                    }
+                
+                # Save or update Idea
+                cursor.execute("SELECT id FROM Idea ORDER BY id DESC LIMIT 1")
+                idea_row = cursor.fetchone()
+                
+                if idea_row:
+                    idea_id = idea_row[0]
+                    cursor.execute("""
+                        UPDATE Idea SET
+                            title = ?, concept = ?, premise = ?, logline = ?, hook = ?,
+                            skeleton = ?, emotional_arc = ?, twist = ?, climax = ?,
+                            tone_guidance = ?, target_audience = ?, genre = ?,
+                            updated_at = datetime('now')
+                        WHERE id = ?
+                    """, (
+                        idea_data.get("title", ""),
+                        idea_data.get("concept", ""),
+                        idea_data.get("premise", ""),
+                        idea_data.get("logline", ""),
+                        idea_data.get("hook", ""),
+                        idea_data.get("skeleton", ""),
+                        idea_data.get("emotional_arc", ""),
+                        idea_data.get("twist", ""),
+                        idea_data.get("climax", ""),
+                        idea_data.get("tone_guidance", ""),
+                        idea_data.get("target_audience", ""),
+                        idea_data.get("genre", "other"),
+                        idea_id,
+                    ))
+                else:
+                    cursor.execute("""
+                        INSERT INTO Idea (title, concept, premise, logline, hook, skeleton,
+                                         emotional_arc, twist, climax, tone_guidance, target_audience, genre)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        idea_data.get("title", ""),
+                        idea_data.get("concept", ""),
+                        idea_data.get("premise", ""),
+                        idea_data.get("logline", ""),
+                        idea_data.get("hook", ""),
+                        idea_data.get("skeleton", ""),
+                        idea_data.get("emotional_arc", ""),
+                        idea_data.get("twist", ""),
+                        idea_data.get("climax", ""),
+                        idea_data.get("tone_guidance", ""),
+                        idea_data.get("target_audience", ""),
+                        idea_data.get("genre", "other"),
+                    ))
+                    idea_id = cursor.lastrowid
+            
+            # Get or create Story
+            cursor.execute("SELECT id FROM Story ORDER BY id DESC LIMIT 1")
+            row = cursor.fetchone()
+            
+            if row:
+                story_id = row[0]
+                # Update existing Story with state and idea_id FK
+                cursor.execute("""
+                    UPDATE Story SET
+                        state = ?,
+                        idea_id = ?,
+                        updated_at = datetime('now')
+                    WHERE id = ?
+                """, (state, idea_id, story_id))
+            else:
+                # Insert new Story with idea_id FK
+                cursor.execute("""
+                    INSERT INTO Story (state, idea_id)
+                    VALUES (?, ?)
+                """, (state, idea_id))
+                story_id = cursor.lastrowid
+            
+            # Save TitleVersion if we have a new title
+            if self.current_title:
+                cursor.execute("""
+                    SELECT MAX(version) FROM TitleVersion WHERE story_id = ?
+                """, (story_id,))
+                max_version = cursor.fetchone()[0] or 0
+                
+                if self.title_version > max_version:
+                    cursor.execute("""
+                        INSERT INTO TitleVersion (story_id, version, text)
+                        VALUES (?, ?, ?)
+                    """, (story_id, self.title_version, self.current_title))
+                    title_version_id = cursor.lastrowid
+                    
+                    # Update Story with current title version
+                    cursor.execute("""
+                        UPDATE Story SET current_title_version_id = ? WHERE id = ?
+                    """, (title_version_id, story_id))
+            
+            # Save ScriptVersion if we have a new script
+            if self.current_script:
+                cursor.execute("""
+                    SELECT MAX(version) FROM ScriptVersion WHERE story_id = ?
+                """, (story_id,))
+                max_version = cursor.fetchone()[0] or 0
+                
+                if self.script_version > max_version:
+                    cursor.execute("""
+                        INSERT INTO ScriptVersion (story_id, version, text)
+                        VALUES (?, ?, ?)
+                    """, (story_id, self.script_version, self.current_script))
+                    script_version_id = cursor.lastrowid
+                    
+                    # Update Story with current script version
+                    cursor.execute("""
+                        UPDATE Story SET current_script_version_id = ? WHERE id = ?
+                    """, (script_version_id, story_id))
+            
+            conn.commit()
+        
+        print_info(f"State saved to {db_path.name} (state: {state})")
+    
+    def _load_state(self) -> bool:
+        """Load state from SQLite database if it exists.
+        
+        Loads from the core tables: Idea, Story, TitleVersion, ScriptVersion.
+        - Idea data is loaded from Idea table via Story.idea_id FK
+        
+        Returns:
+            True if state was loaded, False otherwise.
+        """
+        db_path = self._get_db_path()
+        if not db_path.exists():
+            return False
+        
+        try:
+            with sqlite3.connect(db_path) as conn:
+                conn.execute("PRAGMA foreign_keys=ON")
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                # Load Story (most recent)
+                cursor.execute("""
+                    SELECT * FROM Story ORDER BY id DESC LIMIT 1
+                """)
+                story_row = cursor.fetchone()
+                
+                if not story_row:
+                    return False
+                
+                story_id = story_row["id"]
+                current_state = story_row["state"] or self.PROCESS_STATES['initial']
+                idea_id = story_row["idea_id"]
+                
+                # Derive version counts from state
+                state_order = list(self.PROCESS_STATES.values())
+                if current_state in state_order:
+                    state_idx = state_order.index(current_state)
+                    # Idea version is 1 if we've passed idea_created state
+                    if state_idx >= state_order.index(self.PROCESS_STATES['idea_created']):
+                        self.idea_version = 1
+                    # Title version from TitleVersion table
+                    # Script version from ScriptVersion table
+                
+                # Load idea data from Idea table via FK
+                if idea_id and IDEA_AVAILABLE:
+                    cursor.execute("SELECT * FROM Idea WHERE id = ?", (idea_id,))
+                    idea_row = cursor.fetchone()
+                    
+                    if idea_row:
+                        idea_data = {
+                            "title": idea_row["title"] or "",
+                            "concept": idea_row["concept"] or "",
+                            "premise": idea_row["premise"] or "",
+                            "logline": idea_row["logline"] or "",
+                            "hook": idea_row["hook"] or "",
+                            "skeleton": idea_row["skeleton"] or "",
+                            "emotional_arc": idea_row["emotional_arc"] or "",
+                            "twist": idea_row["twist"] or "",
+                            "climax": idea_row["climax"] or "",
+                            "tone_guidance": idea_row["tone_guidance"] or "",
+                            "target_audience": idea_row["target_audience"] or "",
+                            "genre": idea_row["genre"] or "other",
+                        }
+                        
+                        try:
+                            self.current_idea = Idea.from_dict(idea_data)
+                            self._idea_data = idea_data
+                            self.idea_version = 1
+                        except (AttributeError, TypeError, KeyError, ValueError):
+                            self.current_idea = Idea(
+                                title=idea_data.get("title", ""),
+                                concept=idea_data.get("concept", ""),
+                            )
+                            self._idea_data = idea_data
+                            self.idea_version = 1
+                
+                # Load current TitleVersion
+                if story_row["current_title_version_id"]:
+                    cursor.execute("""
+                        SELECT text, version FROM TitleVersion WHERE id = ?
+                    """, (story_row["current_title_version_id"],))
+                    title_row = cursor.fetchone()
+                    if title_row:
+                        self.current_title = title_row["text"]
+                        self.title_version = title_row["version"]
+                else:
+                    # Get max version if no current set
+                    cursor.execute("""
+                        SELECT text, version FROM TitleVersion 
+                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                    """, (story_id,))
+                    title_row = cursor.fetchone()
+                    if title_row:
+                        self.current_title = title_row["text"]
+                        self.title_version = title_row["version"]
+                
+                # Load current ScriptVersion
+                if story_row["current_script_version_id"]:
+                    cursor.execute("""
+                        SELECT text, version FROM ScriptVersion WHERE id = ?
+                    """, (story_row["current_script_version_id"],))
+                    script_row = cursor.fetchone()
+                    if script_row:
+                        self.current_script = script_row["text"]
+                        self.script_version = script_row["version"]
+                else:
+                    # Get max version if no current set
+                    cursor.execute("""
+                        SELECT text, version FROM ScriptVersion 
+                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                    """, (story_id,))
+                    script_row = cursor.fetchone()
+                    if script_row:
+                        self.current_script = script_row["text"]
+                        self.script_version = script_row["version"]
+            
+            print_info(f"State loaded from {db_path.name} (state: {current_state})")
+            return True
+        except (sqlite3.Error, KeyError, TypeError, ValueError) as e:
+            print_warning(f"Failed to load state: {e}")
+            return False
+    
+    def clear_state(self) -> None:
+        """Clear the saved state database."""
+        db_path = self._get_db_path()
+        if db_path.exists():
+            db_path.unlink()
+            print_info("State database cleared")
+            # Reinitialize empty database
+            self._init_db()
+    
+    def show_welcome(self) -> None:
+        """Display welcome message and available modules."""
+        print_header("PrismQ.T - Interactive Text Client")
+        
+        print("Welcome to the PrismQ Text Generation Pipeline!")
+        print("This interactive client helps you create and refine content.\n")
+        
+        # Show module availability
+        print_section("Module Availability")
+        
+        if IDEA_AVAILABLE:
+            print_success("Idea model loaded (T/Idea/Model)")
+        else:
+            print_warning("Idea model not available - some features limited")
+        
+        if SCRIPT_WRITER_AVAILABLE:
+            print_success("ScriptWriter loaded (T/Script)")
+        else:
+            print_warning("ScriptWriter not available - some features limited")
+        
+        print()
+    
+    def show_menu(self) -> None:
+        """Display the main menu options."""
+        print_section("Main Menu")
+        
+        print(f"""
+{Colors.BOLD}Idea Management:{Colors.END}
+  1. Create new Idea
+  2. Load demo Idea
+  3. View current Idea
+  4. Edit Idea fields
+
+{Colors.BOLD}Title Generation:{Colors.END}
+  5. Generate Title from Idea
+  6. View current Title
+
+{Colors.BOLD}Script Development:{Colors.END}
+  7. Generate Script draft
+  8. View current Script
+  9. Iterate on Script (unlimited feedback loop)
+
+{Colors.BOLD}Workflow:{Colors.END}
+  10. Show workflow status (next to process by lowest version)
+  11. Export current content
+  12. Reset session
+
+{Colors.BOLD}Help & Info:{Colors.END}
+  h.  Show this menu
+  s.  Show session summary
+  q.  Quit
+
+""")
+    
+    def create_idea(self) -> None:
+        """Create a new Idea through interactive prompts."""
+        if not IDEA_AVAILABLE:
+            print_error("Idea model not available. Cannot create Idea.")
+            return
+        
+        print_section("Create New Idea")
+        
+        print("Enter your idea details (press Enter to skip optional fields):\n")
+        
+        # Required fields
+        title = input(f"{Colors.BOLD}Title{Colors.END} (required): ").strip()
+        if not title:
+            print_error("Title is required!")
+            return
+        
+        concept = input(f"{Colors.BOLD}Concept{Colors.END} (required): ").strip()
+        if not concept:
+            print_error("Concept is required!")
+            return
+        
+        # Optional story foundation
+        print(f"\n{Colors.CYAN}Story Foundation (optional):{Colors.END}")
+        premise = input("Premise (1-3 sentences): ").strip()
+        logline = input("Logline (one dramatic sentence): ").strip()
+        hook = input("Hook (first engaging moment): ").strip()
+        
+        # Genre selection
+        print(f"\n{Colors.CYAN}Genre:{Colors.END}")
+        genres = list(ContentGenre)
+        for i, genre in enumerate(genres, 1):
+            print(f"  {i}. {genre.value}")
+        genre_choice = input("Select genre (1-10, default=10 other): ").strip()
+        try:
+            genre_idx = int(genre_choice) - 1
+            genre = genres[genre_idx] if 0 <= genre_idx < len(genres) else ContentGenre.OTHER
+        except ValueError:
+            genre = ContentGenre.OTHER
+        
+        # Target audience
+        target_audience = input("\nTarget audience: ").strip()
+        
+        # Create the Idea
+        self.current_idea = Idea(
+            title=title,
+            concept=concept,
+            premise=premise,
+            logline=logline,
+            hook=hook,
+            genre=genre,
+            target_audience=target_audience,
+            created_by="text_client",
+        )
+        
+        # Increment idea version
+        self.idea_version += 1
+        
+        self.history.append({
+            "action": "create_idea",
+            "timestamp": datetime.now().isoformat(),
+            "title": title,
+            "version": self.idea_version,
+        })
+        
+        print_success(f"Idea created: '{title}' (version {self.idea_version})")
+        self.show_idea()
+        self._save_state()
+    
+    def load_demo_idea(self) -> None:
+        """Load a demo Idea for testing."""
+        if not IDEA_AVAILABLE:
+            print_error("Idea model not available. Cannot load demo.")
+            return
+        
+        print_section("Loading Demo Idea")
+        
+        self.current_idea = Idea(
+            title="The Echo",
+            concept="A girl hears a voice that sounds exactly like her own",
+            idea="Girl hears voice exactly like hers",
+            premise="A teenage girl starts hearing a voice that sounds identical to her own, "
+                    "giving her warnings about the future. When the warnings come true, "
+                    "she realizes the voice is her future self trying to prevent her death.",
+            logline="A girl discovers she can hear her own future thoughts—and they're telling her to run.",
+            hook="Last night I woke up... but my body kept sleeping.",
+            skeleton="1. Girl hears strange voice\n2. Voice sounds like her\n3. Voice predicts events\n"
+                     "4. Predictions come true\n5. Final warning: run now\n6. She realizes too late",
+            pov="first person (I) - intimate, strong emotions",
+            emotional_arc="curiosity → confusion → fear → terror → realization",
+            twist="She's already dead - talking to her past self",
+            climax="Final moment when she realizes the truth",
+            genre=ContentGenre.HORROR,
+            target_audience="Horror enthusiasts aged 18-35",
+            target_platforms=["youtube", "tiktok", "medium"],
+            target_formats=["video", "audio", "text"],
+            length_target="60 seconds video / 500 words text",
+            tone_guidance="Start mysterious, build to terrifying, end with shocking twist",
+            created_by="demo_loader",
+        )
+        
+        # Increment idea version
+        self.idea_version += 1
+        
+        self.history.append({
+            "action": "load_demo",
+            "timestamp": datetime.now().isoformat(),
+            "title": "The Echo",
+            "version": self.idea_version,
+        })
+        
+        print_success(f"Demo Idea loaded: 'The Echo' (version {self.idea_version})")
+        self.show_idea()
+        self._save_state()
+    
+    def show_idea(self) -> None:
+        """Display the current Idea."""
+        if self.current_idea is None:
+            print_warning("No Idea loaded. Create or load one first.")
+            return
+        
+        print_section("Current Idea")
+        
+        idea = self.current_idea
+        print(f"{Colors.BOLD}Title:{Colors.END} {idea.title}")
+        print(f"{Colors.BOLD}Concept:{Colors.END} {idea.concept}")
+        print(f"{Colors.BOLD}Genre:{Colors.END} {idea.genre.value}")
+        print(f"{Colors.BOLD}Status:{Colors.END} {idea.status.value}")
+        print(f"{Colors.BOLD}Version:{Colors.END} {idea.version}")
+        
+        if idea.premise:
+            print(f"\n{Colors.BOLD}Premise:{Colors.END}")
+            print(f"  {idea.premise}")
+        
+        if idea.logline:
+            print(f"\n{Colors.BOLD}Logline:{Colors.END}")
+            print(f"  {idea.logline}")
+        
+        if idea.hook:
+            print(f"\n{Colors.BOLD}Hook:{Colors.END}")
+            print(f"  {idea.hook}")
+        
+        if idea.skeleton:
+            print(f"\n{Colors.BOLD}Skeleton:{Colors.END}")
+            for line in idea.skeleton.split('\n'):
+                print(f"  {line}")
+        
+        if idea.target_audience:
+            print(f"\n{Colors.BOLD}Target Audience:{Colors.END} {idea.target_audience}")
+        
+        if idea.target_platforms:
+            print(f"{Colors.BOLD}Platforms:{Colors.END} {', '.join(idea.target_platforms)}")
+        
+        print()
+    
+    def generate_title(self) -> None:
+        """Generate a Title from the current Idea."""
+        if self.current_idea is None:
+            print_warning("No Idea loaded. Create or load one first.")
+            return
+        
+        print_section("Generate Title")
+        
+        # Simple title generation based on idea fields
+        idea = self.current_idea
+        
+        # Generate title variants
+        variants = []
+        
+        # Use existing title as base
+        if idea.title:
+            variants.append(idea.title)
+        
+        # Generate from logline (extract key phrase)
+        if idea.logline:
+            # Take first part of logline
+            logline_title = idea.logline.split('—')[0].strip() if '—' in idea.logline else idea.logline[:50]
+            variants.append(logline_title)
+        
+        # Generate from concept
+        if idea.concept:
+            variants.append(idea.concept[:60])
+        
+        # Generate hook-based title
+        if idea.hook:
+            variants.append(f"'{idea.hook[:40]}...'")
+        
+        print("Generated Title Variants:")
+        for i, variant in enumerate(variants, 1):
+            print(f"  {i}. {variant}")
+        
+        # Let user select
+        choice = input(f"\nSelect title (1-{len(variants)}) or enter custom: ").strip()
+        
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(variants):
+                self.current_title = variants[idx]
+            else:
+                self.current_title = choice
+        except ValueError:
+            self.current_title = choice if choice else variants[0]
+        
+        # Increment title version
+        self.title_version += 1
+        
+        self.history.append({
+            "action": "generate_title",
+            "timestamp": datetime.now().isoformat(),
+            "title": self.current_title,
+            "version": self.title_version,
+        })
+        
+        print_success(f"Title selected: '{self.current_title}' (version {self.title_version})")
+        self._save_state()
+    
+    def show_title(self) -> None:
+        """Display the current Title."""
+        if self.current_title is None:
+            print_warning("No Title generated. Generate one first.")
+            return
+        
+        print_section("Current Title")
+        print(f"  {self.current_title}")
+        print()
+    
+    def generate_script(self) -> None:
+        """Generate a Script draft from Idea and Title."""
+        if self.current_idea is None:
+            print_warning("No Idea loaded. Create or load one first.")
+            return
+        
+        if self.current_title is None:
+            print_warning("No Title generated. Generate one first.")
+            return
+        
+        print_section("Generate Script Draft")
+        
+        idea = self.current_idea
+        
+        # Build script structure
+        script_parts = []
+        
+        # Hook opening
+        if idea.hook:
+            script_parts.append(f"[HOOK]\n{idea.hook}\n")
+        
+        # Main content from skeleton/outline
+        if idea.skeleton:
+            script_parts.append("[STRUCTURE]")
+            for line in idea.skeleton.split('\n'):
+                if line.strip():
+                    script_parts.append(f"• {line.strip()}")
+            script_parts.append("")
+        
+        # Emotional arc guidance
+        if idea.emotional_arc:
+            script_parts.append(f"[EMOTIONAL ARC]\n{idea.emotional_arc}\n")
+        
+        # Climax
+        if idea.climax:
+            script_parts.append(f"[CLIMAX]\n{idea.climax}\n")
+        
+        # Twist/Ending
+        if idea.twist:
+            script_parts.append(f"[TWIST]\n{idea.twist}\n")
+        
+        # Tone guidance
+        if idea.tone_guidance:
+            script_parts.append(f"[TONE GUIDANCE]\n{idea.tone_guidance}\n")
+        
+        self.current_script = '\n'.join(script_parts)
+        
+        # Increment script version
+        self.script_version += 1
+        
+        # Initialize script writer if available (unlimited iterations)
+        if SCRIPT_WRITER_AVAILABLE:
+            # Create ScriptWriter with a very high max_iterations value to effectively allow unlimited iterations
+            # Note: ScriptWriter doesn't have a native "unlimited" mode, so we use a large integer
+            self.script_writer = ScriptWriter(
+                writer_id="text_client_writer",
+                target_score_threshold=80,
+                max_iterations=999999,  # Effectively unlimited
+            )
+            print_info("ScriptWriter initialized for unlimited iteration support")
+        
+        self.history.append({
+            "action": "generate_script",
+            "timestamp": datetime.now().isoformat(),
+            "version": self.script_version,
+        })
+        
+        print_success(f"Script draft generated! (version {self.script_version})")
+        self.show_script()
+        self._save_state()
+    
+    def show_script(self) -> None:
+        """Display the current Script."""
+        if self.current_script is None:
+            print_warning("No Script generated. Generate one first.")
+            return
+        
+        print_section("Current Script")
+        print(self.current_script)
+        
+        print(f"\n{Colors.CYAN}Script Version:{Colors.END} {self.script_version}")
+        if self.script_writer:
+            print(f"{Colors.CYAN}Writer Status:{Colors.END}")
+            print(f"  Iteration: {self.script_writer.current_iteration} (unlimited)")
+            print(f"  Target Score: {self.script_writer.target_score_threshold}%")
+    
+    def iterate_script(self) -> None:
+        """Run feedback loop iteration on the script (unlimited iterations)."""
+        if self.current_script is None:
+            print_warning("No Script generated. Generate one first.")
+            return
+        
+        if not SCRIPT_WRITER_AVAILABLE:
+            print_warning("ScriptWriter not available. Cannot iterate.")
+            return
+        
+        print_section("Script Iteration (Feedback Loop - Unlimited)")
+        
+        print("Provide feedback on the current script:")
+        print("(Enter areas to improve, or 'skip' for auto-improvement)\n")
+        
+        feedback = input("Feedback: ").strip()
+        
+        if feedback.lower() != 'skip' and feedback:
+            # Apply user feedback to script
+            self.current_script += f"\n\n[USER FEEDBACK - Iteration {self.script_writer.current_iteration + 1}]\n"
+            self.current_script += f"Improvements requested: {feedback}\n"
+        
+        # Track iteration and increment script version
+        if self.script_writer:
+            self.script_writer.current_iteration += 1
+        self.script_version += 1
+        
+        self.history.append({
+            "action": "iterate_script",
+            "timestamp": datetime.now().isoformat(),
+            "feedback": feedback,
+            "version": self.script_version,
+        })
+        
+        print_success(f"Script iteration {self.script_writer.current_iteration} recorded (version {self.script_version})")
+        print_info("Unlimited iterations available - continue as needed")
+        self._save_state()
+    
+    def get_next_to_process(self) -> str:
+        """Get the item type with lowest version count for next processing.
+        
+        The workflow prioritizes items with the lowest version count to ensure
+        balanced progression. When multiple items have the same version count,
+        the priority order is: Idea > Title > Script (following the natural
+        workflow sequence).
+        
+        Returns:
+            The name of the item type (Idea, Title, or Script) with lowest version.
+            On tie, returns in workflow order: Idea first, then Title, then Script.
+        """
+        # List in workflow priority order - when versions are equal, earlier items win
+        versions = [
+            ("Idea", self.idea_version),
+            ("Title", self.title_version),
+            ("Script", self.script_version),
+        ]
+        # Sort by version count (ascending); stable sort preserves original order on ties
+        versions.sort(key=lambda x: x[1])
+        return versions[0][0]
+    
+    def show_workflow_status(self) -> None:
+        """Display current workflow status with version tracking."""
+        print_section("Workflow Status")
+        
+        stages = [
+            ("Idea", self.current_idea is not None, self.idea_version),
+            ("Title", self.current_title is not None, self.title_version),
+            ("Script", self.current_script is not None, self.script_version),
+        ]
+        
+        print(f"\n{Colors.BOLD}Content Status & Version Counts:{Colors.END}")
+        for stage, completed, version in stages:
+            status = f"{Colors.GREEN}✓{Colors.END}" if completed else f"{Colors.YELLOW}○{Colors.END}"
+            print(f"  {status} {stage}: version {version}")
+        
+        # Show recommendation for next item to process (lowest version)
+        next_item = self.get_next_to_process()
+        print(f"\n{Colors.CYAN}➤ Next to process (lowest version):{Colors.END} {next_item}")
+        
+        print(f"\n{Colors.BOLD}Session Duration:{Colors.END} {datetime.now() - self.session_start}")
+        print(f"{Colors.BOLD}Actions Taken:{Colors.END} {len(self.history)}")
+    
+    def export_content(self) -> None:
+        """Export current content to a file."""
+        print_section("Export Content")
+        
+        if not any([self.current_idea, self.current_title, self.current_script]):
+            print_warning("No content to export.")
+            return
+        
+        filename = input("Export filename (default: prismq_export.txt): ").strip()
+        filename = filename if filename else "prismq_export.txt"
+        
+        content = []
+        content.append(f"PrismQ.T Export - {datetime.now().isoformat()}")
+        content.append("=" * 60)
+        
+        if self.current_idea:
+            content.append("\n[IDEA]")
+            content.append(f"Title: {self.current_idea.title}")
+            content.append(f"Concept: {self.current_idea.concept}")
+            if self.current_idea.premise:
+                content.append(f"Premise: {self.current_idea.premise}")
+        
+        if self.current_title:
+            content.append(f"\n[TITLE]\n{self.current_title}")
+        
+        if self.current_script:
+            content.append(f"\n[SCRIPT]\n{self.current_script}")
+        
+        # Write to file
+        export_path = Path.cwd() / filename
+        with open(export_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(content))
+        
+        print_success(f"Content exported to: {export_path}")
+    
+    def reset_session(self) -> None:
+        """Reset the session."""
+        print_section("Reset Session")
+        
+        confirm = input("Are you sure you want to reset? (y/n): ").strip().lower()
+        if confirm == 'y':
+            self.current_idea = None
+            self.current_title = None
+            self.current_script = None
+            self.script_writer = None
+            self.history.clear()
+            self.session_start = datetime.now()
+            # Reset version counts
+            self.idea_version = 0
+            self.title_version = 0
+            self.script_version = 0
+            # Clear state file
+            self.clear_state()
+            print_success("Session reset! (all versions reset to 0)")
+        else:
+            print_info("Reset cancelled.")
+    
+    def show_session_summary(self) -> None:
+        """Display session summary."""
+        print_section("Session Summary")
+        
+        print(f"{Colors.BOLD}Started:{Colors.END} {self.session_start.isoformat()}")
+        print(f"{Colors.BOLD}Duration:{Colors.END} {datetime.now() - self.session_start}")
+        print(f"{Colors.BOLD}Actions:{Colors.END} {len(self.history)}")
+        
+        if self.history:
+            print(f"\n{Colors.BOLD}Action History:{Colors.END}")
+            for i, action in enumerate(self.history[-10:], 1):  # Show last 10
+                print(f"  {i}. {action['action']} - {action['timestamp']}")
+    
+    def _run_interactive_loop(self) -> None:
+        """Run the interactive command loop.
+        
+        This is the core command processing loop, separated from run() so it can
+        be reused when demo mode pre-loads data before starting the loop.
+        """
+        while True:
+            try:
+                choice = input(f"{Colors.BOLD}> {Colors.END}").strip().lower()
+                
+                if choice == '1':
+                    self.create_idea()
+                elif choice == '2':
+                    self.load_demo_idea()
+                elif choice == '3':
+                    self.show_idea()
+                elif choice == '4':
+                    print_info("Edit functionality - use create_idea to modify")
+                elif choice == '5':
+                    self.generate_title()
+                elif choice == '6':
+                    self.show_title()
+                elif choice == '7':
+                    self.generate_script()
+                elif choice == '8':
+                    self.show_script()
+                elif choice == '9':
+                    self.iterate_script()
+                elif choice == '10':
+                    self.show_workflow_status()
+                elif choice == '11':
+                    self.export_content()
+                elif choice == '12':
+                    self.reset_session()
+                elif choice in ('h', 'help', 'menu'):
+                    self.show_menu()
+                elif choice == 's':
+                    self.show_session_summary()
+                elif choice in ('q', 'quit', 'exit'):
+                    print_info("Thank you for using PrismQ.T Text Client!")
+                    break
+                elif choice == '':
+                    continue
+                else:
+                    print_warning(f"Unknown command: '{choice}'. Type 'h' for help.")
+                    
+            except KeyboardInterrupt:
+                print("\n")
+                print_info("Use 'q' to quit.")
+            except EOFError:
+                print_info("\nGoodbye!")
+                break
+    
+    def run(self) -> None:
+        """Run the interactive client."""
+        self.show_welcome()
+        self.show_menu()
+        self._run_interactive_loop()
+
+
+def main():
+    """Main entry point."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description="PrismQ.T Interactive Text Client",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python run_text_client.py                    # Start interactive client
+  python run_text_client.py --demo             # Start with demo data loaded
+  python run_text_client.py --check            # Check module availability
+  python run_text_client.py --action create_idea    # Run create idea step
+  python run_text_client.py --action generate_title # Run generate title step
+  python run_text_client.py --action generate_script # Run generate script step
+  python run_text_client.py --action iterate_script  # Run iterate script step
+  python run_text_client.py --action export          # Export content
+  python run_text_client.py --action status          # Show workflow status
+  python run_text_client.py --action load_demo       # Load demo idea
+  python run_text_client.py --action reset           # Reset session and clear state
+        """
+    )
+    
+    parser.add_argument(
+        '--demo', 
+        action='store_true',
+        help='Start with demo Idea loaded'
+    )
+    parser.add_argument(
+        '--check',
+        action='store_true', 
+        help='Check module availability and exit'
+    )
+    parser.add_argument(
+        '--action',
+        type=str,
+        choices=['create_idea', 'generate_title', 'generate_script', 
+                 'iterate_script', 'export', 'status', 'load_demo', 'reset'],
+        help='Run a specific action (for batch script workflows)'
+    )
+    
+    args = parser.parse_args()
+    
+    if args.check:
+        print("PrismQ.T Module Availability Check")
+        print("=" * 40)
+        print(f"Idea Model:    {'✓ Available' if IDEA_AVAILABLE else '✗ Not available'}")
+        print(f"ScriptWriter:  {'✓ Available' if SCRIPT_WRITER_AVAILABLE else '✗ Not available'}")
+        print(f"\nRepository Root: {REPO_ROOT}")
+        print(f"T Module Root:   {T_ROOT}")
+        return
+    
+    # Handle --action mode for batch scripts (each step as separate process)
+    if args.action:
+        # Load state from previous steps
+        client = TextClient(load_state=True)
+        
+        action_map = {
+            'create_idea': client.create_idea,
+            'generate_title': client.generate_title,
+            'generate_script': client.generate_script,
+            'iterate_script': client.iterate_script,
+            'export': client.export_content,
+            'status': client.show_workflow_status,
+            'load_demo': client.load_demo_idea,
+            'reset': lambda: (client.reset_session(), client.clear_state()),
+        }
+        
+        action_func = action_map.get(args.action)
+        if action_func:
+            print_header(f"PrismQ.T - {args.action.replace('_', ' ').title()}")
+            action_func()
+        else:
+            print_error(f"Unknown action: {args.action}")
+            sys.exit(1)
+        return
+    
+    client = TextClient()
+    
+    if args.demo:
+        # Pre-load demo data before starting interactive session
+        client.show_welcome()
+        client.load_demo_idea()
+        client.show_menu()
+        # Continue with normal interactive loop (client.run starts its own loop)
+        client._run_interactive_loop()
+    else:
+        client.run()
+
+
+if __name__ == "__main__":
+    main()
