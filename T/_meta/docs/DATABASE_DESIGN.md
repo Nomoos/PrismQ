@@ -43,10 +43,11 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 ```sql
 -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
 -- Text field contains prompt-like content for content generation
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT,                                      -- Prompt-like text describing the idea
-    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
@@ -64,35 +65,53 @@ Story (
 )
 
 -- Title versions with full history
+-- Each title version directly references its review (if any)
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- Version tracking (UINT simulation)
     text TEXT NOT NULL,
+    review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
 -- Script/Text versions with full history
+-- Each script version directly references its review (if any)
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- Version tracking (UINT simulation)
     text TEXT NOT NULL,
+    review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
--- Reviews with discriminator pattern for different review types
+-- Review: Simple review content without version tracking
+-- Title/Script reference Review directly via FK
+-- Story references Review via StoryReview linking table
 Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_title_version_id INTEGER FK NULL REFERENCES Title(id),
-    reviewed_script_version_id INTEGER FK NULL REFERENCES Script(id),
-    feedback TEXT NOT NULL,
+    text TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+
+-- StoryReview: Linking table for Story reviews (many-to-many)
+-- Allows one Story to have multiple reviews with different types
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
+-- UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
+StoryReview (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER FK NOT NULL REFERENCES Story(id),
+    review_id INTEGER FK NOT NULL REFERENCES Review(id),
+    version INTEGER NOT NULL CHECK (version >= 0),    -- Story version being reviewed (UINT simulation)
+    review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(story_id, version, review_type)
 )
 ```
 
@@ -106,18 +125,38 @@ Review (
          ┌────────────────┼────────────────┐
          │                │                │
          ▼                ▼                ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────┐
-│    Title     │  │    Script    │  │  Review  │
-└──────────────┘  └──────────────┘  └──────────┘
+┌──────────────┐  ┌──────────────┐  ┌─────────────┐
+│    Title     │  │    Script    │  │ StoryReview │
+│  review_id───┼──┼──review_id───┼──┼──►┌────────┐│
+└──────────────┘  └──────────────┘  │   │ Review ││
+                                    │   └────────┘│
+                                    └─────────────┘
 ```
 
-### Review Types Explained
+### Review Relationship Types
 
-| Review Type | Description | Version IDs Set |
-|-------------|-------------|-----------------|
-| `title` | Reviews only the title | `reviewed_title_version_id` only |
-| `script` | Reviews only the script | `reviewed_script_version_id` only |
-| `story` | Reviews complete story (title + script) | Both version IDs set |
+| Content Type | Review Relationship | Multiple Reviews? |
+|--------------|---------------------|-------------------|
+| Title | Direct FK (`title.review_id → review.id`) | No (1:1 per version) |
+| Script | Direct FK (`script.review_id → review.id`) | No (1:1 per version) |
+| Story | Linking table (`StoryReview`) | Yes (many reviews per story) |
+
+### StoryReview Types (for Story-level reviews)
+
+| review_type | Description |
+|-------------|-------------|
+| `grammar` | Grammar and spelling review |
+| `tone` | Tone and voice consistency |
+| `content` | Content quality and accuracy |
+| `consistency` | Internal consistency check |
+| `editing` | Editorial improvements |
+
+### Design Benefits
+
+1. **Title/Script**: Direct FK relationship is simple and efficient
+2. **Story**: Linking table allows multiple reviews with different types (grammar, tone, etc.)
+3. **Clean Review table**: Review only contains review content, no relationship tracking
+4. **Extensible**: New review types can be added to StoryReview without schema changes
 
 ---
 
@@ -202,11 +241,11 @@ When running steps as separate processes (via batch scripts), the state is prese
 - [x] Create `Story` model with state machine and implicit version tracking (PR #139)
 - [ ] Create `Title` model
 - [ ] Create `Script` model
-- [ ] Create `Review` model with discriminator
+- [x] Create `Review` model with discriminator and single reviewed_version field
 
 ### Phase 2: Relationships & Constraints
 - [x] Set up foreign key relationships (Story → Idea FK)
-- [ ] Add CHECK constraints for Review types
+- [x] Add CHECK constraints for Review types (review_type IN ('title', 'script', 'story'))
 - [ ] Create indexes for common queries
 - [ ] ~~Add database triggers for `updated_at`~~ (Not needed - timestamps immutable after creation)
 
@@ -354,8 +393,8 @@ Following established conventions for database relation naming:
 | Convention | Example | Description |
 |------------|---------|-------------|
 | `<table>_id` | `story_id`, `idea_id` | Standard FK reference |
-| `<role>_<table>_id` | `reviewed_title_version_id` | Role-specific reference |
-| `current_<table>_id` | `current_title_version_id` | Current/active reference |
+| `<role>_<type>` | `reviewed_version` | Role-specific field with discriminator |
+| `current_<table>_id` | `current_title_version_id` | Current/active reference (deprecated - use implicit lookup) |
 
 #### Relationship Field Naming (ORM)
 | Convention | Example | Description |
@@ -448,12 +487,12 @@ StoryMetrics (
    - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)
 
-4. **Create Review Model**
-   - Discriminator pattern for review types
-   - `reviewed_title_version_id` FK (nullable)
-   - `reviewed_script_version_id` FK (nullable)
-   - CHECK constraints for version ID validation
-   - Score range validation
+4. **Create Review Model** ✅ IMPLEMENTED
+   - Discriminator pattern for review types (`title`, `script`, `story`)
+   - Single `reviewed_version` field (INTEGER) for universal version tracking
+   - Implicit version identification: `review_type` + `reviewed_version` = target content
+   - CHECK constraints for review_type validation
+   - Score range validation (0-100)
 
 5. **Create Idea Model** ✅ IMPLEMENTED (PR #138)
    - Simplified schema: `(id, text, version, created_at)`

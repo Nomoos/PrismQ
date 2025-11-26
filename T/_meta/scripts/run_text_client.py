@@ -274,9 +274,12 @@ class TextClient:
         Tables:
         - Idea: Idea data (referenced by Story via FK)
         - Story: Main object with state (next process name) and idea_id FK
-        - TitleVersion: Version history for titles
-        - ScriptVersion: Version history for scripts
-        - Review: Reviews with discriminator pattern (title/script/story)
+        - TitleVersion: Version history for titles (with direct review_id FK)
+        - ScriptVersion: Version history for scripts (with direct review_id FK)
+        - Review: Simple review content
+        - StoryReview: Linking table for Story reviews (many-to-many)
+        
+        Note: version fields use INTEGER with CHECK >= 0 to simulate unsigned integer
         """
         db_path = self._get_db_path()
         with sqlite3.connect(db_path) as conn:
@@ -284,16 +287,12 @@ class TextClient:
             conn.execute("PRAGMA foreign_keys=ON")
             
             # Idea: Simple idea data table (referenced by Story via FK)
-            # Schema follows the simplified requirement:
-            #   id INTEGER PRIMARY KEY AUTOINCREMENT
-            #   text TEXT - prompt-like text describing the idea
-            #   version INTEGER NOT NULL - version tracking
-            #   created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Idea (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     text TEXT,
-                    version INTEGER NOT NULL DEFAULT 1,
+                    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
                     created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
@@ -312,46 +311,65 @@ class TextClient:
                 )
             """)
             
-            # TitleVersion: Version history for titles
+            # Review: Simple review content (no relationship tracking)
+            # Title/Script reference Review directly via FK
+            # Story references Review via StoryReview linking table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Review (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    text TEXT NOT NULL,
+                    score INTEGER CHECK (score >= 0 AND score <= 100),
+                    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                )
+            """)
+            
+            # TitleVersion: Version history for titles with direct review FK
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS TitleVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
-                    version INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
                     text TEXT NOT NULL,
+                    review_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (story_id) REFERENCES Story(id),
+                    FOREIGN KEY (review_id) REFERENCES Review(id),
                     UNIQUE(story_id, version)
                 )
             """)
             
-            # ScriptVersion: Version history for scripts
+            # ScriptVersion: Version history for scripts with direct review FK
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS ScriptVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
-                    version INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
                     text TEXT NOT NULL,
+                    review_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (story_id) REFERENCES Story(id),
+                    FOREIGN KEY (review_id) REFERENCES Review(id),
                     UNIQUE(story_id, version)
                 )
             """)
             
-            # Review: Reviews with discriminator pattern
+            # StoryReview: Linking table for Story reviews (many-to-many)
+            # Allows one Story to have multiple reviews with different types
+            # version uses CHECK >= 0 to simulate unsigned integer
+            # UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Review (
+                CREATE TABLE IF NOT EXISTS StoryReview (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
-                    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-                    reviewed_title_version_id INTEGER NULL,
-                    reviewed_script_version_id INTEGER NULL,
-                    feedback TEXT NOT NULL,
-                    score INTEGER CHECK (score >= 0 AND score <= 100),
+                    review_id INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
+                    review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (story_id) REFERENCES Story(id),
-                    FOREIGN KEY (reviewed_title_version_id) REFERENCES TitleVersion(id),
-                    FOREIGN KEY (reviewed_script_version_id) REFERENCES ScriptVersion(id)
+                    FOREIGN KEY (review_id) REFERENCES Review(id),
+                    UNIQUE(story_id, version, review_type)
                 )
             """)
             
