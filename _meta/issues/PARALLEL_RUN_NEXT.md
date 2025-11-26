@@ -125,7 +125,7 @@ Story (
 )
 
 -- Title versions with full history
-TitleVersion (
+Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     version INTEGER NOT NULL,
@@ -136,7 +136,7 @@ TitleVersion (
 )
 
 -- Script versions with full history
-ScriptVersion (
+Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     version INTEGER NOT NULL,
@@ -153,8 +153,8 @@ ScriptVersion (
 
 The system tracks version counts for each content type:
 - **Idea Version**: Tracked in Idea.version field
-- **Title Version**: Tracked in TitleVersion.version field
-- **Script Version**: Tracked in ScriptVersion.version field
+- **Title Version**: Tracked in Title.version field
+- **Script Version**: Tracked in Script.version field
 
 **Next-to-Process Algorithm**: Selects item with lowest version count
 - Tie-breaking follows natural workflow order: Idea → Title → Script
@@ -185,7 +185,7 @@ Story (
 )
 
 -- Title versions with full history
-TitleVersion (
+Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
@@ -195,7 +195,7 @@ TitleVersion (
 )
 
 -- Script versions with full history
-ScriptVersion (
+Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
