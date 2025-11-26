@@ -145,6 +145,118 @@ class TextClient:
         """Get the path to the SQLite database file."""
         return SCRIPT_DIR / self.STATE_DB
     
+    def _idea_to_prompt_text(self, idea: Any) -> str:
+        """Convert an Idea object to prompt-like text format.
+        
+        This method creates a structured prompt text from an Idea object,
+        following the requirement that Idea.text should be in "format prompt like".
+        
+        Args:
+            idea: The Idea object to convert
+            
+        Returns:
+            A prompt-like text string representing the idea
+        """
+        parts = []
+        
+        # Get title and concept (required fields)
+        title = getattr(idea, "title", "")
+        concept = getattr(idea, "concept", "")
+        
+        if title:
+            parts.append(f"Title: {title}")
+        if concept:
+            parts.append(f"Concept: {concept}")
+        
+        # Optional story foundation fields
+        premise = getattr(idea, "premise", "")
+        if premise:
+            parts.append(f"Premise: {premise}")
+        
+        logline = getattr(idea, "logline", "")
+        if logline:
+            parts.append(f"Logline: {logline}")
+        
+        hook = getattr(idea, "hook", "")
+        if hook:
+            parts.append(f"Hook: {hook}")
+        
+        # Story structure
+        skeleton = getattr(idea, "skeleton", "")
+        if skeleton:
+            parts.append(f"Structure: {skeleton}")
+        
+        # Narrative elements
+        emotional_arc = getattr(idea, "emotional_arc", "")
+        if emotional_arc:
+            parts.append(f"Emotional Arc: {emotional_arc}")
+        
+        twist = getattr(idea, "twist", "")
+        if twist:
+            parts.append(f"Twist: {twist}")
+        
+        climax = getattr(idea, "climax", "")
+        if climax:
+            parts.append(f"Climax: {climax}")
+        
+        # Guidance
+        tone_guidance = getattr(idea, "tone_guidance", "")
+        if tone_guidance:
+            parts.append(f"Tone Guidance: {tone_guidance}")
+        
+        target_audience = getattr(idea, "target_audience", "")
+        if target_audience:
+            parts.append(f"Target Audience: {target_audience}")
+        
+        # Genre
+        genre = getattr(idea, "genre", None)
+        if genre:
+            genre_value = genre.value if hasattr(genre, 'value') else str(genre)
+            parts.append(f"Genre: {genre_value}")
+        
+        return "\n".join(parts)
+    
+    def _prompt_text_to_idea_data(self, text: str) -> Dict[str, Any]:
+        """Parse prompt-like text back into idea data dictionary.
+        
+        Args:
+            text: The prompt text to parse
+            
+        Returns:
+            Dictionary with idea fields extracted from text
+        """
+        data = {}
+        
+        # Parse key-value lines from the prompt text
+        for line in text.split("\n"):
+            line = line.strip()
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip().lower().replace(" ", "_")
+                value = value.strip()
+                
+                # Map parsed keys to idea fields
+                field_map = {
+                    "title": "title",
+                    "concept": "concept",
+                    "premise": "premise",
+                    "logline": "logline",
+                    "hook": "hook",
+                    "structure": "skeleton",
+                    "skeleton": "skeleton",
+                    "emotional_arc": "emotional_arc",
+                    "twist": "twist",
+                    "climax": "climax",
+                    "tone_guidance": "tone_guidance",
+                    "target_audience": "target_audience",
+                    "genre": "genre",
+                }
+                
+                if key in field_map:
+                    data[field_map[key]] = value
+        
+        return data
+
     # Process state names following PrismQ naming convention (folder structure)
     # See T/WORKFLOW_STATE_MACHINE.md for full state machine documentation
     PROCESS_STATES = {
@@ -171,24 +283,18 @@ class TextClient:
             cursor = conn.cursor()
             conn.execute("PRAGMA foreign_keys=ON")
             
-            # Idea: Idea data table (referenced by Story via FK)
+            # Idea: Simple idea data table (referenced by Story via FK)
+            # Schema follows the simplified requirement:
+            #   id INTEGER PRIMARY KEY AUTOINCREMENT
+            #   text TEXT - prompt-like text describing the idea
+            #   version INTEGER NOT NULL - version tracking
+            #   created_at TEXT NOT NULL DEFAULT (datetime('now'))
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Idea (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    concept TEXT,
-                    premise TEXT,
-                    logline TEXT,
-                    hook TEXT,
-                    skeleton TEXT,
-                    emotional_arc TEXT,
-                    twist TEXT,
-                    climax TEXT,
-                    tone_guidance TEXT,
-                    target_audience TEXT,
-                    genre TEXT,
-                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+                    text TEXT,
+                    version INTEGER NOT NULL DEFAULT 1,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
             
@@ -278,35 +384,14 @@ class TextClient:
             else:
                 state = self.PROCESS_STATES['initial']
             
-            # Extract idea data
-            idea_data = {}
+            # Extract idea data and convert to prompt-like text format
             idea_id = None
             if self.current_idea is not None:
-                try:
-                    idea_data = self.current_idea.to_dict()
-                except AttributeError:
-                    genre_value = "other"
-                    if IDEA_AVAILABLE:
-                        genre = getattr(self.current_idea, "genre", None)
-                        if genre is not None:
-                            genre_value = genre.value if hasattr(genre, 'value') else str(genre)
-                    
-                    idea_data = {
-                        "title": getattr(self.current_idea, "title", ""),
-                        "concept": getattr(self.current_idea, "concept", ""),
-                        "premise": getattr(self.current_idea, "premise", ""),
-                        "logline": getattr(self.current_idea, "logline", ""),
-                        "hook": getattr(self.current_idea, "hook", ""),
-                        "skeleton": getattr(self.current_idea, "skeleton", ""),
-                        "emotional_arc": getattr(self.current_idea, "emotional_arc", ""),
-                        "twist": getattr(self.current_idea, "twist", ""),
-                        "climax": getattr(self.current_idea, "climax", ""),
-                        "tone_guidance": getattr(self.current_idea, "tone_guidance", ""),
-                        "target_audience": getattr(self.current_idea, "target_audience", ""),
-                        "genre": genre_value,
-                    }
+                # Convert full Idea to simplified prompt text format
+                # This follows the requirement: "text in format prompt like"
+                idea_text = self._idea_to_prompt_text(self.current_idea)
                 
-                # Save or update Idea
+                # Save or update Idea using simplified schema (id, text, version, created_at)
                 cursor.execute("SELECT id FROM Idea ORDER BY id DESC LIMIT 1")
                 idea_row = cursor.fetchone()
                 
@@ -314,45 +399,14 @@ class TextClient:
                     idea_id = idea_row[0]
                     cursor.execute("""
                         UPDATE Idea SET
-                            title = ?, concept = ?, premise = ?, logline = ?, hook = ?,
-                            skeleton = ?, emotional_arc = ?, twist = ?, climax = ?,
-                            tone_guidance = ?, target_audience = ?, genre = ?,
-                            updated_at = datetime('now')
+                            text = ?, version = ?
                         WHERE id = ?
-                    """, (
-                        idea_data.get("title", ""),
-                        idea_data.get("concept", ""),
-                        idea_data.get("premise", ""),
-                        idea_data.get("logline", ""),
-                        idea_data.get("hook", ""),
-                        idea_data.get("skeleton", ""),
-                        idea_data.get("emotional_arc", ""),
-                        idea_data.get("twist", ""),
-                        idea_data.get("climax", ""),
-                        idea_data.get("tone_guidance", ""),
-                        idea_data.get("target_audience", ""),
-                        idea_data.get("genre", "other"),
-                        idea_id,
-                    ))
+                    """, (idea_text, self.idea_version, idea_id))
                 else:
                     cursor.execute("""
-                        INSERT INTO Idea (title, concept, premise, logline, hook, skeleton,
-                                         emotional_arc, twist, climax, tone_guidance, target_audience, genre)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        idea_data.get("title", ""),
-                        idea_data.get("concept", ""),
-                        idea_data.get("premise", ""),
-                        idea_data.get("logline", ""),
-                        idea_data.get("hook", ""),
-                        idea_data.get("skeleton", ""),
-                        idea_data.get("emotional_arc", ""),
-                        idea_data.get("twist", ""),
-                        idea_data.get("climax", ""),
-                        idea_data.get("tone_guidance", ""),
-                        idea_data.get("target_audience", ""),
-                        idea_data.get("genre", "other"),
-                    ))
+                        INSERT INTO Idea (text, version)
+                        VALUES (?, ?)
+                    """, (idea_text, self.idea_version))
                     idea_id = cursor.lastrowid
             
             # Get or create Story
@@ -461,38 +515,30 @@ class TextClient:
                     # Title version from TitleVersion table
                     # Script version from ScriptVersion table
                 
-                # Load idea data from Idea table via FK
+                # Load idea data from Idea table via FK (simplified schema: text, version, created_at)
                 if idea_id and IDEA_AVAILABLE:
                     cursor.execute("SELECT * FROM Idea WHERE id = ?", (idea_id,))
                     idea_row = cursor.fetchone()
                     
                     if idea_row:
-                        idea_data = {
-                            "title": idea_row["title"] or "",
-                            "concept": idea_row["concept"] or "",
-                            "premise": idea_row["premise"] or "",
-                            "logline": idea_row["logline"] or "",
-                            "hook": idea_row["hook"] or "",
-                            "skeleton": idea_row["skeleton"] or "",
-                            "emotional_arc": idea_row["emotional_arc"] or "",
-                            "twist": idea_row["twist"] or "",
-                            "climax": idea_row["climax"] or "",
-                            "tone_guidance": idea_row["tone_guidance"] or "",
-                            "target_audience": idea_row["target_audience"] or "",
-                            "genre": idea_row["genre"] or "other",
-                        }
+                        # Parse prompt text back to idea data
+                        idea_text = idea_row["text"] or ""
+                        idea_version = idea_row["version"] or 1
+                        
+                        # Convert prompt text to idea data dictionary
+                        idea_data = self._prompt_text_to_idea_data(idea_text)
                         
                         try:
                             self.current_idea = Idea.from_dict(idea_data)
                             self._idea_data = idea_data
-                            self.idea_version = 1
+                            self.idea_version = idea_version
                         except (AttributeError, TypeError, KeyError, ValueError):
                             self.current_idea = Idea(
                                 title=idea_data.get("title", ""),
                                 concept=idea_data.get("concept", ""),
                             )
                             self._idea_data = idea_data
-                            self.idea_version = 1
+                            self.idea_version = idea_version
                 
                 # Load current TitleVersion
                 if story_row["current_title_version_id"]:
