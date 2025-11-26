@@ -225,17 +225,23 @@ processing is picked by lowest version count, ensuring balanced workflow progres
 
 ## Database Schema
 
-The system uses a **SQLite database** with only **4 core tables**:
+The system uses a **SQLite database** with **5 core tables**:
 
 ```sql
-Story (id, state, current_title_version_id FK, current_script_version_id FK, 
-       title, concept, premise, logline, hook, skeleton, emotional_arc, 
-       twist, climax, tone_guidance, target_audience, genre, created_at, updated_at)
+Idea (id, title, concept, premise, logline, hook, skeleton, emotional_arc, 
+      twist, climax, tone_guidance, target_audience, genre, created_at, updated_at)
+Story (id, idea_id FK, state, current_title_version_id FK, current_script_version_id FK, 
+       created_at, updated_at)
 TitleVersion (id, story_id FK, version, text, created_at)
 ScriptVersion (id, story_id FK, version, text, created_at)
 Review (id, story_id FK, review_type, reviewed_title_version_id FK NULL, 
         reviewed_script_version_id FK NULL, feedback, score, created_at)
 ```
+
+### Entity Relationship
+- **Story** references **Idea** via `idea_id` FK
+- **TitleVersion** and **ScriptVersion** reference **Story** via `story_id` FK
+- **Review** references **Story** and optionally **TitleVersion**/**ScriptVersion**
 
 ### Process State (Story.state)
 

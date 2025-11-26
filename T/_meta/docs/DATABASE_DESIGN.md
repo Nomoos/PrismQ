@@ -38,18 +38,12 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 
 ## Chosen Approach: Hybrid Model
 
-### Core Tables (Only 4 Tables)
+### Core Tables (5 Tables)
 
 ```sql
--- Main Story table with state (next process name) and current version references
--- State is stored as a string representing the next process to run
-Story (
+-- Idea: Idea data (referenced by Story via FK)
+Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_id INTEGER NULL,              -- Reference to Idea model (future)
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',  -- Next process name
-    current_title_version_id INTEGER FK NULL,
-    current_script_version_id INTEGER FK NULL,
-    -- Idea data stored directly on Story
     title TEXT,
     concept TEXT,
     premise TEXT,
@@ -62,6 +56,18 @@ Story (
     tone_guidance TEXT,
     target_audience TEXT,
     genre TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+
+-- Main Story table with state (next process name) and idea_id FK
+-- State is stored as a string representing the next process to run
+Story (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',  -- Next process name
+    current_title_version_id INTEGER FK NULL,
+    current_script_version_id INTEGER FK NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
@@ -97,6 +103,21 @@ Review (
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
+```
+
+### Entity Relationship
+
+```
+┌──────────┐         ┌──────────┐
+│   Idea   │◄────FK──│  Story   │
+└──────────┘         └────┬─────┘
+                          │
+         ┌────────────────┼────────────────┐
+         │                │                │
+         ▼                ▼                ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────┐
+│ TitleVersion │  │ScriptVersion │  │  Review  │
+└──────────────┘  └──────────────┘  └──────────┘
 ```
 
 ### Review Types Explained
