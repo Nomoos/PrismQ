@@ -278,6 +278,8 @@ class TextClient:
         - ScriptVersion: Version history for scripts (with direct review_id FK)
         - Review: Simple review content
         - StoryReview: Linking table for Story reviews (many-to-many)
+        
+        Note: version fields use INTEGER with CHECK >= 0 to simulate unsigned integer
         """
         db_path = self._get_db_path()
         with sqlite3.connect(db_path) as conn:
@@ -285,16 +287,12 @@ class TextClient:
             conn.execute("PRAGMA foreign_keys=ON")
             
             # Idea: Simple idea data table (referenced by Story via FK)
-            # Schema follows the simplified requirement:
-            #   id INTEGER PRIMARY KEY AUTOINCREMENT
-            #   text TEXT - prompt-like text describing the idea
-            #   version INTEGER NOT NULL - version tracking
-            #   created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Idea (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     text TEXT,
-                    version INTEGER NOT NULL DEFAULT 1,
+                    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
                     created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
@@ -326,11 +324,12 @@ class TextClient:
             """)
             
             # TitleVersion: Version history for titles with direct review FK
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS TitleVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
-                    version INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
                     text TEXT NOT NULL,
                     review_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -341,11 +340,12 @@ class TextClient:
             """)
             
             # ScriptVersion: Version history for scripts with direct review FK
+            # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS ScriptVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
-                    version INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
                     text TEXT NOT NULL,
                     review_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -357,13 +357,14 @@ class TextClient:
             
             # StoryReview: Linking table for Story reviews (many-to-many)
             # Allows one Story to have multiple reviews with different types
+            # version uses CHECK >= 0 to simulate unsigned integer
             # UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS StoryReview (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
                     review_id INTEGER NOT NULL,
-                    version INTEGER NOT NULL,
+                    version INTEGER NOT NULL CHECK (version >= 0),
                     review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (story_id) REFERENCES Story(id),

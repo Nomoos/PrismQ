@@ -43,10 +43,11 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 ```sql
 -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
 -- Text field contains prompt-like content for content generation
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT,                                      -- Prompt-like text describing the idea
-    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
@@ -65,10 +66,11 @@ Story (
 
 -- Title versions with full history
 -- Each title version directly references its review (if any)
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- Version tracking (UINT simulation)
     text TEXT NOT NULL,
     review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -77,10 +79,11 @@ Title (
 
 -- Script/Text versions with full history
 -- Each script version directly references its review (if any)
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- Version tracking (UINT simulation)
     text TEXT NOT NULL,
     review_id INTEGER FK NULL REFERENCES Review(id),  -- Direct FK to review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -99,12 +102,13 @@ Review (
 
 -- StoryReview: Linking table for Story reviews (many-to-many)
 -- Allows one Story to have multiple reviews with different types
+-- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
 -- UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
 StoryReview (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     review_id INTEGER FK NOT NULL REFERENCES Review(id),
-    version INTEGER NOT NULL,                          -- Story version being reviewed
+    version INTEGER NOT NULL CHECK (version >= 0),    -- Story version being reviewed (UINT simulation)
     review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version, review_type)

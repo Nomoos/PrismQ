@@ -66,6 +66,7 @@ cd /home/runner/work/PrismQ/PrismQ
 git checkout -b db-002-title-model
 # Create: T/Database/models/title.py
 # - Implement Title model using IModel interface
+# - Fields: id, story_id, version (INTEGER >= 0), text, review_id (FK), created_at
 # - Depend on abstraction, not concrete database
 # Tests: T/Database/_meta/tests/test_title_model.py
 
@@ -75,6 +76,7 @@ cd /home/runner/work/PrismQ/PrismQ
 git checkout -b db-003-script-model
 # Create: T/Database/models/script.py
 # - Implement Script model using IModel interface
+# - Fields: id, story_id, version (INTEGER >= 0), text, review_id (FK), created_at
 # Tests: T/Database/_meta/tests/test_script_model.py
 
 # === DB-004: Implement Review Model (Single Responsibility) ===
@@ -82,9 +84,18 @@ git checkout -b db-003-script-model
 cd /home/runner/work/PrismQ/PrismQ
 git checkout -b db-004-review-model
 # Create: T/Database/models/review.py
-# - Single reviewed_version field + review_type discriminator
-# - Only handles review data, not business logic
+# - Simple content: id, text, score, created_at
+# - No relationship tracking - Title/Script reference Review via FK
 # Tests: T/Database/_meta/tests/test_review_model.py
+
+# === DB-005: Implement StoryReview Linking Table ===
+# Worker: Any (parallel with DB-004)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b db-005-story-review-model
+# Create: T/Database/models/story_review.py
+# - Linking table: id, story_id, review_id, version (INTEGER >= 0), review_type, created_at
+# - Allows one Story to have multiple reviews with different types
+# Tests: T/Database/_meta/tests/test_story_review_model.py
 ```
 
 ### Parallel Group 3: Integration (After Group 2)
@@ -143,7 +154,7 @@ git checkout -b post-005-batch-processing
 | Group | Issues | Can Run Parallel | Depends On | SOLID Principle |
 |-------|--------|------------------|------------|-----------------|
 | **Group 1** | STATE-001, STATE-002, STATE-003 | ✅ All 3 parallel | None | S, O, L |
-| **Group 2** | DB-001, DB-002, DB-003, DB-004 | ✅ All 4 parallel | Group 1 | I, D, S |
+| **Group 2** | DB-001, DB-002, DB-003, DB-004, DB-005 | ✅ All 5 parallel | Group 1 | I, D, S |
 | **Group 3** | INT-001, INT-002 | ✅ Both parallel | Group 2 | D |
 | **Group 4** | POST-001, POST-003, POST-005 | ✅ All 3 parallel | None (Independent) | - |
 
@@ -151,7 +162,7 @@ git checkout -b post-005-batch-processing
 ```
 Week 1:
 ├─ Day 1-2: Group 1 (STATE-001, STATE-002, STATE-003) [PARALLEL]
-├─ Day 2-4: Group 2 (DB-001, DB-002, DB-003, DB-004) [PARALLEL]
+├─ Day 2-4: Group 2 (DB-001, DB-002, DB-003, DB-004, DB-005) [PARALLEL]
 └─ Day 1-4: Group 4 (POST-001, POST-003, POST-005) [PARALLEL, Independent]
 
 Week 2:
@@ -257,9 +268,10 @@ TRANSITIONS = {
 
 **Acceptance Criteria**:
 - [ ] Create `TitleModel` implementing `IModel` interface
-- [ ] Fields: `id`, `story_id`, `version`, `text`, `created_at`
+- [ ] Fields: `id`, `story_id`, `version` (INTEGER >= 0), `text`, `review_id` (FK), `created_at`
 - [ ] Unique constraint on `(story_id, version)`
 - [ ] Current version lookup via `ORDER BY version DESC LIMIT 1`
+- [ ] Direct FK to Review table for 1:1 review relationship
 
 ---
 
@@ -269,8 +281,10 @@ TRANSITIONS = {
 
 **Acceptance Criteria**:
 - [ ] Create `ScriptModel` implementing `IModel` interface
-- [ ] Fields: `id`, `story_id`, `version`, `text`, `created_at`
+- [ ] Fields: `id`, `story_id`, `version` (INTEGER >= 0), `text`, `review_id` (FK), `created_at`
+- [ ] Unique constraint on `(story_id, version)`
 - [ ] Same structure as TitleModel for consistency
+- [ ] Direct FK to Review table for 1:1 review relationship
 
 ---
 
@@ -280,21 +294,44 @@ TRANSITIONS = {
 
 **Acceptance Criteria**:
 - [ ] Create `ReviewModel` implementing `IModel` interface
-- [ ] Single `reviewed_version` field (not multiple FKs)
-- [ ] `review_type` discriminator: `'title'`, `'script'`, `'story'`
-- [ ] Implicit version lookup via `review_type + reviewed_version`
+- [ ] Simple content storage: `id`, `text`, `score`, `created_at`
+- [ ] No relationship tracking - Title/Script reference Review via FK
+- [ ] Story references Review via StoryReview linking table
 
 **Schema**:
 ```sql
+-- Review: Simple content (no relationship tracking)
 Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER NOT NULL,
-    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_version INTEGER NULL,
     text TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+```
+
+---
+
+### DB-005: Implement StoryReview Linking Table
+**Priority**: 🟠 HIGH | **Effort**: 0.5 day | **Status**: 🔒 BLOCKED (by DB-001, DB-004)  
+**SOLID**: Single Responsibility (only linking Story to Reviews)
+
+**Acceptance Criteria**:
+- [ ] Create `StoryReviewModel` implementing `IModel` interface
+- [ ] Fields: `id`, `story_id`, `review_id`, `version` (INTEGER >= 0), `review_type`, `created_at`
+- [ ] Unique constraint on `(story_id, version, review_type)`
+- [ ] `review_type` CHECK constraint: ('grammar', 'tone', 'content', 'consistency', 'editing')
+- [ ] Allows one Story to have multiple reviews with different types
+
+**Schema**:
+```sql
+StoryReview (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL REFERENCES Story(id),
+    review_id INTEGER NOT NULL REFERENCES Review(id),
+    version INTEGER NOT NULL CHECK (version >= 0),
+    review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (story_id) REFERENCES Story(id)
+    UNIQUE(story_id, version, review_type)
 )
 ```
 
@@ -317,13 +354,13 @@ All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>
 
 ## 📊 DATABASE SCHEMA REFERENCE
 
-**SQLite State Schema**:
+**SQLite State Schema** (version uses INTEGER with CHECK >= 0 to simulate UINT):
 ```sql
 -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT,                                      -- Prompt-like text describing the idea
-    version INTEGER NOT NULL DEFAULT 1,
+    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- UINT simulation
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
@@ -348,7 +385,7 @@ Review (
 Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- UINT simulation
     text TEXT NOT NULL,
     review_id INTEGER NULL,                         -- Direct FK to Review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -361,7 +398,7 @@ Title (
 Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
-    version INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),  -- UINT simulation
     text TEXT NOT NULL,
     review_id INTEGER NULL,                         -- Direct FK to Review
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -377,7 +414,7 @@ StoryReview (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     review_id INTEGER NOT NULL,
-    version INTEGER NOT NULL,                       -- Story version being reviewed
+    version INTEGER NOT NULL CHECK (version >= 0),  -- UINT simulation
     review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (story_id) REFERENCES Story(id),
@@ -413,7 +450,7 @@ See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) 
 | Group | Issues | Status |
 |-------|--------|--------|
 | Group 1 (State) | STATE-001, STATE-002, STATE-003 | 🆕 Ready |
-| Group 2 (Database) | DB-001, DB-002, DB-003, DB-004 | 🔒 Blocked by Group 1 |
+| Group 2 (Database) | DB-001, DB-002, DB-003, DB-004, DB-005 | 🔒 Blocked by Group 1 |
 | Group 3 (Integration) | INT-001, INT-002 | 🔒 Blocked by Group 2 |
 | Group 4 (Enhancement) | POST-001, POST-003, POST-005 | 🆕 Ready (Independent) |
 
