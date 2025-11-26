@@ -6,7 +6,7 @@ This document outlines the database design decisions, model structures, and impl
 - [Design Decisions](#design-decisions)
 - [Chosen Approach: Hybrid Model](#chosen-approach-hybrid-model)
 - [Database Schema](#database-schema)
-- [State Machine Integration](#state-machine-integration)
+- [Process State Machine](#process-state-machine)
 - [Implementation Plan](#implementation-plan)
 - [Best Practices Research](#best-practices-research)
 - [Future Improvements](#future-improvements)
@@ -38,61 +38,64 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 
 ## Chosen Approach: Hybrid Model
 
-### Core Tables
+### Core Tables (Only 4 Tables)
 
 ```sql
--- Main Story table with state machine status and current version references
+-- Main Story table with state (next process name) and current version references
+-- State is stored as a string representing the next process to run
 Story (
-    id UUID PRIMARY KEY,
-    idea_id UUID FK NULL,              -- Reference to Idea model (future)
-    status ENUM('draft', 'in_progress', 'review', 'approved', 'published') NOT NULL,
-    current_title_version_id UUID FK NULL,
-    current_script_version_id UUID FK NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(255)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idea_id INTEGER NULL,              -- Reference to Idea model (future)
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',  -- Next process name
+    current_title_version_id INTEGER FK NULL,
+    current_script_version_id INTEGER FK NULL,
+    -- Idea data stored directly on Story
+    title TEXT,
+    concept TEXT,
+    premise TEXT,
+    logline TEXT,
+    hook TEXT,
+    skeleton TEXT,
+    emotional_arc TEXT,
+    twist TEXT,
+    climax TEXT,
+    tone_guidance TEXT,
+    target_audience TEXT,
+    genre TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
 -- Title versions with full history
 TitleVersion (
-    id UUID PRIMARY KEY,
-    story_id UUID FK NOT NULL REFERENCES Story(id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(255),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
 -- Script/Text versions with full history
 ScriptVersion (
-    id UUID PRIMARY KEY,
-    story_id UUID FK NOT NULL REFERENCES Story(id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(255),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
 -- Reviews with discriminator pattern for different review types
 Review (
-    id UUID PRIMARY KEY,
-    story_id UUID FK NOT NULL REFERENCES Story(id),
-    review_type ENUM('title', 'script', 'story') NOT NULL,
-    reviewed_title_version_id UUID FK NULL REFERENCES TitleVersion(id),
-    reviewed_script_version_id UUID FK NULL REFERENCES ScriptVersion(id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER FK NOT NULL REFERENCES Story(id),
+    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+    reviewed_title_version_id INTEGER FK NULL REFERENCES TitleVersion(id),
+    reviewed_script_version_id INTEGER FK NULL REFERENCES ScriptVersion(id),
     feedback TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(255),
-    
-    -- Ensure correct version IDs are set based on review_type
-    CONSTRAINT review_type_check CHECK (
-        (review_type = 'title' AND reviewed_title_version_id IS NOT NULL AND reviewed_script_version_id IS NULL) OR
-        (review_type = 'script' AND reviewed_script_version_id IS NOT NULL AND reviewed_title_version_id IS NULL) OR
-        (review_type = 'story' AND reviewed_title_version_id IS NOT NULL AND reviewed_script_version_id IS NOT NULL)
-    )
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 ```
 
@@ -106,48 +109,65 @@ Review (
 
 ---
 
-## State Machine Integration
+## Process State Machine
 
-The `Story.status` field implements a state machine that tracks workflow progression:
+The `Story.state` field stores the **next process name** to be executed, following PrismQ naming conventions:
 
 ```
-                    ┌─────────────┐
-                    │   draft     │
-                    └──────┬──────┘
-                           │ create_idea
-                           ▼
-                    ┌─────────────┐
-                    │ in_progress │◄──────┐
-                    └──────┬──────┘       │
-                           │ submit       │ revise
-                           ▼              │
-                    ┌─────────────┐       │
-                    │   review    │───────┘
-                    └──────┬──────┘
-                           │ approve
-                           ▼
-                    ┌─────────────┐
-                    │  approved   │
-                    └──────┬──────┘
-                           │ publish
-                           ▼
-                    ┌─────────────┐
-                    │  published  │
-                    └─────────────┘
+                    ┌─────────────────────────┐
+                    │   PrismQ.T.Initial      │
+                    └───────────┬─────────────┘
+                                │ create_idea
+                                ▼
+                    ┌─────────────────────────┐
+                    │ PrismQ.T.Idea.Creation  │
+                    └───────────┬─────────────┘
+                                │ generate_title
+                                ▼
+                    ┌─────────────────────────┐
+                    │ PrismQ.T.Title.By.Idea  │
+                    └───────────┬─────────────┘
+                                │ generate_script
+                                ▼
+                    ┌─────────────────────────┐
+                    │ PrismQ.T.Script.By.Title│
+                    └───────────┬─────────────┘
+                                │ iterate
+                                ▼
+                    ┌─────────────────────────┐
+                    │ PrismQ.T.Script.Iteration│◄──┐
+                    └───────────┬─────────────┘    │ (unlimited)
+                                │                   │
+                                └───────────────────┘
+                                │ export
+                                ▼
+                    ┌─────────────────────────┐
+                    │    PrismQ.T.Export      │
+                    └─────────────────────────┘
 ```
 
-### State Transitions
-| From | To | Trigger |
-|------|-----|---------|
-| `draft` | `in_progress` | Content creation started |
-| `in_progress` | `review` | Submit for review |
-| `review` | `in_progress` | Revisions requested |
-| `review` | `approved` | Review passed |
-| `approved` | `published` | Final publication |
+### Process State Values
+| State | Description | Next Action |
+|-------|-------------|-------------|
+| `PrismQ.T.Initial` | Initial state, no content | Create idea |
+| `PrismQ.T.Idea.Creation` | Idea created | Generate title |
+| `PrismQ.T.Title.By.Idea` | Title generated from idea | Generate script |
+| `PrismQ.T.Script.By.Title` | Script generated from title | Iterate or export |
+| `PrismQ.T.Script.Iteration` | Script iteration (unlimited) | Continue iterating or export |
+| `PrismQ.T.Export` | Content exported | Complete |
+
+### Batch Script to Process State Mapping
+| Batch Script | State After Execution |
+|--------------|----------------------|
+| `step1_create_idea.bat` | `PrismQ.T.Idea.Creation` |
+| `step2_generate_title.bat` | `PrismQ.T.Title.By.Idea` |
+| `step3_generate_script.bat` | `PrismQ.T.Script.By.Title` |
+| `step4_iterate_script.bat` | `PrismQ.T.Script.Iteration` |
+| `step5_export.bat` | `PrismQ.T.Export` |
 
 ### Persistence Between Processes
 
-When running steps as separate processes (via batch scripts), the state machine status is preserved in the `Story` table. Each batch script:
+When running steps as separate processes (via batch scripts), the state is preserved in the `Story.state` field. Each batch script:
 1. Loads current state from database
 2. Validates allowed transitions
 3. Performs the action

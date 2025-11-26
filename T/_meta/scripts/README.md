@@ -223,17 +223,32 @@ Idea Creation → Title Generation → Script Draft → Review & Iterate (unlimi
 Each stage builds on the previous, maintaining version tracking. The next item for
 processing is picked by lowest version count, ensuring balanced workflow progression.
 
-## Database Design (Future)
+## Database Schema
 
-The system will use a **Hybrid Database Model** with the following core tables:
+The system uses a **SQLite database** with only **4 core tables**:
 
-```
-Story (id, status, current_title_version_id FK, current_script_version_id FK, idea_id FK)
+```sql
+Story (id, state, current_title_version_id FK, current_script_version_id FK, 
+       title, concept, premise, logline, hook, skeleton, emotional_arc, 
+       twist, climax, tone_guidance, target_audience, genre, created_at, updated_at)
 TitleVersion (id, story_id FK, version, text, created_at)
 ScriptVersion (id, story_id FK, version, text, created_at)
-Review (id, story_id FK, review_type ENUM, reviewed_title_version_id FK NULL, 
-        reviewed_script_version_id FK NULL, feedback, score)
+Review (id, story_id FK, review_type, reviewed_title_version_id FK NULL, 
+        reviewed_script_version_id FK NULL, feedback, score, created_at)
 ```
+
+### Process State (Story.state)
+
+The `Story.state` field stores the **next process name** following PrismQ naming conventions:
+
+| State | Description |
+|-------|-------------|
+| `PrismQ.T.Initial` | Initial state, no content |
+| `PrismQ.T.Idea.Creation` | Idea created |
+| `PrismQ.T.Title.By.Idea` | Title generated from idea |
+| `PrismQ.T.Script.By.Title` | Script generated from title |
+| `PrismQ.T.Script.Iteration` | Script iteration (unlimited) |
+| `PrismQ.T.Export` | Content exported |
 
 ### Review Types
 - **TitleReview**: `review_type='title'`, only `reviewed_title_version_id` set

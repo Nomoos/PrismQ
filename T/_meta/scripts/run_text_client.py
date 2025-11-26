@@ -145,30 +145,38 @@ class TextClient:
         """Get the path to the SQLite database file."""
         return SCRIPT_DIR / self.STATE_DB
     
+    # Process state names following PrismQ naming convention
+    PROCESS_STATES = {
+        'initial': 'PrismQ.T.Initial',
+        'idea_created': 'PrismQ.T.Idea.Creation',
+        'title_generated': 'PrismQ.T.Title.By.Idea',
+        'script_generated': 'PrismQ.T.Script.By.Title',
+        'script_iterated': 'PrismQ.T.Script.Iteration',
+        'exported': 'PrismQ.T.Export',
+    }
+    
     def _init_db(self) -> None:
-        """Initialize the SQLite database with required tables."""
+        """Initialize the SQLite database with core tables.
+        
+        Tables:
+        - Story: Main object with state (next process name) and current version references
+        - TitleVersion: Version history for titles
+        - ScriptVersion: Version history for scripts
+        - Review: Reviews with discriminator pattern (title/script/story)
+        """
         db_path = self._get_db_path()
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
+            conn.execute("PRAGMA foreign_keys=ON")
             
-            # Create state table for session data
+            # Story: Main table with state as string (next process name)
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS session_state (
-                    id INTEGER PRIMARY KEY CHECK (id = 1),
-                    idea_version INTEGER DEFAULT 0,
-                    title_version INTEGER DEFAULT 0,
-                    script_version INTEGER DEFAULT 0,
-                    current_title TEXT,
-                    current_script TEXT,
-                    session_start TEXT,
-                    updated_at TEXT
-                )
-            """)
-            
-            # Create idea_data table for storing idea fields
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS idea_data (
-                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                CREATE TABLE IF NOT EXISTS Story (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    idea_id INTEGER NULL,
+                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',
+                    current_title_version_id INTEGER NULL,
+                    current_script_version_id INTEGER NULL,
                     title TEXT,
                     concept TEXT,
                     premise TEXT,
@@ -180,57 +188,99 @@ class TextClient:
                     climax TEXT,
                     tone_guidance TEXT,
                     target_audience TEXT,
-                    genre TEXT
+                    genre TEXT,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
             
-            # Create history table for action history
+            # TitleVersion: Version history for titles
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS action_history (
+                CREATE TABLE IF NOT EXISTS TitleVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    action TEXT NOT NULL,
-                    timestamp TEXT NOT NULL,
-                    details TEXT
+                    story_id INTEGER NOT NULL,
+                    version INTEGER NOT NULL,
+                    text TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    UNIQUE(story_id, version)
+                )
+            """)
+            
+            # ScriptVersion: Version history for scripts
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS ScriptVersion (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    story_id INTEGER NOT NULL,
+                    version INTEGER NOT NULL,
+                    text TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    UNIQUE(story_id, version)
+                )
+            """)
+            
+            # Review: Reviews with discriminator pattern
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Review (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    story_id INTEGER NOT NULL,
+                    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+                    reviewed_title_version_id INTEGER NULL,
+                    reviewed_script_version_id INTEGER NULL,
+                    feedback TEXT NOT NULL,
+                    score INTEGER CHECK (score >= 0 AND score <= 100),
+                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    FOREIGN KEY (story_id) REFERENCES Story(id),
+                    FOREIGN KEY (reviewed_title_version_id) REFERENCES TitleVersion(id),
+                    FOREIGN KEY (reviewed_script_version_id) REFERENCES ScriptVersion(id)
                 )
             """)
             
             conn.commit()
     
     def _save_state(self) -> None:
-        """Save current state to SQLite database for persistence between processes."""
+        """Save current state to SQLite database for persistence between processes.
+        
+        Uses the core tables: Story, TitleVersion, ScriptVersion.
+        State is stored as a process name string on the Story object.
+        """
         db_path = self._get_db_path()
         
         with sqlite3.connect(db_path) as conn:
+            conn.execute("PRAGMA foreign_keys=ON")
             cursor = conn.cursor()
             
-            # Upsert session state
-            cursor.execute("""
-                INSERT OR REPLACE INTO session_state 
-                (id, idea_version, title_version, script_version, current_title, current_script, session_start, updated_at)
-                VALUES (1, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                self.idea_version,
-                self.title_version,
-                self.script_version,
-                self.current_title,
-                self.current_script,
-                self.session_start.isoformat(),
-                datetime.now().isoformat()
-            ))
+            # Determine current state based on workflow progress
+            if self.current_script is not None:
+                if self.script_version > 1:
+                    state = self.PROCESS_STATES['script_iterated']
+                else:
+                    state = self.PROCESS_STATES['script_generated']
+            elif self.current_title is not None:
+                state = self.PROCESS_STATES['title_generated']
+            elif self.current_idea is not None:
+                state = self.PROCESS_STATES['idea_created']
+            else:
+                state = self.PROCESS_STATES['initial']
             
-            # Save idea data if available
+            # Get or create Story
+            cursor.execute("SELECT id FROM Story ORDER BY id DESC LIMIT 1")
+            row = cursor.fetchone()
+            
+            # Extract idea data
+            idea_data = {}
             if self.current_idea is not None:
                 try:
-                    idea_dict = self.current_idea.to_dict()
+                    idea_data = self.current_idea.to_dict()
                 except AttributeError:
-                    # If to_dict() not available, extract basic fields
                     genre_value = "other"
                     if IDEA_AVAILABLE:
                         genre = getattr(self.current_idea, "genre", None)
                         if genre is not None:
                             genre_value = genre.value if hasattr(genre, 'value') else str(genre)
                     
-                    idea_dict = {
+                    idea_data = {
                         "title": getattr(self.current_idea, "title", ""),
                         "concept": getattr(self.current_idea, "concept", ""),
                         "premise": getattr(self.current_idea, "premise", ""),
@@ -244,50 +294,112 @@ class TextClient:
                         "target_audience": getattr(self.current_idea, "target_audience", ""),
                         "genre": genre_value,
                     }
-                
-                cursor.execute("""
-                    INSERT OR REPLACE INTO idea_data 
-                    (id, title, concept, premise, logline, hook, skeleton, emotional_arc, twist, climax, tone_guidance, target_audience, genre)
-                    VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    idea_dict.get("title", ""),
-                    idea_dict.get("concept", ""),
-                    idea_dict.get("premise", ""),
-                    idea_dict.get("logline", ""),
-                    idea_dict.get("hook", ""),
-                    idea_dict.get("skeleton", ""),
-                    idea_dict.get("emotional_arc", ""),
-                    idea_dict.get("twist", ""),
-                    idea_dict.get("climax", ""),
-                    idea_dict.get("tone_guidance", ""),
-                    idea_dict.get("target_audience", ""),
-                    idea_dict.get("genre", "other"),
-                ))
             
-            # Save history (append new items)
-            for item in self.history:
-                # Check if this item already exists
+            if row:
+                story_id = row[0]
+                # Update existing Story
                 cursor.execute("""
-                    SELECT COUNT(*) FROM action_history 
-                    WHERE action = ? AND timestamp = ?
-                """, (item.get("action", ""), item.get("timestamp", "")))
+                    UPDATE Story SET
+                        state = ?,
+                        title = ?,
+                        concept = ?,
+                        premise = ?,
+                        logline = ?,
+                        hook = ?,
+                        skeleton = ?,
+                        emotional_arc = ?,
+                        twist = ?,
+                        climax = ?,
+                        tone_guidance = ?,
+                        target_audience = ?,
+                        genre = ?,
+                        updated_at = datetime('now')
+                    WHERE id = ?
+                """, (
+                    state,
+                    idea_data.get("title", ""),
+                    idea_data.get("concept", ""),
+                    idea_data.get("premise", ""),
+                    idea_data.get("logline", ""),
+                    idea_data.get("hook", ""),
+                    idea_data.get("skeleton", ""),
+                    idea_data.get("emotional_arc", ""),
+                    idea_data.get("twist", ""),
+                    idea_data.get("climax", ""),
+                    idea_data.get("tone_guidance", ""),
+                    idea_data.get("target_audience", ""),
+                    idea_data.get("genre", "other"),
+                    story_id,
+                ))
+            else:
+                # Insert new Story
+                cursor.execute("""
+                    INSERT INTO Story (state, title, concept, premise, logline, hook, skeleton,
+                                       emotional_arc, twist, climax, tone_guidance, target_audience, genre)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    state,
+                    idea_data.get("title", ""),
+                    idea_data.get("concept", ""),
+                    idea_data.get("premise", ""),
+                    idea_data.get("logline", ""),
+                    idea_data.get("hook", ""),
+                    idea_data.get("skeleton", ""),
+                    idea_data.get("emotional_arc", ""),
+                    idea_data.get("twist", ""),
+                    idea_data.get("climax", ""),
+                    idea_data.get("tone_guidance", ""),
+                    idea_data.get("target_audience", ""),
+                    idea_data.get("genre", "other"),
+                ))
+                story_id = cursor.lastrowid
+            
+            # Save TitleVersion if we have a new title
+            if self.current_title:
+                cursor.execute("""
+                    SELECT MAX(version) FROM TitleVersion WHERE story_id = ?
+                """, (story_id,))
+                max_version = cursor.fetchone()[0] or 0
                 
-                if cursor.fetchone()[0] == 0:
+                if self.title_version > max_version:
                     cursor.execute("""
-                        INSERT INTO action_history (action, timestamp, details)
+                        INSERT INTO TitleVersion (story_id, version, text)
                         VALUES (?, ?, ?)
-                    """, (
-                        item.get("action", ""),
-                        item.get("timestamp", ""),
-                        json.dumps(item.get("details", {})) if item.get("details") else None
-                    ))
+                    """, (story_id, self.title_version, self.current_title))
+                    title_version_id = cursor.lastrowid
+                    
+                    # Update Story with current title version
+                    cursor.execute("""
+                        UPDATE Story SET current_title_version_id = ? WHERE id = ?
+                    """, (title_version_id, story_id))
+            
+            # Save ScriptVersion if we have a new script
+            if self.current_script:
+                cursor.execute("""
+                    SELECT MAX(version) FROM ScriptVersion WHERE story_id = ?
+                """, (story_id,))
+                max_version = cursor.fetchone()[0] or 0
+                
+                if self.script_version > max_version:
+                    cursor.execute("""
+                        INSERT INTO ScriptVersion (story_id, version, text)
+                        VALUES (?, ?, ?)
+                    """, (story_id, self.script_version, self.current_script))
+                    script_version_id = cursor.lastrowid
+                    
+                    # Update Story with current script version
+                    cursor.execute("""
+                        UPDATE Story SET current_script_version_id = ? WHERE id = ?
+                    """, (script_version_id, story_id))
             
             conn.commit()
         
-        print_info(f"State saved to {db_path.name}")
+        print_info(f"State saved to {db_path.name} (state: {state})")
     
     def _load_state(self) -> bool:
         """Load state from SQLite database if it exists.
+        
+        Loads from the core tables: Story, TitleVersion, ScriptVersion.
         
         Returns:
             True if state was loaded, False otherwise.
@@ -298,71 +410,102 @@ class TextClient:
         
         try:
             with sqlite3.connect(db_path) as conn:
+                conn.execute("PRAGMA foreign_keys=ON")
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 
-                # Load session state
-                cursor.execute("SELECT * FROM session_state WHERE id = 1")
-                state_row = cursor.fetchone()
+                # Load Story (most recent)
+                cursor.execute("""
+                    SELECT * FROM Story ORDER BY id DESC LIMIT 1
+                """)
+                story_row = cursor.fetchone()
                 
-                if state_row:
-                    self.idea_version = state_row["idea_version"] or 0
-                    self.title_version = state_row["title_version"] or 0
-                    self.script_version = state_row["script_version"] or 0
-                    self.current_title = state_row["current_title"]
-                    self.current_script = state_row["current_script"]
-                    
-                    session_start_str = state_row["session_start"]
-                    if session_start_str:
-                        self.session_start = datetime.fromisoformat(session_start_str)
+                if not story_row:
+                    return False
                 
-                # Load idea data
-                cursor.execute("SELECT * FROM idea_data WHERE id = 1")
-                idea_row = cursor.fetchone()
+                story_id = story_row["id"]
+                current_state = story_row["state"] or self.PROCESS_STATES['initial']
                 
-                if idea_row and IDEA_AVAILABLE:
+                # Derive version counts from state
+                state_order = list(self.PROCESS_STATES.values())
+                if current_state in state_order:
+                    state_idx = state_order.index(current_state)
+                    # Idea version is 1 if we've passed idea_created state
+                    if state_idx >= state_order.index(self.PROCESS_STATES['idea_created']):
+                        self.idea_version = 1
+                    # Title version from TitleVersion table
+                    # Script version from ScriptVersion table
+                
+                # Load idea data from Story
+                if IDEA_AVAILABLE and story_row["title"]:
                     idea_data = {
-                        "title": idea_row["title"] or "",
-                        "concept": idea_row["concept"] or "",
-                        "premise": idea_row["premise"] or "",
-                        "logline": idea_row["logline"] or "",
-                        "hook": idea_row["hook"] or "",
-                        "skeleton": idea_row["skeleton"] or "",
-                        "emotional_arc": idea_row["emotional_arc"] or "",
-                        "twist": idea_row["twist"] or "",
-                        "climax": idea_row["climax"] or "",
-                        "tone_guidance": idea_row["tone_guidance"] or "",
-                        "target_audience": idea_row["target_audience"] or "",
-                        "genre": idea_row["genre"] or "other",
+                        "title": story_row["title"] or "",
+                        "concept": story_row["concept"] or "",
+                        "premise": story_row["premise"] or "",
+                        "logline": story_row["logline"] or "",
+                        "hook": story_row["hook"] or "",
+                        "skeleton": story_row["skeleton"] or "",
+                        "emotional_arc": story_row["emotional_arc"] or "",
+                        "twist": story_row["twist"] or "",
+                        "climax": story_row["climax"] or "",
+                        "tone_guidance": story_row["tone_guidance"] or "",
+                        "target_audience": story_row["target_audience"] or "",
+                        "genre": story_row["genre"] or "other",
                     }
                     
                     try:
                         self.current_idea = Idea.from_dict(idea_data)
                         self._idea_data = idea_data
+                        self.idea_version = 1
                     except (AttributeError, TypeError, KeyError, ValueError):
-                        # If from_dict fails, create a basic Idea
                         self.current_idea = Idea(
                             title=idea_data.get("title", ""),
                             concept=idea_data.get("concept", ""),
                         )
                         self._idea_data = idea_data
+                        self.idea_version = 1
                 
-                # Load history
-                cursor.execute("SELECT action, timestamp, details FROM action_history ORDER BY id")
-                self.history = []
-                for row in cursor.fetchall():
-                    item = {
-                        "action": row["action"],
-                        "timestamp": row["timestamp"],
-                    }
-                    if row["details"]:
-                        try:
-                            item["details"] = json.loads(row["details"])
-                        except json.JSONDecodeError:
-                            pass
-                    self.history.append(item)
+                # Load current TitleVersion
+                if story_row["current_title_version_id"]:
+                    cursor.execute("""
+                        SELECT text, version FROM TitleVersion WHERE id = ?
+                    """, (story_row["current_title_version_id"],))
+                    title_row = cursor.fetchone()
+                    if title_row:
+                        self.current_title = title_row["text"]
+                        self.title_version = title_row["version"]
+                else:
+                    # Get max version if no current set
+                    cursor.execute("""
+                        SELECT text, version FROM TitleVersion 
+                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                    """, (story_id,))
+                    title_row = cursor.fetchone()
+                    if title_row:
+                        self.current_title = title_row["text"]
+                        self.title_version = title_row["version"]
+                
+                # Load current ScriptVersion
+                if story_row["current_script_version_id"]:
+                    cursor.execute("""
+                        SELECT text, version FROM ScriptVersion WHERE id = ?
+                    """, (story_row["current_script_version_id"],))
+                    script_row = cursor.fetchone()
+                    if script_row:
+                        self.current_script = script_row["text"]
+                        self.script_version = script_row["version"]
+                else:
+                    # Get max version if no current set
+                    cursor.execute("""
+                        SELECT text, version FROM ScriptVersion 
+                        WHERE story_id = ? ORDER BY version DESC LIMIT 1
+                    """, (story_id,))
+                    script_row = cursor.fetchone()
+                    if script_row:
+                        self.current_script = script_row["text"]
+                        self.script_version = script_row["version"]
             
-            print_info(f"State loaded from {db_path.name}")
+            print_info(f"State loaded from {db_path.name} (state: {current_state})")
             return True
         except (sqlite3.Error, KeyError, TypeError, ValueError) as e:
             print_warning(f"Failed to load state: {e}")
