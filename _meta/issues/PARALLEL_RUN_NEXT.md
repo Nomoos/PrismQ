@@ -104,7 +104,7 @@ All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>
 
 **SQLite State Schema**:
 ```sql
--- Idea: Simple prompt-based idea data (referenced by Story via FK)
+-- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
 -- Text field contains prompt-like content for content generation
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

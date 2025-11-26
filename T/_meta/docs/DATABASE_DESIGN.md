@@ -41,7 +41,7 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 ### Core Tables (5 Tables)
 
 ```sql
--- Idea: Simple prompt-based idea data (referenced by Story via FK)
+-- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
 -- Text field contains prompt-like content for content generation
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
