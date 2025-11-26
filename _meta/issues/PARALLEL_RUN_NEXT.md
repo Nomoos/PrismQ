@@ -6,10 +6,47 @@
 > **Post-MVP Issues**: See `T/_meta/issues/new/POST-MVP-Enhancements/` for detailed Text Pipeline issue specifications  
 > **Story Generation**: See `_meta/issues/new/STORY_GENERATION_PLAN.md` for Story workflow implementation (STORY-001 to STORY-020)
 
-**Date**: 2025-11-25 (Updated)  
+**Date**: 2025-11-26 (Updated)  
 **Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1 + Story Generation Planning  
 **Status**: 🎯 READY FOR EXECUTION  
 **Timeline**: Weeks 9-10 (2 weeks)
+
+---
+
+## 🔥 NEXT TO RUN: State Naming Convention Refactor
+
+**Status**: 🎯 HIGH PRIORITY - RUN NEXT  
+**Location**: `T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md`
+
+### State Naming Convention Pattern
+```
+PrismQ.T.<Output>.From.<Input1>.<Input2>...
+```
+
+Where:
+- `<Output>` = The entity being created/modified (Idea, Title, Script, Review)
+- `From` = Indicates input sources follow
+- `<Input1>.<Input2>...` = Input dependencies that create the output
+
+### Standard State Names
+
+| State | Meaning | Inputs → Output |
+|-------|---------|-----------------|
+| `PrismQ.T.Idea.Creation` | Creating initial idea | ∅ → Idea |
+| `PrismQ.T.Title.From.Idea` | Creating title from idea | Idea → Title |
+| `PrismQ.T.Script.From.Idea.Title` | Creating script from idea + title | Idea, Title → Script |
+| `PrismQ.T.Review.Title.From.Script` | Creating title review from script | Script → TitleReview |
+| `PrismQ.T.Review.Script.From.Title` | Creating script review from title | Title → ScriptReview |
+| `PrismQ.T.Title.From.Script.Review.Title` | Iterating title from original + review | Title, Script, TitleReview → Title v2 |
+| `PrismQ.T.Script.From.Title.Review.Script` | Iterating script from original + review | Script, Title, ScriptReview → Script v2 |
+| `PrismQ.T.Publishing` | Publishing completed content | Title, Script → Published |
+
+### Implementation Tasks
+- [ ] Phase 1: Create folder structure matching naming pattern
+- [ ] Phase 2: Update state constants in all files
+- [ ] Phase 3: Migration for existing data
+
+**See**: [T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md](../T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md)
 
 ---
 
@@ -51,6 +88,19 @@ step2_generate_title.bat # Process 2: Loads state, generates title, saves state
 # ... time passes ...
 step3_generate_script.bat # Process 3: Loads state, generates script, saves state
 ```
+
+### State Naming Convention
+
+All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>...`
+
+| State | Description |
+|-------|-------------|
+| `PrismQ.T.Idea.Creation` | Creating initial idea |
+| `PrismQ.T.Title.From.Idea` | Creating title from idea |
+| `PrismQ.T.Script.From.Idea.Title` | Creating script from idea + title |
+| `PrismQ.T.Title.From.Script.Review.Title` | Iterating title using review |
+| `PrismQ.T.Script.From.Title.Review.Script` | Iterating script using review |
+| `PrismQ.T.Publishing` | Publishing completed content |
 
 **SQLite State Schema**:
 ```sql

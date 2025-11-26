@@ -61,8 +61,7 @@ Idea (
 )
 
 -- Main Story table with state (next process name) and idea_id FK
--- State is stored as a string representing the next process to run
--- State values match folder structure (see T/WORKFLOW_STATE_MACHINE.md)
+-- State is stored as a string following the pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
@@ -133,7 +132,18 @@ Review (
 
 ## Process State Machine
 
-The `Story.state` field stores the **next process name** to be executed, following PrismQ folder structure naming conventions (see `T/WORKFLOW_STATE_MACHINE.md`):
+The `Story.state` field stores the **next process name** to be executed, following the naming convention:
+
+```
+PrismQ.T.<Output>.From.<Input1>.<Input2>...
+```
+
+Where:
+- `<Output>` = The entity being created/modified
+- `From` = Indicates input sources follow
+- `<Input1>.<Input2>...` = Input dependencies that create the output
+
+### Workflow State Diagram
 
 ```
                     ┌─────────────────────────────────────────────┐
@@ -142,17 +152,17 @@ The `Story.state` field stores the **next process name** to be executed, followi
                                         │ create_idea
                                         ▼
                     ┌─────────────────────────────────────────────┐
-                    │ PrismQ.T.Title.FromIdea                     │
+                    │ PrismQ.T.Title.From.Idea                    │
                     └───────────────────┬─────────────────────────┘
                                         │ generate_title
                                         ▼
                     ┌─────────────────────────────────────────────┐
-                    │ PrismQ.T.Script.FromIdeaAndTitle            │
+                    │ PrismQ.T.Script.From.Idea.Title             │
                     └───────────────────┬─────────────────────────┘
                                         │ generate_script
                                         ▼
                     ┌─────────────────────────────────────────────────────────┐
-                    │ PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle     │◄──┐
+                    │ PrismQ.T.Script.From.Title.Review.Script               │◄──┐
                     └───────────────────┬─────────────────────────────────────┘   │ (unlimited)
                                         │                                          │
                                         └──────────────────────────────────────────┘
@@ -167,18 +177,21 @@ The `Story.state` field stores the **next process name** to be executed, followi
 | State | Description | Next Action |
 |-------|-------------|-------------|
 | `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation | Create idea |
-| `PrismQ.T.Title.FromIdea` | Idea created, awaiting title | Generate title |
-| `PrismQ.T.Script.FromIdeaAndTitle` | Title generated, awaiting script | Generate script |
-| `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) | Continue iterating or export |
+| `PrismQ.T.Title.From.Idea` | Idea created, awaiting title | Generate title from idea |
+| `PrismQ.T.Script.From.Idea.Title` | Title generated, awaiting script | Generate script from idea + title |
+| `PrismQ.T.Review.Title.From.Script` | Generate title review from script | Review title |
+| `PrismQ.T.Review.Script.From.Title` | Generate script review from title | Review script |
+| `PrismQ.T.Title.From.Script.Review.Title` | Iterate title using review | Create new title version |
+| `PrismQ.T.Script.From.Title.Review.Script` | Script iteration (unlimited) | Continue iterating or export |
 | `PrismQ.T.Publishing` | Content exported, ready for publishing | Complete |
 
 ### Batch Script to Process State Mapping
 | Batch Script | State After Execution |
 |--------------|----------------------|
-| `step1_create_idea.bat` | `PrismQ.T.Title.FromIdea` |
-| `step2_generate_title.bat` | `PrismQ.T.Script.FromIdeaAndTitle` |
-| `step3_generate_script.bat` | `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` |
-| `step4_iterate_script.bat` | `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` |
+| `step1_create_idea.bat` | `PrismQ.T.Title.From.Idea` |
+| `step2_generate_title.bat` | `PrismQ.T.Script.From.Idea.Title` |
+| `step3_generate_script.bat` | `PrismQ.T.Script.From.Title.Review.Script` |
+| `step4_iterate_script.bat` | `PrismQ.T.Script.From.Title.Review.Script` |
 | `step5_export.bat` | `PrismQ.T.Publishing` |
 
 ### Persistence Between Processes
