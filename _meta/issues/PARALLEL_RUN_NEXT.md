@@ -104,92 +104,108 @@ All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>
 
 **SQLite State Schema**:
 ```sql
--- Session state table (single row, id=1)
-session_state (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    idea_version INTEGER DEFAULT 0,
-    title_version INTEGER DEFAULT 0,
-    script_version INTEGER DEFAULT 0,
-    current_title TEXT,
-    current_script TEXT,
-    session_start TEXT,
-    updated_at TEXT
-)
-
--- Idea data table (single row, id=1)
-idea_data (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    title TEXT,
-    concept TEXT,
-    premise TEXT,
-    logline TEXT,
-    hook TEXT,
-    skeleton TEXT,
-    emotional_arc TEXT,
-    twist TEXT,
-    climax TEXT,
-    tone_guidance TEXT,
-    target_audience TEXT,
-    genre TEXT
-)
-
--- Action history table
-action_history (
+-- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
+-- Text field contains prompt-like content for content generation
+Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    action TEXT NOT NULL,
-    timestamp TEXT NOT NULL,
-    details TEXT
+    text TEXT,                                      -- Prompt-like text describing the idea
+    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
-```
 
-### Version Tracking & Next-to-Process Selection
-
-The system tracks version counts for each content type:
-- **Idea Version**: Incremented on create/modify
-- **Title Version**: Incremented on generation/selection
-- **Script Version**: Incremented on generation/iteration
-
-**Next-to-Process Algorithm**: Selects item with lowest version count
-- Tie-breaking follows natural workflow order: Idea → Title → Script
-- Ensures balanced progression through the workflow
-
-### Database Integration (Future)
-
-When database models are implemented, state will be stored in the `Story` table:
-
-```sql
+-- Story: Main table with state (next process name) and idea_id FK
+-- Note: current_title_version_id and current_script_version_id are removed
+-- Current versions are implicit - determined by highest version in Title/Script tables
 Story (
-    id UUID PRIMARY KEY,
-    status ENUM('draft', 'in_progress', 'review', 'approved', 'published'),
-    -- State persisted for independent process execution
-    idea_version INTEGER DEFAULT 0,
-    title_version INTEGER DEFAULT 0,
-    script_version INTEGER DEFAULT 0,
-    current_title_id UUID FK NULL REFERENCES Title(id),
-    current_script_id UUID FK NULL REFERENCES Script(id),
-    ...
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idea_id INTEGER NULL,                           -- Reference to Idea
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
 
 -- Title versions with full history
 Title (
-    id UUID PRIMARY KEY,
-    story_id UUID FK NOT NULL REFERENCES Story(id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL,
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
-    created_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(story_id, version),
+    FOREIGN KEY (story_id) REFERENCES Story(id)
+)
+
+-- Script versions with full history
+Script (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL,
+    version INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(story_id, version),
+    FOREIGN KEY (story_id) REFERENCES Story(id)
+)
+```
+
+**Note**: Current title/script versions are determined implicitly via `ORDER BY version DESC LIMIT 1` queries.
+
+### Version Tracking & Next-to-Process Selection
+
+The system tracks version counts for each content type:
+- **Idea Version**: Tracked in Idea.version field
+- **Title Version**: Tracked in Title.version field
+- **Script Version**: Tracked in Script.version field
+
+**Next-to-Process Algorithm**: Selects item with lowest version count
+- Tie-breaking follows natural workflow order: Idea → Title → Script
+- Ensures balanced progression through the workflow
+- Current versions determined via `ORDER BY version DESC LIMIT 1`
+
+### Database Integration (Implemented)
+
+Database models are now implemented in `T/_meta/scripts/run_text_client.py`:
+
+```sql
+-- Simple Idea model (prompt-based storage)
+Idea (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,                                      -- Prompt-like text
+    version INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
+
+-- Story with state machine and Idea FK
+-- Note: current_title/script version IDs removed - now implicit
+Story (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idea_id INTEGER NULL REFERENCES Idea(id),
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (idea_id) REFERENCES Idea(id)
+)
+
+-- Title versions with full history
+Title (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL REFERENCES Story(id),
+    version INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 
 -- Script versions with full history
 Script (
-    id UUID PRIMARY KEY,
-    story_id UUID FK NOT NULL REFERENCES Story(id),
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
-    created_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
 ```
+
+**Current Version Lookup**: Use `ORDER BY version DESC LIMIT 1` to get the current version instead of FK references.
 
 See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) for full schema.
 
@@ -549,5 +565,5 @@ git checkout -b post-005-batch-processing
 
 **Status**: Sprint 4 Ready - 3 POST Issues Unblocked + Story Generation Planning Complete  
 **Next Action**: Worker17, Worker12, Worker02 begin POST execution; Worker10 review Story Generation  
-**Updated**: 2025-11-24  
+**Updated**: 2025-11-26  
 **Owner**: Worker01 (Project Manager)
