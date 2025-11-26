@@ -84,13 +84,17 @@ Script (
 )
 
 -- Reviews with discriminator pattern for different review types
+-- Uses single reviewed_version field for universal version tracking (max 1 field)
+-- The version a review refers to is implicitly known by combining:
+--   - review_type: identifies the content type (title/script/story)
+--   - reviewed_version: the INTEGER version number of that content
+-- Example: review_type='title', reviewed_version=3 → reviews Title v3
 Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_title_version_id INTEGER FK NULL REFERENCES Title(id),
-    reviewed_script_version_id INTEGER FK NULL REFERENCES Script(id),
-    feedback TEXT NOT NULL,
+    reviewed_version INTEGER NULL,
+    text TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
@@ -113,11 +117,27 @@ Review (
 
 ### Review Types Explained
 
-| Review Type | Description | Version IDs Set |
-|-------------|-------------|-----------------|
-| `title` | Reviews only the title | `reviewed_title_version_id` only |
-| `script` | Reviews only the script | `reviewed_script_version_id` only |
-| `story` | Reviews complete story (title + script) | Both version IDs set |
+| Review Type | Description | reviewed_version Meaning |
+|-------------|-------------|--------------------------|
+| `title` | Reviews only the title | Version number in Title table (e.g., 3 = Title v3) |
+| `script` | Reviews only the script | Version number in Script table (e.g., 5 = Script v5) |
+| `story` | Reviews complete story (title + script) | NULL - reviews current state of entire story |
+
+### Implicit Version Identification
+
+The design uses a **single `reviewed_version` field** (max 1 field requirement) to universally identify what version a review refers to:
+
+1. **Discriminator pattern**: `review_type` tells us which content type is being reviewed
+2. **Version number**: `reviewed_version` stores the INTEGER version number from that content's version table
+3. **Implicit lookup**: To get the actual content being reviewed:
+   - For `title` reviews: `SELECT * FROM Title WHERE story_id = ? AND version = reviewed_version`
+   - For `script` reviews: `SELECT * FROM Script WHERE story_id = ? AND version = reviewed_version`
+   - For `story` reviews: Get current versions of both title and script (reviewed_version is NULL)
+
+This approach:
+- Uses only 1 field (`reviewed_version`) instead of multiple FK fields
+- Is universal - works for any number of content types
+- Is extensible - adding new content types only requires updating the CHECK constraint
 
 ---
 
@@ -202,11 +222,11 @@ When running steps as separate processes (via batch scripts), the state is prese
 - [x] Create `Story` model with state machine and implicit version tracking (PR #139)
 - [ ] Create `Title` model
 - [ ] Create `Script` model
-- [ ] Create `Review` model with discriminator
+- [x] Create `Review` model with discriminator and single reviewed_version field
 
 ### Phase 2: Relationships & Constraints
 - [x] Set up foreign key relationships (Story → Idea FK)
-- [ ] Add CHECK constraints for Review types
+- [x] Add CHECK constraints for Review types (review_type IN ('title', 'script', 'story'))
 - [ ] Create indexes for common queries
 - [ ] ~~Add database triggers for `updated_at`~~ (Not needed - timestamps immutable after creation)
 
@@ -448,12 +468,12 @@ StoryMetrics (
    - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)
 
-4. **Create Review Model**
-   - Discriminator pattern for review types
-   - `reviewed_title_version_id` FK (nullable)
-   - `reviewed_script_version_id` FK (nullable)
-   - CHECK constraints for version ID validation
-   - Score range validation
+4. **Create Review Model** ✅ IMPLEMENTED
+   - Discriminator pattern for review types (`title`, `script`, `story`)
+   - Single `reviewed_version` field (INTEGER) for universal version tracking
+   - Implicit version identification: `review_type` + `reviewed_version` = target content
+   - CHECK constraints for review_type validation
+   - Score range validation (0-100)
 
 5. **Create Idea Model** ✅ IMPLEMENTED (PR #138)
    - Simplified schema: `(id, text, version, created_at)`

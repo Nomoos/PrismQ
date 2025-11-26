@@ -277,6 +277,8 @@ class TextClient:
         - TitleVersion: Version history for titles
         - ScriptVersion: Version history for scripts
         - Review: Reviews with discriminator pattern (title/script/story)
+                  Uses single reviewed_version field - version is implicitly known
+                  by combining review_type with reviewed_version number
         """
         db_path = self._get_db_path()
         with sqlite3.connect(db_path) as conn:
@@ -338,20 +340,22 @@ class TextClient:
                 )
             """)
             
-            # Review: Reviews with discriminator pattern
+            # Review: Reviews with discriminator pattern for different review types
+            # Uses single reviewed_version field - the version is implicitly identified by:
+            #   - review_type='title' → reviewed_version refers to TitleVersion.version
+            #   - review_type='script' → reviewed_version refers to ScriptVersion.version
+            #   - review_type='story' → reviewed_version is NULL (reviews current state)
+            # This universal design uses max 1 field to know what version a review refers to
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Review (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
                     review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-                    reviewed_title_version_id INTEGER NULL,
-                    reviewed_script_version_id INTEGER NULL,
-                    feedback TEXT NOT NULL,
+                    reviewed_version INTEGER NULL,
+                    text TEXT NOT NULL,
                     score INTEGER CHECK (score >= 0 AND score <= 100),
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                    FOREIGN KEY (story_id) REFERENCES Story(id),
-                    FOREIGN KEY (reviewed_title_version_id) REFERENCES TitleVersion(id),
-                    FOREIGN KEY (reviewed_script_version_id) REFERENCES ScriptVersion(id)
+                    FOREIGN KEY (story_id) REFERENCES Story(id)
                 )
             """)
             

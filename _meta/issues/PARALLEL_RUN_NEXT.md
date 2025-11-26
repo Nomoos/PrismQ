@@ -145,6 +145,38 @@ Script (
     UNIQUE(story_id, version),
     FOREIGN KEY (story_id) REFERENCES Story(id)
 )
+
+-- Reviews with discriminator pattern for different review types
+-- Uses single reviewed_version field for universal version tracking (max 1 field)
+-- The version is implicitly known by combining review_type + reviewed_version
+Review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL,
+    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+    reviewed_version INTEGER NULL,                  -- Version number of content being reviewed
+    text TEXT NOT NULL,
+    score INTEGER CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (story_id) REFERENCES Story(id)
+)
+```
+
+### Implicit Version Identification for Reviews
+
+The Review model uses a **single field** (`reviewed_version`) to universally track what version is being reviewed:
+
+| review_type | reviewed_version | Meaning |
+|-------------|------------------|---------|
+| `title` | 3 | Reviews Title v3 for this story |
+| `script` | 5 | Reviews Script v5 for this story |
+| `story` | NULL | Reviews current state of entire story |
+
+**Lookup Example**:
+```sql
+-- Get the title content for a title review
+SELECT t.* FROM Title t
+JOIN Review r ON t.story_id = r.story_id AND t.version = r.reviewed_version
+WHERE r.id = ? AND r.review_type = 'title';
 ```
 
 **Note**: Current title/script versions are determined implicitly via `ORDER BY version DESC LIMIT 1` queries.
@@ -203,9 +235,22 @@ Script (
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(story_id, version)
 )
+
+-- Reviews with discriminator pattern (single reviewed_version field)
+Review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL REFERENCES Story(id),
+    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+    reviewed_version INTEGER NULL,                  -- Version number (implicit lookup via review_type)
+    text TEXT NOT NULL,
+    score INTEGER CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)
 ```
 
 **Current Version Lookup**: Use `ORDER BY version DESC LIMIT 1` to get the current version instead of FK references.
+
+**Review Version Lookup**: Use `review_type` + `reviewed_version` to implicitly identify the content being reviewed.
 
 See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) for full schema.
 
