@@ -246,28 +246,28 @@ class SimpleIdeaDatabase:
         if not self.conn:
             self.connect()
         
-        # Build update query dynamically based on provided fields
-        updates = []
-        values = []
-        
-        if text is not None:
-            updates.append("text = ?")
-            values.append(text)
-        
-        if version is not None:
-            updates.append("version = ?")
-            values.append(version)
-        
-        if not updates:
+        # Determine which fields to update - only text and version are allowed
+        # This is safe because we explicitly control the field names
+        if text is not None and version is not None:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "UPDATE Idea SET text = ?, version = ? WHERE id = ?",
+                (text, version, idea_id)
+            )
+        elif text is not None:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "UPDATE Idea SET text = ? WHERE id = ?",
+                (text, idea_id)
+            )
+        elif version is not None:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "UPDATE Idea SET version = ? WHERE id = ?",
+                (version, idea_id)
+            )
+        else:
             return False
-        
-        values.append(idea_id)
-        
-        cursor = self.conn.cursor()
-        cursor.execute(
-            f"UPDATE Idea SET {', '.join(updates)} WHERE id = ?",
-            values
-        )
         
         self.conn.commit()
         return cursor.rowcount > 0

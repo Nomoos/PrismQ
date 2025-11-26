@@ -10,6 +10,7 @@ The SimpleIdea is designed to be referenced by Story via foreign key (FK).
 It focuses on storing idea prompts/text in a clean, minimal structure.
 """
 
+import re
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -332,7 +333,6 @@ class IdeaPromptTemplates:
         Returns:
             List of variable names in the template
         """
-        import re
         template = cls.get_template(name)
         # Find all {variable_name} patterns
         variables = re.findall(r'\{(\w+)\}', template)
