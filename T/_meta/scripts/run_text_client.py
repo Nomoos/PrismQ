@@ -483,7 +483,9 @@ class TextClient:
                             self._idea_data = idea_data
                             self.idea_version = 1
                 
-                # Load current TitleVersion (use MAX(version) query - implicit)
+                # Load current TitleVersion (highest version is implicit current)
+                # Using ORDER BY version DESC LIMIT 1 which is equivalent to MAX(version)
+                # for the INTEGER version column
                 cursor.execute("""
                     SELECT text, version FROM TitleVersion 
                     WHERE story_id = ? ORDER BY version DESC LIMIT 1
@@ -493,7 +495,9 @@ class TextClient:
                     self.current_title = title_row["text"]
                     self.title_version = title_row["version"]
                 
-                # Load current ScriptVersion (use MAX(version) query - implicit)
+                # Load current ScriptVersion (highest version is implicit current)
+                # Using ORDER BY version DESC LIMIT 1 which is equivalent to MAX(version)
+                # for the INTEGER version column
                 cursor.execute("""
                     SELECT text, version FROM ScriptVersion 
                     WHERE story_id = ? ORDER BY version DESC LIMIT 1
