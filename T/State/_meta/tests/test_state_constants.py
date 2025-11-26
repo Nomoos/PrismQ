@@ -317,6 +317,11 @@ class TestParseStateName:
         """Test that parsing invalid state raises ValueError."""
         with pytest.raises(ValueError, match="Invalid state name"):
             StateNames.parse_state_name("Invalid.State.Name")
+    
+    def test_parse_malformed_state_raises_error(self):
+        """Test that parsing malformed state with too few parts raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid state name"):
+            StateNames.parse_state_name("PrismQ")
 
 
 class TestConvenienceAliases:

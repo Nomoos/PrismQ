@@ -288,20 +288,19 @@ class StateNames:
             raise ValueError(f"Invalid state name: {state_name}")
         
         parts = state_name.split('.')
+        # Validate minimum parts (PrismQ.T needs at least 2 parts)
+        if len(parts) < 2:
+            raise ValueError(f"Invalid state name: {state_name}")
+        
         result = {
             'prefix': f"{parts[0]}.{parts[1]}",
             'output': parts[2] if len(parts) > 2 else '',
         }
         
         if len(parts) > 3:
-            # Check for action patterns like 'From' or 'By'
-            if parts[3] in ('From', 'By'):
-                result['action'] = parts[3]
-                result['input'] = '.'.join(parts[4:]) if len(parts) > 4 else ''
-            else:
-                # Handle cases like Review.Script.Grammar
-                result['action'] = parts[3]
-                result['input'] = '.'.join(parts[4:]) if len(parts) > 4 else ''
+            # Parse action and input parts
+            result['action'] = parts[3]
+            result['input'] = '.'.join(parts[4:]) if len(parts) > 4 else ''
         
         return result
 
