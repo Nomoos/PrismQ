@@ -16,41 +16,60 @@ The current state names follow folder structure but lack Review-related processe
 1. **Missing Review processes** - There are no explicit states for Review generation
 2. **Naming pattern inconsistency** - Current pattern doesn't clearly show input dependencies
 3. **Review workflow gaps** - No states for:
-   - Title review by Script content
-   - Combined Title review by Script and Idea
+   - Title review from Script content
+   - Script review from Title content
 
 ## Proposed Refactoring
+
+### Naming Convention Pattern
+```
+PrismQ.T.<Output>.From.<Input1>.<Input2>...
+```
+
+Where:
+- `<Output>` = The entity being created/modified (Idea, Title, Script, Review)
+- `From` = Indicates input sources follow
+- `<Input1>.<Input2>...` = Input dependencies that create the output
 
 ### New State Names (Proposed)
 | Process | Proposed State Name | Inputs → Output |
 |---------|---------------------|-----------------|
 | Create Idea | `PrismQ.T.Idea.Creation` | ∅ → Idea |
-| Create Title from Idea | `PrismQ.T.Title.By.Idea` | Idea → Title |
-| Create Script from Title+Idea | `PrismQ.T.Script.By.Title.Idea` | Title, Idea → Script |
-| Review Title by Script | `PrismQ.T.Review.Title.By.Script` | Script → TitleReview |
-| Review Title by Script+Idea | `PrismQ.T.Review.Title.By.Script.Idea` | Script, Idea → TitleReview |
-| Review Script by Title | `PrismQ.T.Review.Script.By.Title` | Title → ScriptReview |
-| Iterate Title with Review | `PrismQ.T.Title.By.Review.Title` | TitleReview → Title |
-| Iterate Script with Review | `PrismQ.T.Script.By.Review.Script` | ScriptReview → Script |
+| Create Title from Idea | `PrismQ.T.Title.From.Idea` | Idea → Title |
+| Create Script from Idea+Title | `PrismQ.T.Script.From.Idea.Title` | Idea, Title → Script |
+| Review Title (using Script) | `PrismQ.T.Review.Title.From.Script` | Script → TitleReview |
+| Review Script (using Title) | `PrismQ.T.Review.Script.From.Title` | Title → ScriptReview |
+| Iterate Title (from original + script + review) | `PrismQ.T.Title.From.Script.Review.Title` | Title, Script, TitleReview → Title v2 |
+| Iterate Script (from original + title + review) | `PrismQ.T.Script.From.Title.Review.Script` | Script, Title, ScriptReview → Script v2 |
 | Publishing | `PrismQ.T.Publishing` | Title, Script → Published |
 
-### Naming Convention Pattern
+### Key Examples
 ```
-PrismQ.T.<Output>.<Action>.By.<Input1>.<Input2>...
-```
+PrismQ.T.Title.From.Idea
+  → Creating a new title from the idea
 
-Where:
-- `<Output>` = The entity being created/modified (Idea, Title, Script, Review)
-- `<Action>` = Optional action type (Creation, Publishing)
-- `<Input1>.<Input2>...` = Input dependencies in order of importance
+PrismQ.T.Script.From.Idea.Title
+  → Creating a new script from idea and title
+
+PrismQ.T.Review.Title.From.Script
+  → Creating a title review based on the script
+
+PrismQ.T.Title.From.Script.Review.Title
+  → Creating a new title version from the original title, script, and title review
+
+PrismQ.T.Script.From.Title.Review.Script
+  → Creating a new script version from the original script, title, and script review
+```
 
 ## Tasks
 
 ### Phase 1: Folder Structure
-- [ ] Create `T/Review/Title/` folder structure
-- [ ] Create `T/Review/Title/By.Script/`
-- [ ] Create `T/Review/Title/By.Script.Idea/`
-- [ ] Create `T/Review/Script/By.Title/`
+- [ ] Create `T/Title/From/Idea/`
+- [ ] Create `T/Title/From/Script/Review/Title/`
+- [ ] Create `T/Script/From/Idea/Title/`
+- [ ] Create `T/Script/From/Title/Review/Script/`
+- [ ] Create `T/Review/Title/From/Script/`
+- [ ] Create `T/Review/Script/From/Title/`
 
 ### Phase 2: Update State Names
 - [ ] Update `DATABASE_DESIGN.md` with new state names
@@ -63,10 +82,10 @@ Where:
 - [ ] Update state transition logic in client
 
 ## Benefits
-1. **Clearer dependencies** - Input sources are explicit in the name
+1. **Clearer dependencies** - Input sources are explicit in the name with `From`
 2. **Complete workflow** - Review processes are now included
-3. **Consistent pattern** - All states follow `Output.By.Input` pattern
-4. **Self-documenting** - State names describe what they do
+3. **Consistent pattern** - All states follow `Output.From.Input` pattern
+4. **Self-documenting** - State names describe what they produce from what inputs
 
 ## Related Files
 - `T/_meta/docs/DATABASE_DESIGN.md`
