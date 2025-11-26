@@ -261,10 +261,6 @@ For SQLite (S3DB - SQLite):
 - Use `sqlite3` with `check_same_thread=False` for multi-process access
 - Consider WAL mode for better concurrency: `PRAGMA journal_mode=WAL;`
 
-For PostgreSQL (future):
-- Use connection pooling (e.g., `asyncpg`, `psycopg2.pool`)
-- Set appropriate pool size based on concurrent processes
-
 ### SQLite (S3DB) Specific Considerations
 
 ```python
@@ -310,7 +306,7 @@ This simplified schema stores idea content as prompt-like text, enabling:
 - Version tracking via `create_new_version()` method
 - Flexible prompt text format for various content types
 
-### Future: Inspiration Sources (PostgreSQL)
+### Future: Inspiration Sources
 
 -- IdeaInspiration: Source materials that inspired an Idea
 -- Used when Idea is created via Idea.Fusion (combining multiple inspirations)
@@ -465,12 +461,12 @@ StoryMetrics (
    - Version tracking via `create_new_version()` method
    - Prompt templates: `IdeaPromptTemplates` class
 
-6. **Create IdeaInspiration Model** (Future - PostgreSQL)
+6. **Create IdeaInspiration Model** (Future)
    - Source material storage
    - title, source, content, notes fields
    - Timestamps and audit fields
 
-7. **Create idea_inspirations Junction Table** (Future - PostgreSQL)
+7. **Create idea_inspirations Junction Table** (Future)
    - Many-to-many between Idea and IdeaInspiration
    - `idea_id` FK with CASCADE delete
    - `inspiration_id` FK with CASCADE delete
