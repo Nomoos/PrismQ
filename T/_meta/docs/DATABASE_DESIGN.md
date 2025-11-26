@@ -374,8 +374,8 @@ Following established conventions for database relation naming:
 | Convention | Example | Description |
 |------------|---------|-------------|
 | `<table>_id` | `story_id`, `idea_id` | Standard FK reference |
-| `<role>_<table>_id` | `reviewed_title_version_id` | Role-specific reference |
-| `current_<table>_id` | `current_title_version_id` | Current/active reference |
+| `<role>_<type>` | `reviewed_version` | Role-specific field with discriminator |
+| `current_<table>_id` | `current_title_version_id` | Current/active reference (deprecated - use implicit lookup) |
 
 #### Relationship Field Naming (ORM)
 | Convention | Example | Description |

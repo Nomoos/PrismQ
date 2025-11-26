@@ -7,89 +7,300 @@
 > **Story Generation**: See `_meta/issues/new/STORY_GENERATION_PLAN.md` for Story workflow implementation (STORY-001 to STORY-020)
 
 **Date**: 2025-11-26 (Updated)  
-**Current Sprint**: Sprint 4 - Text Pipeline Enhancements Part 1 + Story Generation Planning  
+**Current Sprint**: Sprint 4 - State Refactoring + Database Models  
 **Status**: 🎯 READY FOR EXECUTION  
 **Timeline**: Weeks 9-10 (2 weeks)
 
 ---
 
-## 🔥 NEXT TO RUN: State Naming Convention Refactor
+## 🚀 COMMANDS FOR WORKERS - START HERE
 
-**Status**: 🎯 HIGH PRIORITY - RUN NEXT  
-**Location**: `T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md`
+### Parallel Group 1: State Refactoring (HIGH PRIORITY - RUN FIRST)
+> All issues in this group can run in parallel. Complete before Group 2.
 
-### State Naming Convention Pattern
+```bash
+# === STATE-001: Define State Interface (Single Responsibility) ===
+# Worker: Any
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b state-001-state-interface
+# Create: T/State/interfaces/state_interface.py
+# - Define IState interface with single responsibility
+# - Methods: get_name(), get_next_states(), can_transition_to()
+# Tests: T/State/_meta/tests/test_state_interface.py
+
+# === STATE-002: Create State Constants Module (Open/Closed) ===
+# Worker: Any (parallel with STATE-001)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b state-002-state-constants
+# Create: T/State/constants/state_names.py
+# - Define all state name constants following pattern: PrismQ.T.<Output>.From.<Input>
+# - Extensible for new states without modifying existing code
+# Tests: T/State/_meta/tests/test_state_constants.py
+
+# === STATE-003: Create State Transition Validator (Liskov Substitution) ===
+# Worker: Any (parallel with STATE-001, STATE-002)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b state-003-transition-validator
+# Create: T/State/validators/transition_validator.py
+# - Validate state transitions
+# - All validators interchangeable via IValidator interface
+# Tests: T/State/_meta/tests/test_transition_validator.py
 ```
-PrismQ.T.<Output>.From.<Input1>.<Input2>...
+
+### Parallel Group 2: Database Models (After Group 1)
+> All issues in this group can run in parallel. Requires Group 1 complete.
+
+```bash
+# === DB-001: Create Base Model Interface (Interface Segregation) ===
+# Worker: Any
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b db-001-base-model
+# Create: T/Database/models/base.py
+# - Define IModel interface with CRUD operations
+# - Small, focused interface (not fat interface)
+# Tests: T/Database/_meta/tests/test_base_model.py
+
+# === DB-002: Implement Title Model (Dependency Inversion) ===
+# Worker: Any (parallel with DB-001 after interface defined)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b db-002-title-model
+# Create: T/Database/models/title.py
+# - Implement Title model using IModel interface
+# - Depend on abstraction, not concrete database
+# Tests: T/Database/_meta/tests/test_title_model.py
+
+# === DB-003: Implement Script Model (Dependency Inversion) ===
+# Worker: Any (parallel with DB-002)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b db-003-script-model
+# Create: T/Database/models/script.py
+# - Implement Script model using IModel interface
+# Tests: T/Database/_meta/tests/test_script_model.py
+
+# === DB-004: Implement Review Model (Single Responsibility) ===
+# Worker: Any (parallel with DB-002, DB-003)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b db-004-review-model
+# Create: T/Database/models/review.py
+# - Single reviewed_version field + review_type discriminator
+# - Only handles review data, not business logic
+# Tests: T/Database/_meta/tests/test_review_model.py
 ```
 
-Where:
-- `<Output>` = The entity being created/modified (Idea, Title, Script, Review)
-- `From` = Indicates input sources follow
-- `<Input1>.<Input2>...` = Input dependencies that create the output
+### Parallel Group 3: Integration (After Group 2)
+> Integrate state and database layers. Requires Group 2 complete.
 
-### Standard State Names
+```bash
+# === INT-001: State-Database Integration ===
+# Worker: Any
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b int-001-state-db-integration
+# Create: T/Integration/state_persistence.py
+# - Connect state machine to database models
+# - Use repository pattern for data access
+# Tests: T/Integration/_meta/tests/test_state_persistence.py
 
-| State | Meaning | Inputs → Output |
-|-------|---------|-----------------|
-| `PrismQ.T.Idea.Creation` | Creating initial idea | ∅ → Idea |
-| `PrismQ.T.Title.From.Idea` | Creating title from idea | Idea → Title |
-| `PrismQ.T.Script.From.Idea.Title` | Creating script from idea + title | Idea, Title → Script |
-| `PrismQ.T.Review.Title.From.Script` | Creating title review from script | Script → TitleReview |
-| `PrismQ.T.Review.Script.From.Title` | Creating script review from title | Title → ScriptReview |
-| `PrismQ.T.Title.From.Script.Review.Title` | Iterating title from original + review | Title, Script, TitleReview → Title v2 |
-| `PrismQ.T.Script.From.Title.Review.Script` | Iterating script from original + review | Script, Title, ScriptReview → Script v2 |
-| `PrismQ.T.Publishing` | Publishing completed content | Title, Script → Published |
+# === INT-002: Migration Script ===
+# Worker: Any (parallel with INT-001)
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b int-002-migration
+# Create: T/Database/migrations/001_initial_schema.py
+# - Migrate existing data to new schema
+# - Idempotent migration (can run multiple times safely)
+# Tests: T/Database/_meta/tests/test_migration.py
+```
 
-### Implementation Tasks
-- [ ] Phase 1: Create folder structure matching naming pattern
-- [ ] Phase 2: Update state constants in all files
-- [ ] Phase 3: Migration for existing data
+### Parallel Group 4: Enhancement Issues (After Group 3 OR Independent)
+> These can run in parallel with each other. Some independent of Groups 1-3.
 
-**See**: [T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md](../T/_meta/issues/new/REFACTOR_STATE_NAMING_CONVENTION.md)
+```bash
+# === POST-001: SEO Keywords (Independent) ===
+# Worker: Worker17 + Worker13
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-001-seo-keywords
+# Create: T/Publishing/SEO/Keywords/
+# Follow spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md
+
+# === POST-003: Blog Format (Independent) ===
+# Worker: Worker12
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-003-blog-format
+# Create: T/Script/Formatter/Blog/
+# Follow spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md
+
+# === POST-005: Batch Processing (Independent) ===
+# Worker: Worker02
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b post-005-batch-processing
+# Create: T/Idea/Batch/
+# Follow spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md
+```
 
 ---
 
-## 🆕 Interactive Text Client with Independent State Processing
+## 📋 PARALLEL GROUPS OVERVIEW
 
-**Status**: ✅ IMPLEMENTED  
-**Location**: `T/_meta/scripts/`
+| Group | Issues | Can Run Parallel | Depends On | SOLID Principle |
+|-------|--------|------------------|------------|-----------------|
+| **Group 1** | STATE-001, STATE-002, STATE-003 | ✅ All 3 parallel | None | S, O, L |
+| **Group 2** | DB-001, DB-002, DB-003, DB-004 | ✅ All 4 parallel | Group 1 | I, D, S |
+| **Group 3** | INT-001, INT-002 | ✅ Both parallel | Group 2 | D |
+| **Group 4** | POST-001, POST-003, POST-005 | ✅ All 3 parallel | None (Independent) | - |
 
-### Independent State Processing Architecture
+### Execution Timeline
+```
+Week 1:
+├─ Day 1-2: Group 1 (STATE-001, STATE-002, STATE-003) [PARALLEL]
+├─ Day 2-4: Group 2 (DB-001, DB-002, DB-003, DB-004) [PARALLEL]
+└─ Day 1-4: Group 4 (POST-001, POST-003, POST-005) [PARALLEL, Independent]
 
-Each workflow step runs as an **independent process** with state persisted between executions. This enables:
-- Parallel execution of different workflows
-- Fault tolerance (crashed steps can be rerun)
-- Distributed processing across workers
-
-### State Transformation Batch Scripts
-
-| Batch Script | State Transformation | Description |
-|--------------|---------------------|-------------|
-| `step1_create_idea.bat` | `∅ → idea_created` | Create new idea from scratch |
-| `step2_generate_title.bat` | `idea_created → title_generated` | Generate title variants from idea |
-| `step3_generate_script.bat` | `title_generated → script_generated` | Generate script draft from title + idea |
-| `step4_iterate_script.bat` | `script_generated → script_iterated` | Apply feedback loop (unlimited iterations) |
-| `step5_export.bat` | `* → exported` | Export content to file |
-| `load_demo.bat` | `∅ → idea_created` | Load demo idea for testing |
-| `show_status.bat` | N/A (read-only) | Display current workflow state |
-| `run_all_steps.bat` | `∅ → exported` | Run complete workflow sequentially |
-
-### State Persistence
-
-**State Database**: `T/_meta/scripts/text_client_state.db` (SQLite)
-
-State is persisted to SQLite after each step, enabling:
-```bash
-# Run steps independently as separate processes
-step1_create_idea.bat    # Process 1: Creates idea, saves state to SQLite
-# ... time passes ...
-step2_generate_title.bat # Process 2: Loads state, generates title, saves state
-# ... time passes ...
-step3_generate_script.bat # Process 3: Loads state, generates script, saves state
+Week 2:
+├─ Day 5-6: Group 3 (INT-001, INT-002) [PARALLEL]
+├─ Day 6-8: POST-002, POST-004, POST-006 [After POST-001, POST-003]
+└─ Day 7-10: Testing, Documentation, Review
 ```
 
-### State Naming Convention
+---
+
+## 🔥 PRIORITY 1: State Refactoring Issues
+
+### STATE-001: Define State Interface
+**Priority**: 🔴 CRITICAL | **Effort**: 0.5 day | **Status**: 🆕 UNBLOCKED  
+**SOLID**: Single Responsibility Principle
+
+**Acceptance Criteria**:
+- [ ] Create `IState` interface in `T/State/interfaces/state_interface.py`
+- [ ] Interface has single responsibility: define state behavior contract
+- [ ] Methods: `get_name() -> str`, `get_next_states() -> List[str]`, `can_transition_to(state: str) -> bool`
+- [ ] Unit tests with 100% coverage
+
+**File Structure**:
+```
+T/State/
+├── __init__.py
+├── interfaces/
+│   ├── __init__.py
+│   └── state_interface.py      # IState interface
+└── _meta/
+    └── tests/
+        └── test_state_interface.py
+```
+
+---
+
+### STATE-002: Create State Constants Module
+**Priority**: 🔴 CRITICAL | **Effort**: 0.5 day | **Status**: 🆕 UNBLOCKED  
+**SOLID**: Open/Closed Principle (extensible without modification)
+
+**Acceptance Criteria**:
+- [ ] Create `T/State/constants/state_names.py`
+- [ ] Define all state constants following pattern: `PrismQ.T.<Output>.From.<Input>`
+- [ ] States are extensible - new states can be added without modifying existing code
+- [ ] Unit tests verify all state names follow convention
+
+**State Names to Define**:
+```python
+IDEA_CREATION = "PrismQ.T.Idea.Creation"
+TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"
+SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
+REVIEW_TITLE_FROM_SCRIPT = "PrismQ.T.Review.Title.From.Script"
+REVIEW_SCRIPT_FROM_TITLE = "PrismQ.T.Review.Script.From.Title"
+TITLE_FROM_SCRIPT_REVIEW = "PrismQ.T.Title.From.Script.Review.Title"
+SCRIPT_FROM_TITLE_REVIEW = "PrismQ.T.Script.From.Title.Review.Script"
+PUBLISHING = "PrismQ.T.Publishing"
+```
+
+---
+
+### STATE-003: Create State Transition Validator
+**Priority**: 🔴 CRITICAL | **Effort**: 1 day | **Status**: 🆕 UNBLOCKED  
+**SOLID**: Liskov Substitution Principle (validators interchangeable)
+
+**Acceptance Criteria**:
+- [ ] Create `IValidator` interface in `T/State/interfaces/validator_interface.py`
+- [ ] Create `TransitionValidator` implementing `IValidator`
+- [ ] Validates state transitions against allowed transition map
+- [ ] All validators can be substituted without affecting correctness
+- [ ] Unit tests cover all valid/invalid transitions
+
+**Transition Map**:
+```python
+TRANSITIONS = {
+    IDEA_CREATION: [TITLE_FROM_IDEA],
+    TITLE_FROM_IDEA: [SCRIPT_FROM_IDEA_TITLE],
+    SCRIPT_FROM_IDEA_TITLE: [REVIEW_SCRIPT_FROM_TITLE, PUBLISHING],
+    REVIEW_SCRIPT_FROM_TITLE: [SCRIPT_FROM_TITLE_REVIEW],
+    SCRIPT_FROM_TITLE_REVIEW: [REVIEW_SCRIPT_FROM_TITLE, PUBLISHING],
+    # ... etc
+}
+```
+
+---
+
+## 🔥 PRIORITY 2: Database Model Issues
+
+### DB-001: Create Base Model Interface
+**Priority**: 🟠 HIGH | **Effort**: 0.5 day | **Status**: 🔒 BLOCKED (by Group 1)  
+**SOLID**: Interface Segregation Principle (small, focused interface)
+
+**Acceptance Criteria**:
+- [ ] Create `IModel` interface in `T/Database/models/base.py`
+- [ ] Small interface: `create()`, `read()`, `update()`, `delete()`, `find_by_id()`
+- [ ] No fat interface - only essential CRUD operations
+- [ ] Abstract database connection handling
+
+---
+
+### DB-002: Implement Title Model
+**Priority**: 🟠 HIGH | **Effort**: 1 day | **Status**: 🔒 BLOCKED (by DB-001)  
+**SOLID**: Dependency Inversion Principle (depend on IModel, not SQLite)
+
+**Acceptance Criteria**:
+- [ ] Create `TitleModel` implementing `IModel` interface
+- [ ] Fields: `id`, `story_id`, `version`, `text`, `created_at`
+- [ ] Unique constraint on `(story_id, version)`
+- [ ] Current version lookup via `ORDER BY version DESC LIMIT 1`
+
+---
+
+### DB-003: Implement Script Model
+**Priority**: 🟠 HIGH | **Effort**: 1 day | **Status**: 🔒 BLOCKED (by DB-001)  
+**SOLID**: Dependency Inversion Principle
+
+**Acceptance Criteria**:
+- [ ] Create `ScriptModel` implementing `IModel` interface
+- [ ] Fields: `id`, `story_id`, `version`, `text`, `created_at`
+- [ ] Same structure as TitleModel for consistency
+
+---
+
+### DB-004: Implement Review Model
+**Priority**: 🟠 HIGH | **Effort**: 1 day | **Status**: 🔒 BLOCKED (by DB-001)  
+**SOLID**: Single Responsibility (only review data, no business logic)
+
+**Acceptance Criteria**:
+- [ ] Create `ReviewModel` implementing `IModel` interface
+- [ ] Single `reviewed_version` field (not multiple FKs)
+- [ ] `review_type` discriminator: `'title'`, `'script'`, `'story'`
+- [ ] Implicit version lookup via `review_type + reviewed_version`
+
+**Schema**:
+```sql
+Review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL,
+    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
+    reviewed_version INTEGER NULL,
+    text TEXT NOT NULL,
+    score INTEGER CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (story_id) REFERENCES Story(id)
+)
+```
+
+---
+
+## 📊 State Naming Convention Reference
 
 All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>...`
 
@@ -102,24 +313,25 @@ All process states follow the pattern: `PrismQ.T.<Output>.From.<Input1>.<Input2>
 | `PrismQ.T.Script.From.Title.Review.Script` | Iterating script using review |
 | `PrismQ.T.Publishing` | Publishing completed content |
 
+---
+
+## 📊 DATABASE SCHEMA REFERENCE
+
 **SQLite State Schema**:
 ```sql
 -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
--- Text field contains prompt-like content for content generation
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT,                                      -- Prompt-like text describing the idea
-    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    version INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
 -- Story: Main table with state (next process name) and idea_id FK
--- Note: current_title_version_id and current_script_version_id are removed
--- Current versions are implicit - determined by highest version in Title/Script tables
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_id INTEGER NULL,                           -- Reference to Idea
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
+    idea_id INTEGER NULL,
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
@@ -146,14 +358,12 @@ Script (
     FOREIGN KEY (story_id) REFERENCES Story(id)
 )
 
--- Reviews with discriminator pattern for different review types
--- Uses single reviewed_version field for universal version tracking (max 1 field)
--- The version is implicitly known by combining review_type + reviewed_version
+-- Reviews with discriminator pattern (single reviewed_version field)
 Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_version INTEGER NULL,                  -- Version number of content being reviewed
+    reviewed_version INTEGER NULL,
     text TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -163,452 +373,59 @@ Review (
 
 ### Implicit Version Identification for Reviews
 
-The Review model uses a **single field** (`reviewed_version`) to universally track what version is being reviewed:
-
 | review_type | reviewed_version | Meaning |
 |-------------|------------------|---------|
 | `title` | 3 | Reviews Title v3 for this story |
 | `script` | 5 | Reviews Script v5 for this story |
 | `story` | NULL | Reviews current state of entire story |
 
-**Lookup Example**:
-```sql
--- Get the title content for a title review
-SELECT t.* FROM Title t
-JOIN Review r ON t.story_id = r.story_id AND t.version = r.reviewed_version
-WHERE r.id = ? AND r.review_type = 'title';
-```
-
-**Note**: Current title/script versions are determined implicitly via `ORDER BY version DESC LIMIT 1` queries.
-
-### Version Tracking & Next-to-Process Selection
-
-The system tracks version counts for each content type:
-- **Idea Version**: Tracked in Idea.version field
-- **Title Version**: Tracked in Title.version field
-- **Script Version**: Tracked in Script.version field
-
-**Next-to-Process Algorithm**: Selects item with lowest version count
-- Tie-breaking follows natural workflow order: Idea → Title → Script
-- Ensures balanced progression through the workflow
-- Current versions determined via `ORDER BY version DESC LIMIT 1`
-
-### Database Integration (Implemented)
-
-Database models are now implemented in `T/_meta/scripts/run_text_client.py`:
-
-```sql
--- Simple Idea model (prompt-based storage)
-Idea (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT,                                      -- Prompt-like text
-    version INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-)
-
--- Story with state machine and Idea FK
--- Note: current_title/script version IDs removed - now implicit
-Story (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_id INTEGER NULL REFERENCES Idea(id),
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (idea_id) REFERENCES Idea(id)
-)
-
--- Title versions with full history
-Title (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
-    text TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE(story_id, version)
-)
-
--- Script versions with full history
-Script (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER NOT NULL REFERENCES Story(id),
-    version INTEGER NOT NULL,
-    text TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE(story_id, version)
-)
-
--- Reviews with discriminator pattern (single reviewed_version field)
-Review (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    story_id INTEGER NOT NULL REFERENCES Story(id),
-    review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_version INTEGER NULL,                  -- Version number (implicit lookup via review_type)
-    text TEXT NOT NULL,
-    score INTEGER CHECK (score >= 0 AND score <= 100),
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-)
-```
-
-**Current Version Lookup**: Use `ORDER BY version DESC LIMIT 1` to get the current version instead of FK references.
-
-**Review Version Lookup**: Use `review_type` + `reviewed_version` to implicitly identify the content being reviewed.
+**Version Lookup**: Use `ORDER BY version DESC LIMIT 1` to get current version.
+**Review Lookup**: Use `review_type + reviewed_version` to identify content being reviewed.
 
 See [T/_meta/docs/DATABASE_DESIGN.md](../../../T/_meta/docs/DATABASE_DESIGN.md) for full schema.
 
-### Command Line Actions
-
-Python script supports direct action invocation:
-```bash
-python run_text_client.py --action create_idea
-python run_text_client.py --action generate_title
-python run_text_client.py --action generate_script
-python run_text_client.py --action iterate_script
-python run_text_client.py --action export
-python run_text_client.py --action status
-python run_text_client.py --action load_demo
-python run_text_client.py --action reset
-```
-
 ---
 
-## 🆕 Story Generation Workflow - Implementation Planning
-
-**Status**: ✅ PLANNING COMPLETE - Awaiting Worker10 Review  
-**Documentation Package**: 83KB across 6 files  
-**Location**: `_meta/issues/new/Worker01/`
-
-### Overview
-Story Generation (Stages 21-22) serves as the final quality gate before publishing, using GPT-based expert review and polish.
-
-**Workflow Position**:
-```
-Stage 1-20: Text Pipeline (Idea → Title → Script → Local Reviews) ✅ COMPLETE
-    ↓
-Stage 21: Story.ExpertReview (GPT-based holistic review) ⚠️ PLANNING DONE
-    ↓
-    ├─ If PUBLISH → Stage 23: Publishing.Finalization
-    │
-    └─ If POLISH → Stage 22: Story.Polish (Apply improvements)
-                       ↓
-                   Return to Stage 21 (Review again)
-```
-
-### Key Documents
-
-| Document | Size | Purpose |
-|----------|------|---------|
-| [STORY_GENERATION_PLAN.md](new/STORY_GENERATION_PLAN.md) | 10KB | Master implementation plan with 20 atomic issues |
-| [STORY_GENERATION_OVERVIEW.md](new/Worker01/STORY_GENERATION_OVERVIEW.md) | 16KB | Complete planning package summary |
-| [STORY-001-GPT-Review-API-Integration.md](new/Worker01/STORY-001-GPT-Review-API-Integration.md) | 16KB | Sample atomic issue: GPT API integration |
-| [STORY-003-Prompt-Engineering.md](new/Worker01/STORY-003-Prompt-Engineering.md) | 16KB | Sample atomic issue: Prompt engineering |
-| [STORY-005-Workflow-Orchestrator.md](new/Worker01/STORY-005-Workflow-Orchestrator.md) | 21KB | Sample atomic issue: Orchestration |
-| [TASK_CHECKLIST.md](new/Worker01/TASK_CHECKLIST.md) | 8KB | Verification checklist |
-| [WORKER10_REVIEW_REQUEST.md](new/Worker01/WORKER10_REVIEW_REQUEST.md) | 8KB | Review request for Worker10 |
-
-### Story Issues Summary (20 issues across 5 phases)
-
-**Phase 1: GPT Integration (Issues STORY-001 to STORY-004)** - 4 days
-- STORY-001: GPT API Integration for ExpertReview
-- STORY-002: GPT API Integration for Polish
-- STORY-003: Prompt Engineering and Templates
-- STORY-004: Response Parsing and Validation
-
-**Phase 2: Workflow Orchestration (Issues STORY-005 to STORY-008)** - 5 days
-- STORY-005: Workflow Orchestrator
-- STORY-006: Review Loop Controller
-- STORY-007: State Management and Persistence
-- STORY-008: Error Recovery System
-
-**Phase 3: Database Integration (Issues STORY-009 to STORY-012)** - 4 days
-- STORY-009: Review History Repository
-- STORY-010: Polish Change Tracking
-- STORY-011: Analytics and Metrics
-- STORY-012: Caching Layer
-
-**Phase 4: CLI and API (Issues STORY-013 to STORY-016)** - 4 days
-- STORY-013: CLI Runner
-- STORY-014: REST API Endpoints
-- STORY-015: Status Monitoring
-- STORY-016: Configuration Management
-
-**Phase 5: Testing and Polish (Issues STORY-017 to STORY-020)** - 5 days
-- STORY-017: Integration Test Suite
-- STORY-018: Performance Testing
-- STORY-019: Documentation
-- STORY-020: Production Deployment
-
-**Next Action**: Worker10 review required before execution
-
----
-
-## 🎉 MVP Complete: All 24 Issues Done!
+## 🎉 COMPLETED WORK
 
 **MVP Status**: ✅ ALL COMPLETE (MVP-001 through MVP-024)  
-**Location**: All MVP issues moved to `_meta/issues/done/`
-
-**Foundation Built**:
-- ✅ Idea Creation (MVP-001)
-- ✅ Title Generation v1, v2, v3 (MVP-002, MVP-006)
-- ✅ Script Generation v1, v2, v3 (MVP-003, MVP-007)
-- ✅ Cross-Review System (MVP-004, MVP-005)
-- ✅ Acceptance Gates (MVP-012, MVP-013)
-- ✅ Quality Reviews: Grammar, Tone, Content, Consistency, Editing (MVP-014-018)
-- ✅ Readability Checks (MVP-019, MVP-020)
-- ✅ Expert Review & Polish (MVP-021, MVP-022)
-- ✅ Publishing Pipeline (MVP-023, MVP-024)
-
-**Next Phase**: Post-MVP Enhancements (48 issues across Sprints 4-11) + Story Generation (20 issues)
+**Location**: `_meta/issues/done/`
 
 ---
 
-## Sprint 4: Text Pipeline Enhancement - Part 1 (CURRENT)
+## 📈 PROGRESS TRACKING
 
-**Goal**: Add SEO optimization, multi-format support, and batch processing to T module  
-**Timeline**: Weeks 9-10 (2 weeks)  
-**Active Workers**: Worker02, Worker12, Worker13, Worker17  
-**Status**: 🎯 READY FOR EXECUTION
-
-### Unblocked Issues Ready to Start
-
-#### POST-001: T.Publishing.SEO - Keyword Research & Optimization
-**Worker**: Worker17 (Analytics) + Worker13 (Prompt Master)  
-**Priority**: High | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
-
-**Quick Summary**: Implement automated SEO keyword research and optimization for published content.
-
-**Acceptance Criteria**:
-- Extract relevant keywords from title and script
-- Generate SEO-optimized metadata (title tags, meta descriptions)
-- Keyword density analysis
-- Store SEO data with published content
-
-**Dependencies**: MVP-024 ✅ (Complete)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md)
-
----
-
-#### POST-003: T.Script.MultiFormat - Blog Format Optimization
-**Worker**: Worker12 (Content Specialist)  
-**Priority**: High | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
-
-**Quick Summary**: Transform scripts into blog-optimized format with heading hierarchy, sections, and formatting.
-
-**Acceptance Criteria**:
-- Convert script to blog structure (H1, H2, H3 hierarchy)
-- Add paragraph breaks and formatting
-- Platform-specific optimizations (Medium, WordPress, Ghost)
-- Generate blog metadata (excerpt, reading time)
-
-**Dependencies**: MVP-024 ✅ (Complete)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md)
-
----
-
-#### POST-005: T.Idea.Batch - Batch Idea Processing
-**Worker**: Worker02 (Python Specialist)  
-**Priority**: Medium | **Effort**: 2 days | **Status**: 🆕 UNBLOCKED
-
-**Quick Summary**: Process multiple ideas in parallel for efficient content pipeline scaling.
-
-**Acceptance Criteria**:
-- Accept list of ideas as input (10-100+ ideas)
-- Process ideas concurrently using async/parallel execution
-- Track batch processing status
-- Handle failures gracefully with retry logic
-
-**Dependencies**: MVP-001 ✅ (Complete)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md)
-
----
-
-### Blocked Issues (Ready Next)
-
-#### POST-002: T.Publishing.SEO - Tags & Categories
-**Worker**: Worker17 (Analytics)  
-**Priority**: High | **Effort**: 1.5 days | **Status**: 🔒 BLOCKED
-
-**Blocked By**: POST-001 (SEO Keywords must complete first)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-002-SEO-Taxonomy.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-002-SEO-Taxonomy.md)
-
----
-
-#### POST-004: T.Script.MultiFormat - Social Media Adaptation
-**Worker**: Worker12 (Content Specialist)  
-**Priority**: High | **Effort**: 2 days | **Status**: 🔒 BLOCKED
-
-**Blocked By**: POST-003 (Blog Format - using shared formatting infrastructure)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-004-Social-Media-Format.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-004-Social-Media-Format.md)
-
----
-
-#### POST-006: T.Title.ABTesting - A/B Testing Framework
-**Worker**: Worker17 (Analytics)  
-**Priority**: Medium | **Effort**: 2 days | **Status**: 🔒 BLOCKED
-
-**Blocked By**: POST-001, POST-002 (SEO infrastructure needed)  
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/POST-006-ABTesting.md](../../T/_meta/issues/new/POST-MVP-Enhancements/POST-006-ABTesting.md)
-
----
-
-## Sprint 4 Execution Plan
-
-### Week 1: Parallel Track (3 workers)
-```bash
-# Track A: SEO Foundation
-Worker17: POST-001 (SEO Keywords) [2 days]
-Worker13: Support POST-001 with prompt engineering [2 days]
-
-# Track B: Multi-Format Content
-Worker12: POST-003 (Blog Format) [2 days]
-
-# Track C: Scalability
-Worker02: POST-005 (Batch Processing) [2 days]
-```
-
-### Week 2: Sequential Completion (2-3 workers)
-```bash
-# After POST-001 completes
-Worker17: POST-002 (Tags & Categories) [1.5 days] → POST-006 (A/B Testing) [0.5 days]
-
-# After POST-003 completes
-Worker12: POST-004 (Social Media) [2 days]
-
-# Support/Testing
-Worker04: Integration testing [2 days]
-Worker15: Documentation updates [2 days]
-```
-
-**Total Calendar Time**: ~10 days (with weekends: 2 weeks)
-
----
-
-## Sprint 5: Text Pipeline Enhancement - Part 2 (NEXT)
-
-**Goal**: Add inspiration sources, versioning, and collaboration features  
-**Timeline**: Weeks 11-12 (2 weeks)  
-**Status**: 🔜 UPCOMING
-
-### Planned Issues (Not Yet Unblocked)
-- POST-007: YouTube API Inspiration (Worker08) - 2 days
-- POST-008: RSS Feed Inspiration (Worker08) - 1.5 days
-- POST-009: Twitter/X API Inspiration (Worker08) - 1.5 days
-- POST-010: Script Versioning (Worker06) - 2 days
-- POST-011: Multi-Reviewer Workflow (Worker18) - 2 days
-- POST-012: Inline Comments (Worker18) - 2 days
-
-**Details**: See [T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md](../../T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md)
-
----
-
-## Issue State Management
-
-### Issue States
-- 🆕 **UNBLOCKED**: Ready to start immediately (no blocking dependencies)
-- 🔒 **BLOCKED**: Waiting on dependency completion
-- 🔄 **WIP**: Currently being worked on
-- ✅ **COMPLETE**: Done and moved to `_meta/issues/done/`
-
-### Moving Issues
-
-**When starting work**:
-```bash
-# Move issue to WIP folder (when Worker begins)
-mv _meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md _meta/issues/wip/
-```
-
-**When completing work**:
-```bash
-# Move issue to done folder (after PR merge and review)
-mv _meta/issues/wip/POST-001-SEO-Keywords.md _meta/issues/done/
-```
-
-**Unblocking issues**:
-```bash
-# When POST-001 completes, POST-002 becomes unblocked
-# Update this file to move POST-002 to "Unblocked Issues" section
-```
-
----
-
-## Sprint 4 Success Criteria
-
-### Must Complete (Unblocked Issues)
-- [ ] POST-001: SEO Keywords functional
-- [ ] POST-003: Blog format working for 3+ platforms
-- [ ] POST-005: Batch processing handles 50+ ideas
-
-### Should Complete (Blocked Issues)
-- [ ] POST-002: Tags & Categories integrated
-- [ ] POST-004: Social media formatting for 4+ platforms
-- [ ] POST-006: A/B Testing framework operational
+### Current Sprint Progress
+| Group | Issues | Status |
+|-------|--------|--------|
+| Group 1 (State) | STATE-001, STATE-002, STATE-003 | 🆕 Ready |
+| Group 2 (Database) | DB-001, DB-002, DB-003, DB-004 | 🔒 Blocked by Group 1 |
+| Group 3 (Integration) | INT-001, INT-002 | 🔒 Blocked by Group 2 |
+| Group 4 (Enhancement) | POST-001, POST-003, POST-005 | 🆕 Ready (Independent) |
 
 ### Quality Gates
 - [ ] All new code has >80% test coverage
 - [ ] Integration tests pass for new features
 - [ ] Documentation updated
-- [ ] Code review completed by Worker10
+- [ ] Code review completed
 - [ ] No security vulnerabilities introduced
 
 ---
 
-## Commands for Workers
+## 📚 RELATED DOCUMENTS
 
-### Worker17 + Worker13: Start POST-001
-```bash
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b post-001-seo-keywords
-# Create implementation in T/Publishing/SEO/Keywords/
-# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md
-```
-
-### Worker12: Start POST-003
-```bash
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b post-003-blog-format
-# Create implementation in T/Script/Formatter/Blog/
-# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md
-```
-
-### Worker02: Start POST-005
-```bash
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b post-005-batch-processing
-# Create implementation in T/Idea/Batch/
-# Follow spec in T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md
-```
+| Document | Location | Purpose |
+|----------|----------|---------|
+| Database Design | `T/_meta/docs/DATABASE_DESIGN.md` | Full schema documentation |
+| POST Issues | `T/_meta/issues/new/POST-MVP-Enhancements/` | Enhancement specifications |
+| Story Generation | `_meta/issues/new/STORY_GENERATION_PLAN.md` | Story workflow (STORY-001 to STORY-020) |
+| Full Roadmap | `_meta/issues/PARALLEL_RUN_NEXT_FULL.md` | All 48 POST issues |
+| Completed MVPs | `_meta/issues/done/MVP-*.md` | Issues 001-024 |
 
 ---
 
-## Progress Tracking
-
-### Sprint 4 Progress
-**Week 1**: 0/3 unblocked issues started  
-**Week 2**: 0/3 blocked issues started  
-**Overall**: 0/6 issues complete
-
-**Last Updated**: 2025-11-24
-
----
-
-## Related Documents
-
-### Issue References
-- **Completed MVPs**: `_meta/issues/done/MVP-*.md` (001-024)
-- **Text Pipeline POST Issues**: `T/_meta/issues/new/POST-MVP-Enhancements/` (POST-001 to POST-012)
-- **POST Issue Index**: `T/_meta/issues/new/POST-MVP-Enhancements/INDEX.md`
-- **POST Issue Reference**: `_meta/issues/new/POST-MVP-ENHANCEMENTS.md`
-- **Story Generation Plan**: `_meta/issues/new/STORY_GENERATION_PLAN.md` (STORY-001 to STORY-020)
-- **Story Generation Package**: `_meta/issues/new/Worker01/` (Complete planning documentation)
-
-### Planning Documents
-- **Full Roadmap**: `_meta/issues/PARALLEL_RUN_NEXT_FULL.md` (All 48 POST issues)
-- **Archive (Consolidated)**: `_meta/issues/archive/` (MVP reviews and historical planning)
-  - `MVP_REVIEWS_CONSOLIDATED.md` - All MVP implementation reviews
-  - `HISTORICAL_PLANNING_CONSOLIDATED.md` - Historical planning documents
-- **Issue Management**: `_meta/issues/ISSUE_MANAGEMENT_STRUCTURE.md`
-
----
-
-**Status**: Sprint 4 Ready - 3 POST Issues Unblocked + Story Generation Planning Complete  
-**Next Action**: Worker17, Worker12, Worker02 begin POST execution; Worker10 review Story Generation  
+**Status**: Sprint 4 Ready - State Refactoring + Database Models  
+**Priority Order**: Group 1 (State) → Group 2 (Database) → Group 3 (Integration)  
+**Independent**: Group 4 (Enhancement) can run in parallel with any group  
 **Updated**: 2025-11-26  
 **Owner**: Worker01 (Project Manager)
