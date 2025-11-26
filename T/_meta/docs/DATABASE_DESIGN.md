@@ -173,7 +173,7 @@ When running steps as separate processes (via batch scripts), the state machine 
 - [ ] Implement state transition logic
 - [ ] Add validation for allowed transitions
 - [ ] Integrate with batch script workflow
-- [ ] Update `text_client_state.json` to use database
+- [x] ~~Update `text_client_state.json` to use database~~ (Now using SQLite: `text_client_state.db`)
 
 ### Phase 4: Migration & Testing
 - [ ] Create database migration scripts

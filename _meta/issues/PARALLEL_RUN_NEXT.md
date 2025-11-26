@@ -40,16 +40,56 @@ Each workflow step runs as an **independent process** with state persisted betwe
 
 ### State Persistence
 
-**State File**: `T/_meta/scripts/text_client_state.json`
+**State Database**: `T/_meta/scripts/text_client_state.db` (SQLite)
 
-State is persisted after each step, enabling:
+State is persisted to SQLite after each step, enabling:
 ```bash
 # Run steps independently as separate processes
-step1_create_idea.bat    # Process 1: Creates idea, saves state
+step1_create_idea.bat    # Process 1: Creates idea, saves state to SQLite
 # ... time passes ...
 step2_generate_title.bat # Process 2: Loads state, generates title, saves state
 # ... time passes ...
 step3_generate_script.bat # Process 3: Loads state, generates script, saves state
+```
+
+**SQLite State Schema**:
+```sql
+-- Session state table (single row, id=1)
+session_state (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    idea_version INTEGER DEFAULT 0,
+    title_version INTEGER DEFAULT 0,
+    script_version INTEGER DEFAULT 0,
+    current_title TEXT,
+    current_script TEXT,
+    session_start TEXT,
+    updated_at TEXT
+)
+
+-- Idea data table (single row, id=1)
+idea_data (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    title TEXT,
+    concept TEXT,
+    premise TEXT,
+    logline TEXT,
+    hook TEXT,
+    skeleton TEXT,
+    emotional_arc TEXT,
+    twist TEXT,
+    climax TEXT,
+    tone_guidance TEXT,
+    target_audience TEXT,
+    genre TEXT
+)
+
+-- Action history table
+action_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    details TEXT
+)
 ```
 
 ### Version Tracking & Next-to-Process Selection

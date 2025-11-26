@@ -112,10 +112,11 @@ The client tracks versions for each content type (Idea, Title, Script). The work
 This ensures balanced progression through the workflow by always suggesting work on the item with the least iterations.
 
 ### State Persistence
-When using batch scripts or `--action` mode, state is automatically saved to `text_client_state.json`. This allows:
+When using batch scripts or `--action` mode, state is automatically saved to a SQLite database (`text_client_state.db`). This allows:
 - Running each step as a separate process
 - Resuming work after closing the terminal
 - Sharing state between interactive and batch modes
+- Full transaction support and data integrity
 
 ## Menu Commands
 

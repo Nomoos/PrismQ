@@ -89,11 +89,17 @@ Three review types in one table:
 
 **Question**: Is the single table with discriminator pattern the right choice vs. separate tables?
 
-### Decision 3: State Persistence via JSON
+### Decision 3: State Persistence via SQLite
 
-State persisted to `text_client_state.json` between batch script executions.
+State persisted to `text_client_state.db` (SQLite database) between batch script executions.
 
-**Question**: Is JSON file-based persistence sufficient for independent process execution? Should we use SQLite from the start?
+**Status**: ✅ Implemented - Using SQLite for state persistence with proper schema.
+
+**Benefits**:
+- ACID transaction support
+- Structured schema with typed columns  
+- Data integrity guarantees
+- Ready for future Story model integration
 
 ### Decision 4: Version Tracking for Next-to-Process
 

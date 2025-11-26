@@ -21,6 +21,7 @@ the text generation workflow step by step.
 import sys
 import os
 import json
+import sqlite3
 from pathlib import Path
 from typing import Optional, Dict, Any
 from datetime import datetime
@@ -107,17 +108,17 @@ class TextClient:
     Version tracking is used to determine which item to process next,
     with the lowest version count being selected for processing.
     
-    State can be persisted to a JSON file to allow running each step
+    State is persisted to a SQLite database to allow running each step
     as a separate process (for batch script workflows).
     """
     
-    STATE_FILE = "text_client_state.json"
+    STATE_DB = "text_client_state.db"
     
     def __init__(self, load_state: bool = False):
         """Initialize the text client.
         
         Args:
-            load_state: If True, load state from file if it exists.
+            load_state: If True, load state from database if it exists.
         """
         self.current_idea: Optional[Any] = None
         self.current_title: Optional[str] = None
@@ -134,109 +135,247 @@ class TextClient:
         # Idea data for persistence (since Idea objects may not serialize directly)
         self._idea_data: Optional[Dict[str, Any]] = None
         
+        # Initialize database
+        self._init_db()
+        
         if load_state:
             self._load_state()
     
-    def _get_state_file_path(self) -> Path:
-        """Get the path to the state file."""
-        return SCRIPT_DIR / self.STATE_FILE
+    def _get_db_path(self) -> Path:
+        """Get the path to the SQLite database file."""
+        return SCRIPT_DIR / self.STATE_DB
+    
+    def _init_db(self) -> None:
+        """Initialize the SQLite database with required tables."""
+        db_path = self._get_db_path()
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Create state table for session data
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS session_state (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    idea_version INTEGER DEFAULT 0,
+                    title_version INTEGER DEFAULT 0,
+                    script_version INTEGER DEFAULT 0,
+                    current_title TEXT,
+                    current_script TEXT,
+                    session_start TEXT,
+                    updated_at TEXT
+                )
+            """)
+            
+            # Create idea_data table for storing idea fields
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS idea_data (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    title TEXT,
+                    concept TEXT,
+                    premise TEXT,
+                    logline TEXT,
+                    hook TEXT,
+                    skeleton TEXT,
+                    emotional_arc TEXT,
+                    twist TEXT,
+                    climax TEXT,
+                    tone_guidance TEXT,
+                    target_audience TEXT,
+                    genre TEXT
+                )
+            """)
+            
+            # Create history table for action history
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS action_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    action TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    details TEXT
+                )
+            """)
+            
+            conn.commit()
     
     def _save_state(self) -> None:
-        """Save current state to file for persistence between processes."""
-        state = {
-            "idea_version": self.idea_version,
-            "title_version": self.title_version,
-            "script_version": self.script_version,
-            "current_title": self.current_title,
-            "current_script": self.current_script,
-            "history": self.history,
-            "session_start": self.session_start.isoformat(),
-        }
+        """Save current state to SQLite database for persistence between processes."""
+        db_path = self._get_db_path()
         
-        # Save idea data if available
-        if self.current_idea is not None:
-            try:
-                state["idea_data"] = self.current_idea.to_dict()
-            except AttributeError:
-                # If to_dict() not available, save basic fields
-                genre_value = "other"
-                if IDEA_AVAILABLE:
-                    genre = getattr(self.current_idea, "genre", None)
-                    if genre is not None:
-                        genre_value = genre.value if hasattr(genre, 'value') else str(genre)
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Upsert session state
+            cursor.execute("""
+                INSERT OR REPLACE INTO session_state 
+                (id, idea_version, title_version, script_version, current_title, current_script, session_start, updated_at)
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                self.idea_version,
+                self.title_version,
+                self.script_version,
+                self.current_title,
+                self.current_script,
+                self.session_start.isoformat(),
+                datetime.now().isoformat()
+            ))
+            
+            # Save idea data if available
+            if self.current_idea is not None:
+                try:
+                    idea_dict = self.current_idea.to_dict()
+                except AttributeError:
+                    # If to_dict() not available, extract basic fields
+                    genre_value = "other"
+                    if IDEA_AVAILABLE:
+                        genre = getattr(self.current_idea, "genre", None)
+                        if genre is not None:
+                            genre_value = genre.value if hasattr(genre, 'value') else str(genre)
+                    
+                    idea_dict = {
+                        "title": getattr(self.current_idea, "title", ""),
+                        "concept": getattr(self.current_idea, "concept", ""),
+                        "premise": getattr(self.current_idea, "premise", ""),
+                        "logline": getattr(self.current_idea, "logline", ""),
+                        "hook": getattr(self.current_idea, "hook", ""),
+                        "skeleton": getattr(self.current_idea, "skeleton", ""),
+                        "emotional_arc": getattr(self.current_idea, "emotional_arc", ""),
+                        "twist": getattr(self.current_idea, "twist", ""),
+                        "climax": getattr(self.current_idea, "climax", ""),
+                        "tone_guidance": getattr(self.current_idea, "tone_guidance", ""),
+                        "target_audience": getattr(self.current_idea, "target_audience", ""),
+                        "genre": genre_value,
+                    }
                 
-                state["idea_data"] = {
-                    "title": getattr(self.current_idea, "title", ""),
-                    "concept": getattr(self.current_idea, "concept", ""),
-                    "premise": getattr(self.current_idea, "premise", ""),
-                    "logline": getattr(self.current_idea, "logline", ""),
-                    "hook": getattr(self.current_idea, "hook", ""),
-                    "skeleton": getattr(self.current_idea, "skeleton", ""),
-                    "emotional_arc": getattr(self.current_idea, "emotional_arc", ""),
-                    "twist": getattr(self.current_idea, "twist", ""),
-                    "climax": getattr(self.current_idea, "climax", ""),
-                    "tone_guidance": getattr(self.current_idea, "tone_guidance", ""),
-                    "target_audience": getattr(self.current_idea, "target_audience", ""),
-                    "genre": genre_value,
-                }
+                cursor.execute("""
+                    INSERT OR REPLACE INTO idea_data 
+                    (id, title, concept, premise, logline, hook, skeleton, emotional_arc, twist, climax, tone_guidance, target_audience, genre)
+                    VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    idea_dict.get("title", ""),
+                    idea_dict.get("concept", ""),
+                    idea_dict.get("premise", ""),
+                    idea_dict.get("logline", ""),
+                    idea_dict.get("hook", ""),
+                    idea_dict.get("skeleton", ""),
+                    idea_dict.get("emotional_arc", ""),
+                    idea_dict.get("twist", ""),
+                    idea_dict.get("climax", ""),
+                    idea_dict.get("tone_guidance", ""),
+                    idea_dict.get("target_audience", ""),
+                    idea_dict.get("genre", "other"),
+                ))
+            
+            # Save history (append new items)
+            for item in self.history:
+                # Check if this item already exists
+                cursor.execute("""
+                    SELECT COUNT(*) FROM action_history 
+                    WHERE action = ? AND timestamp = ?
+                """, (item.get("action", ""), item.get("timestamp", "")))
+                
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute("""
+                        INSERT INTO action_history (action, timestamp, details)
+                        VALUES (?, ?, ?)
+                    """, (
+                        item.get("action", ""),
+                        item.get("timestamp", ""),
+                        json.dumps(item.get("details", {})) if item.get("details") else None
+                    ))
+            
+            conn.commit()
         
-        state_path = self._get_state_file_path()
-        with open(state_path, 'w', encoding='utf-8') as f:
-            json.dump(state, f, indent=2, default=str)
-        
-        print_info(f"State saved to {state_path.name}")
+        print_info(f"State saved to {db_path.name}")
     
     def _load_state(self) -> bool:
-        """Load state from file if it exists.
+        """Load state from SQLite database if it exists.
         
         Returns:
             True if state was loaded, False otherwise.
         """
-        state_path = self._get_state_file_path()
-        if not state_path.exists():
+        db_path = self._get_db_path()
+        if not db_path.exists():
             return False
         
         try:
-            with open(state_path, 'r', encoding='utf-8') as f:
-                state = json.load(f)
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                
+                # Load session state
+                cursor.execute("SELECT * FROM session_state WHERE id = 1")
+                state_row = cursor.fetchone()
+                
+                if state_row:
+                    self.idea_version = state_row["idea_version"] or 0
+                    self.title_version = state_row["title_version"] or 0
+                    self.script_version = state_row["script_version"] or 0
+                    self.current_title = state_row["current_title"]
+                    self.current_script = state_row["current_script"]
+                    
+                    session_start_str = state_row["session_start"]
+                    if session_start_str:
+                        self.session_start = datetime.fromisoformat(session_start_str)
+                
+                # Load idea data
+                cursor.execute("SELECT * FROM idea_data WHERE id = 1")
+                idea_row = cursor.fetchone()
+                
+                if idea_row and IDEA_AVAILABLE:
+                    idea_data = {
+                        "title": idea_row["title"] or "",
+                        "concept": idea_row["concept"] or "",
+                        "premise": idea_row["premise"] or "",
+                        "logline": idea_row["logline"] or "",
+                        "hook": idea_row["hook"] or "",
+                        "skeleton": idea_row["skeleton"] or "",
+                        "emotional_arc": idea_row["emotional_arc"] or "",
+                        "twist": idea_row["twist"] or "",
+                        "climax": idea_row["climax"] or "",
+                        "tone_guidance": idea_row["tone_guidance"] or "",
+                        "target_audience": idea_row["target_audience"] or "",
+                        "genre": idea_row["genre"] or "other",
+                    }
+                    
+                    try:
+                        self.current_idea = Idea.from_dict(idea_data)
+                        self._idea_data = idea_data
+                    except (AttributeError, TypeError, KeyError, ValueError):
+                        # If from_dict fails, create a basic Idea
+                        self.current_idea = Idea(
+                            title=idea_data.get("title", ""),
+                            concept=idea_data.get("concept", ""),
+                        )
+                        self._idea_data = idea_data
+                
+                # Load history
+                cursor.execute("SELECT action, timestamp, details FROM action_history ORDER BY id")
+                self.history = []
+                for row in cursor.fetchall():
+                    item = {
+                        "action": row["action"],
+                        "timestamp": row["timestamp"],
+                    }
+                    if row["details"]:
+                        try:
+                            item["details"] = json.loads(row["details"])
+                        except json.JSONDecodeError:
+                            pass
+                    self.history.append(item)
             
-            self.idea_version = state.get("idea_version", 0)
-            self.title_version = state.get("title_version", 0)
-            self.script_version = state.get("script_version", 0)
-            self.current_title = state.get("current_title")
-            self.current_script = state.get("current_script")
-            self.history = state.get("history", [])
-            
-            session_start_str = state.get("session_start")
-            if session_start_str:
-                self.session_start = datetime.fromisoformat(session_start_str)
-            
-            # Restore idea if data is available and Idea model is loaded
-            idea_data = state.get("idea_data")
-            if idea_data and IDEA_AVAILABLE:
-                try:
-                    self.current_idea = Idea.from_dict(idea_data)
-                    self._idea_data = idea_data
-                except (AttributeError, TypeError, KeyError, ValueError):
-                    # If from_dict fails, create a basic Idea
-                    self.current_idea = Idea(
-                        title=idea_data.get("title", ""),
-                        concept=idea_data.get("concept", ""),
-                    )
-                    self._idea_data = idea_data
-            
-            print_info(f"State loaded from {state_path.name}")
+            print_info(f"State loaded from {db_path.name}")
             return True
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+        except (sqlite3.Error, KeyError, TypeError, ValueError) as e:
             print_warning(f"Failed to load state: {e}")
             return False
     
     def clear_state(self) -> None:
-        """Clear the saved state file."""
-        state_path = self._get_state_file_path()
-        if state_path.exists():
-            state_path.unlink()
-            print_info("State file cleared")
+        """Clear the saved state database."""
+        db_path = self._get_db_path()
+        if db_path.exists():
+            db_path.unlink()
+            print_info("State database cleared")
+            # Reinitialize empty database
+            self._init_db()
     
     def show_welcome(self) -> None:
         """Display welcome message and available modules."""

@@ -84,20 +84,19 @@ CONSTRAINT review_type_check CHECK (
 
 ### Question 3: Is JSON state persistence sufficient vs SQLite?
 
-**Answer: ✅ YES - Sufficient for Current Phase**
+**Answer: ✅ UPDATED - Now using SQLite**
 
-JSON file persistence (`text_client_state.json`) is appropriate for:
-- Development and prototyping phase ✅
-- Single-user scenarios ✅
-- Simple state management ✅
+State persistence has been migrated from JSON to SQLite (`text_client_state.db`):
+- Full transaction support ✅
+- Data integrity guarantees ✅
+- Proper schema with typed columns ✅
+- Consistent with database design document ✅
 
-**When to migrate to SQLite:**
-- Multi-user concurrent access needed
-- Data integrity with transactions required
-- Complex queries on historical data
-- State exceeds reasonable JSON size (~1MB)
-
-**Migration path is well-documented in DATABASE_DESIGN.md** ✅
+**SQLite Benefits:**
+- ACID compliance for concurrent access
+- Structured schema prevents data corruption
+- Ready for future Story model integration
+- Better handling of complex nested data
 
 ### Question 4: Is version-based next-to-process algorithm appropriate?
 
@@ -177,9 +176,9 @@ SELECT * FROM Idea WHERE EXISTS (
    max_iterations=UNLIMITED_ITERATIONS,
    ```
 
-2. **Line 114**: STATE_FILE could be configurable via environment variable:
+2. **Line 114**: STATE_DB could be configurable via environment variable:
    ```python
-   STATE_FILE = os.environ.get("PRISMQ_STATE_FILE", "text_client_state.json")
+   STATE_DB = os.environ.get("PRISMQ_STATE_DB", "text_client_state.db")
    ```
 
 ### Batch Scripts
