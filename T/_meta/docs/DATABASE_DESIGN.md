@@ -99,6 +99,7 @@ Review (
 
 -- StoryReview: Linking table for Story reviews (many-to-many)
 -- Allows one Story to have multiple reviews with different types
+-- UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
 StoryReview (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
@@ -106,7 +107,7 @@ StoryReview (
     version INTEGER NOT NULL,                          -- Story version being reviewed
     review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE(story_id, review_id)
+    UNIQUE(story_id, version, review_type)
 )
 ```
 

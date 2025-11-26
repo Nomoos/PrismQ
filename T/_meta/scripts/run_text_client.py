@@ -357,6 +357,7 @@ class TextClient:
             
             # StoryReview: Linking table for Story reviews (many-to-many)
             # Allows one Story to have multiple reviews with different types
+            # UNIQUE(story_id, version, review_type) prevents duplicate reviews of same type for same version
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS StoryReview (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -367,7 +368,7 @@ class TextClient:
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (story_id) REFERENCES Story(id),
                     FOREIGN KEY (review_id) REFERENCES Review(id),
-                    UNIQUE(story_id, review_id)
+                    UNIQUE(story_id, version, review_type)
                 )
             """)
             
