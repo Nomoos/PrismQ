@@ -145,14 +145,15 @@ class TextClient:
         """Get the path to the SQLite database file."""
         return SCRIPT_DIR / self.STATE_DB
     
-    # Process state names following PrismQ naming convention
+    # Process state names following PrismQ naming convention (folder structure)
+    # See T/WORKFLOW_STATE_MACHINE.md for full state machine documentation
     PROCESS_STATES = {
-        'initial': 'PrismQ.T.Initial',
-        'idea_created': 'PrismQ.T.Idea.Creation',
-        'title_generated': 'PrismQ.T.Title.By.Idea',
-        'script_generated': 'PrismQ.T.Script.By.Title',
-        'script_iterated': 'PrismQ.T.Script.Iteration',
-        'exported': 'PrismQ.T.Export',
+        'initial': 'PrismQ.T.Idea.Creation',  # Initial state - awaiting idea creation
+        'idea_created': 'PrismQ.T.Title.FromIdea',  # After idea, next is title generation
+        'title_generated': 'PrismQ.T.Script.FromIdeaAndTitle',  # After title, next is script
+        'script_generated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Script iteration
+        'script_iterated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Continue iteration
+        'exported': 'PrismQ.T.Publishing',  # Final state
     }
     
     def _init_db(self) -> None:
@@ -196,7 +197,7 @@ class TextClient:
                 CREATE TABLE IF NOT EXISTS Story (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     idea_id INTEGER NULL,
-                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',
+                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
                     current_title_version_id INTEGER NULL,
                     current_script_version_id INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),

@@ -62,10 +62,11 @@ Idea (
 
 -- Main Story table with state (next process name) and idea_id FK
 -- State is stored as a string representing the next process to run
+-- State values match folder structure (see T/WORKFLOW_STATE_MACHINE.md)
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Initial',  -- Next process name
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
     current_title_version_id INTEGER FK NULL,
     current_script_version_id INTEGER FK NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -132,59 +133,53 @@ Review (
 
 ## Process State Machine
 
-The `Story.state` field stores the **next process name** to be executed, following PrismQ naming conventions:
+The `Story.state` field stores the **next process name** to be executed, following PrismQ folder structure naming conventions (see `T/WORKFLOW_STATE_MACHINE.md`):
 
 ```
-                    ┌─────────────────────────┐
-                    │   PrismQ.T.Initial      │
-                    └───────────┬─────────────┘
-                                │ create_idea
-                                ▼
-                    ┌─────────────────────────┐
-                    │ PrismQ.T.Idea.Creation  │
-                    └───────────┬─────────────┘
-                                │ generate_title
-                                ▼
-                    ┌─────────────────────────┐
-                    │ PrismQ.T.Title.By.Idea  │
-                    └───────────┬─────────────┘
-                                │ generate_script
-                                ▼
-                    ┌─────────────────────────┐
-                    │ PrismQ.T.Script.By.Title│
-                    └───────────┬─────────────┘
-                                │ iterate
-                                ▼
-                    ┌─────────────────────────┐
-                    │ PrismQ.T.Script.Iteration│◄──┐
-                    └───────────┬─────────────┘    │ (unlimited)
-                                │                   │
-                                └───────────────────┘
-                                │ export
-                                ▼
-                    ┌─────────────────────────┐
-                    │    PrismQ.T.Export      │
-                    └─────────────────────────┘
+                    ┌─────────────────────────────────────────────┐
+                    │   PrismQ.T.Idea.Creation (Initial)          │
+                    └───────────────────┬─────────────────────────┘
+                                        │ create_idea
+                                        ▼
+                    ┌─────────────────────────────────────────────┐
+                    │ PrismQ.T.Title.FromIdea                     │
+                    └───────────────────┬─────────────────────────┘
+                                        │ generate_title
+                                        ▼
+                    ┌─────────────────────────────────────────────┐
+                    │ PrismQ.T.Script.FromIdeaAndTitle            │
+                    └───────────────────┬─────────────────────────┘
+                                        │ generate_script
+                                        ▼
+                    ┌─────────────────────────────────────────────────────────┐
+                    │ PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle     │◄──┐
+                    └───────────────────┬─────────────────────────────────────┘   │ (unlimited)
+                                        │                                          │
+                                        └──────────────────────────────────────────┘
+                                        │ export
+                                        ▼
+                    ┌─────────────────────────────────────────────┐
+                    │    PrismQ.T.Publishing                      │
+                    └─────────────────────────────────────────────┘
 ```
 
 ### Process State Values
 | State | Description | Next Action |
 |-------|-------------|-------------|
-| `PrismQ.T.Initial` | Initial state, no content | Create idea |
-| `PrismQ.T.Idea.Creation` | Idea created | Generate title |
-| `PrismQ.T.Title.By.Idea` | Title generated from idea | Generate script |
-| `PrismQ.T.Script.By.Title` | Script generated from title | Iterate or export |
-| `PrismQ.T.Script.Iteration` | Script iteration (unlimited) | Continue iterating or export |
-| `PrismQ.T.Export` | Content exported | Complete |
+| `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation | Create idea |
+| `PrismQ.T.Title.FromIdea` | Idea created, awaiting title | Generate title |
+| `PrismQ.T.Script.FromIdeaAndTitle` | Title generated, awaiting script | Generate script |
+| `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) | Continue iterating or export |
+| `PrismQ.T.Publishing` | Content exported, ready for publishing | Complete |
 
 ### Batch Script to Process State Mapping
 | Batch Script | State After Execution |
 |--------------|----------------------|
-| `step1_create_idea.bat` | `PrismQ.T.Idea.Creation` |
-| `step2_generate_title.bat` | `PrismQ.T.Title.By.Idea` |
-| `step3_generate_script.bat` | `PrismQ.T.Script.By.Title` |
-| `step4_iterate_script.bat` | `PrismQ.T.Script.Iteration` |
-| `step5_export.bat` | `PrismQ.T.Export` |
+| `step1_create_idea.bat` | `PrismQ.T.Title.FromIdea` |
+| `step2_generate_title.bat` | `PrismQ.T.Script.FromIdeaAndTitle` |
+| `step3_generate_script.bat` | `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` |
+| `step4_iterate_script.bat` | `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` |
+| `step5_export.bat` | `PrismQ.T.Publishing` |
 
 ### Persistence Between Processes
 

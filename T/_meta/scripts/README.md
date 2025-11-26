@@ -245,16 +245,15 @@ Review (id, story_id FK, review_type, reviewed_title_version_id FK NULL,
 
 ### Process State (Story.state)
 
-The `Story.state` field stores the **next process name** following PrismQ naming conventions:
+The `Story.state` field stores the **next process name** following PrismQ folder structure naming conventions:
 
 | State | Description |
 |-------|-------------|
-| `PrismQ.T.Initial` | Initial state, no content |
-| `PrismQ.T.Idea.Creation` | Idea created |
-| `PrismQ.T.Title.By.Idea` | Title generated from idea |
-| `PrismQ.T.Script.By.Title` | Script generated from title |
-| `PrismQ.T.Script.Iteration` | Script iteration (unlimited) |
-| `PrismQ.T.Export` | Content exported |
+| `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation |
+| `PrismQ.T.Title.FromIdea` | Idea created, awaiting title |
+| `PrismQ.T.Script.FromIdeaAndTitle` | Title generated, awaiting script |
+| `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) |
+| `PrismQ.T.Publishing` | Content exported, ready for publishing |
 
 ### Review Types
 - **TitleReview**: `review_type='title'`, only `reviewed_title_version_id` set
