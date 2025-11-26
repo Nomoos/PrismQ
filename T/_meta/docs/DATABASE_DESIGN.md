@@ -73,7 +73,7 @@ Story (
 )
 
 -- Title versions with full history
-TitleVersion (
+Title (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
@@ -83,7 +83,7 @@ TitleVersion (
 )
 
 -- Script/Text versions with full history
-ScriptVersion (
+Script (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     version INTEGER NOT NULL,
@@ -97,8 +97,8 @@ Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER FK NOT NULL REFERENCES Story(id),
     review_type TEXT NOT NULL CHECK (review_type IN ('title', 'script', 'story')),
-    reviewed_title_version_id INTEGER FK NULL REFERENCES TitleVersion(id),
-    reviewed_script_version_id INTEGER FK NULL REFERENCES ScriptVersion(id),
+    reviewed_title_version_id INTEGER FK NULL REFERENCES Title(id),
+    reviewed_script_version_id INTEGER FK NULL REFERENCES Script(id),
     feedback TEXT NOT NULL,
     score INTEGER CHECK (score >= 0 AND score <= 100),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -116,7 +116,7 @@ Review (
          │                │                │
          ▼                ▼                ▼
 ┌──────────────┐  ┌──────────────┐  ┌──────────┐
-│ TitleVersion │  │ScriptVersion │  │  Review  │
+│    Title     │  │    Script    │  │  Review  │
 └──────────────┘  └──────────────┘  └──────────┘
 ```
 
@@ -208,8 +208,8 @@ When running steps as separate processes (via batch scripts), the state is prese
 
 ### Phase 1: Core Models
 - [ ] Create `Story` model with state machine
-- [ ] Create `TitleVersion` model
-- [ ] Create `ScriptVersion` model
+- [ ] Create `Title` model
+- [ ] Create `Script` model
 - [ ] Create `Review` model with discriminator
 
 ### Phase 2: Relationships & Constraints
@@ -259,8 +259,8 @@ Story (
 -- Primary query patterns
 CREATE INDEX idx_story_status ON Story(status);
 CREATE INDEX idx_story_created_at ON Story(created_at);
-CREATE INDEX idx_titleversion_story ON TitleVersion(story_id, version DESC);
-CREATE INDEX idx_scriptversion_story ON ScriptVersion(story_id, version DESC);
+CREATE INDEX idx_title_story ON Title(story_id, version DESC);
+CREATE INDEX idx_script_story ON Script(story_id, version DESC);
 CREATE INDEX idx_review_story ON Review(story_id, review_type);
 ```
 
@@ -440,8 +440,8 @@ StoryMetrics (
 - Description: Create individual GitHub issues for each model based on this design document
 - Acceptance Criteria:
   - [ ] Issue created for Story model
-  - [ ] Issue created for TitleVersion model
-  - [ ] Issue created for ScriptVersion model
+  - [ ] Issue created for Title model
+  - [ ] Issue created for Script model
   - [ ] Issue created for Review model
   - [ ] Issue created for Idea model
   - [ ] Issue created for IdeaInspiration model
@@ -457,12 +457,12 @@ StoryMetrics (
    - Include timestamps and audit fields
    - Add `idea_id` FK reference (nullable)
 
-2. **Create TitleVersion Model**
+2. **Create Title Model**
    - Version tracking for titles
    - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)
 
-3. **Create ScriptVersion Model**
+3. **Create Script Model**
    - Version tracking for scripts
    - Link to Story via `story_id` FK
    - Unique constraint on (story_id, version)

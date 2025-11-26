@@ -165,9 +165,29 @@ Story (
     idea_version INTEGER DEFAULT 0,
     title_version INTEGER DEFAULT 0,
     script_version INTEGER DEFAULT 0,
-    current_title_version_id UUID FK NULL,
-    current_script_version_id UUID FK NULL,
+    current_title_id UUID FK NULL REFERENCES Title(id),
+    current_script_id UUID FK NULL REFERENCES Script(id),
     ...
+)
+
+-- Title versions with full history
+Title (
+    id UUID PRIMARY KEY,
+    story_id UUID FK NOT NULL REFERENCES Story(id),
+    version INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(story_id, version)
+)
+
+-- Script versions with full history
+Script (
+    id UUID PRIMARY KEY,
+    story_id UUID FK NOT NULL REFERENCES Story(id),
+    version INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(story_id, version)
 )
 ```
 
