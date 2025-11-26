@@ -21,9 +21,9 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 #### Why Hybrid Approach?
 | Aspect | Benefit |
 |--------|---------|
-| **Current Version Access** | Direct FK references make accessing current versions O(1) |
+| **Current Version Access** | Implicit via `ORDER BY version DESC LIMIT 1` query on indexed INTEGER column |
 | **Full History** | Separate version tables preserve complete history |
-| **Query Simplicity** | Avoids complex subqueries for common operations |
+| **Query Simplicity** | Simple queries without maintaining redundant FK columns |
 | **Flexibility** | Easy to add new content types |
 
 #### Why Single Table Discriminator for Reviews?
@@ -41,35 +41,26 @@ After evaluating multiple database model variants, we chose the **Hybrid Approac
 ### Core Tables (5 Tables)
 
 ```sql
--- Idea: Idea data (referenced by Story via FK)
+-- Idea: Simple prompt-based idea data (referenced by Story via FK)
+-- Text field contains prompt-like content for content generation
 Idea (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    concept TEXT,
-    premise TEXT,
-    logline TEXT,
-    hook TEXT,
-    skeleton TEXT,
-    emotional_arc TEXT,
-    twist TEXT,
-    climax TEXT,
-    tone_guidance TEXT,
-    target_audience TEXT,
-    genre TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    text TEXT,                                      -- Prompt-like text describing the idea
+    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
 
 -- Main Story table with state (next process name) and idea_id FK
 -- State is stored as a string following the pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...
+-- Note: current_title_version_id and current_script_version_id are removed
+-- Current versions are now implicit - determined by highest version integer
+-- in Title/Script tables via ORDER BY version DESC LIMIT 1
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
     state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
-    current_title_version_id INTEGER FK NULL,
-    current_script_version_id INTEGER FK NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
 
 -- Title versions with full history
@@ -207,26 +198,27 @@ When running steps as separate processes (via batch scripts), the state is prese
 ## Implementation Plan
 
 ### Phase 1: Core Models
-- [ ] Create `Story` model with state machine
+- [x] Create `Idea` model with simplified schema (PR #138)
+- [x] Create `Story` model with state machine and implicit version tracking (PR #139)
 - [ ] Create `Title` model
 - [ ] Create `Script` model
 - [ ] Create `Review` model with discriminator
 
 ### Phase 2: Relationships & Constraints
-- [ ] Set up foreign key relationships
+- [x] Set up foreign key relationships (Story → Idea FK)
 - [ ] Add CHECK constraints for Review types
 - [ ] Create indexes for common queries
-- [ ] Add database triggers for `updated_at`
+- [ ] ~~Add database triggers for `updated_at`~~ (Not needed - timestamps immutable after creation)
 
 ### Phase 3: State Machine Integration
-- [ ] Implement state transition logic
+- [x] Implement state transition logic
 - [ ] Add validation for allowed transitions
-- [ ] Integrate with batch script workflow
+- [x] Integrate with batch script workflow
 - [x] ~~Update `text_client_state.json` to use database~~ (Now using SQLite: `text_client_state.db`)
 
 ### Phase 4: Migration & Testing
 - [ ] Create database migration scripts
-- [ ] Write unit tests for models
+- [x] Write unit tests for models (SimpleIdea tests added in PR #138)
 - [ ] Write integration tests for state machine
 - [ ] Performance testing for version history queries
 
@@ -297,35 +289,28 @@ def get_connection():
 
 ### Story Model Enhancement: Idea Reference
 
-```sql
--- Future: Link Story to Idea model
-Story (
-    id UUID PRIMARY KEY,
-    idea_id UUID FK NULL REFERENCES Idea(id),  -- Added reference
-    ...
-)
+**Note**: Story → Idea FK relationship is now implemented in the Core Tables section.
 
--- Future: Idea model structure
--- Note: creation_method is inferred from idea_inspirations relation:
---   - No entries = created via Idea.Creation (from scratch)
---   - One or more entries = created via Idea.Fusion (from inspirations)
+### Implemented: Simple Idea Model
+
+The Idea model has been simplified to a prompt-based structure:
+
+```sql
+-- IMPLEMENTED: Simple Idea model for prompt-based storage
 Idea (
-    id UUID PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    concept TEXT NOT NULL,
-    premise TEXT,
-    logline TEXT,
-    hook TEXT,
-    skeleton TEXT,
-    emotional_arc TEXT,
-    twist TEXT,
-    climax TEXT,
-    genre ENUM(...) NOT NULL,
-    target_audience TEXT,
-    status ENUM('draft', 'developed', 'approved') NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(255)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,                                      -- Prompt-like text describing the idea
+    version INTEGER NOT NULL DEFAULT 1,             -- Version tracking for iterations
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )
+```
+
+This simplified schema stores idea content as prompt-like text, enabling:
+- Direct storage of structured prompts using templates (horror_story, mystery_story, etc.)
+- Version tracking via `create_new_version()` method
+- Flexible prompt text format for various content types
+
+### Future: Inspiration Sources (PostgreSQL)
 
 -- IdeaInspiration: Source materials that inspired an Idea
 -- Used when Idea is created via Idea.Fusion (combining multiple inspirations)
@@ -451,10 +436,10 @@ StoryMetrics (
 
 ### Model Implementation Issues
 
-1. **Create Story Model**
+1. **Create Story Model** ✅ IMPLEMENTED (PR #139)
    - Implement base Story model with state machine
    - Add status transitions and validation
-   - Include timestamps and audit fields
+   - Implicit version tracking via `ORDER BY version DESC LIMIT 1`
    - Add `idea_id` FK reference (nullable)
 
 2. **Create Title Model**
@@ -474,17 +459,18 @@ StoryMetrics (
    - CHECK constraints for version ID validation
    - Score range validation
 
-5. **Create Idea Model**
-   - Core idea fields from current text client
-   - Link to Story for idea-to-story workflow
-   - Status tracking for idea lifecycle
+5. **Create Idea Model** ✅ IMPLEMENTED (PR #138)
+   - Simplified schema: `(id, text, version, created_at)`
+   - Prompt-like text format for content generation
+   - Version tracking via `create_new_version()` method
+   - Prompt templates: `IdeaPromptTemplates` class
 
-6. **Create IdeaInspiration Model**
+6. **Create IdeaInspiration Model** (Future - PostgreSQL)
    - Source material storage
    - title, source, content, notes fields
    - Timestamps and audit fields
 
-7. **Create idea_inspirations Junction Table**
+7. **Create idea_inspirations Junction Table** (Future - PostgreSQL)
    - Many-to-many between Idea and IdeaInspiration
    - `idea_id` FK with CASCADE delete
    - `inspiration_id` FK with CASCADE delete
@@ -493,5 +479,5 @@ StoryMetrics (
 
 ---
 
-*Last Updated: 2024*
+*Last Updated: 2025-11-26*
 *Part of PrismQ Content Production Platform*
