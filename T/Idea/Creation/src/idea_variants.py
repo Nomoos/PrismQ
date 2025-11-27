@@ -362,6 +362,12 @@ import random
 import hashlib
 from datetime import datetime
 
+# Configuration constants
+MIN_KEYWORD_LENGTH = 3  # Minimum word length for keywords
+MAX_KEYWORDS = 5  # Maximum number of keywords to extract
+MAX_ESSENCE_WORDS = 5  # Maximum words for hook essence
+MAX_CONCEPT_WORDS = 6  # Maximum words for concept
+
 # Variability pools for generating diverse content
 EMOTION_POOL = ["curiosity", "fear", "excitement", "wonder", "surprise", "intrigue", "nostalgia", "hope", "tension", "empathy"]
 ANGLE_POOL = [
@@ -406,9 +412,21 @@ DEMOGRAPHICS = ["18-24", "25-34", "35-44", "18-34", "25-45", "all ages"]
 INTERESTS = ["entertainment", "education", "true crime", "science", "history", "culture", "technology", "lifestyle"]
 
 
-def _get_variation_seed(title: str, variant_name: str, variation_index: int = 0) -> int:
-    """Generate a deterministic but varied seed for consistent randomization."""
-    seed_string = f"{title}_{variant_name}_{variation_index}_{datetime.now().strftime('%Y%m%d%H')}"
+def _get_variation_seed(title: str, variant_name: str, variation_index: int = 0, use_time: bool = False) -> int:
+    """Generate a deterministic but varied seed for consistent randomization.
+    
+    Args:
+        title: The idea title
+        variant_name: Name of the variant
+        variation_index: Index for additional variation
+        use_time: Whether to include time component (makes it non-deterministic)
+        
+    Returns:
+        Integer seed for randomization
+    """
+    seed_string = f"{title}_{variant_name}_{variation_index}"
+    if use_time:
+        seed_string += f"_{datetime.now().strftime('%Y%m%d%H')}"
     return int(hashlib.md5(seed_string.encode()).hexdigest()[:8], 16)
 
 
@@ -453,9 +471,11 @@ def create_idea_variant(
     template = get_template(variant_name)
     
     # Generate variation seed for consistent but varied output
-    seed = _get_variation_seed(title, variant_name, variation_index)
+    seed = _get_variation_seed(title, variant_name, variation_index, use_time=randomize)
     if randomize:
-        seed += random.randint(0, 1000)
+        # Use seed to initialize random state for reproducibility when debugging
+        rng = random.Random(seed)
+        seed += rng.randint(0, 1000)
     
     # Start with the example as base and customize
     result = {
@@ -517,7 +537,6 @@ def create_all_variants(
         variant = create_idea_variant(title, variant_name, description, variation_index=i, **kwargs)
         variants.append(variant)
     return variants
-
 
 
 def create_selected_variants(
@@ -653,7 +672,7 @@ def _create_skeleton_variant(title: str, description: str, kwargs: Dict, seed: i
         "conclusion_shape": kwargs.get("conclusion", conclusion),
         "platform": kwargs.get("platform", platform),
         "target_audience": kwargs.get("target_audience", "Story lovers"),
-        "title_keywords": [w for w in title.split() if len(w) > 3][:5],
+        "title_keywords": [w for w in title.split() if len(w) > MIN_KEYWORD_LENGTH][:MAX_KEYWORDS],
         "title_images": ["Dramatic reveal", "Key visual", "Symbolic image"]
     }
 
@@ -663,7 +682,7 @@ def _create_shortform_variant(title: str, description: str, kwargs: Dict, seed: 
     words = title.split()
     
     essence_templates = [
-        " ".join(words[:5]) + "..." if len(words) > 5 else f"{title} - Wait for it",
+        " ".join(words[:MAX_ESSENCE_WORDS]) + "..." if len(words) > MAX_ESSENCE_WORDS else f"{title} - Wait for it",
         f"The truth about {title.lower()}",
         f"You won't believe {title.lower()}",
         f"This is {title.lower()} explained",
@@ -809,7 +828,7 @@ def _create_shortform2_variant(title: str, description: str, kwargs: Dict, seed:
     words = title.split()
     
     concepts = [
-        " ".join(words[:6]) if len(words) > 6 else f"{title} - Wait for it",
+        " ".join(words[:MAX_CONCEPT_WORDS]) if len(words) > MAX_CONCEPT_WORDS else f"{title} - Wait for it",
         f"POV: {title}",
         f"This is {title} in 60 seconds",
         f"The {title} story",
