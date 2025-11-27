@@ -36,16 +36,14 @@ Repository Interfaces:
 
 Repository Implementations:
     - TitleRepository: SQLite implementation for Title entities
+    - ScriptRepository: SQLite implementation for Script entities
     - StoryReviewRepository: SQLite implementation for StoryReview entities
 
 Models:
+    - Title: Versioned title content with review FK
+    - Script: Script model for versioned content storage
     - StoryReviewModel: Linking table for Story reviews (implements IModel)
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
-    - ScriptRepository: SQLite implementation for Script entities
-
-Models:
-    - Script: Script model for versioned content storage
-    - Title: Versioned title content with review FK
 
 Design Decisions:
     - No delete operations: Data is immutable or never deleted
@@ -54,36 +52,28 @@ Design Decisions:
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
 Example:
-    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository
-    >>> from T.Database import StoryReviewRepository, StoryReviewModel, ReviewType
+    >>> from T.Database import (
+    ...     IRepository, IVersionedRepository,
+    ...     TitleRepository, ScriptRepository, StoryReviewRepository,
+    ...     Title, Script, StoryReviewModel, ReviewType
+    ... )
     >>> 
     >>> # Create repositories with SQLite connection
     >>> title_repo = TitleRepository(connection)
+    >>> script_repo = ScriptRepository(connection)
     >>> review_repo = StoryReviewRepository(connection)
     >>> 
-    >>> # Insert new title
+    >>> # Insert new title and script
     >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> saved = title_repo.insert(title)
+    >>> script = Script(story_id=1, version=0, text="Once upon a time...")
+    >>> saved_title = title_repo.insert(title)
+    >>> saved_script = script_repo.insert(script)
     >>> 
     >>> # Link story to review
     >>> story_review = StoryReviewModel(
     ...     story_id=1, review_id=5, version=0, review_type=ReviewType.GRAMMAR
     ... )
     >>> saved_review = review_repo.insert(story_review)
-    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository, ScriptRepository
-    >>> from T.Database.models import Title, Script
-    >>> 
-    >>> # Create repository with SQLite connection
-    >>> title_repo = TitleRepository(connection)
-    >>> script_repo = ScriptRepository(connection)
-    >>> 
-    >>> # Insert new title
-    >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> saved_title = title_repo.insert(title)
-    >>> 
-    >>> # Insert new script
-    >>> script = Script(story_id=1, version=0, text="Once upon a time...")
-    >>> saved_script = script_repo.insert(script)
     >>> 
     >>> # Find latest versions
     >>> latest_title = title_repo.find_latest_version(story_id=1)
@@ -110,18 +100,16 @@ __all__ = [
     "IReadable",
     "IModel",
     # Models
+    "Title",
+    "Script",
     "StoryReviewModel",
     "ReviewType",
-    "Title",
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
     "IUpdatableRepository",
     # Repository implementations
     "TitleRepository",
-    "StoryReviewRepository",
     "ScriptRepository",
-    # Models
-    "Script",
-    "Title",
+    "StoryReviewRepository",
 ]
