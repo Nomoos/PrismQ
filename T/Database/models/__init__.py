@@ -10,9 +10,18 @@ Main Classes:
 
 from T.Database.models.base import IReadable, IModel
 from T.Database.models.review import Review
+    - Title: Versioned title content with review FK
+
+Models follow the Dependency Inversion Principle by depending
+on the IModel abstraction rather than concrete database implementations.
+"""
+
+from T.Database.models.base import IReadable, IModel
+from T.Database.models.title import Title
 
 __all__ = [
     "IReadable",
     "IModel",
     "Review",
+    "Title",
 ]
