@@ -31,11 +31,11 @@ class TestReviewBasic:
         """Test creating a basic Review instance."""
         review = Review(
             text="Great story structure, but pacing needs work.",
-            score=7.5
+            score=75
         )
         
         assert review.text == "Great story structure, but pacing needs work."
-        assert review.score == 7.5
+        assert review.score == 75
         assert review.id is None
         assert review.created_at is not None
     
@@ -45,57 +45,58 @@ class TestReviewBasic:
         review = Review(
             id=42,
             text="Excellent work on the dialogue.",
-            score=9.0,
+            score=90,
             created_at=created_at
         )
         
         assert review.id == 42
         assert review.text == "Excellent work on the dialogue."
-        assert review.score == 9.0
+        assert review.score == 90
         assert review.created_at == created_at
     
     def test_timestamps_auto_generated(self):
         """Test that timestamps are automatically generated."""
-        review = Review(text="Test review", score=5.0)
+        review = Review(text="Test review", score=50)
         
         assert review.created_at is not None
         assert isinstance(review.created_at, datetime)
     
-    def test_score_can_be_integer(self):
-        """Test that score can be an integer value."""
-        review = Review(text="Test review", score=8)
-        assert review.score == 8
-    
-    def test_score_can_be_float(self):
-        """Test that score can be a float value."""
-        review = Review(text="Test review", score=7.5)
-        assert review.score == 7.5
+    def test_score_must_be_integer(self):
+        """Test that score must be an integer value."""
+        review = Review(text="Test review", score=80)
+        assert review.score == 80
+        assert isinstance(review.score, int)
     
     def test_score_can_be_zero(self):
         """Test that score can be zero (min rating)."""
-        review = Review(text="Poor content", score=0.0)
+        review = Review(text="Poor content", score=0)
         assert review.score == MIN_SCORE
     
-    def test_score_can_be_ten(self):
-        """Test that score can be ten (max rating)."""
-        review = Review(text="Perfect!", score=10.0)
+    def test_score_can_be_hundred(self):
+        """Test that score can be 100 (max rating)."""
+        review = Review(text="Perfect!", score=100)
         assert review.score == MAX_SCORE
     
     def test_invalid_score_type_raises_error(self):
-        """Test that non-numeric score raises TypeError."""
+        """Test that non-integer score raises TypeError."""
         with pytest.raises(TypeError):
             Review(text="Test", score="invalid")
+    
+    def test_float_score_raises_error(self):
+        """Test that float score raises TypeError (must be integer)."""
+        with pytest.raises(TypeError):
+            Review(text="Test", score=7.5)
     
     def test_score_below_min_raises_error(self):
         """Test that score below MIN_SCORE raises ValueError."""
         with pytest.raises(ValueError) as exc_info:
-            Review(text="Test", score=-1.0)
+            Review(text="Test", score=-1)
         assert "score must be between" in str(exc_info.value)
     
     def test_score_above_max_raises_error(self):
         """Test that score above MAX_SCORE raises ValueError."""
         with pytest.raises(ValueError) as exc_info:
-            Review(text="Test", score=11.0)
+            Review(text="Test", score=101)
         assert "score must be between" in str(exc_info.value)
 
 
@@ -104,50 +105,50 @@ class TestReviewIModelInterface:
     
     def test_review_is_imodel(self):
         """Test that Review implements IModel."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert isinstance(review, IModel)
     
     def test_review_is_ireadable(self):
         """Test that Review implements IReadable."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert isinstance(review, IReadable)
     
     def test_get_id_returns_none_when_not_persisted(self):
         """Test get_id returns None for new review."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert review.get_id() is None
     
     def test_get_id_returns_id_when_set(self):
         """Test get_id returns ID when set."""
-        review = Review(id=42, text="Test", score=5.0)
+        review = Review(id=42, text="Test", score=50)
         assert review.get_id() == 42
     
     def test_exists_returns_false_when_not_persisted(self):
         """Test exists returns False for new review."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert review.exists() is False
     
     def test_exists_returns_true_when_has_id(self):
         """Test exists returns True when review has ID."""
-        review = Review(id=1, text="Test", score=5.0)
+        review = Review(id=1, text="Test", score=50)
         assert review.exists() is True
     
     def test_get_created_at_returns_datetime(self):
         """Test get_created_at returns datetime."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert isinstance(review.get_created_at(), datetime)
     
     def test_save_returns_true(self):
         """Test save returns True (placeholder)."""
-        review = Review(text="Test", score=5.0)
+        review = Review(text="Test", score=50)
         assert review.save() is True
     
     def test_refresh_returns_exists_status(self):
         """Test refresh returns exists status."""
-        review_new = Review(text="Test", score=5.0)
+        review_new = Review(text="Test", score=50)
         assert review_new.refresh() is False
         
-        review_existing = Review(id=1, text="Test", score=5.0)
+        review_existing = Review(id=1, text="Test", score=50)
         assert review_existing.refresh() is True
 
 
@@ -160,7 +161,7 @@ class TestReviewSerialization:
         review = Review(
             id=1,
             text="Good work on the narrative flow.",
-            score=8.5,
+            score=85,
             created_at=created_at
         )
         
@@ -169,7 +170,7 @@ class TestReviewSerialization:
         assert isinstance(data, dict)
         assert data["id"] == 1
         assert data["text"] == "Good work on the narrative flow."
-        assert data["score"] == 8.5
+        assert data["score"] == 85
         assert data["created_at"] == "2025-01-15T10:00:00"
     
     def test_from_dict(self):
@@ -177,7 +178,7 @@ class TestReviewSerialization:
         data = {
             "id": 5,
             "text": "Needs more detail in the character development.",
-            "score": 6.0,
+            "score": 60,
             "created_at": "2025-01-15T12:00:00"
         }
         
@@ -185,7 +186,7 @@ class TestReviewSerialization:
         
         assert review.id == 5
         assert review.text == "Needs more detail in the character development."
-        assert review.score == 6.0
+        assert review.score == 60
         assert isinstance(review.created_at, datetime)
     
     def test_from_dict_with_defaults(self):
@@ -195,7 +196,7 @@ class TestReviewSerialization:
         review = Review.from_dict(data)
         
         assert review.text == "Minimal review"
-        assert review.score == 0.0
+        assert review.score == 0
         assert review.id is None
         assert review.created_at is not None
     
@@ -203,7 +204,7 @@ class TestReviewSerialization:
         """Test that to_dict -> from_dict preserves data."""
         original = Review(
             text="Comprehensive review with detailed feedback.",
-            score=8.0,
+            score=80,
         )
         
         # Roundtrip
@@ -221,19 +222,19 @@ class TestReviewRepresentation:
     
     def test_repr_short_text(self):
         """Test __repr__ with short text."""
-        review = Review(id=1, text="Short review", score=7.0)
+        review = Review(id=1, text="Short review", score=70)
         
         repr_str = repr(review)
         
         assert "Review" in repr_str
         assert "id=1" in repr_str
-        assert "score=7.0" in repr_str
+        assert "score=70" in repr_str
         assert "Short review" in repr_str
     
     def test_repr_long_text_truncated(self):
         """Test __repr__ truncates long text."""
         long_text = "A" * 100
-        review = Review(text=long_text, score=5.5)
+        review = Review(text=long_text, score=55)
         
         repr_str = repr(review)
         

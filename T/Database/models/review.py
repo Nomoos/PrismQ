@@ -3,7 +3,7 @@
 This module defines a simple Review data model with essential fields:
 - id: Unique identifier
 - text: Review text content
-- score: Numeric score for the review (0.0 to 10.0)
+- score: Integer score for the review (0 to 100)
 - created_at: Timestamp of creation
 
 The Review model follows single responsibility principle - it stores review
@@ -20,16 +20,16 @@ from datetime import datetime
 from .base import IModel
 
 
-# Score range constants
-MIN_SCORE = 0.0
-MAX_SCORE = 10.0
+# Score range constants (integer 0-100)
+MIN_SCORE = 0
+MAX_SCORE = 100
 
 
 @dataclass
 class Review(IModel[int]):
     """Simple Review model for content review storage.
     
-    This model represents a review with text content and a numeric score.
+    This model represents a review with text content and an integer score.
     It is designed to be referenced by Title/Script entities via foreign key
     relationships, keeping the Review model focused on a single responsibility.
     
@@ -39,34 +39,34 @@ class Review(IModel[int]):
         Review (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
-            score REAL NOT NULL CHECK (score >= 0.0 AND score <= 10.0),
+            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
     
     Attributes:
         id: Unique identifier (auto-generated in database)
         text: Review text content
-        score: Numeric score for the review (0.0 to 10.0)
+        score: Integer score for the review (0 to 100)
         created_at: Timestamp of creation
     
     Example:
         >>> review = Review(
         ...     text="Great story structure, but the pacing needs work in Act 2.",
-        ...     score=7.5
+        ...     score=75
         ... )
         >>> print(review.score)
-        7.5
+        75
     """
     
     text: str
-    score: float
+    score: int
     id: Optional[int] = None
     created_at: datetime = field(default_factory=datetime.now)
     
     def __post_init__(self):
         """Initialize timestamps and validate fields."""
-        if not isinstance(self.score, (int, float)):
-            raise TypeError("score must be an int or float value")
+        if not isinstance(self.score, int):
+            raise TypeError("score must be an integer value")
         if self.score < MIN_SCORE or self.score > MAX_SCORE:
             raise ValueError(f"score must be between {MIN_SCORE} and {MAX_SCORE}, got {self.score}")
     
@@ -150,7 +150,7 @@ class Review(IModel[int]):
         return cls(
             id=data.get("id"),
             text=data.get("text", ""),
-            score=data.get("score", 0.0),
+            score=data.get("score", 0),
             created_at=created_at or datetime.now(),
         )
     
