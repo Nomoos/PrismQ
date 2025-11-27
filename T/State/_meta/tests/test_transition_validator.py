@@ -28,9 +28,9 @@ import pytest
 from T.State.interfaces.validator_interface import IValidator, ValidationResult
 from T.State.validators.transition_validator import (
     TransitionValidator,
-    StateNames,
     TRANSITIONS
 )
+from T.State.constants.state_names import StateNames
 
 
 class TestValidationResult:
@@ -512,13 +512,20 @@ class TestStateNames:
     
     def test_state_names_follow_convention(self):
         """Test that all state names follow PrismQ.T.* convention."""
+        # Get all string attributes that start with the state prefix (actual state constants)
         state_attrs = [
-            attr for attr in dir(StateNames)
-            if not attr.startswith('_') and attr.isupper()
+            (attr, getattr(StateNames, attr))
+            for attr in dir(StateNames)
+            if not attr.startswith('_') 
+            and attr.isupper()
+            and isinstance(getattr(StateNames, attr), str)
+            and getattr(StateNames, attr).startswith(StateNames.STATE_PREFIX + '.')
         ]
         
-        for attr in state_attrs:
-            state_name = getattr(StateNames, attr)
+        # Ensure we found state constants
+        assert len(state_attrs) > 0, "No state constants found"
+        
+        for attr, state_name in state_attrs:
             assert state_name.startswith("PrismQ.T."), \
                 f"State {attr} doesn't follow naming convention: {state_name}"
     
