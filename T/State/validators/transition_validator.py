@@ -19,59 +19,17 @@ Workflow Position:
     Part of Sprint 4 - State Refactoring
 """
 
+from types import MappingProxyType
 from typing import Dict, List, Optional
+
+from T.State.constants.state_names import StateNames
 from T.State.interfaces.validator_interface import IValidator, ValidationResult
-
-
-# State name constants following PrismQ naming convention
-# - Generation states: PrismQ.T.<Output>.From.<Input>
-# - Review states: PrismQ.T.Review.<Target>.By.<Source>
-class StateNames:
-    """State name constants for the PrismQ.T workflow.
-    
-    State naming patterns (from WORKFLOW_STATE_MACHINE.md):
-    - Generation states use 'From': PrismQ.T.<Output>.From.<Input>
-    - Review states use 'By': PrismQ.T.Review.<Target>.By.<Source>
-    
-    These are used for state machine transitions and validation.
-    """
-    # Initial state (Stage 1)
-    IDEA_CREATION = "PrismQ.T.Idea.Creation"
-    
-    # Title generation states (Stage 2, 7)
-    TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"
-    TITLE_FROM_SCRIPT_REVIEW_TITLE = "PrismQ.T.Title.From.Script.Review.Title"
-    
-    # Script generation states (Stage 3, 8)
-    SCRIPT_FROM_TITLE_IDEA = "PrismQ.T.Script.From.Title.Idea"
-    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = "PrismQ.T.Script.From.Title.Review.Script"
-    
-    # Review states using 'By' pattern (Stage 4, 5, 6, 9)
-    REVIEW_TITLE_BY_SCRIPT_IDEA = "PrismQ.T.Review.Title.By.Script.Idea"
-    REVIEW_SCRIPT_BY_TITLE_IDEA = "PrismQ.T.Review.Script.By.Title.Idea"
-    REVIEW_TITLE_BY_SCRIPT = "PrismQ.T.Review.Title.By.Script"
-    REVIEW_SCRIPT_BY_TITLE = "PrismQ.T.Review.Script.By.Title"
-    
-    # Quality review states (Stages 10-16)
-    REVIEW_SCRIPT_GRAMMAR = "PrismQ.T.Review.Script.Grammar"
-    REVIEW_SCRIPT_TONE = "PrismQ.T.Review.Script.Tone"
-    REVIEW_SCRIPT_CONTENT = "PrismQ.T.Review.Script.Content"
-    REVIEW_SCRIPT_CONSISTENCY = "PrismQ.T.Review.Script.Consistency"
-    REVIEW_SCRIPT_EDITING = "PrismQ.T.Review.Script.Editing"
-    REVIEW_TITLE_READABILITY = "PrismQ.T.Review.Title.Readability"
-    REVIEW_SCRIPT_READABILITY = "PrismQ.T.Review.Script.Readability"
-    
-    # Story review states (Stages 17-18)
-    STORY_REVIEW = "PrismQ.T.Story.Review"
-    STORY_POLISH = "PrismQ.T.Story.Polish"
-    
-    # Terminal state
-    PUBLISHING = "PrismQ.T.Publishing"
 
 
 # Valid state transitions map based on WORKFLOW_STATE_MACHINE.md
 # Each state maps to a list of valid next states
-TRANSITIONS: Dict[str, List[str]] = {
+# Made immutable with MappingProxyType to prevent accidental modification
+_TRANSITIONS_DICT: Dict[str, List[str]] = {
     # Initial state can only go to title generation (Stage 1 -> 2)
     StateNames.IDEA_CREATION: [
         StateNames.TITLE_FROM_IDEA,
@@ -173,6 +131,9 @@ TRANSITIONS: Dict[str, List[str]] = {
     # Terminal state - no valid transitions from Publishing
     StateNames.PUBLISHING: [],
 }
+
+# Immutable view of transitions - prevents accidental modification
+TRANSITIONS = MappingProxyType(_TRANSITIONS_DICT)
 
 
 class TransitionValidator(IValidator):
@@ -347,4 +308,4 @@ class TransitionValidator(IValidator):
         return ValidationResult(is_valid=True)
 
 
-__all__ = ["TransitionValidator", "StateNames", "TRANSITIONS"]
+__all__ = ["TransitionValidator", "TRANSITIONS"]
