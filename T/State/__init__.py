@@ -1,7 +1,7 @@
-"""PrismQ State module for state management and validation.
+"""PrismQ.T.State - State Machine for Content Production Workflow.
 
 This module provides state machine infrastructure for the PrismQ workflow,
-including state interfaces, validators, and transition logic.
+including state interfaces, validators, constants, and transition logic.
 
 Following SOLID principles:
 - Single Responsibility: Each state has one responsibility
@@ -9,51 +9,33 @@ Following SOLID principles:
 - Liskov Substitution: All validators are interchangeable
 - Interface Segregation: Small, focused interfaces
 - Dependency Inversion: Depend on abstractions, not concretions
-"""
-
-from T.State.interfaces.validator_interface import IValidator
-from T.State.validators.transition_validator import TransitionValidator
-
-__all__ = [
-    "IValidator",
-    "TransitionValidator",
-"""State module for PrismQ.T workflow state management.
-
-This module provides state constants and utilities for the text generation pipeline.
-"""
-
-from T.State.constants.state_names import StateNames, StateCategory
-
-__all__ = ["StateNames", "StateCategory"]
-"""PrismQ.T.State - State Machine for Content Production Workflow.
-
-This module provides the state machine implementation for the PrismQ
-content production workflow. It includes:
-
-- IState interface defining the contract for all state implementations
-- State transition logic
-- State validation
 
 Main Classes:
     - IState: Interface defining state behavior contract
+    - IValidator: Interface for state validators
+    - TransitionValidator: Validates state transitions
+    - StateNames: Constants for all workflow states
+    - StateCategory: State categorization enum
 
 Example:
     >>> from typing import List
-    >>> from T.State.interfaces import IState
+    >>> from T.State import IState, IValidator, TransitionValidator, StateNames
     >>> 
-    >>> class MyState(IState):
-    ...     def get_name(self) -> str:
-    ...         return "MyState"
-    ...     
-    ...     def get_next_states(self) -> List[str]:
-    ...         return ["NextState1", "NextState2"]
-    ...     
-    ...     def can_transition_to(self, target_state: str) -> bool:
-    ...         return target_state in self.get_next_states()
+    >>> # Use TransitionValidator to validate transitions
+    >>> validator = TransitionValidator()
+    >>> result = validator.validate(StateNames.IDEA_CREATION, StateNames.TITLE_FROM_IDEA)
+    >>> print(result.is_valid)  # True
 """
 
-from .interfaces import IState
+from T.State.interfaces.state_interface import IState
+from T.State.interfaces.validator_interface import IValidator
+from T.State.validators.transition_validator import TransitionValidator
+from T.State.constants.state_names import StateNames, StateCategory
 
 __all__ = [
-    'IState',
+    "IState",
+    "IValidator",
+    "TransitionValidator",
+    "StateNames",
+    "StateCategory",
 ]
