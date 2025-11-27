@@ -2,6 +2,7 @@
 
 This package provides database models and interfaces for the PrismQ text
 generation pipeline.
+This module exports all database models and interfaces.
 
 Model Interfaces:
     - IReadable: Interface for read-only model operations
@@ -10,6 +11,7 @@ Model Interfaces:
 Models:
     - StoryReviewModel: Linking table for Story reviews with review types
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
+    - Review: Simple review model for content review storage
     - Script: Script model for versioned content storage
     - Title: Versioned title content with review FK
 
@@ -18,6 +20,7 @@ on the IModel abstraction rather than concrete database implementations.
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
 
@@ -34,6 +37,7 @@ __all__ = [
     # Models
     "StoryReviewModel",
     "ReviewType",
+    "Review",
     "Script",
     "Title",
 ]

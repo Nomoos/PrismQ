@@ -1,3 +1,7 @@
+"""Database module for PrismQ.
+
+This module contains database models for the PrismQ content creation workflow.
+"""
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
