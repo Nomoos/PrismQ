@@ -57,7 +57,7 @@ class Review:
         if self.created_at is None:
             self.created_at = datetime.now().isoformat()
         if not isinstance(self.score, (int, float)):
-            raise TypeError("score must be a numeric value")
+            raise TypeError("score must be an int or float value")
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert Review to dictionary representation.
