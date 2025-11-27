@@ -109,7 +109,7 @@ class StoryReviewModel:
             "story_id": self.story_id,
             "review_id": self.review_id,
             "version": self.version,
-            "review_type": self.review_type.value if isinstance(self.review_type, ReviewType) else self.review_type,
+            "review_type": self.review_type.value,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
     
@@ -149,14 +149,21 @@ class StoryReviewModel:
         Returns:
             SQL statement to create the StoryReview table with all
             constraints (CHECK, UNIQUE, FOREIGN KEY).
+        
+        Note:
+            The review_type CHECK constraint is generated dynamically from
+            the ReviewType enum to maintain consistency.
         """
-        return """
+        # Generate CHECK constraint values from enum
+        review_type_values = ", ".join(f"'{rt.value}'" for rt in ReviewType)
+        
+        return f"""
         CREATE TABLE IF NOT EXISTS StoryReview (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             review_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
-            review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
+            review_type TEXT NOT NULL CHECK (review_type IN ({review_type_values})),
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (story_id) REFERENCES Story(id),
             FOREIGN KEY (review_id) REFERENCES Review(id),
