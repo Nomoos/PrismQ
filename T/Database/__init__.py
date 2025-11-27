@@ -40,6 +40,11 @@ Repository Interfaces:
 
 Repository Implementations:
     - TitleRepository: SQLite implementation for Title entities
+    - ScriptRepository: SQLite implementation for Script entities
+
+Models:
+    - Script: Script model for versioned content storage
+    - Title: Versioned title content with review FK
 
 Design Decisions:
     - No delete operations: Data is immutable or never deleted
@@ -47,25 +52,29 @@ Design Decisions:
     - Story state updated in place (workflow progression)
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
-Models:
-    - Title: Versioned title content with review FK
-
 Example:
-    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository
-    >>> from T.Database.models import Title
+    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository, ScriptRepository
+    >>> from T.Database.models import Title, Script
     >>> 
     >>> # Create repository with SQLite connection
-    >>> repo = TitleRepository(connection)
+    >>> title_repo = TitleRepository(connection)
+    >>> script_repo = ScriptRepository(connection)
     >>> 
     >>> # Insert new title
     >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> saved = repo.insert(title)
+    >>> saved_title = title_repo.insert(title)
     >>> 
-    >>> # Find latest version
-    >>> latest = repo.find_latest_version(story_id=1)
+    >>> # Insert new script
+    >>> script = Script(story_id=1, version=0, text="Once upon a time...")
+    >>> saved_script = script_repo.insert(script)
+    >>> 
+    >>> # Find latest versions
+    >>> latest_title = title_repo.find_latest_version(story_id=1)
+    >>> latest_script = script_repo.find_latest_version(story_id=1)
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.script import Script
 from T.Database.models.title import Title
 from T.Database.repositories.base import (
     IRepository,
@@ -73,6 +82,7 @@ from T.Database.repositories.base import (
     IUpdatableRepository,
 )
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.repositories.script_repository import ScriptRepository
 
 __all__ = [
     # Model interfaces
@@ -84,6 +94,8 @@ __all__ = [
     "IUpdatableRepository",
     # Repository implementations
     "TitleRepository",
+    "ScriptRepository",
     # Models
+    "Script",
     "Title",
 ]
