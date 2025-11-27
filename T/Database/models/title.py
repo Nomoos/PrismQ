@@ -12,7 +12,7 @@ from .base import IModel
 
 
 @dataclass
-class Title(IModel):
+class Title(IModel[int]):
     """Title version model.
     
     Stores versioned title content with optional review reference.
@@ -30,7 +30,7 @@ class Title(IModel):
     Note:
         - UNIQUE constraint on (story_id, version)
         - version >= 0 (simulates UINT)
-        - Use get_current_version() to find latest version
+        - Use repository's find_latest_version() to find current version
     
     Schema:
         ```sql
@@ -71,6 +71,66 @@ class Title(IModel):
         
         if not self.text:
             raise ValueError("Title text cannot be empty")
+    
+    # === IReadable Implementation ===
+    
+    def get_id(self) -> Optional[int]:
+        """Return the unique identifier of this title.
+        
+        Returns:
+            Optional[int]: The title ID, or None if not persisted yet.
+        """
+        return self.id
+    
+    def exists(self) -> bool:
+        """Check if the title exists in the database.
+        
+        Returns:
+            bool: True if the title has been persisted (has an ID).
+        """
+        return self.id is not None
+    
+    def get_created_at(self) -> Optional[datetime]:
+        """Return the creation timestamp of this title.
+        
+        Returns:
+            Optional[datetime]: The creation timestamp.
+        """
+        return self.created_at
+    
+    # === IModel Implementation ===
+    
+    def save(self) -> bool:
+        """Persist the title to the database.
+        
+        Note:
+            Actual database operations are handled by TitleRepository.
+            This method is for interface compliance. Use repository.insert()
+            for actual persistence.
+        
+        Returns:
+            bool: True (placeholder - actual save via repository).
+        """
+        # Actual persistence handled by repository
+        return True
+    
+    def refresh(self) -> bool:
+        """Check if the title can be refreshed from the database.
+        
+        Note:
+            Actual database refresh operations are handled by TitleRepository.
+            This method provides interface compliance and returns whether
+            a refresh would succeed (i.e., if the entity exists).
+            
+            Use repository.find_by_id(title.get_id()) to actually reload
+            data from the database.
+        
+        Returns:
+            bool: True if the title exists (refresh possible), False otherwise.
+        """
+        return self.exists()
+    
+    # === Serialization ===
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for database storage.

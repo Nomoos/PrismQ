@@ -1,24 +1,3 @@
-"""PrismQ.Database - Core database models for PrismQ.
-
-This package provides database models following SOLID principles:
-- Interface Segregation: Small, focused IModel interface
-- Dependency Inversion: Models depend on IModel abstraction
-- Single Responsibility: Each model handles one entity
-"""
-
-try:
-    from .models.base import IModel
-    from .models.title import Title
-except ImportError:
-    # Allow importing when not installed as package
-    pass
-
-__all__ = [
-    "IModel",
-    "Title",
-]
-
-__version__ = "0.1.0"
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
@@ -52,13 +31,18 @@ Design Decisions:
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
     - IVersionedRepository: For tables like Title, Script that maintain version history
 
+Models:
+    - Title: Versioned title content with review FK
+
 Example:
     >>> from T.Database import IReadable, IModel, IRepository, IVersionedRepository
+    >>> from T.Database.models import Title
     >>> # Implement IModel for entity persistence
     >>> # Implement IVersionedRepository for versioned data access
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.title import Title
 from T.Database.repositories.base import IRepository, IVersionedRepository
 
 __all__ = [
@@ -68,4 +52,6 @@ __all__ = [
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
+    # Models
+    "Title",
 ]

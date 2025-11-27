@@ -15,6 +15,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from T.Database.models.title import Title
+from T.Database.models.base import IModel, IReadable
 
 
 class TestTitle:
@@ -172,6 +173,56 @@ class TestTitle:
         assert len(titles) == 3
         assert all(t.story_id == 1 for t in titles)
         assert [t.version for t in titles] == [0, 1, 2]
+
+
+class TestTitleIModelInterface:
+    """Tests for Title model IModel interface compliance."""
+    
+    def test_title_is_imodel(self):
+        """Test Title is a subclass of IModel."""
+        assert issubclass(Title, IModel)
+    
+    def test_title_is_ireadable(self):
+        """Test Title is a subclass of IReadable."""
+        assert issubclass(Title, IReadable)
+    
+    def test_get_id_returns_none_when_not_persisted(self):
+        """Test get_id returns None for new title."""
+        title = Title(story_id=1, version=0, text="Test")
+        assert title.get_id() is None
+    
+    def test_get_id_returns_id_when_set(self):
+        """Test get_id returns ID when set."""
+        title = Title(story_id=1, version=0, text="Test", id=42)
+        assert title.get_id() == 42
+    
+    def test_exists_returns_false_when_not_persisted(self):
+        """Test exists returns False for new title."""
+        title = Title(story_id=1, version=0, text="Test")
+        assert title.exists() is False
+    
+    def test_exists_returns_true_when_has_id(self):
+        """Test exists returns True when ID is set."""
+        title = Title(story_id=1, version=0, text="Test", id=42)
+        assert title.exists() is True
+    
+    def test_get_created_at_returns_datetime(self):
+        """Test get_created_at returns datetime."""
+        title = Title(story_id=1, version=0, text="Test")
+        assert isinstance(title.get_created_at(), datetime)
+    
+    def test_save_returns_true(self):
+        """Test save returns True (placeholder implementation)."""
+        title = Title(story_id=1, version=0, text="Test")
+        assert title.save() is True
+    
+    def test_refresh_returns_exists_status(self):
+        """Test refresh returns exists status."""
+        title_new = Title(story_id=1, version=0, text="Test")
+        title_saved = Title(story_id=1, version=0, text="Test", id=42)
+        
+        assert title_new.refresh() is False
+        assert title_saved.refresh() is True
 
 
 if __name__ == "__main__":
