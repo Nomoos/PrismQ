@@ -287,6 +287,100 @@ class TestStoryReviewModelSQL:
         """Test SQL schema includes unique constraint on (story_id, version, review_type)."""
         schema = StoryReviewModel.get_sql_schema()
         assert "UNIQUE(story_id, version, review_type)" in schema
+    
+    def test_sql_schema_has_performance_indexes(self):
+        """Test SQL schema includes performance indexes."""
+        schema = StoryReviewModel.get_sql_schema()
+        assert "idx_storyreview_story_id" in schema
+        assert "idx_storyreview_review_id" in schema
+        assert "idx_storyreview_story_version" in schema
+
+
+class TestStoryReviewModelIModel:
+    """Tests for IModel interface implementation."""
+    
+    def test_get_id_returns_none_when_not_persisted(self):
+        """Test get_id returns None for new model."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        assert story_review.get_id() is None
+    
+    def test_get_id_returns_id_when_set(self):
+        """Test get_id returns the ID when set."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR,
+            id=42
+        )
+        assert story_review.get_id() == 42
+    
+    def test_exists_returns_false_when_no_id(self):
+        """Test exists returns False when model has no ID."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        assert story_review.exists() is False
+    
+    def test_exists_returns_true_when_has_id(self):
+        """Test exists returns True when model has ID."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR,
+            id=42
+        )
+        assert story_review.exists() is True
+    
+    def test_get_created_at_returns_datetime(self):
+        """Test get_created_at returns datetime."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        assert isinstance(story_review.get_created_at(), datetime)
+    
+    def test_save_returns_true(self):
+        """Test save returns True (actual persistence via repository)."""
+        story_review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        assert story_review.save() is True
+    
+    def test_refresh_returns_exists_status(self):
+        """Test refresh returns exists status."""
+        # Without ID
+        story_review1 = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        assert story_review1.refresh() is False
+        
+        # With ID
+        story_review2 = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR,
+            id=42
+        )
+        assert story_review2.refresh() is True
 
 
 if __name__ == "__main__":

@@ -36,10 +36,12 @@ Repository Interfaces:
 
 Repository Implementations:
     - TitleRepository: SQLite implementation for Title entities
+    - StoryReviewRepository: SQLite implementation for StoryReview entities
 
 Models:
-    - StoryReviewModel: Linking table for Story reviews with review types
+    - StoryReviewModel: Linking table for Story reviews (implements IModel)
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
+    - Title: Versioned title content with review FK
 
 Design Decisions:
     - No delete operations: Data is immutable or never deleted
@@ -47,29 +49,29 @@ Design Decisions:
     - Story state updated in place (workflow progression)
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
-Models:
-    - Title: Versioned title content with review FK
-
 Example:
     >>> from T.Database import IRepository, IVersionedRepository, TitleRepository
-    >>> from T.Database.models import Title
+    >>> from T.Database import StoryReviewRepository, StoryReviewModel, ReviewType
     >>> 
-    >>> # Create repository with SQLite connection
-    >>> repo = TitleRepository(connection)
+    >>> # Create repositories with SQLite connection
+    >>> title_repo = TitleRepository(connection)
+    >>> review_repo = StoryReviewRepository(connection)
     >>> 
     >>> # Insert new title
     >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> saved = repo.insert(title)
+    >>> saved = title_repo.insert(title)
     >>> 
-    >>> # Find latest version
-    >>> latest = repo.find_latest_version(story_id=1)
+    >>> # Link story to review
+    >>> story_review = StoryReviewModel(
+    ...     story_id=1, review_id=5, version=0, review_type=ReviewType.GRAMMAR
+    ... )
+    >>> saved_review = review_repo.insert(story_review)
 """
 
 __version__ = "0.1.0"
 
 from T.Database.models.base import IReadable, IModel
 from T.Database.models.story_review import StoryReviewModel, ReviewType
-from T.Database.repositories.base import IRepository, IVersionedRepository
 from T.Database.models.title import Title
 from T.Database.repositories.base import (
     IRepository,
@@ -77,6 +79,7 @@ from T.Database.repositories.base import (
     IUpdatableRepository,
 )
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.repositories.story_review_repository import StoryReviewRepository
 
 __all__ = [
     # Model interfaces
@@ -85,12 +88,12 @@ __all__ = [
     # Models
     "StoryReviewModel",
     "ReviewType",
+    "Title",
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
     "IUpdatableRepository",
     # Repository implementations
     "TitleRepository",
-    # Models
-    "Title",
+    "StoryReviewRepository",
 ]

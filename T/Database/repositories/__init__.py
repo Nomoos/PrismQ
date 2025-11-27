@@ -9,6 +9,7 @@ Interfaces:
 
 Implementations:
     - TitleRepository: SQLite implementation for Title entities
+    - StoryReviewRepository: SQLite implementation for StoryReview entities
 """
 
 from T.Database.repositories.base import (
@@ -17,6 +18,7 @@ from T.Database.repositories.base import (
     IUpdatableRepository,
 )
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.repositories.story_review_repository import StoryReviewRepository
 
 __all__ = [
     # Interfaces
@@ -25,4 +27,5 @@ __all__ = [
     "IUpdatableRepository",
     # Implementations
     "TitleRepository",
+    "StoryReviewRepository",
 ]
