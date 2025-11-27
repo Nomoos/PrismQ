@@ -1,12 +1,13 @@
-"""Tests for IModel interface.
+"""Tests for IReadable and IModel interfaces.
 
-Tests the IModel interface defined in T.Database.models.base.
-Ensures the interface follows the Interface Segregation Principle and
+Tests the interfaces defined in T.Database.models.base.
+Ensures the interfaces follow the Interface Segregation Principle and
 can be properly implemented by concrete model classes.
 """
 
 import sys
 from pathlib import Path
+from datetime import datetime
 
 
 def _find_project_root() -> Path:
@@ -27,7 +28,32 @@ import pytest
 from abc import ABC
 from typing import Optional
 
-from T.Database.models.base import IModel
+from T.Database.models.base import IReadable, IModel
+
+
+class ConcreteReadable(IReadable[str]):
+    """Concrete implementation of IReadable for testing purposes."""
+    
+    def __init__(self, id: Optional[str] = None):
+        """Initialize the concrete readable model.
+        
+        Args:
+            id: The unique identifier of this model (None if not persisted)
+        """
+        self._id = id
+        self._created_at = datetime.now() if id else None
+    
+    def get_id(self) -> Optional[str]:
+        """Return the model's identifier."""
+        return self._id
+    
+    def exists(self) -> bool:
+        """Check if the model exists in persistence."""
+        return self._id is not None
+    
+    def get_created_at(self) -> Optional[datetime]:
+        """Return the creation timestamp."""
+        return self._created_at
 
 
 class ConcreteModel(IModel[str]):
@@ -43,24 +69,27 @@ class ConcreteModel(IModel[str]):
         self._id = id
         self._data = data
         self._saved = False
-        self._deleted = False
+        self._created_at = datetime.now() if id else None
     
     def get_id(self) -> Optional[str]:
         """Return the model's identifier."""
         return self._id
     
+    def exists(self) -> bool:
+        """Check if the model exists in persistence."""
+        return self._id is not None
+    
+    def get_created_at(self) -> Optional[datetime]:
+        """Return the creation timestamp."""
+        return self._created_at
+    
     def save(self) -> bool:
         """Persist the model."""
         if self._id is None:
             self._id = "generated-id"
+        if self._created_at is None:
+            self._created_at = datetime.now()
         self._saved = True
-        return True
-    
-    def delete(self) -> bool:
-        """Remove the model from persistence."""
-        if self._id is None:
-            return False
-        self._deleted = True
         return True
     
     def refresh(self) -> bool:
@@ -81,24 +110,59 @@ class ConcreteIntModel(IModel[int]):
     def __init__(self, id: Optional[int] = None):
         """Initialize with optional integer ID."""
         self._id = id
+        self._created_at = datetime.now() if id else None
     
     def get_id(self) -> Optional[int]:
         """Return the integer identifier."""
         return self._id
     
+    def exists(self) -> bool:
+        """Check if the model exists."""
+        return self._id is not None
+    
+    def get_created_at(self) -> Optional[datetime]:
+        """Return the creation timestamp."""
+        return self._created_at
+    
     def save(self) -> bool:
         """Persist the model."""
         if self._id is None:
             self._id = 1
+        if self._created_at is None:
+            self._created_at = datetime.now()
         return True
-    
-    def delete(self) -> bool:
-        """Remove the model."""
-        return self._id is not None
     
     def refresh(self) -> bool:
         """Reload the model."""
         return self._id is not None
+
+
+class TestIReadableInterface:
+    """Tests for IReadable interface definition."""
+    
+    def test_ireadable_is_abstract_base_class(self):
+        """Test that IReadable is an abstract base class."""
+        assert issubclass(IReadable, ABC)
+    
+    def test_cannot_instantiate_ireadable_directly(self):
+        """Test that IReadable cannot be instantiated directly."""
+        with pytest.raises(TypeError):
+            IReadable()
+    
+    def test_ireadable_has_get_id_method(self):
+        """Test that IReadable defines get_id abstract method."""
+        assert hasattr(IReadable, 'get_id')
+        assert callable(getattr(IReadable, 'get_id'))
+    
+    def test_ireadable_has_exists_method(self):
+        """Test that IReadable defines exists abstract method."""
+        assert hasattr(IReadable, 'exists')
+        assert callable(getattr(IReadable, 'exists'))
+    
+    def test_ireadable_has_get_created_at_method(self):
+        """Test that IReadable defines get_created_at abstract method."""
+        assert hasattr(IReadable, 'get_created_at')
+        assert callable(getattr(IReadable, 'get_created_at'))
 
 
 class TestIModelInterface:
@@ -107,6 +171,10 @@ class TestIModelInterface:
     def test_imodel_is_abstract_base_class(self):
         """Test that IModel is an abstract base class."""
         assert issubclass(IModel, ABC)
+    
+    def test_imodel_extends_ireadable(self):
+        """Test that IModel extends IReadable."""
+        assert issubclass(IModel, IReadable)
     
     def test_cannot_instantiate_imodel_directly(self):
         """Test that IModel cannot be instantiated directly."""
@@ -118,20 +186,83 @@ class TestIModelInterface:
         assert hasattr(IModel, 'get_id')
         assert callable(getattr(IModel, 'get_id'))
     
+    def test_imodel_has_exists_method(self):
+        """Test that IModel defines exists abstract method."""
+        assert hasattr(IModel, 'exists')
+        assert callable(getattr(IModel, 'exists'))
+    
+    def test_imodel_has_get_created_at_method(self):
+        """Test that IModel defines get_created_at abstract method."""
+        assert hasattr(IModel, 'get_created_at')
+        assert callable(getattr(IModel, 'get_created_at'))
+    
     def test_imodel_has_save_method(self):
         """Test that IModel defines save abstract method."""
         assert hasattr(IModel, 'save')
         assert callable(getattr(IModel, 'save'))
     
-    def test_imodel_has_delete_method(self):
-        """Test that IModel defines delete abstract method."""
-        assert hasattr(IModel, 'delete')
-        assert callable(getattr(IModel, 'delete'))
-    
     def test_imodel_has_refresh_method(self):
         """Test that IModel defines refresh abstract method."""
         assert hasattr(IModel, 'refresh')
         assert callable(getattr(IModel, 'refresh'))
+    
+    def test_imodel_does_not_have_delete_method(self):
+        """Test that IModel does NOT define delete method (immutable data)."""
+        # Check that delete is not an abstract method in IModel
+        imodel_methods = [
+            method for method in dir(IModel)
+            if not method.startswith('_') and callable(getattr(IModel, method))
+        ]
+        assert 'delete' not in imodel_methods, \
+            "IModel should not have 'delete' method (data is immutable)"
+
+
+class TestConcreteReadableImplementation:
+    """Tests for concrete IReadable implementation."""
+    
+    def test_create_concrete_readable(self):
+        """Test creating a concrete readable instance."""
+        readable = ConcreteReadable()
+        
+        assert readable is not None
+        assert isinstance(readable, IReadable)
+    
+    def test_get_id_returns_none_for_new_readable(self):
+        """Test that get_id returns None for a new model."""
+        readable = ConcreteReadable()
+        
+        assert readable.get_id() is None
+    
+    def test_get_id_returns_id_for_existing_readable(self):
+        """Test that get_id returns the correct ID for an existing model."""
+        readable = ConcreteReadable(id="existing-id")
+        
+        assert readable.get_id() == "existing-id"
+    
+    def test_exists_returns_false_for_new_readable(self):
+        """Test that exists returns False for a new model."""
+        readable = ConcreteReadable()
+        
+        assert readable.exists() is False
+    
+    def test_exists_returns_true_for_existing_readable(self):
+        """Test that exists returns True for an existing model."""
+        readable = ConcreteReadable(id="existing-id")
+        
+        assert readable.exists() is True
+    
+    def test_get_created_at_returns_none_for_new_readable(self):
+        """Test that get_created_at returns None for a new model."""
+        readable = ConcreteReadable()
+        
+        assert readable.get_created_at() is None
+    
+    def test_get_created_at_returns_timestamp_for_existing_readable(self):
+        """Test that get_created_at returns timestamp for an existing model."""
+        readable = ConcreteReadable(id="existing-id")
+        
+        assert readable.get_created_at() is not None
+        assert isinstance(readable.get_created_at(), datetime)
 
 
 class TestConcreteModelImplementation:
@@ -143,6 +274,7 @@ class TestConcreteModelImplementation:
         
         assert model is not None
         assert isinstance(model, IModel)
+        assert isinstance(model, IReadable)
     
     def test_get_id_returns_none_for_new_model(self):
         """Test that get_id returns None for a new unsaved model."""
@@ -155,6 +287,31 @@ class TestConcreteModelImplementation:
         model = ConcreteModel(id="existing-id", data="test data")
         
         assert model.get_id() == "existing-id"
+    
+    def test_exists_returns_false_for_new_model(self):
+        """Test that exists returns False for a new model."""
+        model = ConcreteModel()
+        
+        assert model.exists() is False
+    
+    def test_exists_returns_true_for_existing_model(self):
+        """Test that exists returns True for an existing model."""
+        model = ConcreteModel(id="existing-id")
+        
+        assert model.exists() is True
+    
+    def test_get_created_at_returns_none_for_new_model(self):
+        """Test that get_created_at returns None for a new model."""
+        model = ConcreteModel()
+        
+        assert model.get_created_at() is None
+    
+    def test_get_created_at_returns_timestamp_for_existing_model(self):
+        """Test that get_created_at returns timestamp for an existing model."""
+        model = ConcreteModel(id="existing-id")
+        
+        assert model.get_created_at() is not None
+        assert isinstance(model.get_created_at(), datetime)
     
     def test_save_returns_true_on_success(self):
         """Test that save returns True on successful save."""
@@ -174,6 +331,25 @@ class TestConcreteModelImplementation:
         assert model.get_id() is not None
         assert model.get_id() == "generated-id"
     
+    def test_save_sets_created_at_for_new_model(self):
+        """Test that save sets created_at timestamp for a new model."""
+        model = ConcreteModel(data="test content")
+        assert model.get_created_at() is None
+        
+        model.save()
+        
+        assert model.get_created_at() is not None
+        assert isinstance(model.get_created_at(), datetime)
+    
+    def test_save_makes_model_exist(self):
+        """Test that save makes exists() return True."""
+        model = ConcreteModel(data="test content")
+        assert model.exists() is False
+        
+        model.save()
+        
+        assert model.exists() is True
+    
     def test_save_preserves_existing_id(self):
         """Test that save preserves an existing ID."""
         model = ConcreteModel(id="my-id", data="test content")
@@ -181,22 +357,6 @@ class TestConcreteModelImplementation:
         model.save()
         
         assert model.get_id() == "my-id"
-    
-    def test_delete_returns_true_for_persisted_model(self):
-        """Test that delete returns True for a persisted model."""
-        model = ConcreteModel(id="existing-id")
-        
-        result = model.delete()
-        
-        assert result is True
-    
-    def test_delete_returns_false_for_new_model(self):
-        """Test that delete returns False for an unsaved model."""
-        model = ConcreteModel()
-        
-        result = model.delete()
-        
-        assert result is False
     
     def test_refresh_returns_true_for_persisted_model(self):
         """Test that refresh returns True for a persisted model."""
@@ -245,55 +405,87 @@ class TestGenericTypeSupport:
 class TestInterfaceSegregation:
     """Tests verifying Interface Segregation Principle compliance."""
     
-    def test_interface_only_defines_crud_methods(self):
-        """Test that interface only has CRUD methods."""
-        # Get all public methods from IModel (excluding dunder methods)
+    def test_ireadable_only_defines_read_methods(self):
+        """Test that IReadable only has read methods."""
+        ireadable_methods = [
+            method for method in dir(IReadable)
+            if not method.startswith('_') and callable(getattr(IReadable, method))
+        ]
+        
+        # IReadable should only define these methods
+        expected_methods = {'get_id', 'exists', 'get_created_at'}
+        
+        assert expected_methods.issubset(set(ireadable_methods))
+    
+    def test_imodel_extends_ireadable_with_write_methods(self):
+        """Test that IModel extends IReadable with write methods."""
         imodel_methods = [
             method for method in dir(IModel)
             if not method.startswith('_') and callable(getattr(IModel, method))
         ]
         
-        # IModel should only define these four methods for interface segregation
-        expected_methods = {'get_id', 'save', 'delete', 'refresh'}
+        # IModel should have all IReadable methods plus save and refresh
+        expected_methods = {'get_id', 'exists', 'get_created_at', 'save', 'refresh'}
         
-        # Note: ABC may add additional methods, so we check that our methods exist
         assert expected_methods.issubset(set(imodel_methods))
     
+    def test_no_delete_method_in_interfaces(self):
+        """Test that neither interface has delete method (immutable data)."""
+        assert not hasattr(IReadable, 'delete') or not callable(getattr(IReadable, 'delete', None))
+        
+        # Check IModel doesn't have delete as a defined method
+        imodel_methods = [
+            method for method in dir(IModel)
+            if not method.startswith('_') and callable(getattr(IModel, method))
+        ]
+        assert 'delete' not in imodel_methods
+    
     def test_interface_does_not_contain_query_methods(self):
-        """Test that IModel interface has no query-related methods."""
-        # Query methods that should NOT exist in IModel (ISP)
+        """Test that interfaces have no query-related methods."""
         query_methods = ['find', 'find_all', 'find_by', 'query', 'search', 'filter']
         
         for method in query_methods:
+            assert not hasattr(IReadable, method), \
+                f"IReadable should not have '{method}' method (Interface Segregation)"
             assert not hasattr(IModel, method), \
                 f"IModel should not have '{method}' method (Interface Segregation)"
     
     def test_interface_does_not_contain_relationship_methods(self):
-        """Test that IModel interface has no relationship methods."""
-        # Relationship methods that should NOT exist in IModel (ISP)
+        """Test that interfaces have no relationship methods."""
         relationship_methods = ['get_children', 'get_parent', 'add_child', 'join']
         
         for method in relationship_methods:
+            assert not hasattr(IReadable, method), \
+                f"IReadable should not have '{method}' method (Interface Segregation)"
             assert not hasattr(IModel, method), \
                 f"IModel should not have '{method}' method (Interface Segregation)"
     
     def test_interface_does_not_contain_validation_methods(self):
-        """Test that IModel interface has no validation methods."""
-        # Validation methods that should NOT exist in IModel (ISP)
+        """Test that interfaces have no validation methods."""
         validation_methods = ['validate', 'is_valid', 'get_errors']
         
         for method in validation_methods:
+            assert not hasattr(IReadable, method), \
+                f"IReadable should not have '{method}' method (Interface Segregation)"
             assert not hasattr(IModel, method), \
                 f"IModel should not have '{method}' method (Interface Segregation)"
     
     def test_interface_does_not_contain_transaction_methods(self):
-        """Test that IModel interface has no transaction methods."""
-        # Transaction methods that should NOT exist in IModel (ISP)
+        """Test that interfaces have no transaction methods."""
         transaction_methods = ['begin_transaction', 'commit', 'rollback']
         
         for method in transaction_methods:
+            assert not hasattr(IReadable, method), \
+                f"IReadable should not have '{method}' method (Interface Segregation)"
             assert not hasattr(IModel, method), \
                 f"IModel should not have '{method}' method (Interface Segregation)"
+    
+    def test_no_updated_at_method(self):
+        """Test that interfaces don't have updated_at (versioning strategy)."""
+        assert not hasattr(IReadable, 'get_updated_at'), \
+            "IReadable should not have 'get_updated_at' (versioning strategy)"
+        assert not hasattr(IModel, 'get_updated_at'), \
+            "IModel should not have 'get_updated_at' (versioning strategy)"
 
 
 class TestModelWorkflowExamples:
@@ -304,31 +496,29 @@ class TestModelWorkflowExamples:
         model = ConcreteModel(data="New content")
         
         assert model.get_id() is None
+        assert model.exists() is False
+        assert model.get_created_at() is None
         
         save_result = model.save()
         
         assert save_result is True
         assert model.get_id() is not None
+        assert model.exists() is True
+        assert model.get_created_at() is not None
     
-    def test_update_existing_model(self):
-        """Test updating an existing model."""
-        model = ConcreteModel(id="existing-123", data="Original content")
+    def test_read_only_access_with_ireadable(self):
+        """Test read-only access using IReadable interface."""
+        # A function that only needs read access
+        def display_model_info(readable: IReadable) -> str:
+            if readable.exists():
+                return f"ID: {readable.get_id()}, Created: {readable.get_created_at()}"
+            return "Model does not exist"
         
-        # Simulate updating the model
-        model._data = "Updated content"
-        save_result = model.save()
+        model = ConcreteModel(id="test-123", data="Content")
+        info = display_model_info(model)
         
-        assert save_result is True
-        assert model.get_id() == "existing-123"
-        assert model.data == "Updated content"
-    
-    def test_delete_existing_model(self):
-        """Test deleting an existing model."""
-        model = ConcreteModel(id="to-delete-456", data="Content to delete")
-        
-        delete_result = model.delete()
-        
-        assert delete_result is True
+        assert "ID: test-123" in info
+        assert "Created:" in info
     
     def test_refresh_model_from_database(self):
         """Test refreshing model data from database."""
@@ -337,14 +527,6 @@ class TestModelWorkflowExamples:
         refresh_result = model.refresh()
         
         assert refresh_result is True
-    
-    def test_cannot_delete_unsaved_model(self):
-        """Test that deleting an unsaved model returns False."""
-        model = ConcreteModel(data="Never saved")
-        
-        delete_result = model.delete()
-        
-        assert delete_result is False
     
     def test_cannot_refresh_unsaved_model(self):
         """Test that refreshing an unsaved model returns False."""
@@ -362,9 +544,41 @@ class TestPartialImplementation:
         """Test that missing get_id implementation raises TypeError."""
         with pytest.raises(TypeError):
             class IncompleteModel(IModel[str]):
+                def exists(self) -> bool:
+                    return False
+                def get_created_at(self) -> Optional[datetime]:
+                    return None
                 def save(self) -> bool:
                     return True
-                def delete(self) -> bool:
+                def refresh(self) -> bool:
+                    return True
+            
+            IncompleteModel()
+    
+    def test_missing_exists_raises_error(self):
+        """Test that missing exists implementation raises TypeError."""
+        with pytest.raises(TypeError):
+            class IncompleteModel(IModel[str]):
+                def get_id(self) -> Optional[str]:
+                    return None
+                def get_created_at(self) -> Optional[datetime]:
+                    return None
+                def save(self) -> bool:
+                    return True
+                def refresh(self) -> bool:
+                    return True
+            
+            IncompleteModel()
+    
+    def test_missing_get_created_at_raises_error(self):
+        """Test that missing get_created_at implementation raises TypeError."""
+        with pytest.raises(TypeError):
+            class IncompleteModel(IModel[str]):
+                def get_id(self) -> Optional[str]:
+                    return None
+                def exists(self) -> bool:
+                    return False
+                def save(self) -> bool:
                     return True
                 def refresh(self) -> bool:
                     return True
@@ -377,21 +591,10 @@ class TestPartialImplementation:
             class IncompleteModel(IModel[str]):
                 def get_id(self) -> Optional[str]:
                     return None
-                def delete(self) -> bool:
-                    return True
-                def refresh(self) -> bool:
-                    return True
-            
-            IncompleteModel()
-    
-    def test_missing_delete_raises_error(self):
-        """Test that missing delete implementation raises TypeError."""
-        with pytest.raises(TypeError):
-            class IncompleteModel(IModel[str]):
-                def get_id(self) -> Optional[str]:
+                def exists(self) -> bool:
+                    return False
+                def get_created_at(self) -> Optional[datetime]:
                     return None
-                def save(self) -> bool:
-                    return True
                 def refresh(self) -> bool:
                     return True
             
@@ -403,9 +606,21 @@ class TestPartialImplementation:
             class IncompleteModel(IModel[str]):
                 def get_id(self) -> Optional[str]:
                     return None
+                def exists(self) -> bool:
+                    return False
+                def get_created_at(self) -> Optional[datetime]:
+                    return None
                 def save(self) -> bool:
-                    return True
-                def delete(self) -> bool:
                     return True
             
             IncompleteModel()
+    
+    def test_ireadable_partial_implementation_fails(self):
+        """Test that partial IReadable implementation raises TypeError."""
+        with pytest.raises(TypeError):
+            class IncompleteReadable(IReadable[str]):
+                def get_id(self) -> Optional[str]:
+                    return None
+                # Missing exists and get_created_at
+            
+            IncompleteReadable()

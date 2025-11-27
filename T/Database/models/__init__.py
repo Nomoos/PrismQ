@@ -3,11 +3,13 @@
 This module contains model interfaces and base classes for database operations.
 
 Main Classes:
-    - IModel: Base interface for all database models with CRUD operations
+    - IReadable: Interface for read-only model operations
+    - IModel: Interface for full persistence operations (extends IReadable)
 """
 
-from T.Database.models.base import IModel
+from T.Database.models.base import IReadable, IModel
 
 __all__ = [
+    "IReadable",
     "IModel",
 ]
