@@ -171,3 +171,46 @@ class Title(IModel[int]):
             review_id=data.get("review_id"),
             created_at=created_at or datetime.now(),
         )
+    
+    # === Version Management ===
+    
+    def create_next_version(self, new_text: str, review_id: Optional[int] = None) -> "Title":
+        """Create a new version of this title with updated text.
+        
+        This method follows the INSERT+READ only architecture - instead of
+        updating the current title, it creates a new version with incremented
+        version number.
+        
+        Args:
+            new_text: The new title text for the next version.
+            review_id: Optional review reference for the new version.
+        
+        Returns:
+            Title: A new Title instance with version incremented by 1.
+            
+        Example:
+            >>> title_v0 = Title(story_id=1, version=0, text="Original Title")
+            >>> title_v1 = title_v0.create_next_version("Improved Title", review_id=5)
+            >>> print(title_v1.version)
+            1
+        """
+        return Title(
+            story_id=self.story_id,
+            version=self.version + 1,
+            text=new_text,
+            review_id=review_id,
+            created_at=datetime.now(),  # Ensure distinct creation time
+        )
+    
+    def get_version_info(self) -> str:
+        """Get a formatted string with version information.
+        
+        Returns:
+            str: Version info in format "v{version} (story_id={story_id})".
+            
+        Example:
+            >>> title = Title(story_id=1, version=2, text="Title")
+            >>> print(title.get_version_info())
+            v2 (story_id=1)
+        """
+        return f"v{self.version} (story_id={self.story_id})"

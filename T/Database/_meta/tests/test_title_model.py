@@ -225,5 +225,70 @@ class TestTitleIModelInterface:
         assert title_saved.refresh() is True
 
 
+class TestTitleVersionManagement:
+    """Tests for Title version management methods."""
+    
+    def test_create_next_version_increments_version(self):
+        """Test create_next_version increments version number."""
+        title_v0 = Title(story_id=1, version=0, text="Original Title")
+        title_v1 = title_v0.create_next_version("Improved Title")
+        
+        assert title_v1.version == 1
+        assert title_v1.story_id == title_v0.story_id
+    
+    def test_create_next_version_updates_text(self):
+        """Test create_next_version uses new text."""
+        title_v0 = Title(story_id=1, version=0, text="Original")
+        title_v1 = title_v0.create_next_version("Updated")
+        
+        assert title_v1.text == "Updated"
+        assert title_v0.text == "Original"  # Original unchanged
+    
+    def test_create_next_version_with_review_id(self):
+        """Test create_next_version can include review_id."""
+        title_v0 = Title(story_id=1, version=0, text="Original")
+        title_v1 = title_v0.create_next_version("Reviewed Title", review_id=5)
+        
+        assert title_v1.review_id == 5
+    
+    def test_create_next_version_preserves_story_id(self):
+        """Test create_next_version preserves story_id."""
+        title_v0 = Title(story_id=42, version=0, text="Original")
+        title_v1 = title_v0.create_next_version("Next")
+        
+        assert title_v1.story_id == 42
+    
+    def test_create_next_version_chain(self):
+        """Test creating multiple versions in chain."""
+        title_v0 = Title(story_id=1, version=0, text="v0")
+        title_v1 = title_v0.create_next_version("v1")
+        title_v2 = title_v1.create_next_version("v2")
+        title_v3 = title_v2.create_next_version("v3", review_id=10)
+        
+        assert [title_v0.version, title_v1.version, title_v2.version, title_v3.version] == [0, 1, 2, 3]
+        assert title_v3.text == "v3"
+        assert title_v3.review_id == 10
+    
+    def test_create_next_version_is_new_instance(self):
+        """Test create_next_version returns new instance."""
+        title_v0 = Title(story_id=1, version=0, text="Original", id=1)
+        title_v1 = title_v0.create_next_version("Next")
+        
+        assert title_v0 is not title_v1
+        assert title_v1.id is None  # New instance has no ID
+    
+    def test_get_version_info(self):
+        """Test get_version_info returns formatted string."""
+        title = Title(story_id=5, version=3, text="Test")
+        
+        assert title.get_version_info() == "v3 (story_id=5)"
+    
+    def test_get_version_info_initial_version(self):
+        """Test get_version_info for initial version."""
+        title = Title(story_id=1, version=0, text="Test")
+        
+        assert title.get_version_info() == "v0 (story_id=1)"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

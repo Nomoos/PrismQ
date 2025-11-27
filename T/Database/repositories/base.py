@@ -161,9 +161,10 @@ class IVersionedRepository(IRepository[TEntity, TId]):
     interface provides methods to query specific versions.
     
     Version Strategy:
-        Versions are represented as integers (1, 2, 3, ...).
-        Each insert creates a new version with an incremented number.
-        The original entity ID remains the same across versions.
+        Versions are represented as integers starting from 0 (0, 1, 2, ...).
+        Version 0 is the initial version, and each subsequent insert creates
+        a new version with an incremented number.
+        The story_id remains the same across versions of the same content.
     
     Type Parameters:
         TEntity: The versioned entity type this repository manages
@@ -236,13 +237,32 @@ class IVersionedRepository(IRepository[TEntity, TId]):
         
         Args:
             id: The entity identifier (not including version).
-            version: The version number (integer, starting from 1).
+            version: The version number (integer, starting from 0).
             
         Returns:
             Optional[TEntity]: The specific version if found, None otherwise.
             
         Note:
-            Version numbers start from 1 and increment with each
-            new version. Version 0 is not valid.
+            Version numbers start from 0 (initial version) and increment
+            with each new version.
+        """
+        pass
+    
+    @abstractmethod
+    def find_by_story_id(self, story_id: int) -> List[TEntity]:
+        """Find all versions of content for a specific story.
+        
+        Args:
+            story_id: The story identifier (integer, references Story table).
+            
+        Returns:
+            List[TEntity]: List of all versions for the story, ordered by
+                version number in ascending order.
+                Returns empty list if no content exists for the story.
+                
+        Note:
+            This method uses int for story_id as it references the Story
+            table's primary key. The generic TId parameter refers to the
+            entity's own identifier, not the story reference.
         """
         pass
