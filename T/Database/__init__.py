@@ -1,7 +1,3 @@
-"""Database module for PrismQ.
-
-This module contains database models for the PrismQ content creation workflow.
-"""
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
@@ -46,6 +42,7 @@ Repository Implementations:
 Models:
     - Title: Versioned title content with review FK
     - Script: Script model for versioned content storage
+    - Review: Simple review model for content review storage
     - StoryReviewModel: Linking table for Story reviews (implements IModel)
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
 
@@ -88,6 +85,7 @@ __version__ = "0.1.0"
 
 from T.Database.models.base import IReadable, IModel
 from T.Database.models.story_review import StoryReviewModel, ReviewType
+from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
 from T.Database.repositories.base import (
@@ -106,6 +104,7 @@ __all__ = [
     # Models
     "Title",
     "Script",
+    "Review",
     "StoryReviewModel",
     "ReviewType",
     # Repository interfaces
