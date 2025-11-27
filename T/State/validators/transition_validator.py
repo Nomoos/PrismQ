@@ -9,8 +9,10 @@ Following the Liskov Substitution Principle (LSP):
 - All validators are interchangeable
 
 State Naming Convention:
-- States follow the pattern: PrismQ.T.<Output>.From.<Input>
-- Example: PrismQ.T.Title.From.Idea, PrismQ.T.Script.From.Idea.Title
+- Generation states use the 'From' pattern: PrismQ.T.<Output>.From.<Input>
+  Example: PrismQ.T.Title.From.Idea, PrismQ.T.Script.From.Title.Idea
+- Review states use the 'By' pattern: PrismQ.T.Review.<Target>.By.<Source>
+  Example: PrismQ.T.Review.Title.By.Script.Idea
 
 Workflow Position:
     STATE-003: Create State Transition Validator
@@ -22,31 +24,35 @@ from T.State.interfaces.validator_interface import IValidator, ValidationResult
 
 
 # State name constants following PrismQ naming convention
-# Pattern: PrismQ.T.<Output>.From.<Input>
+# - Generation states: PrismQ.T.<Output>.From.<Input>
+# - Review states: PrismQ.T.Review.<Target>.By.<Source>
 class StateNames:
     """State name constants for the PrismQ.T workflow.
     
-    All state names follow the pattern: PrismQ.T.<Output>.From.<Input>
+    State naming patterns (from WORKFLOW_STATE_MACHINE.md):
+    - Generation states use 'From': PrismQ.T.<Output>.From.<Input>
+    - Review states use 'By': PrismQ.T.Review.<Target>.By.<Source>
+    
     These are used for state machine transitions and validation.
     """
-    # Initial state
+    # Initial state (Stage 1)
     IDEA_CREATION = "PrismQ.T.Idea.Creation"
     
-    # Title generation states
+    # Title generation states (Stage 2, 7)
     TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"
-    TITLE_FROM_SCRIPT_REVIEW = "PrismQ.T.Title.From.Script.Review.Title"
+    TITLE_FROM_SCRIPT_REVIEW_TITLE = "PrismQ.T.Title.From.Script.Review.Title"
     
-    # Script generation states
-    SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
-    SCRIPT_FROM_TITLE_REVIEW = "PrismQ.T.Script.From.Title.Review.Script"
+    # Script generation states (Stage 3, 8)
+    SCRIPT_FROM_TITLE_IDEA = "PrismQ.T.Script.From.Title.Idea"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = "PrismQ.T.Script.From.Title.Review.Script"
     
-    # Review states
-    REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
-    REVIEW_SCRIPT_FROM_TITLE_IDEA = "PrismQ.T.Review.Script.From.Title.Idea"
-    REVIEW_TITLE_FROM_SCRIPT = "PrismQ.T.Review.Title.From.Script"
-    REVIEW_SCRIPT_FROM_TITLE = "PrismQ.T.Review.Script.From.Title"
+    # Review states using 'By' pattern (Stage 4, 5, 6, 9)
+    REVIEW_TITLE_BY_SCRIPT_IDEA = "PrismQ.T.Review.Title.By.Script.Idea"
+    REVIEW_SCRIPT_BY_TITLE_IDEA = "PrismQ.T.Review.Script.By.Title.Idea"
+    REVIEW_TITLE_BY_SCRIPT = "PrismQ.T.Review.Title.By.Script"
+    REVIEW_SCRIPT_BY_TITLE = "PrismQ.T.Review.Script.By.Title"
     
-    # Quality review states
+    # Quality review states (Stages 10-16)
     REVIEW_SCRIPT_GRAMMAR = "PrismQ.T.Review.Script.Grammar"
     REVIEW_SCRIPT_TONE = "PrismQ.T.Review.Script.Tone"
     REVIEW_SCRIPT_CONTENT = "PrismQ.T.Review.Script.Content"
@@ -55,7 +61,7 @@ class StateNames:
     REVIEW_TITLE_READABILITY = "PrismQ.T.Review.Title.Readability"
     REVIEW_SCRIPT_READABILITY = "PrismQ.T.Review.Script.Readability"
     
-    # Story review states
+    # Story review states (Stages 17-18)
     STORY_REVIEW = "PrismQ.T.Story.Review"
     STORY_POLISH = "PrismQ.T.Story.Polish"
     
@@ -66,102 +72,102 @@ class StateNames:
 # Valid state transitions map based on WORKFLOW_STATE_MACHINE.md
 # Each state maps to a list of valid next states
 TRANSITIONS: Dict[str, List[str]] = {
-    # Initial state can only go to title generation
+    # Initial state can only go to title generation (Stage 1 -> 2)
     StateNames.IDEA_CREATION: [
         StateNames.TITLE_FROM_IDEA,
     ],
     
-    # Title from idea goes to script generation
+    # Title from idea goes to script generation (Stage 2 -> 3)
     StateNames.TITLE_FROM_IDEA: [
-        StateNames.SCRIPT_FROM_IDEA_TITLE,
+        StateNames.SCRIPT_FROM_TITLE_IDEA,
     ],
     
-    # Script from idea+title goes to initial reviews
-    StateNames.SCRIPT_FROM_IDEA_TITLE: [
-        StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA,
+    # Script from title+idea goes to initial title review (Stage 3 -> 4)
+    StateNames.SCRIPT_FROM_TITLE_IDEA: [
+        StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA,
     ],
     
-    # Initial title review
-    StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA: [
-        StateNames.REVIEW_SCRIPT_FROM_TITLE_IDEA,
-        StateNames.TITLE_FROM_SCRIPT_REVIEW,  # If review suggests changes
+    # Initial title review (Stage 4)
+    StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA: [
+        StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,  # Accepted -> Stage 5
+        StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE,  # Not accepted -> Stage 7 (refine title)
     ],
     
-    # Initial script review
-    StateNames.REVIEW_SCRIPT_FROM_TITLE_IDEA: [
-        StateNames.REVIEW_TITLE_FROM_SCRIPT,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # If review suggests changes
+    # Initial script review (Stage 5)
+    StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA: [
+        StateNames.REVIEW_TITLE_BY_SCRIPT,  # Accepted -> Stage 6
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Not accepted -> Stage 8 (refine script)
     ],
     
-    # Iterative title review
-    StateNames.REVIEW_TITLE_FROM_SCRIPT: [
-        StateNames.REVIEW_SCRIPT_FROM_TITLE,
-        StateNames.TITLE_FROM_SCRIPT_REVIEW,  # If review suggests changes
+    # Iterative title review (Stage 6)
+    StateNames.REVIEW_TITLE_BY_SCRIPT: [
+        StateNames.REVIEW_SCRIPT_BY_TITLE,  # Accepted -> Stage 9
+        StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE,  # Not accepted -> Stage 7 (refine title)
     ],
     
-    # Iterative script review
-    StateNames.REVIEW_SCRIPT_FROM_TITLE: [
-        StateNames.REVIEW_SCRIPT_GRAMMAR,  # Move to quality reviews
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # If review suggests changes
+    # Title refinement from review (Stage 7)
+    StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE: [
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # After title refinement -> Stage 8
+        StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,  # Back to script review
+        StateNames.REVIEW_TITLE_BY_SCRIPT,  # Back to title review cycle
     ],
     
-    # Title refinement from review
-    StateNames.TITLE_FROM_SCRIPT_REVIEW: [
-        StateNames.REVIEW_SCRIPT_FROM_TITLE_IDEA,
-        StateNames.REVIEW_TITLE_FROM_SCRIPT,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,
+    # Script refinement from review (Stage 8)
+    StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT: [
+        StateNames.REVIEW_TITLE_BY_SCRIPT,  # After script refinement -> title review
+        StateNames.REVIEW_SCRIPT_BY_TITLE,  # After script refinement -> script review
     ],
     
-    # Script refinement from review  
-    StateNames.SCRIPT_FROM_TITLE_REVIEW: [
-        StateNames.REVIEW_SCRIPT_FROM_TITLE,
-        StateNames.REVIEW_TITLE_FROM_SCRIPT,
+    # Iterative script review (Stage 9) - Gateway to quality reviews
+    StateNames.REVIEW_SCRIPT_BY_TITLE: [
+        StateNames.REVIEW_SCRIPT_GRAMMAR,  # Accepted -> Start quality reviews (Stage 10)
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Not accepted -> Stage 8 (refine script)
     ],
     
-    # Quality review chain (linear progression with failure paths)
+    # Quality review chain (Stages 10-16) - linear progression with failure paths
     StateNames.REVIEW_SCRIPT_GRAMMAR: [
-        StateNames.REVIEW_SCRIPT_TONE,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.REVIEW_SCRIPT_TONE,  # Passes -> Stage 11
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
     StateNames.REVIEW_SCRIPT_TONE: [
-        StateNames.REVIEW_SCRIPT_CONTENT,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.REVIEW_SCRIPT_CONTENT,  # Passes -> Stage 12
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
     StateNames.REVIEW_SCRIPT_CONTENT: [
-        StateNames.REVIEW_SCRIPT_CONSISTENCY,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.REVIEW_SCRIPT_CONSISTENCY,  # Passes -> Stage 13
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
     StateNames.REVIEW_SCRIPT_CONSISTENCY: [
-        StateNames.REVIEW_SCRIPT_EDITING,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.REVIEW_SCRIPT_EDITING,  # Passes -> Stage 14
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
     StateNames.REVIEW_SCRIPT_EDITING: [
-        StateNames.REVIEW_TITLE_READABILITY,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.REVIEW_TITLE_READABILITY,  # Passes -> Stage 15
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
     StateNames.REVIEW_TITLE_READABILITY: [
-        StateNames.REVIEW_SCRIPT_READABILITY,
-        StateNames.TITLE_FROM_SCRIPT_REVIEW,  # Failure path
+        StateNames.REVIEW_SCRIPT_READABILITY,  # Passes -> Stage 16
+        StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE,  # Fails -> Stage 7
     ],
     
     StateNames.REVIEW_SCRIPT_READABILITY: [
-        StateNames.STORY_REVIEW,
-        StateNames.SCRIPT_FROM_TITLE_REVIEW,  # Failure path
+        StateNames.STORY_REVIEW,  # Passes -> Stage 17
+        StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT,  # Fails -> Stage 8
     ],
     
-    # Expert review loop
+    # Expert review loop (Stages 17-18)
     StateNames.STORY_REVIEW: [
-        StateNames.PUBLISHING,  # Accepted
-        StateNames.STORY_POLISH,  # Not accepted - needs polish
+        StateNames.PUBLISHING,  # Accepted -> Terminal
+        StateNames.STORY_POLISH,  # Not accepted -> Stage 18
     ],
     
     StateNames.STORY_POLISH: [
-        StateNames.STORY_REVIEW,  # Loop back to review
+        StateNames.STORY_REVIEW,  # Loop back to Stage 17
     ],
     
     # Terminal state - no valid transitions from Publishing
