@@ -84,7 +84,7 @@ class Title(IModel):
             "version": self.version,
             "text": self.text,
             "review_id": self.review_id,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "created_at": self.created_at.isoformat(),
         }
     
     @classmethod
