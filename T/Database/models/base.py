@@ -12,7 +12,6 @@ Interface Segregation:
     IModel defines only essential CRUD operations - small, focused interface.
 """
 
-from abc import ABC, abstractmethod
 from typing import Protocol, Optional, Dict, Any, runtime_checkable
 
 
