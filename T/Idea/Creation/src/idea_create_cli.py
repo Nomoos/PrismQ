@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Add parent directories to path for imports
+# Note: This pattern is established in the codebase (see idea_cli.py example)
+# and is necessary for the module's position in the directory structure
 current_dir = os.path.dirname(os.path.abspath(__file__))
 src_dir = current_dir
 model_dir = os.path.join(current_dir, '../../Model/src')
@@ -38,8 +40,25 @@ from idea import Idea, ContentGenre, IdeaStatus
 from idea_db import IdeaDatabase
 
 
+# Module constants
+DEFAULT_DB_FILENAME = "idea.db"
+DEFAULT_COUNT = 10
+DEFAULT_MODEL = "llama3.1:70b-q4_K_M"
+DEFAULT_TEMPERATURE = 0.8
+MAX_COUNT = 100
+MIN_COUNT = 1
+
 # Required fields for database insertion
 REQUIRED_DB_FIELDS = ['title', 'concept']
+
+# UI Messages (Czech localization)
+MSG_SAVE_PROMPT = "💾 Uložit do databáze?"
+MSG_YES_NO = "[Y] Ano  /  [N] Ne"
+MSG_INVALID_INPUT = "❌ Neplatná odpověď. Zadejte Y nebo N."
+MSG_CANCELLED = "\n⚠️  Operace zrušena."
+MSG_DB_ERROR = "Chyba při ukládání do databáze"
+MSG_INVALID_INPUT_ERROR = "Neplatný vstup"
+MSG_GENERATION_ERROR = "Chyba při generování nápadů"
 
 
 class ValidationError(Exception):
@@ -56,13 +75,13 @@ class CLIError(Exception):
 class CLIOptions:
     """Options for the CLI tool."""
     prompt: str
-    count: int = 10
+    count: int = DEFAULT_COUNT
     preview: bool = False
     no_save: bool = False
     debug: bool = False
     validate: bool = False
-    model: str = "llama3.1:70b-q4_K_M"
-    temperature: float = 0.8
+    model: str = DEFAULT_MODEL
+    temperature: float = DEFAULT_TEMPERATURE
     db_path: Optional[str] = None
 
 
@@ -208,7 +227,7 @@ def print_header(prompt: str, count: int, options: CLIOptions):
     print(f"{'='*80}\n")
 
 
-def prompt_user_confirmation(message: str = "💾 Uložit do databáze?") -> bool:
+def prompt_user_confirmation(message: str = MSG_SAVE_PROMPT) -> bool:
     """Prompt user for Y/N confirmation.
     
     Args:
@@ -218,7 +237,7 @@ def prompt_user_confirmation(message: str = "💾 Uložit do databáze?") -> boo
         True if user confirms (Y), False otherwise (N)
     """
     print(f"\n{message}")
-    print("[Y] Ano  /  [N] Ne")
+    print(MSG_YES_NO)
     
     while True:
         try:
@@ -228,9 +247,9 @@ def prompt_user_confirmation(message: str = "💾 Uložit do databáze?") -> boo
             elif response in ('N', 'NE', 'NO', '0', ''):
                 return False
             else:
-                print("❌ Neplatná odpověď. Zadejte Y nebo N.")
+                print(MSG_INVALID_INPUT)
         except (EOFError, KeyboardInterrupt):
-            print("\n⚠️  Operace zrušena.")
+            print(MSG_CANCELLED)
             return False
 
 
@@ -248,7 +267,7 @@ def save_idea_to_db(idea: Idea, db_path: Optional[str] = None) -> int:
         CLIError: If database save fails
     """
     try:
-        db = IdeaDatabase(db_path or "idea.db")
+        db = IdeaDatabase(db_path or DEFAULT_DB_FILENAME)
         db.connect()
         db.create_tables()
         
@@ -258,7 +277,7 @@ def save_idea_to_db(idea: Idea, db_path: Optional[str] = None) -> int:
         db.close()
         return idea_id
     except Exception as e:
-        raise CLIError(f"Chyba při ukládání do databáze: {e}")
+        raise CLIError(f"{MSG_DB_ERROR}: {e}")
 
 
 def generate_ideas(options: CLIOptions) -> List[Idea]:
@@ -294,9 +313,9 @@ def generate_ideas(options: CLIOptions) -> List[Idea]:
         return ideas
         
     except ValueError as e:
-        raise CLIError(f"Neplatný vstup: {e}")
+        raise CLIError(f"{MSG_INVALID_INPUT_ERROR}: {e}")
     except Exception as e:
-        raise CLIError(f"Chyba při generování nápadů: {e}")
+        raise CLIError(f"{MSG_GENERATION_ERROR}: {e}")
 
 
 def run_cli(options: CLIOptions) -> int:
@@ -489,11 +508,11 @@ Examples:
         sys.exit(1)
     
     # Validate count
-    if parsed.count < 1:
-        parser.error("--count must be at least 1")
+    if parsed.count < MIN_COUNT:
+        parser.error(f"--count must be at least {MIN_COUNT}")
     
-    if parsed.count > 100:
-        parser.error("--count cannot exceed 100")
+    if parsed.count > MAX_COUNT:
+        parser.error(f"--count cannot exceed {MAX_COUNT}")
     
     # Validate temperature
     if parsed.temperature < 0.0 or parsed.temperature > 2.0:
