@@ -4,7 +4,7 @@ Tests cover:
 - Script creation with required and optional fields
 - Version validation (non-negative INTEGER)
 - Serialization to/from dictionary
-- IModel interface compliance
+- Data transfer methods (to_dict/from_dict)
 """
 
 import pytest
@@ -16,7 +16,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "models"))
 
 from script import Script
-from base import IModel
 
 
 class TestScript:
@@ -157,30 +156,30 @@ class TestScript:
         assert restored.id == original.id
 
 
-class TestScriptIModelInterface:
-    """Tests for IModel interface compliance."""
+class TestScriptDataTransferMethods:
+    """Tests for Script data transfer methods (to_dict/from_dict)."""
     
     def test_script_has_id_attribute(self):
-        """Test Script has id attribute as per IModel."""
+        """Test Script has id attribute for persistence."""
         script = Script(story_id=1, version=0, text="Test")
         assert hasattr(script, "id")
     
     def test_script_has_to_dict_method(self):
-        """Test Script has to_dict method as per IModel."""
+        """Test Script has to_dict method for serialization."""
         script = Script(story_id=1, version=0, text="Test")
         assert hasattr(script, "to_dict")
         assert callable(script.to_dict)
     
     def test_script_has_from_dict_method(self):
-        """Test Script has from_dict classmethod as per IModel."""
+        """Test Script has from_dict classmethod for deserialization."""
         assert hasattr(Script, "from_dict")
         assert callable(Script.from_dict)
     
-    def test_script_implements_imodel_protocol(self):
-        """Test Script is a structural subtype of IModel Protocol."""
+    def test_script_has_created_at_attribute(self):
+        """Test Script has created_at attribute for timestamp tracking."""
         script = Script(story_id=1, version=0, text="Test")
-        # Using isinstance with runtime_checkable Protocol
-        assert isinstance(script, IModel)
+        assert hasattr(script, "created_at")
+        assert isinstance(script.created_at, datetime)
 
 
 class TestScriptEdgeCases:

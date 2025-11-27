@@ -1,14 +1,3 @@
-"""Database module for PrismQ.
-
-This module contains database models and interfaces following SOLID principles:
-- Single Responsibility: Each model handles only its own data
-- Interface Segregation: Small, focused IModel interface
-- Dependency Inversion: Depend on abstractions (IModel) not implementations
-"""
-
-from .models import IModel, Script
-
-__all__ = ["IModel", "Script"]
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
@@ -36,6 +25,9 @@ Repository Interfaces:
     - IRepository: Interface for Insert + Read data access
     - IVersionedRepository: Extended interface for versioned entities
 
+Models:
+    - Script: Script model for versioned content storage
+
 Design Decisions:
     - No delete operations: Data is immutable; new versions are created instead
     - Only created_at timestamp: Due to versioning, updated_at is not needed
@@ -43,12 +35,13 @@ Design Decisions:
     - IVersionedRepository: For tables like Title, Script that maintain version history
 
 Example:
-    >>> from T.Database import IReadable, IModel, IRepository, IVersionedRepository
+    >>> from T.Database import IReadable, IModel, IRepository, IVersionedRepository, Script
     >>> # Implement IModel for entity persistence
     >>> # Implement IVersionedRepository for versioned data access
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.script import Script
 from T.Database.repositories.base import IRepository, IVersionedRepository
 
 __all__ = [
@@ -58,4 +51,6 @@ __all__ = [
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
+    # Models
+    "Script",
 ]
