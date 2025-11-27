@@ -4,16 +4,26 @@ This module defines interfaces for database models following the Interface Segre
 Principle. Each interface is minimal and focused, allowing clients to depend only on
 the operations they need.
 
+Architecture: INSERT + READ Only
+    All database tables in PrismQ follow an Insert+Read only pattern:
+    - INSERT: Create new records/versions (supported)
+    - READ: Query existing data (supported)
+    - UPDATE: Not supported (create new version instead)
+    - DELETE: Not supported (data is immutable for history preservation)
+    
+    This applies to tables like Title, Script, and future versioned tables.
+
 Interface Segregation Principle:
     - IReadable: Read-only operations (get_id, exists, get_created_at)
     - IModel: Full persistence operations (extends IReadable with save, refresh)
     
     These interfaces do NOT handle:
-    - Complex queries (handled by repository/query interfaces)
+    - Complex queries (handled by IRepository - see DB-002)
     - Relationships/joins (handled by relationship interfaces)
     - Validation logic (handled by validator interfaces)
     - Transaction management (handled by unit of work pattern)
-    - Delete operations (data is immutable; new versions are created instead)
+    - Update operations (data is immutable; new versions are created)
+    - Delete operations (history preservation; no data removal)
 
 The interfaces are intentionally small and focused to allow clients to depend
 only on the operations they need, following the ISP principle of "no client
