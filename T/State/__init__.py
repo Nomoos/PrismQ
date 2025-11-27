@@ -11,13 +11,14 @@ Main Classes:
     - IState: Interface defining state behavior contract
 
 Example:
+    >>> from typing import List
     >>> from T.State.interfaces import IState
     >>> 
     >>> class MyState(IState):
     ...     def get_name(self) -> str:
     ...         return "MyState"
     ...     
-    ...     def get_next_states(self) -> list[str]:
+    ...     def get_next_states(self) -> List[str]:
     ...         return ["NextState1", "NextState2"]
     ...     
     ...     def can_transition_to(self, target_state: str) -> bool:
