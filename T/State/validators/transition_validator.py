@@ -319,9 +319,9 @@ class TransitionValidator(IValidator):
         
         if len(path) == 1:
             # Single state is valid if it's a known state
-            if path[0] in self.transitions or path[0] in [
-                state for states in self.transitions.values() for state in states
-            ]:
+            # Use the get_all_states method which returns a cached view of all states
+            all_states = set(self.get_all_states())
+            if path[0] in all_states:
                 return ValidationResult(is_valid=True)
             return ValidationResult(
                 is_valid=False,

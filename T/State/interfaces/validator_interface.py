@@ -13,7 +13,7 @@ The interface follows SOLID principles:
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 
@@ -90,7 +90,7 @@ class IValidator(ABC):
         pass
     
     @abstractmethod
-    def get_valid_next_states(self, current_state: str) -> list:
+    def get_valid_next_states(self, current_state: str) -> List[str]:
         """Get all valid next states from the current state.
         
         Args:

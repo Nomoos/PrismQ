@@ -18,6 +18,7 @@ Test Categories:
 
 import sys
 from pathlib import Path
+from typing import List
 
 # Add project root to path
 project_root = Path(__file__).resolve().parents[5]
@@ -470,7 +471,7 @@ class TestLiskovSubstitution:
             def is_valid_transition(self, from_state: str, to_state: str) -> bool:
                 return self.validate(from_state, to_state).is_valid
             
-            def get_valid_next_states(self, current_state: str) -> list:
+            def get_valid_next_states(self, current_state: str) -> List[str]:
                 return self.transitions.get(current_state, [])
         
         # Both validators should work the same way through the interface
