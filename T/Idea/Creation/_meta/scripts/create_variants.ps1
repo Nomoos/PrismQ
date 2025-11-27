@@ -1,21 +1,27 @@
-# PrismQ - Create Idea Variants (PowerShell)
+# PrismQ - Create Idea Variants from Any Text (PowerShell)
+#
+# This script creates idea variants from any input (title, description, story, JSON)
 #
 # Usage:
-#   .\create_variants.ps1 "My Idea Title"
-#   .\create_variants.ps1 "My Idea Title" -Variant emotion_first
-#   .\create_variants.ps1 "My Idea Title" -Variant emotion_first -Count 5
-#   .\create_variants.ps1 "My Idea Title" -All
+#   .\create_variants.ps1 "I wore a baggy tee on the first day of school..."
+#   .\create_variants.ps1 "Fashion Revolution"
+#   .\create_variants.ps1 "text" -Variant emotion_first
+#   .\create_variants.ps1 "text" -Count 5
+#   .\create_variants.ps1 -File story.txt
 #   .\create_variants.ps1 -List
 
 param(
     [Parameter(Position=0)]
-    [string]$Title,
+    [string]$Input,
+    
+    [Alias("f")]
+    [string]$File,
     
     [Alias("v")]
     [string]$Variant,
     
     [Alias("c")]
-    [int]$Count = 1,
+    [int]$Count = 10,
     
     [Alias("a")]
     [switch]$All,
@@ -24,10 +30,7 @@ param(
     [switch]$List,
     
     [Alias("j")]
-    [switch]$Json,
-    
-    [Alias("d")]
-    [string]$Description = ""
+    [switch]$Json
 )
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -55,8 +58,11 @@ $pyArgs = @()
 if ($List) {
     $pyArgs += "--list"
 } else {
-    if ($Title) {
-        $pyArgs += "`"$Title`""
+    if ($File) {
+        $pyArgs += "--file"
+        $pyArgs += "`"$File`""
+    } elseif ($Input) {
+        $pyArgs += "`"$Input`""
     }
     
     if ($Variant) {
@@ -64,7 +70,7 @@ if ($List) {
         $pyArgs += $Variant
     }
     
-    if ($Count -gt 1) {
+    if ($Count -ne 10) {
         $pyArgs += "--count"
         $pyArgs += $Count
     }
@@ -75,11 +81,6 @@ if ($List) {
     
     if ($Json) {
         $pyArgs += "--json"
-    }
-    
-    if ($Description) {
-        $pyArgs += "--description"
-        $pyArgs += "`"$Description`""
     }
 }
 

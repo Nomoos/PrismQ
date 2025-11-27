@@ -1,12 +1,13 @@
 @echo off
-REM PrismQ - Create Idea Variants
-REM This script creates idea variants from a title
+REM PrismQ - Create Idea Variants from Any Text
+REM This script creates idea variants from any input (title, description, story, JSON)
 REM
 REM Usage:
-REM   create_variants.bat "My Idea Title"
-REM   create_variants.bat "My Idea Title" --variant emotion_first
-REM   create_variants.bat "My Idea Title" --variant emotion_first --count 5
-REM   create_variants.bat "My Idea Title" --all
+REM   create_variants.bat "I wore a baggy tee on the first day of school..."
+REM   create_variants.bat "Fashion Revolution"
+REM   create_variants.bat "text" --variant emotion_first
+REM   create_variants.bat "text" --count 5
+REM   create_variants.bat --file story.txt
 REM   create_variants.bat --list
 
 echo ========================================
