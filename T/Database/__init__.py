@@ -39,6 +39,7 @@ Repository Implementations:
 
 Models:
     - Script: Script model for versioned content storage
+    - Title: Versioned title content with review FK
 
 Design Decisions:
     - No delete operations: Data is immutable or never deleted
@@ -46,20 +47,9 @@ Design Decisions:
     - Story state updated in place (workflow progression)
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
-Models:
-    - Title: Versioned title content with review FK
-
 Example:
-    >>> from T.Database import IReadable, IModel, IRepository, IVersionedRepository, Script
-    >>> # Implement IModel for entity persistence
-    >>> # Implement IVersionedRepository for versioned data access
-"""
-
-from T.Database.models.base import IReadable, IModel
-from T.Database.models.script import Script
-from T.Database.repositories.base import IRepository, IVersionedRepository
     >>> from T.Database import IRepository, IVersionedRepository, TitleRepository
-    >>> from T.Database.models import Title
+    >>> from T.Database.models import Title, Script
     >>> 
     >>> # Create repository with SQLite connection
     >>> repo = TitleRepository(connection)
@@ -73,6 +63,7 @@ from T.Database.repositories.base import IRepository, IVersionedRepository
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.script import Script
 from T.Database.models.title import Title
 from T.Database.repositories.base import (
     IRepository,
@@ -88,11 +79,10 @@ __all__ = [
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
-    # Models
-    "Script",
     "IUpdatableRepository",
     # Repository implementations
     "TitleRepository",
     # Models
+    "Script",
     "Title",
 ]
