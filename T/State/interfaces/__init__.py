@@ -1,14 +1,17 @@
 """PrismQ.T.State.interfaces - State Machine Interfaces.
 
-This module provides interfaces (abstract base classes) for the state machine
-implementation.
+This package contains abstract interfaces that define contracts for state
+management components.
 
 Main Classes:
     - IState: Interface defining state behavior contract
+    - IValidator: Interface for state validators
 """
 
-from .state_interface import IState
+from T.State.interfaces.state_interface import IState
+from T.State.interfaces.validator_interface import IValidator
 
 __all__ = [
-    'IState',
+    "IState",
+    "IValidator",
 ]
