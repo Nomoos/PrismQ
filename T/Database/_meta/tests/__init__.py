@@ -1,2 +1,1 @@
-"""Tests for T/Database models."""
-"""Tests for Database module."""
+"""Tests for T/Database module (models and repositories)."""

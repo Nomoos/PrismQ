@@ -1,7 +1,18 @@
-"""PrismQ.T.Database.models - Database models.
+"""PrismQ.T.Database.models - Database models and interfaces.
 
-This package provides database models for the PrismQ text generation pipeline.
+This package provides database models and interfaces for the PrismQ text
+generation pipeline.
+
+Model Interfaces:
+    - IReadable: Interface for read-only model operations
+    - IModel: Interface for full persistence operations (extends IReadable)
+
+Models:
+    - StoryReviewModel: Linking table for Story reviews with review types
+    - ReviewType: Enum for review types (grammar, tone, content, etc.)
 """
+
+from T.Database.models.base import IReadable, IModel
 
 try:
     from .story_review import StoryReviewModel, ReviewType
@@ -10,20 +21,10 @@ except ImportError:
     pass
 
 __all__ = [
-    "StoryReviewModel",
-    "ReviewType",
-"""Database models module.
-
-This module contains model interfaces and base classes for database operations.
-
-Main Classes:
-    - IReadable: Interface for read-only model operations
-    - IModel: Interface for full persistence operations (extends IReadable)
-"""
-
-from T.Database.models.base import IReadable, IModel
-
-__all__ = [
+    # Interfaces
     "IReadable",
     "IModel",
+    # Models
+    "StoryReviewModel",
+    "ReviewType",
 ]

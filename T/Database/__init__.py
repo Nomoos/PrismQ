@@ -1,13 +1,3 @@
-"""PrismQ.T.Database - Database models for the Text Pipeline.
-
-This package provides database models for persisting content in the
-PrismQ text generation pipeline.
-
-Models:
-- StoryReview: Linking table for Story reviews with review types
-"""
-
-__version__ = "0.1.0"
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
@@ -35,6 +25,10 @@ Repository Interfaces:
     - IRepository: Interface for Insert + Read data access
     - IVersionedRepository: Extended interface for versioned entities
 
+Models:
+    - StoryReviewModel: Linking table for Story reviews with review types
+    - ReviewType: Enum for review types (grammar, tone, content, etc.)
+
 Design Decisions:
     - No delete operations: Data is immutable; new versions are created instead
     - Only created_at timestamp: Due to versioning, updated_at is not needed
@@ -47,13 +41,19 @@ Example:
     >>> # Implement IVersionedRepository for versioned data access
 """
 
+__version__ = "0.1.0"
+
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.repositories.base import IRepository, IVersionedRepository
 
 __all__ = [
     # Model interfaces
     "IReadable",
     "IModel",
+    # Models
+    "StoryReviewModel",
+    "ReviewType",
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
