@@ -135,6 +135,15 @@ class ConcreteVersionedRepository(IVersionedRepository[VersionedEntity, str]):
         if id not in self._storage:
             return None
         return self._storage[id].get(version)
+    
+    def find_by_story_id(self, story_id: int) -> List[VersionedEntity]:
+        """Find all entities associated with a story_id.
+        
+        Note: In this test implementation, we don't have a story_id field,
+        so this returns an empty list. Real implementations would query
+        by story_id field.
+        """
+        return []
 
 
 # === Test Classes ===

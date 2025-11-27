@@ -3,12 +3,20 @@
 This module provides database interfaces and implementations for the PrismQ
 workflow, following SOLID principles.
 
-Architecture: INSERT + READ Only
-    All database tables follow an Insert+Read only pattern:
-    - INSERT: Create new records/versions
-    - READ: Query existing data
-    - UPDATE: Not supported (create new version instead)
-    - DELETE: Not supported (data is immutable for history preservation)
+Architecture:
+    PrismQ uses two distinct patterns based on data characteristics:
+    
+    1. INSERT + READ Only (Title, Script, Review, StoryReview):
+       - INSERT: Create new records/versions
+       - READ: Query existing data
+       - UPDATE: Not supported (create new version instead)
+       - DELETE: Not supported (data is immutable for history preservation)
+    
+    2. CRUD with UPDATE (Story):
+       - CREATE: Create new story
+       - READ: Query story data
+       - UPDATE: Update state field (workflow progression)
+       - DELETE: Not supported (stories never deleted)
 
 Following SOLID principles:
 - Single Responsibility: Each interface has one responsibility
@@ -24,21 +32,37 @@ Model Interfaces:
 Repository Interfaces:
     - IRepository: Interface for Insert + Read data access
     - IVersionedRepository: Extended interface for versioned entities
+    - IUpdatableRepository: Extended interface for updatable entities
+
+Repository Implementations:
+    - TitleRepository: SQLite implementation for Title entities
 
 Models:
     - StoryReviewModel: Linking table for Story reviews with review types
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
 
 Design Decisions:
-    - No delete operations: Data is immutable; new versions are created instead
-    - Only created_at timestamp: Due to versioning, updated_at is not needed
+    - No delete operations: Data is immutable or never deleted
+    - Version history preserved for Title, Script
+    - Story state updated in place (workflow progression)
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
-    - IVersionedRepository: For tables like Title, Script that maintain version history
+
+Models:
+    - Title: Versioned title content with review FK
 
 Example:
-    >>> from T.Database import IReadable, IModel, IRepository, IVersionedRepository
-    >>> # Implement IModel for entity persistence
-    >>> # Implement IVersionedRepository for versioned data access
+    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository
+    >>> from T.Database.models import Title
+    >>> 
+    >>> # Create repository with SQLite connection
+    >>> repo = TitleRepository(connection)
+    >>> 
+    >>> # Insert new title
+    >>> title = Title(story_id=1, version=0, text="My Title")
+    >>> saved = repo.insert(title)
+    >>> 
+    >>> # Find latest version
+    >>> latest = repo.find_latest_version(story_id=1)
 """
 
 __version__ = "0.1.0"
@@ -46,6 +70,13 @@ __version__ = "0.1.0"
 from T.Database.models.base import IReadable, IModel
 from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.repositories.base import IRepository, IVersionedRepository
+from T.Database.models.title import Title
+from T.Database.repositories.base import (
+    IRepository,
+    IVersionedRepository,
+    IUpdatableRepository,
+)
+from T.Database.repositories.title_repository import TitleRepository
 
 __all__ = [
     # Model interfaces
@@ -57,4 +88,9 @@ __all__ = [
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
+    "IUpdatableRepository",
+    # Repository implementations
+    "TitleRepository",
+    # Models
+    "Title",
 ]
