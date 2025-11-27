@@ -8,8 +8,19 @@ can be properly implemented by concrete model classes.
 import sys
 from pathlib import Path
 
+
+def _find_project_root() -> Path:
+    """Find project root by looking for pytest.ini marker file."""
+    current = Path(__file__).resolve().parent
+    for parent in [current] + list(current.parents):
+        if (parent / 'pytest.ini').exists():
+            return parent
+    # Fallback to parents[5] for compatibility
+    return Path(__file__).resolve().parents[5]
+
+
 # Add project root to path
-project_root = Path(__file__).resolve().parents[5]
+project_root = _find_project_root()
 sys.path.insert(0, str(project_root))
 
 import pytest
