@@ -1,7 +1,3 @@
-"""Database module for PrismQ.
-
-This module contains database models for the PrismQ content creation workflow.
-"""
 """PrismQ.T.Database - Database Models, Repositories and Persistence Layer.
 
 This module provides database interfaces and implementations for the PrismQ
@@ -41,10 +37,14 @@ Repository Interfaces:
 Repository Implementations:
     - TitleRepository: SQLite implementation for Title entities
     - ScriptRepository: SQLite implementation for Script entities
+    - StoryReviewRepository: SQLite implementation for StoryReview entities
 
 Models:
-    - Script: Script model for versioned content storage
     - Title: Versioned title content with review FK
+    - Script: Script model for versioned content storage
+    - Review: Simple review model for content review storage
+    - StoryReviewModel: Linking table for Story reviews (implements IModel)
+    - ReviewType: Enum for review types (grammar, tone, content, etc.)
 
 Design Decisions:
     - No delete operations: Data is immutable or never deleted
@@ -53,27 +53,39 @@ Design Decisions:
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
 Example:
-    >>> from T.Database import IRepository, IVersionedRepository, TitleRepository, ScriptRepository
-    >>> from T.Database.models import Title, Script
+    >>> from T.Database import (
+    ...     IRepository, IVersionedRepository,
+    ...     TitleRepository, ScriptRepository, StoryReviewRepository,
+    ...     Title, Script, StoryReviewModel, ReviewType
+    ... )
     >>> 
-    >>> # Create repository with SQLite connection
+    >>> # Create repositories with SQLite connection
     >>> title_repo = TitleRepository(connection)
     >>> script_repo = ScriptRepository(connection)
+    >>> review_repo = StoryReviewRepository(connection)
     >>> 
-    >>> # Insert new title
+    >>> # Insert new title and script
     >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> saved_title = title_repo.insert(title)
-    >>> 
-    >>> # Insert new script
     >>> script = Script(story_id=1, version=0, text="Once upon a time...")
+    >>> saved_title = title_repo.insert(title)
     >>> saved_script = script_repo.insert(script)
+    >>> 
+    >>> # Link story to review
+    >>> story_review = StoryReviewModel(
+    ...     story_id=1, review_id=5, version=0, review_type=ReviewType.GRAMMAR
+    ... )
+    >>> saved_review = review_repo.insert(story_review)
     >>> 
     >>> # Find latest versions
     >>> latest_title = title_repo.find_latest_version(story_id=1)
     >>> latest_script = script_repo.find_latest_version(story_id=1)
 """
 
+__version__ = "0.1.0"
+
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.story_review import StoryReviewModel, ReviewType
+from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
 from T.Database.repositories.base import (
@@ -82,12 +94,19 @@ from T.Database.repositories.base import (
     IUpdatableRepository,
 )
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.repositories.script_repository import ScriptRepository
 
 __all__ = [
     # Model interfaces
     "IReadable",
     "IModel",
+    # Models
+    "Title",
+    "Script",
+    "Review",
+    "StoryReviewModel",
+    "ReviewType",
     # Repository interfaces
     "IRepository",
     "IVersionedRepository",
@@ -95,7 +114,5 @@ __all__ = [
     # Repository implementations
     "TitleRepository",
     "ScriptRepository",
-    # Models
-    "Script",
-    "Title",
+    "StoryReviewRepository",
 ]
