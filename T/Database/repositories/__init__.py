@@ -1,15 +1,28 @@
 """Database repositories module.
 
-This module contains repository interfaces for data access operations.
+This module contains repository interfaces and implementations for data access.
 
-Main Classes:
+Interfaces:
     - IRepository: Base interface for Insert + Read operations
     - IVersionedRepository: Extended interface for versioned entities (Title, Script)
+    - IUpdatableRepository: Extended interface for updatable entities (Story)
+
+Implementations:
+    - TitleRepository: SQLite implementation for Title entities
 """
 
-from T.Database.repositories.base import IRepository, IVersionedRepository
+from T.Database.repositories.base import (
+    IRepository,
+    IVersionedRepository,
+    IUpdatableRepository,
+)
+from T.Database.repositories.title_repository import TitleRepository
 
 __all__ = [
+    # Interfaces
     "IRepository",
     "IVersionedRepository",
+    "IUpdatableRepository",
+    # Implementations
+    "TitleRepository",
 ]
