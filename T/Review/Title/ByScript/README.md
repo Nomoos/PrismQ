@@ -297,7 +297,7 @@ python T/Review/Title/ByScript/_meta/examples/example_usage.py
 **Stage 8**: Title Review v2
 
 ```
-Stage 6: Title.Improvements (v2) ✓
+Stage 6: Title.From.Title.Review.Script (v2) ✓
     ↓
 Stage 7: Script.Improvements (v2) ✓
     ↓

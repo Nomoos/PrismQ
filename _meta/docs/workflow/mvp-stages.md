@@ -17,7 +17,7 @@ Stage 4: PrismQ.T.Review.Title.ByScript (v1)
     ↓
 Stage 5: PrismQ.T.Review.Script.ByTitle (v1)
     ↓
-Stage 6: PrismQ.T.Title.Improvements (v2)
+Stage 6: PrismQ.T.Title.From.Title.Review.Script (v2)
     ↓
 Stage 7: PrismQ.T.Script.Improvements (v2)
     ↓
@@ -237,7 +237,7 @@ These stages implement the co-dependent improvement methodology where title and 
 
 **Stage 4**: PrismQ.T.Review.Title.ByScript (v1) - Review title v1 against script v1 and idea  
 **Stage 5**: PrismQ.T.Review.Script.ByTitle (v1) - Review script v1 against title v1 and idea  
-**Stage 6**: PrismQ.T.Title.Improvements (v2) - Generate improved title v2 using both reviews  
+**Stage 6**: PrismQ.T.Title.From.Title.Review.Script (v2) - Generate improved title v2 using both reviews  
 **Stage 7**: PrismQ.T.Script.Improvements (v2) - Generate improved script v2 with new title v2  
 **Stage 8**: PrismQ.T.Review.Title.ByScript (v2) - Review title v2 against script v2  
 **Stage 9**: PrismQ.T.Title.Refinement (v3) - Refine title to v3 based on v2 review  

@@ -326,7 +326,7 @@ MVP-024 (Publishing) ──┐
 ## MVP Sprint Overview
 
 ### Approach: MVP-First Development
-Following the workflow: **Idea.Create → T.Title.Draft → T.Script.Draft → T.Review.Initial → T.Script.Improvements → T.Title.Improvements → T.Review.Final → T.Publish**
+Following the workflow: **Idea.Create → T.Title.Draft → T.Script.Draft → T.Review.Initial → T.Script.Improvements → T.Title.From.Title.Review.Script → T.Review.Final → T.Publish**
 
 ### Sprint 1 Objectives
 1. Implement core MVP workflow (8 issues)
@@ -360,7 +360,7 @@ Following the workflow: **Idea.Create → T.Title.Draft → T.Script.Draft → T
 3. T.Script.Draft       → Generate initial script
 4. T.Review.Initial     → Manual review & feedback
 5. T.Script.Improvements → Edit based on feedback
-6. T.Title.Improvements → Update title if needed
+6. T.Title.From.Title.Review.Script → Update title if needed
 7. T.Review.Final       → Final approval gate
 8. T.Publish            → Publish content
 ```

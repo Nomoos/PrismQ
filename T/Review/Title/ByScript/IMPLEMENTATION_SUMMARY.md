@@ -255,7 +255,7 @@ print(f"Assessment: {summary['overall_assessment']}")
 **Stage 8** in the 26-stage MVP workflow:
 
 ```
-Stage 6: Title.Improvements (v2) ✓
+Stage 6: Title.From.Title.Review.Script (v2) ✓
     ↓
 Stage 7: Script.Improvements (v2) ✓
     ↓

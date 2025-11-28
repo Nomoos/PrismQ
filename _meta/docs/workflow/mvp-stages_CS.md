@@ -17,7 +17,7 @@ Fáze 4: PrismQ.T.Review.Title.ByScript (v1)
     ↓
 Fáze 5: PrismQ.T.Review.Script.ByTitle (v1)
     ↓
-Fáze 6: PrismQ.T.Title.Improvements (v2)
+Fáze 6: PrismQ.T.Title.From.Title.Review.Script (v2)
     ↓
 Fáze 7: PrismQ.T.Script.Improvements (v2)
     ↓
