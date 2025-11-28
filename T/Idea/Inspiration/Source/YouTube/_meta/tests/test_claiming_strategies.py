@@ -11,6 +11,8 @@ from src.workers.claiming_strategies import (
     LIFOStrategy,
     PriorityStrategy,
     WeightedRandomStrategy,
+    WorkflowStateStrategy,
+    WORKFLOW_STATE_ORDER,
     BaseClaimStrategy,
     STRATEGIES,
 )
@@ -42,6 +44,12 @@ class TestStrategyInstantiation:
         strategy = WeightedRandomStrategy()
         assert isinstance(strategy, BaseClaimStrategy)
         assert str(strategy) == "WeightedRandomStrategy"
+    
+    def test_workflow_state_strategy_instantiation(self):
+        """Test WorkflowStateStrategy can be instantiated."""
+        strategy = WorkflowStateStrategy()
+        assert isinstance(strategy, BaseClaimStrategy)
+        assert str(strategy) == "WorkflowStateStrategy"
 
 
 class TestOrderByClauses:
@@ -78,18 +86,39 @@ class TestOrderByClauses:
         assert "priority" in order_by
         assert "RANDOM()" in order_by
         assert "DESC" in order_by
+    
+    def test_workflow_state_order_by(self):
+        """Test WORKFLOW_STATE generates correct ORDER BY clause."""
+        strategy = WorkflowStateStrategy()
+        order_by = strategy.get_order_by_clause()
+        assert "CASE" in order_by
+        assert "state" in order_by
+        assert "DESC" in order_by
+        assert "created_at ASC" in order_by
+    
+    def test_workflow_state_order_by_contains_all_states(self):
+        """Test WORKFLOW_STATE ORDER BY contains all workflow states."""
+        strategy = WorkflowStateStrategy()
+        order_by = strategy.get_order_by_clause()
+        
+        # Check that key workflow states are included
+        assert "PrismQ.T.Idea.Creation" in order_by
+        assert "PrismQ.T.Title.From.Idea" in order_by
+        assert "PrismQ.T.Publishing" in order_by
+        assert "PrismQ.T.Story.Review" in order_by
 
 
 class TestStrategyRegistry:
     """Test strategy registry and lookup."""
     
     def test_strategies_registry_contains_all(self):
-        """Test STRATEGIES contains all four strategies."""
-        assert len(STRATEGIES) == 4
+        """Test STRATEGIES contains all five strategies."""
+        assert len(STRATEGIES) == 5
         assert 'FIFO' in STRATEGIES
         assert 'LIFO' in STRATEGIES
         assert 'PRIORITY' in STRATEGIES
         assert 'WEIGHTED_RANDOM' in STRATEGIES
+        assert 'WORKFLOW_STATE' in STRATEGIES
     
     def test_strategies_are_correct_types(self):
         """Test registry contains correct strategy instances."""
@@ -97,6 +126,7 @@ class TestStrategyRegistry:
         assert isinstance(STRATEGIES['LIFO'], LIFOStrategy)
         assert isinstance(STRATEGIES['PRIORITY'], PriorityStrategy)
         assert isinstance(STRATEGIES['WEIGHTED_RANDOM'], WeightedRandomStrategy)
+        assert isinstance(STRATEGIES['WORKFLOW_STATE'], WorkflowStateStrategy)
 
 
 class TestGetStrategy:
@@ -121,6 +151,11 @@ class TestGetStrategy:
         """Test getting WEIGHTED_RANDOM strategy."""
         strategy = get_strategy('WEIGHTED_RANDOM')
         assert isinstance(strategy, WeightedRandomStrategy)
+    
+    def test_get_strategy_workflow_state(self):
+        """Test getting WORKFLOW_STATE strategy."""
+        strategy = get_strategy('WORKFLOW_STATE')
+        assert isinstance(strategy, WorkflowStateStrategy)
     
     def test_get_strategy_case_insensitive(self):
         """Test get_strategy is case-insensitive."""
@@ -151,11 +186,11 @@ class TestGetStrategy:
 class TestGetAvailableStrategies:
     """Test get_available_strategies() function."""
     
-    def test_returns_list_of_four(self):
-        """Test returns list of 4 strategy names."""
+    def test_returns_list_of_five(self):
+        """Test returns list of 5 strategy names."""
         strategies = get_available_strategies()
         assert isinstance(strategies, list)
-        assert len(strategies) == 4
+        assert len(strategies) == 5
     
     def test_contains_all_strategies(self):
         """Test list contains all strategy names."""
@@ -164,6 +199,7 @@ class TestGetAvailableStrategies:
         assert 'LIFO' in strategies
         assert 'PRIORITY' in strategies
         assert 'WEIGHTED_RANDOM' in strategies
+        assert 'WORKFLOW_STATE' in strategies
     
     def test_returns_uppercase_names(self):
         """Test all strategy names are uppercase."""
@@ -187,6 +223,12 @@ class TestStrategyBehavior:
         fifo = FIFOStrategy()
         assert priority.get_order_by_clause() != fifo.get_order_by_clause()
     
+    def test_workflow_state_vs_priority_different(self):
+        """Test WORKFLOW_STATE and PRIORITY produce different ORDER BY clauses."""
+        workflow = WorkflowStateStrategy()
+        priority = PriorityStrategy()
+        assert workflow.get_order_by_clause() != priority.get_order_by_clause()
+    
     def test_all_strategies_unique(self):
         """Test all strategies produce unique ORDER BY clauses."""
         clauses = [
@@ -194,6 +236,7 @@ class TestStrategyBehavior:
             LIFOStrategy().get_order_by_clause(),
             PriorityStrategy().get_order_by_clause(),
             WeightedRandomStrategy().get_order_by_clause(),
+            WorkflowStateStrategy().get_order_by_clause(),
         ]
         # All should be unique
         assert len(clauses) == len(set(clauses))
@@ -220,6 +263,7 @@ class TestStrategyRepr:
             LIFOStrategy(),
             PriorityStrategy(),
             WeightedRandomStrategy(),
+            WorkflowStateStrategy(),
         ]
         
         for strategy in strategies:
@@ -227,6 +271,49 @@ class TestStrategyRepr:
             assert str_repr  # Not empty
             assert "Strategy" in str_repr
             assert str_repr == strategy.__class__.__name__
+
+
+class TestWorkflowStateOrder:
+    """Test workflow state order mapping."""
+    
+    def test_workflow_state_order_contains_all_stages(self):
+        """Test WORKFLOW_STATE_ORDER contains all 19 workflow stages."""
+        assert len(WORKFLOW_STATE_ORDER) == 19
+    
+    def test_workflow_state_order_starts_with_idea_creation(self):
+        """Test workflow starts with Idea.Creation as stage 1."""
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Idea.Creation'] == 1
+    
+    def test_workflow_state_order_ends_with_publishing(self):
+        """Test workflow ends with Publishing as stage 19."""
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Publishing'] == 19
+    
+    def test_workflow_state_order_is_sequential(self):
+        """Test workflow stages are numbered sequentially."""
+        values = sorted(WORKFLOW_STATE_ORDER.values())
+        expected = list(range(1, 20))
+        assert values == expected
+    
+    def test_workflow_state_order_generation_stages(self):
+        """Test generation stages follow correct order."""
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Title.From.Idea'] == 2
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Script.From.Title.Idea'] == 3
+    
+    def test_workflow_state_order_review_stages(self):
+        """Test review stages follow correct order."""
+        # Initial reviews (stages 4-6)
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Review.Title.By.Script.Idea'] == 4
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Review.Script.By.Title.Idea'] == 5
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Review.Title.By.Script'] == 6
+        
+        # Quality reviews (stages 10-16)
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Review.Script.Grammar'] == 10
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Review.Script.Readability'] == 16
+    
+    def test_workflow_state_order_expert_review(self):
+        """Test expert review stages follow correct order."""
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Story.Review'] == 17
+        assert WORKFLOW_STATE_ORDER['PrismQ.T.Story.Polish'] == 18
 
 
 if __name__ == '__main__':
