@@ -45,11 +45,58 @@ class PriorityStrategy(ClaimingStrategy):
         return "priority DESC, created_at ASC"
 
 
+# Workflow state order mapping for WorkflowStateStrategy
+# States earlier in workflow get lower numbers (higher priority)
+# Based on T/WORKFLOW_STATE_MACHINE.md stage numbers
+WORKFLOW_STATE_ORDER = {
+    'PrismQ.T.Idea.Creation': 1,
+    'PrismQ.T.Title.From.Idea': 2,
+    'PrismQ.T.Script.From.Title.Idea': 3,
+    'PrismQ.T.Review.Title.By.Script.Idea': 4,
+    'PrismQ.T.Review.Script.By.Title.Idea': 5,
+    'PrismQ.T.Review.Title.By.Script': 6,
+    'PrismQ.T.Title.From.Script.Review.Title': 7,
+    'PrismQ.T.Script.From.Title.Review.Script': 8,
+    'PrismQ.T.Review.Script.By.Title': 9,
+    'PrismQ.T.Review.Script.Grammar': 10,
+    'PrismQ.T.Review.Script.Tone': 11,
+    'PrismQ.T.Review.Script.Content': 12,
+    'PrismQ.T.Review.Script.Consistency': 13,
+    'PrismQ.T.Review.Script.Editing': 14,
+    'PrismQ.T.Review.Title.Readability': 15,
+    'PrismQ.T.Review.Script.Readability': 16,
+    'PrismQ.T.Story.Review': 17,
+    'PrismQ.T.Story.Polish': 18,
+    'PrismQ.T.Publishing': 19,
+}
+
+
+class WorkflowStateStrategy(ClaimingStrategy):
+    """Workflow state-based ordering: Tasks further in workflow first.
+    
+    Use case:
+    - Content pipeline processing
+    - Prioritizing items closer to completion
+    - Balanced workflow progression
+    """
+    
+    def get_order_by_clause(self) -> str:
+        """Order by workflow state position (descending), then creation time."""
+        # Build CASE expression for state ordering
+        case_parts = [f"WHEN state = '{state}' THEN {order}" 
+                      for state, order in WORKFLOW_STATE_ORDER.items()]
+        case_expr = "CASE " + " ".join(case_parts) + " ELSE 99 END"
+        
+        # Order by state position descending (higher stages first), then FIFO
+        return f"{case_expr} DESC, created_at ASC"
+
+
 # Strategy registry
 _STRATEGIES: Dict[str, ClaimingStrategy] = {
     "FIFO": FIFOStrategy(),
     "LIFO": LIFOStrategy(),
     "PRIORITY": PriorityStrategy(),
+    "WORKFLOW_STATE": WorkflowStateStrategy(),
 }
 
 
@@ -57,7 +104,7 @@ def get_strategy(name: str) -> ClaimingStrategy:
     """Get claiming strategy by name.
     
     Args:
-        name: Strategy name (FIFO, LIFO, PRIORITY)
+        name: Strategy name (FIFO, LIFO, PRIORITY, WORKFLOW_STATE)
         
     Returns:
         ClaimingStrategy instance
@@ -74,4 +121,4 @@ def get_strategy(name: str) -> ClaimingStrategy:
     return strategy
 
 
-__all__ = ["ClaimingStrategy", "get_strategy"]
+__all__ = ["ClaimingStrategy", "get_strategy", "WorkflowStateStrategy", "WORKFLOW_STATE_ORDER"]
