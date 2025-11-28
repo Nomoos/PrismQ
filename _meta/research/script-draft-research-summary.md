@@ -22,7 +22,7 @@ This document provides answers to the research questions about creating script d
 - Title's emotional quality guides script voice
 - Title keywords should appear naturally in script
 
-**Documentation**: See `T/Title/FromIdea/README.md` and related Title module docs
+**Documentation**: See `T/Title/From/Idea/README.md` and related Title module docs
 
 ### Script Draft (Second Requirement)
 

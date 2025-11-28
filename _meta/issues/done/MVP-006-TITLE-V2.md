@@ -1,6 +1,6 @@
 # MVP-006: Title Improvements v2
 
-**Module**: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript  
+**Module**: PrismQ.T.Title.From.Title.Review.Script  
 **Worker**: Worker13  
 **Priority**: Critical  
 **Effort**: 2 days  
@@ -18,7 +18,7 @@ Implement title v2 generation module that creates improved title versions using 
 
 **Requires**:
 - ✅ MVP-001: T.Idea.Creation (Complete)
-- ✅ MVP-002: T.Title.FromIdea (Complete) - Provides title v1
+- ✅ MVP-002: T.Title.From.Idea (Complete) - Provides title v1
 - ✅ MVP-003: T.Script.FromIdeaAndTitle (Complete) - Provides script v1
 - ✅ MVP-004: T.Review.Title.ByScript (Complete) - Provides title review feedback
 - ✅ MVP-005: T.Review.Script.ByTitle (Complete) - Provides script review feedback
@@ -33,10 +33,10 @@ Implement title v2 generation module that creates improved title versions using 
 
 ## Implementation Location
 
-- **Path**: `T/Title/FromOriginalTitleAndReviewAndScript/`
+- **Path**: `T/Title/From/Title/Review/Script/`
 - **Module Structure**:
   ```
-  T/Title/FromOriginalTitleAndReviewAndScript/
+  T/Title/From/Title/Review/Script/
   ├── src/
   │   ├── __init__.py
   │   └── title_improver.py (main implementation)
@@ -117,7 +117,7 @@ Implement title v2 generation module that creates improved title versions using 
     "rationale": "Explanation of how v2 addresses v1 issues",
     "metadata": {
         "created_at": "2025-11-22T...",
-        "generated_by": "PrismQ.T.Title.FromOriginalTitleAndReviewAndScript",
+        "generated_by": "PrismQ.T.Title.From.Title.Review.Script",
         "feedback_sources": ["MVP-004", "MVP-005"]
     }
 }
@@ -250,7 +250,7 @@ Implement title v2 generation module that creates improved title versions using 
 ## Example Usage
 
 ```python
-from T.Title.FromOriginalTitleAndReviewAndScript import TitleImprover
+from T.Title.From.Title.Review.Script import TitleImprover
 
 # Initialize improver
 improver = TitleImprover()

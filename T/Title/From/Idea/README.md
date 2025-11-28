@@ -1,6 +1,6 @@
-# T/Title/FromIdea - Initial Title Draft from Idea
+# T/Title/From/Idea - Initial Title Draft from Idea
 
-**Namespace**: `PrismQ.T.Title.FromIdea`
+**Namespace**: `PrismQ.T.Title.From.Idea`
 
 Generate initial title variants directly from the idea concept.
 
@@ -15,7 +15,7 @@ Create the first version (v1) of title options based solely on the original idea
 ```
 PrismQ.T.Idea.Creation
     ↓
-PrismQ.T.Title.FromIdea (v1) ← Initial title creation
+PrismQ.T.Title.From.Idea (v1) ← Initial title creation
     ↓
 PrismQ.T.Script.Draft (v1)
 ```
@@ -60,10 +60,10 @@ After title variants are created, they are used in:
 
 ## Module Metadata
 
-**[→ View FromIdea/_meta/docs/](./_meta/docs/)**
-**[→ View FromIdea/_meta/examples/](./_meta/examples/)**
-**[→ View FromIdea/_meta/tests/](./_meta/tests/)**
+**[→ View From/Idea/_meta/docs/](./_meta/docs/)**
+**[→ View From/Idea/_meta/examples/](./_meta/examples/)**
+**[→ View From/Idea/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 
-**[← Back to Title](../README.md)** | **[→ Title/_meta](../_meta/)**
+**[← Back to Title](../../README.md)** | **[→ Title/_meta](../../_meta/)**

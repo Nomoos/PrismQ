@@ -254,7 +254,7 @@ for imp in high_priority:
 ## Integration Points
 
 ### With MVP-003 Workflow
-- Input: Title v1 (from T.Title.FromIdea)
+- Input: Title v1 (from T.Title.From.Idea)
 - Input: Script v1 (from T.Script.FromIdeaAndTitle)
 - Input: Idea (from T.Idea.Model)
 - Output: TitleReview with feedback

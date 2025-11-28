@@ -61,7 +61,7 @@ stateDiagram-v2
     
     note right of TitleFromIdea
         Stage 2: Generate title v1
-        Location: T/Title/FromIdea/
+        Location: T/Title/From/Idea/
     end note
     
     note right of ScriptFromTitleIdea
@@ -99,12 +99,12 @@ stateDiagram-v2
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ |
-| TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/FromIdea/ |
+| TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ |
 | ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/FromIdeaAndTitle/ |
 | ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | T/Review/Title/ByScriptIdea/ |
 | ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 5 | T/Review/Script/ByTitleIdea/ |
 | ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 6 | T/Review/Title/ByScript/ |
-| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | T/Title/FromOriginalTitleAndReviewAndScript/ |
+| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | T/Title/From/Title/Review/Script/ |
 | ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 8 | T/Script/FromOriginalScriptAndReviewAndTitle/ |
 | ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | T/Review/Script/ByTitle/ |
 

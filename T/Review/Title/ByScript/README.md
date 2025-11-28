@@ -312,7 +312,7 @@ Stage 11: Script.Refinement (v3)
 
 ### Inputs
 
-- Title v2 (from `T.Title.FromOriginalTitleAndReviewAndScript`)
+- Title v2 (from `T.Title.From.Title.Review.Script`)
 - Script v2 (from `T.Script.FromOriginalScriptAndReviewAndTitle`)
 - v1 Review (from `T.Review.Title.ByScriptAndIdea`)
 
@@ -381,7 +381,7 @@ T/Review/Title/ByScript/
 
 - **T.Review.Title.ByScriptAndIdea**: v1 title review with idea context
 - **T.Review.Script.ByTitle**: Script review by title
-- **T.Title.FromOriginalTitleAndReviewAndScript**: Title v2 generation
+- **T.Title.From.Title.Review.Script**: Title v2 generation
 - **T.Script.FromOriginalScriptAndReviewAndTitle**: Script v2 generation
 
 ## Contributors

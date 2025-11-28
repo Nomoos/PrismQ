@@ -212,7 +212,7 @@ The Review module feeds into the Title Generator's improvement process:
 
 ```python
 from PrismQ.T.Review.Title.ByScriptAndIdea import TitleReview
-from PrismQ.T.Title.FromOriginalTitleAndReviewAndScript import TitleGenerator
+from PrismQ.T.Title.From.Title.Review.Script import TitleGenerator
 
 # AI Reviewer evaluates title
 review = TitleReview(...)

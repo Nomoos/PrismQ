@@ -1,6 +1,6 @@
-# T/Title/FromOriginalTitleAndReviewAndScript - All Title Improvements
+# T/Title/From/Title/Review/Script - All Title Improvements
 
-**Namespace**: `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`
+**Namespace**: `PrismQ.T.Title.From.Title.Review.Script`
 
 **MVP Coverage**: MVP-006 (v1→v2), MVP-009 (v2→v3+)
 
@@ -20,7 +20,7 @@ This state is used in **multiple stages** throughout the workflow:
 Stage 4: Review.Title.ByScript (v1) ← Title review
 Stage 5: Review.Script.ByTitle (v1) ← Script review
     ↓
-Stage 6: Title.FromOriginalTitleAndReviewAndScript (v1 → v2) ← THIS STATE
+Stage 6: Title.From.Title.Review.Script (v1 → v2) ← THIS STATE
 ```
 
 ### Stage 9: Iterative Refinements (v2 → v3, v3 → v4, v4 → v5...) - MVP-009
@@ -28,7 +28,7 @@ Stage 6: Title.FromOriginalTitleAndReviewAndScript (v1 → v2) ← THIS STATE
 ```
 Stage 8: Review.Title.ByScript (vN) ← Review latest (MVP-008)
     ↓
-Stage 9: Title.FromOriginalTitleAndReviewAndScript (vN → vN+1) ← THIS STATE (MVP-009)
+Stage 9: Title.From.Title.Review.Script (vN → vN+1) ← THIS STATE (MVP-009)
     ↓
 Stage 12: Title Acceptance Check
     ↓ if NOT ACCEPTED, loop back to Stage 8 → Stage 9
@@ -39,7 +39,7 @@ Stage 12: Title Acceptance Check
 ```
 Stage 19: Review.Title.Readability ← Final quality check
     ↓ if FAILS
-Title.FromOriginalTitleAndReviewAndScript (polish) ← THIS STATE
+Title.From.Title.Review.Script (polish) ← THIS STATE
 ```
 
 ## Input Components
@@ -185,19 +185,19 @@ This state processes feedback from:
 
 ## State Naming Logic
 
-`FromOriginalTitleAndReviewAndScript` captures:
-- **From Original Title**: Builds on previous version
-- **And Review**: Always includes review feedback
-- **And Script**: Always considers script context
+`From.Title.Review.Script` captures:
+- **From Title**: Builds on previous version
+- **Review**: Always includes review feedback
+- **Script**: Always considers script context
 
 This single state handles all the complexity of title evolution!
 
 ## Module Metadata
 
-**[→ View FromOriginalTitleAndReviewAndScript/_meta/docs/](./_meta/docs/)**
-**[→ View FromOriginalTitleAndReviewAndScript/_meta/examples/](./_meta/examples/)**
-**[→ View FromOriginalTitleAndReviewAndScript/_meta/tests/](./_meta/tests/)**
+**[→ View From/Title/Review/Script/_meta/docs/](./_meta/docs/)**
+**[→ View From/Title/Review/Script/_meta/examples/](./_meta/examples/)**
+**[→ View From/Title/Review/Script/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 
-**[← Back to Title](../README.md)** | **[→ Title/_meta](../_meta/)**
+**[← Back to Title](../../../../README.md)** | **[→ Title/_meta](../../../../_meta/)**

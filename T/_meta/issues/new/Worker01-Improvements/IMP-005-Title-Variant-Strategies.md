@@ -4,7 +4,7 @@
 **Worker**: Worker13 (Prompt Engineering Master)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Title.FromIdea`, `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`  
+**Module**: `PrismQ.T.Title.From.Idea`, `PrismQ.T.Title.From.Title.Review.Script`  
 **Category**: Title Generation  
 **Status**: 🎯 PLANNED
 
@@ -180,7 +180,7 @@ Current title generation uses fixed prompts for 10 strategies. This enhancement 
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea (enhancement target)
+- **MVP-002**: T.Title.From.Idea (enhancement target)
 - **IMP-002**: Emotional Scoring (strategy selection input)
 - **IMP-003**: SEO Enhancement (strategy selection input)
 - Advanced prompt engineering techniques
@@ -340,7 +340,7 @@ class EnhancedTitleGenerator:
 - `T/_meta/data/strategy_examples.json` - Few-shot examples
 
 **Modified Files**:
-- `T/Title/FromIdea/src/title_generator.py` - Use enhanced strategies
+- `T/Title/From/Idea/src/title_generator.py` - Use enhanced strategies
 - `T/Title/ABTesting/ab_testing.py` - Add strategy A/B testing
 
 ### Testing Requirements

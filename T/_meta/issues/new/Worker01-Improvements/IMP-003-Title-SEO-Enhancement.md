@@ -112,7 +112,7 @@ Builds upon POST-001 (SEO Keywords) by focusing specifically on title optimizati
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea (integration point)
+- **MVP-002**: T.Title.From.Idea (integration point)
 - **POST-001**: SEO Keywords (complementary, shares keyword data)
 - **IMP-001**: Platform Optimization (SEO length varies by platform)
 - SEO API access (optional): Google Keyword Planner, SEMrush, Ahrefs
@@ -246,7 +246,7 @@ def classify_search_intent(title: str) -> str:
 - `T/_meta/data/seo_patterns.json` - SEO pattern database
 
 **Modified Files**:
-- `T/Title/FromIdea/src/title_generator.py` - Add SEO mode
+- `T/Title/From/Idea/src/title_generator.py` - Add SEO mode
 - `T/Review/Title/Acceptance/acceptance.py` - Add SEO criteria
 
 ### Testing Requirements

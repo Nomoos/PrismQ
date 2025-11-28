@@ -15,7 +15,7 @@ Create the first version (v1) of the script based on the original idea and the i
 ```
 Stage 1: PrismQ.T.Idea.Creation
     ↓
-Stage 2: PrismQ.T.Title.FromIdea (v1)
+Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
 Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1) ← THIS STATE
     ↓

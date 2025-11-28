@@ -246,8 +246,8 @@ The current implementation provides a solid MVP foundation. Potential future enh
 ## Integration Points
 
 ### Current
-- **T.Title.FromIdea**: Can use ABTesting to test generated variants
-- **T.Title.FromOriginalTitleAndReviewAndScript**: Can test improved titles
+- **T.Title.From.Idea**: Can use ABTesting to test generated variants
+- **T.Title.From.Title.Review.Script**: Can test improved titles
 
 ### Future
 - **M (Metrics)**: Real-time performance tracking

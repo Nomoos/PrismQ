@@ -62,12 +62,12 @@ Develop and refine scripts through state-based workflow.
 
 Create compelling, SEO-optimized titles through state-based workflow.
 
-- **[FromIdea](./Title/FromIdea/)** - Initial title draft (v1)
-- **[FromOriginalTitleAndReviewAndScript](./Title/FromOriginalTitleAndReviewAndScript/)** - Title improvements (v2+)
+- **[From/Idea](./Title/From/Idea/)** - Initial title draft (v1)
+- **[From/Title/Review/Script](./Title/From/Title/Review/Script/)** - Title improvements (v2+)
 
 **Submodule Navigation:**
-- [FromIdea README](./Title/FromIdea/README.md)
-- [FromOriginalTitleAndReviewAndScript README](./Title/FromOriginalTitleAndReviewAndScript/README.md)
+- [From/Idea README](./Title/From/Idea/README.md)
+- [From/Title/Review/Script README](./Title/From/Title/Review/Script/README.md)
 
 ---
 

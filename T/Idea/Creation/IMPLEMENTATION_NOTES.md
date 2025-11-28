@@ -185,7 +185,7 @@ for idea in creator.create_from_title_stream("Topic", 50):
 - MVP-001 has no dependencies ✅
 
 ### Downstream (Will depend on this module)
-1. **MVP-002**: T/Title/FromIdea (Worker13)
+1. **MVP-002**: T/Title/From/Idea (Worker13)
    - Will use created Ideas to generate titles
    - Integration point: `Idea` model
 

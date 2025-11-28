@@ -334,8 +334,8 @@ python3 T/Title/ABTesting/_meta/examples/usage_example.py
 
 ## Related Modules
 
-- **T.Title.FromIdea**: Initial title generation
-- **T.Title.FromOriginalTitleAndReviewAndScript**: Title improvement
+- **T.Title.From.Idea**: Initial title generation
+- **T.Title.From.Title.Review.Script**: Title improvement
 - **M** (Future): Real-time metrics collection
 - **P** (Future): Publishing and distribution
 

@@ -9,7 +9,7 @@
 ```
 Stage 1: PrismQ.T.Idea.Creation
     ↓
-Stage 2: PrismQ.T.Title.FromIdea (v1)
+Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
 Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
     ↓
@@ -133,15 +133,15 @@ idea = {
 }
 ```
 
-**Next Stage**: Stage 2 (Title.FromIdea)
+**Next Stage**: Stage 2 (Title.From.Idea)
 
 ---
 
-### Stage 2: PrismQ.T.Title.FromIdea (v1)
+### Stage 2: PrismQ.T.Title.From.Idea (v1)
 
 **Purpose**: Generate first title from idea
 
-**Folder**: `T/Title/FromIdea/`  
+**Folder**: `T/Title/From/Idea/`  
 **Worker**: Worker13 (Prompt Master)  
 **Effort**: 2 days
 
@@ -162,7 +162,7 @@ idea = {
 
 **API**:
 ```python
-from PrismQ.T.Title.FromIdea import generate_title_v1
+from PrismQ.T.Title.From.Idea import generate_title_v1
 
 titles = generate_title_v1(
     idea=idea,

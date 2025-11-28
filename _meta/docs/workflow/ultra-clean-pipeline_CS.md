@@ -138,7 +138,7 @@ Ultra-Clean Pipeline je zjednodušený pohled na 9 koncepčních fází. Zde je 
 | Fáze Ultra-Clean | Fáze MVP | Popis |
 |------------------|----------|-------|
 | `Idea.Creation` | Fáze 1 | PrismQ.T.Idea.Creation |
-| `Title.From.Idea` | Fáze 2 | PrismQ.T.Title.FromIdea (v1) |
+| `Title.From.Idea` | Fáze 2 | PrismQ.T.Title.From.Idea (v1) |
 | `Script.From.Title.Idea` | Fáze 3 | PrismQ.T.Script.FromIdeaAndTitle (v1) |
 | `Review.Title.By.Script.Idea` | Fáze 4 | PrismQ.T.Review.Title.ByScript (v1) |
 | `Title.From.Script.Review.Title` | Fáze 6 | PrismQ.T.Title.Improvements (v2) |

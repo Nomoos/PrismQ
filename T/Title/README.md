@@ -8,7 +8,7 @@ Create compelling, SEO-optimized titles through testing, optimization, and refin
 
 This module implements a comprehensive title development workflow with the following structure:
 - **Namespace**: All titles in this module use the `PrismQ.T.Title` namespace
-- **Submodules**: `FromIdea` (initial drafts) and `FromOriginalTitleAndReviewAndScript` (improvements)
+- **Submodules**: `From.Idea` (initial drafts) and `From.Title.Review.Script` (improvements)
 - **Integration**: Works with `PrismQ.T.Review.Title` for review-based optimization
 - **Workflow**: Titles are co-improved with scripts through iterative review cycles
 
@@ -18,15 +18,15 @@ Develop attention-grabbing titles that maximize click-through rates while mainta
 
 ## Submodules
 
-#### [FromIdea](./FromIdea/)
+#### [From/Idea](./From/Idea/)
 **Stage 2: Initial title draft from idea** (v1)
 
 Generate initial title variants directly from the idea concept.
 
-**[→ View FromIdea Documentation](./FromIdea/README.md)**
-**[→ View FromIdea Metadata](./FromIdea/_meta/)**
+**[→ View From/Idea Documentation](./From/Idea/README.md)**
+**[→ View From/Idea Metadata](./From/Idea/_meta/)**
 
-#### [FromOriginalTitleAndReviewAndScript](./FromOriginalTitleAndReviewAndScript/)
+#### [From/Title/Review/Script](./From/Title/Review/Script/)
 **Stages 6, 9, 19: All title improvements** (v2, v3, v4, v5...)
 
 Generate improved title versions using review feedback, original title, and script context.
@@ -36,8 +36,8 @@ This state handles:
 - **Stage 9**: Iterative refinements (v2 → v3+) until accepted
 - **Stage 19 Feedback**: Final readability polish
 
-**[→ View FromOriginalTitleAndReviewAndScript Documentation](./FromOriginalTitleAndReviewAndScript/README.md)**
-**[→ View FromOriginalTitleAndReviewAndScript Metadata](./FromOriginalTitleAndReviewAndScript/_meta/)**
+**[→ View From/Title/Review/Script Documentation](./From/Title/Review/Script/README.md)**
+**[→ View From/Title/Review/Script Metadata](./From/Title/Review/Script/_meta/)**
 
 ## Module Metadata
 

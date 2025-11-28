@@ -208,7 +208,7 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 ---
 
 ### Stage 3: Title Creation
-**Location:** `T/Title/FromIdea`  
+**Location:** `T/Title/From/Idea`  
 **Purpose:** Create initial title from idea (v1)
 
 **Activities:**

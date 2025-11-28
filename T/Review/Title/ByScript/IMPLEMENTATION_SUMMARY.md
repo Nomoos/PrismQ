@@ -167,7 +167,7 @@ v1 Score: 50% → v2 Score: 33% (Δ-17%)
 ## Integration Points
 
 ### Inputs
-- Title v2 (from `T.Title.FromOriginalTitleAndReviewAndScript`)
+- Title v2 (from `T.Title.From.Title.Review.Script`)
 - Script v2 (from `T.Script.FromOriginalScriptAndReviewAndTitle`)
 - v1 Review (optional, from `T.Review.Title.ByScriptAndIdea`)
 

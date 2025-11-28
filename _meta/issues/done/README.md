@@ -16,7 +16,7 @@ This directory contains recently completed issues that are kept here for quick r
 ### MVP Issues
 
 #### MVP-006: Title Improvements v2 ✅
-- **Module**: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript
+- **Module**: PrismQ.T.Title.From.Title.Review.Script
 - **Worker**: Worker13
 - **Status**: COMPLETED
 - **Location**: `MVP-006-TITLE-V2.md`

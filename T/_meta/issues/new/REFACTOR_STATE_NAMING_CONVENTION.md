@@ -6,8 +6,8 @@ Refactor the process state naming convention to better reflect the input/output 
 ## Current State
 The current state names follow folder structure but lack Review-related processes:
 - `PrismQ.T.Idea.Creation`
-- `PrismQ.T.Title.FromIdea`
-- `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`
+- `PrismQ.T.Title.From.Idea`
+- `PrismQ.T.Title.From.Title.Review.Script`
 - `PrismQ.T.Script.FromIdeaAndTitle`
 - `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle`
 - `PrismQ.T.Publishing`
