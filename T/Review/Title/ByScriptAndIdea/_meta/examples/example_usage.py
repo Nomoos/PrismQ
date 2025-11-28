@@ -375,7 +375,7 @@ def example_workflow_integration():
         print("\n[Stage 6: Title Improvements v2]")
         print("Input: Title v1 + Review Feedback + Script v1")
         print("Output: Title v2 (improved version)")
-        print("Module: T/Title/FromOriginalTitleAndReviewAndScript")
+        print("Module: T/Title/From/Title/Review/Script")
     else:
         print("\n✗ Review incomplete - cannot proceed to Stage 6")
     

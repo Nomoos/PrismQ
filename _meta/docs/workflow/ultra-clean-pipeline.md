@@ -142,10 +142,10 @@ The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how
 | Ultra-Clean Stage | MVP Stages | Description |
 |-------------------|------------|-------------|
 | `Idea.Creation` | Stage 1 | PrismQ.T.Idea.Creation |
-| `Title.From.Idea` | Stage 2 | PrismQ.T.Title.FromIdea (v1) |
+| `Title.From.Idea` | Stage 2 | PrismQ.T.Title.From.Idea (v1) |
 | `Script.From.Title.Idea` | Stage 3 | PrismQ.T.Script.FromIdeaAndTitle (v1) |
 | `Review.Title.By.Script.Idea` | Stage 4 | PrismQ.T.Review.Title.ByScript (v1) |
-| `Title.From.Script.Review.Title` | Stage 6 | PrismQ.T.Title.Improvements (v2) |
+| `Title.From.Script.Review.Title` | Stage 6 | PrismQ.T.Title.From.Title.Review.Script (v2) |
 | `Review.Script.By.Title.Idea` | Stage 5, 10 | PrismQ.T.Review.Script.ByTitle (v1, v2) |
 | `Script.From.Title.Review.Script` | Stage 7, 11 | PrismQ.T.Script.Improvements (v2, v3) |
 | `Review.Idea.By.Title.Script` | Stages 12-13 | Title & Script Acceptance Checks |

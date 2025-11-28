@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # Run examples
     print("\n" + "=" * 80)
     print("MVP-006: TITLE IMPROVEMENTS v2 - EXAMPLES")
-    print("Module: PrismQ.T.Title.FromOriginalTitleAndReviewAndScript")
+    print("Module: PrismQ.T.Title.From.Title.Review.Script")
     print("=" * 80)
     
     # Example 1: v1 → v2

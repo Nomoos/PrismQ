@@ -49,9 +49,9 @@ See `mvp-reviews/` subdirectory for these detailed individual reviews.
   - Idea retrieval by ID
   - Clean SOLID architecture
 
-#### MVP-002: T.Title.FromIdea ✅
+#### MVP-002: T.Title.From.Idea ✅
 - **Worker**: Worker13
-- **Module**: `T/Title/FromIdea/src/`
+- **Module**: `T/Title/From/Idea/src/`
 - **Size**: ~19KB (title_generator.py)
 - **Status**: COMPLETED
 - **Key Features**:

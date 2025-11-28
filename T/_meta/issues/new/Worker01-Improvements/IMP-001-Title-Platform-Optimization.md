@@ -4,7 +4,7 @@
 **Worker**: Worker12 (Content Specialist)  
 **Priority**: High  
 **Effort**: 1.5 days  
-**Module**: `PrismQ.T.Title.FromIdea`, `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`  
+**Module**: `PrismQ.T.Title.From.Idea`, `PrismQ.T.Title.From.Title.Review.Script`  
 **Category**: Title Generation  
 **Status**: 🎯 PLANNED
 
@@ -79,8 +79,8 @@ Currently, the title generation process uses generic length guidelines. This enh
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea (v1 generation)
-- **MVP-006**: T.Title.FromOriginalTitleAndReviewAndScript (improvements)
+- **MVP-002**: T.Title.From.Idea (v1 generation)
+- **MVP-006**: T.Title.From.Title.Review.Script (improvements)
 - Database schema may need update for platform field
 
 ---
@@ -152,8 +152,8 @@ def generate_title_for_platform(
 - `T/Title/optimizers/platform_optimizer.py` - Platform-specific optimization
 
 **Modified Files**:
-- `T/Title/FromIdea/src/title_generator.py` - Add platform parameter
-- `T/Title/FromOriginalTitleAndReviewAndScript/src/title_improver.py` - Add platform awareness
+- `T/Title/From/Idea/src/title_generator.py` - Add platform parameter
+- `T/Title/From/Title/Review/Script/src/title_improver.py` - Add platform awareness
 - Database schema - Add `platform` field to titles table
 
 ### Database Schema Update

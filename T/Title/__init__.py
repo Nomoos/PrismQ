@@ -7,11 +7,11 @@ This module provides comprehensive title development capabilities including:
 
 The module structure:
 - From/Idea: Initial title generation (v1)
-- FromOriginalTitleAndReviewAndScript: Title improvements (v2, v3+)
+- From/Title/Review/Script: Title improvements (v2, v3+)
 
 Submodules can be imported directly:
 - `from PrismQ.T.Title.From.Idea import TitleGenerator`
-- `from PrismQ.T.Title.FromOriginalTitleAndReviewAndScript import TitleImprover`
+- `from PrismQ.T.Title.From.Title.Review.Script import TitleImprover`
 """
 
 __version__ = "1.0.0"

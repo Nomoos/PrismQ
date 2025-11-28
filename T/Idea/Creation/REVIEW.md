@@ -375,7 +375,7 @@ for idea in creator.create_from_title_stream("Topic", 10):
 
 ### Short-term (Next Sprint)
 1. **Add database integration** (if required by dependent modules)
-2. **Create integration tests** with T/Title/FromIdea (MVP-002 dependency)
+2. **Create integration tests** with T/Title/From/Idea (MVP-002 dependency)
 3. **Add metrics/analytics** (generation time, success rate)
 
 ### Medium-term (Future Releases)

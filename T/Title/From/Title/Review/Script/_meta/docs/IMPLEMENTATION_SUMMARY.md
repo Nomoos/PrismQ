@@ -1,6 +1,6 @@
 # Implementation Summary - MVP-006
 
-**Module**: `PrismQ.T.Title.FromOriginalTitleAndReviewAndScript`  
+**Module**: `PrismQ.T.Title.From.Title.Review.Script`  
 **Status**: ✅ Complete and Production Ready  
 **Version**: 1.0.0  
 **Implemented**: 2025-11-22
@@ -107,7 +107,7 @@ Every improvement includes:
 First improvement using both v1 reviews:
 
 ```python
-from PrismQ.T.Title.FromOriginalTitleAndReviewAndScript import improve_title_from_reviews
+from PrismQ.T.Title.From.Title.Review.Script import improve_title_from_reviews
 
 result = improve_title_from_reviews(
     original_title=title_v1,

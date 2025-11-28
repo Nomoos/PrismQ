@@ -119,7 +119,7 @@ In a global content marketplace, culturally inappropriate titles can damage bran
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea
+- **MVP-002**: T.Title.From.Idea
 - **MVP-012**: Title Acceptance (integration point)
 - Cultural sensitivity database/API
 - Translation API (optional, for localization suggestions)
@@ -259,7 +259,7 @@ class LocalizationSuggester:
 
 **Modified Files**:
 - `T/Review/Title/Acceptance/acceptance.py` - Add cultural check (warning)
-- `T/Title/FromIdea/src/title_generator.py` - Optional cultural filtering
+- `T/Title/From/Idea/src/title_generator.py` - Optional cultural filtering
 
 ### Testing Requirements
 

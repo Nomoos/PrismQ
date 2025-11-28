@@ -261,7 +261,7 @@ class TextClient:
     # See T/WORKFLOW_STATE_MACHINE.md for full state machine documentation
     PROCESS_STATES = {
         'initial': 'PrismQ.T.Idea.Creation',  # Initial state - awaiting idea creation
-        'idea_created': 'PrismQ.T.Title.FromIdea',  # After idea, next is title generation
+        'idea_created': 'PrismQ.T.Title.From.Idea',  # After idea, next is title generation
         'title_generated': 'PrismQ.T.Script.FromIdeaAndTitle',  # After title, next is script
         'script_generated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Script iteration
         'script_iterated': 'PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle',  # Continue iteration

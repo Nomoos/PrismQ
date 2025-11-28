@@ -118,7 +118,7 @@ PrismQ.T.Story.Review
 
 **Purpose**: Generate initial title from the idea
 
-**Location**: `T/Title/FromIdea/`
+**Location**: `T/Title/From/Idea/`
 
 **Input**:
 - Idea document from Stage 1
@@ -217,7 +217,7 @@ PrismQ.T.Story.Review
 
 **Purpose**: Refine title based on script and review feedback
 
-**Location**: `T/Title/FromOriginalTitleAndReviewAndScript/`
+**Location**: `T/Title/From/Title/Review/Script/`
 
 **Input**:
 - Previous Title

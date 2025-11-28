@@ -1,4 +1,4 @@
-"""Example usage of T.Title.FromIdea module.
+"""Example usage of T.Title.From.Idea module.
 
 This example demonstrates how to generate title variants from an Idea.
 """

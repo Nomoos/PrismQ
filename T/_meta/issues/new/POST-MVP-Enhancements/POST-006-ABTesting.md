@@ -55,7 +55,7 @@ This system enables data-driven title optimization by running A/B tests across d
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea module
+- **MVP-002**: T.Title.From.Idea module
 - **Future**: M module integration for real-time metrics
 
 ---

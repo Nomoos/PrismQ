@@ -9,7 +9,7 @@
 ```
 Fáze 1: PrismQ.T.Idea.Creation
     ↓
-Fáze 2: PrismQ.T.Title.FromIdea (v1)
+Fáze 2: PrismQ.T.Title.From.Idea (v1)
     ↓
 Fáze 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
     ↓
@@ -17,7 +17,7 @@ Fáze 4: PrismQ.T.Review.Title.ByScript (v1)
     ↓
 Fáze 5: PrismQ.T.Review.Script.ByTitle (v1)
     ↓
-Fáze 6: PrismQ.T.Title.Improvements (v2)
+Fáze 6: PrismQ.T.Title.From.Title.Review.Script (v2)
     ↓
 Fáze 7: PrismQ.T.Script.Improvements (v2)
     ↓
@@ -133,7 +133,7 @@ idea = {
 }
 ```
 
-**Další fáze**: Fáze 2 (Title.FromIdea)
+**Další fáze**: Fáze 2 (Title.From.Idea)
 
 ---
 

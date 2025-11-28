@@ -46,7 +46,7 @@ Complete version history tracking with ability to view and rollback to previous 
 ## Dependencies
 
 - **MVP-003**: T.Script.FromIdeaAndTitle
-- **MVP-006**: T.Title.FromOriginalTitleAndReviewAndScript
+- **MVP-006**: T.Title.From.Title.Review.Script
 - **MVP-007**: T.Script.FromOriginalScriptAndReviewAndTitle
 
 ---

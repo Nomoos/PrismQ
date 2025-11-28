@@ -97,7 +97,7 @@ Research shows titles with appropriate emotional resonance have 40-60% higher cl
 
 ## Dependencies
 
-- **MVP-002**: T.Title.FromIdea
+- **MVP-002**: T.Title.From.Idea
 - **MVP-012**: Title Acceptance Gate (integration point)
 - NLP library for emotion detection (NLTK, TextBlob, or custom)
 

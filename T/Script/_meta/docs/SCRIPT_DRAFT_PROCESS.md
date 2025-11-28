@@ -36,7 +36,7 @@ Before beginning script draft creation, ensure these inputs are available and ap
   - Content style guidelines
   - Length requirements
 
-#### 2. From Title Module (PrismQ.T.Title.FromIdea)
+#### 2. From Title Module (PrismQ.T.Title.From.Idea)
 - **Working Title**: At least one title draft
   - Provides hook direction
   - Establishes angle
