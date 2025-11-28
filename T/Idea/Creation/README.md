@@ -221,7 +221,7 @@ config = CreationConfig(ai_model="llama3.1:13b")
 
 ## Navigation
 
-**[← Back to Idea](../README.md)** | **[→ AI Generation Guide](./AI_GENERATION.md)** | **[→ Model Module](../Model/)** | **[→ Fusion Module](../Fusion/)**
+**[← Back to Idea](../README.md)** | **[→ How It Works (CZ)](./HOW_IT_WORKS.md)** | **[→ AI Generation Guide](./AI_GENERATION.md)** | **[→ Model Module](../Model/)** | **[→ Fusion Module](../Fusion/)**
 
 ---
 
