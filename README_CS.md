@@ -7,8 +7,8 @@ PrismQ je komplexní platforma pro tvorbu obsahu, která transformuje nápady do
 ## 🔄 Další kroky a paralelní spouštění
 
 Pro aktuální úkoly sprintu a příkazy pro paralelní spouštění viz:
-- **[PARALLEL_RUN_NEXT_CS.md](./_meta/issues/PARALLEL_RUN_NEXT_CS.md)** - Aktuální úkoly MVP sprintu a plán paralelního spouštění
-- **[PARALLEL_RUN_NEXT_FULL_CS.md](./_meta/issues/PARALLEL_RUN_NEXT_FULL_CS.md)** - Kompletní rozpad problémů a přiřazení workerů
+- **[PARALLEL_RUN_NEXT.md](./_meta/issues/PARALLEL_RUN_NEXT.md)** - Aktuální úkoly MVP sprintu a plán paralelního spouštění
+- **[PARALLEL_RUN_NEXT_FULL.md](./_meta/issues/PARALLEL_RUN_NEXT_FULL.md)** - Kompletní rozpad problémů a přiřazení workerů
 
 ## 📚 Hlavní moduly
 
