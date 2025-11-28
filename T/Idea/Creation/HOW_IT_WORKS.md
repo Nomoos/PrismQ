@@ -12,7 +12,7 @@
 4. [Tok dat a workflow](#tok-dat-a-workflow)
 5. [Konfigurace](#konfigurace)
 6. [AI integrace](#ai-integrace)
-7. [Fallback mechanismus](#fallback-mechanismus)
+7. [Prompt šablony](#prompt-šablony)
 8. [Generované pole](#generované-pole)
 9. [Příklady použití](#příklady-použití)
 10. [Integrace do PrismQ workflow](#integrace-do-prismq-workflow)
@@ -23,14 +23,17 @@
 
 Modul `PrismQ.T.Idea.Creation` implementuje **Path 2: Manual Creation** v PrismQ workflow - generování 10 Ideas z jednoduchého vstupu (titul nebo popis) pomocí lokálních AI modelů.
 
+**Důležité**: AI (Ollama) je **povinné** pro generování Ideas. Bez dostupného AI serveru modul vrací prázdný seznam a loguje chybu.
+
 ### Klíčové vlastnosti
 
 | Vlastnost | Hodnota |
 |-----------|---------|
 | **Výchozí počet Ideas** | 10 |
-| **AI engine** | Ollama (lokální LLM) |
+| **AI engine** | Ollama (lokální LLM) - **povinné** |
 | **Optimalizováno pro** | RTX 5090 (24GB VRAM) |
-| **Fallback režim** | Automatický při nedostupnosti AI |
+| **Bez AI** | Prázdný seznam + chyba v logu |
+| **Prompt šablony** | Konfigurovatelné |
 | **Jazyk implementace** | Python 3.12+ |
 
 ---
@@ -47,31 +50,31 @@ Modul `PrismQ.T.Idea.Creation` implementuje **Path 2: Manual Creation** v PrismQ
 │  │  (creation.py)  │◄──────│  - use_ai: bool                 │  │
 │  │                 │       │  - ai_model: str                │  │
 │  │  Orchestruje    │       │  - default_num_ideas: int       │  │
-│  │  celý proces    │       │  - variation_degree: str        │  │
+│  │  celý proces    │       │  - prompt_template: str         │  │
 │  └───────┬─────────┘       └─────────────────────────────────┘  │
 │          │                                                       │
 │          ▼                                                       │
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │                   Rozhodovací logika                     │    │
 │  │        AI dostupné?  ──┬──▶ ANO: AIIdeaGenerator        │    │
-│  │                        └──▶ NE:  Fallback generátor     │    │
+│  │                        └──▶ NE:  ERROR + prázdný seznam │    │
 │  └───────────────────────────────────────────────────────────┘  │
-│          │                        │                              │
-│          ▼                        ▼                              │
-│  ┌───────────────────┐    ┌──────────────────────────────┐      │
-│  │  AIIdeaGenerator  │    │  Fallback (template-based)   │      │
-│  │  (ai_generator.py)│    │  - _generate_title_variation │      │
-│  │                   │    │  - _generate_concept_from_*  │      │
-│  │  Ollama API       │    │  - _generate_narrative_fields│      │
-│  │  komunikace       │    │  - _extract_keywords         │      │
-│  └───────────────────┘    └──────────────────────────────┘      │
-│          │                        │                              │
-│          └──────────┬─────────────┘                              │
-│                     ▼                                            │
-│          ┌─────────────────────┐                                 │
-│          │    List[Idea]       │                                 │
-│          │  (from Model/src/)  │                                 │
-│          └─────────────────────┘                                 │
+│          │                                                       │
+│          ▼                                                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  AIIdeaGenerator (ai_generator.py)                        │  │
+│  │                                                           │  │
+│  │  - Prompt šablony (konfigurovatelné)                     │  │
+│  │  - Ollama API komunikace                                 │  │
+│  │  - JSON parsování odpovědi                               │  │
+│  │  - Validace struktury dat                                │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│          │                                                       │
+│          ▼                                                       │
+│  ┌─────────────────────┐                                         │
+│  │    List[Idea]       │                                         │
+│  │  (from Model/src/)  │                                         │
+│  └─────────────────────┘                                         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -85,9 +88,10 @@ Modul `PrismQ.T.Idea.Creation` implementuje **Path 2: Manual Creation** v PrismQ
 Hlavní třída orchestrující generování Ideas. Zodpovídá za:
 
 - Inicializaci konfigurace
-- Rozhodnutí mezi AI a fallback režimem
+- Kontrolu dostupnosti AI
 - Validaci vstupů
 - Transformaci výstupů na `Idea` objekty
+- **Logování chyby pokud AI není dostupné**
 
 ```python
 class IdeaCreator:
@@ -96,6 +100,8 @@ class IdeaCreator:
         1. Načte konfiguraci (nebo použije výchozí)
         2. Inicializuje AI generator pokud use_ai=True
         3. Ověří dostupnost Ollama serveru
+        4. Nastaví prompt šablonu pokud je definována
+        5. Loguje ERROR pokud AI není dostupné
         """
         
     def create_from_title(self, title: str, num_ideas: int = None) -> List[Idea]:
@@ -191,9 +197,9 @@ Uživatel                IdeaCreator           AIIdeaGenerator        Ollama API
    │            ║        ANO              ║        │                    │
    │            ╠═════════════════════════╣        │                    │
    │            ║                         ║        │                    │
-   │            ║  generate_ideas_from_   ║        │                    │
-   │            ║  title()                ║────────▶                    │
-   │            ║                         ║        │                    │
+   │            ║  Načti prompt šablonu   ║        │                    │
+   │            ║  generate_ideas_from_   ║────────▶                    │
+   │            ║  title()                ║        │                    │
    │            ║                         ║        │  POST /api/generate│
    │            ║                         ║        │────────────────────▶
    │            ║                         ║        │                    │
@@ -206,10 +212,9 @@ Uživatel                IdeaCreator           AIIdeaGenerator        Ollama API
    │            ║        NE               ║        │                    │
    │            ╠═════════════════════════╣        │                    │
    │            ║                         ║        │                    │
-   │            ║  _create_ideas_from_    ║        │                    │
-   │            ║  title_fallback()       ║        │                    │
+   │            ║  logger.error(...)      ║        │                    │
+   │            ║  return []              ║        │                    │
    │            ║                         ║        │                    │
-   │            ║    List[Dict]           ║        │                    │
    │            ╚═════════════════════════╝        │                    │
    │                         │                      │                    │
    │                    ┌────┴────┐                 │                    │
@@ -229,24 +234,19 @@ Uživatel                IdeaCreator           AIIdeaGenerator        Ollama API
    - Kontrola num_ideas >= 1
    - Výjimka `ValueError` při neplatném vstupu
 
-2. **Rozhodnutí o metodě generování**
+2. **Kontrola AI dostupnosti**
    - Kontrola `self.ai_generator` existence
-   - Kontrola `self.ai_generator.available`
-   - Automatický fallback při selhání
+   - Pokud AI není dostupné: **ERROR log + prázdný seznam**
+   - Žádný fallback režim
 
-3. **AI generování (pokud dostupné)**
+3. **AI generování**
+   - Načtení prompt šablony (výchozí nebo vlastní)
    - Sestavení promptu s kontextem
    - HTTP POST na Ollama API
    - Parsování JSON odpovědi
    - Validace struktury
 
-4. **Fallback generování**
-   - Template-based generování
-   - Extrakce klíčových slov
-   - Generování variací titulů
-   - Rychlé, deterministické
-
-5. **Konverze na Idea objekty**
+4. **Konverze na Idea objekty**
    - Mapování polí z dict na Idea
    - Nastavení výchozích hodnot
    - Přidání metadat a poznámek
@@ -263,8 +263,7 @@ CreationConfig(
     ai_model="llama3.1:70b-q4_K_M",
     ai_temperature=0.8,
     default_num_ideas=10,
-    variation_degree="medium",
-    include_all_fields=True
+    prompt_template=None  # Použije výchozí šablonu
 )
 ```
 
@@ -278,13 +277,14 @@ CreationConfig(
 | RTX 3080 | 10GB | `llama3.2:8b` |
 | CPU only | - | `llama3.2:8b` |
 
-### Konfigurace bez AI (testování)
+### Konfigurace bez AI (vrací prázdný seznam)
 
 ```python
-CreationConfig(
-    use_ai=False,
-    default_num_ideas=3
-)
+# POZOR: Bez AI se negenerují žádné Ideas!
+config = CreationConfig(use_ai=False)
+creator = IdeaCreator(config)
+ideas = creator.create_from_title("Test")
+# ideas = [] (prázdný seznam) + ERROR v logu
 ```
 
 ---
@@ -343,63 +343,76 @@ def _parse_ideas_response(self, response_text: str, expected_count: int):
         
         return validated_ideas
     
-    return []  # Fallback při chybě
+    return []  # ERROR při chybě parsování
 ```
 
 ---
 
-## Fallback mechanismus
+## Prompt šablony
 
-### Kdy se aktivuje
+### Výchozí šablony
 
-1. Ollama není nainstalována
-2. Ollama server neběží
-3. Model není stažen
-4. Timeout při generování
-5. Chyba parsování JSON
-6. `use_ai=False` v konfiguraci
+AIIdeaGenerator obsahuje výchozí prompt šablony pro generování z titulu i popisu. Šablony používají tyto proměnné:
 
-### Fallback logika
+| Proměnná | Popis |
+|----------|-------|
+| `{num_ideas}` | Počet Ideas k vygenerování |
+| `{input}` | Titul nebo popis |
+| `{platforms}` | Cílové platformy |
+| `{formats}` | Cílové formáty |
+| `{genre}` | Žánr obsahu |
+| `{length}` | Cílová délka |
+
+### Vlastní prompt šablona
 
 ```python
-def _create_ideas_from_title_fallback(self, title: str, num_ideas: int, ...):
-    ideas = []
-    for i in range(num_ideas):
-        # 1. Generuj variaci titulu
-        idea_title = self._generate_title_variation(title, i, num_ideas)
-        
-        # 2. Generuj koncept
-        concept = self._generate_concept_from_title(title, i)
-        
-        # 3. Generuj narativní pole
-        narrative_fields = self._generate_narrative_fields(
-            title=idea_title,
-            concept=concept,
-            variation_index=i
-        )
-        
-        # 4. Vytvoř Idea objekt
-        idea = Idea(
-            title=idea_title,
-            concept=concept,
-            ...
-        )
-        ideas.append(idea)
-    
-    return ideas
+# Definuj vlastní šablonu
+custom_template = """Jsi kreativní content stratég. Vygeneruj {num_ideas} unikátních 
+nápadů na obsah na základě: "{input}"
+
+Platformy: {platforms}
+Formáty: {formats}
+Žánr: {genre}
+Délka: {length}
+
+Pro každý nápad uveď:
+- title: unikátní titul
+- concept: koncept (1-2 věty)
+- premise: premisa (2-3 věty)
+- logline: logline (1 věta)
+- hook: úvodní háček
+- synopsis: synopse (2-3 odstavce)
+- skeleton: kostra (5-7 bodů)
+- outline: osnova
+- keywords: klíčová slova (pole)
+- themes: témata (pole)
+
+Vrať POUZE JSON pole objektů, bez dalšího textu."""
+
+# Použij vlastní šablonu v konfiguraci
+config = CreationConfig(
+    use_ai=True,
+    prompt_template=custom_template
+)
+creator = IdeaCreator(config)
 ```
 
-### Variace titulů (fallback)
+### Programové nastavení šablony
 
 ```python
-variations = [
-    base_title,
-    f"{base_title}: A Deep Dive",
-    f"Understanding {base_title}",
-    f"{base_title} Explained",
-    f"The Truth About {base_title}",
-    f"{base_title}: Behind the Scenes"
-]
+# Můžeš také nastavit šablonu přímo na AI generátoru
+creator = IdeaCreator()
+if creator.ai_generator:
+    creator.ai_generator.set_prompt_template(custom_template)
+```
+
+### Získání aktuální šablony
+
+```python
+# Získej aktuální šablonu
+if creator.ai_generator:
+    template = creator.ai_generator.get_prompt_template(for_description=False)
+    print(template)
 ```
 
 ---
@@ -545,25 +558,28 @@ IdeaInspiration    ────────▶   T/Idea/Creation
 ### Příklad integrace
 
 ```python
-# 1. Generování Ideas (tento modul)
+# 1. Generování Ideas (tento modul) - vyžaduje AI!
 creator = IdeaCreator()
 ideas = creator.create_from_title("Kybernetická bezpečnost")
 
-# 2. Bodování (T/Idea/Scoring) - existující modul
-from T.Idea.Scoring import IdeaScorer
-scorer = IdeaScorer()
-scored_ideas = [(idea, scorer.score(idea)) for idea in ideas]
-best_idea = max(scored_ideas, key=lambda x: x[1])[0]
+if not ideas:
+    print("ERROR: AI není dostupné. Zkontrolujte, zda běží Ollama.")
+else:
+    # 2. Bodování (T/Idea/Scoring) - existující modul
+    from T.Idea.Scoring import IdeaScorer
+    scorer = IdeaScorer()
+    scored_ideas = [(idea, scorer.score(idea)) for idea in ideas]
+    best_idea = max(scored_ideas, key=lambda x: x[1])[0]
 
-# 3. Generování titulu (MVP-002 - PLÁNOVANÝ modul, zatím neexistuje)
-# Následující kód je příklad budoucí integrace:
-# from T.Title.From.Idea import TitleGenerator
-# titles = TitleGenerator().generate_titles(best_idea)
+    # 3. Generování titulu (MVP-002 - PLÁNOVANÝ modul, zatím neexistuje)
+    # Následující kód je příklad budoucí integrace:
+    # from T.Title.From.Idea import TitleGenerator
+    # titles = TitleGenerator().generate_titles(best_idea)
 
-# 4. Generování skriptu (MVP-003 - PLÁNOVANÝ modul, zatím neexistuje)
-# Následující kód je příklad budoucí integrace:
-# from T.Script.FromIdeaAndTitle import ScriptGenerator
-# script = ScriptGenerator().generate(best_idea, titles[0])
+    # 4. Generování skriptu (MVP-003 - PLÁNOVANÝ modul, zatím neexistuje)
+    # Následující kód je příklad budoucí integrace:
+    # from T.Script.FromIdeaAndTitle import ScriptGenerator
+    # script = ScriptGenerator().generate(best_idea, titles[0])
 ```
 
 ---
@@ -573,17 +589,17 @@ best_idea = max(scored_ideas, key=lambda x: x[1])[0]
 Modul `PrismQ.T.Idea.Creation`:
 
 ✅ **Generuje 10 Ideas** z jednoduchého vstupu (titul nebo popis)  
-✅ **Využívá lokální AI** (Ollama) pro kvalitní generování  
+✅ **Vyžaduje AI** (Ollama) - bez AI vrací prázdný seznam + ERROR  
+✅ **Konfigurovatelné prompt šablony** před AI zpracováním  
 ✅ **Optimalizován pro RTX 5090** s podporou menších GPU  
-✅ **Automatický fallback** při nedostupnosti AI  
 ✅ **Bohatá struktura** - všechna narativní pole  
-✅ **Konfigurovatelný** - model, teplota, počet ideas  
-✅ **Testovaný** - 40 testů, 100% úspěšnost  
+✅ **Konfigurovatelný** - model, teplota, počet ideas, prompt šablona  
+✅ **Testovaný** - 22 testů (15 aktivních, 7 vyžaduje AI)  
 ✅ **Bezpečný** - 0 zranitelností (CodeQL)  
 
 ---
 
 **Autor dokumentace**: Worker10  
 **Datum**: 2025-11-28  
-**Verze modulu**: 1.0.0  
+**Verze modulu**: 1.1.0 (bez fallback, s prompt šablonami)  
 **Status**: Production-ready ✅

@@ -40,6 +40,78 @@ class AIIdeaGenerator:
     narrative structure.
     """
     
+    # Default prompt template for title-based generation
+    DEFAULT_TITLE_PROMPT_TEMPLATE = """You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on the title: "{input}"
+
+Target platforms: {platforms}
+Target formats: {formats}
+Genre: {genre}
+Length target: {length}
+
+For each idea, provide:
+1. A unique title variation
+2. A compelling concept (1-2 sentences)
+3. A detailed premise (2-3 sentences)
+4. A logline (one impactful sentence)
+5. A hook (attention-grabbing opening)
+6. A synopsis (2-3 paragraphs, 150-300 words)
+7. A skeleton (5-7 key points)
+8. An outline (detailed structure with sections)
+9. 5-10 relevant keywords
+10. 3-5 main themes
+
+Make each idea distinct and engaging for the target platforms and formats.
+
+Format your response as a JSON array of {num_ideas} objects, each with these fields:
+- title
+- concept
+- premise
+- logline
+- hook
+- synopsis
+- skeleton
+- outline
+- keywords (array of strings)
+- themes (array of strings)
+
+Return ONLY the JSON array, no additional text."""
+
+    # Default prompt template for description-based generation
+    DEFAULT_DESCRIPTION_PROMPT_TEMPLATE = """You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on this description: "{input}"
+
+Target platforms: {platforms}
+Target formats: {formats}
+Genre: {genre}
+Length target: {length}
+
+For each idea, provide:
+1. A unique title
+2. A compelling concept (1-2 sentences)
+3. A detailed premise (2-3 sentences)
+4. A logline (one impactful sentence)
+5. A hook (attention-grabbing opening)
+6. A synopsis (2-3 paragraphs, 150-300 words)
+7. A skeleton (5-7 key points)
+8. An outline (detailed structure with sections)
+9. 5-10 relevant keywords
+10. 3-5 main themes
+
+Make each idea distinct and engaging for the target platforms and formats.
+
+Format your response as a JSON array of {num_ideas} objects, each with these fields:
+- title
+- concept
+- premise
+- logline
+- hook
+- synopsis
+- skeleton
+- outline
+- keywords (array of strings)
+- themes (array of strings)
+
+Return ONLY the JSON array, no additional text."""
+
     def __init__(self, config: Optional[AIConfig] = None):
         """Initialize AI generator with configuration.
         
@@ -48,6 +120,37 @@ class AIIdeaGenerator:
         """
         self.config = config or AIConfig()
         self.available = self._check_ollama_availability()
+        self._custom_prompt_template: Optional[str] = None
+    
+    def set_prompt_template(self, template: str) -> None:
+        """Set a custom prompt template for AI generation.
+        
+        The template can use the following placeholders:
+        - {num_ideas}: Number of ideas to generate
+        - {input}: The title or description input
+        - {platforms}: Target platforms
+        - {formats}: Target formats
+        - {genre}: Content genre
+        - {length}: Target length
+        
+        Args:
+            template: Custom prompt template string
+        """
+        self._custom_prompt_template = template
+        logger.info("Custom prompt template set for AI generation")
+    
+    def get_prompt_template(self, for_description: bool = False) -> str:
+        """Get the current prompt template.
+        
+        Args:
+            for_description: If True, return template for description-based generation
+            
+        Returns:
+            The current prompt template (custom or default)
+        """
+        if self._custom_prompt_template:
+            return self._custom_prompt_template
+        return self.DEFAULT_DESCRIPTION_PROMPT_TEMPLATE if for_description else self.DEFAULT_TITLE_PROMPT_TEMPLATE
     
     def _check_ollama_availability(self) -> bool:
         """Check if Ollama is available and running.
@@ -152,6 +255,8 @@ class AIIdeaGenerator:
     ) -> str:
         """Create a prompt for generating ideas from a title.
         
+        Uses the configured prompt template with variable substitution.
+        
         Args:
             title: Base title
             num_ideas: Number of ideas to generate
@@ -168,42 +273,16 @@ class AIIdeaGenerator:
         genre_str = genre if genre else "general"
         length_str = length_target if length_target else "variable"
         
-        prompt = f"""You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on the title: "{title}"
-
-Target platforms: {platforms_str}
-Target formats: {formats_str}
-Genre: {genre_str}
-Length target: {length_str}
-
-For each idea, provide:
-1. A unique title variation
-2. A compelling concept (1-2 sentences)
-3. A detailed premise (2-3 sentences)
-4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening)
-6. A synopsis (2-3 paragraphs, 150-300 words)
-7. A skeleton (5-7 key points)
-8. An outline (detailed structure with sections)
-9. 5-10 relevant keywords
-10. 3-5 main themes
-
-Make each idea distinct and engaging for the target platforms and formats.
-
-Format your response as a JSON array of {num_ideas} objects, each with these fields:
-- title
-- concept
-- premise
-- logline
-- hook
-- synopsis
-- skeleton
-- outline
-- keywords (array of strings)
-- themes (array of strings)
-
-Return ONLY the JSON array, no additional text."""
+        template = self.get_prompt_template(for_description=False)
         
-        return prompt
+        return template.format(
+            num_ideas=num_ideas,
+            input=title,
+            platforms=platforms_str,
+            formats=formats_str,
+            genre=genre_str,
+            length=length_str
+        )
     
     def _create_description_prompt(
         self,
@@ -215,6 +294,8 @@ Return ONLY the JSON array, no additional text."""
         length_target: Optional[str] = None
     ) -> str:
         """Create a prompt for generating ideas from a description.
+        
+        Uses the configured prompt template with variable substitution.
         
         Args:
             description: Base description
@@ -232,42 +313,16 @@ Return ONLY the JSON array, no additional text."""
         genre_str = genre if genre else "general"
         length_str = length_target if length_target else "variable"
         
-        prompt = f"""You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on this description: "{description}"
-
-Target platforms: {platforms_str}
-Target formats: {formats_str}
-Genre: {genre_str}
-Length target: {length_str}
-
-For each idea, provide:
-1. A unique title
-2. A compelling concept (1-2 sentences)
-3. A detailed premise (2-3 sentences)
-4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening)
-6. A synopsis (2-3 paragraphs, 150-300 words)
-7. A skeleton (5-7 key points)
-8. An outline (detailed structure with sections)
-9. 5-10 relevant keywords
-10. 3-5 main themes
-
-Make each idea distinct and engaging for the target platforms and formats.
-
-Format your response as a JSON array of {num_ideas} objects, each with these fields:
-- title
-- concept
-- premise
-- logline
-- hook
-- synopsis
-- skeleton
-- outline
-- keywords (array of strings)
-- themes (array of strings)
-
-Return ONLY the JSON array, no additional text."""
+        template = self.get_prompt_template(for_description=True)
         
-        return prompt
+        return template.format(
+            num_ideas=num_ideas,
+            input=description,
+            platforms=platforms_str,
+            formats=formats_str,
+            genre=genre_str,
+            length=length_str
+        )
     
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate content.
