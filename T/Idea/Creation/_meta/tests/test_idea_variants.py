@@ -35,15 +35,23 @@ class TestVariantTemplateRegistry:
     """Tests for the template registry."""
     
     def test_all_templates_registered(self):
-        """Test that all 11 variant templates are registered."""
-        assert len(VARIANT_TEMPLATES) == 11
+        """Test that all 26 variant templates are registered."""
+        assert len(VARIANT_TEMPLATES) == 26
     
     def test_template_names_match_constants(self):
         """Test that registry keys match expected names."""
         expected_names = [
+            # Original 11 templates
             "emotion_first", "mystery", "skeleton", "shortform",
             "niche_blend", "minimal", "4point", "hook_frame",
-            "shortform2", "genre", "scene_seed"
+            "shortform2", "genre", "scene_seed",
+            # New creative genre-based templates
+            "soft_supernatural", "light_mystery", "scifi_school",
+            "safe_survival", "emotional_drama", "rivals_allies",
+            "identity_power", "ai_companion", "urban_quest", "magical_aesthetic",
+            # Reddit-style drama templates
+            "family_drama", "social_home", "realistic_mystery",
+            "school_family", "personal_voice"
         ]
         for name in expected_names:
             assert name in VARIANT_TEMPLATES
@@ -51,9 +59,12 @@ class TestVariantTemplateRegistry:
     def test_list_templates_returns_all(self):
         """Test list_templates returns all template names."""
         templates = list_templates()
-        assert len(templates) == 11
+        assert len(templates) == 26
         assert "emotion_first" in templates
         assert "mystery" in templates
+        # New templates
+        assert "soft_supernatural" in templates
+        assert "family_drama" in templates
 
 
 class TestGetTemplate:
@@ -422,16 +433,16 @@ class TestCreateIdeaVariant:
 class TestCreateAllVariants:
     """Tests for create_all_variants function."""
     
-    def test_creates_11_variants(self):
-        """Test that create_all_variants creates all 11 variants."""
+    def test_creates_26_variants(self):
+        """Test that create_all_variants creates all 26 variants."""
         variants = create_all_variants("Test Title")
-        assert len(variants) == 11
+        assert len(variants) == 26
     
     def test_all_variants_are_different_types(self):
         """Test that all variants are different types."""
         variants = create_all_variants("Test Title")
         types = [v["variant_type"] for v in variants]
-        assert len(set(types)) == 11
+        assert len(set(types)) == 26
 
 
 class TestCreateSelectedVariants:
@@ -529,10 +540,14 @@ class TestVariantContentQuality:
         """Test that generated hooks are not empty."""
         for variant_name in VARIANT_TEMPLATES.keys():
             variant = create_idea_variant("Test Content", variant_name)
-            # Check common hook fields
+            # Check common hook fields - expanded for new templates
             hook_fields = ["hook", "core_hook", "hook_sentence", "hook_essence", 
                           "hook_moment", "scene_hook", "opening_hook", "central_mystery",
-                          "hook_scene", "concept", "premise"]
+                          "hook_scene", "concept", "premise", "hook_line", "voice_hook",
+                          "supernatural_element", "central_puzzle", "tech_concept",
+                          "challenge_scenario", "emotional_premise", "rival_groups",
+                          "identity_struggle", "ai_personality", "urban_setting",
+                          "magical_element", "digital_trigger", "discovery", "collision_point"]
             has_hook = False
             for field in hook_fields:
                 if field in variant and variant[field]:
