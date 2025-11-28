@@ -1,4 +1,4 @@
-"""PrismQ.T.Title.FromIdea - Initial Title Draft from Idea
+"""PrismQ.T.Title.From.Idea - Initial Title Draft from Idea
 
 This module generates the first version (v1) of title options based solely
 on the original idea, before any script content exists.
