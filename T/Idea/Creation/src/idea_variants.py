@@ -10,6 +10,7 @@ Templates are dictionaries that describe:
 - Example values for guidance
 """
 
+import re
 from typing import Dict, Any, List
 
 
@@ -362,7 +363,7 @@ VARIANT_SAFE_SURVIVAL = {
         "payoff": "The reward or revelation at the end"
     },
     "example": {
-        "challenge_scenario": "A storm forces kids to stop at an abandoned stop - they must cooperate to leave",
+        "challenge_scenario": "A storm forces kids to stop at an abandoned bus stop - they must cooperate to leave",
         "cooperation_element": "Each person's random skill becomes crucial",
         "discovery": "The 'weak' kid turns out to be the key to everything",
         "setting_aesthetic": "Rain-soaked bus stop with flickering lights",
@@ -777,9 +778,49 @@ TARGET_AUDIENCES = {
         "gender": "female",
         "region": "US", 
         "device": "mobile",
-        "appeal_factors": ["emotion", "mystery", "character depth", "growth", "drama", "empowerment"]
+        "appeal_factors": ["emotion", "mystery", "growth", "drama", "empowerment", "character depth"]
     }
 }
+
+# Variant type weights for random selection
+# Higher weight = more likely to be selected
+# Weights are tuned for primary audience (US girls 13-15) with mobile-first content
+VARIANT_WEIGHTS = {
+    # Original templates - moderate weights
+    "emotion_first": 8,      # High - emotion appeals to primary audience
+    "mystery": 9,            # High - mystery appeals to all audiences
+    "skeleton": 4,           # Low - more structured, less preferred
+    "shortform": 10,         # Highest - mobile-first, teen-friendly
+    "niche_blend": 5,        # Medium - creative but complex
+    "minimal": 6,            # Medium - simple, good for quick ideas
+    "4point": 3,             # Low - structured format
+    "hook_frame": 7,         # Medium-high - hook-focused
+    "shortform2": 10,        # Highest - mobile-first, teen-friendly
+    "genre": 5,              # Medium - depends on genre picked
+    "scene_seed": 4,         # Low - more cinematic/professional
+    
+    # New creative genre-based templates - weighted for teen appeal
+    "soft_supernatural": 9,   # High - friendship + mystery, girl-coded
+    "light_mystery": 9,       # High - puzzles + adventure, dual appeal
+    "scifi_school": 8,        # High - tech + school, teen relatable
+    "safe_survival": 7,       # Medium-high - teamwork + adventure
+    "emotional_drama": 10,    # Highest - emotion + character depth, primary audience
+    "rivals_allies": 8,       # High - competition + friendship
+    "identity_power": 10,     # Highest - identity + empowerment, primary audience
+    "ai_companion": 7,        # Medium-high - tech + connection
+    "urban_quest": 6,         # Medium - adventure + social
+    "magical_aesthetic": 9,   # High - aesthetics + emotion, girl-coded
+    
+    # Reddit-style drama templates - weighted for relatability
+    "family_drama": 8,        # High - relatable family dynamics
+    "social_home": 9,         # High - social media + family, very relatable
+    "realistic_mystery": 7,   # Medium-high - mystery + emotion
+    "school_family": 9,       # High - school + family collision, very relatable
+    "personal_voice": 10,     # Highest - first-person emotional, primary audience
+}
+
+# Default number of ideas to generate
+DEFAULT_IDEA_COUNT = 10
 
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
@@ -798,8 +839,6 @@ def _humanize_topic(title: str) -> str:
     Returns:
         Humanized, readable topic string
     """
-    import re
-    
     # Replace underscores with spaces
     result = title.replace('_', ' ')
     
@@ -914,6 +953,87 @@ def _pick_from_pool(pool: list, seed: int, offset: int = 0) -> str:
     return pool[(seed + offset) % len(pool)]
 
 
+def pick_weighted_variant(seed: int = None) -> str:
+    """Pick a variant type using weighted random selection.
+    
+    Weights are tuned for the primary audience (US girls 13-15) with
+    higher weights for emotion-focused, identity-focused, and mobile-friendly templates.
+    
+    Args:
+        seed: Optional seed for reproducible selection. If None, uses random.
+        
+    Returns:
+        Selected variant type name
+    """
+    import random as rand_module
+    
+    if seed is not None:
+        rng = rand_module.Random(seed)
+    else:
+        rng = rand_module.Random()
+    
+    # Build weighted list
+    variants = list(VARIANT_WEIGHTS.keys())
+    weights = [VARIANT_WEIGHTS[v] for v in variants]
+    
+    # Use random.choices with weights
+    selected = rng.choices(variants, weights=weights, k=1)[0]
+    return selected
+
+
+def pick_multiple_weighted_variants(count: int = DEFAULT_IDEA_COUNT, seed: int = None, allow_duplicates: bool = True) -> List[str]:
+    """Pick multiple variant types using weighted random selection.
+    
+    Each variant is picked independently, so the same type can appear multiple times
+    unless allow_duplicates is False.
+    
+    Args:
+        count: Number of variants to pick (default: 10)
+        seed: Optional seed for reproducible selection
+        allow_duplicates: If True, same variant can be picked multiple times
+        
+    Returns:
+        List of selected variant type names
+    """
+    import random as rand_module
+    
+    if seed is not None:
+        rng = rand_module.Random(seed)
+    else:
+        rng = rand_module.Random()
+    
+    variants = list(VARIANT_WEIGHTS.keys())
+    weights = [VARIANT_WEIGHTS[v] for v in variants]
+    
+    if allow_duplicates:
+        # Each selection is independent
+        selected = rng.choices(variants, weights=weights, k=count)
+    else:
+        # No duplicates - pick without replacement (limited to available variants)
+        count = min(count, len(variants))
+        selected = []
+        remaining_variants = variants.copy()
+        remaining_weights = weights.copy()
+        
+        for _ in range(count):
+            choice = rng.choices(remaining_variants, weights=remaining_weights, k=1)[0]
+            selected.append(choice)
+            idx = remaining_variants.index(choice)
+            remaining_variants.pop(idx)
+            remaining_weights.pop(idx)
+    
+    return selected
+
+
+def get_variant_weights() -> Dict[str, int]:
+    """Get the current variant weights configuration.
+    
+    Returns:
+        Dictionary mapping variant names to their weights
+    """
+    return VARIANT_WEIGHTS.copy()
+
+
 def create_idea_variant(
     title: str,
     variant_name: str,
@@ -1026,6 +1146,60 @@ def create_idea_variant(
     result["target_audience"] = _get_target_audience_info()
     
     return result
+
+
+def create_ideas_from_input(
+    text_input: str,
+    count: int = DEFAULT_IDEA_COUNT,
+    seed: int = None,
+    allow_duplicate_types: bool = True,
+    **kwargs
+) -> List[Dict[str, Any]]:
+    """Create multiple ideas from a single text input using weighted random variant selection.
+    
+    This is the main entry point for the default idea creation flow:
+    - Takes simple text input
+    - Creates 10 ideas by default
+    - Each idea gets a randomly selected variant type (weighted by audience preference)
+    
+    Variant types are weighted to favor templates that appeal to:
+    - Primary audience: US girls 13-15 (emotion, identity, friendship, aesthetics)
+    - Secondary audience: US boys 12-17 (competition, tech, puzzles, adventure)
+    - Tertiary audience: US women 10-22 (emotion, drama, empowerment)
+    
+    Args:
+        text_input: The text prompt/input to generate ideas from
+        count: Number of ideas to create (default: 10)
+        seed: Optional seed for reproducible variant selection
+        allow_duplicate_types: If True, same variant type can be used for multiple ideas
+        **kwargs: Additional parameters passed to each variant
+        
+    Returns:
+        List of idea variant dictionaries
+        
+    Raises:
+        ValueError: If text_input is empty
+    """
+    if not text_input or not text_input.strip():
+        raise ValueError("Text input cannot be empty")
+    
+    # Pick variant types for each idea using weighted selection
+    variant_types = pick_multiple_weighted_variants(count, seed, allow_duplicate_types)
+    
+    # Create each idea with its assigned variant type
+    ideas = []
+    for i, variant_type in enumerate(variant_types):
+        idea = create_idea_variant(
+            title=text_input.strip(),
+            variant_name=variant_type,
+            description="",
+            variation_index=i,
+            randomize=True,  # Add randomization for variety
+            **kwargs
+        )
+        ideas.append(idea)
+    
+    return ideas
 
 
 def create_all_variants(
@@ -1513,7 +1687,7 @@ SCIFI_TECH = [
 SURVIVAL_SCENARIOS = [
     "students completing safe but intense tasks to earn their way back",
     "a school project that accidentally leads to an old community bunker",
-    "a storm forcing kids to cooperate at an abandoned stop",
+    "a storm forcing kids to cooperate at an abandoned bus stop",
     "an island where sounds repeat old words as riddles",
     "a camping trip where phones don't work and they must use old skills",
     "an escape room that's actually a test of friendship",
@@ -2257,7 +2431,12 @@ def _create_personal_voice_variant(title: str, description: str, kwargs: Dict, s
 
 
 __all__ = [
+    # Constants
     "VARIANT_TEMPLATES",
+    "VARIANT_WEIGHTS",
+    "DEFAULT_IDEA_COUNT",
+    "TARGET_AUDIENCES",
+    # Original template definitions
     "VARIANT_EMOTION_FIRST",
     "VARIANT_MYSTERY",
     "VARIANT_SKELETON",
@@ -2286,7 +2465,7 @@ __all__ = [
     "VARIANT_REALISTIC_MYSTERY",
     "VARIANT_SCHOOL_FAMILY",
     "VARIANT_PERSONAL_VOICE",
-    # Functions
+    # Core functions
     "get_template",
     "list_templates",
     "get_template_fields",
@@ -2295,4 +2474,10 @@ __all__ = [
     "create_all_variants",
     "create_selected_variants",
     "create_multiple_of_same_variant",
+    # Weighted random selection functions
+    "pick_weighted_variant",
+    "pick_multiple_weighted_variants",
+    "get_variant_weights",
+    # Main entry point
+    "create_ideas_from_input",
 ]
