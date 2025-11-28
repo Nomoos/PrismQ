@@ -14,7 +14,7 @@ from pathlib import Path
 # Add parent directories to path for imports
 # Navigate up to T/ directory and then to Idea/Model
 current_file = Path(__file__)
-t_module_dir = current_file.parent.parent.parent.parent
+t_module_dir = current_file.parent.parent.parent.parent.parent
 model_path = t_module_dir / 'Idea' / 'Model'
 sys.path.insert(0, str(model_path / 'src'))
 sys.path.insert(0, str(model_path))

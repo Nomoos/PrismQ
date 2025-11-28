@@ -6,11 +6,11 @@ This module provides comprehensive title development capabilities including:
 - SEO optimization and click-through rate maximization
 
 The module structure:
-- FromIdea: Initial title generation (v1)
+- From/Idea: Initial title generation (v1)
 - FromOriginalTitleAndReviewAndScript: Title improvements (v2, v3+)
 
 Submodules can be imported directly:
-- `from PrismQ.T.Title.FromIdea import TitleGenerator`
+- `from PrismQ.T.Title.From.Idea import TitleGenerator`
 - `from PrismQ.T.Title.FromOriginalTitleAndReviewAndScript import TitleImprover`
 """
 
