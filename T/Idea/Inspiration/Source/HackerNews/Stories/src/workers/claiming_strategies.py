@@ -46,7 +46,8 @@ class PriorityStrategy(ClaimingStrategy):
 
 
 # Workflow state order mapping for WorkflowStateStrategy
-# States earlier in workflow get lower numbers (higher priority)
+# States earlier in workflow get lower numbers (1-19)
+# ORDER BY uses DESC, so higher numbers (later states) get processed first
 # Based on T/WORKFLOW_STATE_MACHINE.md stage numbers
 WORKFLOW_STATE_ORDER = {
     'PrismQ.T.Idea.Creation': 1,
@@ -71,6 +72,11 @@ WORKFLOW_STATE_ORDER = {
 }
 
 
+def _escape_sql_string(value: str) -> str:
+    """Escape single quotes in SQL string values."""
+    return value.replace("'", "''")
+
+
 class WorkflowStateStrategy(ClaimingStrategy):
     """Workflow state-based ordering: Tasks further in workflow first.
     
@@ -82,8 +88,8 @@ class WorkflowStateStrategy(ClaimingStrategy):
     
     def get_order_by_clause(self) -> str:
         """Order by workflow state position (descending), then creation time."""
-        # Build CASE expression for state ordering
-        case_parts = [f"WHEN state = '{state}' THEN {order}" 
+        # Build CASE expression for state ordering with proper SQL escaping
+        case_parts = [f"WHEN state = '{_escape_sql_string(state)}' THEN {order}" 
                       for state, order in WORKFLOW_STATE_ORDER.items()]
         case_expr = "CASE " + " ".join(case_parts) + " ELSE 99 END"
         

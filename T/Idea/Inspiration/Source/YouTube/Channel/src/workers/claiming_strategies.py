@@ -153,7 +153,8 @@ class WeightedRandomStrategy(BaseClaimStrategy):
 
 
 # Workflow state order mapping for WorkflowStateStrategy
-# States earlier in workflow get lower numbers (higher priority)
+# States earlier in workflow get lower numbers (1-19)
+# ORDER BY uses DESC, so higher numbers (later states) get processed first
 # Based on T/WORKFLOW_STATE_MACHINE.md stage numbers
 WORKFLOW_STATE_ORDER = {
     'PrismQ.T.Idea.Creation': 1,
@@ -176,6 +177,18 @@ WORKFLOW_STATE_ORDER = {
     'PrismQ.T.Story.Polish': 18,
     'PrismQ.T.Publishing': 19,
 }
+
+
+def _escape_sql_string(value: str) -> str:
+    """Escape single quotes in SQL string values.
+    
+    Args:
+        value: The string value to escape.
+        
+    Returns:
+        Escaped string safe for SQL string literals.
+    """
+    return value.replace("'", "''")
 
 
 class WorkflowStateStrategy(BaseClaimStrategy):
@@ -209,8 +222,8 @@ class WorkflowStateStrategy(BaseClaimStrategy):
             SQL ORDER BY clause that orders by workflow state position DESC,
             then by created_at ASC as tiebreaker.
         """
-        # Build CASE expression for state ordering
-        case_parts = [f"WHEN state = '{state}' THEN {order}" 
+        # Build CASE expression for state ordering with proper SQL escaping
+        case_parts = [f"WHEN state = '{_escape_sql_string(state)}' THEN {order}" 
                       for state, order in WORKFLOW_STATE_ORDER.items()]
         case_expr = "CASE " + " ".join(case_parts) + " ELSE 99 END"
         
