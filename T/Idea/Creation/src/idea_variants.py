@@ -10,7 +10,10 @@ Templates are dictionaries that describe:
 - Example values for guidance
 """
 
+import hashlib
+import random
 import re
+from datetime import datetime
 from typing import Dict, Any, List
 
 
@@ -701,10 +704,6 @@ def get_template_example(variant_name: str) -> Dict[str, Any]:
 # IDEA VARIANT CREATION
 # =============================================================================
 
-import random
-import hashlib
-from datetime import datetime
-
 # Configuration constants
 MIN_KEYWORD_LENGTH = 3  # Minimum word length for keywords
 MAX_KEYWORDS = 5  # Maximum number of keywords to extract
@@ -965,12 +964,10 @@ def pick_weighted_variant(seed: int = None) -> str:
     Returns:
         Selected variant type name
     """
-    import random as rand_module
-    
     if seed is not None:
-        rng = rand_module.Random(seed)
+        rng = random.Random(seed)
     else:
-        rng = rand_module.Random()
+        rng = random.Random()
     
     # Build weighted list
     variants = list(VARIANT_WEIGHTS.keys())
@@ -995,12 +992,10 @@ def pick_multiple_weighted_variants(count: int = DEFAULT_IDEA_COUNT, seed: int =
     Returns:
         List of selected variant type names
     """
-    import random as rand_module
-    
     if seed is not None:
-        rng = rand_module.Random(seed)
+        rng = random.Random(seed)
     else:
-        rng = rand_module.Random()
+        rng = random.Random()
     
     variants = list(VARIANT_WEIGHTS.keys())
     weights = [VARIANT_WEIGHTS[v] for v in variants]
@@ -1200,6 +1195,217 @@ def create_ideas_from_input(
         ideas.append(idea)
     
     return ideas
+
+
+def format_idea_as_text(variant: Dict[str, Any]) -> str:
+    """Format a variant dictionary as clean, readable text.
+    
+    Removes all metadata and structural elements, outputting only
+    the creative content as natural text.
+    
+    Args:
+        variant: A variant dictionary from create_idea_variant
+        
+    Returns:
+        Clean text representation of the idea
+    """
+    variant_type = variant.get("variant_type", "")
+    
+    # Skip metadata fields
+    skip_fields = {
+        "variant_type", "variant_name", "source_title", "source_description",
+        "variation_index", "variation_seed", "target_audience"
+    }
+    
+    lines = []
+    
+    # Format based on variant type for best readability
+    if variant_type == "emotion_first":
+        lines.append(variant.get("core_hook", ""))
+        if variant.get("unusual_angle"):
+            lines.append(f"Angle: {variant['unusual_angle']}")
+        lines.append(f"Emotion: {variant.get('main_emotion', '')}")
+            
+    elif variant_type == "mystery":
+        lines.append(variant.get("central_mystery", ""))
+        lines.append(variant.get("emotional_hook", ""))
+        if variant.get("key_hook_scene"):
+            lines.append(variant["key_hook_scene"])
+            
+    elif variant_type == "skeleton":
+        lines.append(variant.get("opening_hook", ""))
+        lines.append(variant.get("context_setup", ""))
+        lines.append(variant.get("rising_stakes", ""))
+        lines.append(variant.get("peak_moment", ""))
+            
+    elif variant_type in ("shortform", "shortform2"):
+        lines.append(variant.get("hook_essence", variant.get("concept", "")))
+        lines.append(variant.get("premise", ""))
+        if variant.get("wow_moment"):
+            lines.append(variant["wow_moment"])
+            
+    elif variant_type == "minimal":
+        lines.append(variant.get("hook", ""))
+        
+    elif variant_type == "4point":
+        lines.append(variant.get("hook_moment", ""))
+        
+    elif variant_type == "hook_frame":
+        lines.append(variant.get("hook_sentence", ""))
+        
+    elif variant_type == "genre":
+        lines.append(variant.get("hook", ""))
+        
+    elif variant_type == "scene_seed":
+        lines.append(variant.get("scene_hook", ""))
+        
+    elif variant_type == "soft_supernatural":
+        lines.append(variant.get("supernatural_element", ""))
+        lines.append(variant.get("friendship_dynamic", ""))
+        lines.append(f"Emotional core: {variant.get('emotional_core', '')}")
+        
+    elif variant_type == "light_mystery":
+        lines.append(variant.get("central_puzzle", ""))
+        lines.append(f"Setting: {variant.get('adventure_setting', '')}")
+        lines.append(variant.get("stakes", ""))
+        
+    elif variant_type == "scifi_school":
+        lines.append(variant.get("tech_concept", ""))
+        lines.append(variant.get("social_chaos", ""))
+        lines.append(variant.get("moral_question", ""))
+        
+    elif variant_type == "safe_survival":
+        lines.append(variant.get("challenge_scenario", ""))
+        lines.append(variant.get("cooperation_element", ""))
+        lines.append(variant.get("discovery", ""))
+        
+    elif variant_type == "emotional_drama":
+        lines.append(variant.get("emotional_premise", ""))
+        lines.append(variant.get("character_challenge", ""))
+        lines.append(variant.get("turning_point", ""))
+        
+    elif variant_type == "rivals_allies":
+        lines.append(variant.get("rival_groups", ""))
+        lines.append(variant.get("common_enemy", ""))
+        lines.append(variant.get("transformation", ""))
+        
+    elif variant_type == "identity_power":
+        lines.append(variant.get("identity_struggle", ""))
+        lines.append(variant.get("catalyst", ""))
+        lines.append(variant.get("empowerment_moment", ""))
+        
+    elif variant_type == "ai_companion":
+        lines.append(variant.get("ai_personality", ""))
+        lines.append(variant.get("mystery_element", ""))
+        lines.append(variant.get("helpful_twist", ""))
+        
+    elif variant_type == "urban_quest":
+        lines.append(variant.get("urban_setting", ""))
+        lines.append(variant.get("quest_mechanism", ""))
+        lines.append(variant.get("payoff", ""))
+        
+    elif variant_type == "magical_aesthetic":
+        lines.append(variant.get("magical_element", ""))
+        lines.append(variant.get("aesthetic_world", ""))
+        lines.append(variant.get("wonder_moment", ""))
+        
+    elif variant_type == "family_drama":
+        lines.append(variant.get("hook_line", ""))
+        lines.append(variant.get("conflict_core", ""))
+        lines.append(variant.get("resolution_direction", ""))
+        
+    elif variant_type == "social_home":
+        lines.append(variant.get("digital_trigger", ""))
+        lines.append(variant.get("misunderstanding", ""))
+        lines.append(variant.get("truth_reveal", ""))
+        
+    elif variant_type == "realistic_mystery":
+        lines.append(variant.get("discovery", ""))
+        lines.append(variant.get("question_raised", ""))
+        lines.append(variant.get("revelation_type", ""))
+        
+    elif variant_type == "school_family":
+        lines.append(variant.get("collision_point", ""))
+        lines.append(variant.get("caught_in_middle", ""))
+        lines.append(variant.get("survival_mode", ""))
+        
+    elif variant_type == "personal_voice":
+        lines.append(variant.get("voice_hook", ""))
+        lines.append(variant.get("internal_conflict", ""))
+        lines.append(variant.get("desire_core", ""))
+        
+    else:
+        # Generic fallback - extract any hook-like fields
+        for key in ["hook", "core_hook", "hook_line", "premise", "concept"]:
+            if key in variant and variant[key]:
+                lines.append(str(variant[key]))
+                break
+    
+    # Filter empty lines and join
+    return "\n".join(line for line in lines if line and line.strip())
+
+
+def create_idea_text(
+    text_input: str,
+    variant_name: str = None,
+    variation_index: int = 0
+) -> str:
+    """Create a single idea as clean text from input.
+    
+    This is the simplest entry point - text in, text out.
+    
+    Args:
+        text_input: The text prompt/input
+        variant_name: Optional specific variant type (random if None)
+        variation_index: Index for variation
+        
+    Returns:
+        Clean text idea
+    """
+    if not text_input or not text_input.strip():
+        raise ValueError("Text input cannot be empty")
+    
+    # Pick variant type if not specified
+    if variant_name is None:
+        variant_name = pick_weighted_variant()
+    
+    # Create the variant
+    variant = create_idea_variant(
+        title=text_input.strip(),
+        variant_name=variant_name,
+        variation_index=variation_index,
+        randomize=True
+    )
+    
+    return format_idea_as_text(variant)
+
+
+def create_ideas_as_text(
+    text_input: str,
+    count: int = DEFAULT_IDEA_COUNT,
+    seed: int = None
+) -> List[str]:
+    """Create multiple ideas as clean text from a single input.
+    
+    Default behavior: Enter text → get 10 text ideas
+    Each idea uses a randomly-selected variant type (weighted).
+    
+    Args:
+        text_input: The text prompt/input
+        count: Number of ideas to create (default: 10)
+        seed: Optional seed for reproducible selection
+        
+    Returns:
+        List of clean text ideas
+    """
+    if not text_input or not text_input.strip():
+        raise ValueError("Text input cannot be empty")
+    
+    # Get the structured ideas
+    ideas = create_ideas_from_input(text_input, count, seed)
+    
+    # Convert each to text
+    return [format_idea_as_text(idea) for idea in ideas]
 
 
 def create_all_variants(
@@ -2478,6 +2684,10 @@ __all__ = [
     "pick_weighted_variant",
     "pick_multiple_weighted_variants",
     "get_variant_weights",
-    # Main entry point
+    # Main entry points (structured output)
     "create_ideas_from_input",
+    # Text-only output functions (clean, no metadata)
+    "format_idea_as_text",
+    "create_idea_text",
+    "create_ideas_as_text",
 ]
