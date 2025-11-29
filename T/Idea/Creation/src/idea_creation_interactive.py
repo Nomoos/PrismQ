@@ -44,6 +44,7 @@ try:
         create_ideas_from_input,
         list_templates,
         get_template,
+        format_idea_as_text,
         VARIANT_TEMPLATES,
         DEFAULT_IDEA_COUNT,
     )
@@ -366,21 +367,10 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print(f"{Colors.GREEN}{Colors.BOLD}  Variant {i+1}: {variant.get('variant_name', 'Unknown')}{Colors.END}")
             print(f"{Colors.GREEN}{'─' * 50}{Colors.END}")
             
-            # Print variant details
-            skip_keys = {'variant_type', 'variant_name', 'source_title', 'source_description', 
-                        'variation_index', 'variation_seed'}
-            
-            for key, value in variant.items():
-                if key in skip_keys:
-                    continue
-                if isinstance(value, dict):
-                    print(f"  {key}:")
-                    for k, v in value.items():
-                        print(f"    {k}: {v}")
-                elif isinstance(value, list):
-                    print(f"  {key}: {', '.join(str(v) for v in value)}")
-                else:
-                    print(f"  {key}: {value}")
+            # Print clean text representation of the idea
+            idea_text = format_idea_as_text(variant)
+            for line in idea_text.split('\n'):
+                print(f"  {line}")
             
             if logger:
                 logger.info(f"Variant {i+1}: {variant.get('variant_name')}")
