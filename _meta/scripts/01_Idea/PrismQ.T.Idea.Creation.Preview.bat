@@ -37,8 +37,8 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-REM Run Python script in preview mode with debug logging
-python PrismQ.Idea.Creation.py --preview --debug
+REM Run Python module from T/Idea/Creation/src
+python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
