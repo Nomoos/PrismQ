@@ -38,7 +38,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 REM Run Python module from T/Idea/Creation/src
-python ..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
+python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
