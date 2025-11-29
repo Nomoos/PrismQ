@@ -82,12 +82,6 @@ if not exist "%VENV_DIR%\.requirements_installed" (
     set NEEDS_INSTALL=1
 )
 
-REM Check if requirements.txt is newer than marker file
-if exist "%REQUIREMENTS%" if exist "%VENV_DIR%\.requirements_installed" (
-    for /f %%i in ("%REQUIREMENTS%") do set REQ_DATE=%%~ti
-    for /f %%i in ("%VENV_DIR%\.requirements_installed") do set MARKER_DATE=%%~ti
-)
-
 if "%NEEDS_INSTALL%"=="1" (
     echo [INFO] Installing dependencies from requirements.txt...
     pip install -r "%REQUIREMENTS%" --quiet

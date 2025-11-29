@@ -135,14 +135,14 @@ if (-not (Test-Path $EnvFile)) {
 }
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║                      Environment Setup Complete                               ║" -ForegroundColor Green
-Write-Host "╠══════════════════════════════════════════════════════════════════════════════╣" -ForegroundColor Green
-Write-Host "║  Virtual Environment: $VenvDir" -ForegroundColor Green
-Write-Host "║  Python: $activatedPython" -ForegroundColor Green
-Write-Host "║  Requirements: $RequirementsFile" -ForegroundColor Green
-Write-Host "║  Config: $EnvFile" -ForegroundColor Green
-Write-Host "╚══════════════════════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "========================================"  -ForegroundColor Green
+Write-Host "  Environment Setup Complete" -ForegroundColor Green
+Write-Host "========================================"  -ForegroundColor Green
+Write-Host "  Virtual Environment: $VenvDir" -ForegroundColor White
+Write-Host "  Python: $activatedPython" -ForegroundColor White
+Write-Host "  Requirements: $RequirementsFile" -ForegroundColor White
+Write-Host "  Config: $EnvFile" -ForegroundColor White
+Write-Host "========================================"  -ForegroundColor Green
 Write-Host ""
 
 Write-Host "╔══════════════════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
