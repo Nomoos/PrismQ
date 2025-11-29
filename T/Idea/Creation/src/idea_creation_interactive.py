@@ -6,9 +6,9 @@ It waits for user input, processes it through the idea variant system, and
 optionally saves to the database.
 
 Usage:
-    python PrismQ.Idea.Creation.py                    # Interactive mode with DB save
-    python PrismQ.Idea.Creation.py --preview          # Preview mode (no DB save)
-    python PrismQ.Idea.Creation.py --preview --debug  # Debug mode with extensive logging
+    python idea_creation_interactive.py                    # Interactive mode with DB save
+    python idea_creation_interactive.py --preview          # Preview mode (no DB save)
+    python idea_creation_interactive.py --preview --debug  # Debug mode with extensive logging
 
 Modes:
     Default: Creates ideas and saves to database
@@ -23,16 +23,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 
-# Setup paths
+# Setup paths - Now in T/Idea/Creation/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
-REPO_ROOT = SCRIPT_DIR.parent.parent  # _meta/scripts -> _meta -> repo root
-T_ROOT = REPO_ROOT / "T"
+CREATION_ROOT = SCRIPT_DIR.parent  # T/Idea/Creation
+IDEA_ROOT = CREATION_ROOT.parent  # T/Idea
+T_ROOT = IDEA_ROOT.parent  # T
+REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
-sys.path.insert(0, str(REPO_ROOT))
-sys.path.insert(0, str(T_ROOT / "Idea" / "Creation" / "src"))
-sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
-sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
+sys.path.insert(0, str(SCRIPT_DIR))  # Current directory for local imports
+sys.path.insert(0, str(IDEA_ROOT / "Model" / "src"))
+sys.path.insert(0, str(IDEA_ROOT / "Model"))
 
 # Import idea variants module
 try:
@@ -351,7 +352,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         
         # Ask for variant type
         print_section("Select Variant Type")
-        print("  0. All variants (11 types)")
+        print(f"  0. All variants ({len(templates)} types)")
         for i, name in enumerate(templates, 1):
             print(f"  {i}. {name}")
         print(f"  {len(templates)+1}. Multiple of same type")
@@ -374,7 +375,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         try:
             if choice == 0:
                 # All variants
-                print_info("Creating all 11 variant types...")
+                print_info(f"Creating all {len(templates)} variant types...")
                 if logger:
                     logger.info("Creating all variants")
                 variants = create_all_variants(title, description)
@@ -485,9 +486,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python PrismQ.Idea.Creation.py                    # Interactive mode with DB save
-  python PrismQ.Idea.Creation.py --preview          # Preview mode (no DB save)
-  python PrismQ.Idea.Creation.py --preview --debug  # Debug mode with extensive logging
+  python idea_creation_interactive.py                    # Interactive mode with DB save
+  python idea_creation_interactive.py --preview          # Preview mode (no DB save)
+  python idea_creation_interactive.py --preview --debug  # Debug mode with extensive logging
         """
     )
     
