@@ -41,9 +41,11 @@ try:
         create_idea_variant,
         create_all_variants,
         create_multiple_of_same_variant,
+        create_ideas_from_input,
         list_templates,
         get_template,
         VARIANT_TEMPLATES,
+        DEFAULT_IDEA_COUNT,
     )
     VARIANTS_AVAILABLE = True
 except ImportError as e:
@@ -297,43 +299,32 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     # Interactive loop
     print_section("Enter Text Input")
     print("Type or paste your text (title, description, story snippet, or JSON).")
-    print("Press Enter twice to submit, or type 'quit' to exit.\n")
+    print("Press Enter to submit, or type 'quit' to exit.\n")
     
     while True:
-        # Collect multi-line input
+        # Collect single-line input (or multi-line for JSON)
         print(f"{Colors.CYAN}>>> {Colors.END}", end="")
-        lines = []
-        empty_count = 0
         
-        while True:
-            try:
-                line = input()
-                if line.lower() == 'quit':
-                    print_info("Exiting...")
-                    if logger:
-                        logger.info("User requested exit")
-                    return 0
-                
-                if line == '':
-                    empty_count += 1
-                    if empty_count >= 1 and lines:
-                        break
-                else:
-                    empty_count = 0
-                    lines.append(line)
-                    
-            except EOFError:
-                break
-            except KeyboardInterrupt:
-                print("\n")
-                print_info("Interrupted. Type 'quit' to exit.")
-                lines = []
-                break
-        
-        if not lines:
+        try:
+            line = input().strip()
+            if line.lower() == 'quit':
+                print_info("Exiting...")
+                if logger:
+                    logger.info("User requested exit")
+                return 0
+            
+            if not line:
+                continue
+            
+            input_text = line
+            
+        except EOFError:
+            print_info("Exiting...")
+            return 0
+        except KeyboardInterrupt:
+            print("\n")
+            print_info("Interrupted. Type 'quit' to exit.")
             continue
-        
-        input_text = '\n'.join(lines)
         
         if logger:
             logger.info(f"Received input: {len(input_text)} chars")
@@ -350,66 +341,16 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         if metadata:
             print(f"  Metadata: {json.dumps(metadata, indent=2)[:200]}...")
         
-        # Ask for variant type
-        print_section("Select Variant Type")
-        print(f"  0. All variants ({len(templates)} types)")
-        for i, name in enumerate(templates, 1):
-            print(f"  {i}. {name}")
-        print(f"  {len(templates)+1}. Multiple of same type")
-        
-        try:
-            choice = input(f"\n{Colors.CYAN}Select (0-{len(templates)+1}) [default: 0]: {Colors.END}").strip()
-            if not choice:
-                choice = '0'
-            choice = int(choice)
-        except (ValueError, EOFError):
-            choice = 0
-        
-        if logger:
-            logger.info(f"User selected variant choice: {choice}")
-        
-        # Generate variants
+        # Generate variants with random template selection
         print_section("Generating Variants")
         
         variants = []
         try:
-            if choice == 0:
-                # All variants
-                print_info(f"Creating all {len(templates)} variant types...")
-                if logger:
-                    logger.info("Creating all variants")
-                variants = create_all_variants(title, description)
-                
-            elif 1 <= choice <= len(templates):
-                # Specific variant
-                variant_name = templates[choice - 1]
-                print_info(f"Creating '{variant_name}' variant...")
-                if logger:
-                    logger.info(f"Creating single variant: {variant_name}")
-                variant = create_idea_variant(title, variant_name, description)
-                variants = [variant]
-                
-            elif choice == len(templates) + 1:
-                # Multiple of same type
-                print("Select variant type:")
-                for i, name in enumerate(templates, 1):
-                    print(f"  {i}. {name}")
-                try:
-                    type_choice = int(input(f"{Colors.CYAN}Type (1-{len(templates)}): {Colors.END}"))
-                    count = int(input(f"{Colors.CYAN}Count (1-20): {Colors.END}"))
-                    count = min(max(count, 1), 20)
-                    variant_name = templates[type_choice - 1]
-                    
-                    print_info(f"Creating {count} '{variant_name}' variants...")
-                    if logger:
-                        logger.info(f"Creating {count} variants of type: {variant_name}")
-                    variants = create_multiple_of_same_variant(title, variant_name, count, description)
-                except (ValueError, IndexError):
-                    print_error("Invalid selection")
-                    continue
-            else:
-                print_error("Invalid selection")
-                continue
+            # Generate 10 variants with randomly selected templates (weighted)
+            print_info(f"Creating {DEFAULT_IDEA_COUNT} variants with randomly selected templates...")
+            if logger:
+                logger.info(f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection")
+            variants = create_ideas_from_input(title, count=DEFAULT_IDEA_COUNT)
                 
         except Exception as e:
             print_error(f"Error creating variants: {e}")
