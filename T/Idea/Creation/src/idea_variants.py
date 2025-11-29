@@ -1148,6 +1148,7 @@ def create_ideas_from_input(
     count: int = DEFAULT_IDEA_COUNT,
     seed: int = None,
     allow_duplicate_types: bool = True,
+    description: str = "",
     **kwargs
 ) -> List[Dict[str, Any]]:
     """Create multiple ideas from a single text input using weighted random variant selection.
@@ -1167,6 +1168,7 @@ def create_ideas_from_input(
         count: Number of ideas to create (default: 10)
         seed: Optional seed for reproducible variant selection
         allow_duplicate_types: If True, same variant type can be used for multiple ideas
+        description: Optional description to enrich the variants
         **kwargs: Additional parameters passed to each variant
         
     Returns:
@@ -1187,7 +1189,7 @@ def create_ideas_from_input(
         idea = create_idea_variant(
             title=text_input.strip(),
             variant_name=variant_type,
-            description="",
+            description=description,
             variation_index=i,
             randomize=True,  # Add randomization for variety
             **kwargs

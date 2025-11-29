@@ -350,7 +350,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_info(f"Creating {DEFAULT_IDEA_COUNT} variants with randomly selected templates...")
             if logger:
                 logger.info(f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection")
-            variants = create_ideas_from_input(title, count=DEFAULT_IDEA_COUNT)
+            variants = create_ideas_from_input(title, count=DEFAULT_IDEA_COUNT, description=description)
                 
         except Exception as e:
             print_error(f"Error creating variants: {e}")
