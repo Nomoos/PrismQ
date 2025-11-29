@@ -125,7 +125,7 @@ Soubor `.bat` je **správně strukturovaný** jako čistý launcher:
 2. `validate-mermaid-states.js` - Development tool for validating diagrams (not production code)
 3. `test-validator.js` - Tests for the validator tool
 
-**This differs from other `_meta/scripts` folders** (like `T/_meta/scripts`) where `run_text_client.py` is 49,535 lines and is the main orchestration tool.
+**This differs from other `_meta/scripts` folders** (like `T/_meta/scripts`) where `run_text_client.py` is a large orchestration tool.
 
 **The pattern is consistent:** Scripts in `_meta/scripts` are CLI wrappers/tools that call into actual modules.
 
@@ -253,7 +253,7 @@ Struktura složky `_meta/scripts` je **většinou správná**:
 ## 8. Technical Details / Technické detaily
 
 ### Module location / Umístění modulu:
-- Main module: `T/Idea/Creation/src/idea_variants.py` (2694 lines)
+- Main module: `T/Idea/Creation/src/idea_variants.py`
 - Model module: `T/Idea/Model/src/idea.py`
 
 ### Available variant templates / Dostupné šablony variant:
