@@ -12,10 +12,27 @@ REM   - Does NOT save to database
 REM   - Extensive debug logging to file
 REM   - Log file created in same directory
 REM
+REM Environment:
+REM   Virtual environment: T\Idea\Creation\.venv (created automatically)
+REM   Dependencies: T\Idea\Creation\requirements.txt
+REM   Config file: T\Idea\Creation\.env (created on first run)
+REM
 REM After running, the script will wait for text input.
 REM Enter your text (title, description, story snippet, or JSON)
 REM Press Enter twice to submit.
 REM Type 'quit' to exit.
+
+set SCRIPT_DIR=%~dp0
+cd /d "%SCRIPT_DIR%"
+
+REM Setup Python virtual environment
+call "%SCRIPT_DIR%setup_env.bat"
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo ERROR: Failed to setup Python environment
+    pause
+    exit /b 1
+)
 
 echo ========================================
 echo PrismQ.Idea.Creation - PREVIEW MODE
@@ -25,17 +42,6 @@ echo This mode is for TESTING and TUNING.
 echo Ideas will NOT be saved to database.
 echo Extensive logging enabled.
 echo.
-
-set SCRIPT_DIR=%~dp0
-cd /d "%SCRIPT_DIR%"
-
-REM Check Python availability
-where python >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Python is not installed or not in PATH
-    pause
-    exit /b 1
-)
 
 REM Run Python module from T/Idea/Creation/src
 python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
