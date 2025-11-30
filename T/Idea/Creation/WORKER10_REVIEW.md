@@ -97,8 +97,8 @@ This section evaluates how well each generated variant derives from and relates 
 
 #### Input Derivation Summary
 - **Strong Derivation (85%+)**: emotion_first, shortform2 - directly leverage input themes
-- **Good Derivation (75-84%)**: identity_power, magical_aesthetic, skeleton, light_mystery, realistic_mystery
-- **Moderate Derivation (70-74%)**: 4point, ai_companion - use input but with weaker thematic connection
+- **Good Derivation (75-84%)**: identity_power, magical_aesthetic, skeleton, light_mystery, realistic_mystery, 4point
+- **Moderate Derivation (70-74%)**: ai_companion - use input but with weaker thematic connection
 
 ### 📊 Inter-Variant Differentiation Analysis
 
@@ -413,7 +413,7 @@ The module exceeds expectations for idea generation quality and diversity.
 | Metric | Test Case 1 | Test Case 2 | Assessment |
 |--------|-------------|-------------|------------|
 | Avg Pairwise Differentiation | 42% | 44% | Good variety |
-| High Differentiation Pairs | 6/10 | 5/10 | Strong uniqueness |
+| High Differentiation Pairs | 6 of 8 measured | 5 of 8 measured | Strong uniqueness |
 | Cluster Diversity | 4 clusters | 3 clusters | Well-distributed |
 | Duplicate Impact | 1 duplicate (emotion_first) | 1 duplicate (emotion_first) | Minor redundancy |
 
