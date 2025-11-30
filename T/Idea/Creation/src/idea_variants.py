@@ -1438,8 +1438,8 @@ VARIANT_WEIGHTS = {
 # Default number of ideas to generate
 DEFAULT_IDEA_COUNT = 10
 
-# Default decay factor for variant selection (0.5 = halves probability each use)
-DEFAULT_DECAY_FACTOR = 0.5
+# Default decay factor for variant selection (0.4 = new weight is 40% of current)
+DEFAULT_DECAY_FACTOR = 0.4
 
 # Minimum weight after decay (ensures variant can still be selected even after multiple uses)
 # Weight scale is 0-100, minimum is 2 to ensure variants remain selectable
