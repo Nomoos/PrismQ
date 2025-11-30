@@ -1303,6 +1303,412 @@ VARIANT_COMPARISON_TRAP = {
 
 
 # =============================================================================
+# BLEND TEMPLATES - Combinations of new and existing templates
+# =============================================================================
+
+# Blends using new missing theme templates with each other
+VARIANT_BUTTERFLIES_ANXIETY = {
+    "name": "First Butterflies + Fitting In Blend",
+    "description": "The intersection of first attraction and social anxiety - wanting to be noticed while also wanting to disappear.",
+    "fields": {
+        "the_feeling": "The butterflies mixed with panic",
+        "what_they_want": "To be seen by them specifically",
+        "what_they_fear": "Being seen by everyone else",
+        "the_conflict": "Wanting attention but dreading it",
+        "coping_attempt": "How they try to manage both",
+        "internal_chaos": "The war between hope and fear"
+    },
+    "example": {
+        "the_feeling": "Heart racing - half butterflies, half panic attack",
+        "what_they_want": "For them to look at me, just me",
+        "what_they_fear": "What if I say something stupid in front of everyone?",
+        "the_conflict": "Wanting them to notice me while hoping I'm invisible to everyone else",
+        "coping_attempt": "Standing close enough to be seen, far enough to escape",
+        "internal_chaos": "Be cool be cool be cool - oh god they're looking this way"
+    }
+}
+
+VARIANT_BODY_COMPARISON = {
+    "name": "Body Acceptance + Comparison Trap Blend",
+    "description": "The exhausting cycle of comparing your body to filtered images, knowing better but feeling worse.",
+    "fields": {
+        "the_scroll": "What they see online that triggers it",
+        "the_mirror": "What they see when they look at themselves after",
+        "the_knowledge": "What they know is true rationally",
+        "the_feeling": "What they feel despite knowing",
+        "the_exhaustion": "The tiredness of this cycle",
+        "small_rebellion": "A tiny act of resistance against it"
+    },
+    "example": {
+        "the_scroll": "Perfect bodies, perfect skin, perfect everything",
+        "the_mirror": "All the ways I don't measure up",
+        "the_knowledge": "Filters, angles, editing - none of it's real",
+        "the_feeling": "But what if they're just naturally like that and I'm not?",
+        "the_exhaustion": "I'm so tired of hating what I see",
+        "small_rebellion": "Wearing the outfit anyway"
+    }
+}
+
+VARIANT_ONLINE_FITTING = {
+    "name": "Online Connection + Fitting In Blend",
+    "description": "Finding belonging online because IRL fitting in feels impossible.",
+    "fields": {
+        "irl_struggle": "What makes belonging offline so hard",
+        "online_ease": "Why online connections feel easier",
+        "the_irony": "The strange reality of this situation",
+        "what_irl_people_think": "How offline people view this",
+        "the_truth": "What they wish people understood",
+        "both_worlds": "Navigating between them"
+    },
+    "example": {
+        "irl_struggle": "Every word feels scripted, every interaction exhausting",
+        "online_ease": "I can be myself in text, think before I respond",
+        "the_irony": "More 'real' with people I've never met than people I see daily",
+        "what_irl_people_think": "'You should get out more' 'Those aren't real friends'",
+        "the_truth": "They've seen me ugly cry at 3am - that's real enough",
+        "both_worlds": "Code-switching between who they expect and who I actually am"
+    }
+}
+
+VARIANT_FUTURE_COMPARISON = {
+    "name": "Future Anxiety + Comparison Trap Blend",
+    "description": "Comparing your uncertain future to everyone else's seemingly certain plans.",
+    "fields": {
+        "their_plans": "What everyone else seems to have figured out",
+        "your_blank": "The emptiness where a plan should be",
+        "the_question": "What everyone keeps asking",
+        "the_lie": "What you say vs what's true",
+        "the_spiral": "Where the comparison leads",
+        "quiet_hope": "The thing you haven't told anyone"
+    },
+    "example": {
+        "their_plans": "Med school, gap year, starting a business - everyone has A Thing",
+        "your_blank": "A future that looks like a fog machine",
+        "the_question": "'So what's your plan?' at every family dinner",
+        "the_lie": "'Still figuring it out!' said with fake confidence",
+        "the_spiral": "Maybe I'm just not the kind of person who has dreams",
+        "quiet_hope": "Maybe not knowing yet means I could be anything"
+    }
+}
+
+VARIANT_BODY_BUTTERFLIES = {
+    "name": "Body Acceptance + First Butterflies Blend",
+    "description": "Attraction complicated by body insecurity - wanting to be wanted while not believing you could be.",
+    "fields": {
+        "the_attraction": "What draws them to this person",
+        "the_block": "What body insecurity whispers",
+        "the_fantasy": "What they'd do if they weren't insecure",
+        "the_reality": "What they actually do instead",
+        "almost_moment": "A time they almost let themselves be seen",
+        "the_wish": "What they want to believe"
+    },
+    "example": {
+        "the_attraction": "The way they make everyone feel comfortable",
+        "the_block": "'They'd never look at someone like me'",
+        "the_fantasy": "Walk up, be confident, just talk to them",
+        "the_reality": "Look away, hide, convince myself it's not worth trying",
+        "almost_moment": "They smiled at me and I almost smiled back before I remembered",
+        "the_wish": "That I could see myself the way I see everyone else"
+    }
+}
+
+VARIANT_ONLINE_FUTURE = {
+    "name": "Online Connection + Future Anxiety Blend",
+    "description": "Online friends who understand your future fears when IRL people just add pressure.",
+    "fields": {
+        "irl_pressure": "What people offline keep saying",
+        "online_understanding": "What online friends actually get",
+        "the_conversation": "A moment of real support online",
+        "the_relief": "What it feels like to be understood",
+        "the_gap": "The difference between these two worlds",
+        "shared_uncertainty": "Finding others in the same fog"
+    },
+    "example": {
+        "irl_pressure": "'You need to start thinking seriously about your future'",
+        "online_understanding": "'Same, I have no idea what I'm doing either'",
+        "the_conversation": "3am voice chat where we all admitted we're terrified",
+        "the_relief": "Not being the only one who doesn't have it figured out",
+        "the_gap": "Online: 'it's okay to not know' / Offline: 'you should know by now'",
+        "shared_uncertainty": "Building a support system of equally lost people"
+    }
+}
+
+VARIANT_FITTING_COMPARISON = {
+    "name": "Fitting In + Comparison Trap Blend",
+    "description": "Social anxiety amplified by comparing yourself to people who seem to belong effortlessly.",
+    "fields": {
+        "them": "The people who seem to fit naturally",
+        "you": "How you feel in comparison",
+        "the_performance": "What belonging looks like when you're faking it",
+        "the_exhaustion": "The cost of performing normal",
+        "the_question": "What you can't stop wondering",
+        "secret_truth": "What you suspect but can't confirm"
+    },
+    "example": {
+        "them": "Walking into rooms like they own them, effortless conversation",
+        "you": "Calculating every word, planning bathroom escape routes",
+        "the_performance": "Laughing at the right times, nodding along, seeming present",
+        "the_exhaustion": "Social hangover that lasts for days",
+        "the_question": "Are they actually confident or just better at pretending?",
+        "secret_truth": "Maybe everyone's performing and I just think I'm the only one"
+    }
+}
+
+# Blends with older existing templates
+VARIANT_CONFESSION_BODY = {
+    "name": "Confession Moment + Body Acceptance Blend",
+    "description": "Finally confessing the body image struggles you've been hiding.",
+    "fields": {
+        "the_secret": "What you've been hiding about how you see yourself",
+        "who_youre_telling": "Who finally gets to hear this",
+        "why_now": "What made this the moment",
+        "the_hardest_part": "What's most difficult to admit",
+        "their_response": "What you hope/fear they'll say",
+        "after_speaking": "How it feels to have said it"
+    },
+    "example": {
+        "the_secret": "I've never liked a single photo of myself",
+        "who_youre_telling": "My best friend who doesn't know how bad it is",
+        "why_now": "I can't keep pretending I'm fine",
+        "the_hardest_part": "That I spend hours some days just... hating",
+        "their_response": "Please don't tell me I'm beautiful, just tell me you understand",
+        "after_speaking": "Lighter, even though nothing's fixed"
+    }
+}
+
+VARIANT_UNSENT_FUTURE = {
+    "name": "Unsent Message + Future Anxiety Blend",
+    "description": "The message you'll never send about the pressure to have your life figured out.",
+    "fields": {
+        "to_whom": "Who the message is addressed to",
+        "the_message": "What you'd say if you could",
+        "what_sparked_it": "What made you want to write this",
+        "why_unsent": "Why you'll never actually send it",
+        "what_youd_need": "What you actually need from them",
+        "instead": "What you'll say instead if anything"
+    },
+    "example": {
+        "to_whom": "Mom, Dad, everyone who keeps asking about my plans",
+        "the_message": "Your 'helpful' questions feel like you're measuring my worth by my resume",
+        "what_sparked_it": "Another dinner where my future was the main course",
+        "why_unsent": "They'd just worry more and ask different questions",
+        "what_youd_need": "'I believe in you even if you don't know yet'",
+        "instead": "'Still exploring my options!' with a smile"
+    }
+}
+
+VARIANT_MIRROR_BODY = {
+    "name": "Mirror Moment + Body Acceptance Blend",
+    "description": "A moment in the mirror that changes how you see yourself - for better or worse.",
+    "fields": {
+        "the_moment": "The specific mirror moment",
+        "usual_script": "What you usually think/see",
+        "the_shift": "What was different this time",
+        "new_thought": "A thought you've never had before",
+        "what_it_means": "What this might change",
+        "still_uncertain": "The doubt that remains"
+    },
+    "example": {
+        "the_moment": "Getting out of the shower, not avoiding the mirror for once",
+        "usual_script": "Catalog of flaws, comparison to an impossible standard",
+        "the_shift": "Seeing tired eyes instead of 'wrong' features",
+        "new_thought": "This body has been fighting for me while I've been fighting against it",
+        "what_it_means": "Maybe we can be on the same team",
+        "still_uncertain": "Tomorrow I might hate it again, but today was different"
+    }
+}
+
+VARIANT_GROWING_ONLINE = {
+    "name": "Growing Apart + Online Connection Blend",
+    "description": "Growing apart from IRL friends while growing closer to online ones.",
+    "fields": {
+        "the_old_friend": "The IRL friendship that's fading",
+        "the_new_friend": "The online connection that's growing",
+        "what_changed": "When you noticed the shift",
+        "the_guilt": "Complicated feelings about this",
+        "the_defense": "What you'd say if questioned",
+        "the_truth": "What you know in your heart"
+    },
+    "example": {
+        "the_old_friend": "Known her since third grade, but conversations feel like work now",
+        "the_new_friend": "Met in a server six months ago, tells me things they don't tell anyone",
+        "what_changed": "Realized I was excited to go home and text them, not to see her",
+        "the_guilt": "Am I a bad friend? Am I replacing her?",
+        "the_defense": "Connection isn't measured in proximity",
+        "the_truth": "People grow in different directions. It's sad but it's okay."
+    }
+}
+
+VARIANT_QUIET_BODY = {
+    "name": "Quiet Rebellion + Body Acceptance Blend",
+    "description": "Small acts of rebellion against body expectations - wearing what you want, eating what you want.",
+    "fields": {
+        "the_rule": "The body 'rule' you're breaking",
+        "who_made_it": "Where this rule came from",
+        "the_rebellion": "Your quiet act of defiance",
+        "the_fear": "What you're scared of happening",
+        "the_power": "What it feels like to do it anyway",
+        "the_message": "What you're telling yourself"
+    },
+    "example": {
+        "the_rule": "'Girls like you shouldn't wear that'",
+        "who_made_it": "Magazine covers, comments, looks that linger too long",
+        "the_rebellion": "Wearing the crop top anyway",
+        "the_fear": "People staring, people laughing, people confirming what I fear",
+        "the_power": "Walking out the door with my stomach visible to the world",
+        "the_message": "My body is allowed to exist in spaces, in clothes, in public"
+    }
+}
+
+VARIANT_CHOSEN_ONLINE = {
+    "name": "Chosen Family + Online Connection Blend",
+    "description": "Building a chosen family of online friends who feel more like home than home does.",
+    "fields": {
+        "the_group": "Who this online family is",
+        "how_found": "How you found each other",
+        "what_they_give": "What this family provides",
+        "irl_gap": "What's missing in offline relationships",
+        "defining_moment": "When you knew this was family",
+        "future_hope": "What you hope for this connection"
+    },
+    "example": {
+        "the_group": "Five people scattered across four time zones",
+        "how_found": "A fandom that became so much more than the show",
+        "what_they_give": "Unconditional support, 2am check-ins, inside jokes that span years",
+        "irl_gap": "Family that loves conditions, friends who don't really know me",
+        "defining_moment": "When they pooled money to send me a care package during my worst week",
+        "future_hope": "One day we'll all be in the same room"
+    }
+}
+
+VARIANT_PERMISSION_BODY = {
+    "name": "Permission To + Body Acceptance Blend",
+    "description": "Giving yourself permission to stop fighting your body.",
+    "fields": {
+        "the_permission": "What you're finally allowing",
+        "the_war": "What the fight has been like",
+        "what_triggered": "What made you ready to stop",
+        "the_fear": "What you're scared will happen if you stop",
+        "the_relief": "What peace might feel like",
+        "first_step": "The first thing you're doing differently"
+    },
+    "example": {
+        "the_permission": "To not hate what I see",
+        "the_war": "Years of diets, disguises, avoiding cameras",
+        "what_triggered": "Realized I don't remember a time I liked my body",
+        "the_fear": "If I stop fighting, will I 'let myself go'?",
+        "the_relief": "What would it be like to just... exist? Without the commentary?",
+        "first_step": "Eating when I'm hungry without negotiating with myself"
+    }
+}
+
+VARIANT_SMALL_COMPARISON = {
+    "name": "Small Moment Big + Comparison Trap Blend",
+    "description": "A small moment that reveals how deep the comparison runs.",
+    "fields": {
+        "the_small_thing": "The tiny thing that set it off",
+        "why_big": "Why something so small hit so hard",
+        "the_comparison": "Who you compared yourself to",
+        "the_spiral": "Where it led mentally",
+        "the_realization": "What you understood about yourself",
+        "what_now": "Where you go from here"
+    },
+    "example": {
+        "the_small_thing": "She got more likes on a similar photo",
+        "why_big": "Because it confirmed what I already believed",
+        "the_comparison": "Her: effortless. Me: trying so hard and still less",
+        "the_spiral": "Maybe I'm just... less likable, less pretty, less everything",
+        "the_realization": "I've been measuring my worth in double-taps",
+        "what_now": "Maybe worth isn't a number. Maybe it never was."
+    }
+}
+
+VARIANT_IDENTITY_FITTING = {
+    "name": "Identity Power + Fitting In Blend",
+    "description": "The tension between being yourself and fitting in - choosing authenticity over belonging.",
+    "fields": {
+        "who_you_are": "The authentic self that doesn't fit",
+        "what_fitting_requires": "What you'd have to change to belong",
+        "the_cost": "What hiding costs you",
+        "the_risk": "What being yourself risks",
+        "the_choice": "The decision you're facing",
+        "the_power": "What you gain from choosing you"
+    },
+    "example": {
+        "who_you_are": "Weird interests, strong opinions, too much or not enough",
+        "what_fitting_requires": "Dulling the edges, laughing at the right things, caring about the right stuff",
+        "the_cost": "Feeling like a ghost in my own life",
+        "the_risk": "Being alone, being mocked, being the weird one",
+        "the_choice": "Keep performing or let them see",
+        "the_power": "The exhaustion of pretending is worse than the fear of being seen"
+    }
+}
+
+VARIANT_LEARNED_BODY = {
+    "name": "Learned Young + Body Acceptance Blend",
+    "description": "The body beliefs you absorbed young and are now trying to unlearn.",
+    "fields": {
+        "the_lesson": "What you learned about bodies young",
+        "who_taught": "Where this belief came from",
+        "how_it_stuck": "How it became part of you",
+        "the_damage": "What it's cost you",
+        "the_unlearning": "What you're trying to believe instead",
+        "the_work": "How you're doing that work"
+    },
+    "example": {
+        "the_lesson": "That taking up space was bad, that hunger was weakness",
+        "who_taught": "Mom's comments about her own body, magazines, everything",
+        "how_it_stuck": "Started monitoring myself before I knew what I was monitoring",
+        "the_damage": "Never just... existing. Always calculating, comparing, controlling",
+        "the_unlearning": "My body is a home, not a project",
+        "the_work": "Catching the old thoughts, replacing them, being patient with the process"
+    }
+}
+
+VARIANT_SAFE_ONLINE = {
+    "name": "Safe Person + Online Connection Blend",
+    "description": "When your safest person is someone you've never met in person.",
+    "fields": {
+        "who_they_are": "This person you've found online",
+        "how_safety_built": "How they became safe",
+        "what_you_share": "What you tell them that you tell no one else",
+        "the_paradox": "The strange reality of this",
+        "what_others_say": "What IRL people think about this",
+        "why_it_works": "Why this works when other things don't"
+    },
+    "example": {
+        "who_they_are": "Someone I met on tumblr five years ago, never seen their face",
+        "how_safety_built": "Slow sharing, matched vulnerability, never judgment",
+        "what_you_share": "The thoughts I can't say out loud, the fears that feel too dramatic",
+        "the_paradox": "A stranger knows me better than my family",
+        "what_others_say": "'That's not a real friendship' 'You should talk to real people'",
+        "why_it_works": "No history to disappoint, no face to perform for"
+    }
+}
+
+VARIANT_REWRITING_BODY = {
+    "name": "Rewriting Story + Body Acceptance Blend",
+    "description": "Rewriting the story you've told yourself about your body.",
+    "fields": {
+        "old_story": "The narrative you've carried about your body",
+        "who_wrote_it": "Where this story came from",
+        "the_chapter": "The moment that defined this story",
+        "new_story": "What you want to believe instead",
+        "the_evidence": "What supports the new story",
+        "work_in_progress": "How the rewriting is going"
+    },
+    "example": {
+        "old_story": "'My body is wrong and needs fixing'",
+        "who_wrote_it": "Diet culture, that one comment in middle school, mirrors that felt like enemies",
+        "the_chapter": "The first time someone laughed at me in a swimsuit",
+        "new_story": "My body is trying its best. So am I.",
+        "the_evidence": "It healed when I was sick. It carries me through hard days. It's trying.",
+        "work_in_progress": "Some days the old story wins. But less often now."
+    }
+}
+
+
+# =============================================================================
 # TEMPLATE REGISTRY
 # =============================================================================
 
@@ -1370,6 +1776,27 @@ VARIANT_TEMPLATES: Dict[str, Dict[str, Any]] = {
     "online_connection": VARIANT_ONLINE_CONNECTION,
     "future_anxiety": VARIANT_FUTURE_ANXIETY,
     "comparison_trap": VARIANT_COMPARISON_TRAP,
+    # Blend templates - new themes with each other
+    "butterflies_anxiety": VARIANT_BUTTERFLIES_ANXIETY,
+    "body_comparison": VARIANT_BODY_COMPARISON,
+    "online_fitting": VARIANT_ONLINE_FITTING,
+    "future_comparison": VARIANT_FUTURE_COMPARISON,
+    "body_butterflies": VARIANT_BODY_BUTTERFLIES,
+    "online_future": VARIANT_ONLINE_FUTURE,
+    "fitting_comparison": VARIANT_FITTING_COMPARISON,
+    # Blend templates - new themes with older templates
+    "confession_body": VARIANT_CONFESSION_BODY,
+    "unsent_future": VARIANT_UNSENT_FUTURE,
+    "mirror_body": VARIANT_MIRROR_BODY,
+    "growing_online": VARIANT_GROWING_ONLINE,
+    "quiet_body": VARIANT_QUIET_BODY,
+    "chosen_online": VARIANT_CHOSEN_ONLINE,
+    "permission_body": VARIANT_PERMISSION_BODY,
+    "small_comparison": VARIANT_SMALL_COMPARISON,
+    "identity_fitting": VARIANT_IDENTITY_FITTING,
+    "learned_body": VARIANT_LEARNED_BODY,
+    "safe_online": VARIANT_SAFE_ONLINE,
+    "rewriting_body": VARIANT_REWRITING_BODY,
 }
 
 
@@ -1580,6 +2007,29 @@ VARIANT_WEIGHTS = {
     "online_connection": 95,       # Very high - modern teen experience
     "future_anxiety": 100,         # Highest - universal pressure for this age
     "comparison_trap": 100,        # Highest - social media generation
+    
+    # Blend templates - new themes combined with each other
+    "butterflies_anxiety": 98,     # Very high - attraction + social anxiety combo
+    "body_comparison": 100,        # Highest - body image + social media comparison
+    "online_fitting": 95,          # Very high - online belonging vs IRL struggle
+    "future_comparison": 98,       # Very high - future anxiety + comparison culture
+    "body_butterflies": 95,        # Very high - attraction complicated by body image
+    "online_future": 90,           # High - online friends understanding future fears
+    "fitting_comparison": 98,      # Very high - social anxiety + comparison spiral
+    
+    # Blend templates - new themes with older templates
+    "confession_body": 100,        # Highest - confessing body struggles
+    "unsent_future": 95,           # Very high - unsent message about pressure
+    "mirror_body": 100,            # Highest - mirror moment + body perception
+    "growing_online": 92,          # High - IRL fading, online growing
+    "quiet_body": 98,              # Very high - body rebellion, wearing what you want
+    "chosen_online": 95,           # Very high - online chosen family
+    "permission_body": 100,        # Highest - permission to stop fighting body
+    "small_comparison": 95,        # Very high - small trigger, big spiral
+    "identity_fitting": 98,        # Very high - authenticity vs belonging
+    "learned_body": 100,           # Highest - unlearning body beliefs
+    "safe_online": 90,             # High - safest person is online
+    "rewriting_body": 100,         # Highest - rewriting body narrative
 }
 
 # Default number of ideas to generate
@@ -2000,6 +2450,46 @@ def create_idea_variant(
         result.update(_create_future_anxiety_variant(title, description, kwargs, seed, variation_index))
     elif variant_name == "comparison_trap":
         result.update(_create_comparison_trap_variant(title, description, kwargs, seed, variation_index))
+    # Blend templates - new themes combined
+    elif variant_name == "butterflies_anxiety":
+        result.update(_create_butterflies_anxiety_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "body_comparison":
+        result.update(_create_body_comparison_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "online_fitting":
+        result.update(_create_online_fitting_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "future_comparison":
+        result.update(_create_future_comparison_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "body_butterflies":
+        result.update(_create_body_butterflies_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "online_future":
+        result.update(_create_online_future_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "fitting_comparison":
+        result.update(_create_fitting_comparison_variant(title, description, kwargs, seed, variation_index))
+    # Blend templates - new with older
+    elif variant_name == "confession_body":
+        result.update(_create_confession_body_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "unsent_future":
+        result.update(_create_unsent_future_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "mirror_body":
+        result.update(_create_mirror_body_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "growing_online":
+        result.update(_create_growing_online_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "quiet_body":
+        result.update(_create_quiet_body_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "chosen_online":
+        result.update(_create_chosen_online_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "permission_body":
+        result.update(_create_permission_body_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "small_comparison":
+        result.update(_create_small_comparison_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "identity_fitting":
+        result.update(_create_identity_fitting_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "learned_body":
+        result.update(_create_learned_body_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "safe_online":
+        result.update(_create_safe_online_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "rewriting_body":
+        result.update(_create_rewriting_body_variant(title, description, kwargs, seed, variation_index))
     
     # Add target audience info to all variants
     result["target_audience"] = _get_target_audience_info()
@@ -4954,6 +5444,580 @@ def _create_comparison_trap_variant(title: str, description: str, kwargs: Dict, 
     }
 
 
+# =============================================================================
+# BLEND VARIANT CREATION HELPERS
+# =============================================================================
+
+def _create_butterflies_anxiety_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create butterflies + anxiety blend variant."""
+    topic = _humanize_topic(title)
+    
+    feelings = [
+        "Heart racing - half butterflies, half panic attack",
+        "Excitement and dread doing a tango in my chest",
+        "The good nervous and the bad nervous all at once",
+        "Giddy terror - there's no other word for it",
+        "Wanting this moment and wanting to escape it simultaneously"
+    ]
+    
+    conflicts = [
+        "Wanting them to notice me while hoping I'm invisible to everyone else",
+        "Desperate to be seen, terrified of being watched",
+        "Craving connection, dreading the vulnerability it requires",
+        "Hoping they look my way, planning my exit route",
+        "The fantasy vs the fear of it actually happening"
+    ]
+    
+    return {
+        "the_feeling": f"{_pick_from_pool(feelings, seed, variation_index)} — related to {topic.lower()}",
+        "what_they_want": "For them to notice, just them",
+        "what_they_fear": "What if I freeze? What if everyone sees?",
+        "the_conflict": _pick_from_pool(conflicts, seed, variation_index + 1),
+        "coping_attempt": "Deep breaths, phone as shield, planned escape routes",
+        "internal_chaos": "Be cool be cool be cool - oh god they're looking this way"
+    }
+
+
+def _create_body_comparison_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create body acceptance + comparison trap blend variant."""
+    topic = _humanize_topic(title)
+    
+    scrolls = [
+        "Perfect bodies, perfect skin, perfect everything",
+        "Before and after transformations that look impossible",
+        "That girl who makes everything look effortless",
+        "Influencers in bikinis like it's nothing",
+        "Everyone's glow-up except mine"
+    ]
+    
+    rebellions = [
+        "Wearing the outfit anyway",
+        "Refusing to suck in for photos",
+        "Eating without counting, just this once",
+        "Unfollowing, muting, protecting my peace",
+        "Looking in the mirror and not cataloging flaws"
+    ]
+    
+    return {
+        "the_scroll": f"When {topic.lower()} fills my feed — {_pick_from_pool(scrolls, seed, variation_index)}",
+        "the_mirror": "All the ways I don't measure up",
+        "the_knowledge": "Filters, angles, editing - none of it's real",
+        "the_feeling": "But what if they're just naturally like that and I'm not?",
+        "the_exhaustion": "I'm so tired of hating what I see",
+        "small_rebellion": _pick_from_pool(rebellions, seed, variation_index + 1)
+    }
+
+
+def _create_online_fitting_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create online connection + fitting in blend variant."""
+    topic = _humanize_topic(title)
+    
+    irl_struggles = [
+        "Every word feels scripted, every interaction exhausting",
+        "Never knowing the right thing to say until it's too late",
+        "Feeling like everyone got a manual I never received",
+        "The gap between who I am and who I perform",
+        "Belonging that requires becoming someone else"
+    ]
+    
+    online_ease = [
+        "I can be myself in text, think before I respond",
+        "Time to process, no pressure to be instant",
+        "They like me for my thoughts, not my performance",
+        "Deleting and rewriting until it's right",
+        "Being weird is normal here"
+    ]
+    
+    return {
+        "irl_struggle": f"When it comes to {topic.lower()} — {_pick_from_pool(irl_struggles, seed, variation_index)}",
+        "online_ease": _pick_from_pool(online_ease, seed, variation_index + 1),
+        "the_irony": "More 'real' with people I've never met than people I see daily",
+        "what_irl_people_think": "'You should get out more' 'Those aren't real friends'",
+        "the_truth": "They've seen me ugly cry at 3am - that's real enough",
+        "both_worlds": "Code-switching between who they expect and who I actually am"
+    }
+
+
+def _create_future_comparison_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create future anxiety + comparison trap blend variant."""
+    topic = _humanize_topic(title)
+    
+    their_plans = [
+        "Med school, gap year, starting a business - everyone has A Thing",
+        "Applications submitted, acceptances celebrated, futures secured",
+        "Internships, passion projects, five-year plans",
+        "They've known what they wanted since they were twelve",
+        "LinkedIn profiles that read like success stories"
+    ]
+    
+    quiet_hopes = [
+        "Maybe not knowing yet means I could be anything",
+        "Maybe my path just isn't linear",
+        "Maybe the late bloomers have their own garden",
+        "Maybe I'm not behind, just on a different road",
+        "Maybe uncertainty is its own kind of possibility"
+    ]
+    
+    return {
+        "their_plans": f"Everyone else and {topic.lower()} — {_pick_from_pool(their_plans, seed, variation_index)}",
+        "your_blank": "A future that looks like a fog machine",
+        "the_question": "'So what's your plan?' at every gathering",
+        "the_lie": "'Still figuring it out!' said with fake confidence",
+        "the_spiral": "Maybe I'm just not the kind of person who has dreams",
+        "quiet_hope": _pick_from_pool(quiet_hopes, seed, variation_index + 1)
+    }
+
+
+def _create_body_butterflies_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create body acceptance + first butterflies blend variant."""
+    topic = _humanize_topic(title)
+    
+    blocks = [
+        "'They'd never look at someone like me'",
+        "How can they like this when I don't?",
+        "They deserve someone who looks like the people they follow",
+        "I'd have to be different to be worth wanting",
+        "The mirror said no before they could"
+    ]
+    
+    fantasies = [
+        "Walk up, be confident, just talk to them",
+        "Let them see me without apologizing for existing",
+        "Wear what I want, not what hides me best",
+        "Believe them if they said something nice",
+        "Exist in their space like I belong there"
+    ]
+    
+    return {
+        "the_attraction": f"Something about them and {topic.lower()} that draws me in",
+        "the_block": _pick_from_pool(blocks, seed, variation_index),
+        "the_fantasy": _pick_from_pool(fantasies, seed, variation_index + 1),
+        "the_reality": "Look away, hide, convince myself it's not worth trying",
+        "almost_moment": "They smiled at me and I almost smiled back before I remembered",
+        "the_wish": "That I could see myself the way I see everyone else"
+    }
+
+
+def _create_online_future_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create online connection + future anxiety blend variant."""
+    topic = _humanize_topic(title)
+    
+    irl_pressures = [
+        "'You need to start thinking seriously about your future'",
+        "'When I was your age I already knew what I wanted'",
+        "'Your cousin got accepted early decision, you know'",
+        "'What's the plan? What's the backup plan?'",
+        "'You're running out of time to figure this out'"
+    ]
+    
+    online_understanding = [
+        "'Same, I have no idea what I'm doing either'",
+        "'Honestly? Everyone's just pretending they know'",
+        "'At least we're lost together'",
+        "'No one our age actually has it figured out'",
+        "'Can we just be confused in peace?'"
+    ]
+    
+    return {
+        "irl_pressure": f"About {topic.lower()} — {_pick_from_pool(irl_pressures, seed, variation_index)}",
+        "online_understanding": _pick_from_pool(online_understanding, seed, variation_index + 1),
+        "the_conversation": "3am voice chat where we all admitted we're terrified",
+        "the_relief": "Not being the only one who doesn't have it figured out",
+        "the_gap": "Online: 'it's okay to not know' / Offline: 'you should know by now'",
+        "shared_uncertainty": "Building a support system of equally lost people"
+    }
+
+
+def _create_fitting_comparison_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create fitting in + comparison trap blend variant."""
+    topic = _humanize_topic(title)
+    
+    thems = [
+        "Walking into rooms like they own them, effortless conversation",
+        "Never seeming to second-guess what they just said",
+        "Laughing without checking if it was the right amount",
+        "Belonging without earning it, like it's their birthright",
+        "Confidence that doesn't look like a costume"
+    ]
+    
+    secret_truths = [
+        "Maybe everyone's performing and I just think I'm the only one",
+        "What if being bad at this is normal and no one talks about it?",
+        "Maybe 'natural' is just 'practiced until invisible'",
+        "What if they're all exhausted too, just hiding it better?",
+        "Maybe belonging is something everyone's faking"
+    ]
+    
+    return {
+        "them": f"People and {topic.lower()} — {_pick_from_pool(thems, seed, variation_index)}",
+        "you": "Calculating every word, planning escape routes",
+        "the_performance": "Laughing at the right times, nodding along, seeming present",
+        "the_exhaustion": "Social hangover that lasts for days",
+        "the_question": "Are they actually confident or just better at pretending?",
+        "secret_truth": _pick_from_pool(secret_truths, seed, variation_index + 1)
+    }
+
+
+def _create_confession_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create confession moment + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    secrets = [
+        "I've never liked a single photo of myself",
+        "I spend more time hating my body than living in it",
+        "The mirror and I have never been friends",
+        "I don't know when I started feeling wrong, but I can't remember before",
+        "I've never felt at home in my own skin"
+    ]
+    
+    hardest_parts = [
+        "That I spend hours some days just... hating",
+        "That I've skipped things because of how I thought I'd look",
+        "That compliments feel like lies I have to pretend to believe",
+        "That I've been at war with myself for years",
+        "That I'm exhausted from the constant negotiation"
+    ]
+    
+    return {
+        "the_secret": f"What I've been hiding about {topic.lower()} — {_pick_from_pool(secrets, seed, variation_index)}",
+        "who_youre_telling": "Someone who might finally understand",
+        "why_now": "I can't keep pretending I'm fine",
+        "the_hardest_part": _pick_from_pool(hardest_parts, seed, variation_index + 1),
+        "their_response": "Please don't tell me I'm beautiful, just tell me you understand",
+        "after_speaking": "Lighter, even though nothing's fixed"
+    }
+
+
+def _create_unsent_future_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create unsent message + future anxiety blend variant."""
+    topic = _humanize_topic(title)
+    
+    messages = [
+        "Your 'helpful' questions feel like you're measuring my worth by my resume",
+        "I don't have the answers you want and your disappointment is exhausting",
+        "I'm terrified and your pressure isn't helping",
+        "Can you love me even without a plan?",
+        "I need support, not more expectations"
+    ]
+    
+    what_needed = [
+        "'I believe in you even if you don't know yet'",
+        "'Your worth isn't tied to your productivity'",
+        "'Take your time. The right path will become clear'",
+        "'I'm proud of you for who you are, not what you achieve'",
+        "'It's okay to not have it figured out yet'"
+    ]
+    
+    return {
+        "to_whom": f"Everyone who keeps asking about {topic.lower()}",
+        "the_message": _pick_from_pool(messages, seed, variation_index),
+        "what_sparked_it": "Another conversation where my future was the main topic",
+        "why_unsent": "They'd just worry more and ask different questions",
+        "what_youd_need": _pick_from_pool(what_needed, seed, variation_index + 1),
+        "instead": "'Still exploring my options!' with a practiced smile"
+    }
+
+
+def _create_mirror_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create mirror moment + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    moments = [
+        "Getting out of the shower, not avoiding the mirror for once",
+        "Catching my reflection unexpectedly and pausing",
+        "Looking - really looking - instead of glancing and flinching",
+        "A moment where the usual script didn't play",
+        "Seeing myself through different eyes, just for a second"
+    ]
+    
+    new_thoughts = [
+        "This body has been fighting for me while I've been fighting against it",
+        "Maybe we can be on the same team",
+        "What if I stopped treating myself like an enemy?",
+        "I've survived things. This body carried me through.",
+        "There's more to me than what I see in reflections"
+    ]
+    
+    return {
+        "the_moment": f"A mirror moment about {topic.lower()} — {_pick_from_pool(moments, seed, variation_index)}",
+        "usual_script": "Catalog of flaws, comparison to an impossible standard",
+        "the_shift": "Something was different this time",
+        "new_thought": _pick_from_pool(new_thoughts, seed, variation_index + 1),
+        "what_it_means": "Maybe a truce is possible",
+        "still_uncertain": "Tomorrow I might hate it again, but today was different"
+    }
+
+
+def _create_growing_online_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create growing apart + online connection blend variant."""
+    topic = _humanize_topic(title)
+    
+    old_friends = [
+        "Known her since third grade, but conversations feel like work now",
+        "The person who used to know me without words",
+        "Someone I share history with but not much else anymore",
+        "A friendship running on nostalgia and obligation",
+        "We've become strangers who know each other's childhood"
+    ]
+    
+    defenses = [
+        "Connection isn't measured in proximity",
+        "Real isn't defined by being in the same room",
+        "Depth doesn't require face-to-face",
+        "They know my soul. Geography is irrelevant.",
+        "Some people meet you where you are. Some just knew where you were."
+    ]
+    
+    return {
+        "the_old_friend": f"The IRL connection fading, related to {topic.lower()} — {_pick_from_pool(old_friends, seed, variation_index)}",
+        "the_new_friend": "Someone online who gets it without explanation",
+        "what_changed": "Realized I was excited to go home and text them, not to meet her",
+        "the_guilt": "Am I a bad friend? Am I replacing her?",
+        "the_defense": _pick_from_pool(defenses, seed, variation_index + 1),
+        "the_truth": "People grow in different directions. It's sad but it's okay."
+    }
+
+
+def _create_quiet_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create quiet rebellion + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    rules = [
+        "'Girls like you shouldn't wear that'",
+        "'You'd look better if you just...'",
+        "'That's not flattering on your body type'",
+        "'Are you sure you want to eat that?'",
+        "'You should try to be healthier' (but they mean thinner)"
+    ]
+    
+    rebellions = [
+        "Wearing the crop top anyway",
+        "Eating dessert without earning it with exercise",
+        "Taking up space without apologizing",
+        "Posting a photo without editing",
+        "Existing in public like I belong there"
+    ]
+    
+    return {
+        "the_rule": f"The body rule about {topic.lower()} — {_pick_from_pool(rules, seed, variation_index)}",
+        "who_made_it": "Comments, looks, diet culture, everywhere",
+        "the_rebellion": _pick_from_pool(rebellions, seed, variation_index + 1),
+        "the_fear": "People staring, people laughing, people confirming what I fear",
+        "the_power": "Doing it anyway, terrified and free",
+        "the_message": "My body is allowed to exist in spaces, in clothes, in public"
+    }
+
+
+def _create_chosen_online_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create chosen family + online connection blend variant."""
+    topic = _humanize_topic(title)
+    
+    groups = [
+        "Five people scattered across four time zones",
+        "A group chat that's been going for years",
+        "Strangers who became siblings",
+        "People who found each other in the digital wilderness",
+        "A community that became a family"
+    ]
+    
+    what_they_give = [
+        "Unconditional support, 2am check-ins, inside jokes that span years",
+        "A place where I don't have to explain myself",
+        "Love that doesn't require performance",
+        "The kind of acceptance I didn't get at home",
+        "Chosen family in the truest sense"
+    ]
+    
+    return {
+        "the_group": f"My online family around {topic.lower()} — {_pick_from_pool(groups, seed, variation_index)}",
+        "how_found": "A fandom/interest that became so much more",
+        "what_they_give": _pick_from_pool(what_they_give, seed, variation_index + 1),
+        "irl_gap": "What's missing in offline relationships",
+        "defining_moment": "When they showed up for me in a way no one else had",
+        "future_hope": "One day we'll all be in the same room"
+    }
+
+
+def _create_permission_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create permission to + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    permissions = [
+        "To not hate what I see",
+        "To exist without shrinking",
+        "To stop the constant negotiation with food",
+        "To buy clothes I like instead of clothes that hide",
+        "To be in photos without analyzing them for hours"
+    ]
+    
+    first_steps = [
+        "Eating when I'm hungry without negotiating with myself",
+        "Wearing something I've been hiding in my closet",
+        "Looking in the mirror without the usual script",
+        "Saying 'thank you' to a compliment instead of arguing",
+        "Letting myself rest without earning it"
+    ]
+    
+    return {
+        "the_permission": f"Permission about {topic.lower()} — {_pick_from_pool(permissions, seed, variation_index)}",
+        "the_war": "Years of monitoring, controlling, hating",
+        "what_triggered": "Realized I don't remember a time I liked my body",
+        "the_fear": "If I stop fighting, will I 'let myself go'?",
+        "the_relief": "What would it be like to just... exist? Without the commentary?",
+        "first_step": _pick_from_pool(first_steps, seed, variation_index + 1)
+    }
+
+
+def _create_small_comparison_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create small moment big + comparison trap blend variant."""
+    topic = _humanize_topic(title)
+    
+    small_things = [
+        "She got more likes on a similar photo",
+        "They invited her and not me",
+        "A comment that was probably nothing",
+        "Seeing them tagged in something I wasn't part of",
+        "The smallest thing that proved everything I feared"
+    ]
+    
+    realizations = [
+        "I've been measuring my worth in double-taps",
+        "The comparison has been running in the background constantly",
+        "I didn't know how much I needed external validation until this",
+        "This isn't about them. It's about what I already believed about myself.",
+        "The comparison trap has me and I didn't even see the walls"
+    ]
+    
+    return {
+        "the_small_thing": f"A tiny thing about {topic.lower()} — {_pick_from_pool(small_things, seed, variation_index)}",
+        "why_big": "Because it confirmed what I already believed",
+        "the_comparison": "Her: effortless. Me: trying so hard and still less",
+        "the_spiral": "Maybe I'm just... less likable, less pretty, less everything",
+        "the_realization": _pick_from_pool(realizations, seed, variation_index + 1),
+        "what_now": "Maybe worth isn't a number. Maybe it never was."
+    }
+
+
+def _create_identity_fitting_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create identity power + fitting in blend variant."""
+    topic = _humanize_topic(title)
+    
+    who_you_are = [
+        "Weird interests, strong opinions, too much or not enough",
+        "The person who doesn't fit the mold",
+        "Someone whose authentic self clashes with expectations",
+        "Different in ways that are hard to hide",
+        "The version of me that makes people uncomfortable"
+    ]
+    
+    choices = [
+        "Keep performing or let them see",
+        "Belonging at the cost of being myself",
+        "The exhaustion of pretending vs the fear of being seen",
+        "Hiding to fit in or showing up and maybe being alone",
+        "Safety of blending in vs authenticity that stands out"
+    ]
+    
+    return {
+        "who_you_are": f"My authentic self with {topic.lower()} — {_pick_from_pool(who_you_are, seed, variation_index)}",
+        "what_fitting_requires": "Dulling the edges, caring about the right stuff",
+        "the_cost": "Feeling like a ghost in my own life",
+        "the_risk": "Being alone, being mocked, being the weird one",
+        "the_choice": _pick_from_pool(choices, seed, variation_index + 1),
+        "the_power": "The exhaustion of pretending is worse than the fear of being seen"
+    }
+
+
+def _create_learned_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create learned young + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    lessons = [
+        "That taking up space was bad, that hunger was weakness",
+        "That my body was a project to be fixed",
+        "That certain foods were 'good' and eating was something to monitor",
+        "That I should always be smaller than I am",
+        "That my worth and my weight were connected"
+    ]
+    
+    unlearnings = [
+        "My body is a home, not a project",
+        "Hunger is information, not failure",
+        "I'm allowed to take up exactly as much space as I take up",
+        "My worth has nothing to do with my size",
+        "I can stop fighting the body that's kept me alive"
+    ]
+    
+    return {
+        "the_lesson": f"What I learned young about {topic.lower()} — {_pick_from_pool(lessons, seed, variation_index)}",
+        "who_taught": "Mom's comments, magazines, everything everywhere",
+        "how_it_stuck": "Started monitoring myself before I knew what I was monitoring",
+        "the_damage": "Never just... existing. Always calculating, comparing, controlling",
+        "the_unlearning": _pick_from_pool(unlearnings, seed, variation_index + 1),
+        "the_work": "Catching the old thoughts, replacing them, being patient with the process"
+    }
+
+
+def _create_safe_online_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create safe person + online connection blend variant."""
+    topic = _humanize_topic(title)
+    
+    who_they_are = [
+        "Someone I met online five years ago, never seen their face",
+        "A username that became the person I trust most",
+        "A stranger who knows me better than my family",
+        "Someone I found in the comments and never stopped talking to",
+        "My safest person, 3000 miles away"
+    ]
+    
+    what_you_share = [
+        "The thoughts I can't say out loud, the fears that feel too dramatic",
+        "The ugly parts I hide from everyone else",
+        "The version of me that would scare people in person",
+        "Everything I've been told is 'too much'",
+        "The full truth, not the edited version"
+    ]
+    
+    return {
+        "who_they_are": f"My safe person online, related to {topic.lower()} — {_pick_from_pool(who_they_are, seed, variation_index)}",
+        "how_safety_built": "Slow sharing, matched vulnerability, never judgment",
+        "what_you_share": _pick_from_pool(what_you_share, seed, variation_index + 1),
+        "the_paradox": "A stranger knows me better than my family",
+        "what_others_say": "'That's not a real friendship' 'You should talk to real people'",
+        "why_it_works": "No history to disappoint, no face to perform for"
+    }
+
+
+def _create_rewriting_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create rewriting story + body acceptance blend variant."""
+    topic = _humanize_topic(title)
+    
+    old_stories = [
+        "'My body is wrong and needs fixing'",
+        "'I'll be happy when I'm thinner'",
+        "'I don't deserve to be seen like this'",
+        "'Good things don't happen to people who look like me'",
+        "'My body is the enemy and I'm losing the war'"
+    ]
+    
+    new_stories = [
+        "My body is trying its best. So am I.",
+        "My worth isn't measured in pounds or inches",
+        "This body has survived things. It deserves gentleness.",
+        "I'm allowed to exist exactly as I am",
+        "The war is optional. I can choose peace."
+    ]
+    
+    return {
+        "old_story": f"The story about {topic.lower()} — {_pick_from_pool(old_stories, seed, variation_index)}",
+        "who_wrote_it": "Diet culture, that one comment in middle school, mirrors that felt like enemies",
+        "the_chapter": "The moment that started the story",
+        "new_story": _pick_from_pool(new_stories, seed, variation_index + 1),
+        "the_evidence": "It healed when I was sick. It carries me through hard days. It's trying.",
+        "work_in_progress": "Some days the old story wins. But less often now."
+    }
+
+
 __all__ = [
     # Constants
     "VARIANT_TEMPLATES",
@@ -5026,6 +6090,26 @@ __all__ = [
     "VARIANT_ONLINE_CONNECTION",
     "VARIANT_FUTURE_ANXIETY",
     "VARIANT_COMPARISON_TRAP",
+    # Blend template definitions
+    "VARIANT_BUTTERFLIES_ANXIETY",
+    "VARIANT_BODY_COMPARISON",
+    "VARIANT_ONLINE_FITTING",
+    "VARIANT_FUTURE_COMPARISON",
+    "VARIANT_BODY_BUTTERFLIES",
+    "VARIANT_ONLINE_FUTURE",
+    "VARIANT_FITTING_COMPARISON",
+    "VARIANT_CONFESSION_BODY",
+    "VARIANT_UNSENT_FUTURE",
+    "VARIANT_MIRROR_BODY",
+    "VARIANT_GROWING_ONLINE",
+    "VARIANT_QUIET_BODY",
+    "VARIANT_CHOSEN_ONLINE",
+    "VARIANT_PERMISSION_BODY",
+    "VARIANT_SMALL_COMPARISON",
+    "VARIANT_IDENTITY_FITTING",
+    "VARIANT_LEARNED_BODY",
+    "VARIANT_SAFE_ONLINE",
+    "VARIANT_REWRITING_BODY",
     # Core functions
     "get_template",
     "list_templates",
