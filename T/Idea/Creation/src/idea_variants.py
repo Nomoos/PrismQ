@@ -3815,7 +3815,7 @@ def _create_permission_to_variant(title: str, description: str, kwargs: Dict, se
         "what_changed": _pick_from_pool(what_changed, seed, variation_index + 2),
         "how_it_feels": _pick_from_pool(how_it_feels, seed, variation_index + 3),
         "what_they_feared": "That allowing this makes me less worthy",
-        "whats_next": _pick_from_pool(whats_next, seed, variation_index + 4 if variation_index + 4 < len(whats_next) else 0)
+        "whats_next": _pick_from_pool(whats_next, seed, variation_index + 4)
     }
 
 
@@ -4056,7 +4056,7 @@ def _create_holding_space_variant(title: str, description: str, kwargs: Dict, se
         "what_they_didnt_do": _pick_from_pool(what_didnt_do, seed, variation_index + 1),
         "what_they_did_instead": _pick_from_pool(what_did_instead, seed, variation_index + 2),
         "what_it_cost": _pick_from_pool(what_it_cost, seed, variation_index + 3),
-        "what_was_learned": _pick_from_pool(what_was_learned, seed, variation_index + 4 if variation_index + 4 < len(what_was_learned) else 0)
+        "what_was_learned": _pick_from_pool(what_was_learned, seed, variation_index + 4)
     }
 
 
@@ -4110,7 +4110,7 @@ def _create_rewriting_the_story_variant(title: str, description: str, kwargs: Di
         "the_new_understanding": _pick_from_pool(new_understandings, seed, variation_index + 2),
         "what_made_rewrite_possible": "Time, therapy, or someone who told me the truth",
         "how_it_feels_different": _pick_from_pool(how_feels_different, seed, variation_index + 3),
-        "ongoing_revision": _pick_from_pool(ongoing_revision, seed, variation_index + 4 if variation_index + 4 < len(ongoing_revision) else 0)
+        "ongoing_revision": _pick_from_pool(ongoing_revision, seed, variation_index + 4)
     }
 
 
