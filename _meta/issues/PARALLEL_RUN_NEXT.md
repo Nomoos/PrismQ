@@ -15,7 +15,7 @@ The `PrismQ.T.Idea.Creation` module is complete. Below are all numbered modules 
 
 ## 🔢 NUMBERED MODULES - Pick Your Next Implementation
 
-### Workflow Path A: Core Pipeline (Stages 2-22)
+### Workflow Path A: Core Pipeline (Stages 2-18)
 
 Following the main workflow sequence from WORKFLOW_DETAILED.md:
 
@@ -70,7 +70,7 @@ Following the main workflow sequence from WORKFLOW_DETAILED.md:
 | **32** | GPT API Integration for Polish | Phase 1 | Connect GPT for polishing | 3d | #31 |
 | **33** | Prompt Engineering Templates | Phase 1 | Create review/polish prompts | 2d | None |
 | **34** | Response Parsing & Validation | Phase 1 | Parse GPT responses | 2d | #31, #32 |
-| **35** | Story Workflow Orchestrator | Phase 2 | Run Stage 21-22 loop | 3d | #31, #32 |
+| **35** | Story Workflow Orchestrator | Phase 2 | Run Stage 17-18 loop | 3d | #31, #32 |
 | **36** | Iteration Loop Management | Phase 2 | Polish→Review cycle | 2d | #35 |
 | **37** | DB Integration for Tracking | Phase 2 | Track story workflow state | 2d | #35 |
 | **38** | State Machine Implementation | Phase 2 | Story workflow states | 2d | #35 |
