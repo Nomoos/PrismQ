@@ -1,227 +1,209 @@
-# PARALLEL_RUN_NEXT - Workflow Implementation Guide
+# PARALLEL_RUN_NEXT - Implementation Commands
 
-> **Purpose**: Numbered modules and commands for implementing workflow steps after `PrismQ.T.Idea.Creation`.  
-> **Completed Work**: `_meta/issues/done/` | **Full Roadmap**: `PARALLEL_RUN_NEXT_FULL.md`
+> **Current Focus**: CORE-001 and CORE-002 (Stages 2-3 of Core Pipeline)  
+> **Issue Specs**: `_meta/issues/new/CORE-001-Title-From-Idea.md` | `_meta/issues/new/CORE-002-Script-FromIdeaAndTitle.md`
 
-**Updated**: 2025-11-30 | **Sprint**: 4 - Integration Phase
-
----
-
-## 📍 Current Position: After PrismQ.T.Idea.Creation
-
-The `PrismQ.T.Idea.Creation` module is complete. Below are all numbered modules that can be implemented next, organized by workflow path and priority.
+**Updated**: 2025-11-30 | **Sprint**: 4 - Core Pipeline
 
 ---
 
-## 🔢 NUMBERED MODULES - Pick Your Next Implementation
+## 🎯 ACTIVE ISSUES
 
-### Workflow Path A: Core Pipeline (Stages 2-18)
-
-Following the main workflow sequence from WORKFLOW_DETAILED.md:
-
-| # | Module | Stage | Description | Effort | Dependencies |
-|---|--------|-------|-------------|--------|--------------|
-| **1** | `T.Title.From.Idea` | Stage 2 | Generate initial title variants from idea | 2d | Idea.Creation ✅ |
-| **2** | `T.Script.FromIdeaAndTitle` | Stage 3 | Create initial script draft | 3d | #1 |
-| **3** | `T.Review.Title.ByScriptIdea` | Stage 4 | Review title against script and idea | 2d | #1, #2 |
-| **4** | `T.Review.Script.ByTitleIdea` | Stage 5 | Review script against title and idea | 2d | #1, #2 |
-| **5** | `T.Review.Title.ByScript` | Stage 6 | Title-script alignment review | 1d | #3 |
-| **6** | `T.Title.From.Script.Review.Title` | Stage 7 | Refine title from review feedback | 2d | #5 |
-| **7** | `T.Script.FromOriginalScriptAndReviewAndTitle` | Stage 8 | Refine script from feedback | 2d | #5, #6 |
-| **8** | `T.Review.Script.ByTitle` | Stage 9 | Final script-title review | 1d | #7 |
-| **9** | `T.Review.Script.Grammar` | Stage 10 | Grammar validation | 1d | #8 |
-| **10** | `T.Review.Script.Tone` | Stage 11 | Tone consistency check | 1d | #9 |
-| **11** | `T.Review.Script.Content` | Stage 12 | Content accuracy validation | 1d | #10 |
-| **12** | `T.Review.Script.Consistency` | Stage 13 | Style consistency check | 1d | #11 |
-| **13** | `T.Review.Script.Editing` | Stage 14 | Final editing pass | 1d | #12 |
-| **14** | `T.Review.Title.Readability` | Stage 15 | Title readability check | 1d | #13 |
-| **15** | `T.Review.Script.Readability` | Stage 16 | Script readability check | 1d | #14 |
-| **16** | `T.Story.Review` | Stage 17 | GPT expert review | 3d | #15 |
-| **17** | `T.Story.Polish` | Stage 18 | GPT expert polishing | 3d | #16 |
-
-### Workflow Path B: Integration & Infrastructure
-
-| # | Module | Type | Description | Effort | Dependencies |
-|---|--------|------|-------------|--------|--------------|
-| **18** | `T.Integration.StatePersistence` | Integration | Connect state machine to database | 1d | None |
-| **19** | `T.Database.Migrations` | Integration | Database migration scripts | 1d | None |
-| **20** | `T.Publishing.Finalization` | Publishing | Final publication preparation | 2d | #17 |
-
-### Workflow Path C: Enhancements (POST-MVP)
-
-| # | Module | Sprint | Description | Effort | Dependencies |
-|---|--------|--------|-------------|--------|--------------|
-| **21** | `T.Publishing.SEO.Keywords` | Sprint 4 | Keyword research & optimization | 2d | None |
-| **22** | `T.Script.Formatter.Blog` | Sprint 4 | Blog format optimization | 2d | None |
-| **23** | `T.Idea.Batch` | Sprint 4 | Batch idea processing | 2d | None |
-| **24** | `T.Title.ABTesting` | Sprint 4 | A/B testing framework | 2d | #21 |
-| **25** | `T.Idea.Inspiration.YouTube` | Sprint 5 | YouTube API integration | 2d | None |
-| **26** | `T.Idea.Inspiration.RSS` | Sprint 5 | RSS feed integration | 1.5d | None |
-| **27** | `T.Idea.Inspiration.Twitter` | Sprint 5 | Twitter/X API integration | 1.5d | None |
-| **28** | `T.Script.Versioning` | Sprint 5 | Version history & rollback | 2d | None |
-| **29** | `T.Review.Collaboration` | Sprint 5 | Multi-reviewer workflow | 2d | None |
-| **30** | `T.Review.Comments` | Sprint 5 | Inline comments & annotations | 2d | None |
-
-### Workflow Path D: Story Generation (STORY-xxx)
-
-| # | Module | Phase | Description | Effort | Dependencies |
-|---|--------|-------|-------------|--------|--------------|
-| **31** | GPT API Integration for Review | Phase 1 | Connect GPT for expert review | 3d | None |
-| **32** | GPT API Integration for Polish | Phase 1 | Connect GPT for polishing | 3d | #31 |
-| **33** | Prompt Engineering Templates | Phase 1 | Create review/polish prompts | 2d | None |
-| **34** | Response Parsing & Validation | Phase 1 | Parse GPT responses | 2d | #31, #32 |
-| **35** | Story Workflow Orchestrator | Phase 2 | Run Stage 17-18 loop | 3d | #31, #32 |
-| **36** | Iteration Loop Management | Phase 2 | Polish→Review cycle | 2d | #35 |
-| **37** | DB Integration for Tracking | Phase 2 | Track story workflow state | 2d | #35 |
-| **38** | State Machine Implementation | Phase 2 | Story workflow states | 2d | #35 |
-| **39** | Error Handling & Retry Logic | Phase 3 | Robust error handling | 2d | #35 |
-| **40** | Cost Tracking & Optimization | Phase 3 | GPT API cost management | 2d | #39 |
+| Issue | Module | Stage | Effort | Status |
+|-------|--------|-------|--------|--------|
+| **CORE-001** | `T.Title.From.Idea` | Stage 2 | 2 days | 🆕 Ready |
+| **CORE-002** | `T.Script.FromIdeaAndTitle` | Stage 3 | 3 days | 🔒 Blocked by CORE-001 |
 
 ---
 
-## 👤 USER SELECTION
+## 🚀 CORE-001: T.Title.From.Idea
 
-**To select modules for implementation, enter their numbers:**
-
-Example: `1, 2, 3` or `18, 19` or `21-25`
-
-### Recommended Starting Points:
-
-| Focus Area | Recommended Modules | Notes |
-|------------|---------------------|-------|
-| **Core Workflow** | 1, 2, 3, 4 | Essential pipeline stages |
-| **Integration** | 18, 19 | Quick wins, unblocked |
-| **Enhancements** | 21, 22, 23 | Independent features |
-| **Story Generation** | 31, 33, 35 | GPT expert review setup |
-
----
-
-## 🚀 PARALLEL EXECUTION GROUPS
-
-### Group A: Unblocked - Start Immediately
+### Implementation Commands
 
 ```bash
-# === Module #18: State-Database Integration ===
+# === Step 1: Create Branch ===
 cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-18-state-db-integration
-# Create: T/Integration/state_persistence.py
-# Tests: T/Integration/_meta/tests/test_state_persistence.py
+git checkout -b core-001-title-from-idea
 
-# === Module #19: Migration Script ===
+# === Step 2: Navigate to Module ===
+cd T/Title/From/Idea/
+
+# === Step 3: Review Existing Implementation ===
+cat src/title_generator.py
+cat README.md
+
+# === Step 4: Run Existing Tests ===
 cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-19-migration
-# Create: T/Database/migrations/001_initial_schema.py
-# Tests: T/Database/_meta/tests/test_migration.py
+python -m pytest T/Title/From/Idea/_meta/tests/ -v
+
+# === Step 5: Implement Enhancements ===
+# File: T/Title/From/Idea/src/title_generator.py
+# 
+# Key Classes:
+#   - TitleGenerator: Main generator class
+#   - TitleVariant: Output dataclass (text, style, length, keywords, score)
+#   - TitleConfig: Configuration (num_variants, min/max_length, focus)
+#
+# 10 Generation Strategies:
+#   1. direct      - Straightforward title
+#   2. question    - Engaging question
+#   3. how-to      - Action-oriented
+#   4. curiosity   - Creates intrigue
+#   5. authoritative - Expert perspective
+#   6. listicle    - Number-based
+#   7. problem-solution - Addresses challenges
+#   8. comparison  - Contrasts approaches
+#   9. ultimate-guide - Comprehensive
+#   10. benefit    - Value proposition
+
+# === Step 6: Write/Update Tests ===
+# File: T/Title/From/Idea/_meta/tests/test_title_generator.py
+#
+# Test Cases:
+#   - test_generate_10_variants_from_valid_idea
+#   - test_handle_minimal_idea_data
+#   - test_length_constraints_20_to_100_chars
+#   - test_all_10_strategies_unique_output
+#   - test_keyword_extraction_accuracy
+#   - test_edge_cases_empty_idea_invalid_num
+
+# === Step 7: Run Tests ===
+python -m pytest T/Title/From/Idea/_meta/tests/ -v --cov=T/Title/From/Idea/src
+
+# === Step 8: Integration Test with Idea.Creation ===
+python -m pytest tests/test_integration.py -k "title" -v
+
+# === Step 9: Update Documentation ===
+# Update: T/Title/From/Idea/README.md
+
+# === Step 10: Commit and Push ===
+git add .
+git commit -m "CORE-001: Enhance T.Title.From.Idea module"
+git push origin core-001-title-from-idea
 ```
 
-### Group B: Core Workflow Sequence
+### Acceptance Criteria Checklist
 
-```bash
-# === Module #1: Title.From.Idea ===
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-01-title-from-idea
-# Location: T/Title/From/Idea/
-# Implement: src/title_generator.py
-# Tests: _meta/tests/test_title_from_idea.py
-
-# === Module #2: Script.FromIdeaAndTitle ===
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-02-script-from-idea-title
-# Location: T/Script/FromIdeaAndTitle/
-# Implement: src/script_generator.py
-# Tests: _meta/tests/test_script_generator.py
-```
-
-### Group C: Enhancements (Independent)
-
-```bash
-# === Module #21: SEO Keywords ===
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-21-seo-keywords
-# Create: T/Publishing/SEO/Keywords/
-# Spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-001-SEO-Keywords.md
-
-# === Module #22: Blog Format ===
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-22-blog-format
-# Create: T/Script/Formatter/Blog/
-# Spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-003-Blog-Format.md
-
-# === Module #23: Batch Processing ===
-cd /home/runner/work/PrismQ/PrismQ
-git checkout -b module-23-batch-processing
-# Create: T/Idea/Batch/
-# Spec: T/_meta/issues/new/POST-MVP-Enhancements/POST-005-Batch-Processing.md
-```
-
----
-
-## 📊 DEPENDENCY VISUALIZATION
-
-```
-                    ┌──────────────────────────────────────────────────────────────────┐
-                    │                    WORKFLOW AFTER Idea.Creation                   │
-                    └──────────────────────────────────────────────────────────────────┘
-                                                   │
-            ┌──────────────────────────────────────┼──────────────────────────────────────┐
-            │                                      │                                      │
-   ┌────────┴────────┐                  ┌──────────┴──────────┐               ┌───────────┴───────────┐
-   │  PATH A: CORE   │                  │  PATH B: INTEGR.    │               │  PATH C: ENHANCE     │
-   │  (Sequential)   │                  │  (Unblocked)        │               │  (Independent)       │
-   └────────┬────────┘                  └──────────┬──────────┘               └───────────┬───────────┘
-            │                                      │                                      │
-     ┌──────┴──────┐                        ┌──────┴──────┐                        ┌──────┴──────┐
-     │ #1 Title    │                        │ #18 State  │                        │ #21 SEO    │
-     │ From.Idea   │                        │ Persist    │                        │ Keywords   │
-     └──────┬──────┘                        └────────────┘                        └────────────┘
-            │                                      │                                      │
-     ┌──────┴──────┐                        ┌──────┴──────┐                        ┌──────┴──────┐
-     │ #2 Script   │                        │ #19 DB     │                        │ #22 Blog   │
-     │ FromIdea    │                        │ Migration  │                        │ Format     │
-     └──────┬──────┘                        └────────────┘                        └────────────┘
-            │                                                                            │
-     ┌──────┴──────┐                                                              ┌──────┴──────┐
-     │ #3-#4       │                                                              │ #23 Batch  │
-     │ Reviews     │                                                              │ Processing │
-     └──────┬──────┘                                                              └────────────┘
-            │
-     ┌──────┴──────┐
-     │ #5-#8       │
-     │ Alignment   │
-     └──────┬──────┘
-            │
-     ┌──────┴──────┐
-     │ #9-#15      │
-     │ Quality     │
-     └──────┬──────┘
-            │
-     ┌──────┴──────┐
-     │ #16-#17     │
-     │ Expert GPT  │
-     └──────┬──────┘
-            │
-     ┌──────┴──────┐
-     │ #20 Publish │
-     │ Final       │
-     └─────────────┘
+```markdown
+- [ ] Title generation produces 3-10 high-quality variants per idea
+- [ ] Each variant uses a distinct generation strategy
+- [ ] Generated titles meet length constraints (20-100 chars)
+- [ ] Titles include relevant keywords from source idea
+- [ ] Quality scores accurately reflect title engagement potential
+- [ ] Module integrates with Idea.Creation output format
+- [ ] Unit tests achieve >80% coverage
+- [ ] Integration with Stage 3 (Script.FromIdeaAndTitle) verified
 ```
 
 ---
 
-## 🎉 COMPLETED WORK
+## 🚀 CORE-002: T.Script.FromIdeaAndTitle
 
-- MVP-001 through MVP-024 ✅
-- STATE-001, STATE-002, STATE-003 ✅
-- DB-001 through DB-005 ✅ (175 tests passing)
-- **PrismQ.T.Idea.Creation** ✅ (AI-powered idea generation)
+### Implementation Commands
 
-See `_meta/issues/done/` for details.
+```bash
+# === Step 1: Create Branch (after CORE-001 complete) ===
+cd /home/runner/work/PrismQ/PrismQ
+git checkout -b core-002-script-from-idea-title
+
+# === Step 2: Navigate to Module ===
+cd T/Script/FromIdeaAndTitle/
+
+# === Step 3: Review Existing Implementation ===
+cat src/script_generator.py
+cat README.md
+
+# === Step 4: Run Existing Tests ===
+cd /home/runner/work/PrismQ/PrismQ
+python -m pytest T/Script/FromIdeaAndTitle/_meta/tests/ -v
+
+# === Step 5: Implement Enhancements ===
+# File: T/Script/FromIdeaAndTitle/src/script_generator.py
+#
+# Key Classes:
+#   - ScriptGenerator: Main generator class
+#   - ScriptV1: Output dataclass (script_id, idea_id, title, full_text, sections, duration)
+#   - ScriptSection: Section breakdown (introduction, body, conclusion)
+#   - ScriptGeneratorConfig: Configuration (platform_target, duration, structure, tone)
+#
+# 4 Structure Types:
+#   1. HOOK_DELIVER_CTA: Hook (15%) → Deliver (70%) → CTA (15%)
+#   2. THREE_ACT: Setup (25%) → Development (50%) → Resolution (25%)
+#   3. PROBLEM_SOLUTION: Problem (30%) → Investigation (50%) → Solution (20%)
+#   4. STORY: Beginning → Middle → End
+#
+# Platform Targets:
+#   - YOUTUBE_SHORT: < 60 seconds
+#   - YOUTUBE_MEDIUM: 60-180 seconds
+#   - YOUTUBE_LONG: > 180 seconds
+#   - TIKTOK: < 60 seconds
+#   - INSTAGRAM_REEL: < 90 seconds
+
+# === Step 6: Write/Update Tests ===
+# File: T/Script/FromIdeaAndTitle/_meta/tests/test_script_generator.py
+#
+# Test Cases:
+#   - test_generate_script_from_valid_idea_and_title
+#   - test_section_structure_intro_body_conclusion
+#   - test_all_4_structure_types
+#   - test_duration_calculations_accurate
+#   - test_platform_specific_constraints
+#   - test_tone_detection
+#   - test_edge_cases_minimal_idea_long_titles
+
+# === Step 7: Run Tests ===
+python -m pytest T/Script/FromIdeaAndTitle/_meta/tests/ -v --cov=T/Script/FromIdeaAndTitle/src
+
+# === Step 8: Integration Test with Title.From.Idea ===
+python -m pytest tests/test_integration.py -k "script" -v
+
+# === Step 9: Update Documentation ===
+# Update: T/Script/FromIdeaAndTitle/README.md
+
+# === Step 10: Commit and Push ===
+git add .
+git commit -m "CORE-002: Enhance T.Script.FromIdeaAndTitle module"
+git push origin core-002-script-from-idea-title
+```
+
+### Acceptance Criteria Checklist
+
+```markdown
+- [ ] Script generation produces structured v1 drafts
+- [ ] Scripts respect platform duration constraints (YouTube short < 60s, medium < 180s)
+- [ ] Scripts include intro, body, and conclusion sections
+- [ ] Content delivers on title promises
+- [ ] Duration estimates are accurate (±10%)
+- [ ] Module integrates with Title.From.Idea output
+- [ ] Unit tests achieve >80% coverage
+- [ ] Integration with Stage 4-5 (Review stages) verified
+```
+
+---
+
+## 📊 WORKFLOW POSITION
+
+```
+Stage 1: PrismQ.T.Idea.Creation ✅ COMPLETE
+    ↓
+    Idea Object (concept, themes, keywords, hook, premise, synopsis)
+    ↓
+Stage 2: T.Title.From.Idea ← CORE-001 (Current)
+    ↓
+    TitleVariant (text, style, keywords, score)
+    ↓
+Stage 3: T.Script.FromIdeaAndTitle ← CORE-002 (Next)
+    ↓
+    ScriptV1 (full_text, sections, duration, metadata)
+    ↓
+Stage 4-5: Review stages (Future)
+```
 
 ---
 
 ## 📚 RELATED DOCUMENTATION
 
-- **[PARALLEL_RUN_NEXT_FULL.md](PARALLEL_RUN_NEXT_FULL.md)** - Complete 48-issue POST-MVP roadmap
+- **[CORE-001-Title-From-Idea.md](new/CORE-001-Title-From-Idea.md)** - Full issue specification
+- **[CORE-002-Script-FromIdeaAndTitle.md](new/CORE-002-Script-FromIdeaAndTitle.md)** - Full issue specification
 - **[T/WORKFLOW_DETAILED.md](../../T/WORKFLOW_DETAILED.md)** - Complete 18-stage workflow
-- **[STORY_GENERATION_PLAN.md](new/STORY_GENERATION_PLAN.md)** - Story Generation implementation (STORY-001 to STORY-020)
-- **[POST-MVP-ENHANCEMENTS.md](new/POST-MVP-ENHANCEMENTS.md)** - Enhancement issues reference
+- **[PARALLEL_RUN_NEXT_FULL.md](PARALLEL_RUN_NEXT_FULL.md)** - Complete POST-MVP roadmap
