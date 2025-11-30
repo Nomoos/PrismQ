@@ -63,7 +63,6 @@ Idea → Title v1 → Script v1
 
 | Module | Status | MVP Stage | Implementation |
 |--------|--------|-----------|----------------|
-| Idea | ✅ **Complete** | Pre-Stage | Worker10 idea review with gaps/pros/cons analysis |
 | Title/ByScriptAndIdea | ✅ **Complete** | Stage 4 | Full data model, tests, examples |
 | Script | ✅ **Complete** | Stage 5, 10, 13 | Full review system |
 | Grammar | 📋 **Planned** | Stage 14 | Placeholder only |
@@ -74,27 +73,18 @@ Idea → Title v1 → Script v1
 | Readability | 📋 **Planned** | Stages 19-20 | Placeholder only |
 
 ### [Idea](./Idea/)
-**Idea review and validation** ⭐ **IMPLEMENTED**
+**Idea review and validation** (Future)
 
-Worker10's comprehensive idea review system for analyzing ideas generated from Idea.Creation.
+Review and validate initial idea concepts for viability, target audience fit, and potential impact.
 
-- **Gaps analysis**: Missing or weak content areas
-- **Pros/Cons**: Strengths and areas for improvement
-- **Variant comparison**: Differences across generated variants
-- **Similarity analysis**: Compatibility with original input text
-- **Recommendations**: Actionable suggestions for next steps
-
-**Key Features:**
-- CLI tool for quick reviews: `idea_review_cli.py "skirts 2000"`
-- Supports keywords, phrases, and longer text inputs
-- Works with Czech and other languages
-- Markdown and JSON output formats
-- Seed-based reproducibility
-
-**Testing**: All 27 tests passing
+- Concept viability assessment
+- Target audience validation
+- Originality and uniqueness check
+- Resource requirements evaluation
+- Impact assessment
 
 **[→ View Idea Documentation](./Idea/README.md)**
-**[→ View Idea Tests](./Idea/_meta/tests/)**
+**[→ View Idea Metadata](./Idea/_meta/)**
 
 ### [Script](./Script/)
 **AI-powered script review** ⭐ NEW
