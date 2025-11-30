@@ -246,8 +246,10 @@ class StoryTitleService:
             # Create a simple slug from title
             return idea.title.lower().replace(' ', '-')[:50]
         
-        # Use concept hash as fallback
-        return f"idea-{hash(idea.concept) % 100000:05d}"
+        # Use deterministic hash of concept as fallback (hashlib for stability)
+        import hashlib
+        concept_hash = hashlib.md5(idea.concept.encode()).hexdigest()[:8]
+        return f"idea-{concept_hash}"
     
     def ensure_tables_exist(self) -> None:
         """Ensure Story and Title tables exist in the database.
@@ -264,24 +266,8 @@ class StoryTitleService:
         # Create Story table
         self._conn.executescript(Story.get_sql_schema())
         
-        # Create Title table (if schema method exists)
-        title_schema = """
-        CREATE TABLE IF NOT EXISTS Title (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            story_id INTEGER NOT NULL,
-            version INTEGER NOT NULL CHECK (version >= 0),
-            text TEXT NOT NULL,
-            review_id INTEGER NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version),
-            FOREIGN KEY (story_id) REFERENCES Story(id),
-            FOREIGN KEY (review_id) REFERENCES Review(id)
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_title_story_id ON Title(story_id);
-        CREATE INDEX IF NOT EXISTS idx_title_story_version ON Title(story_id, version);
-        """
-        self._conn.executescript(title_schema)
+        # Create Title table using Title model's schema
+        self._conn.executescript(Title.get_sql_schema())
         self._conn.commit()
 
 
