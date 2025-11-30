@@ -54,9 +54,14 @@ if str(database_path) not in sys.path:
 if str(t_module_dir) not in sys.path:
     sys.path.insert(0, str(t_module_dir))
 
+# Also add the src directory itself for title_generator imports
+src_dir = current_file.parent
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
+
 from idea import Idea
 
-# Import TitleGenerator from same directory using absolute-like path
+# Import TitleGenerator from same directory
 from title_generator import TitleGenerator, TitleVariant, TitleConfig
 
 # Import database models and repositories
