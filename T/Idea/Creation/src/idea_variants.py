@@ -1040,6 +1040,138 @@ VARIANT_REWRITING_THE_STORY = {
 
 
 # =============================================================================
+# FUSION VARIANT TEMPLATES - Combinations of existing templates
+# These blend elements from multiple templates for unique story seeds
+# =============================================================================
+
+VARIANT_CONFESSION_MYSTERY = {
+    "name": "Confession + Mystery Fusion",
+    "description": "First-person confession that reveals a mystery element. Combines confession_moment's vulnerability with mystery's intrigue.",
+    "fields": {
+        "confession_hook": "Opening line promising a reveal",
+        "hidden_mystery": "The mysterious element being confessed",
+        "clues_dropped": "Hints the narrator has been leaving",
+        "why_speaking_now": "What triggered this confession",
+        "what_they_discovered": "The truth they finally uncovered",
+        "unresolved_question": "What still haunts them"
+    },
+    "example": {
+        "confession_hook": "I've been lying to everyone about what I found...",
+        "hidden_mystery": "A pattern in old family photos that nobody else noticed",
+        "clues_dropped": "Comments I made that everyone dismissed",
+        "why_speaking_now": "I finally have proof I wasn't imagining it",
+        "what_they_discovered": "The family secret hidden in plain sight",
+        "unresolved_question": "Why did they hide this from me specifically?"
+    }
+}
+
+VARIANT_OVERHEARD_TRANSFORMATION = {
+    "name": "Overheard + Transformation Fusion",
+    "description": "Something overheard triggers a major personal transformation. Combines overheard_truth's discovery with before_after's change arc.",
+    "fields": {
+        "what_was_heard": "The overheard words that changed everything",
+        "before_hearing": "Who they were before this moment",
+        "immediate_impact": "First reaction to hearing it",
+        "transformation_process": "How they changed because of it",
+        "after_hearing": "Who they became",
+        "confrontation_choice": "Whether they ever addressed what they heard"
+    },
+    "example": {
+        "what_was_heard": "Mom saying she wished I was more like my sister",
+        "before_hearing": "The kid trying desperately to be enough",
+        "immediate_impact": "Something broke and something clicked at the same time",
+        "transformation_process": "Stopped trying to be what they wanted",
+        "after_hearing": "Someone who defines their own worth",
+        "confrontation_choice": "Never told them - the change speaks for itself"
+    }
+}
+
+VARIANT_UNSENT_REBELLION = {
+    "name": "Unsent Message + Quiet Rebellion Fusion",
+    "description": "The unsent message IS the rebellion. Combines unsent_message's unspoken words with quiet_rebellion's silent defiance.",
+    "fields": {
+        "the_message": "What the message says",
+        "who_its_for": "The authority figure it's addressed to",
+        "why_writing_is_rebellion": "How even writing this is an act of defiance",
+        "what_theyd_lose": "What would happen if it was sent",
+        "power_in_keeping": "The strength in choosing not to send",
+        "where_its_saved": "Where this rebellion lives"
+    },
+    "example": {
+        "the_message": "I don't actually want the future you planned for me.",
+        "who_its_for": "Dad who has my whole life mapped out",
+        "why_writing_is_rebellion": "I was never supposed to have different dreams",
+        "what_theyd_lose": "The family peace that depends on my compliance",
+        "power_in_keeping": "I know my truth even if they don't",
+        "where_its_saved": "In a notes app they'll never check"
+    }
+}
+
+VARIANT_MIRROR_INHERITANCE = {
+    "name": "Mirror Moment + Emotional Inheritance Fusion",
+    "description": "Seeing inherited patterns in your own reflection. Combines mirror_moment's self-recognition with emotional_inheritance's generational themes.",
+    "fields": {
+        "what_they_saw": "The inherited trait visible in their reflection",
+        "who_they_saw": "Which family member they recognized",
+        "the_pattern": "The generational pattern being witnessed",
+        "emotional_response": "How it felt to see this",
+        "choice_moment": "The decision about continuing or breaking the pattern",
+        "what_changes": "The first step toward change"
+    },
+    "example": {
+        "what_they_saw": "The same tightness in my jaw mom gets when angry",
+        "who_they_saw": "Three generations of women who hold it in until explosion",
+        "the_pattern": "Silence until it's too much, then regret",
+        "emotional_response": "Grief for all of us who learned this",
+        "choice_moment": "Do I let this become automatic too?",
+        "what_changes": "Speaking when it's small instead of waiting"
+    }
+}
+
+VARIANT_CHOSEN_GROWING = {
+    "name": "Chosen Family + Growing Apart Fusion",
+    "description": "Finding new family while old connections fade. Combines chosen_family's found belonging with growing_apart's relationship changes.",
+    "fields": {
+        "fading_connection": "The relationship that's changing",
+        "new_connection": "The chosen family being found",
+        "what_old_gave": "What the fading relationship used to provide",
+        "what_new_offers": "What the new connection gives instead",
+        "guilt_feeling": "The complicated feelings about this shift",
+        "acceptance": "Coming to terms with the change"
+    },
+    "example": {
+        "fading_connection": "Best friend since childhood who doesn't get me anymore",
+        "new_connection": "Online friends who understand without explaining",
+        "what_old_gave": "History, shared memories, the comfort of being known",
+        "what_new_offers": "Being seen for who I'm becoming, not who I was",
+        "guilt_feeling": "Like I'm betraying something sacred",
+        "acceptance": "People can be 'for a season' without it being failure"
+    }
+}
+
+VARIANT_PARALLEL_PERMISSION = {
+    "name": "Parallel Lives + Permission To Fusion",
+    "description": "Imagining who you'd be if you'd given yourself permission earlier. Combines parallel_lives' what-ifs with permission_to's self-acceptance.",
+    "fields": {
+        "the_permission": "What they're finally allowing now",
+        "earlier_version": "Who they were before permission",
+        "parallel_version": "Who they might have been with earlier permission",
+        "what_delayed_it": "Why they couldn't allow this before",
+        "what_unlocked_it": "What finally made permission possible",
+        "bridging_the_gap": "Connecting present self to possible self"
+    },
+    "example": {
+        "the_permission": "To take up space without apologizing",
+        "earlier_version": "The girl who made herself small to avoid attention",
+        "parallel_version": "Someone confident who never learned to shrink",
+        "what_delayed_it": "Being told 'don't be too much' so many times",
+        "what_unlocked_it": "Meeting someone who celebrated 'too much'",
+        "bridging_the_gap": "That parallel me isn't gone - she's just been waiting"
+    }
+}
+
+
+# =============================================================================
 # TEMPLATE REGISTRY
 # =============================================================================
 
@@ -1093,6 +1225,13 @@ VARIANT_TEMPLATES: Dict[str, Dict[str, Any]] = {
     "safe_person": VARIANT_SAFE_PERSON,
     "holding_space": VARIANT_HOLDING_SPACE,
     "rewriting_the_story": VARIANT_REWRITING_THE_STORY,
+    # Fusion variants - combinations of existing templates
+    "confession_mystery": VARIANT_CONFESSION_MYSTERY,
+    "overheard_transformation": VARIANT_OVERHEARD_TRANSFORMATION,
+    "unsent_rebellion": VARIANT_UNSENT_REBELLION,
+    "mirror_inheritance": VARIANT_MIRROR_INHERITANCE,
+    "chosen_growing": VARIANT_CHOSEN_GROWING,
+    "parallel_permission": VARIANT_PARALLEL_PERMISSION,
 }
 
 
@@ -1286,10 +1425,24 @@ VARIANT_WEIGHTS = {
     "safe_person": 9,             # High - trust and connection themes
     "holding_space": 8,           # High - emotional support, mature theme
     "rewriting_the_story": 10,    # Highest - healing narrative, empowering
+    
+    # Fusion variants - combinations create unique story seeds
+    "confession_mystery": 10,         # Highest - confession + mystery blend
+    "overheard_transformation": 10,   # Highest - discovery triggers change
+    "unsent_rebellion": 9,            # High - silent defiance in words
+    "mirror_inheritance": 9,          # High - seeing family patterns in self
+    "chosen_growing": 9,              # High - new family while old fades
+    "parallel_permission": 10,        # Highest - what-if meets self-acceptance
 }
 
 # Default number of ideas to generate
 DEFAULT_IDEA_COUNT = 10
+
+# Default decay factor for variant selection (0.5 = halves probability each use)
+DEFAULT_DECAY_FACTOR = 0.5
+
+# Minimum weight after decay (ensures variant can still be selected even after multiple uses)
+MIN_DECAY_WEIGHT = 0.1
 
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
@@ -1448,44 +1601,70 @@ def pick_weighted_variant(seed: int = None) -> str:
     return selected
 
 
-def pick_multiple_weighted_variants(count: int = DEFAULT_IDEA_COUNT, seed: int = None, allow_duplicates: bool = True) -> List[str]:
-    """Pick multiple variant types using weighted random selection.
+def pick_multiple_weighted_variants(count: int = DEFAULT_IDEA_COUNT, seed: int = None, allow_duplicates: bool = True, decay_factor: float = DEFAULT_DECAY_FACTOR) -> List[str]:
+    """Pick multiple variant types using weighted random selection with usage decay.
     
-    Each variant is picked independently, so the same type can appear multiple times
-    unless allow_duplicates is False.
+    Each variant is picked based on weights. When a variant is selected, its weight
+    is reduced by the decay_factor for subsequent selections within this call.
+    This promotes variety while still allowing duplicates.
+    
+    Note: When allow_duplicates=False, the function may return fewer variants than
+    requested if all available variants have been selected.
     
     Args:
         count: Number of variants to pick (default: 10)
         seed: Optional seed for reproducible selection
-        allow_duplicates: If True, same variant can be picked multiple times
+        allow_duplicates: If True, same variant can be picked multiple times (with reduced weight)
+        decay_factor: Multiplier applied to weight after each usage (0.0-1.0). 
+                     Default 0.5 means each usage halves the probability.
+                     Set to 1.0 to disable decay (original behavior).
         
     Returns:
-        List of selected variant type names
+        List of selected variant type names. May be shorter than count if 
+        allow_duplicates=False and all variants have been selected.
+        
+    Raises:
+        ValueError: If decay_factor is not between 0.0 and 1.0 (inclusive)
     """
+    # Validate decay_factor
+    if not (0.0 <= decay_factor <= 1.0):
+        raise ValueError(f"decay_factor must be between 0.0 and 1.0, got {decay_factor}")
+    
     if seed is not None:
         rng = random.Random(seed)
     else:
         rng = random.Random()
     
     variants = list(VARIANT_WEIGHTS.keys())
-    weights = [VARIANT_WEIGHTS[v] for v in variants]
+    # Start with original weights - not persistent across runs
+    current_weights = {v: float(VARIANT_WEIGHTS[v]) for v in variants}
     
-    if allow_duplicates:
-        # Each selection is independent
-        selected = rng.choices(variants, weights=weights, k=count)
-    else:
-        # No duplicates - pick without replacement (limited to available variants)
-        count = min(count, len(variants))
-        selected = []
-        remaining_variants = variants.copy()
-        remaining_weights = weights.copy()
+    selected = []
+    
+    for _ in range(count):
+        # Build weight list from current (possibly decayed) weights
+        weights = [current_weights[v] for v in variants]
         
-        for _ in range(count):
-            choice = rng.choices(remaining_variants, weights=remaining_weights, k=1)[0]
-            selected.append(choice)
-            idx = remaining_variants.index(choice)
-            remaining_variants.pop(idx)
-            remaining_weights.pop(idx)
+        # Filter out zero-weight variants if not allowing duplicates
+        if not allow_duplicates:
+            available = [(v, w) for v, w in zip(variants, weights) if w > 0]
+            if not available:
+                break  # No more variants available
+            available_variants = [v for v, _ in available]
+            available_weights = [w for _, w in available]
+            choice = rng.choices(available_variants, weights=available_weights, k=1)[0]
+        else:
+            choice = rng.choices(variants, weights=weights, k=1)[0]
+        
+        selected.append(choice)
+        
+        # Apply decay to the selected variant's weight for next iteration
+        if allow_duplicates:
+            # Reduce weight but keep positive minimum to still allow selection
+            current_weights[choice] = max(MIN_DECAY_WEIGHT, current_weights[choice] * decay_factor)
+        else:
+            # Set to 0 to prevent re-selection
+            current_weights[choice] = 0
     
     return selected
 
@@ -1647,6 +1826,19 @@ def create_idea_variant(
         result.update(_create_holding_space_variant(title, description, kwargs, seed, variation_index))
     elif variant_name == "rewriting_the_story":
         result.update(_create_rewriting_the_story_variant(title, description, kwargs, seed, variation_index))
+    # Fusion variants
+    elif variant_name == "confession_mystery":
+        result.update(_create_confession_mystery_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "overheard_transformation":
+        result.update(_create_overheard_transformation_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "unsent_rebellion":
+        result.update(_create_unsent_rebellion_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "mirror_inheritance":
+        result.update(_create_mirror_inheritance_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "chosen_growing":
+        result.update(_create_chosen_growing_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "parallel_permission":
+        result.update(_create_parallel_permission_variant(title, description, kwargs, seed, variation_index))
     
     # Add target audience info to all variants
     result["target_audience"] = _get_target_audience_info()
@@ -1660,6 +1852,7 @@ def create_ideas_from_input(
     seed: int = None,
     allow_duplicate_types: bool = True,
     description: str = "",
+    decay_factor: float = DEFAULT_DECAY_FACTOR,
     **kwargs
 ) -> List[Dict[str, Any]]:
     """Create multiple ideas from a single text input using weighted random variant selection.
@@ -1668,31 +1861,44 @@ def create_ideas_from_input(
     - Takes simple text input
     - Creates 10 ideas by default
     - Each idea gets a randomly selected variant type (weighted by audience preference)
+    - Already-used variant types have decreased probability (but can still be selected)
     
     Variant types are weighted to favor templates that appeal to:
     - Primary audience: US girls 13-15 (emotion, identity, friendship, aesthetics)
     - Secondary audience: US boys 12-17 (competition, tech, puzzles, adventure)
     - Tertiary audience: US women 10-22 (emotion, drama, empowerment)
     
+    The decay_factor controls how much a variant's probability decreases after each use:
+    - 0.5 (default): Each usage halves the probability
+    - 0.3: More aggressive decay, promotes higher variety
+    - 1.0: No decay (original behavior, equal probability for duplicates)
+    
+    Note: Decay is NOT persistent - each new call starts with original weights.
+    
     Args:
         text_input: The text prompt/input to generate ideas from
         count: Number of ideas to create (default: 10)
         seed: Optional seed for reproducible variant selection
-        allow_duplicate_types: If True, same variant type can be used for multiple ideas
+        allow_duplicate_types: If True, same variant type can be used for multiple ideas (with reduced weight)
         description: Optional description to enrich the variants
+        decay_factor: Multiplier applied to weight after each usage (0.0-1.0). Default 0.5.
         **kwargs: Additional parameters passed to each variant
         
     Returns:
         List of idea variant dictionaries
         
     Raises:
-        ValueError: If text_input is empty
+        ValueError: If text_input is empty or decay_factor is not between 0.0 and 1.0
     """
     if not text_input or not text_input.strip():
         raise ValueError("Text input cannot be empty")
     
-    # Pick variant types for each idea using weighted selection
-    variant_types = pick_multiple_weighted_variants(count, seed, allow_duplicate_types)
+    # Validation is handled in pick_multiple_weighted_variants, but provide clearer error message
+    if not (0.0 <= decay_factor <= 1.0):
+        raise ValueError(f"decay_factor must be between 0.0 and 1.0, got {decay_factor}")
+    
+    # Pick variant types for each idea using weighted selection with decay
+    variant_types = pick_multiple_weighted_variants(count, seed, allow_duplicate_types, decay_factor)
     
     # Create each idea with its assigned variant type
     ideas = []
@@ -4114,11 +4320,254 @@ def _create_rewriting_the_story_variant(title: str, description: str, kwargs: Di
     }
 
 
+# =============================================================================
+# FUSION VARIANT CREATION HELPERS
+# =============================================================================
+
+def _create_confession_mystery_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create confession + mystery fusion variant."""
+    topic = _humanize_topic(title)
+    
+    confession_hooks = [
+        "I've been lying to everyone about what I found...",
+        "There's something I've been keeping that I need to confess...",
+        "I know something that changes everything, and I can't stay silent...",
+        "I finally understand something I wasn't supposed to discover...",
+        "What I'm about to say will make you see things differently..."
+    ]
+    
+    hidden_mysteries = [
+        "A pattern nobody else noticed",
+        "Something that doesn't add up in our family",
+        "A secret hidden in plain sight",
+        "Connections everyone else dismissed",
+        "Evidence of something I was never meant to find"
+    ]
+    
+    unresolved_questions = [
+        "Why did they hide this from me specifically?",
+        "What else don't I know?",
+        "Who else is keeping this secret?",
+        "What happens now that I know?",
+        "Was I better off not knowing?"
+    ]
+    
+    return {
+        "confession_hook": _pick_from_pool(confession_hooks, seed, variation_index),
+        "hidden_mystery": f"Something about {topic.lower()} that I discovered",
+        "clues_dropped": "Comments I made that everyone dismissed",
+        "why_speaking_now": f"I finally have proof about {topic.lower()}",
+        "what_they_discovered": _pick_from_pool(hidden_mysteries, seed, variation_index + 1),
+        "unresolved_question": _pick_from_pool(unresolved_questions, seed, variation_index + 2)
+    }
+
+
+def _create_overheard_transformation_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create overheard + transformation fusion variant."""
+    topic = _humanize_topic(title)
+    
+    before_hearings = [
+        "The kid trying desperately to be enough",
+        "Someone who believed what they were told about themselves",
+        "A people-pleaser who hadn't questioned the system yet",
+        "The one who always adjusted to keep the peace",
+        "Someone who thought their worth depended on others' approval"
+    ]
+    
+    transformation_processes = [
+        "Stopped trying to be what they wanted",
+        "Started questioning every 'truth' they'd been taught",
+        "Built boundaries for the first time",
+        "Found validation from within instead of seeking it outside",
+        "Learned to trust my own perception over their narrative"
+    ]
+    
+    after_hearings = [
+        "Someone who defines their own worth",
+        "A person who doesn't shrink to fit others' comfort",
+        "The version of me they never expected",
+        "Someone who chose authenticity over approval",
+        "A person who knows the truth and lives accordingly"
+    ]
+    
+    return {
+        "what_was_heard": f"Something about {topic.lower()} that changed my understanding",
+        "before_hearing": _pick_from_pool(before_hearings, seed, variation_index),
+        "immediate_impact": "Something broke and something clicked at the same time",
+        "transformation_process": _pick_from_pool(transformation_processes, seed, variation_index + 1),
+        "after_hearing": _pick_from_pool(after_hearings, seed, variation_index + 2),
+        "confrontation_choice": "Never told them - the change speaks for itself"
+    }
+
+
+def _create_unsent_rebellion_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create unsent message + quiet rebellion fusion variant."""
+    topic = _humanize_topic(title)
+    
+    rebellion_messages = [
+        "I don't actually want the future you planned for me.",
+        "Your expectations are suffocating me.",
+        "I'm tired of being who you need me to be.",
+        "You don't actually know me at all.",
+        "I've been pretending to agree for years.",
+        "The version of me you love isn't real."
+    ]
+    
+    why_rebellions = [
+        "I was never supposed to have different dreams",
+        "Disagreement was never allowed",
+        "Writing this truth is the first honest thing I've done",
+        "Even thinking this was forbidden",
+        "This message exists because speaking is impossible"
+    ]
+    
+    power_in_keepings = [
+        "I know my truth even if they don't",
+        "This is mine, and they can't control it",
+        "The words exist even if unspoken",
+        "Knowing I could send it is enough",
+        "This rebellion lives where they can't reach"
+    ]
+    
+    return {
+        "the_message": f"{_pick_from_pool(rebellion_messages, seed, variation_index)} About {topic.lower()}.",
+        "who_its_for": "The authority figure who thinks they know what's best",
+        "why_writing_is_rebellion": _pick_from_pool(why_rebellions, seed, variation_index + 1),
+        "what_theyd_lose": "The peace that depends on my compliance",
+        "power_in_keeping": _pick_from_pool(power_in_keepings, seed, variation_index + 2),
+        "where_its_saved": "In a place they'll never think to look"
+    }
+
+
+def _create_mirror_inheritance_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create mirror moment + emotional inheritance fusion variant."""
+    topic = _humanize_topic(title)
+    
+    inherited_traits = [
+        "The same tightness in my jaw when angry",
+        "That way of going quiet when hurt",
+        "The need to fix everything for everyone",
+        "Deflecting with humor when it's serious",
+        "The inability to ask for what I need"
+    ]
+    
+    patterns = [
+        "Silence until it's too much, then regret",
+        "Putting others first until there's nothing left",
+        "Hiding pain behind productivity",
+        "Love expressed as worry instead of warmth",
+        "Conflict avoided until it explodes"
+    ]
+    
+    choice_moments = [
+        "Do I let this become automatic too?",
+        "Is this who I want to become?",
+        "Can I break what they couldn't?",
+        "Where does their pattern end and my choice begin?",
+        "Do I have to carry what they gave me?"
+    ]
+    
+    return {
+        "what_they_saw": f"An inherited response to {topic.lower()} — {_pick_from_pool(inherited_traits, seed, variation_index)}",
+        "who_they_saw": "Generations of family members who did the same",
+        "the_pattern": _pick_from_pool(patterns, seed, variation_index + 1),
+        "emotional_response": "Grief for all of us who learned this",
+        "choice_moment": _pick_from_pool(choice_moments, seed, variation_index + 2),
+        "what_changes": "Choosing differently, starting with something small"
+    }
+
+
+def _create_chosen_growing_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create chosen family + growing apart fusion variant."""
+    topic = _humanize_topic(title)
+    
+    fading_connections = [
+        "Best friend since childhood who doesn't get me anymore",
+        "The person who was once my whole world",
+        "Someone who used to know me without words",
+        "The relationship I thought would last forever",
+        "A bond that's becoming a memory"
+    ]
+    
+    new_connections = [
+        "Online friends who understand without explaining",
+        "People who see who I'm becoming, not who I was",
+        "A community that celebrates what others criticized",
+        "Someone who asks the questions old friends never did",
+        "Chosen family who chose me back"
+    ]
+    
+    guilt_feelings = [
+        "Like I'm betraying something sacred",
+        "Torn between loyalty and growth",
+        "Grieving while also feeling free",
+        "Wondering if I'm the one who changed too much",
+        "Carrying both gratitude and goodbye"
+    ]
+    
+    return {
+        "fading_connection": f"A relationship around {topic.lower()} that's changing — {_pick_from_pool(fading_connections, seed, variation_index)}",
+        "new_connection": _pick_from_pool(new_connections, seed, variation_index + 1),
+        "what_old_gave": "History, shared memories, the comfort of being known",
+        "what_new_offers": "Being seen for who I'm becoming, not who I was",
+        "guilt_feeling": _pick_from_pool(guilt_feelings, seed, variation_index + 2),
+        "acceptance": "People can be 'for a season' without it being failure"
+    }
+
+
+def _create_parallel_permission_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create parallel lives + permission to fusion variant."""
+    topic = _humanize_topic(title)
+    
+    permissions = [
+        "To take up space without apologizing",
+        "To want things that don't make sense to others",
+        "To change who I've always been",
+        "To disappoint people who expect too much",
+        "To be in progress instead of finished"
+    ]
+    
+    what_delayed = [
+        "Being told 'don't be too much' so many times",
+        "Fear of what they'd think",
+        "Believing I didn't deserve it",
+        "Rules I absorbed without questioning",
+        "The weight of others' expectations"
+    ]
+    
+    what_unlocked = [
+        "Meeting someone who celebrated what I hid",
+        "Getting tired of being small",
+        "Realizing the cost of not allowing this",
+        "Seeing someone else live the permission I wanted",
+        "Understanding I was waiting for approval that wasn't coming"
+    ]
+    
+    bridging_gaps = [
+        "That parallel me isn't gone - she's just been waiting",
+        "Every permission I take now brings those versions closer",
+        "I can become who I might have been, starting today",
+        "The gap is smaller than it looked from the inside",
+        "I'm not too late - I'm right on time for this version"
+    ]
+    
+    return {
+        "the_permission": f"To {_pick_from_pool(permissions, seed, variation_index).lower()} when it comes to {topic.lower()}",
+        "earlier_version": "The one who made themselves small",
+        "parallel_version": "Who I might have been with earlier permission",
+        "what_delayed_it": _pick_from_pool(what_delayed, seed, variation_index + 1),
+        "what_unlocked_it": _pick_from_pool(what_unlocked, seed, variation_index + 2),
+        "bridging_the_gap": _pick_from_pool(bridging_gaps, seed, variation_index + 3)
+    }
+
+
 __all__ = [
     # Constants
     "VARIANT_TEMPLATES",
     "VARIANT_WEIGHTS",
     "DEFAULT_IDEA_COUNT",
+    "DEFAULT_DECAY_FACTOR",
+    "MIN_DECAY_WEIGHT",
     "TARGET_AUDIENCES",
     # Original template definitions
     "VARIANT_EMOTION_FIRST",
@@ -4170,6 +4619,13 @@ __all__ = [
     "VARIANT_SAFE_PERSON",
     "VARIANT_HOLDING_SPACE",
     "VARIANT_REWRITING_THE_STORY",
+    # Fusion variant templates
+    "VARIANT_CONFESSION_MYSTERY",
+    "VARIANT_OVERHEARD_TRANSFORMATION",
+    "VARIANT_UNSENT_REBELLION",
+    "VARIANT_MIRROR_INHERITANCE",
+    "VARIANT_CHOSEN_GROWING",
+    "VARIANT_PARALLEL_PERMISSION",
     # Core functions
     "get_template",
     "list_templates",
