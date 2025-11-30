@@ -1172,6 +1172,137 @@ VARIANT_PARALLEL_PERMISSION = {
 
 
 # =============================================================================
+# MISSING THEME TEMPLATES - Additional templates for primary audience
+# =============================================================================
+
+VARIANT_FIRST_BUTTERFLIES = {
+    "name": "First Butterflies Seed",
+    "description": "Light, innocent moments of first attraction - butterflies, nervousness, noticing someone. Not romance, just the feeling.",
+    "fields": {
+        "the_moment": "When the butterflies first appeared",
+        "physical_feeling": "How it felt in the body",
+        "what_they_noticed": "The specific thing that caught attention",
+        "internal_panic": "The overthinking that followed",
+        "acting_normal": "Trying to seem unaffected",
+        "replay_loop": "The moment playing on repeat"
+    },
+    "example": {
+        "the_moment": "They laughed at something I said, really laughed",
+        "physical_feeling": "Stomach dropped, face got warm, forgot how to breathe",
+        "what_they_noticed": "The way their eyes crinkle when they smile",
+        "internal_panic": "Did I say something weird? Do they think I'm weird?",
+        "acting_normal": "Looked at my phone like I got a text",
+        "replay_loop": "That laugh. That laugh. That laugh."
+    }
+}
+
+VARIANT_BODY_ACCEPTANCE = {
+    "name": "Body Acceptance Seed",
+    "description": "Journey of making peace with one's body - the struggles, small victories, and ongoing process of self-acceptance.",
+    "fields": {
+        "the_struggle": "What's been hardest to accept",
+        "where_it_started": "When this struggle began",
+        "the_voice": "What the critical inner voice says",
+        "moment_of_shift": "A moment that changed perspective",
+        "what_helps": "What makes it easier",
+        "current_truth": "Where they are now with it"
+    },
+    "example": {
+        "the_struggle": "Seeing photos of myself and not recognizing me",
+        "where_it_started": "Middle school when someone made a comment",
+        "the_voice": "'You'd be prettier if...' on repeat",
+        "moment_of_shift": "Realizing my body carried me through hard things",
+        "what_helps": "Unfollowing accounts that make me compare",
+        "current_truth": "Some days are harder. Today I'm trying."
+    }
+}
+
+VARIANT_FITTING_IN = {
+    "name": "Fitting In Seed",
+    "description": "Social anxiety, feeling like an outsider, the exhaustion of trying to belong. The gap between how you feel and how you appear.",
+    "fields": {
+        "the_situation": "Where the anxiety shows up",
+        "what_others_see": "How they appear to others",
+        "internal_reality": "What's actually happening inside",
+        "the_exhaustion": "The cost of performing normal",
+        "coping_mechanism": "How they get through it",
+        "wish_for": "What they wish people understood"
+    },
+    "example": {
+        "the_situation": "Group projects, lunch tables, parties",
+        "what_others_see": "Quiet, maybe shy, probably fine",
+        "internal_reality": "Heart racing, scripting every sentence, counting minutes",
+        "the_exhaustion": "Going home and sleeping for hours after socializing",
+        "coping_mechanism": "Bathroom breaks to breathe, texting someone safe",
+        "wish_for": "That being social didn't feel like a performance"
+    }
+}
+
+VARIANT_ONLINE_CONNECTION = {
+    "name": "Online Connection Seed",
+    "description": "Friendships formed online, parasocial relationships, the realness of digital connections vs dismissal from others.",
+    "fields": {
+        "the_connection": "Who/what the online connection is",
+        "how_it_started": "How this connection formed",
+        "what_it_provides": "What this relationship gives them",
+        "others_opinion": "How others view this connection",
+        "defense_of_realness": "Why it matters despite being 'online'",
+        "complicated_feeling": "The part that's hard to explain"
+    },
+    "example": {
+        "the_connection": "Friends from a Discord server I've never met",
+        "how_it_started": "We bonded over the same niche interest three years ago",
+        "what_it_provides": "They know me better than people who see me daily",
+        "others_opinion": "'They're not real friends' - but they showed up when no one else did",
+        "defense_of_realness": "We've talked through my worst moments",
+        "complicated_feeling": "Mourning that we might never meet in person"
+    }
+}
+
+VARIANT_FUTURE_ANXIETY = {
+    "name": "Future Anxiety Seed",
+    "description": "Anxiety about growing up, college, career, not knowing what you want. The pressure to have it figured out.",
+    "fields": {
+        "the_pressure": "The specific future pressure they feel",
+        "source_of_pressure": "Where this pressure comes from",
+        "what_theyre_supposed_to_know": "What everyone expects them to have figured out",
+        "the_truth": "What they actually feel/know",
+        "comparison_trap": "How others seem to have it together",
+        "what_theyd_say_if_honest": "The thing they can't admit out loud"
+    },
+    "example": {
+        "the_pressure": "Having a major picked, a plan, a direction",
+        "source_of_pressure": "Family questions, college apps, everyone asking",
+        "what_theyre_supposed_to_know": "What I want to do with my life",
+        "the_truth": "I can barely decide what to eat for lunch",
+        "comparison_trap": "Everyone else seems to have passions and plans",
+        "what_theyd_say_if_honest": "I'm terrified of picking wrong and wasting my life"
+    }
+}
+
+VARIANT_COMPARISON_TRAP = {
+    "name": "Comparison Trap Seed",
+    "description": "Social media comparison culture, measuring yourself against curated lives, the exhaustion of never being enough.",
+    "fields": {
+        "the_trigger": "What sets off the comparison spiral",
+        "who_theyre_comparing_to": "The person/people they measure against",
+        "what_it_does": "How comparison makes them feel",
+        "logical_brain": "What they know rationally",
+        "emotional_reality": "What they feel despite knowing better",
+        "breaking_point": "When it becomes too much"
+    },
+    "example": {
+        "the_trigger": "Scrolling and seeing someone's perfect life",
+        "who_theyre_comparing_to": "Girls who seem to have it all figured out",
+        "what_it_does": "Makes my own life feel small and behind",
+        "logical_brain": "I know it's curated, I know it's highlight reels",
+        "emotional_reality": "Still feels like proof that I'm failing somehow",
+        "breaking_point": "Had to delete the app for my own sanity"
+    }
+}
+
+
+# =============================================================================
 # TEMPLATE REGISTRY
 # =============================================================================
 
@@ -1232,6 +1363,13 @@ VARIANT_TEMPLATES: Dict[str, Dict[str, Any]] = {
     "mirror_inheritance": VARIANT_MIRROR_INHERITANCE,
     "chosen_growing": VARIANT_CHOSEN_GROWING,
     "parallel_permission": VARIANT_PARALLEL_PERMISSION,
+    # Missing theme templates - crucial for primary audience
+    "first_butterflies": VARIANT_FIRST_BUTTERFLIES,
+    "body_acceptance": VARIANT_BODY_ACCEPTANCE,
+    "fitting_in": VARIANT_FITTING_IN,
+    "online_connection": VARIANT_ONLINE_CONNECTION,
+    "future_anxiety": VARIANT_FUTURE_ANXIETY,
+    "comparison_trap": VARIANT_COMPARISON_TRAP,
 }
 
 
@@ -1434,6 +1572,14 @@ VARIANT_WEIGHTS = {
     "mirror_inheritance": 90,          # High - seeing family patterns in self
     "chosen_growing": 90,              # High - new family while old fades
     "parallel_permission": 100,        # Highest - what-if meets self-acceptance
+    
+    # Missing theme templates - crucial for primary audience
+    "first_butterflies": 95,       # Very high - universal teen experience
+    "body_acceptance": 100,        # Highest - extremely relatable for this age
+    "fitting_in": 100,             # Highest - core teen anxiety
+    "online_connection": 95,       # Very high - modern teen experience
+    "future_anxiety": 100,         # Highest - universal pressure for this age
+    "comparison_trap": 100,        # Highest - social media generation
 }
 
 # Default number of ideas to generate
@@ -1841,6 +1987,19 @@ def create_idea_variant(
         result.update(_create_chosen_growing_variant(title, description, kwargs, seed, variation_index))
     elif variant_name == "parallel_permission":
         result.update(_create_parallel_permission_variant(title, description, kwargs, seed, variation_index))
+    # Missing theme templates
+    elif variant_name == "first_butterflies":
+        result.update(_create_first_butterflies_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "body_acceptance":
+        result.update(_create_body_acceptance_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "fitting_in":
+        result.update(_create_fitting_in_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "online_connection":
+        result.update(_create_online_connection_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "future_anxiety":
+        result.update(_create_future_anxiety_variant(title, description, kwargs, seed, variation_index))
+    elif variant_name == "comparison_trap":
+        result.update(_create_comparison_trap_variant(title, description, kwargs, seed, variation_index))
     
     # Add target audience info to all variants
     result["target_audience"] = _get_target_audience_info()
@@ -4563,6 +4722,238 @@ def _create_parallel_permission_variant(title: str, description: str, kwargs: Di
     }
 
 
+# =============================================================================
+# MISSING THEME VARIANT CREATION HELPERS
+# =============================================================================
+
+def _create_first_butterflies_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create first butterflies/crush variant."""
+    topic = _humanize_topic(title)
+    
+    moments = [
+        "They laughed at something I said, really laughed",
+        "We accidentally made eye contact and neither looked away",
+        "Their hand brushed mine reaching for the same thing",
+        "They remembered something I mentioned weeks ago",
+        "I heard them say something nice about me to someone else"
+    ]
+    
+    physical_feelings = [
+        "Stomach dropped, face got warm, forgot how to breathe",
+        "Heart beating so loud I was sure everyone could hear",
+        "Couldn't stop smiling and had to look away",
+        "Hands suddenly didn't know what to do",
+        "Words got stuck somewhere between my brain and mouth"
+    ]
+    
+    internal_panics = [
+        "Did I say something weird? Do they think I'm weird?",
+        "Act normal act normal act normal",
+        "What do I do with my face right now?",
+        "Please don't let me say something embarrassing",
+        "Are they looking? Don't look. Should I look?"
+    ]
+    
+    return {
+        "the_moment": f"{_pick_from_pool(moments, seed, variation_index)} — something about {topic.lower()}",
+        "physical_feeling": _pick_from_pool(physical_feelings, seed, variation_index + 1),
+        "what_they_noticed": "A small detail that keeps replaying in my head",
+        "internal_panic": _pick_from_pool(internal_panics, seed, variation_index + 2),
+        "acting_normal": "Looked at my phone like I got a text",
+        "replay_loop": "That moment. Over and over. On repeat."
+    }
+
+
+def _create_body_acceptance_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create body acceptance/self-image variant."""
+    topic = _humanize_topic(title)
+    
+    struggles = [
+        "Seeing photos of myself and not recognizing me",
+        "Avoiding mirrors and cameras",
+        "Comparing every feature to everyone else",
+        "The way clothes fit differently than I expect",
+        "Hearing my voice in recordings"
+    ]
+    
+    voices = [
+        "'You'd be prettier if...' on repeat",
+        "Cataloging every flaw before anyone else can",
+        "The things I'd never say to a friend, but say to myself",
+        "Measuring myself against impossible standards",
+        "Noticing what I hate before what I like"
+    ]
+    
+    shifts = [
+        "Realizing my body carried me through hard things",
+        "Someone seeing me as beautiful and meaning it",
+        "Noticing my body doing amazing things without me thanking it",
+        "A photo where I actually looked happy, not just 'good'",
+        "Getting tired of the constant war with myself"
+    ]
+    
+    return {
+        "the_struggle": f"The way {topic.lower()} makes me see myself — {_pick_from_pool(struggles, seed, variation_index)}",
+        "where_it_started": "Young enough that I don't remember not feeling this way",
+        "the_voice": _pick_from_pool(voices, seed, variation_index + 1),
+        "moment_of_shift": _pick_from_pool(shifts, seed, variation_index + 2),
+        "what_helps": "Unfollowing accounts that make me compare",
+        "current_truth": "Some days are harder. Today I'm trying."
+    }
+
+
+def _create_fitting_in_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create social anxiety/fitting in variant."""
+    topic = _humanize_topic(title)
+    
+    situations = [
+        "Group projects, lunch tables, parties",
+        "Walking into a room where everyone already knows each other",
+        "Being the new one, the quiet one, the different one",
+        "Trying to join a conversation already happening",
+        "Anytime I have to be 'on' around people"
+    ]
+    
+    what_others_see = [
+        "Quiet, maybe shy, probably fine",
+        "Chill, doesn't seem to care much",
+        "Keeps to themselves, mysterious maybe",
+        "Nice enough, just doesn't talk much",
+        "Independent, likes being alone"
+    ]
+    
+    internal_realities = [
+        "Heart racing, scripting every sentence, counting minutes",
+        "Rehearsing what to say, replaying what I said wrong",
+        "Wondering if they noticed me being awkward",
+        "Exhausted from performing 'relaxed'",
+        "Waiting for the moment I can finally leave"
+    ]
+    
+    return {
+        "the_situation": f"When {topic.lower()} puts me in — {_pick_from_pool(situations, seed, variation_index)}",
+        "what_others_see": _pick_from_pool(what_others_see, seed, variation_index + 1),
+        "internal_reality": _pick_from_pool(internal_realities, seed, variation_index + 2),
+        "the_exhaustion": "Going home and needing hours to recover",
+        "coping_mechanism": "Bathroom breaks to breathe, texting someone safe",
+        "wish_for": "That being social didn't feel like a performance"
+    }
+
+
+def _create_online_connection_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create online friendship/connection variant."""
+    topic = _humanize_topic(title)
+    
+    connections = [
+        "Friends from a Discord server I've never met",
+        "Someone I've been DMing for years",
+        "A creator whose content feels like they get me",
+        "People from a fandom who became real friends",
+        "A group chat that knows more about me than my IRL friends"
+    ]
+    
+    what_it_provides = [
+        "They know me better than people who see me daily",
+        "A space where I can be fully myself",
+        "Understanding without having to explain everything",
+        "Connection that doesn't require performing",
+        "Acceptance for the weird parts of me"
+    ]
+    
+    complicated_feelings = [
+        "Mourning that we might never meet in person",
+        "Feeling closer to strangers than to family sometimes",
+        "Not knowing if this makes me antisocial or just... different",
+        "Wondering if this connection is 'real' enough",
+        "Being more honest through a screen than in person"
+    ]
+    
+    return {
+        "the_connection": f"{_pick_from_pool(connections, seed, variation_index)} — connected through {topic.lower()}",
+        "how_it_started": "We bonded over something most people don't understand",
+        "what_it_provides": _pick_from_pool(what_it_provides, seed, variation_index + 1),
+        "others_opinion": "'They're not real friends' - but they showed up when no one else did",
+        "defense_of_realness": "We've talked through my worst moments",
+        "complicated_feeling": _pick_from_pool(complicated_feelings, seed, variation_index + 2)
+    }
+
+
+def _create_future_anxiety_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create future anxiety/growing up variant."""
+    topic = _humanize_topic(title)
+    
+    pressures = [
+        "Having a major picked, a plan, a direction",
+        "Knowing what I want to do with my life",
+        "Being as put-together as everyone else seems",
+        "Having it figured out when I can barely handle today",
+        "Making decisions that will define my whole future"
+    ]
+    
+    sources = [
+        "Family questions, college apps, everyone asking",
+        "Comparison to siblings, cousins, classmates",
+        "The timeline I was supposed to be following",
+        "Adults who expect more certainty than I have",
+        "My own expectations of who I should be by now"
+    ]
+    
+    honest_truths = [
+        "I'm terrified of picking wrong and wasting my life",
+        "I don't know what I'm passionate about and that scares me",
+        "Everyone else seems to have it figured out except me",
+        "I'm not ready to be an adult but time keeps passing",
+        "I feel behind in a race I never agreed to run"
+    ]
+    
+    return {
+        "the_pressure": f"The pressure around {topic.lower()} — {_pick_from_pool(pressures, seed, variation_index)}",
+        "source_of_pressure": _pick_from_pool(sources, seed, variation_index + 1),
+        "what_theyre_supposed_to_know": "What I want to do with my life",
+        "the_truth": "I can barely decide what to eat for lunch",
+        "comparison_trap": "Everyone else seems to have passions and plans",
+        "what_theyd_say_if_honest": _pick_from_pool(honest_truths, seed, variation_index + 2)
+    }
+
+
+def _create_comparison_trap_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
+    """Create comparison culture/social media comparison variant."""
+    topic = _humanize_topic(title)
+    
+    triggers = [
+        "Scrolling and seeing someone's perfect life",
+        "A post from someone doing better than me",
+        "Photos from events I wasn't invited to",
+        "Someone achieving what I've been trying for",
+        "Highlight reels that make my real life feel small"
+    ]
+    
+    who_comparing = [
+        "Girls who seem to have it all figured out",
+        "People with more followers, more friends, more everything",
+        "The version of me I thought I'd be by now",
+        "Influencers who make it all look easy",
+        "People whose lives look like the ones I want"
+    ]
+    
+    what_it_does = [
+        "Makes my own life feel small and behind",
+        "Triggers a spiral of everything I'm not",
+        "Takes the joy out of my own achievements",
+        "Makes me question if I'm doing anything right",
+        "Steals hours and leaves me feeling worse"
+    ]
+    
+    return {
+        "the_trigger": f"When {topic.lower()} triggers — {_pick_from_pool(triggers, seed, variation_index)}",
+        "who_theyre_comparing_to": _pick_from_pool(who_comparing, seed, variation_index + 1),
+        "what_it_does": _pick_from_pool(what_it_does, seed, variation_index + 2),
+        "logical_brain": "I know it's curated, I know it's highlight reels",
+        "emotional_reality": "Still feels like proof that I'm failing somehow",
+        "breaking_point": "Had to delete the app for my own sanity"
+    }
+
+
 __all__ = [
     # Constants
     "VARIANT_TEMPLATES",
@@ -4628,6 +5019,13 @@ __all__ = [
     "VARIANT_MIRROR_INHERITANCE",
     "VARIANT_CHOSEN_GROWING",
     "VARIANT_PARALLEL_PERMISSION",
+    # Missing theme templates
+    "VARIANT_FIRST_BUTTERFLIES",
+    "VARIANT_BODY_ACCEPTANCE",
+    "VARIANT_FITTING_IN",
+    "VARIANT_ONLINE_CONNECTION",
+    "VARIANT_FUTURE_ANXIETY",
+    "VARIANT_COMPARISON_TRAP",
     # Core functions
     "get_template",
     "list_templates",
