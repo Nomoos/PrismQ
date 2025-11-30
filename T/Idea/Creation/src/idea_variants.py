@@ -1935,101 +1935,119 @@ TARGET_AUDIENCES = {
 
 # Variant type weights for random selection
 # Higher weight = more likely to be selected
-# Weights are tuned for primary audience (US girls 13-15) with mobile-first content
+# Weights tuned for:
+#   - Primary audience: US women 13-22
+#   - Ultra-primary (core) audience: 15-18 (highest weights)
+# Mobile-first content optimized
 VARIANT_WEIGHTS = {
-    # Weights on 0-100 scale by suitability for primary audience: US women 13-20
-    # Original templates - moderate weights
-    "emotion_first": 80,      # High - emotion appeals to primary audience
-    "mystery": 90,            # High - mystery appeals to all audiences
-    "skeleton": 40,           # Low - more structured, less preferred
-    "shortform": 100,         # Highest - mobile-first, teen-friendly
-    "niche_blend": 50,        # Medium - creative but complex
-    "minimal": 60,            # Medium - simple, good for quick ideas
-    "4point": 30,             # Low - structured format
-    "hook_frame": 70,         # Medium-high - hook-focused
-    "shortform2": 100,        # Highest - mobile-first, teen-friendly
-    "genre": 50,              # Medium - depends on genre picked
-    "scene_seed": 40,         # Low - more cinematic/professional
+    # ==========================================================================
+    # ORIGINAL TEMPLATES - varied appeal across age range
+    # ==========================================================================
+    "emotion_first": 75,      # Good for all ages, slightly less for ultra-primary
+    "mystery": 85,            # Appeals to full range, especially 13-16
+    "skeleton": 35,           # Too structured, less appealing for teens
+    "shortform": 100,         # ULTRA-PRIMARY - mobile-first, perfect for 15-18
+    "niche_blend": 45,        # More complex, appeals to older 19-22
+    "minimal": 55,            # Moderate - simple but less engaging
+    "4point": 25,             # Too academic/structured for teens
+    "hook_frame": 65,         # Good hook appeal, moderate for teens
+    "shortform2": 100,        # ULTRA-PRIMARY - mobile-first, perfect for 15-18
+    "genre": 50,              # Varies by genre, moderate overall
+    "scene_seed": 35,         # More cinematic, appeals to older 19-22
     
-    # New creative genre-based templates - weighted for teen appeal
-    "soft_supernatural": 90,   # High - friendship + mystery, girl-coded
-    "light_mystery": 90,       # High - puzzles + adventure, dual appeal
-    "scifi_school": 80,        # High - tech + school, teen relatable
-    "safe_survival": 70,       # Medium-high - teamwork + adventure
-    "emotional_drama": 100,    # Highest - emotion + character depth, primary audience
-    "rivals_allies": 80,       # High - competition + friendship
-    "identity_power": 100,     # Highest - identity + empowerment, primary audience
-    "ai_companion": 70,        # Medium-high - tech + connection
-    "urban_quest": 60,         # Medium - adventure + social
-    "magical_aesthetic": 90,   # High - aesthetics + emotion, girl-coded
+    # ==========================================================================
+    # CREATIVE GENRE-BASED TEMPLATES - teen appeal focus
+    # ==========================================================================
+    "soft_supernatural": 92,   # HIGH - friendship + mystery, strong 13-18 appeal
+    "light_mystery": 88,       # HIGH - puzzles appeal to 13-17
+    "scifi_school": 85,        # HIGH - school + tech, 14-18 sweet spot
+    "safe_survival": 70,       # MODERATE - adventure, broader appeal
+    "emotional_drama": 100,    # ULTRA-PRIMARY - emotion resonates 15-18 peak
+    "rivals_allies": 82,       # HIGH - competition themes, 14-18 focus
+    "identity_power": 100,     # ULTRA-PRIMARY - identity crucial for 15-18
+    "ai_companion": 72,        # MODERATE-HIGH - tech interest varies
+    "urban_quest": 58,         # MODERATE - adventure, less specific
+    "magical_aesthetic": 95,   # VERY HIGH - aesthetics peak 14-18
     
-    # Reddit-style drama templates - weighted for relatability
-    "family_drama": 80,        # High - relatable family dynamics
-    "social_home": 90,         # High - social media + family, very relatable
-    "realistic_mystery": 70,   # Medium-high - mystery + emotion
-    "school_family": 90,       # High - school + family collision, very relatable
-    "personal_voice": 100,     # Highest - first-person emotional, primary audience
+    # ==========================================================================
+    # REDDIT-STYLE DRAMA TEMPLATES - high relatability
+    # ==========================================================================
+    "family_drama": 85,        # HIGH - family relatable across 13-22
+    "social_home": 95,         # VERY HIGH - social media + family, 15-19 peak
+    "realistic_mystery": 72,   # MODERATE-HIGH - mystery + drama
+    "school_family": 98,       # ULTRA-PRIMARY - school themes peak 15-18
+    "personal_voice": 100,     # ULTRA-PRIMARY - first-person emotional, 15-18 core
     
-    # Story seed templates for US women 13-20 - high weights for relatability
-    "confession_moment": 100,      # Highest - confession style appeals strongly
-    "before_after": 90,            # High - transformation narratives resonate
-    "overheard_truth": 100,        # Highest - dramatic discovery, very relatable
-    "parallel_lives": 80,          # High - introspective, appeals to older teens
-    "last_time": 90,               # High - nostalgic/emotional moments
-    "unsent_message": 100,         # Highest - deeply relatable for teens
-    "small_moment_big": 90,        # High - subtle emotional depth
-    "almost_said": 100,            # Highest - unspoken truths, very relatable
-    "what_they_dont_know": 90,     # High - hidden self theme
-    "quiet_rebellion": 100,        # Highest - identity assertion, teen empowerment
-    "mirror_moment": 80,           # High - self-recognition themes
-    "chosen_family": 90,           # High - found family resonates strongly
-    "growing_apart": 90,           # High - change and loss themes
-    "permission_to": 100,          # Highest - self-acceptance, empowering
-    "learned_young": 90,           # High - family patterns, therapeutic
-    "the_version_of_me": 100,      # Highest - identity exploration
-    "emotional_inheritance": 80,   # High - generational patterns
-    "safe_person": 90,             # High - trust and connection themes
-    "holding_space": 80,           # High - emotional support, mature theme
-    "rewriting_the_story": 100,    # Highest - healing narrative, empowering
+    # ==========================================================================
+    # STORY SEED TEMPLATES - optimized for 15-18 ultra-primary
+    # ==========================================================================
+    "confession_moment": 100,      # ULTRA-PRIMARY - confession style peak 15-18
+    "before_after": 88,            # HIGH - transformation, good 14-20
+    "overheard_truth": 100,        # ULTRA-PRIMARY - dramatic discovery, 15-18 core
+    "parallel_lives": 78,          # HIGH - introspective, better for 17-22
+    "last_time": 90,               # VERY HIGH - nostalgia hits 16-22
+    "unsent_message": 100,         # ULTRA-PRIMARY - deeply relatable 15-18
+    "small_moment_big": 92,        # VERY HIGH - emotional depth 15-19
+    "almost_said": 100,            # ULTRA-PRIMARY - unspoken truths 15-18 core
+    "what_they_dont_know": 95,     # VERY HIGH - hidden self theme 15-19
+    "quiet_rebellion": 100,        # ULTRA-PRIMARY - teen empowerment 15-18 peak
+    "mirror_moment": 82,           # HIGH - self-recognition 16-20
+    "chosen_family": 92,           # VERY HIGH - found family 14-20
+    "growing_apart": 95,           # VERY HIGH - friendship loss peak 15-18
+    "permission_to": 100,          # ULTRA-PRIMARY - self-acceptance 15-18 core
+    "learned_young": 85,           # HIGH - family patterns 16-22
+    "the_version_of_me": 100,      # ULTRA-PRIMARY - identity exploration 15-18
+    "emotional_inheritance": 78,   # HIGH - generational, better 17-22
+    "safe_person": 92,             # VERY HIGH - trust themes 15-19
+    "holding_space": 75,           # HIGH - mature emotional theme 17-22
+    "rewriting_the_story": 98,     # ULTRA-PRIMARY - healing narrative 15-19
     
-    # Fusion variants - combinations create unique story seeds
-    "confession_mystery": 100,         # Highest - confession + mystery blend
-    "overheard_transformation": 100,   # Highest - discovery triggers change
-    "unsent_rebellion": 90,            # High - silent defiance in words
-    "mirror_inheritance": 90,          # High - seeing family patterns in self
-    "chosen_growing": 90,              # High - new family while old fades
-    "parallel_permission": 100,        # Highest - what-if meets self-acceptance
+    # ==========================================================================
+    # FUSION VARIANTS - unique story seed combinations
+    # ==========================================================================
+    "confession_mystery": 100,         # ULTRA-PRIMARY - confession + mystery 15-18
+    "overheard_transformation": 98,    # ULTRA-PRIMARY - discovery + change 15-18
+    "unsent_rebellion": 95,            # VERY HIGH - silent defiance 15-19
+    "mirror_inheritance": 80,          # HIGH - family patterns 17-22
+    "chosen_growing": 92,              # VERY HIGH - found family + change 15-19
+    "parallel_permission": 95,         # VERY HIGH - what-if + acceptance 15-19
     
-    # Missing theme templates - crucial for primary audience
-    "first_butterflies": 95,       # Very high - universal teen experience
-    "body_acceptance": 100,        # Highest - extremely relatable for this age
-    "fitting_in": 100,             # Highest - core teen anxiety
-    "online_connection": 95,       # Very high - modern teen experience
-    "future_anxiety": 100,         # Highest - universal pressure for this age
-    "comparison_trap": 100,        # Highest - social media generation
+    # ==========================================================================
+    # MISSING THEME TEMPLATES - crucial for 15-18 core audience
+    # ==========================================================================
+    "first_butterflies": 100,      # ULTRA-PRIMARY - universal teen experience 14-17
+    "body_acceptance": 100,        # ULTRA-PRIMARY - peak relevance 15-18
+    "fitting_in": 100,             # ULTRA-PRIMARY - core 15-18 anxiety
+    "online_connection": 98,       # ULTRA-PRIMARY - digital native 15-18
+    "future_anxiety": 100,         # ULTRA-PRIMARY - college pressure 16-18 peak
+    "comparison_trap": 100,        # ULTRA-PRIMARY - social media 15-18
     
-    # Blend templates - new themes combined with each other
-    "butterflies_anxiety": 98,     # Very high - attraction + social anxiety combo
-    "body_comparison": 100,        # Highest - body image + social media comparison
-    "online_fitting": 95,          # Very high - online belonging vs IRL struggle
-    "future_comparison": 98,       # Very high - future anxiety + comparison culture
-    "body_butterflies": 95,        # Very high - attraction complicated by body image
-    "online_future": 90,           # High - online friends understanding future fears
-    "fitting_comparison": 98,      # Very high - social anxiety + comparison spiral
+    # ==========================================================================
+    # BLEND TEMPLATES - new themes combined with each other
+    # ==========================================================================
+    "butterflies_anxiety": 100,    # ULTRA-PRIMARY - attraction + social anxiety 15-17
+    "body_comparison": 100,        # ULTRA-PRIMARY - body image + comparison 15-18
+    "online_fitting": 98,          # ULTRA-PRIMARY - online vs IRL 15-18
+    "future_comparison": 100,      # ULTRA-PRIMARY - future + comparison 16-18
+    "body_butterflies": 98,        # ULTRA-PRIMARY - attraction + body image 15-17
+    "online_future": 92,           # VERY HIGH - online support 15-19
+    "fitting_comparison": 100,     # ULTRA-PRIMARY - social anxiety spiral 15-18
     
-    # Blend templates - new themes with older templates
-    "confession_body": 100,        # Highest - confessing body struggles
-    "unsent_future": 95,           # Very high - unsent message about pressure
-    "mirror_body": 100,            # Highest - mirror moment + body perception
-    "growing_online": 92,          # High - IRL fading, online growing
-    "quiet_body": 98,              # Very high - body rebellion, wearing what you want
-    "chosen_online": 95,           # Very high - online chosen family
-    "permission_body": 100,        # Highest - permission to stop fighting body
-    "small_comparison": 95,        # Very high - small trigger, big spiral
-    "identity_fitting": 98,        # Very high - authenticity vs belonging
-    "learned_body": 100,           # Highest - unlearning body beliefs
-    "safe_online": 90,             # High - safest person is online
-    "rewriting_body": 100,         # Highest - rewriting body narrative
+    # ==========================================================================
+    # BLEND TEMPLATES - new themes with older templates
+    # ==========================================================================
+    "confession_body": 100,        # ULTRA-PRIMARY - confessing struggles 15-18
+    "unsent_future": 98,           # ULTRA-PRIMARY - unsent pressure 16-18
+    "mirror_body": 100,            # ULTRA-PRIMARY - mirror + body 15-18
+    "growing_online": 90,          # VERY HIGH - IRL/online shift 15-19
+    "quiet_body": 100,             # ULTRA-PRIMARY - body rebellion 15-18
+    "chosen_online": 95,           # VERY HIGH - online chosen family 15-19
+    "permission_body": 100,        # ULTRA-PRIMARY - body acceptance 15-18
+    "small_comparison": 98,        # ULTRA-PRIMARY - small trigger spiral 15-18
+    "identity_fitting": 100,       # ULTRA-PRIMARY - authenticity vs belonging 15-18
+    "learned_body": 95,            # VERY HIGH - unlearning beliefs 16-20
+    "safe_online": 92,             # VERY HIGH - online safe person 15-19
+    "rewriting_body": 100,         # ULTRA-PRIMARY - body narrative 15-18
 }
 
 # Default number of ideas to generate
