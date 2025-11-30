@@ -11,12 +11,20 @@ Key Features:
 - Multiple structure types (hook-deliver-cta, three-act, problem-solution)
 - Duration targeting and estimation
 - Coherence with title promises and idea intent
+- Batch processing of stories needing scripts
 
 Usage:
+    # Generate a single script
     from PrismQ.T.Script.FromIdeaAndTitle import ScriptGenerator
     
     generator = ScriptGenerator()
     script = generator.generate_script_v1(idea=my_idea, title="My Title")
+    
+    # Process stories from database
+    from PrismQ.T.Script.FromIdeaAndTitle import StoryScriptService
+    
+    service = StoryScriptService(connection)
+    results = service.process_stories_needing_scripts()
 """
 
 from .src.script_generator import (
@@ -28,14 +36,24 @@ from .src.script_generator import (
     PlatformTarget,
     ScriptTone
 )
+from .src.story_script_service import (
+    StoryScriptService,
+    ScriptGenerationResult,
+    process_all_pending_stories
+)
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
+    # Script Generator
     "ScriptGenerator",
     "ScriptGeneratorConfig",
     "ScriptV1",
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
-    "ScriptTone"
+    "ScriptTone",
+    # Story Script Service
+    "StoryScriptService",
+    "ScriptGenerationResult",
+    "process_all_pending_stories"
 ]

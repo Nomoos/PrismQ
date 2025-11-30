@@ -88,6 +88,7 @@ from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
+from T.Database.models.story import Story
 from T.Database.repositories.base import (
     IRepository,
     IVersionedRepository,
@@ -96,6 +97,7 @@ from T.Database.repositories.base import (
 from T.Database.repositories.title_repository import TitleRepository
 from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.repositories.script_repository import ScriptRepository
+from T.Database.repositories.story_repository import StoryRepository
 
 __all__ = [
     # Model interfaces
@@ -105,6 +107,7 @@ __all__ = [
     "Title",
     "Script",
     "Review",
+    "Story",
     "StoryReviewModel",
     "ReviewType",
     # Repository interfaces
@@ -115,4 +118,5 @@ __all__ = [
     "TitleRepository",
     "ScriptRepository",
     "StoryReviewRepository",
+    "StoryRepository",
 ]
