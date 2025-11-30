@@ -8,11 +8,13 @@ Model Interfaces:
     - IModel: Interface for full persistence operations (extends IReadable)
 
 Models:
+    - Story: Central entity linking Ideas to content versions
     - Title: Versioned title content with review FK
     - Script: Script model for versioned content storage
     - Review: Simple review model for content review storage
     - StoryReviewModel: Linking table for Story reviews with review types
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
+    - StoryState: Enum for story workflow states
 
 Models follow the Dependency Inversion Principle by depending
 on the IModel abstraction rather than concrete database implementations.
@@ -22,6 +24,7 @@ from T.Database.models.base import IReadable, IModel
 from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
+from T.Database.models.story import Story, StoryState
 
 try:
     from .story_review import StoryReviewModel, ReviewType
@@ -34,6 +37,8 @@ __all__ = [
     "IReadable",
     "IModel",
     # Models
+    "Story",
+    "StoryState",
     "StoryReviewModel",
     "ReviewType",
     "Review",
