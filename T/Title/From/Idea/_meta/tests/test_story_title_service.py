@@ -261,6 +261,77 @@ class TestStoryTitleServiceWithDatabase:
         )
         idea1_stories = cursor.fetchone()[0]
         assert idea1_stories == 10
+    
+    def test_skip_if_exists_prevents_duplicates(self, db_connection):
+        """Test that skip_if_exists prevents creating duplicate stories for same Idea."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Skip Test Idea",
+            concept="Testing skip if exists",
+            status=IdeaStatus.DRAFT
+        )
+        
+        # First call should create stories
+        result1 = service.create_stories_with_titles(idea)
+        assert result1 is not None
+        assert result1.count == 10
+        
+        # Second call with skip_if_exists=True (default) should return None
+        result2 = service.create_stories_with_titles(idea)
+        assert result2 is None
+        
+        # Total should still be 10 stories
+        cursor = db_connection.execute('SELECT COUNT(*) FROM Story')
+        total_stories = cursor.fetchone()[0]
+        assert total_stories == 10
+    
+    def test_skip_if_exists_disabled_allows_duplicates(self, db_connection):
+        """Test that skip_if_exists=False allows creating duplicate stories."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Duplicate Test Idea",
+            concept="Testing skip if exists disabled",
+            status=IdeaStatus.DRAFT
+        )
+        
+        # First call creates stories
+        result1 = service.create_stories_with_titles(idea, skip_if_exists=False)
+        assert result1 is not None
+        assert result1.count == 10
+        
+        # Second call with skip_if_exists=False should also create stories
+        result2 = service.create_stories_with_titles(idea, skip_if_exists=False)
+        assert result2 is not None
+        assert result2.count == 10
+        
+        # Total should be 20 stories
+        cursor = db_connection.execute('SELECT COUNT(*) FROM Story')
+        total_stories = cursor.fetchone()[0]
+        assert total_stories == 20
+    
+    def test_idea_has_stories_method(self, db_connection):
+        """Test the idea_has_stories method."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Has Stories Test",
+            concept="Testing has stories method",
+            status=IdeaStatus.DRAFT
+        )
+        
+        # Before creating stories, should return False
+        assert service.idea_has_stories(idea) == False
+        
+        # Create stories
+        service.create_stories_with_titles(idea, skip_if_exists=False)
+        
+        # After creating stories, should return True
+        assert service.idea_has_stories(idea) == True
 
 
 class TestStoryTitleResult:

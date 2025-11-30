@@ -145,28 +145,52 @@ class StoryTitleService:
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
     
+    def idea_has_stories(self, idea: Idea, idea_id: Optional[str] = None) -> bool:
+        """Check if an Idea already has Stories in the database.
+        
+        Args:
+            idea: The Idea object to check.
+            idea_id: Optional explicit idea identifier.
+            
+        Returns:
+            True if the Idea already has Stories, False otherwise.
+            Always returns False if no database connection is available.
+        """
+        if not self._story_repo:
+            return False
+        
+        effective_idea_id = idea_id or self._get_idea_id(idea)
+        count = self._story_repo.count_by_idea_id(effective_idea_id)
+        return count > 0
+    
     def create_stories_with_titles(
         self, 
         idea: Idea,
-        idea_id: Optional[str] = None
-    ) -> StoryTitleResult:
+        idea_id: Optional[str] = None,
+        skip_if_exists: bool = True
+    ) -> Optional[StoryTitleResult]:
         """Create 10 Stories from an Idea, each with a first Title.
         
         This method:
-        1. Generates 10 title variants from the Idea
-        2. Creates 10 Story objects, each referencing the Idea
-        3. Creates the first Title (v0) for each Story using a variant
-        4. Updates each Story's state to TITLE_V0
-        5. Persists to database if connection was provided
+        1. Checks if Idea already has Stories (if skip_if_exists=True)
+        2. Generates 10 title variants from the Idea
+        3. Creates 10 Story objects, each referencing the Idea
+        4. Creates the first Title (v0) for each Story using a variant
+        5. Updates each Story's state to TITLE_V0
+        6. Persists to database if connection was provided
         
         Args:
             idea: The source Idea object containing concept, title, etc.
             idea_id: Optional explicit idea identifier. If not provided,
                 uses idea.title as a simple identifier (for ideas without
                 database persistence).
+            skip_if_exists: If True (default), returns None if the Idea
+                already has Stories in the database. This ensures the module
+                only picks Ideas that aren't referenced by Story table rows yet.
         
         Returns:
-            StoryTitleResult containing created Stories and Titles.
+            StoryTitleResult containing created Stories and Titles,
+            or None if skip_if_exists=True and Idea already has Stories.
             
         Raises:
             ValueError: If idea is None or has no title/concept.
@@ -179,6 +203,10 @@ class StoryTitleService:
         
         # Determine idea ID
         effective_idea_id = idea_id or self._get_idea_id(idea)
+        
+        # Check if Idea already has Stories (skip if exists)
+        if skip_if_exists and self.idea_has_stories(idea, effective_idea_id):
+            return None
         
         # Generate title variants using existing TitleGenerator
         title_variants = self._title_generator.generate_from_idea(
@@ -280,26 +308,34 @@ def create_stories_from_idea(
     idea: Idea,
     connection: Optional[sqlite3.Connection] = None,
     idea_id: Optional[str] = None,
-    title_config: Optional[TitleConfig] = None
-) -> StoryTitleResult:
+    title_config: Optional[TitleConfig] = None,
+    skip_if_exists: bool = True
+) -> Optional[StoryTitleResult]:
     """Convenience function to create Stories with Titles from an Idea.
     
     This is a simpler interface to StoryTitleService.create_stories_with_titles().
+    The module will only pick Ideas that aren't already referenced by Story table rows.
     
     Args:
         idea: The source Idea object.
         connection: Optional SQLite connection for persistence.
         idea_id: Optional explicit idea identifier.
         title_config: Optional configuration for title generation.
+        skip_if_exists: If True (default), returns None if the Idea
+            already has Stories in the database.
         
     Returns:
-        StoryTitleResult containing created Stories and Titles.
+        StoryTitleResult containing created Stories and Titles,
+        or None if skip_if_exists=True and Idea already has Stories.
         
     Example:
         >>> idea = Idea(title="AI Future", concept="Exploring AI trends")
         >>> result = create_stories_from_idea(idea)
-        >>> print(f"Created {result.count} stories")
+        >>> if result:
+        ...     print(f"Created {result.count} stories")
+        ... else:
+        ...     print("Idea already has stories")
         Created 10 stories
     """
     service = StoryTitleService(connection, title_config)
-    return service.create_stories_with_titles(idea, idea_id)
+    return service.create_stories_with_titles(idea, idea_id, skip_if_exists)

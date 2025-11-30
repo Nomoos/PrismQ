@@ -82,11 +82,15 @@ idea = Idea(
 )
 
 # Create stories with titles
+# Module only picks Ideas that aren't already referenced by Story table rows
 result = create_stories_from_idea(idea)
 
-print(f"Created {result.count} stories")
-for story, title in result.get_story_title_pairs():
-    print(f"Story #{story.id}: {title.text}")
+if result:
+    print(f"Created {result.count} stories")
+    for story, title in result.get_story_title_pairs():
+        print(f"Story #{story.id}: {title.text}")
+else:
+    print("Idea already has stories - no new stories created")
 ```
 
 ### With Database Persistence
@@ -112,10 +116,21 @@ idea = Idea(
 )
 
 # Create stories with titles (persisted to database)
+# By default, skips if Idea already has Stories (skip_if_exists=True)
 result = service.create_stories_with_titles(idea)
 
-# Stories and Titles are now in the database
-print(f"Created {result.count} stories with database persistence")
+if result:
+    # Stories and Titles are now in the database
+    print(f"Created {result.count} stories with database persistence")
+else:
+    print("Idea already has stories - skipped")
+
+# Check if an Idea already has Stories
+has_stories = service.idea_has_stories(idea)
+print(f"Idea has stories: {has_stories}")
+
+# Force creation even if Idea already has Stories
+result = service.create_stories_with_titles(idea, skip_if_exists=False)
 ```
 
 ## Next Stage
