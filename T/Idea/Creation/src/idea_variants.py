@@ -1442,7 +1442,8 @@ DEFAULT_IDEA_COUNT = 10
 DEFAULT_DECAY_FACTOR = 0.5
 
 # Minimum weight after decay (ensures variant can still be selected even after multiple uses)
-MIN_DECAY_WEIGHT = 0.1
+# Weight scale is 0-100, minimum is 2 to ensure variants remain selectable
+MIN_DECAY_WEIGHT = 2
 
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
