@@ -22,6 +22,7 @@ from idea_review import (
     IdeaVariantAnalysis,
     generate_idea_review,
 )
+from idea_variants import DEFAULT_IDEA_COUNT
 
 
 class TestIdeaVariantAnalysis:
@@ -260,8 +261,8 @@ class TestGenerateIdeaReview:
         """Test generate_idea_review with default parameters."""
         result = generate_idea_review("another test", seed=42)
         
-        # Default is 10 ideas
-        assert result.total_variants == 10
+        # Default is defined by DEFAULT_IDEA_COUNT constant
+        assert result.total_variants == DEFAULT_IDEA_COUNT
     
     def test_generate_review_returns_complete_result(self):
         """Test that generate_idea_review returns a complete result."""

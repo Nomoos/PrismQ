@@ -132,8 +132,14 @@ Examples:
         
         return 0
         
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except ValueError as e:
+        print(f"❌ Input Error: {e}")
+        return 1
+    except FileNotFoundError as e:
+        print(f"❌ File Error: {e}")
+        return 1
+    except OSError as e:
+        print(f"❌ IO Error: {e}")
         return 1
 
 
