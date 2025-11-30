@@ -1372,67 +1372,68 @@ TARGET_AUDIENCES = {
 # Higher weight = more likely to be selected
 # Weights are tuned for primary audience (US girls 13-15) with mobile-first content
 VARIANT_WEIGHTS = {
+    # Weights on 0-100 scale by suitability for primary audience: US women 13-20
     # Original templates - moderate weights
-    "emotion_first": 8,      # High - emotion appeals to primary audience
-    "mystery": 9,            # High - mystery appeals to all audiences
-    "skeleton": 4,           # Low - more structured, less preferred
-    "shortform": 10,         # Highest - mobile-first, teen-friendly
-    "niche_blend": 5,        # Medium - creative but complex
-    "minimal": 6,            # Medium - simple, good for quick ideas
-    "4point": 3,             # Low - structured format
-    "hook_frame": 7,         # Medium-high - hook-focused
-    "shortform2": 10,        # Highest - mobile-first, teen-friendly
-    "genre": 5,              # Medium - depends on genre picked
-    "scene_seed": 4,         # Low - more cinematic/professional
+    "emotion_first": 80,      # High - emotion appeals to primary audience
+    "mystery": 90,            # High - mystery appeals to all audiences
+    "skeleton": 40,           # Low - more structured, less preferred
+    "shortform": 100,         # Highest - mobile-first, teen-friendly
+    "niche_blend": 50,        # Medium - creative but complex
+    "minimal": 60,            # Medium - simple, good for quick ideas
+    "4point": 30,             # Low - structured format
+    "hook_frame": 70,         # Medium-high - hook-focused
+    "shortform2": 100,        # Highest - mobile-first, teen-friendly
+    "genre": 50,              # Medium - depends on genre picked
+    "scene_seed": 40,         # Low - more cinematic/professional
     
     # New creative genre-based templates - weighted for teen appeal
-    "soft_supernatural": 9,   # High - friendship + mystery, girl-coded
-    "light_mystery": 9,       # High - puzzles + adventure, dual appeal
-    "scifi_school": 8,        # High - tech + school, teen relatable
-    "safe_survival": 7,       # Medium-high - teamwork + adventure
-    "emotional_drama": 10,    # Highest - emotion + character depth, primary audience
-    "rivals_allies": 8,       # High - competition + friendship
-    "identity_power": 10,     # Highest - identity + empowerment, primary audience
-    "ai_companion": 7,        # Medium-high - tech + connection
-    "urban_quest": 6,         # Medium - adventure + social
-    "magical_aesthetic": 9,   # High - aesthetics + emotion, girl-coded
+    "soft_supernatural": 90,   # High - friendship + mystery, girl-coded
+    "light_mystery": 90,       # High - puzzles + adventure, dual appeal
+    "scifi_school": 80,        # High - tech + school, teen relatable
+    "safe_survival": 70,       # Medium-high - teamwork + adventure
+    "emotional_drama": 100,    # Highest - emotion + character depth, primary audience
+    "rivals_allies": 80,       # High - competition + friendship
+    "identity_power": 100,     # Highest - identity + empowerment, primary audience
+    "ai_companion": 70,        # Medium-high - tech + connection
+    "urban_quest": 60,         # Medium - adventure + social
+    "magical_aesthetic": 90,   # High - aesthetics + emotion, girl-coded
     
     # Reddit-style drama templates - weighted for relatability
-    "family_drama": 8,        # High - relatable family dynamics
-    "social_home": 9,         # High - social media + family, very relatable
-    "realistic_mystery": 7,   # Medium-high - mystery + emotion
-    "school_family": 9,       # High - school + family collision, very relatable
-    "personal_voice": 10,     # Highest - first-person emotional, primary audience
+    "family_drama": 80,        # High - relatable family dynamics
+    "social_home": 90,         # High - social media + family, very relatable
+    "realistic_mystery": 70,   # Medium-high - mystery + emotion
+    "school_family": 90,       # High - school + family collision, very relatable
+    "personal_voice": 100,     # Highest - first-person emotional, primary audience
     
     # Story seed templates for US women 13-20 - high weights for relatability
-    "confession_moment": 10,      # Highest - confession style appeals strongly
-    "before_after": 9,            # High - transformation narratives resonate
-    "overheard_truth": 10,        # Highest - dramatic discovery, very relatable
-    "parallel_lives": 8,          # High - introspective, appeals to older teens
-    "last_time": 9,               # High - nostalgic/emotional moments
-    "unsent_message": 10,         # Highest - deeply relatable for teens
-    "small_moment_big": 9,        # High - subtle emotional depth
-    "almost_said": 10,            # Highest - unspoken truths, very relatable
-    "what_they_dont_know": 9,     # High - hidden self theme
-    "quiet_rebellion": 10,        # Highest - identity assertion, teen empowerment
-    "mirror_moment": 8,           # High - self-recognition themes
-    "chosen_family": 9,           # High - found family resonates strongly
-    "growing_apart": 9,           # High - change and loss themes
-    "permission_to": 10,          # Highest - self-acceptance, empowering
-    "learned_young": 9,           # High - family patterns, therapeutic
-    "the_version_of_me": 10,      # Highest - identity exploration
-    "emotional_inheritance": 8,   # High - generational patterns
-    "safe_person": 9,             # High - trust and connection themes
-    "holding_space": 8,           # High - emotional support, mature theme
-    "rewriting_the_story": 10,    # Highest - healing narrative, empowering
+    "confession_moment": 100,      # Highest - confession style appeals strongly
+    "before_after": 90,            # High - transformation narratives resonate
+    "overheard_truth": 100,        # Highest - dramatic discovery, very relatable
+    "parallel_lives": 80,          # High - introspective, appeals to older teens
+    "last_time": 90,               # High - nostalgic/emotional moments
+    "unsent_message": 100,         # Highest - deeply relatable for teens
+    "small_moment_big": 90,        # High - subtle emotional depth
+    "almost_said": 100,            # Highest - unspoken truths, very relatable
+    "what_they_dont_know": 90,     # High - hidden self theme
+    "quiet_rebellion": 100,        # Highest - identity assertion, teen empowerment
+    "mirror_moment": 80,           # High - self-recognition themes
+    "chosen_family": 90,           # High - found family resonates strongly
+    "growing_apart": 90,           # High - change and loss themes
+    "permission_to": 100,          # Highest - self-acceptance, empowering
+    "learned_young": 90,           # High - family patterns, therapeutic
+    "the_version_of_me": 100,      # Highest - identity exploration
+    "emotional_inheritance": 80,   # High - generational patterns
+    "safe_person": 90,             # High - trust and connection themes
+    "holding_space": 80,           # High - emotional support, mature theme
+    "rewriting_the_story": 100,    # Highest - healing narrative, empowering
     
     # Fusion variants - combinations create unique story seeds
-    "confession_mystery": 10,         # Highest - confession + mystery blend
-    "overheard_transformation": 10,   # Highest - discovery triggers change
-    "unsent_rebellion": 9,            # High - silent defiance in words
-    "mirror_inheritance": 9,          # High - seeing family patterns in self
-    "chosen_growing": 9,              # High - new family while old fades
-    "parallel_permission": 10,        # Highest - what-if meets self-acceptance
+    "confession_mystery": 100,         # Highest - confession + mystery blend
+    "overheard_transformation": 100,   # Highest - discovery triggers change
+    "unsent_rebellion": 90,            # High - silent defiance in words
+    "mirror_inheritance": 90,          # High - seeing family patterns in self
+    "chosen_growing": 90,              # High - new family while old fades
+    "parallel_permission": 100,        # Highest - what-if meets self-acceptance
 }
 
 # Default number of ideas to generate
