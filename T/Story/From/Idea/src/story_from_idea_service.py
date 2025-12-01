@@ -176,7 +176,8 @@ class StoryFromIdeaService:
                 unreferenced.append(SimpleIdea.from_dict(idea_dict))
         
         # Sort by created_at (oldest first), with id as tiebreaker for same timestamps
-        unreferenced.sort(key=lambda idea: (idea.created_at or "", idea.id or 0))
+        # Use "9999-12-31" as fallback for None to ensure items with None are sorted last
+        unreferenced.sort(key=lambda idea: (idea.created_at or "9999-12-31T23:59:59", idea.id or 0))
         
         return unreferenced
     

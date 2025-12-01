@@ -325,9 +325,11 @@ class Story(IModel[int]):
         
         Args:
             new_state: The StoryState to transition to.
+            
+        Raises:
+            TypeError: If new_state is not a StoryState enum value.
         """
-        if isinstance(new_state, StoryState):
-            self.state = new_state.value
-        else:
-            self.state = str(new_state)
+        if not isinstance(new_state, StoryState):
+            raise TypeError(f"new_state must be a StoryState enum value, got {type(new_state).__name__}")
+        self.state = new_state.value
         self.updated_at = datetime.now()
