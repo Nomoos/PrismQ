@@ -4,7 +4,7 @@ Tests the workflow step PrismQ.T.Review.Script.Consistency that:
 1. Selects oldest Story with state PrismQ.T.Review.Script.Consistency
 2. Performs consistency review on script
 3. Creates Review record
-4. Links Review to Story via StoryReview
+4. Links Review directly to Script via review_id FK
 5. Updates Story state based on review result
 """
 
@@ -16,11 +16,9 @@ from datetime import datetime, timedelta
 from T.Database.models.story import Story
 from T.Database.models.script import Script
 from T.Database.models.review import Review
-from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.review_repository import ReviewRepository
-from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.State.constants.state_names import StateNames
 
 from T.Review.Script.Consistency.src.script_consistency_review_service import (
@@ -73,19 +71,6 @@ def db_connection():
             state TEXT NOT NULL DEFAULT 'CREATED',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-        )
-    """)
-    
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS StoryReview (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            story_id INTEGER NOT NULL,
-            review_id INTEGER NOT NULL,
-            version INTEGER NOT NULL CHECK (version >= 0),
-            review_type TEXT NOT NULL CHECK (review_type IN 
-                ('grammar', 'tone', 'content', 'consistency', 'editing')),
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version, review_type)
         )
     """)
     
@@ -237,7 +222,6 @@ class TestScriptConsistencyReviewService:
         story_repo = StoryRepository(db_connection)
         script_repo = ScriptRepository(db_connection)
         review_repo = ReviewRepository(db_connection)
-        story_review_repo = StoryReviewRepository(db_connection)
         
         # Create story and script
         story = story_repo.insert(Story(
@@ -269,10 +253,9 @@ class TestScriptConsistencyReviewService:
         assert review is not None
         assert review.score == result.score
         
-        # Verify StoryReview link was created
-        story_reviews = story_review_repo.find_by_story_id(story.id)
-        assert len(story_reviews) == 1
-        assert story_reviews[0].review_type == ReviewType.CONSISTENCY
+        # Verify Script has review_id FK set (Review linked directly to Script)
+        updated_script = script_repo.find_by_id(script.id)
+        assert updated_script.review_id == result.review_id
         
         # Verify Story state was updated
         updated_story = story_repo.find_by_id(story.id)
