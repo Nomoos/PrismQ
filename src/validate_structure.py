@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Validation script for EnvLoad module directory structure.
+Validation script for src module directory structure.
 
-This script validates that the EnvLoad module properly handles
+This script validates that the src module properly handles
 directory structure for all PrismQ modules (T, A, V, P, M).
 """
 
@@ -10,16 +10,16 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Add parent directory to path to import EnvLoad
+# Add parent directory to path to import src
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from EnvLoad import Config
+from src import Config
 
 
 def test_module_directories():
     """Test module directory structure creation."""
     print("=" * 70)
-    print("Testing EnvLoad Module Directory Structure")
+    print("Testing src Module Directory Structure")
     print("=" * 70)
     
     # Use a temporary directory for testing

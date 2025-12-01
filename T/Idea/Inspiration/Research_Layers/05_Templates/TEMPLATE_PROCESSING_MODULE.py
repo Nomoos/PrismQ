@@ -22,7 +22,7 @@ Principles:
 
 from typing import Optional, Dict, Any
 from Model import IdeaInspiration
-from EnvLoad import Config
+from src import Config
 import logging
 
 
@@ -242,7 +242,7 @@ import pytest
 from unittest.mock import Mock, patch
 from {module}.{module_name} import {ModuleName}Processor
 from Model import IdeaInspiration
-from EnvLoad import Config
+from src import Config
 
 
 class Test{ModuleName}Processor:

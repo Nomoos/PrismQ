@@ -1,11 +1,11 @@
-"""Tests for EnvLoad configuration module."""
+"""Tests for src configuration module."""
 
 import pytest
 import tempfile
 import os
 import platform
 from pathlib import Path
-from EnvLoad import Config
+from src import Config
 
 
 @pytest.fixture

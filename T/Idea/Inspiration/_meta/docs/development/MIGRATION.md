@@ -1,6 +1,6 @@
-# EnvLoad Migration Guide
+# src Migration Guide
 
-This guide helps you migrate existing PrismQ modules to use the centralized `EnvLoad` module for .env file loading and logging configuration.
+This guide helps you migrate existing PrismQ modules to use the centralized `src` module for .env file loading and logging configuration.
 
 ## Benefits of Migration
 
@@ -12,7 +12,7 @@ This guide helps you migrate existing PrismQ modules to use the centralized `Env
 
 ## Before You Start
 
-1. Ensure `EnvLoad` is available in the repository root
+1. Ensure `src` is available in the repository root
 2. Install dependencies: `pip install python-dotenv psutil`
 
 ## Migration Steps
@@ -33,15 +33,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 ```
 
-#### After (using EnvLoad):
+#### After (using src):
 ```python
 import sys
 from pathlib import Path
 
-# Add EnvLoad to path
+# Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))  # Adjust as needed
 
-from EnvLoad import Config, get_module_logger
+from src import Config, get_module_logger
 
 # Initialize configuration
 config = Config(interactive=False)
@@ -90,33 +90,33 @@ api_key = config.get_or_prompt(
 
 If your module has its own `logging_config.py`, you have two options:
 
-#### Option A: Delete it and use EnvLoad directly
-Remove the file and update all imports to use EnvLoad.
+#### Option A: Delete it and use src directly
+Remove the file and update all imports to use src.
 
 #### Option B: Create a backward compatibility shim (Recommended)
-Keep the file but re-export from EnvLoad:
+Keep the file but re-export from src:
 
 ```python
-"""DEPRECATED: Use EnvLoad module instead.
+"""DEPRECATED: Use src module instead.
 
 This file is kept for backward compatibility.
-New code should import from EnvLoad module.
+New code should import from src module.
 """
 
 import warnings
 warnings.warn(
-    "YourModule/logging_config is deprecated. Use EnvLoad module instead.",
+    "YourModule/logging_config is deprecated. Use src module instead.",
     DeprecationWarning,
     stacklevel=2
 )
 
-# Re-export from EnvLoad
+# Re-export from src
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from EnvLoad.logging_config import (
+from src.logging_config import (
     ModuleLogger,
     get_module_logger,
     setup_basic_logging
@@ -160,10 +160,10 @@ def main():
 import sys
 from pathlib import Path
 
-# Add EnvLoad to path
+# Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from EnvLoad import Config, get_module_logger
+from src import Config, get_module_logger
 
 # Initialize configuration
 config = Config(interactive=False)
@@ -201,7 +201,7 @@ The path adjustment depends on your module structure:
 
 ```
 PrismQ.T.Idea.Inspiration/
-├── EnvLoad/          # Root level
+├── src/          # Root level
 ├── MyModule/
 │   ├── src/
 │   │   └── main.py     # Need: parent.parent.parent to reach root
@@ -217,37 +217,37 @@ Adjust the number of `.parent` calls based on how deep your file is:
 
 ## Common Issues
 
-### Issue: ModuleNotFoundError: No module named 'EnvLoad'
+### Issue: ModuleNotFoundError: No module named 'src'
 
 **Solution**: Adjust the sys.path.insert() to point to the correct parent directory:
 ```python
 # Check your current file location relative to root
 print(f"Current file: {Path(__file__)}")
-print(f"Looking for EnvLoad at: {Path(__file__).parent.parent.parent}")
+print(f"Looking for src at: {Path(__file__).parent.parent.parent}")
 ```
 
 ### Issue: .env file not found
 
-**Solution**: EnvLoad automatically creates .env in PrismQ_WD directory. If you're in a PrismQ directory structure, it will find it. Otherwise, it uses current directory.
+**Solution**: src automatically creates .env in PrismQ_WD directory. If you're in a PrismQ directory structure, it will find it. Otherwise, it uses current directory.
 
 ### Issue: Existing tests break
 
 **Solution**: 
-1. Update test imports to include EnvLoad in path
+1. Update test imports to include src in path
 2. Mock the Config initialization in tests if needed:
 ```python
 from unittest.mock import patch
 
-@patch('EnvLoad.config.Config')
+@patch('src.config.Config')
 def test_something(mock_config):
     # Your test code
 ```
 
 ## Need Help?
 
-- See `EnvLoad/README.md` for full API documentation
+- See `src/README.md` for full API documentation
 - Check `Scoring/src/main.py` for a complete example
-- Review `EnvLoad/tests/` for usage examples
+- Review `src/_meta/tests/` for usage examples
 
 ## Rollback
 
@@ -256,6 +256,6 @@ If you need to rollback:
 1. Restore your original imports
 2. Add back `load_dotenv()` calls
 3. Restore logging configuration
-4. Remove EnvLoad imports
+4. Remove src imports
 
-The old pattern will still work - EnvLoad is an enhancement, not a requirement.
+The old pattern will still work - src is an enhancement, not a requirement.
