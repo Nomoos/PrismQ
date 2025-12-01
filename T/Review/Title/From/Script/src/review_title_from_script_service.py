@@ -8,9 +8,8 @@ PrismQ.T.Review.Title.From.Script state by:
 4. Updating the Story state based on review result
 
 State Transitions:
-    - If no review exists yet -> PrismQ.T.Review.Script.From.Title
-    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Script.Review.Title
     - If review accepts title (score >= threshold) -> PrismQ.T.Review.Script.From.Title
+    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Script.Review.Title
 """
 
 import sqlite3
@@ -366,11 +365,10 @@ class ReviewTitleFromScriptService:
         story.updated_at = datetime.now()
         self.story_repo.update(story)
         
-        # Update title with review reference
-        title.review_id = saved_review.id
-        # Note: Title repository uses INSERT-only pattern, so we create a new version
-        # However, for simplicity in this case, we could just keep the reference in memory
-        # The FK relationship is primarily for querying, not for data integrity here
+        # Note: The review_id could be linked to Title via FK but Title uses
+        # INSERT-only pattern (create new version instead of update). The review
+        # result is stored separately and the story state tracks progression.
+        # The StoryReview linking table could be used for formal linking if needed.
         
         return ReviewTitleFromScriptResult(
             success=True,

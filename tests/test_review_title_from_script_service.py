@@ -272,8 +272,17 @@ class TestReviewTitleFromScriptService:
         assert not result.success
         assert "expected" in result.error_message
     
-    def test_process_story_accepts_title(self, service, repositories):
+    def test_process_story_accepts_title(self, repositories):
         """Test processing story that accepts title."""
+        # Create service with lower threshold for accepting titles
+        service = ReviewTitleFromScriptService(
+            story_repo=repositories['story'],
+            title_repo=repositories['title'],
+            script_repo=repositories['script'],
+            review_repo=repositories['review'],
+            acceptance_threshold=50  # Lower threshold for test
+        )
+        
         # Create story
         story = Story(
             idea_json='{"title": "Test"}',
@@ -297,9 +306,6 @@ class TestReviewTitleFromScriptService:
         )
         repositories['script'].insert(script)
         
-        # Use high acceptance threshold that will likely pass
-        service.acceptance_threshold = 50  # Lower threshold for test
-        
         result = service.process_story(saved_story)
         
         assert result.success
@@ -313,8 +319,17 @@ class TestReviewTitleFromScriptService:
             StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
         ]
     
-    def test_process_story_rejects_title(self, service, repositories):
+    def test_process_story_rejects_title(self, repositories):
         """Test processing story that rejects title."""
+        # Create service with very high threshold to ensure rejection
+        service = ReviewTitleFromScriptService(
+            story_repo=repositories['story'],
+            title_repo=repositories['title'],
+            script_repo=repositories['script'],
+            review_repo=repositories['review'],
+            acceptance_threshold=100  # Very high threshold for test
+        )
+        
         # Create story
         story = Story(
             idea_json='{"title": "Test"}',
@@ -337,9 +352,6 @@ class TestReviewTitleFromScriptService:
             text="This is completely unrelated content about cooking and recipes."
         )
         repositories['script'].insert(script)
-        
-        # Use high acceptance threshold that will fail
-        service.acceptance_threshold = 100  # Very high threshold for test
         
         result = service.process_story(saved_story)
         
@@ -447,9 +459,16 @@ class TestReviewTitleFromScriptService:
 class TestStateTransitions:
     """Tests for state transition logic."""
     
-    def test_acceptance_threshold_boundary(self, service, repositories):
+    def test_acceptance_threshold_boundary(self, repositories):
         """Test state transition at acceptance threshold boundary."""
-        service.acceptance_threshold = 70
+        # Create service with specific threshold
+        service = ReviewTitleFromScriptService(
+            story_repo=repositories['story'],
+            title_repo=repositories['title'],
+            script_repo=repositories['script'],
+            review_repo=repositories['review'],
+            acceptance_threshold=70
+        )
         
         # Create story
         story = Story(
