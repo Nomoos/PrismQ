@@ -101,6 +101,7 @@ Foundational research and strategic planning documents.
 - **[Proposals](./_meta/proposals/)** - Architecture and design proposals
   - [Module Reorganization](./_meta/proposals/module-reorganization.md)
 - **[Documentation](./_meta/docs/)** - Project-wide documentation
+  - [Database Objects](./_meta/docs/DATABASE.md) - Database schema and models reference
   - [Storytelling Guide](./_meta/docs/STORYTELLING_GUIDE.md)
 
 ### Workflow Documentation
