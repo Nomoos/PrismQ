@@ -142,12 +142,17 @@ class WorkflowStageValidator:
         ],
         'PrismQ.T.Review.Title.From.Script': [
             'PrismQ.T.Review.Script.From.Title',
-            'PrismQ.T.Title.From.Title.Review.Script'
+            'PrismQ.T.Title.From.Title.Review.Script',
+            'PrismQ.T.Title.From.Script.Review.Title'
         ],
         'PrismQ.T.Title.From.Title.Review.Script': [
             'PrismQ.T.Script.From.Script.Review.Title',
             'PrismQ.T.Review.Script.From.Title.Idea',
             'PrismQ.T.Review.Title.From.Script'
+        ],
+        'PrismQ.T.Title.From.Script.Review.Title': [
+            'PrismQ.T.Review.Title.From.Script',
+            'PrismQ.T.Script.From.Script.Review.Title'
         ],
         'PrismQ.T.Script.From.Script.Review.Title': [
             'PrismQ.T.Review.Title.From.Script',

@@ -3,9 +3,9 @@
 AI-powered title evaluation modules.
 """
 
-# Import v1 review (ByScriptAndIdea)
+# Import v1 review (ByScriptAndIdea - located at From.Script.Idea)
 try:
-    from .ByScriptAndIdea import (
+    from .From.Script.Idea import (
         review_title_by_script_and_idea,
         TitleReview,
         TitleReviewCategory,
@@ -16,9 +16,9 @@ try:
 except ImportError:
     _has_v1 = False
 
-# Import v2 review (ByScript)
+# Import v2 review (ByScript - located at From.Script)
 try:
-    from .ByScript import (
+    from .From.Script import (
         review_title_by_script_v2,
         compare_reviews,
         get_improvement_summary,
