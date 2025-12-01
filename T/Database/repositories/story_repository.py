@@ -3,11 +3,17 @@
 This module provides SQLite implementation of the IUpdatableRepository interface
 for Story entities, handling all database operations including UPDATE for
 state transitions.
+"""StoryRepository - SQLite repository for Story entities.
+
+This module provides the SQLite implementation of IUpdatableRepository
+for Story entities. Unlike versioned entities (Title, Script), Story
+supports UPDATE operations for state transitions.
 
 Usage:
     >>> import sqlite3
     >>> from T.Database.repositories.story_repository import StoryRepository
     >>> from T.Database.models.story import Story
+    >>> from T.Database.models.story import Story, StoryState
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -19,6 +25,13 @@ Usage:
     >>> 
     >>> # Find stories needing scripts
     >>> stories = repo.find_needing_script()
+    >>> # Create new story
+    >>> story = Story(idea_id="idea-123")
+    >>> saved = repo.insert(story)
+    >>> 
+    >>> # Update state
+    >>> saved.transition_to(StoryState.TITLE_V0)
+    >>> repo.update(saved)
 """
 
 import sqlite3
@@ -27,6 +40,8 @@ from datetime import datetime
 
 from T.Database.repositories.base import IUpdatableRepository
 from T.Database.models.story import Story
+from .base import IUpdatableRepository
+from ..models.story import Story, StoryState
 
 
 class StoryRepository(IUpdatableRepository[Story, int]):
@@ -34,6 +49,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
     
     This repository handles all database operations for Story
     following the CRUD pattern (with UPDATE capability for state changes).
+    This repository handles all database operations for Story entities.
+    Unlike versioned repositories, StoryRepository supports UPDATE
+    operations for state transitions.
     
     Attributes:
         _conn: SQLite database connection with Row factory enabled.
@@ -50,6 +68,15 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         >>> story = Story(idea_json='{"title": "Test"}')
         >>> saved = repo.insert(story)
         >>> print(saved.id)  # Auto-generated ID
+        >>> # Create story
+        >>> story = Story(idea_id="idea-123")
+        >>> saved = repo.insert(story)
+        >>> 
+        >>> # Update state
+        >>> saved.transition_to(StoryState.TITLE_V0)
+        >>> updated = repo.update(saved)
+        >>> print(updated.state.value)
+        title_v0
     """
     
     def __init__(self, connection: sqlite3.Connection):
@@ -74,6 +101,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         """
         cursor = self._conn.execute(
             "SELECT id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story WHERE id = ?",
             (id,)
         )
@@ -83,6 +111,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             return None
         
         return self._row_to_model(row)
+        return self._row_to_story(row)
     
     def find_all(self) -> List[Story]:
         """Find all story records.
@@ -95,6 +124,10 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             "FROM Story ORDER BY id"
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
+            "SELECT id, idea_id, state, created_at, updated_at "
+            "FROM Story ORDER BY id"
+        )
+        return [self._row_to_story(row) for row in cursor.fetchall()]
     
     def exists(self, id: int) -> bool:
         """Check if story exists by ID.
@@ -132,6 +165,11 @@ class StoryRepository(IUpdatableRepository[Story, int]):
                 entity.title_id,
                 entity.script_id,
                 entity.state,
+            "INSERT INTO Story (idea_id, state, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?)",
+            (
+                entity.idea_id,
+                entity.state.value,
                 entity.created_at.isoformat(),
                 entity.updated_at.isoformat()
             )
@@ -155,12 +193,25 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             
         Returns:
             The updated Story (same instance with changes persisted).
+    # === UPDATE Operation (IUpdatableRepository) ===
+    
+    def update(self, entity: Story) -> Story:
+        """Update existing story.
+        
+        Updates the state and updated_at fields for an existing story.
+        
+        Args:
+            entity: Story instance to update. Must have a valid ID.
+            
+        Returns:
+            The updated Story.
             
         Raises:
             ValueError: If entity has no ID (not yet persisted).
         """
         if entity.id is None:
             raise ValueError("Cannot update story without ID")
+            raise ValueError("Cannot update Story without ID")
         
         # Update the updated_at timestamp
         entity.updated_at = datetime.now()
@@ -173,6 +224,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
                 entity.title_id,
                 entity.script_id,
                 entity.state,
+            "UPDATE Story SET state = ?, updated_at = ? WHERE id = ?",
+            (
+                entity.state.value,
                 entity.updated_at.isoformat(),
                 entity.id
             )
@@ -285,6 +339,59 @@ class StoryRepository(IUpdatableRepository[Story, int]):
     # === Helper Methods ===
     
     def _row_to_model(self, row: sqlite3.Row) -> Story:
+    # === Additional Query Methods ===
+    
+    def find_by_idea_id(self, idea_id: str) -> List[Story]:
+        """Find all stories for a specific idea.
+        
+        Args:
+            idea_id: The idea identifier.
+            
+        Returns:
+            List of all Story entities for the idea, ordered by id.
+        """
+        cursor = self._conn.execute(
+            "SELECT id, idea_id, state, created_at, updated_at "
+            "FROM Story WHERE idea_id = ? ORDER BY id",
+            (idea_id,)
+        )
+        return [self._row_to_story(row) for row in cursor.fetchall()]
+    
+    def find_by_state(self, state: StoryState) -> List[Story]:
+        """Find all stories in a specific state.
+        
+        Args:
+            state: The StoryState to filter by.
+            
+        Returns:
+            List of all Story entities in that state, ordered by id.
+        """
+        cursor = self._conn.execute(
+            "SELECT id, idea_id, state, created_at, updated_at "
+            "FROM Story WHERE state = ? ORDER BY id",
+            (state.value,)
+        )
+        return [self._row_to_story(row) for row in cursor.fetchall()]
+    
+    def count_by_idea_id(self, idea_id: str) -> int:
+        """Count stories for a specific idea.
+        
+        Args:
+            idea_id: The idea identifier.
+            
+        Returns:
+            Number of stories for the idea.
+        """
+        cursor = self._conn.execute(
+            "SELECT COUNT(*) as count FROM Story WHERE idea_id = ?",
+            (idea_id,)
+        )
+        row = cursor.fetchone()
+        return row["count"] if row else 0
+    
+    # === Helper Methods ===
+    
+    def _row_to_story(self, row: sqlite3.Row) -> Story:
         """Convert database row to Story instance.
         
         Args:
@@ -310,3 +417,22 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             created_at=created_at,
             updated_at=updated_at
         )
+        state = row["state"]
+        if isinstance(state, str):
+            state = StoryState(state)
+        
+        return Story(
+            id=row["id"],
+            idea_id=row["idea_id"],
+            state=state,
+            created_at=created_at,
+            updated_at=updated_at
+        )
+    
+    def create_table(self) -> None:
+        """Create the Story table if it doesn't exist.
+        
+        This is a convenience method for setting up the database schema.
+        """
+        self._conn.executescript(Story.get_sql_schema())
+        self._conn.commit()
