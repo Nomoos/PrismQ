@@ -156,10 +156,11 @@ class StoryFromIdeaService:
         return referenced_ids
     
     def get_unreferenced_ideas(self) -> List[SimpleIdea]:
-        """Get all Ideas that don't have Story references.
+        """Get all Ideas that don't have Story references, sorted by oldest first.
         
         Returns:
-            List of SimpleIdea objects that are not referenced by any Story.
+            List of SimpleIdea objects that are not referenced by any Story,
+            sorted by created_at ascending (oldest first), with id as tiebreaker.
         """
         # Get all ideas from database
         all_ideas_dict = self._idea_db.get_all_ideas()
@@ -174,7 +175,23 @@ class StoryFromIdeaService:
             if idea_id is not None and idea_id not in referenced_ids:
                 unreferenced.append(SimpleIdea.from_dict(idea_dict))
         
+        # Sort by created_at (oldest first), with id as tiebreaker for same timestamps
+        # Use "9999-12-31" as fallback for None to ensure items with None are sorted last
+        unreferenced.sort(key=lambda idea: (idea.created_at or "9999-12-31T23:59:59", idea.id or 0))
+        
         return unreferenced
+    
+    def get_oldest_unreferenced_idea(self) -> Optional[SimpleIdea]:
+        """Get the oldest Idea that doesn't have Story references.
+        
+        Returns:
+            The oldest SimpleIdea object that is not referenced by any Story,
+            or None if all Ideas have Story references.
+        """
+        unreferenced = self.get_unreferenced_ideas()
+        if unreferenced:
+            return unreferenced[0]
+        return None
     
     def idea_has_stories(self, idea_id: int) -> bool:
         """Check if an Idea already has Stories in the database.
@@ -257,6 +274,27 @@ class StoryFromIdeaService:
         
         return results
     
+    def process_oldest_unreferenced_idea(self) -> Optional[StoryCreationResult]:
+        """Process the oldest unreferenced Idea and create Stories for it.
+        
+        This is the main entry point for the PrismQ.T.Story.From.Idea workflow.
+        It:
+        1. Finds the oldest Idea that doesn't have Story references
+        2. Creates 10 Stories for that Idea with state PrismQ.T.Title.From.Idea
+        
+        Returns:
+            StoryCreationResult for the processed Idea, or None if no unreferenced Ideas exist.
+        """
+        oldest_idea = self.get_oldest_unreferenced_idea()
+        
+        if oldest_idea is None or oldest_idea.id is None:
+            return None
+        
+        return self.create_stories_from_idea(
+            idea_id=oldest_idea.id,
+            skip_if_exists=False  # We already verified it's unreferenced
+        )
+    
     def ensure_tables_exist(self) -> None:
         """Ensure Story table exists in the database.
         
@@ -313,7 +351,8 @@ def get_unreferenced_ideas(
         idea_db: SimpleIdeaDatabase instance.
         
     Returns:
-        List of SimpleIdea objects that have no Story references.
+        List of SimpleIdea objects that have no Story references,
+        sorted by created_at ascending (oldest first).
         
     Example:
         >>> conn = sqlite3.connect("prismq.db")
@@ -328,9 +367,42 @@ def get_unreferenced_ideas(
     return service.get_unreferenced_ideas()
 
 
+def process_oldest_unreferenced_idea(
+    story_connection: sqlite3.Connection,
+    idea_db: SimpleIdeaDatabase
+) -> Optional[StoryCreationResult]:
+    """Convenience function to process the oldest unreferenced Idea.
+    
+    This is the main entry point for the PrismQ.T.Story.From.Idea workflow.
+    It selects the oldest Idea without Story references and creates 10 Stories.
+    
+    Args:
+        story_connection: SQLite connection for Story table.
+        idea_db: SimpleIdeaDatabase instance.
+        
+    Returns:
+        StoryCreationResult for the processed Idea, or None if no unreferenced Ideas exist.
+        
+    Example:
+        >>> conn = sqlite3.connect("prismq.db")
+        >>> conn.row_factory = sqlite3.Row
+        >>> idea_db = SimpleIdeaDatabase("idea.db")
+        >>> idea_db.connect()
+        >>> 
+        >>> result = process_oldest_unreferenced_idea(conn, idea_db)
+        >>> if result:
+        ...     print(f"Created {result.count} stories for idea {result.idea_id}")
+        ... else:
+        ...     print("No unreferenced ideas found")
+    """
+    service = StoryFromIdeaService(story_connection, idea_db)
+    return service.process_oldest_unreferenced_idea()
+
+
 __all__ = [
     "StoryFromIdeaService",
     "StoryCreationResult",
     "create_stories_from_idea",
     "get_unreferenced_ideas",
+    "process_oldest_unreferenced_idea",
 ]
