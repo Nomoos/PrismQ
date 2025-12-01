@@ -203,6 +203,30 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - Logical flow established
 - Depth appropriate for target audience
 
+**Transitions to:** Story Creation (T/Story/From/Idea)
+
+---
+
+### Stage 2.5: Story Creation
+**Location:** `T/Story/From/Idea`  
+**Purpose:** Create 10 Story objects from each Idea
+
+**Activities:**
+- Create Story objects for each Idea
+- Set `idea_id` reference
+- Set initial state to `PrismQ.T.Title.From.Idea`
+- Prepare for title generation
+
+**Key Deliverables:**
+- 10 Story objects per Idea
+- Story metadata (timestamps)
+- State ready for title generation
+
+**Quality Gates:**
+- Story objects created successfully
+- All required fields populated
+- Database integrity maintained
+
 **Transitions to:** Title Creation (T/Title)
 
 ---
