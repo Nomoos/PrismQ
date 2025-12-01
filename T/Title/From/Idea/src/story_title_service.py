@@ -1,34 +1,36 @@
 """Story and Title Creation Service for PrismQ.T.Title.From.Idea.
 
-This module provides functionality to create 10 Story objects from an Idea
-and generate the first Title (v0) for each Story based on the Idea content.
+This module provides functionality to generate Title (v0) for Stories
+that are ready for title generation (state = PrismQ.T.Title.From.Idea)
+and don't have Title or Script references yet.
 
 Workflow Position: Stage 2 in MVP workflow
     PrismQ.T.Idea.Creation
         ↓
-    PrismQ.T.Title.From.Idea (creates Stories + Title v0) ← This module
+    PrismQ.T.Story.From.Idea (creates Stories)
+        ↓
+    PrismQ.T.Title.From.Idea (generates Title v0) ← This module
         ↓
     PrismQ.T.Script.Draft (v0)
 
 The service:
-1. Takes an Idea object as input
-2. Creates 10 Story objects, each referencing the Idea
+1. Finds Stories with state PrismQ.T.Title.From.Idea
+2. Filters to only Stories without Title references
 3. Generates the first Title (version 0) for each Story
 4. Updates each Story's state to TITLE_V0
-5. Returns the created Stories with their Titles
+5. Returns the created Titles
 
 Example:
     >>> from T.Title.From.Idea.src.story_title_service import StoryTitleService
-    >>> from T.Idea.Model.src.idea import Idea
     >>> 
     >>> # With database connection
     >>> service = StoryTitleService(db_connection)
     >>> 
-    >>> idea = Idea(title="The Future of AI", concept="AI trends")
-    >>> result = service.create_stories_with_titles(idea)
+    >>> # Process stories without titles
+    >>> result = service.process_stories_without_titles()
     >>> 
-    >>> print(f"Created {len(result.stories)} stories")
-    >>> for story, title in zip(result.stories, result.titles):
+    >>> print(f"Created {len(result.titles)} titles")
+    >>> for story, title in result.get_story_title_pairs():
     ...     print(f"Story {story.id}: {title.text}")
 """
 
@@ -97,35 +99,34 @@ class StoryTitleResult:
 
 
 class StoryTitleService:
-    """Service for creating Stories with initial Titles from Ideas.
+    """Service for generating Titles for Stories without Title references.
     
     This service implements the PrismQ.T.Title.From.Idea workflow stage,
-    which creates 10 Story objects from a single Idea and generates
-    the first Title (version 0) for each Story.
+    which finds Stories with state TITLE_FROM_IDEA (ready for title generation)
+    that don't have Title references yet, and generates Title (version 0) for each.
     
-    The service can work in two modes:
-    1. With database persistence (when connection is provided)
-    2. Without persistence (returns in-memory objects only)
+    The service requires a database connection to:
+    1. Find Stories with correct state and no titles
+    2. Persist generated Titles
+    3. Update Story state to TITLE_V0
     
     Attributes:
-        _conn: Optional SQLite database connection
-        _story_repo: Story repository (if connection provided)
-        _title_repo: Title repository (if connection provided)
+        _conn: SQLite database connection
+        _story_repo: Story repository
+        _title_repo: Title repository
         _title_generator: TitleGenerator for creating title variants
     
     Example:
-        >>> # With database
         >>> conn = sqlite3.connect("prismq.db")
         >>> conn.row_factory = sqlite3.Row
         >>> service = StoryTitleService(conn)
-        >>> result = service.create_stories_with_titles(idea)
-        
-        >>> # Without database (in-memory only)
-        >>> service = StoryTitleService()
-        >>> result = service.create_stories_with_titles(idea)
+        >>> 
+        >>> # Process all stories without titles
+        >>> result = service.process_stories_without_titles()
+        >>> print(f"Created {len(result.titles)} titles")
     """
     
-    NUM_STORIES = 10  # Number of stories to create from each Idea
+    NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
     
     def __init__(
         self, 
@@ -135,9 +136,9 @@ class StoryTitleService:
         """Initialize the service.
         
         Args:
-            connection: Optional SQLite connection for persistence.
-                If provided, Stories and Titles will be persisted to database.
-                If None, objects are created in-memory only.
+            connection: SQLite connection for persistence.
+                Required for new workflow (process_stories_without_titles).
+                Optional for backward compatibility (create_stories_with_titles).
             title_config: Optional configuration for title generation.
         """
         self._conn = connection
@@ -145,8 +146,184 @@ class StoryTitleService:
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
     
+    def get_stories_without_titles(self) -> List[Story]:
+        """Get Stories that are ready for title generation but don't have titles.
+        
+        Finds Stories where:
+        1. state = TITLE_FROM_IDEA (ready for title generation)
+        2. No Title records exist for the story_id
+        
+        Returns:
+            List of Story objects without Title references.
+            
+        Raises:
+            RuntimeError: If no database connection is available.
+        """
+        if not self._story_repo or not self._title_repo:
+            raise RuntimeError("Database connection required for this operation")
+        
+        # Get stories with TITLE_FROM_IDEA state
+        stories_ready = self._story_repo.find_by_state(StoryState.TITLE_FROM_IDEA)
+        
+        # Filter to only those without titles
+        stories_without_titles = []
+        for story in stories_ready:
+            titles = self._title_repo.find_by_story_id(story.id)
+            if not titles:
+                stories_without_titles.append(story)
+        
+        return stories_without_titles
+    
+    def story_has_title(self, story_id: int) -> bool:
+        """Check if a Story already has a Title.
+        
+        Args:
+            story_id: The Story's database ID.
+            
+        Returns:
+            True if the Story has at least one Title, False otherwise.
+            Returns False if no database connection.
+        """
+        if not self._title_repo:
+            return False
+        titles = self._title_repo.find_by_story_id(story_id)
+        return len(titles) > 0
+    
+    def story_has_script(self, story_id: int) -> bool:
+        """Check if a Story has a Script reference.
+        
+        Note: This is a placeholder - Script repository would be needed
+        for full implementation. Currently returns False.
+        
+        Args:
+            story_id: The Story's database ID.
+            
+        Returns:
+            False (placeholder - no Script repository implemented yet).
+        """
+        # TODO: Implement when Script repository is available
+        # scripts = self._script_repo.find_by_story_id(story_id)
+        # return len(scripts) > 0
+        return False
+    
+    def generate_title_for_story(
+        self,
+        story: Story,
+        idea: Optional[Idea] = None
+    ) -> Optional[Title]:
+        """Generate a Title (v0) for a single Story.
+        
+        Args:
+            story: The Story to generate a title for.
+            idea: Optional Idea object for context. If not provided,
+                  creates a simple title based on story_id.
+        
+        Returns:
+            Created Title object, or None if story already has a title.
+            
+        Raises:
+            RuntimeError: If no database connection is available.
+        """
+        if not self._title_repo or not self._story_repo:
+            raise RuntimeError("Database connection required for this operation")
+        
+        # Check if story already has a title
+        if self.story_has_title(story.id):
+            return None
+        
+        # Generate title variant
+        if idea:
+            variants = self._title_generator.generate_from_idea(idea, num_variants=3)
+            title_text = variants[0].text if variants else f"Story {story.id}"
+        else:
+            # Fallback: generate a simple title
+            title_text = f"Story {story.id}: New Content"
+        
+        # Create Title (version 0)
+        title = Title(
+            story_id=story.id,
+            version=0,
+            text=title_text
+        )
+        
+        # Persist Title
+        title = self._title_repo.insert(title)
+        
+        # Update Story state to TITLE_V0
+        story.transition_to(StoryState.TITLE_V0)
+        self._story_repo.update(story)
+        
+        return title
+    
+    def process_stories_without_titles(
+        self,
+        idea_db=None
+    ) -> StoryTitleResult:
+        """Process all Stories without titles and generate Title v0 for each.
+        
+        This method:
+        1. Finds all Stories with state TITLE_FROM_IDEA and no Title references
+        2. Generates Title (v0) for each Story
+        3. Updates each Story's state to TITLE_V0
+        
+        Args:
+            idea_db: Optional SimpleIdeaDatabase to fetch Idea content.
+                    If provided, titles will be generated from Idea content.
+        
+        Returns:
+            StoryTitleResult containing processed Stories and created Titles.
+            
+        Raises:
+            RuntimeError: If no database connection is available.
+        """
+        if not self._story_repo or not self._title_repo:
+            raise RuntimeError("Database connection required for this operation")
+        
+        stories_to_process = self.get_stories_without_titles()
+        
+        stories: List[Story] = []
+        titles: List[Title] = []
+        title_variants: List[TitleVariant] = []
+        
+        for story in stories_to_process:
+            idea = None
+            
+            # Try to get Idea content for better title generation
+            if idea_db:
+                try:
+                    idea_id = int(story.idea_id)
+                    idea_dict = idea_db.get_idea(idea_id)
+                    if idea_dict:
+                        idea = Idea(
+                            title=idea_dict.get('text', ''),
+                            concept=idea_dict.get('text', '')
+                        )
+                except (ValueError, TypeError):
+                    pass
+            
+            # Generate title
+            title = self.generate_title_for_story(story, idea)
+            if title:
+                stories.append(story)
+                titles.append(title)
+        
+        # Return result with first idea_id found or empty string
+        idea_id = stories[0].idea_id if stories else ""
+        
+        return StoryTitleResult(
+            idea_id=idea_id,
+            stories=stories,
+            titles=titles,
+            title_variants=title_variants
+        )
+    
+    # === Legacy methods for backward compatibility ===
+    
     def idea_has_stories(self, idea: Idea, idea_id: Optional[str] = None) -> bool:
         """Check if an Idea already has Stories in the database.
+        
+        DEPRECATED: Use Story.From.Idea module for creating stories.
+        This method is kept for backward compatibility.
         
         Args:
             idea: The Idea object to check.
@@ -158,7 +335,6 @@ class StoryTitleService:
         """
         if not self._story_repo:
             return False
-        
         effective_idea_id = idea_id or self._get_idea_id(idea)
         count = self._story_repo.count_by_idea_id(effective_idea_id)
         return count > 0
@@ -170,6 +346,10 @@ class StoryTitleService:
         skip_if_exists: bool = True
     ) -> Optional[StoryTitleResult]:
         """Create 10 Stories from an Idea, each with a first Title.
+        
+        DEPRECATED: Use Story.From.Idea module to create stories first,
+        then use process_stories_without_titles() to generate titles.
+        This method is kept for backward compatibility.
         
         This method:
         1. Checks if Idea already has Stories (if skip_if_exists=True)
@@ -313,8 +493,9 @@ def create_stories_from_idea(
 ) -> Optional[StoryTitleResult]:
     """Convenience function to create Stories with Titles from an Idea.
     
-    This is a simpler interface to StoryTitleService.create_stories_with_titles().
-    The module will only pick Ideas that aren't already referenced by Story table rows.
+    DEPRECATED: Use Story.From.Idea module to create stories first,
+    then use process_stories_without_titles() to generate titles.
+    This function is kept for backward compatibility.
     
     Args:
         idea: The source Idea object.
@@ -339,3 +520,32 @@ def create_stories_from_idea(
     """
     service = StoryTitleService(connection, title_config)
     return service.create_stories_with_titles(idea, idea_id, skip_if_exists)
+
+
+def process_stories_without_titles(
+    connection: sqlite3.Connection,
+    idea_db=None,
+    title_config: Optional[TitleConfig] = None
+) -> StoryTitleResult:
+    """Process Stories without Title references and generate Title v0 for each.
+    
+    This is the main entry point for the PrismQ.T.Title.From.Idea module.
+    It finds Stories with state TITLE_FROM_IDEA that don't have Title
+    references yet, and generates the first Title (v0) for each.
+    
+    Args:
+        connection: SQLite connection for persistence.
+        idea_db: Optional SimpleIdeaDatabase for fetching Idea content.
+        title_config: Optional configuration for title generation.
+        
+    Returns:
+        StoryTitleResult containing processed Stories and created Titles.
+        
+    Example:
+        >>> conn = sqlite3.connect("prismq.db")
+        >>> conn.row_factory = sqlite3.Row
+        >>> result = process_stories_without_titles(conn)
+        >>> print(f"Created {len(result.titles)} titles")
+    """
+    service = StoryTitleService(connection, title_config)
+    return service.process_stories_without_titles(idea_db)
