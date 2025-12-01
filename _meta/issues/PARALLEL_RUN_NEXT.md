@@ -145,10 +145,10 @@ Similar implementation pattern for remaining review stages:
 
 | Issue | State Input | Pass State | Fail State |
 |-------|-------------|------------|------------|
-| **REVIEW-003** | Review.Script.Content | Review.Script.Tone | Script.From.Title.Review.Script |
-| **REVIEW-004** | Review.Script.Consistency | Review.Script.Content | Script.From.Title.Review.Script |
-| **REVIEW-005** | Review.Script.Editing | Review.Script.Consistency | Script.From.Title.Review.Script |
-| **REVIEW-006** | Review.Title.Readability | Review.Script.Editing | Title.From.Script.Review.Title |
+| **REVIEW-003** | Review.Script.Content | Review.Script.Consistency | Script.From.Title.Review.Script |
+| **REVIEW-004** | Review.Script.Consistency | Review.Script.Editing | Script.From.Title.Review.Script |
+| **REVIEW-005** | Review.Script.Editing | Review.Title.Readability | Script.From.Title.Review.Script |
+| **REVIEW-006** | Review.Title.Readability | Review.Script.Readability | Title.From.Script.Review.Title |
 | **REVIEW-007** | Review.Script.Readability | Story.Review | Script.From.Title.Review.Script |
 
 ---
