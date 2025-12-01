@@ -153,6 +153,14 @@ class TestCreateReview:
         
         with pytest.raises(ValueError):
             create_review(score=101, text="Invalid")
+    
+    def test_score_type_validation(self):
+        """Score must be an integer."""
+        with pytest.raises(TypeError):
+            create_review(score="75", text="Invalid type")
+        
+        with pytest.raises(TypeError):
+            create_review(score=75.5, text="Invalid type")
 
 
 class TestEvaluateScript:

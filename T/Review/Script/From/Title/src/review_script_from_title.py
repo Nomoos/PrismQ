@@ -121,7 +121,16 @@ def create_review(
         
     Returns:
         Review instance
+        
+    Raises:
+        ValueError: If score is not in valid range (0-100)
     """
+    # Validate score range before creating Review
+    if not isinstance(score, int):
+        raise TypeError("score must be an integer value")
+    if score < 0 or score > 100:
+        raise ValueError(f"score must be between 0 and 100, got {score}")
+    
     return Review(
         text=text,
         score=score,
