@@ -1,17 +1,9 @@
-"""EnvLoad - Centralized environment and configuration management for PrismQ.
+"""EnvLoad.src - Source code for EnvLoad module.
 
-This module provides a standardized way to load and manage environment variables
-and configuration across all PrismQ modules (T, A, V, P, M, Client).
+This package contains the implementation of the EnvLoad configuration module.
 
-Key Features:
-- Centralized .env file management
-- Standardized working directory at C:\\PrismQ (Windows) or ~/PrismQ (Unix-like)
-- Cross-platform path handling
-- Interactive and non-interactive configuration modes
-- Automatic .env file creation and management
-
-Usage:
-    from EnvLoad.src import Config
+For usage, import from the parent package:
+    from EnvLoad import Config
     
     config = Config()
     print(config.working_directory)
