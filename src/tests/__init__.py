@@ -1,1 +1,1 @@
-"""Tests for EnvLoad module."""
+"""Tests for src configuration module."""

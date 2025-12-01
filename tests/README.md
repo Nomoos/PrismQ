@@ -19,7 +19,7 @@ The root `pytest.ini` provides unified configuration for all tests across the pr
 ```ini
 [pytest]
 minversion = 6.0
-testpaths = tests EnvLoad/tests T/Idea/Creation/_meta/tests ...
+testpaths = tests EnvLoad/_meta/tests T/Idea/Creation/_meta/tests ...
 python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
@@ -272,7 +272,7 @@ pytest tests/test_helpers.py
 pytest tests/test_integration.py
 
 # EnvLoad tests
-pytest EnvLoad/tests/
+pytest EnvLoad/_meta/tests/
 
 # All T module tests
 pytest T/
