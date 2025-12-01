@@ -173,7 +173,7 @@ class TestValidTransitions:
         """Test transition from script to review."""
         result = validator.validate(
             StateNames.SCRIPT_FROM_IDEA_TITLE,
-            StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA
+            StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA
         )
         
         assert result.is_valid is True
@@ -181,7 +181,7 @@ class TestValidTransitions:
     def test_review_to_quality_reviews(self, validator):
         """Test transition to quality review chain."""
         result = validator.validate(
-            StateNames.REVIEW_SCRIPT_BY_TITLE,
+            StateNames.REVIEW_SCRIPT_FROM_TITLE,
             StateNames.REVIEW_SCRIPT_GRAMMAR
         )
         
@@ -387,10 +387,10 @@ class TestPathValidation:
             StateNames.IDEA_CREATION,
             StateNames.TITLE_FROM_IDEA,
             StateNames.SCRIPT_FROM_IDEA_TITLE,
-            StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
-            StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,
-            StateNames.REVIEW_TITLE_BY_SCRIPT,
-            StateNames.REVIEW_SCRIPT_BY_TITLE,
+            StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA,
+            StateNames.REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,
+            StateNames.REVIEW_TITLE_FROM_SCRIPT,
+            StateNames.REVIEW_SCRIPT_FROM_TITLE,
             StateNames.REVIEW_SCRIPT_GRAMMAR,
             StateNames.REVIEW_SCRIPT_TONE,
             StateNames.REVIEW_SCRIPT_CONTENT,

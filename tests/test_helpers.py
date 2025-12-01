@@ -185,7 +185,7 @@ class TestWorkflowStageValidator:
         validator.transition_to('PrismQ.T.Idea.Creation')
         validator.transition_to('PrismQ.T.Title.From.Idea')
         validator.transition_to('PrismQ.T.Script.From.Idea.Title')
-        validator.transition_to('PrismQ.T.Review.Title.ByScriptAndIdea')
+        validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
         validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         
         assert validator.current_stage == 'PrismQ.T.Title.From.Title.Review.Script'

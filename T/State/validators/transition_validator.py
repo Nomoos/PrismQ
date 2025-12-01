@@ -42,42 +42,42 @@ _TRANSITIONS_DICT: Dict[str, List[str]] = {
     
     # Script from idea+title goes to initial title review (Stage 3 -> 4)
     StateNames.SCRIPT_FROM_IDEA_TITLE: [
-        StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
+        StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA,
     ],
     
     # Initial title review (Stage 4)
-    StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA: [
-        StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,  # Accepted -> Stage 5
+    StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA: [
+        StateNames.REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,  # Accepted -> Stage 5
         StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT,  # Not accepted -> Stage 7 (refine title)
     ],
     
     # Initial script review (Stage 5)
-    StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA: [
-        StateNames.REVIEW_TITLE_BY_SCRIPT,  # Accepted -> Stage 6
+    StateNames.REVIEW_SCRIPT_FROM_TITLE_AND_IDEA: [
+        StateNames.REVIEW_TITLE_FROM_SCRIPT,  # Accepted -> Stage 6
         StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE,  # Not accepted -> Stage 8 (refine script)
     ],
     
     # Iterative title review (Stage 6)
-    StateNames.REVIEW_TITLE_BY_SCRIPT: [
-        StateNames.REVIEW_SCRIPT_BY_TITLE,  # Accepted -> Stage 9
+    StateNames.REVIEW_TITLE_FROM_SCRIPT: [
+        StateNames.REVIEW_SCRIPT_FROM_TITLE,  # Accepted -> Stage 9
         StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT,  # Not accepted -> Stage 7 (refine title)
     ],
     
     # Title refinement from review (Stage 7)
     StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT: [
         StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE,  # After title refinement -> Stage 8
-        StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,  # Back to script review
-        StateNames.REVIEW_TITLE_BY_SCRIPT,  # Back to title review cycle
+        StateNames.REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,  # Back to script review
+        StateNames.REVIEW_TITLE_FROM_SCRIPT,  # Back to title review cycle
     ],
     
     # Script refinement from review (Stage 8)
     StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE: [
-        StateNames.REVIEW_TITLE_BY_SCRIPT,  # After script refinement -> title review
-        StateNames.REVIEW_SCRIPT_BY_TITLE,  # After script refinement -> script review
+        StateNames.REVIEW_TITLE_FROM_SCRIPT,  # After script refinement -> title review
+        StateNames.REVIEW_SCRIPT_FROM_TITLE,  # After script refinement -> script review
     ],
     
     # Iterative script review (Stage 9) - Gateway to quality reviews
-    StateNames.REVIEW_SCRIPT_BY_TITLE: [
+    StateNames.REVIEW_SCRIPT_FROM_TITLE: [
         StateNames.REVIEW_SCRIPT_GRAMMAR,  # Accepted -> Start quality reviews (Stage 10)
         StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE,  # Not accepted -> Stage 8 (refine script)
     ],

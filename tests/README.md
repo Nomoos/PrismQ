@@ -123,8 +123,8 @@ history = validator.get_stage_history()   # ['PrismQ.T.Idea.Creation', 'PrismQ.T
 **Valid Stage Transitions:**
 - `PrismQ.T.Idea.Creation` → `PrismQ.T.Title.From.Idea`
 - `PrismQ.T.Title.From.Idea` → `PrismQ.T.Script.From.Idea.Title`
-- `PrismQ.T.Script.From.Idea.Title` → `PrismQ.T.Review.Title.ByScriptAndIdea`
-- `PrismQ.T.Review.Title.ByScriptAndIdea` → `PrismQ.T.Review.Script.ByTitleAndIdea`, `PrismQ.T.Title.From.Title.Review.Script`
+- `PrismQ.T.Script.From.Idea.Title` → `PrismQ.T.Review.Title.From.Script.And.Idea`
+- `PrismQ.T.Review.Title.From.Script.And.Idea` → `PrismQ.T.Review.Script.From.Title.And.Idea`, `PrismQ.T.Title.From.Title.Review.Script`
 - See `tests/helpers.py` for the complete transition map
 
 ### IntegrationTestHelper

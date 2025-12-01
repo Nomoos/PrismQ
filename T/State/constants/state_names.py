@@ -71,16 +71,16 @@ class StateNames:
     # =========================================================================
     # Stages 4-6: Initial Review Cycle
     # =========================================================================
-    REVIEW_TITLE_BY_SCRIPT_AND_IDEA = f"{STATE_PREFIX}.Review.Title.ByScriptAndIdea"
-    REVIEW_SCRIPT_BY_TITLE_AND_IDEA = f"{STATE_PREFIX}.Review.Script.ByTitleAndIdea"
-    REVIEW_TITLE_BY_SCRIPT = f"{STATE_PREFIX}.Review.Title.ByScript"
+    REVIEW_TITLE_FROM_SCRIPT_AND_IDEA = f"{STATE_PREFIX}.Review.Title.From.Script.And.Idea"
+    REVIEW_SCRIPT_FROM_TITLE_AND_IDEA = f"{STATE_PREFIX}.Review.Script.From.Title.And.Idea"
+    REVIEW_TITLE_FROM_SCRIPT = f"{STATE_PREFIX}.Review.Title.From.Script"
     
     # =========================================================================
     # Stages 7-9: Refinement and Re-review
     # =========================================================================
     TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Title.From.Title.Review.Script"
     SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Script.From.Script.Review.Title"
-    REVIEW_SCRIPT_BY_TITLE = f"{STATE_PREFIX}.Review.Script.ByTitle"
+    REVIEW_SCRIPT_FROM_TITLE = f"{STATE_PREFIX}.Review.Script.From.Title"
     
     # =========================================================================
     # Stages 10-16: Quality Review States
@@ -118,10 +118,10 @@ class StateNames:
             SCRIPT_FROM_SCRIPT_REVIEW_TITLE,
         ],
         StateCategory.REVIEW: [
-            REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
-            REVIEW_SCRIPT_BY_TITLE_AND_IDEA,
-            REVIEW_TITLE_BY_SCRIPT,
-            REVIEW_SCRIPT_BY_TITLE,
+            REVIEW_TITLE_FROM_SCRIPT_AND_IDEA,
+            REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,
+            REVIEW_TITLE_FROM_SCRIPT,
+            REVIEW_SCRIPT_FROM_TITLE,
             REVIEW_SCRIPT_GRAMMAR,
             REVIEW_SCRIPT_TONE,
             REVIEW_SCRIPT_CONTENT,
