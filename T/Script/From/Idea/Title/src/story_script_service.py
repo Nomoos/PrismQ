@@ -1,9 +1,10 @@
 """Story Script Service - Generate scripts for stories from Idea and Title.
 
 This module provides a service that:
-1. Selects Story objects from the database where Script is null and Title and Idea are filled
+1. Selects the oldest Story where state is PrismQ.T.Script.From.Idea.Title
 2. Generates scripts using the ScriptGenerator from Idea and Title
 3. Updates the Story with the generated Script
+4. Changes state to PrismQ.T.Review.Title.From.Script
 
 This is the main entry point for automated script generation in the workflow.
 
@@ -14,6 +15,11 @@ Usage:
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
     >>> service = StoryScriptService(conn)
+    >>> 
+    >>> # Process oldest story needing script (by state)
+    >>> result = service.process_oldest_story()
+    >>> if result:
+    ...     print(f"Generated script for story {result.story_id}")
     >>> 
     >>> # Process all stories needing scripts
     >>> results = service.process_stories_needing_scripts()
@@ -31,6 +37,7 @@ from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.title_repository import TitleRepository
 from T.Database.models.story import Story
 from T.Database.models.script import Script as ScriptModel
+from T.State.constants.state_names import StateNames
 
 # Import ScriptGenerator from local module
 from .script_generator import (
@@ -78,14 +85,17 @@ class StoryScriptService:
     """Service for generating scripts for stories from Idea and Title.
     
     This service implements the workflow step:
-        Story (with Idea + Title) → Script Generation → Story (with Script)
+        Story (state=PrismQ.T.Script.From.Idea.Title) → Script Generation 
+        → Story (state=PrismQ.T.Review.Title.From.Script)
     
-    It queries the database for stories that:
-    - Have an idea_json set (Idea is filled)
-    - Have a title_id set (Title is generated)
-    - Do not have a script_id (Script is null)
+    Primary workflow (state-based):
+        - Selects the oldest Story where state is PrismQ.T.Script.From.Idea.Title
+        - Generates a Script (version 0) from Idea and Title
+        - Updates Story state to PrismQ.T.Review.Title.From.Script
     
-    Then generates scripts using the ScriptGenerator and updates the stories.
+    Legacy workflow (content-based):
+        - Queries for stories that have idea_json and title_id but no script_id
+        - Generates scripts and updates stories
     
     Attributes:
         story_repo: Repository for Story operations
@@ -98,11 +108,12 @@ class StoryScriptService:
         >>> conn.row_factory = sqlite3.Row
         >>> service = StoryScriptService(conn)
         >>> 
-        >>> # Get count of stories needing scripts
-        >>> count = service.count_stories_needing_scripts()
-        >>> print(f"{count} stories need scripts")
+        >>> # Process oldest story by state (primary workflow)
+        >>> result = service.process_oldest_story()
+        >>> if result and result.success:
+        ...     print(f"Generated script for story {result.story_id}")
         >>> 
-        >>> # Process all stories
+        >>> # Process all stories (legacy workflow)
         >>> results = service.process_stories_needing_scripts()
         >>> successful = [r for r in results if r.success]
         >>> print(f"Successfully generated {len(successful)} scripts")
@@ -149,15 +160,149 @@ class StoryScriptService:
         """
         return self.story_repo.find_needing_script()
     
+    # === State-based workflow methods (Primary) ===
+    
+    def get_oldest_story_by_state(self) -> Optional[Story]:
+        """Get the oldest story where state is PrismQ.T.Script.From.Idea.Title.
+        
+        This is the primary method for the state-based workflow.
+        Selects the oldest story (by created_at) with the correct state.
+        
+        Returns:
+            The oldest Story with state PrismQ.T.Script.From.Idea.Title,
+            or None if no such stories exist.
+            
+        Example:
+            >>> story = service.get_oldest_story_by_state()
+            >>> if story:
+            ...     print(f"Found story {story.id} created at {story.created_at}")
+        """
+        stories = self.story_repo.find_by_state_ordered_by_created(
+            StateNames.SCRIPT_FROM_IDEA_TITLE,
+            ascending=True  # Oldest first
+        )
+        return stories[0] if stories else None
+    
+    def count_stories_by_state(self) -> int:
+        """Count stories where state is PrismQ.T.Script.From.Idea.Title.
+        
+        Returns:
+            Number of stories with state PrismQ.T.Script.From.Idea.Title.
+        """
+        return self.story_repo.count_by_state(StateNames.SCRIPT_FROM_IDEA_TITLE)
+    
+    def process_oldest_story(self) -> Optional[ScriptGenerationResult]:
+        """Process the oldest story with state PrismQ.T.Script.From.Idea.Title.
+        
+        This is the primary entry point for the state-based workflow.
+        It:
+        1. Selects the oldest Story where state is PrismQ.T.Script.From.Idea.Title
+        2. Generates a Script (version 0) from Idea and Title
+        3. Updates Story state to PrismQ.T.Review.Title.From.Script
+        
+        Returns:
+            ScriptGenerationResult if a story was processed, None if no stories found.
+            
+        Example:
+            >>> result = service.process_oldest_story()
+            >>> if result and result.success:
+            ...     print(f"Generated script {result.script_id} for story {result.story_id}")
+            >>> elif result:
+            ...     print(f"Failed: {result.error}")
+            >>> else:
+            ...     print("No stories to process")
+        """
+        story = self.get_oldest_story_by_state()
+        if not story:
+            return None
+        
+        return self._generate_script_with_state_transition(story)
+    
+    def _generate_script_with_state_transition(self, story: Story) -> ScriptGenerationResult:
+        """Generate script and transition state to PrismQ.T.Review.Title.From.Script.
+        
+        Internal method that handles the state-based workflow script generation.
+        
+        Args:
+            story: Story object with state PrismQ.T.Script.From.Idea.Title
+            
+        Returns:
+            ScriptGenerationResult with success status and details
+        """
+        result = ScriptGenerationResult(story_id=story.id)
+        
+        # Validate story has required content
+        if not story.has_idea():
+            result.error = "Story does not have idea_json set"
+            return result
+        
+        if not story.has_title():
+            result.error = "Story does not have title_id set"
+            return result
+        
+        try:
+            # Parse the Idea from JSON
+            idea_data = json.loads(story.idea_json)
+            idea = Idea.from_dict(idea_data)
+            
+            # Get the Title text
+            title = self.title_repo.find_by_id(story.title_id)
+            if not title:
+                result.error = f"Title with id {story.title_id} not found"
+                return result
+            
+            title_text = title.text
+            
+            # Generate the script
+            script_v1 = self.script_generator.generate_script_v1(
+                idea=idea,
+                title=title_text
+            )
+            
+            # Create Script model for database
+            script_model = ScriptModel(
+                story_id=story.id,
+                version=0,  # First version
+                text=script_v1.full_text
+            )
+            
+            # Save to database
+            saved_script = self.script_repo.insert(script_model)
+            
+            # Update the story with script reference and transition state
+            story.script_id = saved_script.id
+            story.update_state(StateNames.REVIEW_TITLE_FROM_SCRIPT)
+            self.story_repo.update(story)
+            
+            # Populate result
+            result.success = True
+            result.script_id = saved_script.id
+            result.script_v1 = script_v1
+            
+        except json.JSONDecodeError as e:
+            result.error = f"Failed to parse idea_json: {str(e)}"
+        except ValueError as e:
+            result.error = f"Invalid idea or title: {str(e)}"
+        except Exception as e:
+            result.error = f"Script generation failed: {str(e)}"
+        
+        return result
+    
+    # === Legacy workflow methods (content-based) ===
+    
     def generate_script_for_story(self, story: Story) -> ScriptGenerationResult:
-        """Generate a script for a single story.
+        """Generate a script for a single story (legacy workflow).
+        
+        NOTE: This is the legacy method that uses content-based detection
+        (idea_json + title_id + no script_id). For the state-based workflow,
+        use process_oldest_story() instead.
         
         This method:
         1. Retrieves the Idea from story.idea_json
         2. Retrieves the Title from story.title_id
         3. Generates a script using ScriptGenerator
         4. Saves the script to the database
-        5. Updates the story with the script_id
+        5. Updates the story with the script_id (sets state to 'SCRIPT')
         
         Args:
             story: Story object with idea_json and title_id set
@@ -223,7 +368,10 @@ class StoryScriptService:
         self,
         limit: Optional[int] = None
     ) -> List[ScriptGenerationResult]:
-        """Process all stories that need script generation.
+        """Process all stories that need script generation (legacy workflow).
+        
+        NOTE: This is the legacy method that uses content-based detection.
+        For the state-based workflow, use process_oldest_story() instead.
         
         This method queries for all stories needing scripts and generates
         scripts for each of them.
