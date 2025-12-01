@@ -3,14 +3,15 @@ REM PrismQ.T.Title.From.Idea - Preview Mode
 REM Shows what Ideas would be processed without making changes
 REM
 REM Usage:
-REM   Preview.bat --db path\to\database.db
-REM   Preview.bat --db prismq.db --idea-id 123
-REM   Preview.bat --db prismq.db --limit 5
-REM   Preview.bat --db prismq.db --json
+REM   Preview.bat                               Use default .env (C:/PrismQ/.env)
+REM   Preview.bat --env path\to\.env            Use custom .env file
+REM   Preview.bat --idea-id 123                 Preview specific Idea
+REM   Preview.bat --limit 5                     Preview max 5 Ideas
+REM   Preview.bat --json                        Output as JSON
 REM
 REM Environment:
-REM   Virtual environment: T\Title\From\Idea\.venv (created automatically)
-REM   Dependencies: T\Title\From\Idea\requirements.txt
+REM   .env file defines WORKING_DIRECTORY where db.s3db is located
+REM   Default .env location: C:/PrismQ/.env
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"

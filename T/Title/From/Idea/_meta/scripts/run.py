@@ -4,27 +4,34 @@
 This tool loads Ideas from the database that don't yet have Stories and creates
 10 Story objects with their initial Titles (v0) for each.
 
+Database configuration is loaded from .env file (default: C:/PrismQ/.env).
+The .env file defines WORKING_DIRECTORY where db.s3db is located.
+
 Usage:
-    python run.py --db prismq.db                    # Process all pending ideas
-    python run.py --db prismq.db --preview          # Preview mode (no changes)
-    python run.py --db prismq.db --limit 5          # Process max 5 ideas
-    python run.py --db prismq.db --idea-id 123      # Process specific idea
+    python run.py                                   # Use default .env at C:/PrismQ/.env
+    python run.py --env /path/to/.env               # Use custom .env file
+    python run.py --preview                         # Preview mode (no changes)
+    python run.py --limit 5                         # Process max 5 ideas
+    python run.py --idea-id 123                     # Process specific idea
 
 Examples:
     # Preview what would be processed (no changes made)
-    python run.py --db prismq.db --preview
+    python run.py --preview
     
     # Process all Ideas without Stories
-    python run.py --db prismq.db
+    python run.py
     
     # Process only first 3 Ideas
-    python run.py --db prismq.db --limit 3
+    python run.py --limit 3
     
     # Process specific Idea by ID
-    python run.py --db prismq.db --idea-id 42
+    python run.py --idea-id 42
     
     # Output as JSON
-    python run.py --db prismq.db --json
+    python run.py --json
+    
+    # Use custom .env file
+    python run.py --env D:/MyProject/.env
 """
 
 import sys
@@ -40,8 +47,9 @@ script_dir = Path(__file__).parent.absolute()
 project_root = script_dir.parent.parent.parent.parent.parent.parent
 src_dir = script_dir.parent.parent / 'src'
 idea_model_dir = project_root / 'T' / 'Idea' / 'Model' / 'src'
+envload_dir = project_root / 'EnvLoad'
 
-for path in [str(project_root), str(src_dir), str(idea_model_dir)]:
+for path in [str(project_root), str(src_dir), str(idea_model_dir), str(envload_dir)]:
     if path not in sys.path:
         sys.path.insert(0, path)
 
@@ -53,6 +61,10 @@ from story_title_service import (
     create_stories_from_idea,
 )
 from title_generator import TitleConfig
+from EnvLoad import Config
+
+# Default .env file path
+DEFAULT_ENV_FILE = "C:/PrismQ/.env"
 
 
 def get_ideas_without_stories(db_path: str) -> List[Dict[str, Any]]:
@@ -261,23 +273,27 @@ def main():
         epilog="""
 Examples:
   # Preview what would be processed (no changes made)
-  python run.py --db prismq.db --preview
+  python run.py --preview
   
   # Process all Ideas without Stories
-  python run.py --db prismq.db
+  python run.py
   
   # Process only first 3 Ideas
-  python run.py --db prismq.db --limit 3
+  python run.py --limit 3
   
   # Process specific Idea by ID
-  python run.py --db prismq.db --idea-id 42
+  python run.py --idea-id 42
   
   # Output as JSON
-  python run.py --db prismq.db --json
+  python run.py --json
+  
+  # Use custom .env file
+  python run.py --env D:/MyProject/.env
         """
     )
     
-    parser.add_argument('--db', '-d', required=True, help='SQLite database path')
+    parser.add_argument('--env', '-e', default=DEFAULT_ENV_FILE,
+                        help=f'Path to .env file (default: {DEFAULT_ENV_FILE})')
     parser.add_argument('--preview', '-p', action='store_true', 
                         help='Preview mode - show what would be done without making changes')
     parser.add_argument('--idea-id', '-i', type=int, help='Process specific Idea by ID')
@@ -286,20 +302,34 @@ Examples:
     
     args = parser.parse_args()
     
-    # Verify database exists
-    if not os.path.exists(args.db):
-        print(f"Error: Database not found: {args.db}")
+    # Load configuration from .env file
+    try:
+        config = Config(env_file=args.env, interactive=False)
+        db_path = config.database_path
+    except Exception as e:
+        print(f"Error loading configuration from {args.env}: {e}")
         return 1
+    
+    # Verify database exists
+    if not os.path.exists(db_path):
+        print(f"Error: Database not found: {db_path}")
+        print(f"  (loaded from .env file: {args.env})")
+        return 1
+    
+    if not args.json:
+        print(f"  [INFO] Using .env file: {args.env}")
+        print(f"  [INFO] Working directory: {config.working_directory}")
+        print(f"  [INFO] Database: {db_path}")
     
     # Get Ideas to process
     if args.idea_id:
-        idea_dict = get_idea_by_id(args.db, args.idea_id)
+        idea_dict = get_idea_by_id(db_path, args.idea_id)
         if not idea_dict:
             print(f"Error: Idea #{args.idea_id} not found in database")
             return 1
         ideas = [idea_dict]
     else:
-        ideas = get_ideas_without_stories(args.db)
+        ideas = get_ideas_without_stories(db_path)
     
     if args.limit and len(ideas) > args.limit:
         ideas = ideas[:args.limit]
@@ -329,11 +359,11 @@ Examples:
         print("  PrismQ.T.Title.From.Idea - Processing")
         print("=" * 70)
         print(f"  Ideas to process: {len(ideas)}")
-        print(f"  Database: {args.db}")
+        print(f"  Database: {db_path}")
         print("=" * 70)
     
     # Connect to database
-    conn = sqlite3.connect(args.db)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     
     # Ensure Story/Title tables exist

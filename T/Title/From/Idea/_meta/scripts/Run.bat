@@ -3,14 +3,15 @@ REM PrismQ.T.Title.From.Idea - Create Stories from Ideas
 REM Loads Ideas from database and creates 10 Stories with Titles for each
 REM
 REM Usage:
-REM   Run.bat --db path\to\database.db
-REM   Run.bat --db prismq.db --idea-id 123
-REM   Run.bat --db prismq.db --limit 5
-REM   Run.bat --db prismq.db --json
+REM   Run.bat                                   Use default .env (C:/PrismQ/.env)
+REM   Run.bat --env path\to\.env                Use custom .env file
+REM   Run.bat --idea-id 123                     Process specific Idea
+REM   Run.bat --limit 5                         Process max 5 Ideas
+REM   Run.bat --json                            Output as JSON
 REM
 REM Environment:
-REM   Virtual environment: T\Title\From\Idea\.venv (created automatically)
-REM   Dependencies: T\Title\From\Idea\requirements.txt
+REM   .env file defines WORKING_DIRECTORY where db.s3db is located
+REM   Default .env location: C:/PrismQ/.env
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
