@@ -170,7 +170,7 @@ class ScriptGrammarReviewService:
         2. Gets the current script for the story
         3. Performs grammar review on the script
         4. Creates a Review record with the results
-        5. Links the Review to Story via StoryReview
+        5. Links the Review to Script via FK (Script.review_id)
         6. Updates the Story state:
            - PASS: PrismQ.T.Review.Script.Consistency
            - FAIL: PrismQ.T.Script.From.Title.Review.Script
