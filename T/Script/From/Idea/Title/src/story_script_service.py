@@ -194,7 +194,7 @@ class StoryScriptService:
             # Create Script model for database
             script_model = ScriptModel(
                 story_id=story.id,
-                version=0,  # First version
+                version=0,  # Initial version for legacy service
                 text=script_v1.full_text
             )
             
@@ -307,6 +307,9 @@ def process_all_pending_stories(
 # State constants following StateNames convention
 STATE_SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
 STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
+
+# Version constant for initial script creation
+INITIAL_SCRIPT_VERSION = 0
 
 
 @dataclass
@@ -462,7 +465,7 @@ class ScriptFromIdeaTitleService:
             # Create Script model for database
             script_model = ScriptModel(
                 story_id=story.id,
-                version=0,  # First version
+                version=INITIAL_SCRIPT_VERSION,
                 text=script_v1.full_text
             )
             

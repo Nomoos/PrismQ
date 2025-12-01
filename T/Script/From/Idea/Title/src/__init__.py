@@ -29,7 +29,8 @@ from .story_script_service import (
     StateBasedScriptResult,
     process_oldest_from_idea_title,
     STATE_SCRIPT_FROM_IDEA_TITLE,
-    STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+    STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
+    INITIAL_SCRIPT_VERSION
 )
 
 __all__ = [
@@ -50,5 +51,6 @@ __all__ = [
     "StateBasedScriptResult",
     "process_oldest_from_idea_title",
     "STATE_SCRIPT_FROM_IDEA_TITLE",
-    "STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA"
+    "STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA",
+    "INITIAL_SCRIPT_VERSION"
 ]
