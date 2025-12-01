@@ -1,6 +1,6 @@
-# T/Script/FromIdeaAndTitle - Initial Script Draft
+# T/Script/From/Idea/Title - Initial Script Draft
 
-**Namespace**: `PrismQ.T.Script.FromIdeaAndTitle`
+**Namespace**: `PrismQ.T.Script.From.Idea.Title`
 
 Generate initial script draft from the idea and initial title.
 
@@ -17,7 +17,7 @@ Stage 1: PrismQ.T.Idea.Creation
     ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
-Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1) ← THIS STATE
+Stage 3: PrismQ.T.Script.From.Idea.Title (v1) ← THIS STATE
     ↓
 Stage 4: PrismQ.T.Review.Title.ByScript
 ```
@@ -32,7 +32,7 @@ Stage 4: PrismQ.T.Review.Title.ByScript
   - Key message
   - Inspiration source
 
-- **Title v1** (from Title.FromIdea):
+- **Title v1** (from Title.From.Idea):
   - Selected title variant
   - Title promises and expectations
   - Engagement angle
@@ -123,10 +123,10 @@ Script v1 flows to:
 
 ## Module Metadata
 
-**[→ View FromIdeaAndTitle/_meta/docs/](./_meta/docs/)**
-**[→ View FromIdeaAndTitle/_meta/examples/](./_meta/examples/)**
-**[→ View FromIdeaAndTitle/_meta/tests/](./_meta/tests/)**
+**[→ View From/Idea/Title/_meta/docs/](./_meta/docs/)**
+**[→ View From/Idea/Title/_meta/examples/](./_meta/examples/)**
+**[→ View From/Idea/Title/_meta/tests/](./_meta/tests/)**
 
 ## Navigation
 
-**[← Back to Script](../README.md)** | **[→ Script/_meta](../_meta/)**
+**[← Back to Script](../../../README.md)** | **[→ Script/_meta](../../../_meta/)**

@@ -1,9 +1,9 @@
-"""PrismQ.T.Script.FromIdeaAndTitle - Initial Script Generation Module
+"""PrismQ.T.Script.From.Idea.Title - Initial Script Generation Module
 
 This module generates initial script drafts (v1) from an Idea object and a title variant.
 
 Stage 3 in MVP workflow:
-    Idea Creation → Title FromIdea (v1) → Script FromIdeaAndTitle (v1)
+    Idea Creation → Title From.Idea (v1) → Script From.Idea.Title (v1)
 
 Key Features:
 - Generate structured scripts with intro, body, and conclusion
@@ -11,12 +11,20 @@ Key Features:
 - Multiple structure types (hook-deliver-cta, three-act, problem-solution)
 - Duration targeting and estimation
 - Coherence with title promises and idea intent
+- Batch processing of stories needing scripts
 
 Usage:
-    from PrismQ.T.Script.FromIdeaAndTitle import ScriptGenerator
+    # Generate a single script
+    from T.Script.From.Idea.Title import ScriptGenerator
     
     generator = ScriptGenerator()
     script = generator.generate_script_v1(idea=my_idea, title="My Title")
+    
+    # Process stories from database
+    from T.Script.From.Idea.Title import StoryScriptService
+    
+    service = StoryScriptService(connection)
+    results = service.process_stories_needing_scripts()
 """
 
 from .src.script_generator import (
@@ -28,14 +36,24 @@ from .src.script_generator import (
     PlatformTarget,
     ScriptTone
 )
+from .src.story_script_service import (
+    StoryScriptService,
+    ScriptGenerationResult,
+    process_all_pending_stories
+)
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
+    # Script Generator
     "ScriptGenerator",
     "ScriptGeneratorConfig",
     "ScriptV1",
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
-    "ScriptTone"
+    "ScriptTone",
+    # Story Script Service
+    "StoryScriptService",
+    "ScriptGenerationResult",
+    "process_all_pending_stories"
 ]
