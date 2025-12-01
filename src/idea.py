@@ -276,20 +276,19 @@ class IdeaDatabase:
         if not self.conn:
             self.connect()
         
+        cursor = self.conn.cursor()
+        
         if text is not None and version is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET text = ?, version = ? WHERE id = ?",
                 (text, version, idea_id)
             )
         elif text is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET text = ? WHERE id = ?",
                 (text, idea_id)
             )
         elif version is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET version = ? WHERE id = ?",
                 (version, idea_id)
