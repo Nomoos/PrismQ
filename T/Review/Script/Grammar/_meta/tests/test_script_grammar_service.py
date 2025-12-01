@@ -3,8 +3,10 @@
 Tests the grammar review service functionality including:
 - Processing stories in PrismQ.T.Review.Script.Grammar state
 - Creating Review records
-- Linking Reviews via StoryReview table
+- Linking Reviews to Script via FK (Script.review_id)
 - State transitions based on review outcome
+
+Note: StoryReview linking table is not used for Script reviews.
 """
 
 import sys
@@ -28,7 +30,6 @@ from T.Review.Script.Grammar import (
 )
 from T.State.constants.state_names import StateNames
 from T.Database.models.review import Review
-from T.Database.models.story_review import ReviewType
 
 
 @pytest.fixture
@@ -70,7 +71,8 @@ def db_connection():
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             UNIQUE(story_id, version),
-            FOREIGN KEY (story_id) REFERENCES Story(id)
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
         CREATE INDEX IF NOT EXISTS idx_script_story_id ON Script(story_id);
@@ -81,21 +83,6 @@ def db_connection():
             score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
-        
-        CREATE TABLE IF NOT EXISTS StoryReview (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            story_id INTEGER NOT NULL,
-            review_id INTEGER NOT NULL,
-            version INTEGER NOT NULL CHECK (version >= 0),
-            review_type TEXT NOT NULL CHECK (review_type IN 
-                ('grammar', 'tone', 'content', 'consistency', 'editing')),
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version, review_type),
-            FOREIGN KEY (story_id) REFERENCES Story(id),
-            FOREIGN KEY (review_id) REFERENCES Review(id)
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_storyreview_story_id ON StoryReview(story_id);
     """)
     conn.commit()
     
@@ -120,7 +107,6 @@ class TestScriptGrammarReviewService:
         assert service.story_repo is not None
         assert service.script_repo is not None
         assert service.review_repo is not None
-        assert service.story_review_repo is not None
         assert service.grammar_checker is not None
         assert service.pass_threshold == DEFAULT_PASS_THRESHOLD
     
@@ -270,27 +256,6 @@ They was very happy about it."""
         assert review_row["score"] >= 0
         assert review_row["score"] <= 100
         assert "Grammar Review" in review_row["text"]
-    
-    def test_story_review_link_created(self, db_connection, service):
-        """Test that StoryReview link is created."""
-        script_text = "The hero saves the day."
-        story_id = self._create_test_story_with_script(
-            db_connection, script_text
-        )
-        
-        # Process the story
-        result = service.process_oldest_story()
-        
-        # Verify StoryReview link exists
-        cursor = db_connection.execute(
-            "SELECT * FROM StoryReview WHERE story_id = ? AND review_id = ?",
-            (story_id, result.review_id)
-        )
-        link_row = cursor.fetchone()
-        
-        assert link_row is not None
-        assert link_row["review_type"] == ReviewType.GRAMMAR.value
-        assert link_row["version"] == 0  # First script version
     
     def test_script_review_id_set(self, db_connection, service):
         """Test that Script.review_id FK is set to link Review directly."""

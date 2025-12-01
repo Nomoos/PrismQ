@@ -5,10 +5,13 @@ This module implements the workflow step that:
 2. Reviews the script for grammar issues
 3. Creates a Review record with the results
 4. Links the Review to Script directly via FK (Script.review_id)
-5. Also links Review to Story via StoryReview linking table
-6. Updates the Story state based on review outcome:
+5. Updates the Story state based on review outcome:
    - If review passes: PrismQ.T.Review.Script.Consistency
    - If review fails: PrismQ.T.Script.From.Title.Review.Script
+
+Note: This module reviews Scripts, not Stories. The Review is linked directly
+to Script via Script.review_id FK. StoryReview linking table is not used here
+as it is reserved for Story-level reviews only.
 
 This is the main entry point for grammar review in the quality review workflow.
 
@@ -36,10 +39,8 @@ from datetime import datetime
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.review_repository import ReviewRepository
-from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.models.story import Story
 from T.Database.models.review import Review
-from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.State.constants.state_names import StateNames
 
 # Import the grammar checker from the same package
@@ -96,10 +97,13 @@ class ScriptGrammarReviewService:
     1. Selects the oldest Story where state is PrismQ.T.Review.Script.Grammar
     2. Reviews the script for grammar, spelling, punctuation, and tense issues
     3. Creates a Review record with the results
-    4. Links the Review to Story via StoryReview table
+    4. Links the Review to Script directly via FK (Script.review_id)
     5. Updates the Story state based on review outcome:
        - PASS: PrismQ.T.Review.Script.Consistency
        - FAIL: PrismQ.T.Script.From.Title.Review.Script
+    
+    Note: This reviews Scripts, not Stories. StoryReview linking table is not
+    used here as it is reserved for Story-level reviews only.
     
     The service processes stories in FIFO order (oldest first) to ensure
     fair processing of the backlog.
@@ -108,7 +112,6 @@ class ScriptGrammarReviewService:
         story_repo: Repository for Story operations
         script_repo: Repository for Script operations
         review_repo: Repository for Review operations
-        story_review_repo: Repository for StoryReview linking table
         grammar_checker: Grammar checker for reviewing scripts
     
     Example:
@@ -139,7 +142,6 @@ class ScriptGrammarReviewService:
         self.story_repo = StoryRepository(connection)
         self.script_repo = ScriptRepository(connection)
         self.review_repo = ReviewRepository(connection)
-        self.story_review_repo = StoryReviewRepository(connection)
         self.grammar_checker = ScriptGrammarChecker(pass_threshold=pass_threshold)
         self.pass_threshold = pass_threshold
     
@@ -222,16 +224,8 @@ class ScriptGrammarReviewService:
             result.review_id = saved_review.id
             
             # Link Review to Script directly via FK (Script.review_id)
+            # Note: StoryReview linking table is not used for Script reviews
             self.script_repo.update_review_id(current_script.id, saved_review.id)
-            
-            # Also link Review to Story via StoryReview linking table
-            story_review = StoryReviewModel(
-                story_id=story.id,
-                review_id=saved_review.id,
-                version=current_script.version,
-                review_type=ReviewType.GRAMMAR
-            )
-            self.story_review_repo.insert(story_review)
             
             # Update result with review outcome
             result.score = grammar_review.overall_score
