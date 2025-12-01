@@ -291,6 +291,26 @@ They was very happy about it."""
         assert link_row is not None
         assert link_row["review_type"] == ReviewType.GRAMMAR.value
         assert link_row["version"] == 0  # First script version
+    
+    def test_script_review_id_set(self, db_connection, service):
+        """Test that Script.review_id FK is set to link Review directly."""
+        script_text = "The hero saves the day."
+        story_id = self._create_test_story_with_script(
+            db_connection, script_text
+        )
+        
+        # Process the story
+        result = service.process_oldest_story()
+        
+        # Verify Script.review_id is set
+        cursor = db_connection.execute(
+            "SELECT * FROM Script WHERE story_id = ?",
+            (story_id,)
+        )
+        script_row = cursor.fetchone()
+        
+        assert script_row is not None
+        assert script_row["review_id"] == result.review_id
 
 
 class TestFIFOOrdering:

@@ -4,8 +4,9 @@ This module implements the workflow step that:
 1. Selects the oldest Story where state is PrismQ.T.Review.Script.Grammar
 2. Reviews the script for grammar issues
 3. Creates a Review record with the results
-4. Links the Review to Story via StoryReview
-5. Updates the Story state based on review outcome:
+4. Links the Review to Script directly via FK (Script.review_id)
+5. Also links Review to Story via StoryReview linking table
+6. Updates the Story state based on review outcome:
    - If review passes: PrismQ.T.Review.Script.Consistency
    - If review fails: PrismQ.T.Script.From.Title.Review.Script
 
@@ -220,7 +221,10 @@ class ScriptGrammarReviewService:
             saved_review = self.review_repo.insert(review)
             result.review_id = saved_review.id
             
-            # Link Review to Story via StoryReview
+            # Link Review to Script directly via FK (Script.review_id)
+            self.script_repo.update_review_id(current_script.id, saved_review.id)
+            
+            # Also link Review to Story via StoryReview linking table
             story_review = StoryReviewModel(
                 story_id=story.id,
                 review_id=saved_review.id,
