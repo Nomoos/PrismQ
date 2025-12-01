@@ -9,6 +9,7 @@ Key Features:
 - Cross-platform path handling
 - Interactive and non-interactive configuration modes
 - Automatic .env file creation and management
+- Shared Idea database for prompt-based idea storage
 
 Usage:
     from src import Config
@@ -16,9 +17,17 @@ Usage:
     config = Config()
     print(config.working_directory)
     print(config.database_url)
+    
+    # Use shared Idea database
+    from src import IdeaDatabase, setup_idea_database
+    
+    db = setup_idea_database("ideas.db")
+    idea_id = db.insert_idea("Write a horror story...")
+    db.close()
 """
 
 from .config import Config
+from .idea import IdeaDatabase, setup_idea_database
 
-__all__ = ['Config']
+__all__ = ['Config', 'IdeaDatabase', 'setup_idea_database']
 __version__ = '1.0.0'
