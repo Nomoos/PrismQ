@@ -6,11 +6,21 @@
 
 ---
 
+## Script Organization
+
+Scripts are organized into three folders:
+- `scripts/01_Idea` - Idea creation scripts
+- `scripts/02_Story` - Title and Script generation scripts (including improvement from reviews)
+- `scripts/03_Review` - Review scripts
+
+---
+
 ## Module Implementation Status
 
 ### PrismQ.T.Idea.Creation
 **Status**: ✅ COMPLETE  
-**Score**: 95/100
+**Score**: 95/100  
+**Scripts Location**: `_meta/scripts/01_Idea/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -28,7 +38,8 @@
 
 ### PrismQ.T.Title.From.Idea
 **Status**: ✅ COMPLETE  
-**Score**: 92/100
+**Score**: 92/100  
+**Scripts Location**: `_meta/scripts/02_Story/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -46,7 +57,8 @@
 
 ### PrismQ.T.Script.From.Idea.Title
 **Status**: ✅ COMPLETE  
-**Score**: 90/100
+**Score**: 90/100  
+**Scripts Location**: `_meta/scripts/02_Story/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -64,7 +76,8 @@
 
 ### PrismQ.T.Review.Title.From.Script
 **Status**: ✅ COMPLETE  
-**Score**: 88/100
+**Score**: 88/100  
+**Scripts Location**: `_meta/scripts/03_Review/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -81,7 +94,8 @@
 
 ### PrismQ.T.Review.Script.From.Title
 **Status**: ✅ COMPLETE  
-**Score**: 88/100
+**Score**: 88/100  
+**Scripts Location**: `_meta/scripts/03_Review/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -98,7 +112,8 @@
 
 ### PrismQ.T.Title.From.Script.Review.Title
 **Status**: ✅ COMPLETE  
-**Score**: 85/100
+**Score**: 85/100  
+**Scripts Location**: `_meta/scripts/02_Story/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -115,7 +130,8 @@
 
 ### PrismQ.T.Script.From.Title.Review.Script
 **Status**: ✅ COMPLETE  
-**Score**: 85/100
+**Score**: 85/100  
+**Scripts Location**: `_meta/scripts/02_Story/`
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -132,15 +148,15 @@
 
 ## Overall Summary
 
-| Module | Status | Score |
-|--------|--------|-------|
-| PrismQ.T.Idea.Creation | ✅ Complete | 95/100 |
-| PrismQ.T.Title.From.Idea | ✅ Complete | 92/100 |
-| PrismQ.T.Script.From.Idea.Title | ✅ Complete | 90/100 |
-| PrismQ.T.Review.Title.From.Script | ✅ Complete | 88/100 |
-| PrismQ.T.Review.Script.From.Title | ✅ Complete | 88/100 |
-| PrismQ.T.Title.From.Script.Review.Title | ✅ Complete | 85/100 |
-| PrismQ.T.Script.From.Title.Review.Script | ✅ Complete | 85/100 |
+| Module | Status | Score | Scripts Location |
+|--------|--------|-------|------------------|
+| PrismQ.T.Idea.Creation | ✅ Complete | 95/100 | 01_Idea |
+| PrismQ.T.Title.From.Idea | ✅ Complete | 92/100 | 02_Story |
+| PrismQ.T.Script.From.Idea.Title | ✅ Complete | 90/100 | 02_Story |
+| PrismQ.T.Review.Title.From.Script | ✅ Complete | 88/100 | 03_Review |
+| PrismQ.T.Review.Script.From.Title | ✅ Complete | 88/100 | 03_Review |
+| PrismQ.T.Title.From.Script.Review.Title | ✅ Complete | 85/100 | 02_Story |
+| PrismQ.T.Script.From.Title.Review.Script | ✅ Complete | 85/100 | 02_Story |
 
 **Average Score**: 89/100
 
@@ -156,6 +172,7 @@
 - [x] Interactive CLI with colorized output
 - [x] Debug logging to file
 - [x] JSON output option
+- [x] Scripts organized in 01_Idea, 02_Story, 03_Review folders
 
 ### 🔄 Future Improvements
 - [ ] Integrate with actual database save functionality
@@ -174,6 +191,7 @@ All 7 workflow modules have been successfully implemented according to the requi
 2. **Preview Mode**: All modules support `--preview` flag for testing without database save
 3. **Batch Files**: All modules have `.bat` files for run and preview modes
 4. **Virtual Environments**: Each module has its own `.venv` directory created on first run
+5. **Script Organization**: Scripts organized into 01_Idea, 02_Story, 03_Review folders
 
 **Worker10 Verdict**: ✅ **APPROVED** - All modules meet acceptance criteria and are ready for use.
 

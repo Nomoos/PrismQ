@@ -1,10 +1,14 @@
 @echo off
-REM PrismQ.T.Review.Script.From.Title.bat - Interactive Script Review
-REM This script runs in interactive mode for reviewing scripts against titles
+REM PrismQ.T.Script.From.Title.Review.Script.bat - Interactive Script Improvement
+REM This script improves scripts based on review feedback
+REM
+REM Usage:
+REM   PrismQ.T.Script.From.Title.Review.Script.bat
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
+REM Setup Python environment
 call "%SCRIPT_DIR%setup_env.bat"
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -14,11 +18,12 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.From.Title - Interactive Mode
+echo PrismQ.T.Script.From.Title.Review.Script - Interactive Mode
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Script\From\Title\src\review_script_from_title_interactive.py
+REM Run Python module
+python ..\..\..\T\Script\From\Title\Review\Script\src\script_from_review_interactive.py
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

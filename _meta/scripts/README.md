@@ -6,39 +6,27 @@ This directory contains scripts for the PrismQ content production workflow.
 
 Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for interactive execution:
 
-### 01_Idea - PrismQ.T.Idea.Creation
+### 01_Idea - Idea Creation
 - `PrismQ.T.Idea.Creation.bat` - Interactive idea creation
 - `PrismQ.T.Idea.Creation.Preview.bat` - Preview mode (no DB save)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
-### 02_Title - PrismQ.T.Title.From.Idea
+### 02_Story - Title and Script Generation
 - `PrismQ.T.Title.From.Idea.bat` - Generate titles from ideas
 - `PrismQ.T.Title.From.Idea.Preview.bat` - Preview mode
-- `setup_env.bat` / `setup_env.sh` - Environment setup
-
-### 03_Script - PrismQ.T.Script.From.Idea.Title
 - `PrismQ.T.Script.From.Idea.Title.bat` - Generate scripts from idea+title
 - `PrismQ.T.Script.From.Idea.Title.Preview.bat` - Preview mode
+- `PrismQ.T.Title.From.Script.Review.Title.bat` - Improve title from review feedback
+- `PrismQ.T.Title.From.Script.Review.Title.Preview.bat` - Preview mode
+- `PrismQ.T.Script.From.Title.Review.Script.bat` - Improve script from review feedback
+- `PrismQ.T.Script.From.Title.Review.Script.Preview.bat` - Preview mode
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
-### 04_Review_Title - PrismQ.T.Review.Title.From.Script
+### 03_Review - Title and Script Reviews
 - `PrismQ.T.Review.Title.From.Script.bat` - Review title against script
 - `PrismQ.T.Review.Title.From.Script.Preview.bat` - Preview mode
-- `setup_env.bat` / `setup_env.sh` - Environment setup
-
-### 05_Review_Script - PrismQ.T.Review.Script.From.Title
 - `PrismQ.T.Review.Script.From.Title.bat` - Review script against title
 - `PrismQ.T.Review.Script.From.Title.Preview.bat` - Preview mode
-- `setup_env.bat` / `setup_env.sh` - Environment setup
-
-### 06_Title_From_Review - PrismQ.T.Title.From.Script.Review.Title
-- `PrismQ.T.Title.From.Script.Review.Title.bat` - Improve title from review
-- `PrismQ.T.Title.From.Script.Review.Title.Preview.bat` - Preview mode
-- `setup_env.bat` / `setup_env.sh` - Environment setup
-
-### 07_Script_From_Review - PrismQ.T.Script.From.Title.Review.Script
-- `PrismQ.T.Script.From.Title.Review.Script.bat` - Improve script from review
-- `PrismQ.T.Script.From.Title.Review.Script.Preview.bat` - Preview mode
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
 ## Usage
@@ -47,6 +35,12 @@ Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for
 ```batch
 cd _meta\scripts\01_Idea
 PrismQ.T.Idea.Creation.Preview.bat
+
+cd _meta\scripts\02_Story
+PrismQ.T.Title.From.Idea.Preview.bat
+
+cd _meta\scripts\03_Review
+PrismQ.T.Review.Title.From.Script.Preview.bat
 ```
 
 ### Linux/macOS

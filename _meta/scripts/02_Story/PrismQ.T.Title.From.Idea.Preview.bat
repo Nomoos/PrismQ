@@ -10,22 +10,11 @@ REM Features:
 REM   - Generates titles from idea input
 REM   - Does NOT save to database
 REM   - Extensive debug logging to file
-REM   - Log file created in same directory
-REM
-REM Environment:
-REM   Virtual environment: T\Title\From\Idea\.venv (created automatically)
-REM   Dependencies: T\Title\From\Idea\requirements.txt
-REM   Config file: T\Title\From\Idea\.env (created on first run)
-REM
-REM After running, the script will wait for idea input.
-REM Enter your idea (text, JSON, or title/concept)
-REM Press Enter to submit.
-REM Type 'quit' to exit.
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
-REM Setup Python virtual environment
+REM Setup Python environment
 call "%SCRIPT_DIR%setup_env.bat"
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -43,7 +32,7 @@ echo Titles will NOT be saved to database.
 echo Extensive logging enabled.
 echo.
 
-REM Run Python module from T/Title/From/Idea/src
+REM Run Python module in preview mode
 python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (

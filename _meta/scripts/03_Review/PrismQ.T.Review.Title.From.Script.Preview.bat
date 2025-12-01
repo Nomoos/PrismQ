@@ -1,10 +1,14 @@
 @echo off
-REM PrismQ.T.Script.From.Title.Review.Script.Preview.bat - Script Improvement (Preview Mode)
+REM PrismQ.T.Review.Title.From.Script.Preview.bat - Title Review (Preview Mode)
 REM Runs in preview mode WITHOUT saving to database
+REM
+REM Usage:
+REM   PrismQ.T.Review.Title.From.Script.Preview.bat
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
+REM Setup Python environment
 call "%SCRIPT_DIR%setup_env.bat"
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -14,14 +18,15 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo ========================================
-echo PrismQ.T.Script.From.Title.Review.Script - PREVIEW MODE
+echo PrismQ.T.Review.Title.From.Script - PREVIEW MODE
 echo ========================================
 echo.
 echo This mode is for TESTING and TUNING.
-echo Results will NOT be saved to database.
+echo Reviews will NOT be saved to database.
 echo.
 
-python ..\..\..\T\Script\From\Title\Review\Script\src\script_from_review_interactive.py --preview --debug
+REM Run Python module in preview mode
+python ..\..\..\T\Review\Title\From\Script\src\review_title_from_script_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

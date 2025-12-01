@@ -14,6 +14,13 @@ Below are the suggested issues for each workflow module. Each module has been im
 - Shell scripts for Linux/macOS
 - Own virtual environment setup
 
+### Script Organization
+
+Scripts are organized into three folders:
+- `scripts/01_Idea` - Idea creation scripts
+- `scripts/02_Story` - Title and Script generation scripts
+- `scripts/03_Review` - Review scripts
+
 ---
 
 ### ISSUE-001: PrismQ.T.Idea.Creation
@@ -44,7 +51,7 @@ Interactive idea creation module that processes user input (text, JSON, story sn
 ### ISSUE-002: PrismQ.T.Title.From.Idea
 **Status**: ✅ Implemented  
 **Location**: `T/Title/From/Idea/`  
-**Scripts**: `_meta/scripts/02_Title/`
+**Scripts**: `_meta/scripts/02_Story/`
 
 **Description**:
 Generate title variants from ideas. Takes Idea objects and generates 10 compelling title variants using different strategies (direct, question, how-to, curiosity, etc.).
@@ -68,7 +75,7 @@ Generate title variants from ideas. Takes Idea objects and generates 10 compelli
 ### ISSUE-003: PrismQ.T.Script.From.Idea.Title
 **Status**: ✅ Implemented  
 **Location**: `T/Script/From/Idea/Title/`  
-**Scripts**: `_meta/scripts/03_Script/`
+**Scripts**: `_meta/scripts/02_Story/`
 
 **Description**:
 Generate scripts from idea and title combination. Creates structured scripts with intro, body, conclusion sections.
@@ -92,7 +99,7 @@ Generate scripts from idea and title combination. Creates structured scripts wit
 ### ISSUE-004: PrismQ.T.Review.Title.From.Script
 **Status**: ✅ Implemented  
 **Location**: `T/Review/Title/From/Script/`  
-**Scripts**: `_meta/scripts/04_Review_Title/`
+**Scripts**: `_meta/scripts/03_Review/`
 
 **Description**:
 Review title against script for alignment, engagement, and SEO. Provides actionable improvement recommendations.
@@ -116,7 +123,7 @@ Review title against script for alignment, engagement, and SEO. Provides actiona
 ### ISSUE-005: PrismQ.T.Review.Script.From.Title
 **Status**: ✅ Implemented  
 **Location**: `T/Review/Script/From/Title/`  
-**Scripts**: `_meta/scripts/05_Review_Script/`
+**Scripts**: `_meta/scripts/03_Review/`
 
 **Description**:
 Review script against title for alignment and quality. Tracks improvements across versions.
@@ -140,7 +147,7 @@ Review script against title for alignment and quality. Tracks improvements acros
 ### ISSUE-006: PrismQ.T.Title.From.Script.Review.Title
 **Status**: ✅ Implemented  
 **Location**: `T/Title/From/Title/Review/Script/`  
-**Scripts**: `_meta/scripts/06_Title_From_Review/`
+**Scripts**: `_meta/scripts/02_Story/`
 
 **Description**:
 Generate improved title versions based on review feedback. Takes original title, script, and reviews to generate improved v2/v3/etc.
@@ -164,7 +171,7 @@ Generate improved title versions based on review feedback. Takes original title,
 ### ISSUE-007: PrismQ.T.Script.From.Title.Review.Script
 **Status**: ✅ Implemented  
 **Location**: `T/Script/From/Title/Review/Script/`  
-**Scripts**: `_meta/scripts/07_Script_From_Review/`
+**Scripts**: `_meta/scripts/02_Story/`
 
 **Description**:
 Generate improved script versions based on review feedback. Takes original script, title, and reviews to generate improved v2/v3/etc.
@@ -194,6 +201,11 @@ All 7 workflow modules have been implemented with:
 - ✅ Own virtual environment
 - ✅ Windows batch files (run + preview)
 - ✅ Shell script environment setup
+
+**Script Folder Organization**:
+- `01_Idea` - Idea creation (1 module)
+- `02_Story` - Story generation (4 modules: Title, Script, Title improvement, Script improvement)
+- `03_Review` - Reviews (2 modules: Title review, Script review)
 
 **Worker01 recommendation**: All modules are ready for Worker10 review and validation.
 

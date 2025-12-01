@@ -9,16 +9,11 @@ REM After running, the script will wait for input.
 REM Enter idea+title (JSON or plain text)
 REM Press Enter to submit.
 REM Type 'quit' to exit.
-REM
-REM Environment:
-REM   Virtual environment: T\Script\From\Idea\Title\.venv (created automatically)
-REM   Dependencies: T\Script\From\Idea\Title\requirements.txt
-REM   Config file: T\Script\From\Idea\Title\.env (created on first run)
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
-REM Setup Python virtual environment
+REM Setup Python environment
 call "%SCRIPT_DIR%setup_env.bat"
 if %ERRORLEVEL% NEQ 0 (
     echo.
