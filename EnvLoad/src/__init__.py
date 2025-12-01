@@ -11,14 +11,14 @@ Key Features:
 - Automatic .env file creation and management
 
 Usage:
-    from EnvLoad import Config
+    from EnvLoad.src import Config
     
     config = Config()
     print(config.working_directory)
     print(config.database_url)
 """
 
-from .src.config import Config
+from .config import Config
 
 __all__ = ['Config']
 __version__ = '1.0.0'

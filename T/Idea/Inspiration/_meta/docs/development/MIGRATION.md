@@ -247,7 +247,7 @@ def test_something(mock_config):
 
 - See `EnvLoad/README.md` for full API documentation
 - Check `Scoring/src/main.py` for a complete example
-- Review `EnvLoad/tests/` for usage examples
+- Review `EnvLoad/_meta/tests/` for usage examples
 
 ## Rollback
 

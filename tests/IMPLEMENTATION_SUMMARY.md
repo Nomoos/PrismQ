@@ -101,7 +101,7 @@ pytest -m version_tracking
 pytest tests/ --cov=tests --cov-report=html
 
 # Combined with existing tests
-pytest tests/ EnvLoad/tests/  # 65 tests pass
+pytest tests/ EnvLoad/_meta/tests/  # 65 tests pass
 ```
 
 ## Key Features

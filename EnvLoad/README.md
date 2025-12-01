@@ -158,7 +158,7 @@ Run tests with pytest:
 
 ```bash
 cd /path/to/PrismQ
-pytest EnvLoad/tests/
+pytest EnvLoad/_meta/tests/
 ```
 
 ## Cross-Platform Support
