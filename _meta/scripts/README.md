@@ -29,6 +29,26 @@ Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for
 - `PrismQ.T.Review.Script.From.Title.Preview.bat` - Preview mode
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
+### 04_Publish_Text - Text Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 05_Audio - Audio Generation
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 06_Publish_Audio - Audio Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 07_Video - Video Generation
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 08_Publish_Video - Video Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
 ## Usage
 
 ### Windows
