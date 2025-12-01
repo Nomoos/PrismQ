@@ -22,7 +22,6 @@
 4. ✅ Troubleshooting guide (`_meta/docs/SQLITE_QUEUE_TROUBLESHOOTING.md`)
 5. ✅ All testing scenarios completed
 6. ✅ PRAGMA recommendations finalized
->>>>>>> main:_meta/issues/wip/Worker09/337-research-sqlite-concurrency-tuning.md
 
 ---
 
