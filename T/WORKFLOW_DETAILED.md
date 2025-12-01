@@ -11,6 +11,8 @@ This document describes the detailed, iterative workflow for the PrismQ.T (Text 
 ```
 PrismQ.T.Idea.Creation
     ↓
+PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
+    ↓
 PrismQ.T.Title.From.Idea
     ↓
 PrismQ.T.Script.From.Title.Idea
@@ -109,6 +111,24 @@ PrismQ.T.Story.Review
 - Structured idea document
 - Core concept definition
 - Target audience profile
+
+**Transitions To**: PrismQ.T.Story.From.Idea
+
+---
+
+### Stage 1.5: PrismQ.T.Story.From.Idea
+
+**Purpose**: Create 10 Story objects from each Idea
+
+**Location**: `T/Story/From/Idea/`
+
+**Input**:
+- Idea document from Stage 1
+
+**Output**:
+- 10 Story objects per Idea
+- Each Story with `idea_id` reference
+- State set to `PrismQ.T.Title.From.Idea`
 
 **Transitions To**: PrismQ.T.Title.From.Idea
 

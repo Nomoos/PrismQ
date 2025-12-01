@@ -16,6 +16,13 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│                  STAGE 1.5: Story from Idea                      │
+│                  PrismQ.T.Story.From.Idea                        │
+│              (Creates 10 Story objects per Idea)                 │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
 │                    STAGE 2: Title from Idea                      │
 │                  PrismQ.T.Title.From.Idea                        │
 │                          (v1)                                    │
@@ -150,6 +157,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 | Stage | Name | Purpose |
 |-------|------|---------|
 | 1 | Idea.Creation | Initial idea capture |
+| 1.5 | Story.From.Idea | Create 10 Story objects per Idea |
 | 2 | Title.From.Idea | Generate initial title (v1) |
 | 3 | Script.From.Title.Idea | Generate initial script (v1) |
 
@@ -200,24 +208,24 @@ Each quality review can:
 
 ### Pattern 1: Ideal Flow (Minimal Iterations)
 ```
-1 → 2 → 3 → 4 → 5 → 6(accept) → 9(accept) 
+1 → 1.5 → 2 → 3 → 4 → 5 → 6(accept) → 9(accept) 
 → 10(pass) → 11(pass) → 12(pass) → 13(pass) → 14(pass) 
 → 15(pass) → 16(pass) → 17(accept) → Publishing
 ```
-**Total Stages**: 15 (stages 7 and 8 are skipped when all reviews pass)
+**Total Stages**: 16 (stages 7 and 8 are skipped when all reviews pass)
 
 **Note**: In the ideal flow, refinement stages 7 and 8 are not executed because all reviews accept on the first attempt.
 
 ### Pattern 2: Typical Flow (Some Refinements)
 ```
-1 → 2 → 3 → 4 → 5 → 6(reject) → 7 → 8 → 6(accept) 
+1 → 1.5 → 2 → 3 → 4 → 5 → 6(reject) → 7 → 8 → 6(accept) 
 → 9(reject) → 8 → 6 → 9(accept) 
 → 10(pass) → 11(fail) → 8 → 6 → 9(accept) → 10(pass) → 11(pass)
 → 12(pass) → 13(pass) → 14(pass) 
 → 15(fail) → 7 → 8 → 6 → 9(accept) → 10 → 11 → 12 → 13 → 14 → 15(pass)
 → 16(pass) → 17(reject) → 18 → 17(accept) → Publishing
 ```
-**Total Stages**: ~27
+**Total Stages**: ~28
 
 ### Pattern 3: High-Iteration Flow
 Multiple rejections lead to more refinement cycles, but the workflow eventually converges to acceptable quality.

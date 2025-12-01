@@ -9,6 +9,8 @@
 ```
 Stage 1: PrismQ.T.Idea.Creation
     ↓
+Stage 1.5: PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
+    ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
 Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
@@ -130,6 +132,56 @@ idea = {
     "genre": "Mystery",
     "platforms": ["YouTube", "TikTok"],
     "created_at": "2025-01-01T10:00:00Z"
+}
+```
+
+**Next Stage**: Stage 1.5 (Story.From.Idea)
+
+---
+
+### Stage 1.5: PrismQ.T.Story.From.Idea
+
+**Purpose**: Create 10 Story objects from each Idea
+
+**Folder**: `T/Story/From/Idea/`  
+**Worker**: Automated  
+**Effort**: Immediate
+
+**Input**:
+- Idea object with unique ID
+
+**Output**:
+- 10 Story objects per Idea
+- Each Story with `idea_id` reference
+- State set to `PrismQ.T.Title.From.Idea`
+
+**Validation**:
+- Idea exists in database
+- Idea doesn't already have Stories (optional, can be skipped)
+
+**API**:
+```python
+from T.Story.From.Idea import StoryFromIdeaService, create_stories_from_idea
+
+# Using the service
+service = StoryFromIdeaService(story_connection, idea_db)
+result = service.create_stories_from_idea(idea_id=1)
+# Returns: StoryCreationResult with 10 Story objects
+
+# Or process all unreferenced ideas
+results = service.process_unreferenced_ideas()
+# Returns: List of StoryCreationResult for all ideas without stories
+```
+
+**Usage Example**:
+```python
+# Stories created with following structure:
+story = {
+    "id": 1,
+    "idea_id": "PQ001",
+    "state": "PrismQ.T.Title.From.Idea",
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
 }
 ```
 
