@@ -6,10 +6,11 @@ instances with the simplified schema:
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
-        version INTEGER NOT NULL,
+        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
+Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
 The SimpleIdea table is designed to be referenced by Story via foreign key.
 """
 
@@ -68,8 +69,10 @@ class SimpleIdeaDatabase:
         Creates the Idea table with the simplified schema:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
             - text: TEXT (prompt-like content)
-            - version: INTEGER NOT NULL
+            - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
+        
+        Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
         """
         if not self.conn:
             self.connect()
@@ -77,11 +80,12 @@ class SimpleIdeaDatabase:
         cursor = self.conn.cursor()
         
         # Create simple Idea table
+        # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS Idea (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
-                version INTEGER NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
                 created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         """)

@@ -213,6 +213,66 @@ class TestSimpleIdeaDatabaseCRUD:
         assert success is False
 
 
+class TestSimpleIdeaDatabaseVersionConstraint:
+    """Test version constraint enforcement (CHECK >= 0)."""
+    
+    def setup_method(self):
+        """Create a temporary database for each test."""
+        self.temp_dir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
+        self.db = setup_simple_idea_database(self.db_path)
+    
+    def teardown_method(self):
+        """Clean up the temporary database."""
+        if self.db.conn:
+            self.db.close()
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+        os.rmdir(self.temp_dir)
+    
+    def test_negative_version_fails_insert(self):
+        """Test that negative version fails at database level due to CHECK constraint."""
+        import sqlite3
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.insert_idea("Test idea", version=-1)
+    
+    def test_zero_version_allowed(self):
+        """Test that version 0 is allowed (edge case for CHECK >= 0)."""
+        idea_id = self.db.insert_idea("Test idea with version 0", version=0)
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["version"] == 0
+    
+    def test_positive_version_allowed(self):
+        """Test that positive versions work correctly."""
+        idea_id = self.db.insert_idea("Test idea", version=5)
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["version"] == 5
+    
+    def test_update_to_negative_version_fails(self):
+        """Test that updating to negative version fails at database level."""
+        import sqlite3
+        idea_id = self.db.insert_idea("Test idea", version=1)
+        
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.update_idea(idea_id, version=-1)
+    
+    def test_default_version_is_one(self):
+        """Test that default version is 1 when not specified in raw SQL insert."""
+        # Verify the DEFAULT 1 constraint by inserting via raw SQL
+        cursor = self.db.conn.cursor()
+        cursor.execute("INSERT INTO Idea (text) VALUES (?)", ("Test with default version",))
+        self.db.conn.commit()
+        idea_id = cursor.lastrowid
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["version"] == 1
+
+
 class TestSimpleIdeaDatabaseSearch:
     """Test search and query operations."""
     
