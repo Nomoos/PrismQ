@@ -333,7 +333,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             ...     print(f"Processing story {story.id}")
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
             "FROM Story WHERE state = ? ORDER BY created_at ASC LIMIT 1",
             (state,)
         )
