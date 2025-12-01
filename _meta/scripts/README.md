@@ -1,3 +1,88 @@
+# PrismQ Scripts
+
+This directory contains scripts for the PrismQ content production workflow.
+
+## Workflow Module Scripts
+
+Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for interactive execution:
+
+### 01_Idea - Idea Creation
+- `PrismQ.T.Idea.Creation.bat` - Interactive idea creation
+- `PrismQ.T.Idea.Creation.Preview.bat` - Preview mode (no DB save)
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+
+### 02_Story - Title and Script Generation
+- `PrismQ.T.Title.From.Idea.bat` - Generate titles from ideas
+- `PrismQ.T.Title.From.Idea.Preview.bat` - Preview mode
+- `PrismQ.T.Script.From.Idea.Title.bat` - Generate scripts from idea+title
+- `PrismQ.T.Script.From.Idea.Title.Preview.bat` - Preview mode
+- `PrismQ.T.Title.From.Script.Review.Title.bat` - Improve title from review feedback
+- `PrismQ.T.Title.From.Script.Review.Title.Preview.bat` - Preview mode
+- `PrismQ.T.Script.From.Title.Review.Script.bat` - Improve script from review feedback
+- `PrismQ.T.Script.From.Title.Review.Script.Preview.bat` - Preview mode
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+
+### 03_Review - Title and Script Reviews
+- `PrismQ.T.Review.Title.From.Script.bat` - Review title against script
+- `PrismQ.T.Review.Title.From.Script.Preview.bat` - Preview mode
+- `PrismQ.T.Review.Script.From.Title.bat` - Review script against title
+- `PrismQ.T.Review.Script.From.Title.Preview.bat` - Preview mode
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+
+### 04_Publish_Text - Text Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 05_Audio - Audio Generation
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 06_Publish_Audio - Audio Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 07_Video - Video Generation
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+### 08_Publish_Video - Video Publishing
+- `setup_env.bat` / `setup_env.sh` - Environment setup
+- *(Batch scripts to be added)*
+
+## Usage
+
+### Windows
+```batch
+cd _meta\scripts\01_Idea
+PrismQ.T.Idea.Creation.Preview.bat
+
+cd _meta\scripts\02_Story
+PrismQ.T.Title.From.Idea.Preview.bat
+
+cd _meta\scripts\03_Review
+PrismQ.T.Review.Title.From.Script.Preview.bat
+```
+
+### Linux/macOS
+```bash
+cd _meta/scripts/01_Idea
+source setup_env.sh
+python ../../../T/Idea/Creation/src/idea_creation_interactive.py --preview
+```
+
+## Virtual Environments
+
+Each module has its own virtual environment in the corresponding T/ module directory:
+- `T/Idea/Creation/.venv`
+- `T/Title/From/Idea/.venv`
+- `T/Script/From/Idea/Title/.venv`
+- `T/Review/Title/From/Script/.venv`
+- `T/Review/Script/From/Title/.venv`
+- `T/Title/From/Title/Review/Script/.venv`
+- `T/Script/From/Title/Review/Script/.venv`
+
+---
+
 # Mermaid State Diagram Validator
 
 This script validates mermaid state diagrams in the PrismQ repository, specifically the workflow state machine defined in `WORKFLOW.md`.
