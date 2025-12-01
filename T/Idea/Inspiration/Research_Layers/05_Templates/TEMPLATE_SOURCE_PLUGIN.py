@@ -17,7 +17,7 @@ Example:
 
 from typing import List, Optional
 from Model import IdeaInspiration
-from EnvLoad import Config
+from src import Config
 from Source.{MediaType}.src.plugins import {MediaType}Plugin  # e.g., VideoPlugin
 
 
@@ -200,7 +200,7 @@ import pytest
 from unittest.mock import Mock, patch
 from {module}.plugins.{platform}_{endpoint}_plugin import {Platform}{Endpoint}Plugin
 from Model import IdeaInspiration
-from EnvLoad import Config
+from src import Config
 
 
 class Test{Platform}{Endpoint}Plugin:

@@ -61,7 +61,7 @@ from story_title_service import (
     create_stories_from_idea,
 )
 from title_generator import TitleConfig
-from EnvLoad import Config
+from src import Config
 
 # Default .env file path
 DEFAULT_ENV_FILE = "C:/PrismQ/.env"

@@ -138,10 +138,10 @@ PrismQ/
 │   ├── Backend/       # Backend API (TaskManager)
 │   ├── Frontend/      # Frontend UI (TaskManager)
 │   └── _meta/         # Module metadata
-├── EnvLoad/           # Environment & Configuration Management
+├── src/           # Environment & Configuration Management
 │   ├── config.py      # Centralized configuration
 │   ├── tests/         # Test suite
-│   └── README.md      # EnvLoad documentation
+│   └── README.md      # src configuration documentation
 └── _meta/             # Project-wide metadata
     ├── docs/         # Documentation
     ├── research/     # Research documents
@@ -160,7 +160,7 @@ The working directory contains:
 
 ```
 C:\PrismQ/              # Working Directory (Windows) or ~/PrismQ (Unix)
-├── .env                # Configuration (managed by EnvLoad)
+├── .env                # Configuration (managed by src module)
 ├── db.s3db             # Database
 ├── T/{id}/             # Text content by ID
 │   ├── {Platform}/    # Platform-specific output
@@ -177,12 +177,12 @@ C:\PrismQ/              # Working Directory (Windows) or ~/PrismQ (Unix)
     └── {Year}/{Month}/{day-range}/{day}/{hour}/{id}/Metrics/{platform}/
 ```
 
-See [EnvLoad/README.md](./EnvLoad/README.md) for complete configuration documentation.
+See [src/README.md](./src/README.md) for complete configuration documentation.
 
 ## 🚀 Quick Start
 
 1. **Explore a Pipeline**: Start with [T/README.md](./T/README.md) to understand text generation
-2. **Configure Environment**: See [EnvLoad/README.md](./EnvLoad/README.md) for setup
+2. **Configure Environment**: See [src/README.md](./src/README.md) for setup
 3. **Review Workflow**: Read [WORKFLOW.md](./_meta/WORKFLOW.md) for the complete state machine
 4. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
 5. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
