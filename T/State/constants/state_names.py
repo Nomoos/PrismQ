@@ -71,8 +71,8 @@ class StateNames:
     # =========================================================================
     # Stages 4-6: Initial Review Cycle
     # =========================================================================
-    REVIEW_TITLE_FROM_SCRIPT_AND_IDEA = f"{STATE_PREFIX}.Review.Title.From.Script.And.Idea"
-    REVIEW_SCRIPT_FROM_TITLE_AND_IDEA = f"{STATE_PREFIX}.Review.Script.From.Title.And.Idea"
+    REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{STATE_PREFIX}.Review.Title.From.Script.Idea"
+    REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{STATE_PREFIX}.Review.Script.From.Title.Idea"
     REVIEW_TITLE_FROM_SCRIPT = f"{STATE_PREFIX}.Review.Title.From.Script"
     
     # =========================================================================
@@ -118,8 +118,8 @@ class StateNames:
             SCRIPT_FROM_SCRIPT_REVIEW_TITLE,
         ],
         StateCategory.REVIEW: [
-            REVIEW_TITLE_FROM_SCRIPT_AND_IDEA,
-            REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,
+            REVIEW_TITLE_FROM_SCRIPT_IDEA,
+            REVIEW_SCRIPT_FROM_TITLE_IDEA,
             REVIEW_TITLE_FROM_SCRIPT,
             REVIEW_SCRIPT_FROM_TITLE,
             REVIEW_SCRIPT_GRAMMAR,

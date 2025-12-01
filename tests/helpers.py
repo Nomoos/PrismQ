@@ -131,12 +131,12 @@ class WorkflowStageValidator:
     VALID_TRANSITIONS = {
         'PrismQ.T.Idea.Creation': ['PrismQ.T.Title.From.Idea'],
         'PrismQ.T.Title.From.Idea': ['PrismQ.T.Script.From.Idea.Title'],
-        'PrismQ.T.Script.From.Idea.Title': ['PrismQ.T.Review.Title.From.Script.And.Idea'],
-        'PrismQ.T.Review.Title.From.Script.And.Idea': [
-            'PrismQ.T.Review.Script.From.Title.And.Idea',
+        'PrismQ.T.Script.From.Idea.Title': ['PrismQ.T.Review.Title.From.Script.Idea'],
+        'PrismQ.T.Review.Title.From.Script.Idea': [
+            'PrismQ.T.Review.Script.From.Title.Idea',
             'PrismQ.T.Title.From.Title.Review.Script'
         ],
-        'PrismQ.T.Review.Script.From.Title.And.Idea': [
+        'PrismQ.T.Review.Script.From.Title.Idea': [
             'PrismQ.T.Review.Title.From.Script',
             'PrismQ.T.Script.From.Script.Review.Title'
         ],
@@ -146,7 +146,7 @@ class WorkflowStageValidator:
         ],
         'PrismQ.T.Title.From.Title.Review.Script': [
             'PrismQ.T.Script.From.Script.Review.Title',
-            'PrismQ.T.Review.Script.From.Title.And.Idea',
+            'PrismQ.T.Review.Script.From.Title.Idea',
             'PrismQ.T.Review.Title.From.Script'
         ],
         'PrismQ.T.Script.From.Script.Review.Title': [

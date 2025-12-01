@@ -173,7 +173,7 @@ class TestValidTransitions:
         """Test transition from script to review."""
         result = validator.validate(
             StateNames.SCRIPT_FROM_IDEA_TITLE,
-            StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA
+            StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA
         )
         
         assert result.is_valid is True
@@ -387,8 +387,8 @@ class TestPathValidation:
             StateNames.IDEA_CREATION,
             StateNames.TITLE_FROM_IDEA,
             StateNames.SCRIPT_FROM_IDEA_TITLE,
-            StateNames.REVIEW_TITLE_FROM_SCRIPT_AND_IDEA,
-            StateNames.REVIEW_SCRIPT_FROM_TITLE_AND_IDEA,
+            StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA,
+            StateNames.REVIEW_SCRIPT_FROM_TITLE_IDEA,
             StateNames.REVIEW_TITLE_FROM_SCRIPT,
             StateNames.REVIEW_SCRIPT_FROM_TITLE,
             StateNames.REVIEW_SCRIPT_GRAMMAR,

@@ -69,7 +69,7 @@ class TestIdeaTitleScriptWorkflow:
         script_tracker.add_version(1)
         
         # Review title based on script
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         
         # Create improved title v2
         assert helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
@@ -108,7 +108,7 @@ class TestIdeaTitleScriptWorkflow:
         script_tracker.add_version(1)
         
         # First improvement cycle (v1 → v2)
-        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         title_tracker.add_version(2)
         
@@ -233,7 +233,7 @@ class TestWorkflowStageTransitions:
             'PrismQ.T.Idea.Creation',
             'PrismQ.T.Title.From.Idea',
             'PrismQ.T.Script.From.Idea.Title',
-            'PrismQ.T.Review.Title.From.Script.And.Idea',
+            'PrismQ.T.Review.Title.From.Script.Idea',
             'PrismQ.T.Title.From.Title.Review.Script',
             'PrismQ.T.Script.From.Script.Review.Title'
         ]
@@ -254,7 +254,7 @@ class TestWorkflowStageTransitions:
         validator.transition_to('PrismQ.T.Script.From.Idea.Title')
         
         # First iteration (v1 → v2)
-        validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         validator.transition_to('PrismQ.T.Script.From.Script.Review.Title')
         
@@ -282,7 +282,7 @@ class TestWorkflowStageTransitions:
         assert not validator.transition_to('PrismQ.T.Review.Title.From.Script')
         
         # Cannot skip script generation
-        assert not validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        assert not validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         
         # Must go through proper stages
         assert validator.transition_to('PrismQ.T.Script.From.Idea.Title')
@@ -406,7 +406,7 @@ class TestCompleteWorkflowScenario:
         assert helper.validate_cross_version_alignment(1, 1, 1)
         
         # Stage 4: Title Review (cross-validation)
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         
         # Stage 5: Title v2 (improved based on script)
         assert helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
@@ -463,7 +463,7 @@ class TestCompleteWorkflowScenario:
             'PrismQ.T.Idea.Creation',
             'PrismQ.T.Title.From.Idea',
             'PrismQ.T.Script.From.Idea.Title',
-            'PrismQ.T.Review.Title.From.Script.And.Idea',
+            'PrismQ.T.Review.Title.From.Script.Idea',
             'PrismQ.T.Title.From.Title.Review.Script',
             'PrismQ.T.Script.From.Script.Review.Title',
             'PrismQ.T.Review.Title.From.Script',
@@ -484,7 +484,7 @@ class TestManualCreationPipeline:
     3. Script.From.Title.Idea (v1)
     4. Review.Title.By.Script.Idea
     5. Title.From.Script.Review.Title (v2)
-    6. Review.Script.From.Title.And.Idea
+    6. Review.Script.From.Title.Idea
     7. Script.From.Title.Review.Script (v2)
     """
     
@@ -531,7 +531,7 @@ class TestManualCreationPipeline:
         })
         
         # Stage 4: Review.Title.By.Script.Idea
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea'), (
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea'), (
             "Failed to transition to Review.Title.By.Script.Idea"
         )
         
@@ -546,9 +546,9 @@ class TestManualCreationPipeline:
             "description": "Improved title based on script review"
         })
         
-        # Stage 6: Review.Script.From.Title.And.Idea
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.And.Idea'), (
-            "Failed to transition to Review.Script.From.Title.And.Idea"
+        # Stage 6: Review.Script.From.Title.Idea
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.Idea'), (
+            "Failed to transition to Review.Script.From.Title.Idea"
         )
         
         # Stage 7: Script.From.Title.Review.Script (v2 - improved script)
@@ -595,9 +595,9 @@ class TestManualCreationPipeline:
             'PrismQ.T.Idea.Creation',         # Idea.Creation
             'PrismQ.T.Title.From.Idea',              # Title.From.Idea
             'PrismQ.T.Script.From.Idea.Title',             # Script.From.Title.Idea
-            'PrismQ.T.Review.Title.From.Script.And.Idea',          # Review.Title.By.Script.Idea
+            'PrismQ.T.Review.Title.From.Script.Idea',          # Review.Title.By.Script.Idea
             'PrismQ.T.Title.From.Title.Review.Script',              # Title.From.Script.Review.Title
-            'PrismQ.T.Review.Script.From.Title.And.Idea',         # Review.Script.From.Title.And.Idea
+            'PrismQ.T.Review.Script.From.Title.Idea',         # Review.Script.From.Title.Idea
             'PrismQ.T.Script.From.Script.Review.Title'              # Script.From.Title.Review.Script
         ]
         assert stage_history == expected_stages, (
@@ -640,14 +640,14 @@ class TestManualCreationPipeline:
         })
         
         # Progress through review cycle
-        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         title_tracker.add_version(2, {
             "from_review": True,
             "improvements": ["better alignment with script", "SEO optimization"]
         })
         
-        helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.And.Idea')
+        helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.Idea')
         helper.stage_validator.transition_to('PrismQ.T.Script.From.Script.Review.Title')
         script_tracker.add_version(2, {
             "from_review": True,
@@ -698,7 +698,7 @@ class TestManualCreationPipeline:
         )
         
         # First co-improvement cycle (v1 → v2)
-        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         title_tracker.add_version(2)
         
@@ -708,7 +708,7 @@ class TestManualCreationPipeline:
             "Alignment should be valid with title at v2, script at v1"
         )
         
-        helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.And.Idea')
+        helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.Idea')
         helper.stage_validator.transition_to('PrismQ.T.Script.From.Script.Review.Title')
         script_tracker.add_version(2)
         
@@ -756,14 +756,14 @@ class TestManualCreationPipeline:
         script_tracker.add_version(1, {"stage": "from_title_and_idea"})
         
         # Stage 4: Review.Title.By.Script.Idea (Feedback loop)
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.And.Idea')
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Title.From.Script.Idea')
         
         # Stage 5: Title.From.Script.Review.Title (v2)
         assert helper.stage_validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         title_tracker.add_version(2, {"stage": "from_review"})
         
-        # Stage 6: Review.Script.From.Title.And.Idea (Feedback loop)
-        assert helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.And.Idea')
+        # Stage 6: Review.Script.From.Title.Idea (Feedback loop)
+        assert helper.stage_validator.transition_to('PrismQ.T.Review.Script.From.Title.Idea')
         
         # Stage 7: Script.From.Title.Review.Script (v2)
         assert helper.stage_validator.transition_to('PrismQ.T.Script.From.Script.Review.Title')
@@ -830,9 +830,9 @@ class TestManualCreationPipeline:
             'PrismQ.T.Idea.Creation',
             'PrismQ.T.Title.From.Idea',
             'PrismQ.T.Script.From.Idea.Title',
-            'PrismQ.T.Review.Title.From.Script.And.Idea',
+            'PrismQ.T.Review.Title.From.Script.Idea',
             'PrismQ.T.Title.From.Title.Review.Script',
-            'PrismQ.T.Review.Script.From.Title.And.Idea',
+            'PrismQ.T.Review.Script.From.Title.Idea',
             'PrismQ.T.Script.From.Script.Review.Title',
             # Second cycle (v2 → v3)
             'PrismQ.T.Review.Title.From.Script',
