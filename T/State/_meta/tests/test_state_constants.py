@@ -47,9 +47,9 @@ class TestStateNamesConstants:
         """Test Review Title By Script And Idea state constant."""
         assert StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA == "PrismQ.T.Review.Title.ByScriptAndIdea"
     
-    def test_review_script_by_title_idea_state(self):
-        """Test Review Script By Title Idea state constant."""
-        assert StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA == "PrismQ.T.Review.Script.By.Title.Idea"
+    def test_review_script_by_title_and_idea_state(self):
+        """Test Review Script By Title And Idea state constant."""
+        assert StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA == "PrismQ.T.Review.Script.ByTitleAndIdea"
     
     def test_review_title_by_script_state(self):
         """Test Review Title By Script state constant."""
@@ -393,7 +393,7 @@ class TestStateMachineAlignment:
     def test_stages_4_6_review_cycle(self):
         """Test Stages 4-6: Initial review cycle states exist."""
         assert StateNames.is_valid_state(StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA)
-        assert StateNames.is_valid_state(StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA)
+        assert StateNames.is_valid_state(StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA)
         assert StateNames.is_valid_state(StateNames.REVIEW_TITLE_BY_SCRIPT)
     
     def test_stages_7_9_refinement(self):

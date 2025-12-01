@@ -388,7 +388,7 @@ class TestPathValidation:
             StateNames.TITLE_FROM_IDEA,
             StateNames.SCRIPT_FROM_IDEA_TITLE,
             StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
-            StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,
+            StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,
             StateNames.REVIEW_TITLE_BY_SCRIPT,
             StateNames.REVIEW_SCRIPT_BY_TITLE,
             StateNames.REVIEW_SCRIPT_GRAMMAR,

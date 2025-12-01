@@ -47,12 +47,12 @@ _TRANSITIONS_DICT: Dict[str, List[str]] = {
     
     # Initial title review (Stage 4)
     StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA: [
-        StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,  # Accepted -> Stage 5
+        StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,  # Accepted -> Stage 5
         StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT,  # Not accepted -> Stage 7 (refine title)
     ],
     
     # Initial script review (Stage 5)
-    StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA: [
+    StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA: [
         StateNames.REVIEW_TITLE_BY_SCRIPT,  # Accepted -> Stage 6
         StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE,  # Not accepted -> Stage 8 (refine script)
     ],
@@ -66,7 +66,7 @@ _TRANSITIONS_DICT: Dict[str, List[str]] = {
     # Title refinement from review (Stage 7)
     StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT: [
         StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE,  # After title refinement -> Stage 8
-        StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,  # Back to script review
+        StateNames.REVIEW_SCRIPT_BY_TITLE_AND_IDEA,  # Back to script review
         StateNames.REVIEW_TITLE_BY_SCRIPT,  # Back to title review cycle
     ],
     

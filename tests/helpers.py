@@ -133,10 +133,10 @@ class WorkflowStageValidator:
         'PrismQ.T.Title.From.Idea': ['PrismQ.T.Script.From.Idea.Title'],
         'PrismQ.T.Script.From.Idea.Title': ['PrismQ.T.Review.Title.ByScriptAndIdea'],
         'PrismQ.T.Review.Title.ByScriptAndIdea': [
-            'PrismQ.T.Review.Script.By.Title.Idea',
+            'PrismQ.T.Review.Script.ByTitleAndIdea',
             'PrismQ.T.Title.From.Title.Review.Script'
         ],
-        'PrismQ.T.Review.Script.By.Title.Idea': [
+        'PrismQ.T.Review.Script.ByTitleAndIdea': [
             'PrismQ.T.Review.Title.ByScript',
             'PrismQ.T.Script.From.Script.Review.Title'
         ],
@@ -146,7 +146,7 @@ class WorkflowStageValidator:
         ],
         'PrismQ.T.Title.From.Title.Review.Script': [
             'PrismQ.T.Script.From.Script.Review.Title',
-            'PrismQ.T.Review.Script.By.Title.Idea',
+            'PrismQ.T.Review.Script.ByTitleAndIdea',
             'PrismQ.T.Review.Title.ByScript'
         ],
         'PrismQ.T.Script.From.Script.Review.Title': [
