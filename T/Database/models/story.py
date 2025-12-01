@@ -33,6 +33,7 @@ class StoryState(str, Enum):
     States are ordered to track progress through the pipeline.
     """
     CREATED = "created"
+    TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"  # Ready for title generation from idea
     TITLE_V0 = "title_v0"
     SCRIPT_V0 = "script_v0"
     REVIEW_TITLE = "review_title"

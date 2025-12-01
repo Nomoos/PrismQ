@@ -6,7 +6,7 @@ that don't yet have references in the Story table.
 The module:
 1. Loads Idea objects that have no references in the Story table
 2. Creates 10 Story objects per Idea, each with just a reference to the Idea
-3. Stories are created in CREATED state (without Title or Script)
+3. Stories are created with state TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea)
 
 Workflow Position: Early stage before Title generation
     PrismQ.T.Idea.Creation
@@ -95,7 +95,7 @@ class StoryFromIdeaService:
     The service:
     1. Can find Ideas that don't have Story references yet
     2. Creates 10 Story objects for each Idea
-    3. Each Story is in CREATED state (no Title, no Script)
+    3. Each Story has state TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea)
     
     Attributes:
         _story_conn: SQLite database connection for Story table
@@ -196,7 +196,8 @@ class StoryFromIdeaService:
         """Create 10 Story objects from an Idea.
         
         This method creates 10 Story objects referencing the given Idea ID.
-        Each Story is created in CREATED state without Title or Script.
+        Each Story is created with state TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea),
+        ready for title generation.
         
         Args:
             idea_id: The Idea's database ID (integer).
@@ -218,7 +219,7 @@ class StoryFromIdeaService:
             # Create Story with reference to Idea
             story = Story(
                 idea_id=str(idea_id),  # Story.idea_id is TEXT
-                state=StoryState.CREATED
+                state=StoryState.TITLE_FROM_IDEA  # Ready for PrismQ.T.Title.From.Idea processing
             )
             
             # Persist Story

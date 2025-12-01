@@ -135,11 +135,11 @@ class TestStoryFromIdeaService:
         assert result.idea_id == 1
     
     def test_create_stories_from_idea_correct_state(self, service):
-        """Test that created stories are in CREATED state."""
+        """Test that created stories have TITLE_FROM_IDEA state."""
         result = service.create_stories_from_idea(idea_id=1)
         
         for story in result.stories:
-            assert story.state == StoryState.CREATED
+            assert story.state == StoryState.TITLE_FROM_IDEA
     
     def test_create_stories_from_idea_correct_idea_reference(self, service):
         """Test that created stories reference the correct idea."""

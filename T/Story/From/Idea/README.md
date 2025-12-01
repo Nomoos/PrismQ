@@ -9,7 +9,7 @@ Tento modul poskytuje funkcionalitu pro vytváření Story objektů z Idea objek
 **Klíčové funkce:**
 1. Načte Idea objekty bez referencí ve Story tabulce
 2. Vytvoří 10x Story objektů s referencí na Idea (bez Titulku a Scriptu)
-3. Story objekty jsou vytvořeny ve stavu CREATED
+3. Story objekty jsou vytvořeny ve stavu `PrismQ.T.Title.From.Idea`
 
 ## Pozice ve workflow
 
