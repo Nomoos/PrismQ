@@ -3,11 +3,18 @@
 import sys
 import os
 import pytest
+from pathlib import Path
 
-# Add parent directories to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../../Idea/Model/src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../../Idea/Model'))
+# Set up paths before any other imports
+_test_dir = Path(__file__).parent
+_project_root = _test_dir.parent.parent.parent.parent.parent.parent
+_idea_model_path = _project_root / 'T' / 'Idea' / 'Model' / 'src'
+_src_path = _test_dir.parent.parent / 'src'
+
+# Add all required paths
+sys.path.insert(0, str(_project_root))
+sys.path.insert(0, str(_idea_model_path))
+sys.path.insert(0, str(_src_path))
 
 from title_generator import (
     TitleGenerator,

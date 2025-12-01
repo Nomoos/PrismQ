@@ -35,11 +35,14 @@ Repository Interfaces:
     - IUpdatableRepository: Extended interface for updatable entities
 
 Repository Implementations:
+    - StoryRepository: SQLite implementation for Story entities
     - TitleRepository: SQLite implementation for Title entities
     - ScriptRepository: SQLite implementation for Script entities
     - StoryReviewRepository: SQLite implementation for StoryReview entities
 
 Models:
+    - Story: Central entity linking Ideas to content versions
+    - StoryState: Enum for story workflow states
     - Title: Versioned title content with review FK
     - Script: Script model for versioned content storage
     - Review: Simple review model for content review storage
@@ -54,36 +57,33 @@ Design Decisions:
 
 Example:
     >>> from T.Database import (
-    ...     IRepository, IVersionedRepository,
-    ...     TitleRepository, ScriptRepository, StoryReviewRepository,
-    ...     Title, Script, StoryReviewModel, ReviewType
+    ...     IRepository, IVersionedRepository, IUpdatableRepository,
+    ...     StoryRepository, TitleRepository, ScriptRepository, StoryReviewRepository,
+    ...     Story, StoryState, Title, Script, StoryReviewModel, ReviewType
     ... )
     >>> 
     >>> # Create repositories with SQLite connection
+    >>> story_repo = StoryRepository(connection)
     >>> title_repo = TitleRepository(connection)
     >>> script_repo = ScriptRepository(connection)
     >>> review_repo = StoryReviewRepository(connection)
     >>> 
-    >>> # Insert new title and script
-    >>> title = Title(story_id=1, version=0, text="My Title")
-    >>> script = Script(story_id=1, version=0, text="Once upon a time...")
+    >>> # Create story and title
+    >>> story = Story(idea_id="idea-123")
+    >>> saved_story = story_repo.insert(story)
+    >>> 
+    >>> title = Title(story_id=saved_story.id, version=0, text="My Title")
     >>> saved_title = title_repo.insert(title)
-    >>> saved_script = script_repo.insert(script)
     >>> 
-    >>> # Link story to review
-    >>> story_review = StoryReviewModel(
-    ...     story_id=1, review_id=5, version=0, review_type=ReviewType.GRAMMAR
-    ... )
-    >>> saved_review = review_repo.insert(story_review)
-    >>> 
-    >>> # Find latest versions
-    >>> latest_title = title_repo.find_latest_version(story_id=1)
-    >>> latest_script = script_repo.find_latest_version(story_id=1)
+    >>> # Update story state
+    >>> saved_story.transition_to(StoryState.TITLE_V0)
+    >>> story_repo.update(saved_story)
 """
 
 __version__ = "0.1.0"
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.story import Story, StoryState
 from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.models.review import Review
 from T.Database.models.script import Script
@@ -93,6 +93,7 @@ from T.Database.repositories.base import (
     IVersionedRepository,
     IUpdatableRepository,
 )
+from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.title_repository import TitleRepository
 from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.repositories.script_repository import ScriptRepository
@@ -102,6 +103,8 @@ __all__ = [
     "IReadable",
     "IModel",
     # Models
+    "Story",
+    "StoryState",
     "Title",
     "Script",
     "Review",
@@ -112,6 +115,7 @@ __all__ = [
     "IVersionedRepository",
     "IUpdatableRepository",
     # Repository implementations
+    "StoryRepository",
     "TitleRepository",
     "ScriptRepository",
     "StoryReviewRepository",
