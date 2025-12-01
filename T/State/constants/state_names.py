@@ -82,6 +82,7 @@ class StateNames:
     SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Script.From.Script.Review.Title"
     REVIEW_SCRIPT_FROM_TITLE = f"{STATE_PREFIX}.Review.Script.From.Title"
     TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Title.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
     
     # =========================================================================
     # Stages 10-16: Quality Review States
