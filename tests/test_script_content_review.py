@@ -3,7 +3,7 @@
 Tests the ScriptContentReviewer service that:
 1. Selects oldest Story where state is PrismQ.T.Review.Script.Content
 2. Generates content review using ContentReview model
-3. Creates Review record and links via StoryReview
+3. Creates Review record and links it to Script via Script.review_id FK
 4. Updates Story state based on review result
 """
 
@@ -39,7 +39,6 @@ from T.Review.Content.content_review import ContentReview
 from T.Database.models.story import Story
 from T.Database.models.script import Script
 from T.Database.models.review import Review
-from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.State.constants.state_names import StateNames
 
 
@@ -76,16 +75,6 @@ def db_connection():
             text TEXT NOT NULL,
             score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-        
-        CREATE TABLE IF NOT EXISTS StoryReview (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            story_id INTEGER NOT NULL,
-            review_id INTEGER NOT NULL,
-            version INTEGER NOT NULL CHECK (version >= 0),
-            review_type TEXT NOT NULL CHECK (review_type IN ('grammar', 'tone', 'content', 'consistency', 'editing')),
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version, review_type)
         );
         
         CREATE INDEX IF NOT EXISTS idx_story_state ON Story(state);
@@ -363,8 +352,8 @@ class TestProcessOldestStory:
         assert review_row is not None
         assert review_row["score"] == result.overall_score
     
-    def test_process_oldest_story_creates_story_review_link(self, db_connection, service, sample_script_text):
-        """Test that processing creates StoryReview link."""
+    def test_process_oldest_story_links_review_to_script(self, db_connection, service, sample_script_text):
+        """Test that processing links Review to Script via Script.review_id FK."""
         # Insert script
         db_connection.execute(
             "INSERT INTO Script (story_id, text, version, created_at) VALUES (?, ?, ?, ?)",
@@ -380,16 +369,34 @@ class TestProcessOldestStory:
         
         result = service.process_oldest_story()
         
-        # Verify StoryReview link was created
+        # Verify Script.review_id was updated
         cursor = db_connection.execute(
-            "SELECT * FROM StoryReview WHERE story_id = ? AND review_type = ?",
-            (result.story_id, ReviewType.CONTENT.value)
+            "SELECT * FROM Script WHERE id = ?",
+            (result.script_id,)
         )
-        link_row = cursor.fetchone()
+        script_row = cursor.fetchone()
         
-        assert link_row is not None
-        assert link_row["review_id"] == result.review_id
-        assert link_row["review_type"] == "content"
+        assert script_row is not None
+        assert script_row["review_id"] == result.review_id
+    
+    def test_process_oldest_story_returns_script_id(self, db_connection, service, sample_script_text):
+        """Test that result includes script_id."""
+        # Insert script
+        db_connection.execute(
+            "INSERT INTO Script (story_id, text, version, created_at) VALUES (?, ?, ?, ?)",
+            (1, sample_script_text, 3, datetime.now().isoformat())
+        )
+        
+        # Insert story
+        db_connection.execute(
+            "INSERT INTO Story (script_id, state, created_at, updated_at) VALUES (?, ?, ?, ?)",
+            (1, StateNames.REVIEW_SCRIPT_CONTENT, datetime.now().isoformat(), datetime.now().isoformat())
+        )
+        db_connection.commit()
+        
+        result = service.process_oldest_story()
+        
+        assert result.script_id == 1
     
     def test_process_oldest_story_returns_none_when_no_stories(self, db_connection, service):
         """Test that process_oldest_story returns None when no stories found."""

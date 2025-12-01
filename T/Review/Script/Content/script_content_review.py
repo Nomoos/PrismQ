@@ -3,10 +3,13 @@
 This module provides a service that:
 1. Selects the oldest Story where state is PrismQ.T.Review.Script.Content
 2. Generates content review using ContentReview model from T.Review.Content
-3. Creates Review record and links via StoryReview
+3. Creates Review record and links it to the Script via Script.review_id FK
 4. Updates Story state based on review result:
-   - FAIL: PrismQ.T.Script.From.Title.Review.Script
+   - FAIL: PrismQ.T.Script.From.Script.Review.Title
    - PASS: PrismQ.T.Review.Script.Tone
+
+Note: This module reviews the SCRIPT, not the whole Story. The Review is linked
+directly to the Script via the Script.review_id foreign key.
 
 This is the main entry point for automated script content review in the workflow.
 
@@ -21,7 +24,7 @@ Usage:
     >>> # Process oldest story needing content review (by state)
     >>> result = service.process_oldest_story()
     >>> if result:
-    ...     print(f"Reviewed story {result.story_id}, passes: {result.passes}")
+    ...     print(f"Reviewed script {result.script_id}, passes: {result.passes}")
 """
 
 import json
@@ -32,10 +35,9 @@ from datetime import datetime
 
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.script_repository import ScriptRepository
-from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.models.review import Review
-from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.State.constants.state_names import StateNames
 
 # Import ContentReview model from T.Review.Content directly
@@ -55,10 +57,11 @@ OUTPUT_STATE_FAIL = StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE  # PrismQ.T.Scrip
 
 @dataclass
 class ContentReviewResult:
-    """Result of content review for a story.
+    """Result of content review for a script.
     
     Attributes:
         story_id: ID of the story processed
+        script_id: ID of the script that was reviewed
         review_id: ID of the created Review record (if successful)
         passes: Whether the content review passed
         overall_score: Content review score (0-100)
@@ -67,6 +70,7 @@ class ContentReviewResult:
         new_state: The state the story was transitioned to
     """
     story_id: int
+    script_id: Optional[int] = None
     review_id: Optional[int] = None
     passes: bool = False
     overall_score: int = 0
@@ -76,19 +80,22 @@ class ContentReviewResult:
 
 
 class ScriptContentReviewer:
-    """Service for reviewing script content for stories.
+    """Service for reviewing script content.
     
     This service implements the workflow step:
-        Story (state=PrismQ.T.Review.Script.Content) → Content Review 
+        Story (state=PrismQ.T.Review.Script.Content) → Script Content Review 
         → Story (state=PrismQ.T.Review.Script.Tone) if passes
-        → Story (state=PrismQ.T.Script.From.Title.Review.Script) if fails
+        → Story (state=PrismQ.T.Script.From.Script.Review.Title) if fails
+    
+    Note: This reviews the SCRIPT, not the whole Story. The Review is linked
+    directly to the Script via the Script.review_id foreign key.
     
     Workflow:
         - Selects the oldest Story where state is PrismQ.T.Review.Script.Content
-        - Retrieves the associated Script content
+        - Retrieves the associated Script
         - Performs content review (narrative, plot, character, pacing)
         - Creates Review record with score and text
-        - Links Review to Story via StoryReview table
+        - Links Review to Script via Script.review_id FK
         - Updates Story state based on review result
     
     Attributes:
@@ -121,7 +128,6 @@ class ScriptContentReviewer:
         # Initialize repositories
         self.story_repo = StoryRepository(connection)
         self.script_repo = ScriptRepository(connection)
-        self.story_review_repo = StoryReviewRepository(connection)
     
     def get_oldest_story(self) -> Optional[Story]:
         """Get the oldest story in the INPUT_STATE.
@@ -132,23 +138,19 @@ class ScriptContentReviewer:
         """
         return self.story_repo.find_oldest_by_state(self.INPUT_STATE)
     
-    def get_script_content(self, story: Story) -> Optional[str]:
-        """Get the script content for a story.
+    def get_script(self, story: Story) -> Optional[Script]:
+        """Get the script for a story.
         
         Args:
             story: The Story entity to get script for
             
         Returns:
-            The script text content, or None if not found
+            The Script entity, or None if not found
         """
         if story.script_id is None:
             return None
         
-        script = self.script_repo.find_by_id(story.script_id)
-        if script is None:
-            return None
-        
-        return script.text
+        return self.script_repo.find_by_id(story.script_id)
     
     def perform_content_review(
         self,
@@ -377,29 +379,17 @@ class ScriptContentReviewer:
         review.id = cursor.lastrowid
         return review
     
-    def link_review_to_story(
-        self,
-        story: Story,
-        review: Review,
-        version: int = 0
-    ) -> StoryReviewModel:
-        """Link a Review to a Story via StoryReview table.
+    def link_review_to_script(self, script: Script, review: Review) -> bool:
+        """Link a Review to a Script via Script.review_id FK.
         
         Args:
-            story: The Story entity
+            script: The Script entity to update
             review: The Review entity (must have id)
-            version: Story version being reviewed
             
         Returns:
-            The created StoryReviewModel
+            True if the update was successful, False otherwise
         """
-        story_review = StoryReviewModel(
-            story_id=story.id,
-            review_id=review.id,
-            version=version,
-            review_type=ReviewType.CONTENT
-        )
-        return self.story_review_repo.insert(story_review)
+        return self.script_repo.update_review_id(script.id, review.id)
     
     def update_story_state(self, story: Story, passes: bool) -> Story:
         """Update story state based on review result.
@@ -419,14 +409,14 @@ class ScriptContentReviewer:
         return self.story_repo.update(story)
     
     def process_oldest_story(self) -> Optional[ContentReviewResult]:
-        """Process the oldest story needing content review.
+        """Process the oldest story needing script content review.
         
         This is the main workflow method that:
         1. Finds the oldest story in PrismQ.T.Review.Script.Content state
-        2. Retrieves the script content
-        3. Performs content review
+        2. Retrieves the Script
+        3. Performs content review on the Script
         4. Creates Review record
-        5. Links Review to Story
+        5. Links Review to Script via Script.review_id FK
         6. Updates Story state
         
         Returns:
@@ -437,33 +427,34 @@ class ScriptContentReviewer:
         if story is None:
             return None
         
-        # Get script content
-        script_text = self.get_script_content(story)
-        if script_text is None:
+        # Get script
+        script = self.get_script(story)
+        if script is None:
             return ContentReviewResult(
                 story_id=story.id,
                 error=f"Script not found for story {story.id}"
             )
         
-        # Perform content review
+        # Perform content review on script
         content_review = self.perform_content_review(
-            script_text=script_text,
-            script_id=str(story.script_id),
-            script_version="v3"
+            script_text=script.text,
+            script_id=str(script.id),
+            script_version=f"v{script.version}"
         )
         
         # Create and persist Review record
         review = self.create_review_record(content_review)
         review = self._insert_review(review)
         
-        # Link Review to Story
-        self.link_review_to_story(story, review)
+        # Link Review to Script via Script.review_id FK
+        self.link_review_to_script(script, review)
         
         # Update Story state
         story = self.update_story_state(story, content_review.passes)
         
         return ContentReviewResult(
             story_id=story.id,
+            script_id=script.id,
             review_id=review.id,
             passes=content_review.passes,
             overall_score=content_review.overall_score,
