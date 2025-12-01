@@ -5,11 +5,16 @@ Comprehensive checking of character names, timeline, locations, and internal
 contradictions with detailed issue detection and JSON output.
 
 This module serves as a quality gate in the workflow:
-- If PASSES: proceed to Stage 18 (Editing Review / MVP-018)
-- If FAILS: return to Script Refinement (Stage 11) with detailed feedback
+- If PASSES: proceed to PrismQ.T.Review.Script.Content
+- If FAILS: return to PrismQ.T.Script.From.Title.Review.Script with detailed feedback
+
+Service Module (in src/):
+- ScriptConsistencyReviewService: Process stories in PrismQ.T.Review.Script.Consistency state
+- process_oldest_consistency_review: Process single oldest story
+- process_all_consistency_reviews: Process all pending stories
 """
 
-from .consistency_review import (
+from T.Review.Script.Consistency.consistency_review import (
     ConsistencyReview,
     ConsistencyIssue,
     ConsistencyIssueType,
@@ -21,6 +26,7 @@ from .consistency_review import (
 )
 
 __all__ = [
+    # Review model and checker
     "ConsistencyReview",
     "ConsistencyIssue",
     "ConsistencyIssueType",
@@ -28,5 +34,5 @@ __all__ = [
     "ScriptConsistencyChecker",
     "review_script_consistency",
     "review_script_consistency_to_json",
-    "get_consistency_feedback"
+    "get_consistency_feedback",
 ]

@@ -80,6 +80,7 @@ class StateNames:
     # =========================================================================
     TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Title.From.Title.Review.Script"
     SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Script.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
     REVIEW_SCRIPT_FROM_TITLE = f"{STATE_PREFIX}.Review.Script.From.Title"
     
     # =========================================================================
@@ -116,6 +117,7 @@ class StateNames:
             SCRIPT_FROM_IDEA_TITLE,
             TITLE_FROM_TITLE_REVIEW_SCRIPT,
             SCRIPT_FROM_SCRIPT_REVIEW_TITLE,
+            SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
         ],
         StateCategory.REVIEW: [
             REVIEW_TITLE_FROM_SCRIPT_IDEA,

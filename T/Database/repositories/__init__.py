@@ -12,6 +12,7 @@ Implementations:
     - StoryReviewRepository: SQLite implementation for StoryReview entities
     - ScriptRepository: SQLite implementation for Script entities
     - StoryRepository: SQLite implementation for Story entities (with UPDATE)
+    - ReviewRepository: SQLite implementation for Review entities
 """
 
 from T.Database.repositories.base import (
@@ -23,6 +24,7 @@ from T.Database.repositories.title_repository import TitleRepository
 from T.Database.repositories.story_review_repository import StoryReviewRepository
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.review_repository import ReviewRepository
 
 __all__ = [
     # Interfaces
@@ -34,4 +36,5 @@ __all__ = [
     "StoryReviewRepository",
     "ScriptRepository",
     "StoryRepository",
+    "ReviewRepository",
 ]
