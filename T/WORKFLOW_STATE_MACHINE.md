@@ -8,7 +8,8 @@
 stateDiagram-v2
     [*] --> IdeaCreation
     
-    IdeaCreation --> TitleFromIdea
+    IdeaCreation --> StoryFromIdea
+    StoryFromIdea --> TitleFromIdea
     TitleFromIdea --> ScriptFromTitleIdea
     ScriptFromTitleIdea --> ReviewTitleByScriptIdea
     
@@ -59,6 +60,11 @@ stateDiagram-v2
         Location: T/Idea/Creation/
     end note
     
+    note right of StoryFromIdea
+        Stage 1.5: Create 10 Stories per Idea
+        Location: T/Story/From/Idea/
+    end note
+    
     note right of TitleFromIdea
         Stage 2: Generate title v1
         Location: T/Title/From/Idea/
@@ -99,6 +105,7 @@ stateDiagram-v2
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ |
+| StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ |
 | ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/FromIdeaAndTitle/ |
 | ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | T/Review/Title/ByScriptIdea/ |
@@ -141,6 +148,7 @@ Initial linear flow through the workflow:
 
 ```
 IdeaCreation 
+  → StoryFromIdea
   → TitleFromIdea 
   → ScriptFromTitleIdea 
   → ReviewTitleByScriptIdea
