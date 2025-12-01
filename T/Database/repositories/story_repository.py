@@ -281,6 +281,36 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
     
+    def find_oldest_by_state(self, state: str) -> Optional[Story]:
+        """Find the oldest story in a specific state.
+        
+        This method is useful for processing stories in FIFO order,
+        particularly for workflow states like 'PrismQ.T.Script.From.Idea.Title'.
+        
+        Args:
+            state: The state to filter by (e.g., 'PrismQ.T.Script.From.Idea.Title').
+            
+        Returns:
+            The oldest Story entity in the specified state, or None if no stories found.
+            
+        Example:
+            >>> # Find oldest story ready for script generation
+            >>> story = repo.find_oldest_by_state('PrismQ.T.Script.From.Idea.Title')
+            >>> if story:
+            ...     print(f"Processing story {story.id}")
+        """
+        cursor = self._conn.execute(
+            "SELECT id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "FROM Story WHERE state = ? ORDER BY created_at ASC LIMIT 1",
+            (state,)
+        )
+        row = cursor.fetchone()
+        
+        if row is None:
+            return None
+        
+        return self._row_to_model(row)
+    
     def count_by_state(self, state: str) -> int:
         """Count stories in a specific state.
         
