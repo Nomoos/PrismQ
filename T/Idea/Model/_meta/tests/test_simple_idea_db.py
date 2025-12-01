@@ -3,6 +3,7 @@
 import pytest
 import os
 import tempfile
+import sqlite3
 from src.simple_idea_db import SimpleIdeaDatabase, setup_simple_idea_database
 from src.simple_idea import SimpleIdea
 
@@ -232,7 +233,6 @@ class TestSimpleIdeaDatabaseVersionConstraint:
     
     def test_negative_version_fails_insert(self):
         """Test that negative version fails at database level due to CHECK constraint."""
-        import sqlite3
         with pytest.raises(sqlite3.IntegrityError):
             self.db.insert_idea("Test idea", version=-1)
     
@@ -254,7 +254,6 @@ class TestSimpleIdeaDatabaseVersionConstraint:
     
     def test_update_to_negative_version_fails(self):
         """Test that updating to negative version fails at database level."""
-        import sqlite3
         idea_id = self.db.insert_idea("Test idea", version=1)
         
         with pytest.raises(sqlite3.IntegrityError):

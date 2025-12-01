@@ -276,8 +276,6 @@ class IdeaDatabase:
         if not self.conn:
             self.connect()
         
-        # Determine which fields to update - only text and version are allowed
-        # This is safe because we explicitly control the field names
         if text is not None and version is not None:
             cursor = self.conn.cursor()
             cursor.execute(
