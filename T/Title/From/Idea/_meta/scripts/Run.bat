@@ -3,13 +3,14 @@ REM PrismQ.T.Title.From.Idea - Create Stories from Ideas
 REM Loads Ideas from database and creates 10 Stories with Titles for each
 REM
 REM Usage:
-REM   Run.bat                               Process all pending Ideas
-REM   Run.bat --db path\to\database.db      Use specific database
-REM   Run.bat --idea-id 123                 Process specific Idea
-REM   Run.bat --limit 5                     Process max 5 Ideas
-REM   Run.bat --json                        Output as JSON
+REM   Run.bat --db path\to\database.db
+REM   Run.bat --db prismq.db --idea-id 123
+REM   Run.bat --db prismq.db --limit 5
+REM   Run.bat --db prismq.db --json
 REM
-REM Run Preview.bat first to see what would be processed.
+REM Environment:
+REM   Virtual environment: T\Title\From\Idea\.venv (created automatically)
+REM   Dependencies: T\Title\From\Idea\requirements.txt
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
@@ -27,21 +28,8 @@ echo ========================================
 echo PrismQ.T.Title.From.Idea - Create Stories
 echo ========================================
 
-REM Default database path (relative to script)
-set DEFAULT_DB=%SCRIPT_DIR%..\..\..\..\..\..\prismq.db
-
-REM Check if --db is specified, otherwise use default
-set HAS_DB=0
-for %%a in (%*) do (
-    if "%%a"=="--db" set HAS_DB=1
-    if "%%a"=="-d" set HAS_DB=1
-)
-
-if "%HAS_DB%"=="0" (
-    python run.py --db "%DEFAULT_DB%" %*
-) else (
-    python run.py %*
-)
+REM Run Python script with all arguments
+python run.py %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
