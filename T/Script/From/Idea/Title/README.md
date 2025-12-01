@@ -121,6 +121,55 @@ Script v1 flows to:
 - Metadata: 3 sections, 95s total
 - Ready for review
 
+## State-Based Processing
+
+The module implements state-based processing following the PrismQ workflow state machine:
+
+- **Input State**: `PrismQ.T.Script.From.Idea.Title`
+- **Output State**: `PrismQ.T.Review.Title.From.Script.Idea`
+
+### Usage with ScriptFromIdeaTitleService
+
+```python
+import sqlite3
+from T.Script.From.Idea.Title.src.story_script_service import (
+    ScriptFromIdeaTitleService,
+    process_oldest_from_idea_title,
+    STATE_SCRIPT_FROM_IDEA_TITLE,
+    STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+)
+
+# Connect to database
+conn = sqlite3.connect("prismq.db")
+conn.row_factory = sqlite3.Row
+
+# Option 1: Use convenience function to process oldest story
+result = process_oldest_from_idea_title(conn)
+if result.success:
+    print(f"Generated script {result.script_id} for story {result.story_id}")
+    print(f"Story state changed from {result.previous_state} to {result.new_state}")
+else:
+    print(f"Error: {result.error}")
+
+# Option 2: Use service for more control
+service = ScriptFromIdeaTitleService(conn)
+
+# Count pending stories
+pending_count = service.count_pending()
+print(f"Stories waiting: {pending_count}")
+
+# Process all pending stories
+results = service.process_all_pending()
+summary = service.get_processing_summary(results)
+print(f"Processed {summary['successful']} stories successfully")
+```
+
+### Processing Behavior
+
+1. **FIFO Order**: Stories are processed in FIFO order (oldest first) based on `created_at`
+2. **State Transition**: On success, story state changes from `PrismQ.T.Script.From.Idea.Title` to `PrismQ.T.Review.Title.From.Script.Idea`
+3. **Script Creation**: Generates Script v0 from the story's Idea and Title
+
 ## Module Metadata
 
 **[→ View From/Idea/Title/_meta/docs/](./_meta/docs/)**
