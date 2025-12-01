@@ -7,7 +7,8 @@ Implements IModel interface following Dependency Inversion Principle.
 Relationship Pattern:
     - Story 1:N Title (one story has many title versions)
     - Story 1:N Script (one story has many script versions)
-    - Story stores idea_json as serialized Idea data
+    - Story stores idea_id as reference to Idea table
+    - Story stores idea_json as serialized Idea data (optional)
 
 Note:
     Story is the only model that supports UPDATE operations
@@ -16,9 +17,44 @@ Note:
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Optional, Dict, Any
 
 from .base import IModel
+
+
+class StoryState(str, Enum):
+    """Workflow state constants for Story.
+    
+    These states follow the PrismQ.T naming convention and represent
+    the workflow progression of a Story through the content pipeline.
+    
+    States are string-based for database compatibility and readability.
+    """
+    
+    # Initial state when Story is created
+    CREATED = "CREATED"
+    
+    # Story is ready for title generation from idea (PrismQ.T.Title.From.Idea)
+    TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"
+    
+    # Story has completed title generation (version 0)
+    TITLE_V0 = "PrismQ.T.Title.V0"
+    
+    # Story is ready for script generation
+    SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
+    
+    # Story has completed script generation (version 0)
+    SCRIPT_V0 = "PrismQ.T.Script.V0"
+    
+    # Story is ready for review
+    STORY_REVIEW = "PrismQ.T.Story.Review"
+    
+    # Story is being polished
+    STORY_POLISH = "PrismQ.T.Story.Polish"
+    
+    # Story is ready for publishing
+    PUBLISHING = "PrismQ.T.Publishing"
 
 
 @dataclass
@@ -31,15 +67,17 @@ class Story(IModel[int]):
     
     Attributes:
         id: Primary key (auto-generated)
-        idea_json: Serialized Idea data (JSON string) - populated when idea is set
+        idea_id: FK to Idea table (TEXT for flexibility)
+        idea_json: Serialized Idea data (JSON string) - optional, populated when idea is set
         title_id: FK to latest Title version (optional, populated when title is generated)
         script_id: FK to latest Script version (optional, populated when script is generated)
-        state: Current workflow state (e.g., 'IDEA', 'TITLE', 'SCRIPT')
+        state: Current workflow state (e.g., StoryState.TITLE_FROM_IDEA)
         created_at: Timestamp of creation
         updated_at: Timestamp of last update
     
     Note:
-        - idea_json stores the Idea as JSON to decouple from Idea module
+        - idea_id references the Idea table (stored as TEXT for flexibility)
+        - idea_json optionally stores the Idea as JSON for decoupled access
         - title_id and script_id reference the latest versions
         - state can be updated (UPDATE operation allowed)
     
@@ -47,6 +85,7 @@ class Story(IModel[int]):
         ```sql
         Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idea_id TEXT NULL,
             idea_json TEXT NULL,
             title_id INTEGER NULL,
             script_id INTEGER NULL,
@@ -60,13 +99,14 @@ class Story(IModel[int]):
     
     Example:
         >>> story = Story(
-        ...     idea_json='{"title": "My Idea", "concept": "A concept"}',
-        ...     state='IDEA'
+        ...     idea_id="1",
+        ...     state=StoryState.TITLE_FROM_IDEA
         ... )
         >>> print(f"Story state: {story.state}")
-        Story state: IDEA
+        Story state: PrismQ.T.Title.From.Idea
     """
     
+    idea_id: Optional[str] = None
     idea_json: Optional[str] = None
     title_id: Optional[int] = None
     script_id: Optional[int] = None
@@ -143,6 +183,7 @@ class Story(IModel[int]):
         """
         return {
             "id": self.id,
+            "idea_id": self.idea_id,
             "idea_json": self.idea_json,
             "title_id": self.title_id,
             "script_id": self.script_id,
@@ -157,7 +198,7 @@ class Story(IModel[int]):
         
         Args:
             data: Dictionary containing story field values.
-                Optional: id, idea_json, title_id, script_id, state,
+                Optional: id, idea_id, idea_json, title_id, script_id, state,
                           created_at, updated_at
         
         Returns:
@@ -173,6 +214,7 @@ class Story(IModel[int]):
         
         return cls(
             id=data.get("id"),
+            idea_id=data.get("idea_id"),
             idea_json=data.get("idea_json"),
             title_id=data.get("title_id"),
             script_id=data.get("script_id"),
@@ -192,6 +234,7 @@ class Story(IModel[int]):
         return """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idea_id TEXT NULL,
             idea_json TEXT NULL,
             title_id INTEGER NULL,
             script_id INTEGER NULL,
@@ -204,6 +247,7 @@ class Story(IModel[int]):
         
         -- Performance indexes for common query patterns
         CREATE INDEX IF NOT EXISTS idx_story_state ON Story(state);
+        CREATE INDEX IF NOT EXISTS idx_story_idea_id ON Story(idea_id);
         CREATE INDEX IF NOT EXISTS idx_story_title_id ON Story(title_id);
         CREATE INDEX IF NOT EXISTS idx_story_script_id ON Story(script_id);
         """
@@ -214,9 +258,9 @@ class Story(IModel[int]):
         """Check if this story has an idea set.
         
         Returns:
-            bool: True if idea_json is not None and not empty.
+            bool: True if idea_id is set or idea_json is not None and not empty.
         """
-        return bool(self.idea_json)
+        return bool(self.idea_id) or bool(self.idea_json)
     
     def has_title(self) -> bool:
         """Check if this story has a title generated.
@@ -274,4 +318,18 @@ class Story(IModel[int]):
         """
         self.title_id = title_id
         self.state = "TITLE"
+        self.updated_at = datetime.now()
+    
+    def transition_to(self, new_state: "StoryState") -> None:
+        """Transition to a new workflow state.
+        
+        Args:
+            new_state: The StoryState to transition to.
+            
+        Raises:
+            TypeError: If new_state is not a StoryState enum value.
+        """
+        if not isinstance(new_state, StoryState):
+            raise TypeError(f"new_state must be a StoryState enum value, got {type(new_state).__name__}")
+        self.state = new_state.value
         self.updated_at = datetime.now()

@@ -218,6 +218,80 @@ class TestStoryFromIdeaService:
         results = service.process_unreferenced_ideas()
         
         assert len(results) == 0
+    
+    def test_get_oldest_unreferenced_idea(self, service):
+        """Test get_oldest_unreferenced_idea returns the oldest idea."""
+        oldest = service.get_oldest_unreferenced_idea()
+        
+        # First idea inserted should be the oldest
+        assert oldest is not None
+        assert oldest.id == 1
+    
+    def test_get_oldest_unreferenced_idea_with_some_referenced(self, service, story_db):
+        """Test get_oldest_unreferenced_idea skips referenced ideas."""
+        # Create a story for the first idea (oldest)
+        repo = StoryRepository(story_db)
+        story = Story(idea_id="1", state=StoryState.CREATED)
+        repo.insert(story)
+        
+        oldest = service.get_oldest_unreferenced_idea()
+        
+        # Should return idea 2 (the next oldest unreferenced)
+        assert oldest is not None
+        assert oldest.id == 2
+    
+    def test_get_oldest_unreferenced_idea_none_available(self, service, story_db):
+        """Test get_oldest_unreferenced_idea returns None when all referenced."""
+        # Create stories for all ideas
+        repo = StoryRepository(story_db)
+        for idea_id in [1, 2, 3]:
+            story = Story(idea_id=str(idea_id), state=StoryState.CREATED)
+            repo.insert(story)
+        
+        oldest = service.get_oldest_unreferenced_idea()
+        
+        assert oldest is None
+    
+    def test_process_oldest_unreferenced_idea(self, service):
+        """Test process_oldest_unreferenced_idea creates stories for oldest idea."""
+        result = service.process_oldest_unreferenced_idea()
+        
+        assert result is not None
+        assert result.idea_id == 1  # Should be the first (oldest) idea
+        assert result.count == 10
+    
+    def test_process_oldest_unreferenced_idea_with_some_referenced(self, service, story_db):
+        """Test process_oldest_unreferenced_idea processes next oldest when some referenced."""
+        # Create a story for the first idea (oldest)
+        repo = StoryRepository(story_db)
+        story = Story(idea_id="1", state=StoryState.CREATED)
+        repo.insert(story)
+        
+        result = service.process_oldest_unreferenced_idea()
+        
+        assert result is not None
+        assert result.idea_id == 2  # Should be the second (next oldest) idea
+        assert result.count == 10
+    
+    def test_process_oldest_unreferenced_idea_none_available(self, service, story_db):
+        """Test process_oldest_unreferenced_idea returns None when all referenced."""
+        # Create stories for all ideas
+        repo = StoryRepository(story_db)
+        for idea_id in [1, 2, 3]:
+            story = Story(idea_id=str(idea_id), state=StoryState.CREATED)
+            repo.insert(story)
+        
+        result = service.process_oldest_unreferenced_idea()
+        
+        assert result is None
+    
+    def test_process_oldest_unreferenced_idea_stories_have_correct_state(self, service):
+        """Test that stories created by process_oldest_unreferenced_idea have correct state."""
+        result = service.process_oldest_unreferenced_idea()
+        
+        assert result is not None
+        for story in result.stories:
+            assert story.state == StoryState.TITLE_FROM_IDEA
 
 
 class TestConvenienceFunctions:
@@ -270,6 +344,16 @@ class TestConvenienceFunctions:
         unreferenced = get_unreferenced_ideas(story_db, idea_db)
         
         assert len(unreferenced) == 2
+    
+    def test_process_oldest_unreferenced_idea_function(self, story_db, idea_db):
+        """Test process_oldest_unreferenced_idea convenience function."""
+        from T.Story.From.Idea.src.story_from_idea_service import process_oldest_unreferenced_idea
+        
+        result = process_oldest_unreferenced_idea(story_db, idea_db)
+        
+        assert result is not None
+        assert result.idea_id == 1  # Should process the first (oldest) idea
+        assert result.count == 10
 
 
 class TestStoryCreationResult:

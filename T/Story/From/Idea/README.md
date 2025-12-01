@@ -7,7 +7,7 @@ Specializovaný modul pro tvorbu Story objektů z Idea objektů.
 Tento modul poskytuje funkcionalitu pro vytváření Story objektů z Idea objektů, které ještě nemají reference v Story tabulce.
 
 **Klíčové funkce:**
-1. Načte Idea objekty bez referencí ve Story tabulce
+1. Vybere nejstarší Idea objekt bez referencí ve Story tabulce
 2. Vytvoří 10x Story objektů s referencí na Idea (bez Titulku a Scriptu)
 3. Story objekty jsou vytvořeny ve stavu `PrismQ.T.Title.From.Idea`
 
@@ -23,10 +23,10 @@ PrismQ.T.Title.From.Idea (generuje Titulky pro Stories)
 
 ## Použití
 
-### Základní použití
+### Hlavní workflow (zpracování nejstarší neodkazované Idea)
 
 ```python
-from T.Story.From.Idea import StoryFromIdeaService
+from T.Story.From.Idea import StoryFromIdeaService, process_oldest_unreferenced_idea
 from T.Idea.Model.src.simple_idea_db import SimpleIdeaDatabase
 import sqlite3
 
@@ -40,7 +40,26 @@ idea_db.connect()
 # Vytvoření služby
 service = StoryFromIdeaService(story_conn, idea_db)
 
-# Získat neodkazované Ideas
+# Zpracovat nejstarší neodkazovanou Idea (hlavní workflow)
+result = service.process_oldest_unreferenced_idea()
+if result:
+    print(f"Vytvořeno {result.count} Stories pro Idea {result.idea_id}")
+else:
+    print("Žádná neodkazovaná Idea nenalezena")
+
+# Nebo použít pomocnou funkci
+result = process_oldest_unreferenced_idea(story_conn, idea_db)
+```
+
+### Další možnosti použití
+
+```python
+# Získat nejstarší neodkazovanou Idea
+oldest = service.get_oldest_unreferenced_idea()
+if oldest:
+    print(f"Nejstarší neodkazovaná Idea: {oldest.id}")
+
+# Získat všechny neodkazované Ideas (seřazené podle stáří)
 unreferenced = service.get_unreferenced_ideas()
 print(f"Nalezeno {len(unreferenced)} Ideas bez Stories")
 
@@ -48,7 +67,7 @@ print(f"Nalezeno {len(unreferenced)} Ideas bez Stories")
 results = service.process_unreferenced_ideas()
 print(f"Vytvořeno Stories pro {len(results)} Ideas")
 
-# Nebo vytvořit Stories pro konkrétní Idea
+# Vytvořit Stories pro konkrétní Idea
 result = service.create_stories_from_idea(idea_id=1)
 if result:
     print(f"Vytvořeno {result.count} Stories")
@@ -61,10 +80,14 @@ else:
 ```python
 from T.Story.From.Idea import (
     create_stories_from_idea,
-    get_unreferenced_ideas
+    get_unreferenced_ideas,
+    process_oldest_unreferenced_idea
 )
 
-# Získat neodkazované Ideas
+# Zpracovat nejstarší neodkazovanou Idea (hlavní workflow)
+result = process_oldest_unreferenced_idea(story_conn, idea_db)
+
+# Získat neodkazované Ideas (seřazené podle stáří)
 unreferenced = get_unreferenced_ideas(story_conn, idea_db)
 
 # Vytvořit Stories pro konkrétní Idea
@@ -78,9 +101,11 @@ result = create_stories_from_idea(story_conn, idea_db, idea_id=1)
 Hlavní služba pro vytváření Stories z Ideas.
 
 **Metody:**
-- `get_unreferenced_ideas()` - Získá všechny Ideas bez Story referencí
+- `get_oldest_unreferenced_idea()` - Získá nejstarší Idea bez Story referencí
+- `get_unreferenced_ideas()` - Získá všechny Ideas bez Story referencí (seřazené podle stáří)
 - `idea_has_stories(idea_id)` - Zkontroluje, zda Idea již má Stories
 - `create_stories_from_idea(idea_id, skip_if_exists=True)` - Vytvoří 10 Stories pro Idea
+- `process_oldest_unreferenced_idea()` - Zpracuje nejstarší neodkazovanou Idea (hlavní workflow)
 - `process_unreferenced_ideas()` - Zpracuje všechny neodkazované Ideas
 - `ensure_tables_exist()` - Zajistí existenci Story tabulky
 

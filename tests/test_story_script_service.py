@@ -68,6 +68,7 @@ def db_connection():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idea_id TEXT NULL,
             idea_json TEXT NULL,
             title_id INTEGER NULL,
             script_id INTEGER NULL,
