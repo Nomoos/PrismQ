@@ -47,6 +47,10 @@ import sqlite3
 from typing import List, Optional, Dict, Any
 
 
+# Sentinel value to indicate setting idea_id to NULL in update_story
+CLEAR_IDEA_ID = -1
+
+
 class StoryDatabase:
     """Database manager for Story model.
     
@@ -187,26 +191,29 @@ class StoryDatabase:
         
         cursor = self.conn.cursor()
         
-        if created_at and updated_at:
-            cursor.execute("""
-                INSERT INTO Story (idea_id, state, created_at, updated_at)
-                VALUES (?, ?, ?, ?)
-            """, (idea_id, state, created_at, updated_at))
-        elif created_at:
-            cursor.execute("""
-                INSERT INTO Story (idea_id, state, created_at, updated_at)
-                VALUES (?, ?, ?, ?)
-            """, (idea_id, state, created_at, created_at))
-        elif updated_at:
-            cursor.execute("""
-                INSERT INTO Story (idea_id, state, updated_at)
-                VALUES (?, ?, ?)
-            """, (idea_id, state, updated_at))
-        else:
-            cursor.execute("""
-                INSERT INTO Story (idea_id, state)
-                VALUES (?, ?)
-            """, (idea_id, state))
+        # Build column and value lists dynamically
+        columns = ["idea_id", "state"]
+        values = [idea_id, state]
+        
+        if created_at:
+            columns.append("created_at")
+            values.append(created_at)
+            # If created_at is set but updated_at is not, use created_at for both
+            if not updated_at:
+                columns.append("updated_at")
+                values.append(created_at)
+        
+        if updated_at:
+            columns.append("updated_at")
+            values.append(updated_at)
+        
+        placeholders = ", ".join(["?"] * len(values))
+        column_names = ", ".join(columns)
+        
+        cursor.execute(
+            f"INSERT INTO Story ({column_names}) VALUES ({placeholders})",
+            values
+        )
         
         story_id = cursor.lastrowid
         self.conn.commit()
@@ -355,7 +362,7 @@ class StoryDatabase:
         
         Args:
             story_id: ID of the story to update
-            idea_id: New idea_id (optional, use -1 to set to NULL)
+            idea_id: New idea_id (optional, use CLEAR_IDEA_ID to set to NULL)
             state: New state string (optional)
             update_timestamp: Whether to update updated_at (default: True)
             
@@ -375,7 +382,7 @@ class StoryDatabase:
         params = []
         
         if idea_id is not None:
-            if idea_id == -1:
+            if idea_id == CLEAR_IDEA_ID:
                 updates.append("idea_id = NULL")
             else:
                 updates.append("idea_id = ?")
@@ -499,6 +506,7 @@ def setup_story_database(db_path: str = "story.db") -> StoryDatabase:
 
 
 __all__ = [
+    "CLEAR_IDEA_ID",
     "StoryDatabase",
     "setup_story_database",
 ]

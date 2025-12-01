@@ -5,6 +5,7 @@ import os
 import tempfile
 import sqlite3
 from src import StoryDatabase, setup_story_database, IdeaDatabase
+from src.story import CLEAR_IDEA_ID
 
 
 class TestStoryDatabaseSetup:
@@ -436,12 +437,12 @@ class TestStoryDatabaseForeignKey:
         assert story["idea_id"] == idea_id2
     
     def test_update_story_idea_id_to_null(self):
-        """Test updating story's idea_id to NULL using -1."""
+        """Test updating story's idea_id to NULL using CLEAR_IDEA_ID."""
         idea_id = self.idea_db.insert_idea("Test idea")
         story_id = self.story_db.insert_story(idea_id=idea_id)
         
-        # Update to NULL by passing -1
-        success = self.story_db.update_story(story_id, idea_id=-1)
+        # Update to NULL by passing CLEAR_IDEA_ID
+        success = self.story_db.update_story(story_id, idea_id=CLEAR_IDEA_ID)
         
         assert success is True
         story = self.story_db.get_story(story_id)
