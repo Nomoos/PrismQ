@@ -22,6 +22,7 @@ from T.Script.From.Idea.Title.src.story_script_service import (
     ScriptGenerationResult,
     process_all_pending_stories
 )
+from T.State.constants.state_names import StateNames
 
 # Import Idea for test data
 import sys
@@ -541,10 +542,6 @@ class TestProcessAllPendingStories:
         assert summary['total_processed'] == 2
         assert summary['successful'] == 2
         assert summary['success_rate'] == 1.0
-
-
-# Import state names for new tests
-from T.State.constants.state_names import StateNames
 
 
 class TestStoryScriptServiceStateBased:
