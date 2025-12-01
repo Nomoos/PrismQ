@@ -303,6 +303,71 @@ class TestStoryRepository:
         
         count = story_repo.count_needing_script()
         assert count == 3
+    
+    def test_find_by_state_ordered_by_created(self, db_connection):
+        """Test finding stories by state ordered by creation date."""
+        import time
+        story_repo = StoryRepository(db_connection)
+        
+        # Create stories with different creation times
+        # Using different created_at values to ensure ordering
+        from datetime import datetime, timedelta
+        
+        base_time = datetime.now()
+        
+        # Create story 1 (oldest)
+        story1 = Story(
+            idea_json='{"title": "First"}',
+            state='PrismQ.T.Script.From.Idea.Title',
+            created_at=base_time - timedelta(hours=2)
+        )
+        story_repo.insert(story1)
+        
+        # Create story 2 (newest)
+        story2 = Story(
+            idea_json='{"title": "Second"}',
+            state='PrismQ.T.Script.From.Idea.Title',
+            created_at=base_time
+        )
+        story_repo.insert(story2)
+        
+        # Create story 3 (middle)
+        story3 = Story(
+            idea_json='{"title": "Third"}',
+            state='PrismQ.T.Script.From.Idea.Title',
+            created_at=base_time - timedelta(hours=1)
+        )
+        story_repo.insert(story3)
+        
+        # Create story with different state (should not be included)
+        story4 = Story(
+            idea_json='{"title": "Different State"}',
+            state='CREATED',
+            created_at=base_time - timedelta(hours=3)
+        )
+        story_repo.insert(story4)
+        
+        # Test ascending order (oldest first)
+        stories_asc = story_repo.find_by_state_ordered_by_created(
+            'PrismQ.T.Script.From.Idea.Title',
+            ascending=True
+        )
+        
+        assert len(stories_asc) == 3
+        assert stories_asc[0].id == story1.id  # Oldest
+        assert stories_asc[1].id == story3.id  # Middle
+        assert stories_asc[2].id == story2.id  # Newest
+        
+        # Test descending order (newest first)
+        stories_desc = story_repo.find_by_state_ordered_by_created(
+            'PrismQ.T.Script.From.Idea.Title',
+            ascending=False
+        )
+        
+        assert len(stories_desc) == 3
+        assert stories_desc[0].id == story2.id  # Newest
+        assert stories_desc[1].id == story3.id  # Middle
+        assert stories_desc[2].id == story1.id  # Oldest
 
 
 class TestStoryScriptService:

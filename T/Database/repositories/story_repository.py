@@ -199,6 +199,34 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
     
+    def find_by_state_ordered_by_created(self, state: str, ascending: bool = True) -> List[Story]:
+        """Find all stories in a specific state, ordered by creation date.
+        
+        This method is useful for processing stories in the order they were created,
+        particularly for workflow states like 'PrismQ.T.Script.From.Idea.Title'.
+        
+        Args:
+            state: The state to filter by (e.g., 'PrismQ.T.Script.From.Idea.Title').
+            ascending: If True, oldest first (ASC). If False, newest first (DESC).
+            
+        Returns:
+            List of Story entities in the specified state, ordered by created_at.
+            
+        Example:
+            >>> # Find stories ready for script generation, oldest first
+            >>> stories = repo.find_by_state_ordered_by_created(
+            ...     'PrismQ.T.Script.From.Idea.Title',
+            ...     ascending=True
+            ... )
+        """
+        order = "ASC" if ascending else "DESC"
+        cursor = self._conn.execute(
+            f"SELECT id, idea_json, title_id, script_id, state, created_at, updated_at "
+            f"FROM Story WHERE state = ? ORDER BY created_at {order}",
+            (state,)
+        )
+        return [self._row_to_model(row) for row in cursor.fetchall()]
+    
     def find_needing_script(self) -> List[Story]:
         """Find all stories that need script generation.
         
