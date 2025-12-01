@@ -32,8 +32,19 @@ from pathlib import Path
 import sys
 
 # Add parent directories to path for imports
-current_file = Path(__file__)
-t_module_dir = current_file.parent.parent.parent.parent.parent
+# This follows the established pattern in T/Title/From/Idea/src/story_title_service.py
+def _find_t_module_dir() -> Path:
+    """Find the T module directory by walking up from current file."""
+    current = Path(__file__).resolve()
+    while current.name != 'T' and current.parent != current:
+        current = current.parent
+    if current.name == 'T':
+        return current
+    # Fallback to counting parents (src -> Idea -> From -> Story -> T)
+    return Path(__file__).resolve().parent.parent.parent.parent.parent
+
+
+t_module_dir = _find_t_module_dir()
 idea_model_path = t_module_dir / 'Idea' / 'Model'
 database_path = t_module_dir / 'Database'
 

@@ -11,9 +11,20 @@ import os
 from pathlib import Path
 import sys
 
+
+def _find_t_module_dir() -> Path:
+    """Find the T module directory by walking up from current file."""
+    current = Path(__file__).resolve()
+    while current.name != 'T' and current.parent != current:
+        current = current.parent
+    if current.name == 'T':
+        return current
+    # Fallback to counting parents (tests -> _meta -> Idea -> From -> Story -> T)
+    return Path(__file__).resolve().parent.parent.parent.parent.parent.parent
+
+
 # Add paths for imports
-current_file = Path(__file__)
-t_module_dir = current_file.parent.parent.parent.parent.parent.parent
+t_module_dir = _find_t_module_dir()
 if str(t_module_dir) not in sys.path:
     sys.path.insert(0, str(t_module_dir))
 
