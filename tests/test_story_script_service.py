@@ -541,3 +541,257 @@ class TestProcessAllPendingStories:
         assert summary['total_processed'] == 2
         assert summary['successful'] == 2
         assert summary['success_rate'] == 1.0
+
+
+# Import state names for new tests
+from T.State.constants.state_names import StateNames
+
+
+class TestStoryScriptServiceStateBased:
+    """Tests for the state-based workflow (primary workflow).
+    
+    Tests the new methods:
+    - get_oldest_story_by_state()
+    - count_stories_by_state()
+    - process_oldest_story()
+    """
+    
+    def test_get_oldest_story_by_state_no_stories(self, db_connection):
+        """Test get_oldest_story_by_state when no stories exist."""
+        service = StoryScriptService(db_connection)
+        
+        result = service.get_oldest_story_by_state()
+        
+        assert result is None
+    
+    def test_get_oldest_story_by_state_returns_oldest(self, db_connection, sample_idea):
+        """Test that get_oldest_story_by_state returns the oldest story."""
+        from datetime import timedelta
+        
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        title_repo = TitleRepository(db_connection)
+        
+        base_time = datetime.now()
+        
+        # Create oldest story (2 hours ago)
+        story1 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            created_at=base_time - timedelta(hours=2)
+        )
+        story_repo.insert(story1)
+        title1 = title_repo.insert(Title(story_id=story1.id, version=0, text="Title 1"))
+        story1.title_id = title1.id
+        story_repo.update(story1)
+        
+        # Create newer story (1 hour ago)
+        story2 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            created_at=base_time - timedelta(hours=1)
+        )
+        story_repo.insert(story2)
+        title2 = title_repo.insert(Title(story_id=story2.id, version=0, text="Title 2"))
+        story2.title_id = title2.id
+        story_repo.update(story2)
+        
+        # Create newest story
+        story3 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            created_at=base_time
+        )
+        story_repo.insert(story3)
+        title3 = title_repo.insert(Title(story_id=story3.id, version=0, text="Title 3"))
+        story3.title_id = title3.id
+        story_repo.update(story3)
+        
+        # Should return the oldest
+        result = service.get_oldest_story_by_state()
+        
+        assert result is not None
+        assert result.id == story1.id
+    
+    def test_get_oldest_story_by_state_filters_by_state(self, db_connection, sample_idea):
+        """Test that get_oldest_story_by_state only returns stories with correct state."""
+        from datetime import timedelta
+        
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        
+        base_time = datetime.now()
+        
+        # Create story with wrong state (oldest)
+        story1 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state='CREATED',  # Wrong state
+            created_at=base_time - timedelta(hours=2)
+        )
+        story_repo.insert(story1)
+        
+        # Create story with correct state (newer)
+        story2 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            created_at=base_time - timedelta(hours=1)
+        )
+        story_repo.insert(story2)
+        
+        result = service.get_oldest_story_by_state()
+        
+        assert result is not None
+        assert result.id == story2.id
+        assert result.state == StateNames.SCRIPT_FROM_IDEA_TITLE
+    
+    def test_count_stories_by_state(self, db_connection, sample_idea):
+        """Test counting stories with the correct state."""
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        
+        # Initially should be 0
+        assert service.count_stories_by_state() == 0
+        
+        # Add stories with correct state
+        for i in range(3):
+            story = Story(
+                idea_json=json.dumps(sample_idea.to_dict()),
+                state=StateNames.SCRIPT_FROM_IDEA_TITLE
+            )
+            story_repo.insert(story)
+        
+        # Add story with different state
+        story_other = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state='CREATED'
+        )
+        story_repo.insert(story_other)
+        
+        assert service.count_stories_by_state() == 3
+    
+    def test_process_oldest_story_no_stories(self, db_connection):
+        """Test process_oldest_story returns None when no stories exist."""
+        service = StoryScriptService(db_connection)
+        
+        result = service.process_oldest_story()
+        
+        assert result is None
+    
+    def test_process_oldest_story_success(self, db_connection, sample_idea):
+        """Test successful processing of the oldest story."""
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        title_repo = TitleRepository(db_connection)
+        
+        # Create story with correct state
+        story = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE
+        )
+        story_repo.insert(story)
+        
+        title = title_repo.insert(Title(
+            story_id=story.id,
+            version=0,
+            text="The Mystery of the Abandoned House"
+        ))
+        story.title_id = title.id
+        story_repo.update(story)
+        
+        # Process
+        result = service.process_oldest_story()
+        
+        assert result is not None
+        assert result.success is True
+        assert result.script_id is not None
+        assert result.script_v1 is not None
+        assert result.error is None
+        
+        # Verify state changed
+        updated_story = story_repo.find_by_id(story.id)
+        assert updated_story.state == StateNames.REVIEW_TITLE_FROM_SCRIPT
+        assert updated_story.script_id == result.script_id
+    
+    def test_process_oldest_story_missing_idea(self, db_connection):
+        """Test process_oldest_story fails when story has no idea."""
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        
+        # Create story without idea_json
+        story = Story(
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE
+        )
+        story_repo.insert(story)
+        
+        result = service.process_oldest_story()
+        
+        assert result is not None
+        assert result.success is False
+        assert "idea_json" in result.error
+    
+    def test_process_oldest_story_missing_title(self, db_connection, sample_idea):
+        """Test process_oldest_story fails when story has no title."""
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        
+        # Create story without title_id
+        story = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE
+        )
+        story_repo.insert(story)
+        
+        result = service.process_oldest_story()
+        
+        assert result is not None
+        assert result.success is False
+        assert "title_id" in result.error
+    
+    def test_process_oldest_story_processes_in_order(self, db_connection, sample_idea):
+        """Test that process_oldest_story processes stories in creation order."""
+        from datetime import timedelta
+        
+        service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        title_repo = TitleRepository(db_connection)
+        
+        base_time = datetime.now()
+        
+        # Create multiple stories in different orders
+        stories = []
+        for i, offset in enumerate([2, 1, 3]):  # Creating out of order
+            story = Story(
+                idea_json=json.dumps(sample_idea.to_dict()),
+                state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+                created_at=base_time - timedelta(hours=offset)
+            )
+            story_repo.insert(story)
+            title = title_repo.insert(Title(
+                story_id=story.id,
+                version=0,
+                text=f"Title {i}"
+            ))
+            story.title_id = title.id
+            story_repo.update(story)
+            stories.append(story)
+        
+        # Process first - should be the oldest (3 hours ago)
+        result1 = service.process_oldest_story()
+        assert result1.success is True
+        
+        # Process second - should be 2 hours ago
+        result2 = service.process_oldest_story()
+        assert result2.success is True
+        
+        # Process third - should be 1 hour ago
+        result3 = service.process_oldest_story()
+        assert result3.success is True
+        
+        # No more stories to process
+        result4 = service.process_oldest_story()
+        assert result4 is None
+        
+        # Verify all states changed
+        for story in stories:
+            updated = story_repo.find_by_id(story.id)
+            assert updated.state == StateNames.REVIEW_TITLE_FROM_SCRIPT
