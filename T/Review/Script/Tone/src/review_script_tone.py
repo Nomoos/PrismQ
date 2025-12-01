@@ -163,24 +163,18 @@ def evaluate_tone(
     # Check for tone-related keywords (emotional intensity)
     positive_tone_words = {"happy", "joy", "excited", "wonderful", "amazing", "great", "love", "beautiful"}
     negative_tone_words = {"sad", "dark", "fear", "horror", "terrible", "awful", "hate", "ugly", "scary"}
-    neutral_tone_words = {"said", "told", "explained", "described", "showed", "revealed"}
     
     positive_count = sum(1 for word in positive_tone_words if word in script_lower)
     negative_count = sum(1 for word in negative_tone_words if word in script_lower)
-    neutral_count = sum(1 for word in neutral_tone_words if word in script_lower)
     
     # Check for tone consistency
-    has_consistent_tone = False
     if positive_count > 2 and negative_count < 2:
-        has_consistent_tone = True
         review_points.append("Script maintains consistent positive tone.")
         score += 10
     elif negative_count > 2 and positive_count < 2:
-        has_consistent_tone = True
         review_points.append("Script maintains consistent dark/dramatic tone.")
         score += 10
     elif positive_count <= 2 and negative_count <= 2:
-        has_consistent_tone = True
         review_points.append("Script maintains neutral/informative tone.")
         score += 5
     else:
@@ -205,10 +199,12 @@ def evaluate_tone(
                 score -= 10
                 review_points.append(f"Tone doesn't align well with target tone '{target_tone}'.")
     
-    # Check for voice consistency (POV indicators)
-    first_person = script_lower.count(" i ") + script_lower.count("i'm") + script_lower.count("my ")
-    second_person = script_lower.count(" you ") + script_lower.count("your ")
-    third_person = script_lower.count(" he ") + script_lower.count(" she ") + script_lower.count(" they ")
+    # Check for voice consistency (POV indicators) - use word boundaries for better matching
+    # Pad with spaces for boundary detection
+    padded_text = f" {script_lower} "
+    first_person = padded_text.count(" i ") + padded_text.count(" i'm ") + padded_text.count(" my ") + padded_text.count(" me ")
+    second_person = padded_text.count(" you ") + padded_text.count(" your ") + padded_text.count(" yours ")
+    third_person = padded_text.count(" he ") + padded_text.count(" she ") + padded_text.count(" they ") + padded_text.count(" his ") + padded_text.count(" her ") + padded_text.count(" their ")
     
     pov_counts = [first_person, second_person, third_person]
     dominant_pov = max(pov_counts)
