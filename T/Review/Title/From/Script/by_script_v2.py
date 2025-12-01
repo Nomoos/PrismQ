@@ -23,13 +23,13 @@ import os
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..')))
 
-from T.Review.Title.ByScriptAndIdea.title_review import (
+from T.Review.Title.From.Script.Idea.title_review import (
     TitleReview,
     TitleReviewCategory,
     TitleImprovementPoint,
     TitleCategoryScore
 )
-from T.Review.Title.ByScriptAndIdea.by_script_and_idea import (
+from T.Review.Title.From.Script.Idea.by_script_and_idea import (
     extract_keywords,
     analyze_title_script_alignment,
     analyze_engagement,
