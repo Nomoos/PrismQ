@@ -9,7 +9,7 @@ This is the main entry point for automated script generation in the workflow.
 
 Usage:
     >>> import sqlite3
-    >>> from T.Script.FromIdeaAndTitle.src.story_script_service import StoryScriptService
+    >>> from T.Script.From.Idea.Title.src.story_script_service import StoryScriptService
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -46,7 +46,10 @@ from .script_generator import (
 import sys
 from pathlib import Path
 _current_file = Path(__file__)
-_t_module_dir = _current_file.parent.parent.parent.parent
+# Navigate: src -> Title -> Idea -> From -> Script -> T
+# Path: T/Script/From/Idea/Title/src/story_script_service.py
+# Up 6 levels to T/, then into Idea/Model/src
+_t_module_dir = _current_file.parent.parent.parent.parent.parent.parent
 _idea_model_path = _t_module_dir / 'Idea' / 'Model' / 'src'
 sys.path.insert(0, str(_idea_model_path))
 

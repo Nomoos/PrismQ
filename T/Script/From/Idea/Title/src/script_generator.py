@@ -16,7 +16,9 @@ import sys
 import os
 
 # Add parent directories to path for imports
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+# Path: T/Script/From/Idea/Title/src/script_generator.py
+# Up 6 levels to T/, then into Idea/Model/src
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
 idea_model_path = os.path.join(parent_dir, 'Idea', 'Model', 'src')
 sys.path.insert(0, idea_model_path)
 

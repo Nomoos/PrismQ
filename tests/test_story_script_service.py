@@ -17,7 +17,7 @@ from T.Database.models.title import Title
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.title_repository import TitleRepository
-from T.Script.FromIdeaAndTitle.src.story_script_service import (
+from T.Script.From.Idea.Title.src.story_script_service import (
     StoryScriptService,
     ScriptGenerationResult,
     process_all_pending_stories
