@@ -164,7 +164,7 @@ class TestValidTransitions:
         """Test transition from title to script generation."""
         result = validator.validate(
             StateNames.TITLE_FROM_IDEA,
-            StateNames.SCRIPT_FROM_TITLE_IDEA
+            StateNames.SCRIPT_FROM_IDEA_TITLE
         )
         
         assert result.is_valid is True
@@ -172,8 +172,8 @@ class TestValidTransitions:
     def test_script_to_review(self, validator):
         """Test transition from script to review."""
         result = validator.validate(
-            StateNames.SCRIPT_FROM_TITLE_IDEA,
-            StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA
+            StateNames.SCRIPT_FROM_IDEA_TITLE,
+            StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA
         )
         
         assert result.is_valid is True
@@ -266,13 +266,13 @@ class TestValidTransitions:
         # Grammar failure can go to script refinement
         assert validator.is_valid_transition(
             StateNames.REVIEW_SCRIPT_GRAMMAR,
-            StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
+            StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE
         )
         
         # Title readability failure can go to title refinement
         assert validator.is_valid_transition(
             StateNames.REVIEW_TITLE_READABILITY,
-            StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
+            StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT
         )
 
 
@@ -386,8 +386,8 @@ class TestPathValidation:
         ideal_path = [
             StateNames.IDEA_CREATION,
             StateNames.TITLE_FROM_IDEA,
-            StateNames.SCRIPT_FROM_TITLE_IDEA,
-            StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA,
+            StateNames.SCRIPT_FROM_IDEA_TITLE,
+            StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
             StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA,
             StateNames.REVIEW_TITLE_BY_SCRIPT,
             StateNames.REVIEW_SCRIPT_BY_TITLE,

@@ -121,32 +121,78 @@ class WorkflowStageValidator:
     
     Validates that content moves through the correct stages of the workflow
     and that version increments happen at appropriate points.
+    
+    Note: This validator uses module-based state names following the convention:
+        PrismQ.T.<Output>.From.<Input> - for generation states
+        PrismQ.T.<Action>.<Target> - for other states
     """
     
-    # Define valid stage transitions for the workflow
+    # Define valid stage transitions for the workflow using module-based state names
     VALID_TRANSITIONS = {
-        'idea_creation': ['title_v1'],
-        'title_v1': ['script_v1', 'title_v2'],
-        'script_v1': ['title_review', 'script_v2', 'script_review'],
-        'title_review': ['title_v2', 'title_v3'],
-        'script_review': ['script_v2', 'script_v3'],
-        'title_v2': ['script_v2', 'script_review', 'title_v3'],
-        'script_v2': ['title_v2', 'title_review', 'script_v3', 'title_v3'],
-        'title_v3': ['script_v3', 'script_review', 'refinement', 'review_script_grammar'],
-        'script_v3': ['title_v3', 'title_review', 'refinement', 'review_script_grammar'],
-        # Quality review stages (after v3)
-        'review_script_grammar': ['review_script_tone'],
-        'review_script_tone': ['review_script_content'],
-        'review_script_content': ['review_script_consistency'],
-        'review_script_consistency': ['review_script_editing'],
-        'review_script_editing': ['review_title_readability'],
-        'review_title_readability': ['review_script_readability'],
-        'review_script_readability': ['story_expert_review'],
+        'PrismQ.T.Idea.Creation': ['PrismQ.T.Title.From.Idea'],
+        'PrismQ.T.Title.From.Idea': ['PrismQ.T.Script.From.Idea.Title'],
+        'PrismQ.T.Script.From.Idea.Title': ['PrismQ.T.Review.Title.ByScriptAndIdea'],
+        'PrismQ.T.Review.Title.ByScriptAndIdea': [
+            'PrismQ.T.Review.Script.By.Title.Idea',
+            'PrismQ.T.Title.From.Title.Review.Script'
+        ],
+        'PrismQ.T.Review.Script.By.Title.Idea': [
+            'PrismQ.T.Review.Title.ByScript',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Title.ByScript': [
+            'PrismQ.T.Review.Script.ByTitle',
+            'PrismQ.T.Title.From.Title.Review.Script'
+        ],
+        'PrismQ.T.Title.From.Title.Review.Script': [
+            'PrismQ.T.Script.From.Script.Review.Title',
+            'PrismQ.T.Review.Script.By.Title.Idea',
+            'PrismQ.T.Review.Title.ByScript'
+        ],
+        'PrismQ.T.Script.From.Script.Review.Title': [
+            'PrismQ.T.Review.Title.ByScript',
+            'PrismQ.T.Review.Script.ByTitle'
+        ],
+        'PrismQ.T.Review.Script.ByTitle': [
+            'PrismQ.T.Review.Script.Grammar',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        # Quality review stages
+        'PrismQ.T.Review.Script.Grammar': [
+            'PrismQ.T.Review.Script.Tone',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Script.Tone': [
+            'PrismQ.T.Review.Script.Content',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Script.Content': [
+            'PrismQ.T.Review.Script.Consistency',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Script.Consistency': [
+            'PrismQ.T.Review.Script.Editing',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Script.Editing': [
+            'PrismQ.T.Review.Title.Readability',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
+        'PrismQ.T.Review.Title.Readability': [
+            'PrismQ.T.Review.Script.Readability',
+            'PrismQ.T.Title.From.Title.Review.Script'
+        ],
+        'PrismQ.T.Review.Script.Readability': [
+            'PrismQ.T.Story.Review',
+            'PrismQ.T.Script.From.Script.Review.Title'
+        ],
         # Story stages
-        'story_expert_review': ['story_polish'],
-        'story_polish': ['refinement', 'publishing'],
-        'refinement': ['publishing'],
-        'publishing': [],
+        'PrismQ.T.Story.Review': [
+            'PrismQ.T.Publishing',
+            'PrismQ.T.Story.Polish'
+        ],
+        'PrismQ.T.Story.Polish': ['PrismQ.T.Story.Review'],
+        'PrismQ.T.Publishing': [],
     }
     
     def __init__(self):
@@ -158,14 +204,14 @@ class WorkflowStageValidator:
         """Attempt to transition to a new stage.
         
         Args:
-            stage: Target stage to transition to
+            stage: Target stage to transition to (module-based state name)
             
         Returns:
             True if transition is valid, False otherwise
         """
         if self.current_stage is None:
-            # First stage must be idea_creation
-            if stage == 'idea_creation':
+            # First stage must be PrismQ.T.Idea.Creation
+            if stage == 'PrismQ.T.Idea.Creation':
                 self.current_stage = stage
                 self.stage_history.append(stage)
                 return True

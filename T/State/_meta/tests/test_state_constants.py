@@ -39,13 +39,13 @@ class TestStateNamesConstants:
         """Test Title From Idea state constant."""
         assert StateNames.TITLE_FROM_IDEA == "PrismQ.T.Title.From.Idea"
     
-    def test_script_from_title_idea_state(self):
-        """Test Script From Title Idea state constant."""
-        assert StateNames.SCRIPT_FROM_TITLE_IDEA == "PrismQ.T.Script.From.Title.Idea"
+    def test_script_from_idea_title_state(self):
+        """Test Script From Idea Title state constant."""
+        assert StateNames.SCRIPT_FROM_IDEA_TITLE == "PrismQ.T.Script.From.Idea.Title"
     
-    def test_review_title_by_script_idea_state(self):
-        """Test Review Title By Script Idea state constant."""
-        assert StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA == "PrismQ.T.Review.Title.By.Script.Idea"
+    def test_review_title_by_script_and_idea_state(self):
+        """Test Review Title By Script And Idea state constant."""
+        assert StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA == "PrismQ.T.Review.Title.ByScriptAndIdea"
     
     def test_review_script_by_title_idea_state(self):
         """Test Review Script By Title Idea state constant."""
@@ -53,19 +53,19 @@ class TestStateNamesConstants:
     
     def test_review_title_by_script_state(self):
         """Test Review Title By Script state constant."""
-        assert StateNames.REVIEW_TITLE_BY_SCRIPT == "PrismQ.T.Review.Title.By.Script"
+        assert StateNames.REVIEW_TITLE_BY_SCRIPT == "PrismQ.T.Review.Title.ByScript"
     
-    def test_title_from_script_review_title_state(self):
-        """Test Title From Script Review Title state constant."""
-        assert StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE == "PrismQ.T.Title.From.Script.Review.Title"
+    def test_title_from_title_review_script_state(self):
+        """Test Title From Title Review Script state constant."""
+        assert StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT == "PrismQ.T.Title.From.Title.Review.Script"
     
-    def test_script_from_title_review_script_state(self):
-        """Test Script From Title Review Script state constant."""
-        assert StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT == "PrismQ.T.Script.From.Title.Review.Script"
+    def test_script_from_script_review_title_state(self):
+        """Test Script From Script Review Title state constant."""
+        assert StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE == "PrismQ.T.Script.From.Script.Review.Title"
     
     def test_review_script_by_title_state(self):
         """Test Review Script By Title state constant."""
-        assert StateNames.REVIEW_SCRIPT_BY_TITLE == "PrismQ.T.Review.Script.By.Title"
+        assert StateNames.REVIEW_SCRIPT_BY_TITLE == "PrismQ.T.Review.Script.ByTitle"
     
     def test_quality_review_states(self):
         """Test quality review state constants (stages 10-16)."""
@@ -167,7 +167,7 @@ class TestGetAllStates:
         expected_states = [
             StateNames.IDEA_CREATION,
             StateNames.TITLE_FROM_IDEA,
-            StateNames.SCRIPT_FROM_TITLE_IDEA,
+            StateNames.SCRIPT_FROM_IDEA_TITLE,
             StateNames.PUBLISHING,
         ]
         for expected in expected_states:
@@ -186,7 +186,7 @@ class TestGetStatesByCategory:
         """Test getting states by GENERATION category."""
         states = StateNames.get_states_by_category(StateCategory.GENERATION)
         assert StateNames.TITLE_FROM_IDEA in states
-        assert StateNames.SCRIPT_FROM_TITLE_IDEA in states
+        assert StateNames.SCRIPT_FROM_IDEA_TITLE in states
     
     def test_review_category(self):
         """Test getting states by REVIEW category."""
@@ -268,7 +268,7 @@ class TestConvenienceMethods:
         """Test get_generation_states convenience method."""
         states = StateNames.get_generation_states()
         assert StateNames.TITLE_FROM_IDEA in states
-        assert StateNames.SCRIPT_FROM_TITLE_IDEA in states
+        assert StateNames.SCRIPT_FROM_IDEA_TITLE in states
     
     def test_get_quality_review_states(self):
         """Test get_quality_review_states method."""
@@ -307,11 +307,11 @@ class TestParseStateName:
     
     def test_parse_complex_state(self):
         """Test parsing a complex state name."""
-        result = StateNames.parse_state_name(StateNames.SCRIPT_FROM_TITLE_IDEA)
+        result = StateNames.parse_state_name(StateNames.SCRIPT_FROM_IDEA_TITLE)
         assert result['prefix'] == 'PrismQ.T'
         assert result['output'] == 'Script'
         assert result['action'] == 'From'
-        assert 'Title.Idea' in result['input']
+        assert 'Idea.Title' in result['input']
     
     def test_parse_invalid_state_raises_error(self):
         """Test that parsing invalid state raises ValueError."""
@@ -387,19 +387,19 @@ class TestStateMachineAlignment:
         assert StateNames.TITLE_FROM_IDEA == "PrismQ.T.Title.From.Idea"
     
     def test_stage_3_exists(self):
-        """Test Stage 3: ScriptFromTitleIdea exists."""
-        assert StateNames.SCRIPT_FROM_TITLE_IDEA == "PrismQ.T.Script.From.Title.Idea"
+        """Test Stage 3: ScriptFromIdeaTitle exists."""
+        assert StateNames.SCRIPT_FROM_IDEA_TITLE == "PrismQ.T.Script.From.Idea.Title"
     
     def test_stages_4_6_review_cycle(self):
         """Test Stages 4-6: Initial review cycle states exist."""
-        assert StateNames.is_valid_state(StateNames.REVIEW_TITLE_BY_SCRIPT_IDEA)
+        assert StateNames.is_valid_state(StateNames.REVIEW_TITLE_BY_SCRIPT_AND_IDEA)
         assert StateNames.is_valid_state(StateNames.REVIEW_SCRIPT_BY_TITLE_IDEA)
         assert StateNames.is_valid_state(StateNames.REVIEW_TITLE_BY_SCRIPT)
     
     def test_stages_7_9_refinement(self):
         """Test Stages 7-9: Refinement states exist."""
-        assert StateNames.is_valid_state(StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE)
-        assert StateNames.is_valid_state(StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT)
+        assert StateNames.is_valid_state(StateNames.TITLE_FROM_TITLE_REVIEW_SCRIPT)
+        assert StateNames.is_valid_state(StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE)
         assert StateNames.is_valid_state(StateNames.REVIEW_SCRIPT_BY_TITLE)
     
     def test_stages_10_16_quality_reviews(self):

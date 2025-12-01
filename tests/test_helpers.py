@@ -117,53 +117,58 @@ class TestWorkflowStageValidator:
         assert validator.stage_history == []
     
     def test_first_stage_must_be_idea_creation(self):
-        """Test that first stage must be idea_creation."""
+        """Test that first stage must be PrismQ.T.Idea.Creation."""
         validator = WorkflowStageValidator()
         
-        assert validator.transition_to('idea_creation') is True
-        assert validator.current_stage == 'idea_creation'
+        assert validator.transition_to('PrismQ.T.Idea.Creation') is True
+        assert validator.current_stage == 'PrismQ.T.Idea.Creation'
     
     def test_cannot_start_with_invalid_stage(self):
         """Test that workflow cannot start with arbitrary stage."""
         validator = WorkflowStageValidator()
         
-        assert validator.transition_to('title_v1') is False
+        assert validator.transition_to('PrismQ.T.Title.From.Idea') is False
         assert validator.current_stage is None
     
     def test_valid_transition(self):
         """Test valid stage transition."""
         validator = WorkflowStageValidator()
         
-        validator.transition_to('idea_creation')
-        assert validator.transition_to('title_v1') is True
-        assert validator.current_stage == 'title_v1'
+        validator.transition_to('PrismQ.T.Idea.Creation')
+        assert validator.transition_to('PrismQ.T.Title.From.Idea') is True
+        assert validator.current_stage == 'PrismQ.T.Title.From.Idea'
     
     def test_invalid_transition(self):
         """Test invalid stage transition."""
         validator = WorkflowStageValidator()
         
-        validator.transition_to('idea_creation')
-        assert validator.transition_to('script_v2') is False  # Can't skip to v2
-        assert validator.current_stage == 'idea_creation'  # Should stay in current stage
+        validator.transition_to('PrismQ.T.Idea.Creation')
+        # Can't skip to script generation directly without title
+        assert validator.transition_to('PrismQ.T.Script.From.Idea.Title') is False
+        assert validator.current_stage == 'PrismQ.T.Idea.Creation'  # Should stay in current stage
     
     def test_stage_history_tracking(self):
         """Test that stage history is tracked correctly."""
         validator = WorkflowStageValidator()
         
-        validator.transition_to('idea_creation')
-        validator.transition_to('title_v1')
-        validator.transition_to('script_v1')
+        validator.transition_to('PrismQ.T.Idea.Creation')
+        validator.transition_to('PrismQ.T.Title.From.Idea')
+        validator.transition_to('PrismQ.T.Script.From.Idea.Title')
         
         history = validator.get_stage_history()
-        assert history == ['idea_creation', 'title_v1', 'script_v1']
+        assert history == [
+            'PrismQ.T.Idea.Creation',
+            'PrismQ.T.Title.From.Idea',
+            'PrismQ.T.Script.From.Idea.Title'
+        ]
     
     def test_is_valid_path_true(self):
         """Test that valid path is recognized."""
         validator = WorkflowStageValidator()
         
-        validator.transition_to('idea_creation')
-        validator.transition_to('title_v1')
-        validator.transition_to('script_v1')
+        validator.transition_to('PrismQ.T.Idea.Creation')
+        validator.transition_to('PrismQ.T.Title.From.Idea')
+        validator.transition_to('PrismQ.T.Script.From.Idea.Title')
         
         assert validator.is_valid_path() is True
     
@@ -174,16 +179,16 @@ class TestWorkflowStageValidator:
         assert validator.is_valid_path() is True
     
     def test_iteration_path(self):
-        """Test iteration back to earlier versions."""
+        """Test iteration back for refinement."""
         validator = WorkflowStageValidator()
         
-        validator.transition_to('idea_creation')
-        validator.transition_to('title_v1')
-        validator.transition_to('script_v1')
-        validator.transition_to('title_review')
-        validator.transition_to('title_v2')
+        validator.transition_to('PrismQ.T.Idea.Creation')
+        validator.transition_to('PrismQ.T.Title.From.Idea')
+        validator.transition_to('PrismQ.T.Script.From.Idea.Title')
+        validator.transition_to('PrismQ.T.Review.Title.ByScriptAndIdea')
+        validator.transition_to('PrismQ.T.Title.From.Title.Review.Script')
         
-        assert validator.current_stage == 'title_v2'
+        assert validator.current_stage == 'PrismQ.T.Title.From.Title.Review.Script'
         assert validator.is_valid_path() is True
 
 

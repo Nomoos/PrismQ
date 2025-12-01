@@ -66,21 +66,21 @@ class StateNames:
     # Stage 2-3: Initial Content Generation
     # =========================================================================
     TITLE_FROM_IDEA = f"{STATE_PREFIX}.Title.From.Idea"
-    SCRIPT_FROM_TITLE_IDEA = f"{STATE_PREFIX}.Script.From.Title.Idea"
+    SCRIPT_FROM_IDEA_TITLE = f"{STATE_PREFIX}.Script.From.Idea.Title"
     
     # =========================================================================
     # Stages 4-6: Initial Review Cycle
     # =========================================================================
-    REVIEW_TITLE_BY_SCRIPT_IDEA = f"{STATE_PREFIX}.Review.Title.By.Script.Idea"
+    REVIEW_TITLE_BY_SCRIPT_AND_IDEA = f"{STATE_PREFIX}.Review.Title.ByScriptAndIdea"
     REVIEW_SCRIPT_BY_TITLE_IDEA = f"{STATE_PREFIX}.Review.Script.By.Title.Idea"
-    REVIEW_TITLE_BY_SCRIPT = f"{STATE_PREFIX}.Review.Title.By.Script"
+    REVIEW_TITLE_BY_SCRIPT = f"{STATE_PREFIX}.Review.Title.ByScript"
     
     # =========================================================================
     # Stages 7-9: Refinement and Re-review
     # =========================================================================
-    TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Title.From.Script.Review.Title"
-    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
-    REVIEW_SCRIPT_BY_TITLE = f"{STATE_PREFIX}.Review.Script.By.Title"
+    TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Title.From.Title.Review.Script"
+    SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Script.From.Script.Review.Title"
+    REVIEW_SCRIPT_BY_TITLE = f"{STATE_PREFIX}.Review.Script.ByTitle"
     
     # =========================================================================
     # Stages 10-16: Quality Review States
@@ -113,12 +113,12 @@ class StateNames:
         ],
         StateCategory.GENERATION: [
             TITLE_FROM_IDEA,
-            SCRIPT_FROM_TITLE_IDEA,
-            TITLE_FROM_SCRIPT_REVIEW_TITLE,
-            SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
+            SCRIPT_FROM_IDEA_TITLE,
+            TITLE_FROM_TITLE_REVIEW_SCRIPT,
+            SCRIPT_FROM_SCRIPT_REVIEW_TITLE,
         ],
         StateCategory.REVIEW: [
-            REVIEW_TITLE_BY_SCRIPT_IDEA,
+            REVIEW_TITLE_BY_SCRIPT_AND_IDEA,
             REVIEW_SCRIPT_BY_TITLE_IDEA,
             REVIEW_TITLE_BY_SCRIPT,
             REVIEW_SCRIPT_BY_TITLE,

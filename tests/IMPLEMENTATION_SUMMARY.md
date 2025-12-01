@@ -141,7 +141,7 @@ idea_tracker = helper.start_workflow("Idea")
 idea_tracker.add_version(1)
 
 # Create Title v1 → v2
-helper.stage_validator.transition_to('title_v1')
+helper.stage_validator.transition_to('PrismQ.T.Title.From.Idea')
 title_tracker = helper.start_workflow("Title")
 title_tracker.add_version(1)
 title_tracker.add_version(2)

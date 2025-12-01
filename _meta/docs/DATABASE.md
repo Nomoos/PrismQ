@@ -32,25 +32,44 @@ The central entity in PrismQ that ties together Ideas, Titles, Scripts, and Revi
 ```sql
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_id TEXT NOT NULL,
-    state TEXT NOT NULL CHECK (state IN ('created', 'title_v0', 'script_v0', ...)),
+    idea_json TEXT NULL,
+    title_id INTEGER NULL,
+    script_id INTEGER NULL,
+    state TEXT NOT NULL DEFAULT 'CREATED',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (title_id) REFERENCES Title(id),
+    FOREIGN KEY (script_id) REFERENCES Script(id)
 )
 
 -- Performance indexes
-CREATE INDEX idx_story_idea_id ON Story(idea_id);
 CREATE INDEX idx_story_state ON Story(state);
+CREATE INDEX idx_story_title_id ON Story(title_id);
+CREATE INDEX idx_story_script_id ON Story(script_id);
 ```
 
 **Fields:**
 - `id`: Primary key (auto-generated)
-- `idea_id`: Reference to source Idea
-- `state`: Current workflow state (see StoryState enum)
+- `idea_json`: Serialized Idea data (JSON string)
+- `title_id`: FK to latest Title version (optional)
+- `script_id`: FK to latest Script version (optional)
+- `state`: Current workflow state (module-based state name)
 - `created_at`: Creation timestamp
 - `updated_at`: Last state change timestamp
 
-**States:** `created`, `title_v0`, `script_v0`, `review_title`, `title_v1`, `review_script`, `script_v1`, `title_v2`, `script_v2`, `title_v3`, `script_v3`, `quality_review`, `expert_review`, `polish`, `ready`, `published`, `archived`
+**States:** States represent the processing module and follow the pattern `PrismQ.T.<Module>.From.<Input>` or `PrismQ.T.<Action>.<Target>`. Valid states include:
+- `PrismQ.T.Idea.Creation` - Initial idea creation
+- `PrismQ.T.Title.From.Idea` - Title generation from idea
+- `PrismQ.T.Script.From.Idea.Title` - Script generation from idea and title
+- `PrismQ.T.Review.Title.ByScriptAndIdea` - Title review using script and idea
+- `PrismQ.T.Title.From.Title.Review.Script` - Title refinement from review
+- `PrismQ.T.Script.From.Script.Review.Title` - Script refinement from review
+- `PrismQ.T.Review.Script.Grammar` - Grammar review
+- `PrismQ.T.Story.Review` - Expert story review
+- `PrismQ.T.Story.Polish` - Story polishing
+- `PrismQ.T.Publishing` - Publishing (terminal state)
+
+See `T/State/constants/state_names.py` for the complete list of states.
 
 ---
 
