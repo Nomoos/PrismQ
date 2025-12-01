@@ -1,33 +1,53 @@
-"""Database support for SimpleIdea model.
+"""Idea model and database support for PrismQ.
 
-This module provides SQLite database utilities for storing SimpleIdea
-instances with the simplified schema:
+This module provides the shared Idea model for storing prompt-based idea data
+that can be created by PrismQ.T.Idea.Creation or PrismQ.Idea.Fusion.
 
+The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
+
+Schema:
+    -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
+    -- Text field contains prompt-like content for content generation
+    -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT,
-        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
+        text TEXT,                                      -- Prompt-like text describing the idea
+        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
-Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
-The SimpleIdea table is designed to be referenced by Story via foreign key.
+Usage:
+    from src import IdeaDatabase, setup_idea_database
+    
+    # Setup database
+    db = setup_idea_database("ideas.db")
+    
+    # Insert an idea
+    idea_id = db.insert_idea("Write a horror story about...")
+    
+    # Retrieve it
+    idea = db.get_idea(idea_id)
+    print(idea["text"])
+    
+    db.close()
 """
 
 import sqlite3
-from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 
-class SimpleIdeaDatabase:
-    """Database manager for SimpleIdea model.
+class IdeaDatabase:
+    """Database manager for Idea model.
     
-    Provides CRUD operations for the simplified Idea table that stores
+    Provides CRUD operations for the Idea table that stores
     prompt-like text content with versioning support.
     
+    The Idea table is designed to be referenced by Story via foreign key.
+    This is shared database logic used across all PrismQ modules.
+    
     Example:
-        >>> db = SimpleIdeaDatabase("ideas.db")
+        >>> db = IdeaDatabase("ideas.db")
         >>> db.connect()
         >>> db.create_tables()
         >>> 
@@ -41,7 +61,7 @@ class SimpleIdeaDatabase:
         >>> db.close()
     """
     
-    def __init__(self, db_path: str = "simple_idea.db"):
+    def __init__(self, db_path: str = "idea.db"):
         """Initialize database connection.
         
         Args:
@@ -64,11 +84,11 @@ class SimpleIdeaDatabase:
             self.conn = None
     
     def create_tables(self) -> None:
-        """Create database schema for SimpleIdea.
+        """Create database schema for Idea.
         
-        Creates the Idea table with the simplified schema:
+        Creates the Idea table with the schema:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
-            - text: TEXT (prompt-like content)
+            - text: TEXT (prompt-like content for content generation)
             - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
         
@@ -79,7 +99,7 @@ class SimpleIdeaDatabase:
         
         cursor = self.conn.cursor()
         
-        # Create simple Idea table
+        # Create Idea table
         # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS Idea (
@@ -113,12 +133,15 @@ class SimpleIdeaDatabase:
         """Insert a new Idea into the database.
         
         Args:
-            text: Prompt-like text content
-            version: Version number (default: 1)
+            text: Prompt-like text content for content generation
+            version: Version number (default: 1, must be >= 0)
             created_at: Optional timestamp (auto-generated if not provided)
             
         Returns:
             ID of inserted idea
+            
+        Raises:
+            sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
         """
         if not self.conn:
             self.connect()
@@ -181,7 +204,7 @@ class SimpleIdeaDatabase:
         """Retrieve all Ideas.
         
         Returns:
-            List of Idea dictionaries
+            List of Idea dictionaries ordered by created_at descending
         """
         if not self.conn:
             self.connect()
@@ -242,30 +265,30 @@ class SimpleIdeaDatabase:
         Args:
             idea_id: ID of the idea to update
             text: New text content (optional)
-            version: New version number (optional)
+            version: New version number (optional, must be >= 0)
             
         Returns:
             True if successful, False otherwise
+            
+        Raises:
+            sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
         """
         if not self.conn:
             self.connect()
         
-        # Determine which fields to update - only text and version are allowed
-        # This is safe because we explicitly control the field names
+        cursor = self.conn.cursor()
+        
         if text is not None and version is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET text = ?, version = ? WHERE id = ?",
                 (text, version, idea_id)
             )
         elif text is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET text = ? WHERE id = ?",
                 (text, idea_id)
             )
         elif version is not None:
-            cursor = self.conn.cursor()
             cursor.execute(
                 "UPDATE Idea SET version = ? WHERE id = ?",
                 (version, idea_id)
@@ -344,22 +367,22 @@ class SimpleIdeaDatabase:
         return result if result is not None else 0
 
 
-def setup_simple_idea_database(db_path: str = "simple_idea.db") -> SimpleIdeaDatabase:
-    """Initialize and setup the SimpleIdea database.
+def setup_idea_database(db_path: str = "idea.db") -> IdeaDatabase:
+    """Initialize and setup the Idea database.
     
     Args:
         db_path: Path to the database file
         
     Returns:
-        Configured SimpleIdeaDatabase instance
+        Configured IdeaDatabase instance with tables created
     """
-    db = SimpleIdeaDatabase(db_path)
+    db = IdeaDatabase(db_path)
     db.connect()
     db.create_tables()
     return db
 
 
 __all__ = [
-    "SimpleIdeaDatabase",
-    "setup_simple_idea_database",
+    "IdeaDatabase",
+    "setup_idea_database",
 ]

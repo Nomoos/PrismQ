@@ -1,21 +1,20 @@
-"""Tests for SimpleIdea database operations."""
+"""Tests for the shared Idea database module."""
 
 import pytest
 import os
 import tempfile
 import sqlite3
-from src.simple_idea_db import SimpleIdeaDatabase, setup_simple_idea_database
-from src.simple_idea import SimpleIdea
+from src import IdeaDatabase, setup_idea_database
 
 
-class TestSimpleIdeaDatabaseSetup:
+class TestIdeaDatabaseSetup:
     """Test database setup and connection."""
     
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = SimpleIdeaDatabase(self.db_path)
+        self.db = IdeaDatabase(self.db_path)
     
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -52,8 +51,8 @@ class TestSimpleIdeaDatabaseSetup:
         assert result[0] == "Idea"
     
     def test_setup_function(self):
-        """Test the setup_simple_idea_database helper function."""
-        db = setup_simple_idea_database(self.db_path)
+        """Test the setup_idea_database helper function."""
+        db = setup_idea_database(self.db_path)
         
         assert db is not None
         assert db.conn is not None
@@ -70,14 +69,14 @@ class TestSimpleIdeaDatabaseSetup:
         db.close()
 
 
-class TestSimpleIdeaDatabaseCRUD:
-    """Test CRUD operations on SimpleIdea database."""
+class TestIdeaDatabaseCRUD:
+    """Test CRUD operations on Idea database."""
     
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_simple_idea_database(self.db_path)
+        self.db = setup_idea_database(self.db_path)
     
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -99,12 +98,12 @@ class TestSimpleIdeaDatabaseCRUD:
     
     def test_insert_idea_from_dict(self):
         """Test inserting idea from dictionary."""
-        idea = SimpleIdea(
-            text="Create an educational video.",
-            version=2
-        )
+        idea_dict = {
+            "text": "Create an educational video.",
+            "version": 2
+        }
         
-        idea_id = self.db.insert_idea_from_dict(idea.to_dict())
+        idea_id = self.db.insert_idea_from_dict(idea_dict)
         
         assert idea_id is not None
         assert idea_id > 0
@@ -214,14 +213,14 @@ class TestSimpleIdeaDatabaseCRUD:
         assert success is False
 
 
-class TestSimpleIdeaDatabaseVersionConstraint:
+class TestIdeaDatabaseVersionConstraint:
     """Test version constraint enforcement (CHECK >= 0)."""
     
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_simple_idea_database(self.db_path)
+        self.db = setup_idea_database(self.db_path)
     
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -272,14 +271,14 @@ class TestSimpleIdeaDatabaseVersionConstraint:
         assert idea["version"] == 1
 
 
-class TestSimpleIdeaDatabaseSearch:
+class TestIdeaDatabaseSearch:
     """Test search and query operations."""
     
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_simple_idea_database(self.db_path)
+        self.db = setup_idea_database(self.db_path)
     
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -340,71 +339,3 @@ class TestSimpleIdeaDatabaseSearch:
         
         self.db.insert_idea("v2", version=2)
         assert self.db.get_max_version() == 3  # Still 3
-
-
-class TestSimpleIdeaDatabaseIntegration:
-    """Integration tests with SimpleIdea model."""
-    
-    def setup_method(self):
-        """Create a temporary database for each test."""
-        self.temp_dir = tempfile.mkdtemp()
-        self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_simple_idea_database(self.db_path)
-    
-    def teardown_method(self):
-        """Clean up the temporary database."""
-        if self.db.conn:
-            self.db.close()
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
-        os.rmdir(self.temp_dir)
-    
-    def test_roundtrip_simple_idea(self):
-        """Test saving and loading SimpleIdea through database."""
-        # Create SimpleIdea
-        original = SimpleIdea(
-            text="Write a story about time travel consequences.",
-            version=1
-        )
-        
-        # Save to database
-        idea_id = self.db.insert_idea_from_dict(original.to_dict())
-        
-        # Load from database
-        data = self.db.get_idea(idea_id)
-        restored = SimpleIdea.from_dict(data)
-        
-        # Verify
-        assert restored.id == idea_id
-        assert restored.text == original.text
-        assert restored.version == original.version
-    
-    def test_version_workflow(self):
-        """Test versioning workflow with database."""
-        # Create v1
-        v1 = SimpleIdea(text="Initial draft", version=1)
-        v1_id = self.db.insert_idea_from_dict(v1.to_dict())
-        
-        # Create v2 (new version)
-        v2 = v1.create_new_version("Improved draft")
-        v2_id = self.db.insert_idea_from_dict(v2.to_dict())
-        
-        # Create v3
-        v3 = v2.create_new_version("Final draft")
-        v3_id = self.db.insert_idea_from_dict(v3.to_dict())
-        
-        # Verify versions in database
-        ideas_v1 = self.db.get_ideas_by_version(1)
-        ideas_v2 = self.db.get_ideas_by_version(2)
-        ideas_v3 = self.db.get_ideas_by_version(3)
-        
-        assert len(ideas_v1) == 1
-        assert len(ideas_v2) == 1
-        assert len(ideas_v3) == 1
-        
-        assert ideas_v1[0]["text"] == "Initial draft"
-        assert ideas_v2[0]["text"] == "Improved draft"
-        assert ideas_v3[0]["text"] == "Final draft"
-        
-        # Check max version
-        assert self.db.get_max_version() == 3
