@@ -2,6 +2,8 @@
 
 Database models for PrismQ content workflow following SOLID principles.
 
+> **📚 For comprehensive database documentation including all models and schemas, see the [Database Objects Documentation](../../_meta/docs/DATABASE.md).**
+
 ## Principles
 
 - **Interface Segregation**: Small, focused `IModel` interface with essential CRUD methods
@@ -73,6 +75,11 @@ Title (
 - **DB-003**: Implement Script Model
 - **DB-004**: Implement Review Model
 - **DB-005**: Implement StoryReview Linking Table
+
+## Related Documentation
+
+- **[Database Objects Documentation](../../_meta/docs/DATABASE.md)** - Comprehensive database reference
+- **[Repository Pattern](./_meta/docs/REPOSITORY_PATTERN.md)** - Repository pattern guide
 
 ## Testing
 
