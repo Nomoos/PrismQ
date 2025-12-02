@@ -66,6 +66,18 @@ def get_script_schema():
     """
 
 
+def get_review_schema():
+    """Get SQL schema for Review table."""
+    return """
+    CREATE TABLE IF NOT EXISTS Review (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        text TEXT NOT NULL,
+        score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    """
+
+
 @pytest.fixture
 def db_connection():
     """Create an in-memory SQLite database with Story, Script, and Review tables."""
@@ -76,7 +88,7 @@ def db_connection():
     conn.executescript(Story.get_sql_schema())
     
     # Create Review table
-    conn.executescript(ReviewRepository.get_sql_schema())
+    conn.executescript(get_review_schema())
     
     # Create Script table
     conn.executescript(get_script_schema())
@@ -106,12 +118,12 @@ def review_repository(db_connection):
 class TestGetOldestStoryForReview:
     """Tests for get_oldest_story_for_review function."""
     
-    def test_returns_none_when_no_stories(self, story_repository):
+    def test_returns_none_when_no_stories(self, story_repository, db_connection):
         """Should return None when no stories exist."""
-        result = get_oldest_story_for_review(story_repository)
+        result = get_oldest_story_for_review(story_repository, db_connection)
         assert result is None
     
-    def test_returns_none_when_no_stories_in_correct_state(self, story_repository):
+    def test_returns_none_when_no_stories_in_correct_state(self, story_repository, db_connection):
         """Should return None when no stories have the correct state."""
         # Create a story with different state
         story = Story(
@@ -120,30 +132,48 @@ class TestGetOldestStoryForReview:
         )
         story_repository.insert(story)
         
-        result = get_oldest_story_for_review(story_repository)
+        result = get_oldest_story_for_review(story_repository, db_connection)
         assert result is None
     
-    def test_returns_oldest_story_in_correct_state(self, story_repository, db_connection):
-        """Should return the oldest story with the correct state."""
-        # Create multiple stories
-        older_story = Story(
-            idea_json='{"title": "Older Story"}',
+    def test_returns_story_with_lowest_script_version(self, story_repository, script_repository, db_connection):
+        """Should return story with lowest script version (not oldest created)."""
+        # Create first story (will have version 2 scripts)
+        story1 = Story(
+            idea_json='{"title": "Story 1 - high version"}',
             state=STATE_REVIEW_SCRIPT_EDITING
         )
-        older_story = story_repository.insert(older_story)
+        story1 = story_repository.insert(story1)
         
-        # Create a newer story
-        newer_story = Story(
-            idea_json='{"title": "Newer Story"}',
+        # Create scripts for story1 - versions 0, 1, 2 (max = 2)
+        for v in range(3):
+            script = Script(
+                story_id=story1.id,
+                version=v,
+                text=f"Script v{v} for story1"
+            )
+            script_repository.insert(script)
+        
+        # Create second story (will have version 0 script only)
+        story2 = Story(
+            idea_json='{"title": "Story 2 - low version"}',
             state=STATE_REVIEW_SCRIPT_EDITING
         )
-        newer_story = story_repository.insert(newer_story)
+        story2 = story_repository.insert(story2)
         
-        result = get_oldest_story_for_review(story_repository)
+        # Create only version 0 script for story2 (max = 0)
+        script = Script(
+            story_id=story2.id,
+            version=0,
+            text="Script v0 for story2"
+        )
+        script_repository.insert(script)
+        
+        # Should return story2 because it has lower max script version
+        result = get_oldest_story_for_review(story_repository, db_connection)
         
         assert result is not None
-        assert result.id == older_story.id
-        assert result.idea_json == '{"title": "Older Story"}'
+        assert result.id == story2.id
+        assert result.idea_json == '{"title": "Story 2 - low version"}'
 
 
 class TestDetermineNextState:

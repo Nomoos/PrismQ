@@ -2,11 +2,17 @@
 """PrismQ.T.Review.Script.Editing - Script editing review service module.
 
 This module implements the script editing review workflow stage that:
-1. Selects the oldest Story with state 'PrismQ.T.Review.Script.Editing'
+1. Selects the Story with state 'PrismQ.T.Review.Script.Editing' that has
+   the Script with the lowest current version number (highest version for that story_id)
 2. Gets the Script associated with the Story
 3. Reviews the Script for editing quality (clarity, flow, redundancy)
 4. Creates a Review model and links it to the Script via review_id FK
 5. Updates the Story state based on review acceptance
+
+Selection Logic:
+- Prioritizes Stories whose Scripts have fewer iterations (lowest max version)
+- Stories with version 0 scripts are processed before those with version 1, etc.
+- Tie-breaker: oldest creation date
 
 State Transitions:
 - If review accepts script → 'PrismQ.T.Review.Title.Readability'
@@ -80,17 +86,95 @@ class ReviewResult:
     accepted: bool
 
 
-def get_oldest_story_for_review(
-    story_repository: StoryRepository
+def get_story_with_lowest_script_version(
+    connection: sqlite3.Connection,
+    state: str
 ) -> Optional[Story]:
-    """Get the oldest Story with state 'PrismQ.T.Review.Script.Editing'.
+    """Get the Story with state that has the Script with lowest current version.
+    
+    Selection logic:
+    1. Find all Stories with the specified state
+    2. For each Story, find the highest version number of its Scripts
+    3. Select the Story whose Script has the lowest highest-version number
+    
+    This prioritizes Stories with fewer script iterations (less revised scripts).
+    
+    Args:
+        connection: SQLite database connection
+        state: The state to filter Stories by
+        
+    Returns:
+        Story with lowest script version, or None if none found
+    """
+    # Query to find the Story with the lowest max script version
+    # This joins Story with Script, groups by story_id to find max version,
+    # then orders by that max version ascending to get the lowest one first
+    cursor = connection.execute(
+        """
+        SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.script_id, 
+               s.state, s.created_at, s.updated_at,
+               COALESCE(MAX(sc.version), 0) as max_version
+        FROM Story s
+        LEFT JOIN Script sc ON s.id = sc.story_id
+        WHERE s.state = ?
+        GROUP BY s.id
+        ORDER BY max_version ASC, s.created_at ASC
+        LIMIT 1
+        """,
+        (state,)
+    )
+    row = cursor.fetchone()
+    
+    if row is None:
+        return None
+    
+    # Convert row to Story model
+    created_at = row["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+    
+    updated_at = row["updated_at"]
+    if isinstance(updated_at, str):
+        updated_at = datetime.fromisoformat(updated_at)
+    
+    return Story(
+        id=row["id"],
+        idea_id=row["idea_id"],
+        idea_json=row["idea_json"],
+        title_id=row["title_id"],
+        script_id=row["script_id"],
+        state=row["state"],
+        created_at=created_at,
+        updated_at=updated_at
+    )
+
+
+def get_oldest_story_for_review(
+    story_repository: StoryRepository,
+    connection: Optional[sqlite3.Connection] = None
+) -> Optional[Story]:
+    """Get Story with state 'PrismQ.T.Review.Script.Editing' that has lowest script version.
+    
+    Selection logic:
+    - Selects Story whose Script has the lowest current version number
+    - "Current version" = highest version number for that story_id
+    - Prioritizes Stories with fewer script iterations
     
     Args:
         story_repository: Repository for Story database operations
+        connection: Optional SQLite connection for version-based query
         
     Returns:
-        Oldest Story in the review state, or None if none found
+        Story with lowest script version in the review state, or None if none found
     """
+    if connection is not None:
+        # Use new version-based selection
+        return get_story_with_lowest_script_version(
+            connection=connection,
+            state=STATE_REVIEW_SCRIPT_EDITING
+        )
+    
+    # Fallback to old behavior if no connection provided
     stories = story_repository.find_by_state_ordered_by_created(
         state=STATE_REVIEW_SCRIPT_EDITING,
         ascending=True  # Oldest first
@@ -259,7 +343,8 @@ def process_review_script_editing(
     """Process the script editing review workflow stage.
     
     This function:
-    1. Finds the oldest Story with state 'PrismQ.T.Review.Script.Editing'
+    1. Finds the Story with state 'PrismQ.T.Review.Script.Editing' that has
+       the Script with the lowest current version number
     2. Gets the Script associated with the Story (via story.script_id)
     3. Evaluates the script for editing quality
     4. Creates a Review record and persists it
@@ -282,8 +367,8 @@ def process_review_script_editing(
     script_repository = ScriptRepository(connection)
     review_repository = ReviewRepository(connection)
     
-    # Get oldest story in editing review state
-    story = get_oldest_story_for_review(story_repository)
+    # Get story with lowest script version in editing review state
+    story = get_oldest_story_for_review(story_repository, connection)
     
     if story is None:
         return None
@@ -378,6 +463,7 @@ __all__ = [
     "process_review_script_editing",
     "process_all_pending_reviews",
     "get_oldest_story_for_review",
+    "get_story_with_lowest_script_version",
     "determine_next_state",
     "create_review",
     "evaluate_script",
