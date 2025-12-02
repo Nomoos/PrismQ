@@ -15,23 +15,26 @@ The service:
 4. Updates Story state based on review result
 """
 
-# Direct imports to avoid circular import issue in parent package
-import importlib.util
-import os
+from .content_review import (
+    ContentReview,
+    ContentIssue,
+    ContentIssueType,
+    ContentSeverity
+)
 
-# Load the module directly to avoid T.Review.Script package circular import
-_current_dir = os.path.dirname(os.path.abspath(__file__))
-_module_path = os.path.join(_current_dir, 'script_content_review.py')
-_spec = importlib.util.spec_from_file_location('script_content_review', _module_path)
-_module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_module)
-
-# Export the classes and functions
-ScriptContentReviewer = _module.ScriptContentReviewer
-ContentReviewResult = _module.ContentReviewResult
-review_oldest_story_content = _module.review_oldest_story_content
+from .script_content_review import (
+    ScriptContentReviewer,
+    ContentReviewResult,
+    review_oldest_story_content
+)
 
 __all__ = [
+    # Content Review Model
+    "ContentReview",
+    "ContentIssue",
+    "ContentIssueType",
+    "ContentSeverity",
+    # Service
     "ScriptContentReviewer",
     "ContentReviewResult",
     "review_oldest_story_content",

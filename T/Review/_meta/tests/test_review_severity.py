@@ -50,23 +50,23 @@ class TestReviewSeverityExports:
         
         assert ToneSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_model_content(self):
-        """Test that ContentSeverity is exported from Model module."""
-        from T.Review.Model import ContentSeverity
+    def test_export_from_script_content(self):
+        """Test that ContentSeverity is exported from Script.Content module."""
+        from T.Review.Script.Content import ContentSeverity
         from T.Review import ReviewSeverity
         
         assert ContentSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_model_consistency(self):
-        """Test that ConsistencySeverity is exported from Model module."""
-        from T.Review.Model import ConsistencySeverity
+    def test_export_from_script_consistency(self):
+        """Test that ConsistencySeverity is exported from Script.Consistency module."""
+        from T.Review.Script.Consistency import ConsistencySeverity
         from T.Review import ReviewSeverity
         
         assert ConsistencySeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_model_editing(self):
-        """Test that EditingSeverity is exported from Model module."""
-        from T.Review.Model import EditingSeverity
+    def test_export_from_script_editing(self):
+        """Test that EditingSeverity is exported from Script.Editing module."""
+        from T.Review.Script.Editing import EditingSeverity
         from T.Review import ReviewSeverity
         
         assert EditingSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
@@ -103,7 +103,7 @@ class TestBackwardCompatibility:
     
     def test_consistency_severity_still_works(self):
         """Test that ConsistencySeverity can still be used in ConsistencyReview."""
-        from T.Review.Model import (
+        from T.Review.Script.Consistency import (
             ConsistencyReview, ConsistencyIssue, 
             ConsistencyIssueType, ConsistencySeverity
         )
@@ -111,8 +111,10 @@ class TestBackwardCompatibility:
         issue = ConsistencyIssue(
             issue_type=ConsistencyIssueType.CHARACTER_NAME,
             severity=ConsistencySeverity.MEDIUM,
-            section="Chapter 1",
-            description="Name inconsistency"
+            location="Chapter 1",
+            description="Name inconsistency",
+            details="Character named differently",
+            suggestion="Use consistent name"
         )
         
         review = ConsistencyReview(script_id="test-001", overall_score=85)

@@ -40,8 +40,8 @@ from T.Database.models.script import Script
 from T.Database.models.review import Review
 from T.State.constants.state_names import StateNames
 
-# Import ContentReview model from T.Review.Model
-from T.Review.Model.src.content_review import (
+# Import ContentReview model from local module
+from .content_review import (
     ContentReview,
     ContentIssue,
     ContentIssueType,
