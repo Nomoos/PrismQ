@@ -18,7 +18,7 @@ import json
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import asdict
 
-# Import the EditingReview model from local module
+# Import EditingReview model classes from local module
 from .editing_review import (
     EditingReview,
     EditingIssue,
