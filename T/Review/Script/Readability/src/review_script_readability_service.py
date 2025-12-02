@@ -64,7 +64,7 @@ except (FileNotFoundError, ImportError, SyntaxError, AttributeError) as e:
 
 
 # Score threshold for accepting a script readability review
-ACCEPTANCE_THRESHOLD = 85
+ACCEPTANCE_THRESHOLD = 75
 
 # State constants
 STATE_REVIEW_SCRIPT_READABILITY = StateNames.REVIEW_SCRIPT_READABILITY
