@@ -46,13 +46,13 @@ Transform inspiration into structured content concepts with clear outlines and t
 
 Develop and refine scripts through state-based workflow.
 
-- **[FromIdeaAndTitle](./Script/FromIdeaAndTitle/)** - Initial script draft (v1)
-- **[FromOriginalScriptAndReviewAndTitle](./Script/FromOriginalScriptAndReviewAndTitle/)** - Script improvements (v2+)
+- **[From/Idea/Title](./Script/From/Idea/Title/)** - Initial script draft (v1)
+- **[From/Title/Review/Script](./Script/From/Title/Review/Script/)** - Script improvements (v2+)
 - **[Writer](./Script/Writer/)** - AI-powered script writer
 
 **Submodule Navigation:**
-- [FromIdeaAndTitle README](./Script/FromIdeaAndTitle/README.md)
-- [FromOriginalScriptAndReviewAndTitle README](./Script/FromOriginalScriptAndReviewAndTitle/README.md)
+- [From/Idea/Title README](./Script/From/Idea/Title/README.md)
+- [From/Title/Review/Script README](./Script/From/Title/Review/Script/README.md)
 - [Writer README](./Script/Writer/README.md)
 
 ---

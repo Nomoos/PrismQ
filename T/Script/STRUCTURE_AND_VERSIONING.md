@@ -21,8 +21,12 @@ T/
 │   └── Editing/         # Final editing pass
 │
 └── Script/
-    ├── FromIdeaAndTitle/           # Initial script draft from idea and title (v1)
-    ├── FromOriginalScriptAndReviewAndTitle/  # All script improvements (v2, v3+)
+    ├── From/
+    │   ├── Idea/
+    │   │   └── Title/               # Initial script draft from idea and title (v1)
+    │   └── Title/
+    │       └── Review/
+    │           └── Script/          # All script improvements (v2, v3+)
     ├── src/                         # AI script writer with feedback loop ⭐ NEW
     └── _meta/                       # Script module metadata
 ```
