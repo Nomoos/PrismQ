@@ -46,7 +46,7 @@ from T.State.constants.state_names import StateNames
 
 
 # Score threshold for accepting a title readability review
-ACCEPTANCE_THRESHOLD = 70
+ACCEPTANCE_THRESHOLD = 75
 
 # State constants
 STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
