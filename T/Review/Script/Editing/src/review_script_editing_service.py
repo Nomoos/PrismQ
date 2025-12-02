@@ -59,7 +59,7 @@ from T.State.constants.state_names import StateNames
 
 
 # Score threshold for accepting an editing review
-ACCEPTANCE_THRESHOLD = 70
+ACCEPTANCE_THRESHOLD = 75
 
 # State constants
 STATE_REVIEW_SCRIPT_EDITING = StateNames.REVIEW_SCRIPT_EDITING
