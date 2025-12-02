@@ -8,6 +8,9 @@ This module provides models for storing and managing content reviews:
 
 - **Review**: Simple review content (text, score)
 - **StoryReview**: Linking table for Story reviews with review types
+- **ConsistencyReview**: Script consistency validation model (Stage 17)
+- **ContentReview**: Script content validation model (Stage 16)
+- **EditingReview**: Script editing validation model (Stage 18)
 
 ## Installation
 
@@ -18,8 +21,8 @@ pip install -e .
 ## Quick Start
 
 ```python
-from review import Review
-from story_review import StoryReview, ReviewType
+from T.Review.Model import Review, StoryReview, ReviewType
+from T.Review.Model import ConsistencyReview, ContentReview, EditingReview
 
 # Create a simple review
 review = Review(
@@ -33,6 +36,31 @@ story_review = StoryReview(
     review_id=5,
     version=2,
     review_type=ReviewType.GRAMMAR
+)
+
+# Create a consistency review
+consistency_review = ConsistencyReview(
+    script_id="script-001",
+    script_version="v3",
+    overall_score=88,
+    character_score=90,
+    timeline_score=85
+)
+
+# Create a content review
+content_review = ContentReview(
+    script_id="script-001",
+    script_version="v3",
+    overall_score=85,
+    logic_score=90,
+    plot_score=85
+)
+
+# Create an editing review
+editing_review = EditingReview(
+    script_id="script-001",
+    script_version="v3",
+    overall_score=92
 )
 ```
 
@@ -76,6 +104,56 @@ class StoryReview:
 - `content`: Content quality and accuracy
 - `consistency`: Internal consistency check
 - `editing`: Editorial improvements
+
+### ConsistencyReview (Stage 17)
+
+AI-powered consistency review for internal script continuity.
+
+```python
+@dataclass
+class ConsistencyReview:
+    script_id: str
+    script_version: str = "v3"
+    overall_score: int  # 0-100
+    pass_threshold: int = 80
+    character_score: int  # 0-100
+    timeline_score: int  # 0-100
+    location_score: int  # 0-100
+    logic_score: int  # 0-100
+    issues: List[ConsistencyIssue]
+```
+
+### ContentReview (Stage 16)
+
+AI-powered content review for narrative and plot validation.
+
+```python
+@dataclass
+class ContentReview:
+    script_id: str
+    script_version: str = "v3"
+    overall_score: int  # 0-100
+    pass_threshold: int = 75
+    logic_score: int  # 0-100
+    plot_score: int  # 0-100
+    character_score: int  # 0-100
+    pacing_score: int  # 0-100
+    issues: List[ContentIssue]
+```
+
+### EditingReview (Stage 18)
+
+AI-powered editing review for clarity and flow improvements.
+
+```python
+@dataclass
+class EditingReview:
+    script_id: str
+    script_version: str = "v3"
+    overall_score: int  # 0-100
+    pass_threshold: int = 85
+    issues: List[EditingIssue]
+```
 
 ## Database Schema
 

@@ -2,7 +2,7 @@
 
 This module provides a service that:
 1. Selects the oldest Story where state is PrismQ.T.Review.Script.Content
-2. Generates content review using ContentReview model from T.Review.Content
+2. Generates content review using ContentReview model from T.Review.Model
 3. Creates Review record and links it to the Script via Script.review_id FK
 4. Updates Story state based on review result:
    - FAIL: PrismQ.T.Script.From.Script.Review.Title
@@ -40,8 +40,8 @@ from T.Database.models.script import Script
 from T.Database.models.review import Review
 from T.State.constants.state_names import StateNames
 
-# Import ContentReview model from T.Review.Content directly
-from T.Review.Content.content_review import (
+# Import ContentReview model from T.Review.Model
+from T.Review.Model.src.content_review import (
     ContentReview,
     ContentIssue,
     ContentIssueType,
