@@ -293,3 +293,27 @@ class ScriptRepository(IVersionedRepository[Script, int]):
         row = cursor.fetchone()
         max_version = row["max_version"] if row["max_version"] is not None else -1
         return max_version + 1
+    
+    def update_review_id(self, script_id: int, review_id: int) -> bool:
+        """Update the review_id FK on an existing script.
+        
+        This is the only UPDATE operation allowed on Script, specifically
+        for linking a Review to a Script after the review is created.
+        
+        Args:
+            script_id: The ID of the script to update.
+            review_id: The ID of the review to link.
+            
+        Returns:
+            True if the update was successful, False if script not found.
+            
+        Example:
+            >>> repo.update_review_id(script_id=5, review_id=10)
+            True
+        """
+        cursor = self._conn.execute(
+            "UPDATE Script SET review_id = ? WHERE id = ?",
+            (review_id, script_id)
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
