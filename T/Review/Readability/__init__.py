@@ -7,6 +7,7 @@ This is the FINAL review stage for titles - focused 100% on spoken-word
 suitability, voiceover flow, natural rhythm, and listening clarity.
 """
 
+from T.Review import ReviewSeverity
 from .title_readability_review import (
     TitleReadabilityReview,
     ReadabilityIssue,
@@ -14,9 +15,12 @@ from .title_readability_review import (
     ReadabilitySeverity
 )
 
+# Re-export unified severity for convenience
+# ReadabilitySeverity is kept for backward compatibility, but ReviewSeverity is the unified version
 __all__ = [
     "TitleReadabilityReview",
     "ReadabilityIssue",
     "ReadabilityIssueType",
-    "ReadabilitySeverity"
+    "ReadabilitySeverity",
+    "ReviewSeverity",
 ]
