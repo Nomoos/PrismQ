@@ -39,6 +39,7 @@ process_review_script_tone = _module.process_review_script_tone
 get_oldest_story_for_review = _module.get_oldest_story_for_review
 get_script_for_story = _module.get_script_for_story
 save_review = _module.save_review
+update_script_review_id = _module.update_script_review_id
 determine_next_state = _module.determine_next_state
 create_review = _module.create_review
 evaluate_tone = _module.evaluate_tone
@@ -338,10 +339,15 @@ class TestProcessReviewScriptTone:
         # Process the review
         result = process_review_script_tone(db_connection)
         
-        # Verify new script has review_id set
+        # Verify script has review_id set (same script, not new version)
         assert result.script is not None
+        assert result.script.id == initial_script.id  # Same script, not a new version
         assert result.script.review_id is not None
         assert result.script.review_id == result.review.id
+        
+        # Verify in database the script's review_id was updated
+        updated_script = script_repository.find_by_id(initial_script.id)
+        assert updated_script.review_id == result.review.id
     
     def test_updates_story_state(self, db_connection, story_repository):
         """Should update story state after processing."""
@@ -477,6 +483,32 @@ class TestSaveReview:
         assert row is not None
         assert row['text'] == "Test review"
         assert row['score'] == 75
+
+
+class TestUpdateScriptReviewId:
+    """Tests for update_script_review_id function."""
+    
+    def test_updates_script_review_id(self, db_connection, story_repository, script_repository):
+        """Should update existing script's review_id."""
+        # Create a story
+        story = Story(idea_json='{"title": "Test"}', state=STATE_REVIEW_SCRIPT_TONE)
+        story = story_repository.insert(story)
+        
+        # Create a script without review_id
+        script = Script(story_id=story.id, version=0, text="Test content")
+        script = script_repository.insert(script)
+        assert script.review_id is None
+        
+        # Create and save a review
+        review = Review(text="Test review", score=80)
+        review = save_review(db_connection, review)
+        
+        # Update script's review_id
+        update_script_review_id(db_connection, script.id, review.id)
+        
+        # Verify the update in database
+        updated_script = script_repository.find_by_id(script.id)
+        assert updated_script.review_id == review.id
 
 
 class TestReviewResult:

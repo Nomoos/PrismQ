@@ -252,6 +252,24 @@ def save_review(connection: sqlite3.Connection, review: Review) -> Review:
     return review
 
 
+def update_script_review_id(connection: sqlite3.Connection, script_id: int, review_id: int) -> None:
+    """Update a Script's review_id to link it to a Review.
+    
+    This updates the existing script's review_id without creating a new version,
+    since adding a review reference doesn't change the script content.
+    
+    Args:
+        connection: SQLite database connection
+        script_id: ID of the Script to update
+        review_id: ID of the Review to link to
+    """
+    connection.execute(
+        "UPDATE Script SET review_id = ? WHERE id = ?",
+        (review_id, script_id)
+    )
+    connection.commit()
+
+
 def get_script_for_story(
     script_repository: ScriptRepository,
     story: Story
@@ -332,25 +350,22 @@ def process_review_script_tone(
     # Determine if accepted
     accepted = score >= ACCEPTANCE_THRESHOLD
     
-    # Create a new Script version with the review_id set (linking Review to Script)
+    # Link Review to Script by updating the script's review_id
     if script is not None:
-        new_script = script.create_next_version(
-            new_text=script.text,  # Keep same text, just adding review reference
-            review_id=review.id
-        )
-        new_script = script_repository.insert(new_script)
-        # Update story to point to new script version
-        story.script_id = new_script.id
+        # Update existing script's review_id directly (no need to create new version)
+        update_script_review_id(connection, script.id, review.id)
+        script.review_id = review.id
+        reviewed_script = script
     else:
-        # If no script exists, create a minimal one for testing purposes
-        new_script = Script(
+        # If no script exists, create one with the review reference
+        reviewed_script = Script(
             story_id=story.id,
             version=0,
             text=actual_script_text,
             review_id=review.id
         )
-        new_script = script_repository.insert(new_script)
-        story.script_id = new_script.id
+        reviewed_script = script_repository.insert(reviewed_script)
+        story.script_id = reviewed_script.id
     
     # Determine next state
     new_state = determine_next_state(accepted=accepted)
@@ -361,7 +376,7 @@ def process_review_script_tone(
     
     return ReviewResult(
         story=story,
-        script=new_script,
+        script=reviewed_script,
         review=review,
         new_state=new_state,
         accepted=accepted
@@ -404,6 +419,7 @@ __all__ = [
     "get_oldest_story_for_review",
     "get_script_for_story",
     "save_review",
+    "update_script_review_id",
     "determine_next_state",
     "create_review",
     "evaluate_tone",
