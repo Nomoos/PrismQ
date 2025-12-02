@@ -12,8 +12,8 @@ This module implements the title readability review workflow stage that:
 
 ## State Transitions
 
-- **If review doesn't accept title** → `PrismQ.T.Title.From.Script.Review.Title` (return to title refinement)
-- **If review accepts title** → `PrismQ.T.Review.Script.Readability` (proceed to script readability review)
+- **If review doesn't accept title** → `PrismQ.T.Script.From.Title.Review.Script` (return to script refinement)
+- **If review accepts title** → `PrismQ.T.Story.Review` (proceed to story review)
 
 ## Review Output Schema
 
@@ -60,5 +60,5 @@ The title readability evaluation checks:
 
 - `ACCEPTANCE_THRESHOLD = 70`: Minimum score required to accept a title
 - `STATE_REVIEW_TITLE_READABILITY`: Current state being processed
-- `STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE`: State for rejected titles
-- `STATE_REVIEW_SCRIPT_READABILITY`: State for accepted titles
+- `STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT`: State for rejected titles
+- `STATE_STORY_REVIEW`: State for accepted titles

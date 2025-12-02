@@ -12,8 +12,8 @@ Workflow Position:
     Story (state=PrismQ.T.Review.Title.Readability) → Review → State Transition
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Title.From.Script.Review.Title' (refinement)
-- If review accepts title → 'PrismQ.T.Review.Script.Readability' (next stage)
+- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script' (refinement)
+- If review accepts title → 'PrismQ.T.Story.Review' (next stage)
 
 Output:
     Review (
@@ -46,8 +46,8 @@ from .src import (
     evaluate_title_readability,
     ACCEPTANCE_THRESHOLD,
     STATE_REVIEW_TITLE_READABILITY,
-    STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE,
-    STATE_REVIEW_SCRIPT_READABILITY,
+    STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
+    STATE_STORY_REVIEW,
 )
 
 __all__ = [
@@ -60,6 +60,6 @@ __all__ = [
     "evaluate_title_readability",
     "ACCEPTANCE_THRESHOLD",
     "STATE_REVIEW_TITLE_READABILITY",
-    "STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE",
-    "STATE_REVIEW_SCRIPT_READABILITY",
+    "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
+    "STATE_STORY_REVIEW",
 ]

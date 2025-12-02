@@ -7,8 +7,8 @@ This module provides the title readability review workflow stage:
 - Updates the Story state based on review acceptance
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Title.From.Script.Review.Title'
-- If review accepts title → 'PrismQ.T.Review.Script.Readability'
+- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script'
+- If review accepts title → 'PrismQ.T.Story.Review'
 """
 
 from .review_title_readability import (
@@ -21,8 +21,8 @@ from .review_title_readability import (
     evaluate_title_readability,
     ACCEPTANCE_THRESHOLD,
     STATE_REVIEW_TITLE_READABILITY,
-    STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE,
-    STATE_REVIEW_SCRIPT_READABILITY,
+    STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
+    STATE_STORY_REVIEW,
 )
 
 __all__ = [
@@ -35,6 +35,6 @@ __all__ = [
     "evaluate_title_readability",
     "ACCEPTANCE_THRESHOLD",
     "STATE_REVIEW_TITLE_READABILITY",
-    "STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE",
-    "STATE_REVIEW_SCRIPT_READABILITY",
+    "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
+    "STATE_STORY_REVIEW",
 ]

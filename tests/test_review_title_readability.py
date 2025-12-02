@@ -38,8 +38,8 @@ create_review = _module.create_review
 evaluate_title_readability = _module.evaluate_title_readability
 ACCEPTANCE_THRESHOLD = _module.ACCEPTANCE_THRESHOLD
 STATE_REVIEW_TITLE_READABILITY = _module.STATE_REVIEW_TITLE_READABILITY
-STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE = _module.STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
-STATE_REVIEW_SCRIPT_READABILITY = _module.STATE_REVIEW_SCRIPT_READABILITY
+STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = _module.STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
+STATE_STORY_REVIEW = _module.STATE_STORY_REVIEW
 
 
 @pytest.fixture
@@ -107,15 +107,15 @@ class TestGetOldestStoryForReview:
 class TestDetermineNextState:
     """Tests for determine_next_state function."""
     
-    def test_not_accepted_returns_to_title_refinement(self):
-        """Non-accepted review should return to title refinement."""
+    def test_not_accepted_returns_to_script_refinement(self):
+        """Non-accepted review should return to script refinement."""
         result = determine_next_state(accepted=False)
-        assert result == STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
+        assert result == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
-    def test_accepted_proceeds_to_script_readability(self):
-        """Accepted review should proceed to script readability review."""
+    def test_accepted_proceeds_to_story_review(self):
+        """Accepted review should proceed to story review."""
         result = determine_next_state(accepted=True)
-        assert result == STATE_REVIEW_SCRIPT_READABILITY
+        assert result == STATE_STORY_REVIEW
 
 
 class TestCreateReview:
@@ -248,8 +248,8 @@ class TestProcessReviewTitleReadability:
         updated_story = story_repository.find_by_id(story.id)
         assert updated_story.state == result.new_state
     
-    def test_accepted_transitions_to_script_readability(self, db_connection, story_repository):
-        """Accepted review should transition to script readability."""
+    def test_accepted_transitions_to_story_review(self, db_connection, story_repository):
+        """Accepted review should transition to story review."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_TITLE_READABILITY
@@ -263,10 +263,10 @@ class TestProcessReviewTitleReadability:
         )
         
         if result.accepted:
-            assert result.new_state == STATE_REVIEW_SCRIPT_READABILITY
+            assert result.new_state == STATE_STORY_REVIEW
     
-    def test_rejected_transitions_to_title_refinement(self, db_connection, story_repository):
-        """Rejected review should transition to title refinement."""
+    def test_rejected_transitions_to_script_refinement(self, db_connection, story_repository):
+        """Rejected review should transition to script refinement."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_TITLE_READABILITY
@@ -280,7 +280,7 @@ class TestProcessReviewTitleReadability:
         )
         
         if not result.accepted:
-            assert result.new_state == STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
+            assert result.new_state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 
 
 class TestReviewResult:
@@ -317,8 +317,8 @@ class TestConstants:
     def test_state_constants_are_valid(self):
         """State constants should match StateNames values."""
         assert STATE_REVIEW_TITLE_READABILITY == StateNames.REVIEW_TITLE_READABILITY
-        assert STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE == StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
-        assert STATE_REVIEW_SCRIPT_READABILITY == StateNames.REVIEW_SCRIPT_READABILITY
+        assert STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT == StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
+        assert STATE_STORY_REVIEW == StateNames.STORY_REVIEW
 
 
 @pytest.mark.integration
@@ -347,7 +347,7 @@ class TestReviewWorkflowIntegration:
         
         # Verify: Story state updated in database
         updated = story_repository.find_by_id(story.id)
-        assert updated.state in [STATE_REVIEW_SCRIPT_READABILITY, STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE]
+        assert updated.state in [STATE_STORY_REVIEW, STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT]
     
     def test_complete_rejection_flow(self, db_connection, story_repository):
         """Test complete rejection flow."""
@@ -367,11 +367,11 @@ class TestReviewWorkflowIntegration:
         # Verify: Check result
         assert result is not None
         assert not result.accepted
-        assert result.new_state == STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
+        assert result.new_state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
         
         # Verify: Story state updated in database
         updated = story_repository.find_by_id(story.id)
-        assert updated.state == STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
+        assert updated.state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
     def test_multiple_stories_processed_in_order(self, db_connection, story_repository):
         """Test that multiple stories are processed oldest first."""

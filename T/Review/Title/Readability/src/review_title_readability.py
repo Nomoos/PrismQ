@@ -8,8 +8,8 @@ This module implements the title readability review workflow stage that:
 4. Updates the Story state based on review acceptance
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Title.From.Script.Review.Title' (return to title refinement)
-- If review accepts title → 'PrismQ.T.Review.Script.Readability' (proceed to script readability review)
+- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script' (return to script refinement)
+- If review accepts title → 'PrismQ.T.Story.Review' (proceed to story review)
 
 Review Model Output:
     Review (
@@ -48,8 +48,8 @@ ACCEPTANCE_THRESHOLD = 70
 
 # State constants
 STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
-STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE = StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
-STATE_REVIEW_SCRIPT_READABILITY = StateNames.REVIEW_SCRIPT_READABILITY
+STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
+STATE_STORY_REVIEW = StateNames.STORY_REVIEW
 
 
 @dataclass
@@ -97,15 +97,15 @@ def determine_next_state(accepted: bool) -> str:
         
     Returns:
         The next state name:
-        - STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE if not accepted (return to title refinement)
-        - STATE_REVIEW_SCRIPT_READABILITY if accepted (proceed to script readability review)
+        - STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT if not accepted (return to script refinement)
+        - STATE_STORY_REVIEW if accepted (proceed to story review)
     """
     if not accepted:
-        # Title not accepted - return to title refinement
-        return STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE
+        # Title not accepted - return to script refinement
+        return STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
-    # Title accepted - proceed to script readability review
-    return STATE_REVIEW_SCRIPT_READABILITY
+    # Title accepted - proceed to story review
+    return STATE_STORY_REVIEW
 
 
 def create_review(score: int, text: str) -> Review:
@@ -318,6 +318,6 @@ __all__ = [
     "evaluate_title_readability",
     "ACCEPTANCE_THRESHOLD",
     "STATE_REVIEW_TITLE_READABILITY",
-    "STATE_TITLE_FROM_SCRIPT_REVIEW_TITLE",
-    "STATE_REVIEW_SCRIPT_READABILITY",
+    "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
+    "STATE_STORY_REVIEW",
 ]
