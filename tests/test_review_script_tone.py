@@ -1,7 +1,7 @@
 """Tests for PrismQ.T.Review.Script.Tone module.
 
 These tests verify the review script tone workflow stage:
-1. Selecting oldest Story with correct state
+1. Selecting Story with lowest current script version in correct state
 2. Getting the Script for the Story
 3. Creating Review model with text and score
 4. Linking Review to Script via Script.review_id FK
@@ -36,7 +36,7 @@ _spec.loader.exec_module(_module)
 
 ReviewResult = _module.ReviewResult
 process_review_script_tone = _module.process_review_script_tone
-get_oldest_story_for_review = _module.get_oldest_story_for_review
+get_story_with_lowest_script_version = _module.get_story_with_lowest_script_version
 get_script_for_story = _module.get_script_for_story
 save_review = _module.save_review
 update_script_review_id = _module.update_script_review_id
@@ -102,47 +102,70 @@ def script_repository(db_connection):
     return ScriptRepository(db_connection)
 
 
-class TestGetOldestStoryForReview:
-    """Tests for get_oldest_story_for_review function."""
+class TestGetStoryWithLowestScriptVersion:
+    """Tests for get_story_with_lowest_script_version function."""
     
-    def test_returns_none_when_no_stories(self, story_repository):
+    def test_returns_none_when_no_stories(self, db_connection, story_repository):
         """Should return None when no stories exist."""
-        result = get_oldest_story_for_review(story_repository)
+        result = get_story_with_lowest_script_version(db_connection, story_repository)
         assert result is None
     
-    def test_returns_none_when_no_stories_in_correct_state(self, story_repository):
+    def test_returns_none_when_no_stories_in_correct_state(self, db_connection, story_repository, script_repository):
         """Should return None when no stories have the correct state."""
         # Create a story with different state
         story = Story(
             idea_json='{"title": "Test"}',
             state=StateNames.IDEA_CREATION
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
         
-        result = get_oldest_story_for_review(story_repository)
+        # Create a script for the story
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script_repository.insert(script)
+        
+        result = get_story_with_lowest_script_version(db_connection, story_repository)
         assert result is None
     
-    def test_returns_oldest_story_in_correct_state(self, story_repository, db_connection):
-        """Should return the oldest story with the correct state."""
-        # Create multiple stories
-        older_story = Story(
-            idea_json='{"title": "Older Story"}',
+    def test_returns_story_with_lowest_script_version(self, db_connection, story_repository, script_repository):
+        """Should return the story whose script has the lowest current version."""
+        # Create story A with script versions 0, 1, 2 (max=2)
+        story_a = Story(
+            idea_json='{"title": "Story A"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        older_story = story_repository.insert(older_story)
+        story_a = story_repository.insert(story_a)
+        for v in range(3):  # versions 0, 1, 2
+            script = Script(story_id=story_a.id, version=v, text=f"Story A v{v}")
+            script_repository.insert(script)
         
-        # Create a newer story
-        newer_story = Story(
-            idea_json='{"title": "Newer Story"}',
+        # Create story B with script versions 0, 1 (max=1)
+        story_b = Story(
+            idea_json='{"title": "Story B"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        newer_story = story_repository.insert(newer_story)
+        story_b = story_repository.insert(story_b)
+        for v in range(2):  # versions 0, 1
+            script = Script(story_id=story_b.id, version=v, text=f"Story B v{v}")
+            script_repository.insert(script)
         
-        result = get_oldest_story_for_review(story_repository)
+        # Should return story B (lower max version)
+        result = get_story_with_lowest_script_version(db_connection, story_repository)
         
         assert result is not None
-        assert result.id == older_story.id
-        assert result.idea_json == '{"title": "Older Story"}'
+        assert result.id == story_b.id
+        assert result.idea_json == '{"title": "Story B"}'
+    
+    def test_returns_none_when_story_has_no_scripts(self, db_connection, story_repository):
+        """Should return None when stories in correct state have no scripts."""
+        # Create a story in correct state but with no scripts
+        story = Story(
+            idea_json='{"title": "No Scripts"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story_repository.insert(story)
+        
+        result = get_story_with_lowest_script_version(db_connection, story_repository)
+        assert result is None
 
 
 class TestDetermineNextState:
@@ -271,19 +294,24 @@ class TestProcessReviewScriptTone:
         result = process_review_script_tone(db_connection)
         assert result is None
     
-    def test_processes_story_and_returns_result(self, db_connection, story_repository):
+    def test_processes_story_and_returns_result(self, db_connection, story_repository, script_repository):
         """Should process story and return ReviewResult."""
         # Create a story in the correct state
         story = Story(
             idea_json='{"title": "Test Story"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
         
-        result = process_review_script_tone(
-            db_connection,
-            script_text="This is a test script with consistent dark tone about fear and horror."
+        # Create a script for the story (required by new selection logic)
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="This is a test script with consistent dark tone about fear and horror."
         )
+        script_repository.insert(script)
+        
+        result = process_review_script_tone(db_connection)
         
         assert result is not None
         assert isinstance(result, ReviewResult)
@@ -293,18 +321,23 @@ class TestProcessReviewScriptTone:
         assert isinstance(result.review, Review)
         assert isinstance(result.script, Script)
     
-    def test_review_saved_to_database(self, db_connection, story_repository):
+    def test_review_saved_to_database(self, db_connection, story_repository, script_repository):
         """Review should be saved to database and have an ID."""
         story = Story(
             idea_json='{"title": "Test Story"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
         
-        result = process_review_script_tone(
-            db_connection,
-            script_text="This is a test script with consistent dark tone about fear and horror."
+        # Create a script for the story
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="This is a test script with consistent dark tone about fear and horror."
         )
+        script_repository.insert(script)
+        
+        result = process_review_script_tone(db_connection)
         
         # Verify review has an ID (was saved to database)
         assert result.review.id is not None
@@ -349,7 +382,7 @@ class TestProcessReviewScriptTone:
         updated_script = script_repository.find_by_id(initial_script.id)
         assert updated_script.review_id == result.review.id
     
-    def test_updates_story_state(self, db_connection, story_repository):
+    def test_updates_story_state(self, db_connection, story_repository, script_repository):
         """Should update story state after processing."""
         # Create a story
         story = Story(
@@ -358,42 +391,58 @@ class TestProcessReviewScriptTone:
         )
         story = story_repository.insert(story)
         
+        # Create a script for the story
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="Test script content about dark horror."
+        )
+        script_repository.insert(script)
+        
         result = process_review_script_tone(db_connection)
         
         # Verify state was updated
         updated_story = story_repository.find_by_id(story.id)
         assert updated_story.state == result.new_state
     
-    def test_accepted_transitions_to_editing(self, db_connection, story_repository):
+    def test_accepted_transitions_to_editing(self, db_connection, story_repository, script_repository):
         """Accepted review should transition to editing review state."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
         
-        # Use a script that will score above threshold
-        result = process_review_script_tone(
-            db_connection,
-            script_text=" ".join(["good consistent happy wonderful amazing joy love beautiful"] * 20)
+        # Create a script with good content
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text=" ".join(["good consistent happy wonderful amazing joy love beautiful"] * 20)
         )
+        script_repository.insert(script)
+        
+        result = process_review_script_tone(db_connection)
         
         if result.accepted:
             assert result.new_state == STATE_REVIEW_SCRIPT_EDITING
     
-    def test_not_accepted_transitions_to_rewrite(self, db_connection, story_repository):
+    def test_not_accepted_transitions_to_rewrite(self, db_connection, story_repository, script_repository):
         """Not accepted review should transition to script rewrite state."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
         
-        # Use a very short script that will score below threshold
-        result = process_review_script_tone(
-            db_connection,
-            script_text="Too short."
+        # Create a very short script
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="Too short."
         )
+        script_repository.insert(script)
+        
+        result = process_review_script_tone(db_connection)
         
         if not result.accepted:
             assert result.new_state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
@@ -514,13 +563,21 @@ class TestUpdateScriptReviewId:
 class TestReviewResult:
     """Tests for ReviewResult dataclass."""
     
-    def test_review_result_fields(self, db_connection, story_repository):
+    def test_review_result_fields(self, db_connection, story_repository, script_repository):
         """ReviewResult should have all expected fields."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
+        
+        # Create a script for the story
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="Test script content."
+        )
+        script_repository.insert(script)
         
         result = process_review_script_tone(db_connection)
         
@@ -555,7 +612,7 @@ class TestConstants:
 class TestToneReviewWorkflowIntegration:
     """Integration tests for the tone review workflow."""
     
-    def test_complete_review_flow_accepted(self, db_connection, story_repository):
+    def test_complete_review_flow_accepted(self, db_connection, story_repository, script_repository):
         """Test complete review flow when accepted."""
         # Setup: Create story in correct state
         story = Story(
@@ -564,10 +621,17 @@ class TestToneReviewWorkflowIntegration:
         )
         story = story_repository.insert(story)
         
-        # Process: Execute review with good tone script
+        # Create a script for the story with good content
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="The dark night was filled with fear and horror. " * 20
+        )
+        script_repository.insert(script)
+        
+        # Process: Execute review
         result = process_review_script_tone(
             db_connection,
-            script_text="The dark night was filled with fear and horror. " * 20,
             target_tone="dark horror"
         )
         
@@ -580,7 +644,7 @@ class TestToneReviewWorkflowIntegration:
         updated = story_repository.find_by_id(story.id)
         assert updated.state == STATE_REVIEW_SCRIPT_EDITING
     
-    def test_complete_review_flow_not_accepted(self, db_connection, story_repository):
+    def test_complete_review_flow_not_accepted(self, db_connection, story_repository, script_repository):
         """Test complete review flow when not accepted."""
         # Setup: Create story in correct state
         story = Story(
@@ -589,11 +653,16 @@ class TestToneReviewWorkflowIntegration:
         )
         story = story_repository.insert(story)
         
-        # Process: Execute review with poor tone script (too short)
-        result = process_review_script_tone(
-            db_connection,
-            script_text="Short script."
+        # Create a script with poor content (too short)
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="Short script."
         )
+        script_repository.insert(script)
+        
+        # Process: Execute review
+        result = process_review_script_tone(db_connection)
         
         # Verify: Check result
         assert result is not None
@@ -604,28 +673,35 @@ class TestToneReviewWorkflowIntegration:
         updated = story_repository.find_by_id(story.id)
         assert updated.state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
-    def test_multiple_stories_processed_in_order(self, db_connection, story_repository):
-        """Test that multiple stories are processed oldest first."""
-        # Create multiple stories
+    def test_multiple_stories_processed_by_lowest_version(self, db_connection, story_repository, script_repository):
+        """Test that multiple stories are processed by lowest script version first."""
+        # Create story 1 with script versions 0, 1, 2 (max=2)
         story1 = Story(
             idea_json='{"title": "Story 1"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
         story1 = story_repository.insert(story1)
+        for v in range(3):
+            script = Script(story_id=story1.id, version=v, text=f"Story 1 v{v}")
+            script_repository.insert(script)
         
+        # Create story 2 with script versions 0, 1 (max=1)
         story2 = Story(
             idea_json='{"title": "Story 2"}',
             state=STATE_REVIEW_SCRIPT_TONE
         )
         story2 = story_repository.insert(story2)
+        for v in range(2):
+            script = Script(story_id=story2.id, version=v, text=f"Story 2 v{v}")
+            script_repository.insert(script)
         
-        # Process first story
+        # Process first story - should be story2 (lower max version)
         result1 = process_review_script_tone(db_connection)
-        assert result1.story.id == story1.id
+        assert result1.story.id == story2.id
         
-        # Process second story
+        # Process second story - should be story1
         result2 = process_review_script_tone(db_connection)
-        assert result2.story.id == story2.id
+        assert result2.story.id == story1.id
         
         # No more stories to process
         result3 = process_review_script_tone(db_connection)

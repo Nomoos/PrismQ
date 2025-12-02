@@ -5,12 +5,19 @@ Script tone and style review module for the PrismQ workflow.
 ## Purpose
 
 This module implements the script tone review stage that:
-1. Selects the oldest Story with state `PrismQ.T.Review.Script.Tone`
-2. Gets the Script associated with the Story
+1. Selects the Story with lowest current script version in state `PrismQ.T.Review.Script.Tone`
+   (current version = highest version number for that story_id)
+2. Gets the Script (latest version) associated with the Story
 3. Reviews the script for tone and style consistency
 4. Outputs a Review model (text, score, created_at) and saves it to database
 5. Links the Review to the Script via `Script.review_id` FK
 6. Updates Story state based on review acceptance
+
+## Selection Logic
+
+The module selects the Story whose Script has the **lowest current version number**:
+- Current version = MAX(version) across all scripts for the same story_id
+- If Story A has script versions 0,1,2 (max=2) and Story B has versions 0,1 (max=1), Story B is selected
 
 ## State Transitions
 

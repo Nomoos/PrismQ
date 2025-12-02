@@ -2,11 +2,13 @@
 """PrismQ.T.Review.Script.Tone - Script tone review module.
 
 This module implements the script tone review workflow stage that:
-1. Selects the oldest Story with state 'PrismQ.T.Review.Script.Tone'
-2. Reviews the script for tone and style consistency
-3. Outputs a Review model (simple: text, score, created_at)
-4. Links the Review to the Script via Script.review_id FK
-5. Updates the Story state based on review acceptance
+1. Selects the Story with lowest current script version in state 'PrismQ.T.Review.Script.Tone'
+   (current version = highest version number for that story_id)
+2. Gets the Script (latest version) for the Story
+3. Reviews the script for tone and style consistency
+4. Outputs a Review model (simple: text, score, created_at)
+5. Links the Review to the Script via Script.review_id FK
+6. Updates the Story state based on review acceptance
 
 State Transitions:
 - If review doesn't accept script → 'PrismQ.T.Script.From.Title.Review.Script' (for rewrite)
@@ -66,25 +68,44 @@ class ReviewResult:
     accepted: bool
 
 
-def get_oldest_story_for_review(
+def get_story_with_lowest_script_version(
+    connection: sqlite3.Connection,
     story_repository: StoryRepository
 ) -> Optional[Story]:
-    """Get the oldest Story with state 'PrismQ.T.Review.Script.Tone'.
+    """Get the Story with the lowest current script version for review.
+    
+    Selects from Stories with state 'PrismQ.T.Review.Script.Tone',
+    picking the one whose Script has the lowest current version number.
+    Current version = highest version number across same story_id.
     
     Args:
+        connection: SQLite database connection
         story_repository: Repository for Story database operations
         
     Returns:
-        Oldest Story in the review state, or None if none found
+        Story with lowest current script version, or None if none found
     """
-    stories = story_repository.find_by_state_ordered_by_created(
-        state=STATE_REVIEW_SCRIPT_TONE,
-        ascending=True  # Oldest first
+    # Query to find stories in review state, joined with scripts,
+    # ordered by the maximum script version (lowest first)
+    cursor = connection.execute(
+        """
+        SELECT s.id as story_id
+        FROM Story s
+        INNER JOIN Script sc ON s.id = sc.story_id
+        WHERE s.state = ?
+        GROUP BY s.id
+        ORDER BY MAX(sc.version) ASC
+        LIMIT 1
+        """,
+        (STATE_REVIEW_SCRIPT_TONE,)
     )
     
-    if stories:
-        return stories[0]
-    return None
+    row = cursor.fetchone()
+    if row is None:
+        return None
+    
+    story_id = row["story_id"] if isinstance(row, sqlite3.Row) else row[0]
+    return story_repository.find_by_id(story_id)
 
 
 def determine_next_state(accepted: bool) -> str:
@@ -297,11 +318,11 @@ def process_review_script_tone(
     """Process the script tone review workflow stage.
     
     This function:
-    1. Finds the oldest Story with state 'PrismQ.T.Review.Script.Tone'
-    2. Gets the Script associated with the Story
+    1. Finds the Story with lowest current script version in state 'PrismQ.T.Review.Script.Tone'
+    2. Gets the Script associated with the Story (latest version)
     3. Evaluates the script's tone consistency
     4. Creates a Review record and saves it to database
-    5. Creates a new Script version with the review_id set (linking Review to Script)
+    5. Links the Review to the Script via Script.review_id FK
     6. Updates the Story state based on review outcome
     
     Args:
@@ -318,8 +339,8 @@ def process_review_script_tone(
     story_repository = StoryRepository(connection)
     script_repository = ScriptRepository(connection)
     
-    # Get oldest story in review state
-    story = get_oldest_story_for_review(story_repository)
+    # Get story with lowest current script version in review state
+    story = get_story_with_lowest_script_version(connection, story_repository)
     
     if story is None:
         return None
@@ -416,7 +437,7 @@ __all__ = [
     "ReviewResult",
     "process_review_script_tone",
     "process_all_pending_reviews",
-    "get_oldest_story_for_review",
+    "get_story_with_lowest_script_version",
     "get_script_for_story",
     "save_review",
     "update_script_review_id",
