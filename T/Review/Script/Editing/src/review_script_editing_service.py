@@ -3,8 +3,8 @@
 
 This module implements the script editing review workflow stage that:
 1. Selects the Story with state 'PrismQ.T.Review.Script.Editing' that has
-   the Script with the lowest current version number (highest version for that story_id)
-2. Gets the Script associated with the Story
+   the Script with the lowest current version number (current = MAX(version) for that story_id)
+2. Gets the latest Script version for that Story
 3. Reviews the Script for editing quality (clarity, flow, redundancy)
 4. Creates a Review model and links it to the Script via review_id FK
 5. Updates the Story state based on review acceptance
@@ -13,6 +13,7 @@ Selection Logic:
 - Prioritizes Stories whose Scripts have fewer iterations (lowest max version)
 - Stories with version 0 scripts are processed before those with version 1, etc.
 - Tie-breaker: oldest creation date
+- After selecting the Story, always retrieves the **latest Script version** for it
 
 State Transitions:
 - If review accepts script → 'PrismQ.T.Review.Title.Readability'
@@ -344,8 +345,8 @@ def process_review_script_editing(
     
     This function:
     1. Finds the Story with state 'PrismQ.T.Review.Script.Editing' that has
-       the Script with the lowest current version number
-    2. Gets the Script associated with the Story (via story.script_id)
+       the Script with the lowest current version number (current = MAX(version) for that story_id)
+    2. Gets the latest Script version for that Story
     3. Evaluates the script for editing quality
     4. Creates a Review record and persists it
     5. Links the Review to the Script via script.review_id FK
@@ -373,14 +374,15 @@ def process_review_script_editing(
     if story is None:
         return None
     
-    # Get the Script associated with the Story
+    # Get the latest Script version for this Story
+    # Always retrieve the latest version, not just the one referenced by story.script_id
     script = None
-    if story.script_id is not None:
-        script = script_repository.find_by_id(story.script_id)
-    
-    # If no script found via script_id, try to find latest version
-    if script is None and story.id is not None:
+    if story.id is not None:
         script = script_repository.find_latest_version(story.id)
+    
+    # Fallback: if no script found via find_latest_version, try story.script_id
+    if script is None and story.script_id is not None:
+        script = script_repository.find_by_id(story.script_id)
     
     # Get script text (use override if provided, for testing)
     # In production, this comes from the Script model
