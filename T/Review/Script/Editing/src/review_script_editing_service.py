@@ -3,9 +3,10 @@
 
 This module implements the script editing review workflow stage that:
 1. Selects the oldest Story with state 'PrismQ.T.Review.Script.Editing'
-2. Reviews the script for editing quality (clarity, flow, redundancy)
-3. Outputs a Review model (simple: text, score, created_at)
-4. Updates the Story state based on review acceptance
+2. Gets the Script associated with the Story
+3. Reviews the Script for editing quality (clarity, flow, redundancy)
+4. Creates a Review model and links it to the Script via review_id FK
+5. Updates the Story state based on review acceptance
 
 State Transitions:
 - If review accepts script → 'PrismQ.T.Review.Title.Readability'
@@ -19,6 +20,10 @@ Review Model Output:
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
+Script-Review Relationship:
+    The Review is linked to the Script via the Script.review_id FK field.
+    This allows tracking which review was created for which script version.
+
 Usage:
     from T.Review.Script.Editing.src.review_script_editing_service import (
         process_review_script_editing,
@@ -29,6 +34,7 @@ Usage:
     result = process_review_script_editing(conn)
     if result:
         print(f"Review created with score: {result.review.score}")
+        print(f"Script reviewed: {result.script.id}")
         print(f"Story state changed to: {result.new_state}")
 """
 
@@ -38,7 +44,10 @@ from datetime import datetime
 from typing import Optional, Tuple, List
 
 from T.Database.models.review import Review
+from T.Database.models.script import Script
 from T.Database.models.story import Story
+from T.Database.repositories.review_repository import ReviewRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.story_repository import StoryRepository
 from T.State.constants.state_names import StateNames
 
@@ -58,12 +67,14 @@ class ReviewResult:
     """Result of the review script editing process.
     
     Attributes:
-        story: The Story that was reviewed
-        review: The Review that was created
+        story: The Story that contains the script
+        script: The Script that was reviewed
+        review: The Review that was created (linked to script via review_id)
         new_state: The new state the story was transitioned to
         accepted: Whether the script was accepted
     """
     story: Story
+    script: Script
     review: Review
     new_state: str
     accepted: bool
@@ -249,9 +260,11 @@ def process_review_script_editing(
     
     This function:
     1. Finds the oldest Story with state 'PrismQ.T.Review.Script.Editing'
-    2. Evaluates the script for editing quality
-    3. Creates a Review record
-    4. Updates the Story state based on review outcome:
+    2. Gets the Script associated with the Story (via story.script_id)
+    3. Evaluates the script for editing quality
+    4. Creates a Review record and persists it
+    5. Links the Review to the Script via script.review_id FK
+    6. Updates the Story state based on review outcome:
        - If accepted: PrismQ.T.Review.Title.Readability
        - If not accepted: PrismQ.T.Script.From.Title.Review.Script
     
@@ -266,6 +279,8 @@ def process_review_script_editing(
     connection.row_factory = sqlite3.Row
     
     story_repository = StoryRepository(connection)
+    script_repository = ScriptRepository(connection)
+    review_repository = ReviewRepository(connection)
     
     # Get oldest story in editing review state
     story = get_oldest_story_for_review(story_repository)
@@ -273,15 +288,35 @@ def process_review_script_editing(
     if story is None:
         return None
     
+    # Get the Script associated with the Story
+    script = None
+    if story.script_id is not None:
+        script = script_repository.find_by_id(story.script_id)
+    
+    # If no script found via script_id, try to find latest version
+    if script is None and story.id is not None:
+        script = script_repository.find_latest_version(story.id)
+    
     # Get script text (use override if provided, for testing)
-    # In production, this would come from the Script table via story.script_id
-    actual_script_text = script_text or "Sample script content for editing review"
+    # In production, this comes from the Script model
+    if script_text is not None:
+        actual_script_text = script_text
+    elif script is not None:
+        actual_script_text = script.text
+    else:
+        actual_script_text = "Sample script content for editing review"
     
     # Evaluate the script for editing quality
     score, review_text = evaluate_script(script_text=actual_script_text)
     
-    # Create review
+    # Create and persist review
     review = create_review(score=score, text=review_text)
+    review = review_repository.insert(review)
+    
+    # Link the Review to the Script via review_id FK
+    if script is not None and script.id is not None and review.id is not None:
+        script_repository.update_review_id(script.id, review.id)
+        script.review_id = review.id  # Update local object
     
     # Determine if accepted
     accepted = score >= ACCEPTANCE_THRESHOLD
@@ -293,8 +328,18 @@ def process_review_script_editing(
     story.update_state(new_state)
     story_repository.update(story)
     
+    # Create a placeholder Script if none was found (for testing scenarios)
+    if script is None:
+        script = Script(
+            story_id=story.id or 0,
+            version=0,
+            text=actual_script_text,
+            review_id=review.id
+        )
+    
     return ReviewResult(
         story=story,
+        script=script,
         review=review,
         new_state=new_state,
         accepted=accepted

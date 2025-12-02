@@ -2,8 +2,10 @@
 
 These tests verify the review script editing workflow stage:
 1. Selecting oldest Story with correct state
-2. Creating Review model with text and score
-3. State transitions based on review acceptance
+2. Getting the Script associated with the Story
+3. Creating Review model with text and score
+4. Linking the Review to the Script via review_id FK
+5. State transitions based on review acceptance
 """
 
 import pytest
@@ -21,8 +23,11 @@ _project_root = _test_dir.parent
 sys.path.insert(0, str(_project_root))
 
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.models.review import Review
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
+from T.Database.repositories.review_repository import ReviewRepository
 from T.State.constants.state_names import StateNames
 
 
@@ -44,14 +49,37 @@ STATE_SCRIPT_REFINEMENT = _module.STATE_SCRIPT_REFINEMENT
 STATE_REVIEW_TITLE_READABILITY = _module.STATE_REVIEW_TITLE_READABILITY
 
 
+def get_script_schema():
+    """Get SQL schema for Script table."""
+    return """
+    CREATE TABLE IF NOT EXISTS Script (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        story_id INTEGER NOT NULL,
+        version INTEGER NOT NULL CHECK (version >= 0),
+        text TEXT NOT NULL,
+        review_id INTEGER NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(story_id, version),
+        FOREIGN KEY (story_id) REFERENCES Story(id),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
+    );
+    """
+
+
 @pytest.fixture
 def db_connection():
-    """Create an in-memory SQLite database with Story table."""
+    """Create an in-memory SQLite database with Story, Script, and Review tables."""
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     
     # Create Story table
     conn.executescript(Story.get_sql_schema())
+    
+    # Create Review table
+    conn.executescript(ReviewRepository.get_sql_schema())
+    
+    # Create Script table
+    conn.executescript(get_script_schema())
     
     yield conn
     conn.close()
@@ -61,6 +89,18 @@ def db_connection():
 def story_repository(db_connection):
     """Create a StoryRepository instance."""
     return StoryRepository(db_connection)
+
+
+@pytest.fixture
+def script_repository(db_connection):
+    """Create a ScriptRepository instance."""
+    return ScriptRepository(db_connection)
+
+
+@pytest.fixture
+def review_repository(db_connection):
+    """Create a ReviewRepository instance."""
+    return ReviewRepository(db_connection)
 
 
 class TestGetOldestStoryForReview:
@@ -293,7 +333,7 @@ class TestReviewResult:
     """Tests for ReviewResult dataclass."""
     
     def test_review_result_fields(self, db_connection, story_repository):
-        """ReviewResult should have all expected fields."""
+        """ReviewResult should have all expected fields including script."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_EDITING
@@ -303,11 +343,13 @@ class TestReviewResult:
         result = process_review_script_editing(db_connection)
         
         assert hasattr(result, 'story')
+        assert hasattr(result, 'script')
         assert hasattr(result, 'review')
         assert hasattr(result, 'new_state')
         assert hasattr(result, 'accepted')
         
         assert isinstance(result.story, Story)
+        assert isinstance(result.script, Script)
         assert isinstance(result.review, Review)
         assert isinstance(result.new_state, str)
         assert isinstance(result.accepted, bool)
@@ -382,3 +424,102 @@ class TestReviewWorkflowIntegration:
         # No more stories to process
         result3 = process_review_script_editing(db_connection)
         assert result3 is None
+
+
+@pytest.mark.integration
+class TestScriptReviewLinkage:
+    """Tests for Script-Review relationship via review_id FK."""
+    
+    def test_review_linked_to_script(self, db_connection, story_repository, script_repository, review_repository):
+        """Test that Review is linked to Script via review_id FK."""
+        # Create a story in the correct state
+        story = Story(
+            idea_json='{"title": "Test Story"}',
+            state=STATE_REVIEW_SCRIPT_EDITING
+        )
+        story = story_repository.insert(story)
+        
+        # Create a script for the story
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="This is the script content for review testing."
+        )
+        script = script_repository.insert(script)
+        
+        # Update story to reference the script
+        story.script_id = script.id
+        story_repository.update(story)
+        
+        # Process the review
+        result = process_review_script_editing(db_connection)
+        
+        # Verify: Review was created and persisted
+        assert result is not None
+        assert result.review is not None
+        assert result.review.id is not None
+        
+        # Verify: Review is linked to Script
+        updated_script = script_repository.find_by_id(script.id)
+        assert updated_script.review_id == result.review.id
+        
+        # Verify: Script in result has the review_id set
+        assert result.script.review_id == result.review.id
+    
+    def test_review_persisted_in_database(self, db_connection, story_repository, script_repository, review_repository):
+        """Test that Review is persisted and can be retrieved."""
+        # Create a story in the correct state
+        story = Story(
+            idea_json='{"title": "Test Story"}',
+            state=STATE_REVIEW_SCRIPT_EDITING
+        )
+        story = story_repository.insert(story)
+        
+        # Create a script for the story
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="This is the script content."
+        )
+        script = script_repository.insert(script)
+        
+        # Update story to reference the script
+        story.script_id = script.id
+        story_repository.update(story)
+        
+        # Process the review
+        result = process_review_script_editing(db_connection)
+        
+        # Verify: Review can be retrieved from database
+        retrieved_review = review_repository.find_by_id(result.review.id)
+        assert retrieved_review is not None
+        assert retrieved_review.score == result.review.score
+        assert retrieved_review.text == result.review.text
+    
+    def test_script_text_used_for_evaluation(self, db_connection, story_repository, script_repository):
+        """Test that Script text is used for evaluation when available."""
+        # Create a story in the correct state
+        story = Story(
+            idea_json='{"title": "Test Story"}',
+            state=STATE_REVIEW_SCRIPT_EDITING
+        )
+        story = story_repository.insert(story)
+        
+        # Create a script with wordy text that will get lower score
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="In order to do this. Due to the fact that it is. Very unique. Past history."
+        )
+        script = script_repository.insert(script)
+        
+        # Update story to reference the script
+        story.script_id = script.id
+        story_repository.update(story)
+        
+        # Process the review (should use script text from database)
+        result = process_review_script_editing(db_connection)
+        
+        # Verify: Review mentions editing issues
+        assert result is not None
+        assert "wordy" in result.review.text.lower() or "redundant" in result.review.text.lower()
