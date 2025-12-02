@@ -457,14 +457,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             if logger:
                 logger.info(f"Preview mode: {len(variants)} variants created but not saved")
         
-        # Output as JSON option
-        json_choice = input(f"\n{Colors.CYAN}Output as JSON? (y/n) [n]: {Colors.END}").strip().lower()
-        if json_choice == 'y':
-            print_section("JSON Output")
-            print(json.dumps(variants, indent=2, ensure_ascii=False))
-            if logger:
-                logger.info("User requested JSON output")
-        
         print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
         print("Enter new text or type 'quit' to exit.\n")
 
