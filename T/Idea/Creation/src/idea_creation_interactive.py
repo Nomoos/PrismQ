@@ -140,17 +140,17 @@ def get_database_path() -> str:
     """Get the database path for saving ideas.
     
     Returns database path from Config if available, otherwise falls back
-    to the default database location in the repository root.
+    to C:/PrismQ/db.s3db.
     
     Returns:
-        Path to the database file
+        Path to the database file (db.s3db in working directory)
     """
     if Config is not None:
         config = Config(interactive=False)
         return config.database_path
     else:
-        # Fallback to default database location
-        return str(REPO_ROOT / "idea.db")
+        # Fallback to C:/PrismQ/db.s3db
+        return str(Path("C:/PrismQ") / "db.s3db")
 
 
 # =============================================================================

@@ -19,8 +19,8 @@ Schema:
 Usage:
     from src import IdeaDatabase, setup_idea_database
     
-    # Setup database
-    db = setup_idea_database("ideas.db")
+    # Setup database (default: db.s3db)
+    db = setup_idea_database()
     
     # Insert an idea
     idea_id = db.insert_idea("Write a horror story about...")
@@ -61,11 +61,11 @@ class IdeaDatabase:
         >>> db.close()
     """
     
-    def __init__(self, db_path: str = "idea.db"):
+    def __init__(self, db_path: str = "db.s3db"):
         """Initialize database connection.
         
         Args:
-            db_path: Path to SQLite database file
+            db_path: Path to SQLite database file (default: db.s3db)
         """
         self.db_path = db_path
         self.conn: Optional[sqlite3.Connection] = None
@@ -367,11 +367,11 @@ class IdeaDatabase:
         return result if result is not None else 0
 
 
-def setup_idea_database(db_path: str = "idea.db") -> IdeaDatabase:
+def setup_idea_database(db_path: str = "db.s3db") -> IdeaDatabase:
     """Initialize and setup the Idea database.
     
     Args:
-        db_path: Path to the database file
+        db_path: Path to the database file (default: db.s3db)
         
     Returns:
         Configured IdeaDatabase instance with tables created

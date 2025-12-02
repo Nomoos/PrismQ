@@ -5,7 +5,6 @@ and .env files, with standardized working directory management.
 """
 
 import os
-import platform
 from pathlib import Path
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv, set_key
@@ -22,9 +21,10 @@ class Config:
     For example, the CLI --top argument overrides these defaults at runtime.
     
     Working Directory:
-    - Windows: C:\\PrismQ (permanent MVP location as specified)
-    - Unix-like: ~/PrismQ (expanded to user's home directory)
-    - Legacy: Falls back to PrismQ_WD sibling directory if PrismQ found in path
+    - Default: C:/PrismQ (fallback for all platforms)
+    - Override: Set PRISMQ_WORKING_DIRECTORY environment variable
+    - .env file: C:/PrismQ/.env (fallback)
+    - Database: db.s3db in working directory
     """
     
     # Runtime parameter defaults (not environment variables)
@@ -75,10 +75,7 @@ class Config:
         
         Returns the working directory based on the following priority:
         1. PRISMQ_WORKING_DIRECTORY environment variable (if set)
-        2. C:\\PrismQ on Windows (MVP permanent location)
-        3. ~/PrismQ on Unix-like systems (expanded to user's home)
-        4. PrismQ_WD sibling to PrismQ directory (legacy fallback)
-        5. Current directory (final fallback)
+        2. C:/PrismQ (fallback for all platforms)
         
         Returns:
             Path to the working directory
@@ -88,15 +85,8 @@ class Config:
         if env_override:
             return Path(env_override).absolute()
         
-        # Use platform-specific standard location
-        system = platform.system()
-        
-        if system == "Windows":
-            # Windows: C:\PrismQ (as specified in requirements)
-            return Path("C:/PrismQ")
-        else:
-            # Unix-like systems: ~/PrismQ
-            return Path.home() / "PrismQ"
+        # Fallback: C:/PrismQ for all platforms
+        return Path("C:/PrismQ")
     
     def _find_prismq_directory(self) -> Path:
         """Find the topmost/root parent directory with exact name 'PrismQ'.
