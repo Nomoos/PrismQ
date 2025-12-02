@@ -33,10 +33,32 @@ from T.Database.models.review import Review
 from T.Database.models.story import Story
 from T.Database.repositories.story_repository import StoryRepository
 from T.State.constants.state_names import StateNames
-from T.Review.Script.Readability.script_readability_review import (
-    review_script_readability,
-    ReadabilityReview,
-)
+
+# Direct import to avoid circular import through T.Review.Script.__init__
+import importlib.util
+from pathlib import Path
+
+# Load the script_readability_review module directly with error handling
+_module_dir = Path(__file__).parent.parent
+_module_path = _module_dir / "script_readability_review.py"
+
+try:
+    if not _module_path.exists():
+        raise FileNotFoundError(f"Required module not found: {_module_path}")
+    
+    _spec = importlib.util.spec_from_file_location("script_readability_review", _module_path)
+    if _spec is None or _spec.loader is None:
+        raise ImportError(f"Could not load module spec for: {_module_path}")
+    
+    _readability_module = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_readability_module)
+    
+    review_script_readability = _readability_module.review_script_readability
+    ReadabilityReview = _readability_module.ReadabilityReview
+except (FileNotFoundError, ImportError, SyntaxError, AttributeError) as e:
+    raise ImportError(
+        f"Failed to load script_readability_review module from {_module_path}: {e}"
+    ) from e
 
 
 # Score threshold for accepting a script readability review
