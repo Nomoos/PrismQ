@@ -30,18 +30,40 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 src_dir = current_dir
 model_dir = os.path.join(current_dir, '../../Model/src')
 model_base = os.path.join(current_dir, '../../Model')
+repo_root = os.path.join(current_dir, '../../../../')
 
 sys.path.insert(0, src_dir)
 sys.path.insert(0, model_dir)
 sys.path.insert(0, model_base)
+sys.path.insert(0, repo_root)
 
 from creation import IdeaCreator, CreationConfig
 from idea import Idea, ContentGenre, IdeaStatus
 from idea_db import IdeaDatabase
 
+# Try to import Config for database path
+try:
+    from src import Config
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
+
+
+def get_default_db_path() -> str:
+    """Get the default database path from Config or fallback.
+    
+    Returns:
+        Path to the database file (db.s3db in working directory)
+    """
+    if CONFIG_AVAILABLE:
+        config = Config(interactive=False)
+        return config.database_path
+    else:
+        # Fallback to C:/PrismQ/db.s3db
+        return os.path.join("C:/PrismQ", "db.s3db")
+
 
 # Module constants
-DEFAULT_DB_FILENAME = "idea.db"
 DEFAULT_COUNT = 10
 DEFAULT_MODEL = "llama3.1:70b-q4_K_M"
 DEFAULT_TEMPERATURE = 0.8
@@ -267,7 +289,7 @@ def save_idea_to_db(idea: Idea, db_path: Optional[str] = None) -> int:
         CLIError: If database save fails
     """
     try:
-        db = IdeaDatabase(db_path or DEFAULT_DB_FILENAME)
+        db = IdeaDatabase(db_path or get_default_db_path())
         db.connect()
         db.create_tables()
         
@@ -497,7 +519,7 @@ Examples:
     parser.add_argument(
         '--db-path',
         dest='db_path',
-        help='Path to the database file (default: idea.db)'
+        help='Path to the database file (default: db.s3db in working directory)'
     )
     
     parsed = parser.parse_args(args)

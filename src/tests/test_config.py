@@ -3,7 +3,6 @@
 import pytest
 import tempfile
 import os
-import platform
 from pathlib import Path
 from src import Config
 
@@ -168,11 +167,8 @@ def test_existing_env_values_preserved(temp_dir, clean_env):
         assert "DATABASE_URL=sqlite:///custom.db" in content
 
 
-def test_standard_working_directory_windows(temp_dir, clean_env, monkeypatch):
-    """Test that standard working directory is C:\\PrismQ on Windows."""
-    # Mock platform.system to return Windows
-    monkeypatch.setattr(platform, 'system', lambda: 'Windows')
-    
+def test_standard_working_directory_with_explicit_env_path(temp_dir, clean_env):
+    """Test that working directory is derived from env_file path when provided."""
     env_path = Path(temp_dir) / ".env"
     config = Config(str(env_path), interactive=False)
     
@@ -181,15 +177,15 @@ def test_standard_working_directory_windows(temp_dir, clean_env, monkeypatch):
     assert config.working_directory == temp_dir
 
 
-def test_standard_working_directory_unix(temp_dir, clean_env, monkeypatch):
-    """Test that standard working directory is ~/PrismQ on Unix-like systems."""
-    # Mock platform.system to return Linux
-    monkeypatch.setattr(platform, 'system', lambda: 'Linux')
+def test_standard_working_directory_fallback(temp_dir, clean_env):
+    """Test that PRISMQ_WORKING_DIRECTORY env var overrides the default C:/PrismQ fallback."""
+    # Override the working directory to use temp_dir for testing
+    # Note: We use the override because C:/PrismQ may not exist in the test environment
+    os.environ["PRISMQ_WORKING_DIRECTORY"] = temp_dir
     
-    env_path = Path(temp_dir) / ".env"
-    config = Config(str(env_path), interactive=False)
+    config = Config(interactive=False)
     
-    # Working directory should be derived from env_file path
+    # Working directory should use the override
     assert config.working_directory == temp_dir
 
 
