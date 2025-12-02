@@ -35,7 +35,7 @@ ScriptContentReviewer = _scr_module.ScriptContentReviewer
 ContentReviewResult = _scr_module.ContentReviewResult
 review_oldest_story_content = _scr_module.review_oldest_story_content
 
-from T.Review.Content.content_review import ContentReview
+from T.Review.Model.src.content_review import ContentReview
 from T.Database.models.story import Story
 from T.Database.models.script import Script
 from T.Database.models.review import Review

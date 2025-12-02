@@ -8,10 +8,13 @@ This module provides AI-powered consistency review for script content, checking:
 - Repeated detail matching
 
 Stage 17 (MVP-017): Consistency Review
+
+DEPRECATED: This module is deprecated. Import from T.Review.Model instead:
+    from T.Review.Model import ConsistencyReview, ConsistencyIssue, ConsistencyIssueType, ConsistencySeverity
 """
 
 from T.Review import ReviewSeverity
-from .consistency_review import (
+from T.Review.Model.src.consistency_review import (
     ConsistencyReview,
     ConsistencyIssue,
     ConsistencyIssueType,
