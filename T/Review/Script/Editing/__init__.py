@@ -9,6 +9,13 @@ This module serves as a quality gate in the workflow:
 - If FAILS: return to Script Refinement (Stage 11) with detailed feedback
 """
 
+from .editing_review import (
+    EditingReview,
+    EditingIssue,
+    EditingIssueType,
+    EditingSeverity
+)
+
 from .script_editing_review import (
     ScriptEditingChecker,
     review_script_editing,
@@ -17,6 +24,12 @@ from .script_editing_review import (
 )
 
 __all__ = [
+    # Editing Review Model
+    "EditingReview",
+    "EditingIssue",
+    "EditingIssueType",
+    "EditingSeverity",
+    # Service
     "ScriptEditingChecker",
     "review_script_editing",
     "review_script_editing_to_json",

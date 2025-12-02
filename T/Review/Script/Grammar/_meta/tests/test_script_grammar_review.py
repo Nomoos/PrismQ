@@ -21,9 +21,7 @@ from T.Review.Script.Grammar import (
     ScriptGrammarChecker,
     review_script_grammar,
     review_script_grammar_to_json,
-    get_grammar_feedback
-)
-from T.Review.Grammar import (
+    get_grammar_feedback,
     GrammarReview,
     GrammarIssue,
     GrammarIssueType,
