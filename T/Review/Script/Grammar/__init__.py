@@ -21,6 +21,13 @@ Usage:
     >>> result = service.process_oldest_story()
 """
 
+from .grammar_review import (
+    GrammarReview,
+    GrammarIssue,
+    GrammarIssueType,
+    GrammarSeverity
+)
+
 from .script_grammar_review import (
     ScriptGrammarChecker,
     review_script_grammar,
@@ -39,6 +46,11 @@ from .script_grammar_service import (
 )
 
 __all__ = [
+    # Grammar model
+    "GrammarReview",
+    "GrammarIssue",
+    "GrammarIssueType",
+    "GrammarSeverity",
     # Grammar checker
     "ScriptGrammarChecker",
     "review_script_grammar",

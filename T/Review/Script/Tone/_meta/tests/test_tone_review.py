@@ -8,7 +8,7 @@ project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
 import pytest
-from T.Review.Tone import (
+from T.Review.Script.Tone import (
     ToneReview,
     ToneIssue,
     ToneIssueType,

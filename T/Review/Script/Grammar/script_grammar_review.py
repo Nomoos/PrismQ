@@ -18,13 +18,8 @@ import json
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import asdict
 
-# Import the GrammarReview model from T.Review.Grammar
-import sys
-from pathlib import Path
-project_root = Path(__file__).resolve().parents[4]  # Grammar -> Script -> Review -> T -> PrismQ
-sys.path.insert(0, str(project_root))
-
-from T.Review.Grammar import (
+# Import the GrammarReview model from local module
+from .grammar_review import (
     GrammarReview,
     GrammarIssue,
     GrammarIssueType,

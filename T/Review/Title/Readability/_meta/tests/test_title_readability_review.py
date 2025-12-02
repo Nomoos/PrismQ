@@ -15,7 +15,7 @@ sys.path.insert(0, str(project_root))
 import pytest
 import json
 from datetime import datetime
-from T.Review.Readability import (
+from T.Review.Title.Readability import (
     TitleReadabilityReview,
     ReadabilityIssue,
     ReadabilityIssueType,
