@@ -1,7 +1,7 @@
 """Tests for PrismQ.T.Review.Script.Readability module.
 
 These tests verify the review script readability workflow stage:
-1. Selecting oldest Story with correct state
+1. Selecting Story with script that has the lowest current version number
 2. Creating Review model with text and score
 3. State transitions based on review acceptance
 """
@@ -19,8 +19,10 @@ _project_root = _test_dir.parent
 sys.path.insert(0, str(_project_root))
 
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.models.review import Review
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.State.constants.state_names import StateNames
 
 
@@ -32,6 +34,7 @@ _spec.loader.exec_module(_module)
 
 ReviewResult = _module.ReviewResult
 process_review_script_readability = _module.process_review_script_readability
+get_story_for_review = _module.get_story_for_review
 get_oldest_story_for_review = _module.get_oldest_story_for_review
 determine_next_state = _module.determine_next_state
 create_review = _module.create_review
@@ -42,14 +45,33 @@ STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = _module.STATE_SCRIPT_FROM_TITLE_REVIEW_S
 STATE_STORY_REVIEW = _module.STATE_STORY_REVIEW
 
 
+def get_script_schema():
+    """Get the SQL CREATE TABLE statement for Script model."""
+    return """
+    CREATE TABLE IF NOT EXISTS Script (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        story_id INTEGER NOT NULL,
+        version INTEGER NOT NULL CHECK (version >= 0),
+        text TEXT NOT NULL,
+        review_id INTEGER NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(story_id, version),
+        FOREIGN KEY (story_id) REFERENCES Story(id),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
+    );
+    """
+
+
 @pytest.fixture
 def db_connection():
-    """Create an in-memory SQLite database with Story table."""
+    """Create an in-memory SQLite database with Story and Script tables."""
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     
     # Create Story table
     conn.executescript(Story.get_sql_schema())
+    # Create Script table
+    conn.executescript(get_script_schema())
     
     yield conn
     conn.close()
@@ -61,8 +83,99 @@ def story_repository(db_connection):
     return StoryRepository(db_connection)
 
 
+@pytest.fixture
+def script_repository(db_connection):
+    """Create a ScriptRepository instance."""
+    return ScriptRepository(db_connection)
+
+
+class TestGetStoryForReview:
+    """Tests for get_story_for_review function."""
+    
+    def test_returns_none_when_no_stories(self, story_repository, script_repository):
+        """Should return None when no stories exist."""
+        result = get_story_for_review(story_repository, script_repository)
+        assert result is None
+    
+    def test_returns_none_when_no_stories_in_correct_state(self, story_repository, script_repository):
+        """Should return None when no stories have the correct state."""
+        # Create a story with different state
+        story = Story(
+            idea_json='{"title": "Test"}',
+            state=StateNames.IDEA_CREATION
+        )
+        story_repository.insert(story)
+        
+        result = get_story_for_review(story_repository, script_repository)
+        assert result is None
+    
+    def test_returns_story_with_lowest_script_version(self, story_repository, script_repository, db_connection):
+        """Should return the story whose script has the lowest current version."""
+        # Create first story with script v0
+        story1 = Story(
+            idea_json='{"title": "Story 1 - Low Version"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story1 = story_repository.insert(story1)
+        script1 = Script(story_id=story1.id, version=0, text="Script v0 for story 1")
+        script1 = script_repository.insert(script1)
+        story1.script_id = script1.id
+        story_repository.update(story1)
+        
+        # Create second story with script v2
+        story2 = Story(
+            idea_json='{"title": "Story 2 - High Version"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story2 = story_repository.insert(story2)
+        # Insert multiple versions for story2
+        script2_v0 = Script(story_id=story2.id, version=0, text="Script v0 for story 2")
+        script_repository.insert(script2_v0)
+        script2_v1 = Script(story_id=story2.id, version=1, text="Script v1 for story 2")
+        script_repository.insert(script2_v1)
+        script2_v2 = Script(story_id=story2.id, version=2, text="Script v2 for story 2")
+        script2_v2 = script_repository.insert(script2_v2)
+        story2.script_id = script2_v2.id
+        story_repository.update(story2)
+        
+        result = get_story_for_review(story_repository, script_repository)
+        
+        assert result is not None
+        # story1 has lower current version (v0) than story2 (v2)
+        assert result.id == story1.id
+        assert result.idea_json == '{"title": "Story 1 - Low Version"}'
+    
+    def test_returns_story_without_script_first(self, story_repository, script_repository):
+        """Story without a script should be selected first (treated as version 0)."""
+        # Create story with no script
+        story1 = Story(
+            idea_json='{"title": "Story without script"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story1 = story_repository.insert(story1)
+        
+        # Create story with script v1
+        story2 = Story(
+            idea_json='{"title": "Story with script v1"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story2 = story_repository.insert(story2)
+        script2_v0 = Script(story_id=story2.id, version=0, text="Script v0")
+        script_repository.insert(script2_v0)
+        script2_v1 = Script(story_id=story2.id, version=1, text="Script v1")
+        script2_v1 = script_repository.insert(script2_v1)
+        story2.script_id = script2_v1.id
+        story_repository.update(story2)
+        
+        result = get_story_for_review(story_repository, script_repository)
+        
+        assert result is not None
+        # Story without script (treated as v0) should be selected
+        assert result.id == story1.id
+
+
 class TestGetOldestStoryForReview:
-    """Tests for get_oldest_story_for_review function."""
+    """Tests for deprecated get_oldest_story_for_review function."""
     
     def test_returns_none_when_no_stories(self, story_repository):
         """Should return None when no stories exist."""
@@ -397,28 +510,42 @@ This is a very long sentence that goes on and on without any natural pauses or b
         if not result.accepted:
             assert updated.state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
-    def test_multiple_stories_processed_in_order(self, db_connection, story_repository):
-        """Test that multiple stories are processed oldest first."""
-        # Create multiple stories
+    def test_multiple_stories_processed_by_script_version(self, db_connection, story_repository, script_repository):
+        """Test that multiple stories are processed by lowest script version first."""
+        # Create story1 with script v2
         story1 = Story(
-            idea_json='{"title": "Story 1"}',
+            idea_json='{"title": "Story 1 - Higher Version"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
         story1 = story_repository.insert(story1)
+        # Create multiple script versions for story1
+        script1_v0 = Script(story_id=story1.id, version=0, text="Script v0")
+        script_repository.insert(script1_v0)
+        script1_v1 = Script(story_id=story1.id, version=1, text="Script v1")
+        script_repository.insert(script1_v1)
+        script1_v2 = Script(story_id=story1.id, version=2, text="Script v2")
+        script1_v2 = script_repository.insert(script1_v2)
+        story1.script_id = script1_v2.id
+        story_repository.update(story1)
         
+        # Create story2 with script v0 (lower version - should be processed first)
         story2 = Story(
-            idea_json='{"title": "Story 2"}',
+            idea_json='{"title": "Story 2 - Lower Version"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
         story2 = story_repository.insert(story2)
+        script2_v0 = Script(story_id=story2.id, version=0, text="Script v0 for story 2")
+        script2_v0 = script_repository.insert(script2_v0)
+        story2.script_id = script2_v0.id
+        story_repository.update(story2)
         
-        # Process first story
+        # Process first story - should be story2 (lower version)
         result1 = process_review_script_readability(db_connection)
-        assert result1.story.id == story1.id
+        assert result1.story.id == story2.id
         
-        # Process second story
+        # Process second story - should be story1 (higher version)
         result2 = process_review_script_readability(db_connection)
-        assert result2.story.id == story2.id
+        assert result2.story.id == story1.id
         
         # No more stories to process
         result3 = process_review_script_readability(db_connection)

@@ -31,7 +31,9 @@ from typing import Optional, Tuple, List
 
 from T.Database.models.review import Review
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.State.constants.state_names import StateNames
 
 # Direct import to avoid circular import through T.Review.Script.__init__
@@ -88,10 +90,67 @@ class ReviewResult:
     readability_review: Optional[ReadabilityReview] = None
 
 
+def get_story_for_review(
+    story_repository: StoryRepository,
+    script_repository: ScriptRepository
+) -> Optional[Story]:
+    """Get the Story whose script has the lowest current version number.
+    
+    Selection criteria:
+    1. Get all stories with state 'PrismQ.T.Review.Script.Readability'
+    2. For each story, get its script via story.script_id
+    3. For each script, get its current (highest) version number for the same story_id
+    4. Return the story whose script has the lowest current version number
+    
+    Args:
+        story_repository: Repository for Story database operations
+        script_repository: Repository for Script database operations
+        
+    Returns:
+        Story with the lowest current script version, or None if none found
+    """
+    # Get all stories in the readability review state
+    stories = story_repository.find_by_state(STATE_REVIEW_SCRIPT_READABILITY)
+    
+    if not stories:
+        return None
+    
+    # Find the story whose script has the lowest current version number
+    # "Current version" = the highest version number among all scripts for a story
+    story_with_lowest_version = None
+    lowest_version = float('inf')
+    
+    for story in stories:
+        if story.script_id is None:
+            # Story without a script - treat as version 0 (highest priority)
+            current_version = 0
+        else:
+            # Get the script by ID to find the story_id
+            script = script_repository.find_by_id(story.script_id)
+            if script is None:
+                # Script not found - treat as version 0
+                current_version = 0
+            else:
+                # Get the current (highest) version for this story's scripts
+                # This is the "current version" - the most recent version of the script
+                latest_script = script_repository.find_latest_version(script.story_id)
+                current_version = latest_script.version if latest_script else 0
+        
+        if current_version < lowest_version:
+            lowest_version = current_version
+            story_with_lowest_version = story
+    
+    return story_with_lowest_version
+
+
+# Keep the old function for backward compatibility but mark as deprecated
 def get_oldest_story_for_review(
     story_repository: StoryRepository
 ) -> Optional[Story]:
-    """Get the oldest Story with state 'PrismQ.T.Review.Script.Readability'.
+    """DEPRECATED: Get the oldest Story with state 'PrismQ.T.Review.Script.Readability'.
+    
+    This function is deprecated. Use get_story_for_review() instead, which selects
+    stories based on the lowest current script version number.
     
     Args:
         story_repository: Repository for Story database operations
@@ -211,10 +270,11 @@ def process_review_script_readability(
     """Process the script readability review workflow stage.
     
     This function:
-    1. Finds the oldest Story with state 'PrismQ.T.Review.Script.Readability'
-    2. Evaluates the script for voiceover readability
-    3. Creates a Review record
-    4. Updates the Story state based on review outcome
+    1. Finds the Story with the lowest current script version in state 'PrismQ.T.Review.Script.Readability'
+    2. Retrieves the Script associated with the Story via story.script_id
+    3. Evaluates the script for voiceover readability
+    4. Creates a Review record
+    5. Updates the Story state based on review outcome
     
     Args:
         connection: SQLite database connection
@@ -229,18 +289,31 @@ def process_review_script_readability(
     connection.row_factory = sqlite3.Row
     
     story_repository = StoryRepository(connection)
+    script_repository = ScriptRepository(connection)
     
-    # Get oldest story in readability review state
-    story = get_oldest_story_for_review(story_repository)
+    # Get story with lowest current script version in readability review state
+    story = get_story_for_review(story_repository, script_repository)
     
     if story is None:
         return None
     
-    # Get script text (use override if provided, for testing)
-    # In production, this would come from the Script table via script_id
-    actual_script_text = script_text or "Sample script content for readability review"
-    actual_script_id = script_id or f"script-{story.script_id}" if story.script_id else "script-001"
-    actual_script_version = script_version or "v3"
+    # Get script text from database if not provided
+    actual_script_text = script_text
+    actual_script_id = script_id
+    actual_script_version = script_version
+    
+    if actual_script_text is None and story.script_id is not None:
+        # Get the script from the database
+        script = script_repository.find_by_id(story.script_id)
+        if script is not None:
+            actual_script_text = script.text
+            actual_script_id = str(script.id)
+            actual_script_version = f"v{script.version}"
+    
+    # Fallback values for testing or if no script found
+    actual_script_text = actual_script_text or "Sample script content for readability review"
+    actual_script_id = actual_script_id or f"script-{story.script_id}" if story.script_id else "script-001"
+    actual_script_version = actual_script_version or "v3"
     
     # Evaluate the script for readability
     score, review_text, readability_review = evaluate_script_readability(
@@ -303,6 +376,7 @@ __all__ = [
     "determine_next_state",
     "create_review",
     "evaluate_script_readability",
+    "get_story_for_review",
     "ACCEPTANCE_THRESHOLD",
     "STATE_REVIEW_SCRIPT_READABILITY",
     "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
