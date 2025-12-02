@@ -1,7 +1,7 @@
 """Review Repository - SQLite implementation for Review entities.
 
 This module provides SQLite implementation of the IRepository interface
-for Review entities, handling all database operations.
+for Review entities, handling all database operations for reviews.
 
 Usage:
     >>> import sqlite3
@@ -15,6 +15,7 @@ Usage:
     >>> # Insert new review
     >>> review = Review(text="Great script!", score=85)
     >>> saved = repo.insert(review)
+    >>> print(saved.id)
 """
 
 import sqlite3
@@ -40,12 +41,12 @@ class ReviewRepository(IRepository[Review, int]):
         >>> repo = ReviewRepository(conn)
         >>> 
         >>> # Create schema
-        >>> conn.executescript(ReviewRepository.get_sql_schema())
+        >>> repo.create_table()
         >>> 
         >>> # Insert review
-        >>> review = Review(text="Great script!", score=85)
+        >>> review = Review(text="Good quality script", score=80)
         >>> saved = repo.insert(review)
-        >>> print(saved.id)  # Auto-generated ID
+        >>> print(saved.id)
     """
     
     def __init__(self, connection: sqlite3.Connection):
@@ -56,6 +57,25 @@ class ReviewRepository(IRepository[Review, int]):
                 recommended for dictionary-like row access.
         """
         self._conn = connection
+    
+    def create_table(self) -> None:
+        """Create the Review table if it doesn't exist.
+        
+        Creates the Review table with schema:
+            - id INTEGER PRIMARY KEY AUTOINCREMENT
+            - text TEXT NOT NULL
+            - score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100)
+            - created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        """
+        self._conn.execute("""
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """)
+        self._conn.commit()
     
     # === READ Operations ===
     
@@ -69,8 +89,7 @@ class ReviewRepository(IRepository[Review, int]):
             Review if found, None otherwise.
         """
         cursor = self._conn.execute(
-            "SELECT id, text, score, created_at "
-            "FROM Review WHERE id = ?",
+            "SELECT id, text, score, created_at FROM Review WHERE id = ?",
             (id,)
         )
         row = cursor.fetchone()
@@ -87,8 +106,7 @@ class ReviewRepository(IRepository[Review, int]):
             List of all Review entities, ordered by id.
         """
         cursor = self._conn.execute(
-            "SELECT id, text, score, created_at "
-            "FROM Review ORDER BY id"
+            "SELECT id, text, score, created_at FROM Review ORDER BY id"
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
     
@@ -121,12 +139,11 @@ class ReviewRepository(IRepository[Review, int]):
             The inserted Review with id populated.
         """
         cursor = self._conn.execute(
-            "INSERT INTO Review (text, score, created_at) "
-            "VALUES (?, ?, ?)",
+            "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
             (
                 entity.text,
                 entity.score,
-                entity.created_at.isoformat()
+                entity.created_at.isoformat() if entity.created_at else datetime.now().isoformat()
             )
         )
         self._conn.commit()
@@ -134,35 +151,6 @@ class ReviewRepository(IRepository[Review, int]):
         # Update entity with generated ID
         entity.id = cursor.lastrowid
         return entity
-    
-    # === Custom Query Methods ===
-    
-    def find_by_score_range(self, min_score: int, max_score: int) -> List[Review]:
-        """Find all reviews within a score range.
-        
-        Args:
-            min_score: Minimum score (inclusive).
-            max_score: Maximum score (inclusive).
-            
-        Returns:
-            List of Review entities within the score range.
-        """
-        cursor = self._conn.execute(
-            "SELECT id, text, score, created_at "
-            "FROM Review WHERE score >= ? AND score <= ? "
-            "ORDER BY score DESC",
-            (min_score, max_score)
-        )
-        return [self._row_to_model(row) for row in cursor.fetchall()]
-    
-    def count_all(self) -> int:
-        """Count all reviews.
-        
-        Returns:
-            Total number of reviews.
-        """
-        cursor = self._conn.execute("SELECT COUNT(*) FROM Review")
-        return cursor.fetchone()[0]
     
     # === Helper Methods ===
     
@@ -185,19 +173,3 @@ class ReviewRepository(IRepository[Review, int]):
             score=row["score"],
             created_at=created_at
         )
-    
-    @staticmethod
-    def get_sql_schema() -> str:
-        """Get the SQL CREATE TABLE statement for Review.
-        
-        Returns:
-            SQL statement to create the Review table.
-        """
-        return """
-        CREATE TABLE IF NOT EXISTS Review (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            text TEXT NOT NULL,
-            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-        """
