@@ -81,8 +81,8 @@ T/Review/Script/Tone/
 ## Configuration
 
 - `ACCEPTANCE_THRESHOLD`: Score threshold (0-100) for accepting a script
-  - Default: 70
-  - Scripts scoring >= 70 proceed to editing review
+  - Default: 75
+  - Scripts scoring >= 75 proceed to editing review
   - Scripts scoring < 70 are sent back for rewrite
 
 ## Related Components

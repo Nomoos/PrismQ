@@ -42,7 +42,7 @@ from T.State.constants.state_names import StateNames
 
 
 # Score threshold for accepting a script review
-ACCEPTANCE_THRESHOLD = 70
+ACCEPTANCE_THRESHOLD = 75
 
 # State constants
 STATE_REVIEW_SCRIPT_TONE = StateNames.REVIEW_SCRIPT_TONE
