@@ -2956,6 +2956,10 @@ DEFAULT_DECAY_FACTOR = 0.4
 # Weight scale is 0-100, minimum is 2 to ensure variants remain selectable
 MIN_DECAY_WEIGHT = 2
 
+# Minimum length for generated Idea text in characters
+# Ensures all generated text provides sufficient context and value
+MIN_IDEA_TEXT_LENGTH = 100
+
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
 
@@ -3519,15 +3523,17 @@ def format_idea_as_text(variant: Dict[str, Any]) -> str:
     """Format a variant dictionary as clean, readable text.
     
     Removes all metadata and structural elements, outputting only
-    the creative content as natural text.
+    the creative content as natural text. Guarantees minimum output
+    length of MIN_IDEA_TEXT_LENGTH characters.
     
     Args:
         variant: A variant dictionary from create_idea_variant
         
     Returns:
-        Clean text representation of the idea
+        Clean text representation of the idea (minimum 100 characters)
     """
     variant_type = variant.get("variant_type", "")
+    source_title = variant.get("source_title", "")
     
     # Skip metadata fields
     skip_fields = {
@@ -3543,124 +3549,533 @@ def format_idea_as_text(variant: Dict[str, Any]) -> str:
         if variant.get("unusual_angle"):
             lines.append(f"Angle: {variant['unusual_angle']}")
         lines.append(f"Emotion: {variant.get('main_emotion', '')}")
+        if variant.get("target_audience") and isinstance(variant.get("target_audience"), str):
+            lines.append(f"For: {variant['target_audience']}")
             
     elif variant_type == "mystery":
         lines.append(variant.get("central_mystery", ""))
         lines.append(variant.get("emotional_hook", ""))
         if variant.get("key_hook_scene"):
             lines.append(variant["key_hook_scene"])
+        if variant.get("tone_notes"):
+            lines.append(f"Tone: {variant['tone_notes']}")
             
     elif variant_type == "skeleton":
         lines.append(variant.get("opening_hook", ""))
         lines.append(variant.get("context_setup", ""))
         lines.append(variant.get("rising_stakes", ""))
         lines.append(variant.get("peak_moment", ""))
+        if variant.get("conclusion_shape"):
+            lines.append(f"Conclusion: {variant['conclusion_shape']}")
             
     elif variant_type in ("shortform", "shortform2"):
         lines.append(variant.get("hook_essence", variant.get("concept", "")))
         lines.append(variant.get("premise", ""))
         if variant.get("wow_moment"):
             lines.append(variant["wow_moment"])
+        if variant.get("audience"):
+            lines.append(f"Audience: {variant['audience']}")
             
     elif variant_type == "minimal":
         lines.append(variant.get("hook", ""))
+        if variant.get("audience"):
+            lines.append(f"Audience: {variant['audience']}")
+        if variant.get("tone"):
+            lines.append(f"Tone: {variant['tone']}")
+        if variant.get("length"):
+            lines.append(f"Length: {variant['length']}")
         
     elif variant_type == "4point":
         lines.append(variant.get("hook_moment", ""))
+        if variant.get("target_audience") and isinstance(variant.get("target_audience"), str):
+            lines.append(f"Target: {variant['target_audience']}")
+        if variant.get("style_tone"):
+            lines.append(f"Style: {variant['style_tone']}")
+        if variant.get("ideal_length"):
+            lines.append(f"Length: {variant['ideal_length']}")
         
     elif variant_type == "hook_frame":
         lines.append(variant.get("hook_sentence", ""))
+        if variant.get("title_frame") and isinstance(variant.get("title_frame"), dict):
+            lines.append(f"Title: {variant['title_frame'].get('framed_title', '')}")
+        if variant.get("target_audience") and isinstance(variant.get("target_audience"), str):
+            lines.append(f"Audience: {variant['target_audience']}")
+        if variant.get("suggested_length"):
+            lines.append(f"Length: {variant['suggested_length']}")
         
     elif variant_type == "genre":
         lines.append(variant.get("hook", ""))
+        if variant.get("genre"):
+            lines.append(f"Genre: {variant['genre']}")
+        if variant.get("audience"):
+            lines.append(f"Audience: {variant['audience']}")
+        if variant.get("tone_style"):
+            lines.append(f"Style: {variant['tone_style']}")
+        if variant.get("length_limit"):
+            lines.append(f"Length: {variant['length_limit']}")
         
     elif variant_type == "scene_seed":
         lines.append(variant.get("scene_hook", ""))
+        if variant.get("audience"):
+            lines.append(f"Audience: {variant['audience']}")
+        if variant.get("tone"):
+            lines.append(f"Tone: {variant['tone']}")
+        if variant.get("target_script_length"):
+            lines.append(f"Target length: {variant['target_script_length']}")
         
     elif variant_type == "soft_supernatural":
         lines.append(variant.get("supernatural_element", ""))
         lines.append(variant.get("friendship_dynamic", ""))
         lines.append(f"Emotional core: {variant.get('emotional_core', '')}")
+        if variant.get("twist_seed"):
+            lines.append(f"Twist: {variant['twist_seed']}")
         
     elif variant_type == "light_mystery":
         lines.append(variant.get("central_puzzle", ""))
         lines.append(f"Setting: {variant.get('adventure_setting', '')}")
         lines.append(variant.get("stakes", ""))
+        if variant.get("resolution_style"):
+            lines.append(f"Resolution: {variant['resolution_style']}")
         
     elif variant_type == "scifi_school":
         lines.append(variant.get("tech_concept", ""))
         lines.append(variant.get("social_chaos", ""))
         lines.append(variant.get("moral_question", ""))
+        if variant.get("character_growth"):
+            lines.append(f"Growth: {variant['character_growth']}")
         
     elif variant_type == "safe_survival":
         lines.append(variant.get("challenge_scenario", ""))
         lines.append(variant.get("cooperation_element", ""))
         lines.append(variant.get("discovery", ""))
+        if variant.get("payoff"):
+            lines.append(f"Payoff: {variant['payoff']}")
         
     elif variant_type == "emotional_drama":
         lines.append(variant.get("emotional_premise", ""))
         lines.append(variant.get("character_challenge", ""))
         lines.append(variant.get("turning_point", ""))
+        if variant.get("growth_arc"):
+            lines.append(f"Growth: {variant['growth_arc']}")
         
     elif variant_type == "rivals_allies":
         lines.append(variant.get("rival_groups", ""))
         lines.append(variant.get("common_enemy", ""))
         lines.append(variant.get("transformation", ""))
+        if variant.get("skill_combination"):
+            lines.append(f"Skills: {variant['skill_combination']}")
         
     elif variant_type == "identity_power":
         lines.append(variant.get("identity_struggle", ""))
         lines.append(variant.get("catalyst", ""))
         lines.append(variant.get("empowerment_moment", ""))
+        if variant.get("message_core"):
+            lines.append(f"Message: {variant['message_core']}")
         
     elif variant_type == "ai_companion":
         lines.append(variant.get("ai_personality", ""))
         lines.append(variant.get("mystery_element", ""))
         lines.append(variant.get("helpful_twist", ""))
+        if variant.get("ethical_note"):
+            lines.append(f"Question: {variant['ethical_note']}")
         
     elif variant_type == "urban_quest":
         lines.append(variant.get("urban_setting", ""))
         lines.append(variant.get("quest_mechanism", ""))
         lines.append(variant.get("payoff", ""))
+        if variant.get("social_element"):
+            lines.append(f"Social: {variant['social_element']}")
         
     elif variant_type == "magical_aesthetic":
         lines.append(variant.get("magical_element", ""))
         lines.append(variant.get("aesthetic_world", ""))
         lines.append(variant.get("wonder_moment", ""))
+        if variant.get("character_journey"):
+            lines.append(f"Journey: {variant['character_journey']}")
         
     elif variant_type == "family_drama":
         lines.append(variant.get("hook_line", ""))
         lines.append(variant.get("conflict_core", ""))
         lines.append(variant.get("resolution_direction", ""))
+        if variant.get("emotional_weight"):
+            lines.append(f"Emotional weight: {variant['emotional_weight']}")
         
     elif variant_type == "social_home":
         lines.append(variant.get("digital_trigger", ""))
         lines.append(variant.get("misunderstanding", ""))
         lines.append(variant.get("truth_reveal", ""))
+        if variant.get("aftermath"):
+            lines.append(f"Aftermath: {variant['aftermath']}")
         
     elif variant_type == "realistic_mystery":
         lines.append(variant.get("discovery", ""))
         lines.append(variant.get("question_raised", ""))
         lines.append(variant.get("revelation_type", ""))
+        if variant.get("emotional_stakes"):
+            lines.append(f"Stakes: {variant['emotional_stakes']}")
         
     elif variant_type == "school_family":
         lines.append(variant.get("collision_point", ""))
         lines.append(variant.get("caught_in_middle", ""))
         lines.append(variant.get("survival_mode", ""))
+        if variant.get("outside_perception"):
+            lines.append(f"Perception: {variant['outside_perception']}")
         
     elif variant_type == "personal_voice":
         lines.append(variant.get("voice_hook", ""))
         lines.append(variant.get("internal_conflict", ""))
         lines.append(variant.get("desire_core", ""))
-        
+        if variant.get("truth_behind"):
+            lines.append(f"Truth: {variant['truth_behind']}")
+    
+    # Story seed variants for US women 13-20
+    elif variant_type == "confession_moment":
+        lines.append(variant.get("confession_hook", ""))
+        lines.append(variant.get("what_im_hiding", ""))
+        lines.append(variant.get("why_now", ""))
+        if variant.get("hope_for"):
+            lines.append(f"Hope: {variant['hope_for']}")
+            
+    elif variant_type == "before_after":
+        lines.append(variant.get("before_state", ""))
+        lines.append(variant.get("the_moment", ""))
+        lines.append(variant.get("after_state", ""))
+        if variant.get("unexpected_lesson"):
+            lines.append(f"Lesson: {variant['unexpected_lesson']}")
+            
+    elif variant_type == "overheard_truth":
+        lines.append(variant.get("what_was_heard", ""))
+        lines.append(variant.get("immediate_reaction", ""))
+        lines.append(variant.get("what_it_changed", ""))
+        if variant.get("dilemma"):
+            lines.append(f"Dilemma: {variant['dilemma']}")
+            
+    elif variant_type == "parallel_lives":
+        lines.append(variant.get("the_choice_point", ""))
+        lines.append(variant.get("path_taken", ""))
+        lines.append(variant.get("path_imagined", ""))
+        if variant.get("wondering"):
+            lines.append(f"Wondering: {variant['wondering']}")
+            
+    elif variant_type == "last_time":
+        lines.append(variant.get("the_last_moment", ""))
+        lines.append(variant.get("didnt_know_then", ""))
+        lines.append(variant.get("looking_back", ""))
+        if variant.get("carrying_forward"):
+            lines.append(f"Carrying forward: {variant['carrying_forward']}")
+            
+    elif variant_type == "unsent_message":
+        lines.append(variant.get("the_message", ""))
+        lines.append(variant.get("who_its_for", ""))
+        lines.append(variant.get("why_unsent", ""))
+        if variant.get("still_saved"):
+            lines.append(f"Status: {variant['still_saved']}")
+            
+    elif variant_type == "small_moment_big":
+        lines.append(variant.get("the_small_thing", ""))
+        lines.append(variant.get("why_it_hit", ""))
+        lines.append(variant.get("bigger_pattern", ""))
+        if variant.get("still_thinking"):
+            lines.append(f"Still thinking: {variant['still_thinking']}")
+            
+    elif variant_type == "almost_said":
+        lines.append(variant.get("what_almost_came_out", ""))
+        lines.append(variant.get("the_setting", ""))
+        lines.append(variant.get("the_safer_thing", ""))
+        if variant.get("next_time"):
+            lines.append(f"Next time: {variant['next_time']}")
+            
+    elif variant_type == "what_they_dont_know":
+        lines.append(variant.get("the_surface", ""))
+        lines.append(variant.get("the_truth", ""))
+        lines.append(variant.get("why_hidden", ""))
+        if variant.get("would_change_if"):
+            lines.append(f"Would change if: {variant['would_change_if']}")
+            
+    elif variant_type == "quiet_rebellion":
+        lines.append(variant.get("the_rule_they_break", ""))
+        lines.append(variant.get("how_they_do_it", ""))
+        lines.append(variant.get("why_it_matters", ""))
+        if variant.get("victory_feeling"):
+            lines.append(f"Victory: {variant['victory_feeling']}")
+            
+    elif variant_type == "mirror_moment":
+        lines.append(variant.get("what_they_saw", ""))
+        lines.append(variant.get("expected_vs_actual", ""))
+        lines.append(variant.get("emotional_response", ""))
+        if variant.get("ongoing_question"):
+            lines.append(f"Question: {variant['ongoing_question']}")
+            
+    elif variant_type == "chosen_family":
+        lines.append(variant.get("the_connection", ""))
+        lines.append(variant.get("the_moment_it_clicked", ""))
+        lines.append(variant.get("what_they_offer_each_other", ""))
+        if variant.get("gratitude_for"):
+            lines.append(f"Gratitude: {variant['gratitude_for']}")
+            
+    elif variant_type == "growing_apart":
+        lines.append(variant.get("the_relationship", ""))
+        lines.append(variant.get("first_signs", ""))
+        lines.append(variant.get("the_undeniable_moment", ""))
+        if variant.get("hope_or_grief"):
+            lines.append(f"Feeling: {variant['hope_or_grief']}")
+            
+    elif variant_type == "permission_to":
+        lines.append(variant.get("the_permission", ""))
+        lines.append(variant.get("who_denied_it_before", ""))
+        lines.append(variant.get("what_changed", ""))
+        if variant.get("whats_next"):
+            lines.append(f"What's next: {variant['whats_next']}")
+            
+    elif variant_type == "learned_young":
+        lines.append(variant.get("the_belief", ""))
+        lines.append(variant.get("age_or_moment", ""))
+        lines.append(variant.get("how_it_shaped_them", ""))
+        if variant.get("unlearning_process"):
+            lines.append(f"Unlearning: {variant['unlearning_process']}")
+            
+    elif variant_type == "the_version_of_me":
+        lines.append(variant.get("which_version", ""))
+        lines.append(variant.get("where_it_appears", ""))
+        lines.append(variant.get("how_its_different", ""))
+        if variant.get("wish_for_integration"):
+            lines.append(f"Wish: {variant['wish_for_integration']}")
+            
+    elif variant_type == "emotional_inheritance":
+        lines.append(variant.get("what_was_passed_down", ""))
+        lines.append(variant.get("from_whom", ""))
+        lines.append(variant.get("how_they_noticed", ""))
+        if variant.get("what_theyd_pass_on"):
+            lines.append(f"Pass on: {variant['what_theyd_pass_on']}")
+            
+    elif variant_type == "safe_person":
+        lines.append(variant.get("who_they_are", ""))
+        lines.append(variant.get("what_makes_them_safe", ""))
+        lines.append(variant.get("what_happens_around_them", ""))
+        if variant.get("what_they_give_back"):
+            lines.append(f"Give back: {variant['what_they_give_back']}")
+            
+    elif variant_type == "holding_space":
+        lines.append(variant.get("who_needed_it", ""))
+        lines.append(variant.get("what_was_happening", ""))
+        lines.append(variant.get("what_they_did_instead", ""))
+        if variant.get("what_was_learned"):
+            lines.append(f"Learned: {variant['what_was_learned']}")
+            
+    elif variant_type == "rewriting_the_story":
+        lines.append(variant.get("the_old_story", ""))
+        lines.append(variant.get("the_new_understanding", ""))
+        lines.append(variant.get("how_it_feels_different", ""))
+        if variant.get("ongoing_revision"):
+            lines.append(f"Ongoing: {variant['ongoing_revision']}")
+    
+    # Fusion variants
+    elif variant_type == "confession_mystery":
+        lines.append(variant.get("confession_hook", ""))
+        lines.append(variant.get("hidden_mystery", ""))
+        lines.append(variant.get("what_they_discovered", ""))
+        if variant.get("unresolved_question"):
+            lines.append(f"Unresolved: {variant['unresolved_question']}")
+            
+    elif variant_type == "overheard_transformation":
+        lines.append(variant.get("what_was_heard", ""))
+        lines.append(variant.get("before_hearing", ""))
+        lines.append(variant.get("after_hearing", ""))
+        if variant.get("confrontation_choice"):
+            lines.append(f"Choice: {variant['confrontation_choice']}")
+            
+    elif variant_type == "unsent_rebellion":
+        lines.append(variant.get("the_message", ""))
+        lines.append(variant.get("who_its_for", ""))
+        lines.append(variant.get("why_writing_is_rebellion", ""))
+        if variant.get("power_in_keeping"):
+            lines.append(f"Power: {variant['power_in_keeping']}")
+            
+    elif variant_type == "mirror_inheritance":
+        lines.append(variant.get("what_they_saw", ""))
+        lines.append(variant.get("who_they_saw", ""))
+        lines.append(variant.get("the_pattern", ""))
+        if variant.get("what_changes"):
+            lines.append(f"Changes: {variant['what_changes']}")
+            
+    elif variant_type == "chosen_growing":
+        lines.append(variant.get("fading_connection", ""))
+        lines.append(variant.get("new_connection", ""))
+        lines.append(variant.get("what_new_offers", ""))
+        if variant.get("acceptance"):
+            lines.append(f"Acceptance: {variant['acceptance']}")
+            
+    elif variant_type == "parallel_permission":
+        lines.append(variant.get("the_permission", ""))
+        lines.append(variant.get("earlier_version", ""))
+        lines.append(variant.get("parallel_version", ""))
+        if variant.get("bridging_the_gap"):
+            lines.append(f"Bridging: {variant['bridging_the_gap']}")
+    
+    # Missing theme templates
+    elif variant_type == "first_butterflies":
+        lines.append(variant.get("the_feeling", ""))
+        lines.append(variant.get("what_triggered_it", ""))
+        lines.append(variant.get("internal_chaos", ""))
+        if variant.get("what_they_wish_they_could_do"):
+            lines.append(f"Wish: {variant['what_they_wish_they_could_do']}")
+            
+    elif variant_type == "body_acceptance":
+        lines.append(variant.get("the_struggle", ""))
+        lines.append(variant.get("the_voice", ""))
+        lines.append(variant.get("moment_of_shift", ""))
+        if variant.get("current_truth"):
+            lines.append(f"Now: {variant['current_truth']}")
+            
+    elif variant_type == "fitting_in":
+        lines.append(variant.get("the_situation", ""))
+        lines.append(variant.get("what_others_see", ""))
+        lines.append(variant.get("internal_reality", ""))
+        if variant.get("wish_for"):
+            lines.append(f"Wish: {variant['wish_for']}")
+            
+    elif variant_type == "online_connection":
+        lines.append(variant.get("the_connection", ""))
+        lines.append(variant.get("what_it_provides", ""))
+        lines.append(variant.get("defense_of_realness", ""))
+        if variant.get("complicated_feeling"):
+            lines.append(f"Complicated: {variant['complicated_feeling']}")
+            
+    elif variant_type == "future_anxiety":
+        lines.append(variant.get("the_pressure", ""))
+        lines.append(variant.get("the_truth", ""))
+        lines.append(variant.get("comparison_trap", ""))
+        if variant.get("what_theyd_say_if_honest"):
+            lines.append(f"Honest: {variant['what_theyd_say_if_honest']}")
+            
+    elif variant_type == "comparison_trap":
+        lines.append(variant.get("the_trigger", ""))
+        lines.append(variant.get("what_it_does", ""))
+        lines.append(variant.get("logical_brain", ""))
+        if variant.get("breaking_point"):
+            lines.append(f"Breaking point: {variant['breaking_point']}")
+    
+    # Blend templates - add more handlers
+    elif variant_type == "niche_blend":
+        combined = variant.get("combined_niches", "")
+        if isinstance(combined, list):
+            combined = ", ".join(str(c) for c in combined)
+        lines.append(f"Combined niches: {combined}")
+        lines.append(variant.get("niche_blend_description", ""))
+        lines.append(variant.get("hook_scene", ""))
+        if variant.get("emotional_driver"):
+            lines.append(f"Emotion: {variant['emotional_driver']}")
+    
+    # Family-friendly themes
+    elif variant_type == "fandom_passion":
+        lines.append(variant.get("the_thing", ""))
+        lines.append(variant.get("what_it_gave_you", ""))
+        lines.append(variant.get("the_moment", ""))
+        if variant.get("why_it_matters"):
+            lines.append(f"Why it matters: {variant['why_it_matters']}")
+            
+    elif variant_type == "pet_bond":
+        lines.append(variant.get("who_they_are", ""))
+        lines.append(variant.get("what_they_know", ""))
+        lines.append(variant.get("the_quiet_moment", ""))
+        if variant.get("what_they_taught_you"):
+            lines.append(f"Taught: {variant['what_they_taught_you']}")
+            
+    elif variant_type == "imposter_feelings":
+        lines.append(variant.get("where_it_hits", ""))
+        lines.append(variant.get("the_voice", ""))
+        lines.append(variant.get("the_evidence_for_you", ""))
+        if variant.get("the_crack"):
+            lines.append(f"Crack: {variant['the_crack']}")
+            
+    elif variant_type == "sibling_truth":
+        lines.append(variant.get("the_dynamic", ""))
+        lines.append(variant.get("the_fight_that_wasnt_about_the_thing", ""))
+        lines.append(variant.get("the_moment_of_understanding", ""))
+        if variant.get("the_truth_now"):
+            lines.append(f"Truth now: {variant['the_truth_now']}")
+            
+    elif variant_type == "mentor_moment":
+        lines.append(variant.get("who_they_were", ""))
+        lines.append(variant.get("the_moment", ""))
+        lines.append(variant.get("what_they_gave_you", ""))
+        if variant.get("where_you_carry_it"):
+            lines.append(f"Carry: {variant['where_you_carry_it']}")
+            
+    elif variant_type == "money_reality":
+        lines.append(variant.get("the_awareness", ""))
+        lines.append(variant.get("the_small_thing", ""))
+        lines.append(variant.get("what_it_taught_you", ""))
+        if variant.get("the_truth"):
+            lines.append(f"Truth: {variant['the_truth']}")
+            
+    elif variant_type == "heritage_discovery":
+        lines.append(variant.get("the_two_worlds", ""))
+        lines.append(variant.get("the_question", ""))
+        lines.append(variant.get("the_reclaiming", ""))
+        if variant.get("the_new_story"):
+            lines.append(f"New story: {variant['the_new_story']}")
+            
+    elif variant_type == "grief_growth":
+        lines.append(variant.get("what_changed", ""))
+        lines.append(variant.get("what_actually_helped", ""))
+        lines.append(variant.get("the_carrying", ""))
+        if variant.get("the_growing"):
+            lines.append(f"Growing: {variant['the_growing']}")
+    
     else:
-        # Generic fallback - extract any hook-like fields
-        for key in ["hook", "core_hook", "hook_line", "premise", "concept"]:
-            if key in variant and variant[key]:
-                lines.append(str(variant[key]))
-                break
+        # Generic fallback - extract content from all non-metadata fields
+        content_fields = []
+        priority_keys = [
+            "hook", "core_hook", "hook_line", "hook_sentence", "hook_moment",
+            "premise", "concept", "the_feeling", "the_moment", "the_truth",
+            "confession_hook", "central_mystery", "opening_hook", "scene_hook"
+        ]
+        
+        # First try priority keys
+        for key in priority_keys:
+            if key in variant and variant[key] and str(variant[key]).strip():
+                content_fields.append(str(variant[key]))
+        
+        # Then add other non-metadata string fields
+        for key, value in variant.items():
+            if key not in skip_fields and key not in priority_keys:
+                if isinstance(value, str) and value.strip() and len(value) > 10:
+                    content_fields.append(str(value))
+        
+        # Take up to 4 fields for variety
+        lines.extend(content_fields[:4])
     
     # Filter empty lines and join
-    return "\n".join(line for line in lines if line and line.strip())
+    text = "\n".join(line for line in lines if line and str(line).strip())
+    
+    # Ensure minimum length requirement
+    if len(text) < MIN_IDEA_TEXT_LENGTH:
+        # Add context from source_title and variant info to meet minimum
+        additions = []
+        
+        if source_title:
+            additions.append(f"About: {source_title}")
+        
+        variant_name = variant.get("variant_name", "")
+        if variant_name:
+            additions.append(f"Style: {variant_name}")
+        
+        # Add additional fields if still short
+        if len(text) + sum(len(a) for a in additions) + len(additions) < MIN_IDEA_TEXT_LENGTH:
+            # Look for any string fields we haven't used yet
+            used_values = set(text.split("\n"))
+            for key, value in variant.items():
+                if key not in skip_fields and isinstance(value, str) and value.strip():
+                    if value not in used_values and len(value) > 5:
+                        additions.append(value)
+                        if len(text) + sum(len(a) for a in additions) + len(additions) * 2 >= MIN_IDEA_TEXT_LENGTH:
+                            break
+        
+        if additions:
+            text = text + "\n" + "\n".join(additions) if text else "\n".join(additions)
+    
+    return text
 
 
 def create_idea_text(
@@ -8008,6 +8423,7 @@ __all__ = [
     "DEFAULT_IDEA_COUNT",
     "DEFAULT_DECAY_FACTOR",
     "MIN_DECAY_WEIGHT",
+    "MIN_IDEA_TEXT_LENGTH",
     "TARGET_AUDIENCES",
     # Original template definitions
     "VARIANT_EMOTION_FIRST",
