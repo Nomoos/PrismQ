@@ -81,7 +81,8 @@ def get_story_for_review(
     is the highest version number among all scripts for a given story_id.
     
     This ensures stories with less refined scripts (fewer iterations) are
-    processed first.
+    processed first. Stories without scripts (NULL version) are treated as
+    having the lowest priority (version -1).
     
     Args:
         connection: SQLite database connection
@@ -92,6 +93,7 @@ def get_story_for_review(
     """
     # Query to find stories in the correct state, joined with their scripts,
     # and ordered by the MAX(version) for each story_id (lowest first)
+    # COALESCE handles NULL versions (stories without scripts) consistently
     query = """
         SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.script_id, 
                s.state, s.created_at, s.updated_at,
@@ -100,7 +102,7 @@ def get_story_for_review(
         LEFT JOIN Script sc ON s.id = sc.story_id
         WHERE s.state = ?
         GROUP BY s.id
-        ORDER BY max_script_version ASC, s.created_at ASC
+        ORDER BY COALESCE(max_script_version, -1) ASC, s.created_at ASC
         LIMIT 1
     """
     
