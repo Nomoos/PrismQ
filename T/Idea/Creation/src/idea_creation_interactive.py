@@ -250,15 +250,24 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         log_filename = f"idea_creation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         log_path = SCRIPT_DIR / log_filename
         
-        logging.basicConfig(
-            level=logging.DEBUG if debug else logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(log_path),
-                logging.StreamHandler() if debug else logging.NullHandler()
-            ]
-        )
+        # Create logger with DEBUG level to allow all messages through
+        # Handler levels control what actually gets logged
         logger = logging.getLogger('PrismQ.Idea.Creation')
+        logger.setLevel(logging.DEBUG)
+        
+        # File handler - captures all DEBUG messages (including JSON data)
+        file_handler = logging.FileHandler(log_path)
+        file_handler.setLevel(logging.DEBUG if debug else logging.INFO)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
+        
+        # Console handler - only INFO and above (no JSON dumps to console)
+        if debug:
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+            console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+            logger.addHandler(console_handler)
+        
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
     

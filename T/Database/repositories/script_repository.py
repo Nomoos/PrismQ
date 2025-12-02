@@ -224,6 +224,32 @@ class ScriptRepository(IVersionedRepository[Script, int]):
         """
         return self.find_versions(story_id)
     
+    # === UPDATE Operation (for review_id only) ===
+    
+    def update_review_id(self, script_id: int, review_id: int) -> bool:
+        """Update the review_id FK on a Script.
+        
+        This is a limited update operation specifically for linking
+        a Review to a Script after grammar/quality review is performed.
+        
+        Note:
+            This is an exception to the INSERT+READ only pattern,
+            allowed because review_id is a reference field, not content.
+        
+        Args:
+            script_id: The script's primary key.
+            review_id: The review to link (FK to Review table).
+            
+        Returns:
+            True if the script was updated, False if not found.
+        """
+        cursor = self._conn.execute(
+            "UPDATE Script SET review_id = ? WHERE id = ?",
+            (review_id, script_id)
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
+    
     # === Helper Methods ===
     
     def _row_to_script(self, row: sqlite3.Row) -> Script:
@@ -267,3 +293,27 @@ class ScriptRepository(IVersionedRepository[Script, int]):
         row = cursor.fetchone()
         max_version = row["max_version"] if row["max_version"] is not None else -1
         return max_version + 1
+    
+    def update_review_id(self, script_id: int, review_id: int) -> bool:
+        """Update the review_id FK on an existing script.
+        
+        This is the only UPDATE operation allowed on Script, specifically
+        for linking a Review to a Script after the review is created.
+        
+        Args:
+            script_id: The ID of the script to update.
+            review_id: The ID of the review to link.
+            
+        Returns:
+            True if the update was successful, False if script not found.
+            
+        Example:
+            >>> repo.update_review_id(script_id=5, review_id=10)
+            True
+        """
+        cursor = self._conn.execute(
+            "UPDATE Script SET review_id = ? WHERE id = ?",
+            (review_id, script_id)
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
