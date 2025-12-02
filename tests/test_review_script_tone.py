@@ -2,8 +2,10 @@
 
 These tests verify the review script tone workflow stage:
 1. Selecting oldest Story with correct state
-2. Creating Review model with text and score
-3. State transitions based on review acceptance
+2. Getting the Script for the Story
+3. Creating Review model with text and score
+4. Linking Review to Script via Script.review_id FK
+5. State transitions based on review acceptance
 """
 
 import pytest
@@ -19,8 +21,10 @@ _project_root = _test_dir.parent
 sys.path.insert(0, str(_project_root))
 
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.models.review import Review
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.State.constants.state_names import StateNames
 
 
@@ -33,6 +37,8 @@ _spec.loader.exec_module(_module)
 ReviewResult = _module.ReviewResult
 process_review_script_tone = _module.process_review_script_tone
 get_oldest_story_for_review = _module.get_oldest_story_for_review
+get_script_for_story = _module.get_script_for_story
+save_review = _module.save_review
 determine_next_state = _module.determine_next_state
 create_review = _module.create_review
 evaluate_tone = _module.evaluate_tone
@@ -42,14 +48,42 @@ STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = _module.STATE_SCRIPT_FROM_TITLE_REVIEW_S
 STATE_REVIEW_SCRIPT_EDITING = _module.STATE_REVIEW_SCRIPT_EDITING
 
 
+# SQL schema for Script table
+SCRIPT_SQL_SCHEMA = """
+CREATE TABLE IF NOT EXISTS Script (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    story_id INTEGER NOT NULL,
+    version INTEGER NOT NULL CHECK (version >= 0),
+    text TEXT NOT NULL,
+    review_id INTEGER NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(story_id, version),
+    FOREIGN KEY (story_id) REFERENCES Story(id),
+    FOREIGN KEY (review_id) REFERENCES Review(id)
+);
+"""
+
+# SQL schema for Review table
+REVIEW_SQL_SCHEMA = """
+CREATE TABLE IF NOT EXISTS Review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT NOT NULL,
+    score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+"""
+
+
 @pytest.fixture
 def db_connection():
-    """Create an in-memory SQLite database with Story table."""
+    """Create an in-memory SQLite database with Story, Script, and Review tables."""
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     
-    # Create Story table
+    # Create all tables
     conn.executescript(Story.get_sql_schema())
+    conn.executescript(SCRIPT_SQL_SCHEMA)
+    conn.executescript(REVIEW_SQL_SCHEMA)
     
     yield conn
     conn.close()
@@ -59,6 +93,12 @@ def db_connection():
 def story_repository(db_connection):
     """Create a StoryRepository instance."""
     return StoryRepository(db_connection)
+
+
+@pytest.fixture
+def script_repository(db_connection):
+    """Create a ScriptRepository instance."""
+    return ScriptRepository(db_connection)
 
 
 class TestGetOldestStoryForReview:
@@ -248,7 +288,60 @@ class TestProcessReviewScriptTone:
         assert isinstance(result, ReviewResult)
         assert result.story is not None
         assert result.review is not None
+        assert result.script is not None
         assert isinstance(result.review, Review)
+        assert isinstance(result.script, Script)
+    
+    def test_review_saved_to_database(self, db_connection, story_repository):
+        """Review should be saved to database and have an ID."""
+        story = Story(
+            idea_json='{"title": "Test Story"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story_repository.insert(story)
+        
+        result = process_review_script_tone(
+            db_connection,
+            script_text="This is a test script with consistent dark tone about fear and horror."
+        )
+        
+        # Verify review has an ID (was saved to database)
+        assert result.review.id is not None
+        
+        # Verify review can be retrieved from database
+        cursor = db_connection.execute("SELECT * FROM Review WHERE id = ?", (result.review.id,))
+        row = cursor.fetchone()
+        assert row is not None
+        assert row['score'] == result.review.score
+    
+    def test_script_references_review(self, db_connection, story_repository, script_repository):
+        """Script should have review_id set to link to the Review."""
+        # Create story with existing script
+        story = Story(
+            idea_json='{"title": "Test Story"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story = story_repository.insert(story)
+        
+        # Create initial script for the story
+        initial_script = Script(
+            story_id=story.id,
+            version=0,
+            text="Initial script content about dark horror and fear."
+        )
+        initial_script = script_repository.insert(initial_script)
+        
+        # Update story to reference the script
+        story.script_id = initial_script.id
+        story_repository.update(story)
+        
+        # Process the review
+        result = process_review_script_tone(db_connection)
+        
+        # Verify new script has review_id set
+        assert result.script is not None
+        assert result.script.review_id is not None
+        assert result.script.review_id == result.review.id
     
     def test_updates_story_state(self, db_connection, story_repository):
         """Should update story state after processing."""
@@ -300,6 +393,92 @@ class TestProcessReviewScriptTone:
             assert result.new_state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 
 
+class TestGetScriptForStory:
+    """Tests for get_script_for_story function."""
+    
+    def test_returns_script_by_story_script_id(self, db_connection, story_repository, script_repository):
+        """Should return Script when story has script_id."""
+        # Create story
+        story = Story(
+            idea_json='{"title": "Test"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story = story_repository.insert(story)
+        
+        # Create script
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text="Test script content"
+        )
+        script = script_repository.insert(script)
+        
+        # Update story to reference script
+        story.script_id = script.id
+        story_repository.update(story)
+        
+        # Get script for story
+        result = get_script_for_story(script_repository, story)
+        
+        assert result is not None
+        assert result.id == script.id
+        assert result.text == "Test script content"
+    
+    def test_returns_latest_version_if_no_script_id(self, db_connection, story_repository, script_repository):
+        """Should return latest Script version when story has no script_id."""
+        # Create story without script_id
+        story = Story(
+            idea_json='{"title": "Test"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story = story_repository.insert(story)
+        
+        # Create multiple script versions
+        script_v0 = Script(story_id=story.id, version=0, text="Version 0")
+        script_v0 = script_repository.insert(script_v0)
+        
+        script_v1 = Script(story_id=story.id, version=1, text="Version 1")
+        script_v1 = script_repository.insert(script_v1)
+        
+        # Get script for story (should return latest version)
+        result = get_script_for_story(script_repository, story)
+        
+        assert result is not None
+        assert result.version == 1
+        assert result.text == "Version 1"
+    
+    def test_returns_none_when_no_script(self, db_connection, story_repository, script_repository):
+        """Should return None when no script exists for story."""
+        story = Story(
+            idea_json='{"title": "Test"}',
+            state=STATE_REVIEW_SCRIPT_TONE
+        )
+        story = story_repository.insert(story)
+        
+        result = get_script_for_story(script_repository, story)
+        
+        assert result is None
+
+
+class TestSaveReview:
+    """Tests for save_review function."""
+    
+    def test_saves_review_to_database(self, db_connection):
+        """Should save review to database and set ID."""
+        review = Review(text="Test review", score=75)
+        
+        saved_review = save_review(db_connection, review)
+        
+        assert saved_review.id is not None
+        
+        # Verify it exists in database
+        cursor = db_connection.execute("SELECT * FROM Review WHERE id = ?", (saved_review.id,))
+        row = cursor.fetchone()
+        assert row is not None
+        assert row['text'] == "Test review"
+        assert row['score'] == 75
+
+
 class TestReviewResult:
     """Tests for ReviewResult dataclass."""
     
@@ -314,11 +493,13 @@ class TestReviewResult:
         result = process_review_script_tone(db_connection)
         
         assert hasattr(result, 'story')
+        assert hasattr(result, 'script')
         assert hasattr(result, 'review')
         assert hasattr(result, 'new_state')
         assert hasattr(result, 'accepted')
         
         assert isinstance(result.story, Story)
+        assert isinstance(result.script, Script)
         assert isinstance(result.review, Review)
         assert isinstance(result.new_state, str)
         assert isinstance(result.accepted, bool)

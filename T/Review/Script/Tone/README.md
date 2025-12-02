@@ -6,9 +6,11 @@ Script tone and style review module for the PrismQ workflow.
 
 This module implements the script tone review stage that:
 1. Selects the oldest Story with state `PrismQ.T.Review.Script.Tone`
-2. Reviews the script for tone and style consistency
-3. Outputs a Review model (text, score, created_at)
-4. Updates Story state based on review acceptance
+2. Gets the Script associated with the Story
+3. Reviews the script for tone and style consistency
+4. Outputs a Review model (text, score, created_at) and saves it to database
+5. Links the Review to the Script via `Script.review_id` FK
+6. Updates Story state based on review acceptance
 
 ## State Transitions
 
@@ -28,7 +30,7 @@ Review (
 )
 ```
 
-Story references Review via StoryReview linking table.
+**Script references Review directly via FK** (`Script.review_id` → `Review.id`).
 
 ## Tone Evaluation
 
@@ -50,6 +52,8 @@ from T.Review.Script.Tone import (
 result = process_review_script_tone(conn)
 if result:
     print(f"Review created with score: {result.review.score}")
+    print(f"Script reviewed: {result.script.id}")
+    print(f"Script now references review: {result.script.review_id}")
     print(f"Story state changed to: {result.new_state}")
     print(f"Accepted: {result.accepted}")
 ```
@@ -62,7 +66,6 @@ T/Review/Script/Tone/
 ├── README.md                # This file
 ├── _meta/
 │   └── tests/
-│       └── test_review_script_tone.py
 └── src/
     ├── __init__.py
     └── review_script_tone.py  # Main implementation
@@ -78,6 +81,8 @@ T/Review/Script/Tone/
 ## Related Components
 
 - `T/Database/models/review.py` - Review model
+- `T/Database/models/script.py` - Script model (with `review_id` FK)
 - `T/Database/repositories/story_repository.py` - Story repository
+- `T/Database/repositories/script_repository.py` - Script repository
 - `T/State/constants/state_names.py` - State constants
 - `T/Review/Script/From/Title/` - Similar review implementation pattern

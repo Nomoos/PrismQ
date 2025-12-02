@@ -5,7 +5,8 @@ This module implements the script tone review workflow stage that:
 1. Selects the oldest Story with state 'PrismQ.T.Review.Script.Tone'
 2. Reviews the script for tone and style consistency
 3. Outputs a Review model (simple: text, score, created_at)
-4. Updates the Story state based on review acceptance
+4. Links the Review to the Script via Script.review_id FK
+5. Updates the Story state based on review acceptance
 
 State Transitions:
 - If review doesn't accept script → 'PrismQ.T.Script.From.Title.Review.Script' (for rewrite)
@@ -21,6 +22,7 @@ Usage:
     result = process_review_script_tone(conn)
     if result:
         print(f"Review created with score: {result.review.score}")
+        print(f"Script reviewed: {result.script.id}")
         print(f"Story state changed to: {result.new_state}")
 """
 
@@ -31,7 +33,9 @@ from typing import Optional, Tuple
 
 from T.Database.models.review import Review
 from T.Database.models.story import Story
+from T.Database.models.script import Script
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.State.constants.state_names import StateNames
 
 
@@ -50,11 +54,13 @@ class ReviewResult:
     
     Attributes:
         story: The Story that was reviewed
+        script: The Script that was reviewed
         review: The Review that was created
         new_state: The new state the story was transitioned to
         accepted: Whether the script was accepted
     """
     story: Story
+    script: Script
     review: Review
     new_state: str
     accepted: bool
@@ -227,6 +233,44 @@ def evaluate_tone(
     return score, review_text
 
 
+def save_review(connection: sqlite3.Connection, review: Review) -> Review:
+    """Save a Review to the database.
+    
+    Args:
+        connection: SQLite database connection
+        review: Review instance to save
+        
+    Returns:
+        Review with id populated
+    """
+    cursor = connection.execute(
+        "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
+        (review.text, review.score, review.created_at.isoformat())
+    )
+    connection.commit()
+    review.id = cursor.lastrowid
+    return review
+
+
+def get_script_for_story(
+    script_repository: ScriptRepository,
+    story: Story
+) -> Optional[Script]:
+    """Get the current Script for a Story.
+    
+    Args:
+        script_repository: Repository for Script database operations
+        story: The Story to get Script for
+        
+    Returns:
+        The Script if found, None otherwise
+    """
+    if story.script_id is not None:
+        return script_repository.find_by_id(story.script_id)
+    # If no script_id, try to find latest version for story
+    return script_repository.find_latest_version(story.id)
+
+
 def process_review_script_tone(
     connection: sqlite3.Connection,
     script_text: Optional[str] = None,
@@ -236,9 +280,11 @@ def process_review_script_tone(
     
     This function:
     1. Finds the oldest Story with state 'PrismQ.T.Review.Script.Tone'
-    2. Evaluates the script's tone consistency
-    3. Creates a Review record
-    4. Updates the Story state based on review outcome
+    2. Gets the Script associated with the Story
+    3. Evaluates the script's tone consistency
+    4. Creates a Review record and saves it to database
+    5. Creates a new Script version with the review_id set (linking Review to Script)
+    6. Updates the Story state based on review outcome
     
     Args:
         connection: SQLite database connection
@@ -252,6 +298,7 @@ def process_review_script_tone(
     connection.row_factory = sqlite3.Row
     
     story_repository = StoryRepository(connection)
+    script_repository = ScriptRepository(connection)
     
     # Get oldest story in review state
     story = get_oldest_story_for_review(story_repository)
@@ -259,9 +306,17 @@ def process_review_script_tone(
     if story is None:
         return None
     
-    # Get script text (use override if provided, for testing)
-    # In production, this would come from the Script table
-    actual_script_text = script_text or "Sample script content for tone review"
+    # Get the script for this story
+    script = get_script_for_story(script_repository, story)
+    
+    # Get script text from the Script entity, or use override if provided (for testing)
+    if script_text is not None:
+        actual_script_text = script_text
+    elif script is not None:
+        actual_script_text = script.text
+    else:
+        actual_script_text = "Sample script content for tone review"
+    
     actual_target_tone = target_tone or ""
     
     # Evaluate the script tone
@@ -270,11 +325,32 @@ def process_review_script_tone(
         target_tone=actual_target_tone
     )
     
-    # Create review
+    # Create and save review to database
     review = create_review(score=score, text=review_text)
+    review = save_review(connection, review)
     
     # Determine if accepted
     accepted = score >= ACCEPTANCE_THRESHOLD
+    
+    # Create a new Script version with the review_id set (linking Review to Script)
+    if script is not None:
+        new_script = script.create_next_version(
+            new_text=script.text,  # Keep same text, just adding review reference
+            review_id=review.id
+        )
+        new_script = script_repository.insert(new_script)
+        # Update story to point to new script version
+        story.script_id = new_script.id
+    else:
+        # If no script exists, create a minimal one for testing purposes
+        new_script = Script(
+            story_id=story.id,
+            version=0,
+            text=actual_script_text,
+            review_id=review.id
+        )
+        new_script = script_repository.insert(new_script)
+        story.script_id = new_script.id
     
     # Determine next state
     new_state = determine_next_state(accepted=accepted)
@@ -285,6 +361,7 @@ def process_review_script_tone(
     
     return ReviewResult(
         story=story,
+        script=new_script,
         review=review,
         new_state=new_state,
         accepted=accepted
@@ -325,6 +402,8 @@ __all__ = [
     "process_review_script_tone",
     "process_all_pending_reviews",
     "get_oldest_story_for_review",
+    "get_script_for_story",
+    "save_review",
     "determine_next_state",
     "create_review",
     "evaluate_tone",
