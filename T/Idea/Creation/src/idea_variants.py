@@ -2960,6 +2960,14 @@ MIN_DECAY_WEIGHT = 2
 # Ensures all generated text provides sufficient context and value
 MIN_IDEA_TEXT_LENGTH = 100
 
+# Minimum field value length to include in fallback text extraction
+# Used in format_idea_as_text to filter out very short field values
+MIN_FIELD_VALUE_LENGTH = 10
+
+# Minimum field value length when padding short outputs
+# Used to filter fields when meeting minimum text length requirement
+MIN_PADDING_FIELD_LENGTH = 5
+
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
 
@@ -4040,7 +4048,7 @@ def format_idea_as_text(variant: Dict[str, Any]) -> str:
         # Then add other non-metadata string fields
         for key, value in variant.items():
             if key not in skip_fields and key not in priority_keys:
-                if isinstance(value, str) and value.strip() and len(value) > 10:
+                if isinstance(value, str) and value.strip() and len(value) > MIN_FIELD_VALUE_LENGTH:
                     content_fields.append(str(value))
         
         # Take up to 4 fields for variety
@@ -4067,7 +4075,7 @@ def format_idea_as_text(variant: Dict[str, Any]) -> str:
             used_values = set(text.split("\n"))
             for key, value in variant.items():
                 if key not in skip_fields and isinstance(value, str) and value.strip():
-                    if value not in used_values and len(value) > 5:
+                    if value not in used_values and len(value) > MIN_PADDING_FIELD_LENGTH:
                         additions.append(value)
                         if len(text) + sum(len(a) for a in additions) + len(additions) * 2 >= MIN_IDEA_TEXT_LENGTH:
                             break
@@ -8424,6 +8432,8 @@ __all__ = [
     "DEFAULT_DECAY_FACTOR",
     "MIN_DECAY_WEIGHT",
     "MIN_IDEA_TEXT_LENGTH",
+    "MIN_FIELD_VALUE_LENGTH",
+    "MIN_PADDING_FIELD_LENGTH",
     "TARGET_AUDIENCES",
     # Original template definitions
     "VARIANT_EMOTION_FIRST",

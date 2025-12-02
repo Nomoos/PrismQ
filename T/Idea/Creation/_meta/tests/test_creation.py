@@ -344,3 +344,88 @@ class TestDefaultBehavior:
         
         assert len(ideas) == 10
         assert all(isinstance(idea, Idea) for idea in ideas)
+
+
+class TestAIGeneratorIdeaText:
+    """Tests for AI generator's idea_text field generation."""
+    
+    def test_validate_idea_dict_creates_idea_text(self):
+        """Test that _validate_idea_dict generates idea_text from other fields."""
+        from ai_generator import AIIdeaGenerator
+        
+        generator = AIIdeaGenerator()
+        
+        # Test with missing idea_text
+        idea = {
+            'title': 'Test Title',
+            'hook': 'An engaging hook that captures attention immediately.',
+            'premise': 'This is a detailed premise that explains the story setup.',
+            'concept': 'The underlying concept that drives the narrative.',
+        }
+        
+        validated = generator._validate_idea_dict(idea)
+        
+        # Should have idea_text field now
+        assert 'idea_text' in validated
+        # idea_text should be at least MIN_IDEA_TEXT_LENGTH characters
+        assert len(validated['idea_text']) >= generator.MIN_IDEA_TEXT_LENGTH
+    
+    def test_generate_idea_text_meets_minimum_length(self):
+        """Test that _generate_idea_text always produces at least MIN_IDEA_TEXT_LENGTH characters."""
+        from ai_generator import AIIdeaGenerator
+        
+        generator = AIIdeaGenerator()
+        
+        # Test with minimal content
+        idea = {
+            'title': 'A Short Title',
+            'hook': 'Hook',
+            'premise': 'Premise',
+            'concept': 'Concept',
+        }
+        
+        text = generator._generate_idea_text(idea)
+        assert len(text) >= generator.MIN_IDEA_TEXT_LENGTH
+    
+    def test_generate_idea_text_uses_available_fields(self):
+        """Test that _generate_idea_text combines available fields."""
+        from ai_generator import AIIdeaGenerator
+        
+        generator = AIIdeaGenerator()
+        
+        idea = {
+            'title': 'The Story of Tomorrow',
+            'hook': 'What if everything you knew was wrong?',
+            'premise': 'A young scientist discovers a hidden truth.',
+            'concept': 'Reality vs illusion explored through science.',
+            'logline': 'One discovery changes everything.',
+            'themes': ['mystery', 'science', 'truth'],
+        }
+        
+        text = generator._generate_idea_text(idea)
+        
+        # Should include content from multiple fields
+        assert 'What if everything you knew was wrong' in text or 'scientist discovers' in text
+    
+    def test_validate_idea_dict_preserves_existing_valid_idea_text(self):
+        """Test that valid existing idea_text is preserved."""
+        from ai_generator import AIIdeaGenerator
+        
+        generator = AIIdeaGenerator()
+        
+        existing_text = "This is a valid idea text that is definitely long enough to meet the minimum length requirement of 100 characters."
+        idea = {
+            'title': 'Test',
+            'idea_text': existing_text
+        }
+        
+        validated = generator._validate_idea_dict(idea)
+        
+        # Should preserve the existing valid idea_text
+        assert validated['idea_text'] == existing_text
+    
+    def test_min_idea_text_length_constant(self):
+        """Test that MIN_IDEA_TEXT_LENGTH constant is 100."""
+        from ai_generator import AIIdeaGenerator
+        
+        assert AIIdeaGenerator.MIN_IDEA_TEXT_LENGTH == 100
