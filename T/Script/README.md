@@ -8,7 +8,7 @@ Develop and refine scripts through iterative drafting, improvement, and optimiza
 
 This module implements a comprehensive script development workflow with the following structure:
 - **Namespace**: All scripts in this module use the `PrismQ.T.Script` namespace
-- **Submodules**: `FromIdeaAndTitle` (initial drafts) and `FromOriginalScriptAndReviewAndTitle` (improvements)
+- **Submodules**: `From/Idea/Title` (initial drafts) and `From/Title/Review/Script` (improvements)
 - **ScriptWriter**: The AI-powered ScriptWriter is located in `T/Script/src/` but imported as `from PrismQ.T.Script import ScriptWriter` for cleaner usage
 - **Integration**: Works with `PrismQ.T.Review.Script` for feedback loop optimization
 
@@ -18,15 +18,15 @@ Transform structured ideas into polished scripts ready for review and publicatio
 
 ## Submodules
 
-#### [FromIdeaAndTitle](./FromIdeaAndTitle/)
+#### [From/Idea/Title](./From/Idea/Title/) (FromIdeaAndTitle)
 **Stage 3: Initial script draft from idea and title** (v1)
 
 Generate initial script draft from the idea and initial title.
 
-**[→ View FromIdeaAndTitle Documentation](./FromIdeaAndTitle/README.md)**
-**[→ View FromIdeaAndTitle Metadata](./FromIdeaAndTitle/_meta/)**
+**[→ View From/Idea/Title Documentation](./From/Idea/Title/README.md)**
+**[→ View From/Idea/Title Metadata](./From/Idea/Title/_meta/)**
 
-#### [FromOriginalScriptAndReviewAndTitle](./FromOriginalScriptAndReviewAndTitle/)
+#### [From/Title/Review/Script](./From/Title/Review/Script/) (FromOriginalScriptAndReviewAndTitle)
 **Stages 7, 11, 14-18, 20: All script improvements** (v2, v3, v4, v5...)
 
 Generate improved script versions using review feedback, original script, and title context.
@@ -37,8 +37,8 @@ This state handles:
 - **Stages 14-18**: Quality reviews (Grammar, Tone, Content, Consistency, Editing)
 - **Stage 20 Feedback**: Final voiceover readability polish
 
-**[→ View FromOriginalScriptAndReviewAndTitle Documentation](./FromOriginalScriptAndReviewAndTitle/README.md)**
-**[→ View FromOriginalScriptAndReviewAndTitle Metadata](./FromOriginalScriptAndReviewAndTitle/_meta/)**
+**[→ View From/Title/Review/Script Documentation](./From/Title/Review/Script/README.md)**
+**[→ View From/Title/Review/Script Metadata](./From/Title/Review/Script/_meta/)**
 
 #### [src](./src/)
 **AI script writer with feedback loop** ⭐ NEW
