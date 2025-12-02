@@ -261,7 +261,7 @@ class IdeaCreator:
             idea = Idea(
                 title=ai_idea.get('title', f'Untitled Idea {i + 1}'),
                 concept=ai_idea.get('concept', ''),
-                idea=ai_idea.get('title', ''),  # Use title as basic idea spark
+                idea=ai_idea.get('idea_text', ai_idea.get('title', '')),  # Use idea_text or title as idea spark
                 premise=ai_idea.get('premise', ''),
                 logline=ai_idea.get('logline', ''),
                 hook=ai_idea.get('hook', ''),
@@ -284,6 +284,5 @@ class IdeaCreator:
         
         return ideas
     
-
 
 __all__ = ["IdeaCreator", "CreationConfig"]

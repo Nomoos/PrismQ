@@ -40,6 +40,9 @@ class AIIdeaGenerator:
     narrative structure.
     """
     
+    # Minimum length for generated idea text in characters
+    MIN_IDEA_TEXT_LENGTH = 100
+    
     # Default prompt template for title-based generation
     DEFAULT_TITLE_PROMPT_TEMPLATE = """You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on the title: "{input}"
 
@@ -53,12 +56,15 @@ For each idea, provide:
 2. A compelling concept (1-2 sentences)
 3. A detailed premise (2-3 sentences)
 4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening)
+5. A hook (attention-grabbing opening, minimum 50 characters)
 6. A synopsis (2-3 paragraphs, 150-300 words)
 7. A skeleton (5-7 key points)
 8. An outline (detailed structure with sections)
 9. 5-10 relevant keywords
 10. 3-5 main themes
+11. An idea_text field: A rich, detailed description of the idea combining the hook, premise, and key emotional appeal. This MUST be at least 100 characters long and capture the essence of the idea in an engaging way.
+
+IMPORTANT: The idea_text field must be substantive and descriptive - at least 100 characters. It should be a compelling paragraph that makes someone want to learn more.
 
 Make each idea distinct and engaging for the target platforms and formats.
 
@@ -73,6 +79,7 @@ Format your response as a JSON array of {num_ideas} objects, each with these fie
 - outline
 - keywords (array of strings)
 - themes (array of strings)
+- idea_text (at least 100 characters, combining hook and premise into an engaging description)
 
 Return ONLY the JSON array, no additional text."""
 
@@ -89,12 +96,15 @@ For each idea, provide:
 2. A compelling concept (1-2 sentences)
 3. A detailed premise (2-3 sentences)
 4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening)
+5. A hook (attention-grabbing opening, minimum 50 characters)
 6. A synopsis (2-3 paragraphs, 150-300 words)
 7. A skeleton (5-7 key points)
 8. An outline (detailed structure with sections)
 9. 5-10 relevant keywords
 10. 3-5 main themes
+11. An idea_text field: A rich, detailed description of the idea combining the hook, premise, and key emotional appeal. This MUST be at least 100 characters long and capture the essence of the idea in an engaging way.
+
+IMPORTANT: The idea_text field must be substantive and descriptive - at least 100 characters. It should be a compelling paragraph that makes someone want to learn more.
 
 Make each idea distinct and engaging for the target platforms and formats.
 
@@ -109,6 +119,7 @@ Format your response as a JSON array of {num_ideas} objects, each with these fie
 - outline
 - keywords (array of strings)
 - themes (array of strings)
+- idea_text (at least 100 characters, combining hook and premise into an engaging description)
 
 Return ONLY the JSON array, no additional text."""
 
@@ -419,7 +430,8 @@ Return ONLY the JSON array, no additional text."""
             'skeleton': '',
             'outline': '',
             'keywords': [],
-            'themes': []
+            'themes': [],
+            'idea_text': ''
         }
         
         for field, default in required_fields.items():
@@ -428,7 +440,91 @@ Return ONLY the JSON array, no additional text."""
             elif field in ['keywords', 'themes'] and not isinstance(idea[field], list):
                 idea[field] = [idea[field]] if idea[field] else []
         
+        # Ensure idea_text meets minimum length requirement
+        idea_text = idea.get('idea_text', '')
+        if len(idea_text) < self.MIN_IDEA_TEXT_LENGTH:
+            idea['idea_text'] = self._generate_idea_text(idea)
+        
         return idea
+    
+    def _generate_idea_text(self, idea: Dict[str, Any]) -> str:
+        """Generate idea_text field from other fields when missing or too short.
+        
+        Combines hook, premise, concept, and other fields to create a rich
+        description that meets the minimum length requirement.
+        
+        Args:
+            idea: The idea dictionary
+            
+        Returns:
+            Generated idea_text of at least MIN_IDEA_TEXT_LENGTH characters
+        """
+        parts = []
+        
+        # Start with hook if available
+        hook = idea.get('hook', '')
+        if hook and len(hook) > 3:
+            parts.append(hook)
+        
+        # Add premise
+        premise = idea.get('premise', '')
+        if premise and len(premise) > 3:
+            parts.append(premise)
+        
+        # Add concept if still short
+        text = ' '.join(parts)
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH:
+            concept = idea.get('concept', '')
+            if concept and len(concept) > 3:
+                parts.append(concept)
+        
+        # Add logline if still short
+        text = ' '.join(parts)
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH:
+            logline = idea.get('logline', '')
+            if logline and len(logline) > 3:
+                parts.append(logline)
+        
+        # Add themes if still short
+        text = ' '.join(parts)
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH:
+            themes = idea.get('themes', [])
+            if themes:
+                parts.append(f"Themes: {', '.join(str(t) for t in themes)}")
+        
+        # Add keywords if still short
+        text = ' '.join(parts)
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH:
+            keywords = idea.get('keywords', [])
+            if keywords:
+                parts.append(f"Keywords: {', '.join(str(k) for k in keywords)}")
+        
+        # Combine all parts
+        text = ' '.join(parts)
+        
+        # If still too short, add title and synopsis excerpt
+        title = idea.get('title', '')
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH and title:
+            text = f"About: {title}. {text}" if text else f"About: {title}"
+        
+        synopsis = idea.get('synopsis', '')
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH and synopsis:
+            # Add excerpt of synopsis
+            excerpt = synopsis[:200].rsplit(' ', 1)[0] if len(synopsis) > 200 else synopsis
+            text = f"{text} {excerpt}" if text else excerpt
+        
+        # Add skeleton if still short
+        skeleton = idea.get('skeleton', '')
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH and skeleton:
+            excerpt = skeleton[:150] if len(skeleton) > 150 else skeleton
+            text = f"{text} Structure: {excerpt}" if text else f"Structure: {excerpt}"
+        
+        # Final fallback: pad with contextual description
+        if len(text) < self.MIN_IDEA_TEXT_LENGTH:
+            padding = f" This idea explores creative possibilities for engaging content targeting various platforms and formats."
+            text = text + padding if text else padding.strip()
+        
+        return text
 
 
 # Export public classes for the module
