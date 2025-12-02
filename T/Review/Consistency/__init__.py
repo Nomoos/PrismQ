@@ -10,6 +10,7 @@ This module provides AI-powered consistency review for script content, checking:
 Stage 17 (MVP-017): Consistency Review
 """
 
+from T.Review import ReviewSeverity
 from .consistency_review import (
     ConsistencyReview,
     ConsistencyIssue,
@@ -17,9 +18,12 @@ from .consistency_review import (
     ConsistencySeverity
 )
 
+# Re-export unified severity for convenience
+# ConsistencySeverity is kept for backward compatibility, but ReviewSeverity is the unified version
 __all__ = [
     "ConsistencyReview",
     "ConsistencyIssue",
     "ConsistencyIssueType",
-    "ConsistencySeverity"
+    "ConsistencySeverity",
+    "ReviewSeverity",
 ]
