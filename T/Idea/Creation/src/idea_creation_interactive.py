@@ -136,6 +136,23 @@ def print_debug(text: str, logger: Optional[logging.Logger] = None) -> None:
         logger.debug(text)
 
 
+def get_database_path() -> str:
+    """Get the database path for saving ideas.
+    
+    Returns database path from Config if available, otherwise falls back
+    to the default database location in the repository root.
+    
+    Returns:
+        Path to the database file
+    """
+    if Config is not None:
+        config = Config(interactive=False)
+        return config.database_path
+    else:
+        # Fallback to default database location
+        return str(REPO_ROOT / "idea.db")
+
+
 # =============================================================================
 # Input Parsing
 # =============================================================================
@@ -404,13 +421,8 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     logger.info(f"Saving {len(variants)} variants to database")
                 
                 try:
-                    # Get database path from Config if available, otherwise use default
-                    if Config is not None:
-                        config = Config(interactive=False)
-                        db_path = config.database_path
-                    else:
-                        # Fallback to default database location
-                        db_path = str(REPO_ROOT / "idea.db")
+                    # Get database path using helper function
+                    db_path = get_database_path()
                     
                     # Setup and connect to database
                     db = setup_idea_database(db_path)
@@ -421,7 +433,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                         # Convert variant to text using format_idea_as_text
                         idea_text = format_idea_as_text(variant)
                         
-                        # Insert into database (version defaults to 1)
+                        # Insert into database with version=1 (new ideas always start at version 1)
                         idea_id = db.insert_idea(text=idea_text, version=1)
                         saved_ids.append(idea_id)
                         
