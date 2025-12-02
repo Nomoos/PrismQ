@@ -2,7 +2,8 @@
 """PrismQ.T.Review.Title.Readability - Title readability review module.
 
 This module implements the title readability review workflow stage that:
-1. Selects the oldest Story with state 'PrismQ.T.Review.Title.Readability'
+1. Selects the Story with state 'PrismQ.T.Review.Title.Readability' that has
+   the Script with the lowest current version number (highest version per story_id)
 2. Reviews the title for readability (voiceover suitability)
 3. Outputs a Review model (simple: text, score, created_at)
 4. Updates the Story state based on review acceptance
@@ -40,6 +41,7 @@ from typing import Optional, Tuple
 from T.Database.models.review import Review
 from T.Database.models.story import Story
 from T.Database.repositories.story_repository import StoryRepository
+from T.Database.repositories.script_repository import ScriptRepository
 from T.State.constants.state_names import StateNames
 
 
@@ -68,10 +70,74 @@ class ReviewResult:
     accepted: bool
 
 
+def get_story_for_review(
+    connection: sqlite3.Connection,
+    story_repository: StoryRepository
+) -> Optional[Story]:
+    """Get the Story with lowest Script version for review.
+    
+    Selects the Story in 'PrismQ.T.Review.Title.Readability' state that has
+    the Script with the lowest current version number. The "current version"
+    is the highest version number among all scripts for a given story_id.
+    
+    This ensures stories with less refined scripts (fewer iterations) are
+    processed first.
+    
+    Args:
+        connection: SQLite database connection
+        story_repository: Repository for Story database operations
+        
+    Returns:
+        Story with lowest Script version in the review state, or None if none found
+    """
+    # Query to find stories in the correct state, joined with their scripts,
+    # and ordered by the MAX(version) for each story_id (lowest first)
+    query = """
+        SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.script_id, 
+               s.state, s.created_at, s.updated_at,
+               MAX(sc.version) as max_script_version
+        FROM Story s
+        LEFT JOIN Script sc ON s.id = sc.story_id
+        WHERE s.state = ?
+        GROUP BY s.id
+        ORDER BY max_script_version ASC, s.created_at ASC
+        LIMIT 1
+    """
+    
+    cursor = connection.execute(query, (STATE_REVIEW_TITLE_READABILITY,))
+    row = cursor.fetchone()
+    
+    if row is None:
+        return None
+    
+    # Convert to Story model
+    created_at = row["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at)
+    
+    updated_at = row["updated_at"]
+    if isinstance(updated_at, str):
+        updated_at = datetime.fromisoformat(updated_at)
+    
+    return Story(
+        id=row["id"],
+        idea_id=row["idea_id"],
+        idea_json=row["idea_json"],
+        title_id=row["title_id"],
+        script_id=row["script_id"],
+        state=row["state"],
+        created_at=created_at,
+        updated_at=updated_at
+    )
+
+
 def get_oldest_story_for_review(
     story_repository: StoryRepository
 ) -> Optional[Story]:
     """Get the oldest Story with state 'PrismQ.T.Review.Title.Readability'.
+    
+    DEPRECATED: This function is kept for backward compatibility.
+    Use get_story_for_review() instead which selects by lowest Script version.
     
     Args:
         story_repository: Repository for Story database operations
@@ -235,7 +301,8 @@ def process_review_title_readability(
     """Process the title readability review workflow stage.
     
     This function:
-    1. Finds the oldest Story with state 'PrismQ.T.Review.Title.Readability'
+    1. Finds the Story with state 'PrismQ.T.Review.Title.Readability' that has
+       the Script with the lowest current version number
     2. Evaluates the title for voiceover readability
     3. Creates a Review record
     4. Updates the Story state based on review outcome
@@ -252,8 +319,8 @@ def process_review_title_readability(
     
     story_repository = StoryRepository(connection)
     
-    # Get oldest story in review state
-    story = get_oldest_story_for_review(story_repository)
+    # Get story with lowest script version in review state
+    story = get_story_for_review(connection, story_repository)
     
     if story is None:
         return None
@@ -312,7 +379,8 @@ __all__ = [
     "ReviewResult",
     "process_review_title_readability",
     "process_all_pending_reviews",
-    "get_oldest_story_for_review",
+    "get_story_for_review",
+    "get_oldest_story_for_review",  # Kept for backward compatibility
     "determine_next_state",
     "create_review",
     "evaluate_title_readability",

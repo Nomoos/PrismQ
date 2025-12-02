@@ -11,6 +11,11 @@ Workflow Position:
     Stage 14: Title Readability Review
     Story (state=PrismQ.T.Review.Title.Readability) → Review → State Transition
 
+Selection Logic:
+    Selects the Story that has the Script with the lowest current version number
+    (where "current version" is the highest version for a given story_id).
+    This ensures stories with less refined scripts are processed first.
+
 State Transitions:
 - If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script' (refinement)
 - If review accepts title → 'PrismQ.T.Story.Review' (next stage)
@@ -40,6 +45,7 @@ from .src import (
     ReviewResult,
     process_review_title_readability,
     process_all_pending_reviews,
+    get_story_for_review,
     get_oldest_story_for_review,
     determine_next_state,
     create_review,
@@ -54,6 +60,7 @@ __all__ = [
     "ReviewResult",
     "process_review_title_readability",
     "process_all_pending_reviews",
+    "get_story_for_review",
     "get_oldest_story_for_review",
     "determine_next_state",
     "create_review",

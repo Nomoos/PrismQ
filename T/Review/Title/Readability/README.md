@@ -5,10 +5,18 @@ Title Readability Review module for the PrismQ workflow.
 ## Overview
 
 This module implements the title readability review workflow stage that:
-1. Selects the oldest Story with state `PrismQ.T.Review.Title.Readability`
+1. Selects the Story with state `PrismQ.T.Review.Title.Readability` that has the Script with the **lowest current version number** (where "current version" is the highest version among all scripts for that story)
 2. Reviews the title for voiceover readability
 3. Outputs a Review model (text, score, created_at)
 4. Updates the Story state based on review acceptance
+
+## Selection Logic
+
+Stories are selected by:
+1. **Primary sort**: Lowest current script version number (Stories with less refined scripts are processed first)
+2. **Secondary sort**: Oldest creation date (tie-breaker when versions are equal)
+
+This ensures stories with fewer revision iterations get processed before heavily revised ones.
 
 ## State Transitions
 
@@ -34,7 +42,7 @@ from T.Review.Title.Readability.src import (
     ReviewResult
 )
 
-# Process a single story
+# Process a single story (selects by lowest script version)
 result = process_review_title_readability(db_connection)
 if result:
     print(f"Review score: {result.review.score}")
