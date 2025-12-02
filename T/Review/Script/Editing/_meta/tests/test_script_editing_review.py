@@ -23,7 +23,7 @@ from T.Review.Script.Editing import (
     review_script_editing_to_json,
     get_editing_feedback
 )
-from T.Review.Editing import (
+from T.Review.Model import (
     EditingReview,
     EditingIssue,
     EditingIssueType,

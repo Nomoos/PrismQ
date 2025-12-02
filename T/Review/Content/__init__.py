@@ -2,10 +2,13 @@
 
 AI-powered narrative and content validation for script content.
 Stage 16 (MVP-016) in the iterative co-improvement workflow.
+
+DEPRECATED: This module is deprecated. Import from T.Review.Model instead:
+    from T.Review.Model import ContentReview, ContentIssue, ContentIssueType, ContentSeverity
 """
 
 from T.Review import ReviewSeverity
-from .content_review import (
+from T.Review.Model.src.content_review import (
     ContentReview,
     ContentIssue,
     ContentIssueType,
