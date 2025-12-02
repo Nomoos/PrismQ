@@ -98,6 +98,8 @@ Foundational research and strategic planning documents.
   - [Popular Media Platforms Research](./_meta/research/popular-media-platforms-research.md)
   - [Content Platforms by Category and Age](./_meta/research/content-platforms-by-category-and-age.md)
   - [Teen Audience Platform Strategy](./_meta/research/teen-audience-platform-strategy.md)
+- **[Audio Research](./A/Narrator/_meta/research/)** - Narrator and voiceover research
+  - [Default Narrator Voice Profile](./A/Narrator/_meta/research/default-narrator-voice-profile.md) - First-person teen girl narrator template
 - **[Proposals](./_meta/proposals/)** - Architecture and design proposals
   - [Module Reorganization](./_meta/proposals/module-reorganization.md)
 - **[Documentation](./_meta/docs/)** - Project-wide documentation

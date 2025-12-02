@@ -44,6 +44,7 @@ Voice talent records from published text script with quality review.
 Select and manage voice talent for audio production.
 
 - [Selection](./Narrator/Selection/) - Voice talent selection
+- [Default Voice Profile](./Narrator/_meta/research/default-narrator-voice-profile.md) - First-person teen girl narrator template
 
 **[→ View Narrator Metadata](./Narrator/_meta/)**
 
