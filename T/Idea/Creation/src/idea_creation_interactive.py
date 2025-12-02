@@ -411,52 +411,46 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logger.info(f"Variant {i+1}: {variant.get('variant_name')}")
                 logger.debug(f"Variant {i+1} data: {json.dumps(variant, indent=2, ensure_ascii=False)}")
         
-        # Save to database (if not preview mode)
+        # Save to database automatically (if not preview mode)
         if not preview and DB_AVAILABLE:
             print_section("Database Operations")
-            save_choice = input(f"{Colors.CYAN}Save to database? (y/n) [y]: {Colors.END}").strip().lower()
-            if save_choice != 'n':
-                print_info("Saving to database...")
-                if logger:
-                    logger.info(f"Saving {len(variants)} variants to database")
+            print_info("Saving to database...")
+            if logger:
+                logger.info(f"Saving {len(variants)} variants to database")
+            
+            try:
+                # Get database path using helper function
+                db_path = get_database_path()
                 
-                try:
-                    # Get database path using helper function
-                    db_path = get_database_path()
+                # Setup and connect to database
+                db = setup_idea_database(db_path)
+                
+                # Save each variant to the database
+                saved_ids = []
+                for i, variant in enumerate(variants):
+                    # Convert variant to text using format_idea_as_text
+                    idea_text = format_idea_as_text(variant)
                     
-                    # Setup and connect to database
-                    db = setup_idea_database(db_path)
-                    
-                    # Save each variant to the database
-                    saved_ids = []
-                    for i, variant in enumerate(variants):
-                        # Convert variant to text using format_idea_as_text
-                        idea_text = format_idea_as_text(variant)
-                        
-                        # Insert into database with version=1 (new ideas always start at version 1)
-                        idea_id = db.insert_idea(text=idea_text, version=1)
-                        saved_ids.append(idea_id)
-                        
-                        if logger:
-                            logger.info(f"Saved variant {i+1} with ID: {idea_id}")
-                    
-                    db.close()
-                    
-                    print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
-                    print_info(f"Database: {db_path}")
-                    print_info(f"Saved IDs: {saved_ids}")
+                    # Insert into database with version=1 (new ideas always start at version 1)
+                    idea_id = db.insert_idea(text=idea_text, version=1)
+                    saved_ids.append(idea_id)
                     
                     if logger:
-                        logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
-                        
-                except Exception as e:
-                    print_error(f"Failed to save to database: {e}")
-                    if logger:
-                        logger.exception("Database save failed")
-            else:
-                print_info("Skipped database save")
+                        logger.info(f"Saved variant {i+1} with ID: {idea_id}")
+                
+                db.close()
+                
+                print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
+                print_info(f"Database: {db_path}")
+                print_info(f"Saved IDs: {saved_ids}")
+                
                 if logger:
-                    logger.info("User skipped database save")
+                    logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
+                    
+            except Exception as e:
+                print_error(f"Failed to save to database: {e}")
+                if logger:
+                    logger.exception("Database save failed")
         elif preview:
             print_section("Preview Mode - No Database Save")
             print_info(f"Created {len(variants)} variant(s) - NOT saved to database")
