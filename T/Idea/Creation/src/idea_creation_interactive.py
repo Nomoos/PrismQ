@@ -34,6 +34,7 @@ REPO_ROOT = T_ROOT.parent  # repo root
 sys.path.insert(0, str(SCRIPT_DIR))  # Current directory for local imports
 sys.path.insert(0, str(IDEA_ROOT / "Model" / "src"))
 sys.path.insert(0, str(IDEA_ROOT / "Model"))
+sys.path.insert(0, str(REPO_ROOT))  # Add repo root for src module import
 
 # Import idea variants module
 try:
@@ -60,12 +61,20 @@ try:
 except ImportError:
     IDEA_MODEL_AVAILABLE = False
 
-# Try to import database
+# Try to import database from shared src module
 try:
-    from idea_db import IdeaDatabase
+    from src import IdeaDatabase, setup_idea_database, Config
     DB_AVAILABLE = True
 except ImportError:
-    DB_AVAILABLE = False
+    # Fallback: try local simple_idea_db
+    try:
+        from simple_idea_db import SimpleIdeaDatabase as IdeaDatabase
+        from simple_idea_db import setup_simple_idea_database as setup_idea_database
+        Config = None
+        DB_AVAILABLE = True
+    except ImportError:
+        DB_AVAILABLE = False
+        Config = None
 
 
 # =============================================================================
@@ -393,8 +402,45 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 print_info("Saving to database...")
                 if logger:
                     logger.info(f"Saving {len(variants)} variants to database")
-                # TODO: Implement actual DB save when IdeaDatabase is properly integrated
-                print_warning("Database save not yet implemented - variants were created but not persisted")
+                
+                try:
+                    # Get database path from Config if available, otherwise use default
+                    if Config is not None:
+                        config = Config(interactive=False)
+                        db_path = config.database_path
+                    else:
+                        # Fallback to default database location
+                        db_path = str(REPO_ROOT / "idea.db")
+                    
+                    # Setup and connect to database
+                    db = setup_idea_database(db_path)
+                    
+                    # Save each variant to the database
+                    saved_ids = []
+                    for i, variant in enumerate(variants):
+                        # Convert variant to text using format_idea_as_text
+                        idea_text = format_idea_as_text(variant)
+                        
+                        # Insert into database (version defaults to 1)
+                        idea_id = db.insert_idea(text=idea_text, version=1)
+                        saved_ids.append(idea_id)
+                        
+                        if logger:
+                            logger.info(f"Saved variant {i+1} with ID: {idea_id}")
+                    
+                    db.close()
+                    
+                    print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
+                    print_info(f"Database: {db_path}")
+                    print_info(f"Saved IDs: {saved_ids}")
+                    
+                    if logger:
+                        logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
+                        
+                except Exception as e:
+                    print_error(f"Failed to save to database: {e}")
+                    if logger:
+                        logger.exception("Database save failed")
             else:
                 print_info("Skipped database save")
                 if logger:
