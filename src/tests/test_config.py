@@ -178,13 +178,14 @@ def test_standard_working_directory_with_explicit_env_path(temp_dir, clean_env):
 
 
 def test_standard_working_directory_fallback(temp_dir, clean_env):
-    """Test that standard working directory is C:/PrismQ when no env_file provided."""
+    """Test that PRISMQ_WORKING_DIRECTORY env var overrides the default C:/PrismQ fallback."""
     # Override the working directory to use temp_dir for testing
+    # Note: We use the override because C:/PrismQ may not exist in the test environment
     os.environ["PRISMQ_WORKING_DIRECTORY"] = temp_dir
     
     config = Config(interactive=False)
     
-    # Working directory should be the override (since C:/PrismQ may not exist in test env)
+    # Working directory should use the override
     assert config.working_directory == temp_dir
 
 
