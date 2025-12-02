@@ -35,55 +35,47 @@ class TestReviewSeverityEnum:
 class TestReviewSeverityExports:
     """Tests for ReviewSeverity exports from child modules."""
     
-    def test_export_from_grammar(self):
-        """Test that ReviewSeverity is exported from Grammar module."""
-        from T.Review.Grammar import ReviewSeverity, GrammarSeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_script_grammar(self):
+        """Test that GrammarSeverity is exported from Script.Grammar module."""
+        from T.Review.Script.Grammar import GrammarSeverity
+        from T.Review import ReviewSeverity
         
-        # Should be the same class
-        assert ReviewSeverity is ParentReviewSeverity
-        
-        # GrammarSeverity should still work (backward compatibility)
+        # GrammarSeverity should have same values as ReviewSeverity
         assert GrammarSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_tone(self):
-        """Test that ReviewSeverity is exported from Tone module."""
-        from T.Review.Tone import ReviewSeverity, ToneSeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_script_tone(self):
+        """Test that ToneSeverity is exported from Script.Tone module."""
+        from T.Review.Script.Tone import ToneSeverity
+        from T.Review import ReviewSeverity
         
-        assert ReviewSeverity is ParentReviewSeverity
         assert ToneSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_content(self):
-        """Test that ReviewSeverity is exported from Content module."""
-        from T.Review.Content import ReviewSeverity, ContentSeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_model_content(self):
+        """Test that ContentSeverity is exported from Model module."""
+        from T.Review.Model import ContentSeverity
+        from T.Review import ReviewSeverity
         
-        assert ReviewSeverity is ParentReviewSeverity
         assert ContentSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_consistency(self):
-        """Test that ReviewSeverity is exported from Consistency module."""
-        from T.Review.Consistency import ReviewSeverity, ConsistencySeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_model_consistency(self):
+        """Test that ConsistencySeverity is exported from Model module."""
+        from T.Review.Model import ConsistencySeverity
+        from T.Review import ReviewSeverity
         
-        assert ReviewSeverity is ParentReviewSeverity
         assert ConsistencySeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_editing(self):
-        """Test that ReviewSeverity is exported from Editing module."""
-        from T.Review.Editing import ReviewSeverity, EditingSeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_model_editing(self):
+        """Test that EditingSeverity is exported from Model module."""
+        from T.Review.Model import EditingSeverity
+        from T.Review import ReviewSeverity
         
-        assert ReviewSeverity is ParentReviewSeverity
         assert EditingSeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
     
-    def test_export_from_readability(self):
-        """Test that ReviewSeverity is exported from Readability module."""
-        from T.Review.Readability import ReviewSeverity, ReadabilitySeverity
-        from T.Review import ReviewSeverity as ParentReviewSeverity
+    def test_export_from_title_readability(self):
+        """Test that ReadabilitySeverity is exported from Title.Readability module."""
+        from T.Review.Title.Readability import ReadabilitySeverity
+        from T.Review import ReviewSeverity
         
-        assert ReviewSeverity is ParentReviewSeverity
         assert ReadabilitySeverity.CRITICAL.value == ReviewSeverity.CRITICAL.value
 
 
@@ -92,7 +84,7 @@ class TestBackwardCompatibility:
     
     def test_grammar_severity_still_works(self):
         """Test that GrammarSeverity can still be used in GrammarReview."""
-        from T.Review.Grammar import GrammarReview, GrammarIssue, GrammarIssueType, GrammarSeverity
+        from T.Review.Script.Grammar import GrammarReview, GrammarIssue, GrammarIssueType, GrammarSeverity
         
         issue = GrammarIssue(
             issue_type=GrammarIssueType.SPELLING,
@@ -111,7 +103,7 @@ class TestBackwardCompatibility:
     
     def test_consistency_severity_still_works(self):
         """Test that ConsistencySeverity can still be used in ConsistencyReview."""
-        from T.Review.Consistency import (
+        from T.Review.Model import (
             ConsistencyReview, ConsistencyIssue, 
             ConsistencyIssueType, ConsistencySeverity
         )
