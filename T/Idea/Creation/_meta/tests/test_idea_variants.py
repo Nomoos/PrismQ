@@ -563,3 +563,51 @@ class TestVariantContentQuality:
             # The title should appear in at least one field
             variant_str = str(variant).lower()
             assert "unique test topic xyz" in variant_str or "test" in variant_str
+
+
+class TestMinimumTextLength:
+    """Tests for the minimum 100 character requirement for idea text generation."""
+    
+    def test_min_idea_text_length_constant_exists(self):
+        """Test that MIN_IDEA_TEXT_LENGTH constant exists and is 100."""
+        from idea_variants import MIN_IDEA_TEXT_LENGTH
+        assert MIN_IDEA_TEXT_LENGTH == 100
+    
+    def test_format_idea_as_text_minimum_length(self):
+        """Test that format_idea_as_text returns at least 100 characters."""
+        from idea_variants import format_idea_as_text, MIN_IDEA_TEXT_LENGTH
+        
+        for variant_name in VARIANT_TEMPLATES.keys():
+            variant = create_idea_variant("Test Topic", variant_name)
+            text = format_idea_as_text(variant)
+            assert len(text) >= MIN_IDEA_TEXT_LENGTH, \
+                f"Variant '{variant_name}' produced only {len(text)} characters, " \
+                f"expected at least {MIN_IDEA_TEXT_LENGTH}"
+    
+    def test_create_idea_text_minimum_length(self):
+        """Test that create_idea_text returns at least 100 characters."""
+        from idea_variants import create_idea_text, MIN_IDEA_TEXT_LENGTH
+        
+        for variant_name in list(VARIANT_TEMPLATES.keys())[:10]:  # Test first 10 for speed
+            text = create_idea_text("Test Topic", variant_name=variant_name)
+            assert len(text) >= MIN_IDEA_TEXT_LENGTH, \
+                f"create_idea_text with variant '{variant_name}' produced only {len(text)} characters"
+    
+    def test_create_ideas_as_text_all_minimum_length(self):
+        """Test that all ideas from create_ideas_as_text have at least 100 characters."""
+        from idea_variants import create_ideas_as_text, MIN_IDEA_TEXT_LENGTH
+        
+        ideas = create_ideas_as_text("Test Topic About Technology", count=10)
+        for i, text in enumerate(ideas):
+            assert len(text) >= MIN_IDEA_TEXT_LENGTH, \
+                f"Idea {i} produced only {len(text)} characters, expected at least {MIN_IDEA_TEXT_LENGTH}"
+    
+    def test_minimum_length_with_short_title(self):
+        """Test that even with very short titles, output is at least 100 characters."""
+        from idea_variants import create_idea_text, MIN_IDEA_TEXT_LENGTH
+        
+        short_titles = ["AI", "Test", "X", "Fun"]
+        for title in short_titles:
+            text = create_idea_text(title)
+            assert len(text) >= MIN_IDEA_TEXT_LENGTH, \
+                f"Short title '{title}' produced only {len(text)} characters"
