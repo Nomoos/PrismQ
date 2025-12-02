@@ -99,8 +99,9 @@ def get_story_for_review(
     Selection criteria:
     1. Get all stories with state 'PrismQ.T.Review.Script.Readability'
     2. For each story, get its script via story.script_id
-    3. For each script, get its current (highest) version number for the same story_id
-    4. Return the story whose script has the lowest current version number
+    3. Skip stories without scripts (invalid state - should not be in review)
+    4. For each script, get its current (highest) version number for the same story_id
+    5. Return the story whose script has the lowest current version number
     
     Args:
         story_repository: Repository for Story database operations
@@ -122,19 +123,23 @@ def get_story_for_review(
     
     for story in stories:
         if story.script_id is None:
-            # Story without a script - treat as version 0 (highest priority)
-            current_version = 0
-        else:
-            # Get the script by ID to find the story_id
-            script = script_repository.find_by_id(story.script_id)
-            if script is None:
-                # Script not found - treat as version 0
-                current_version = 0
-            else:
-                # Get the current (highest) version for this story's scripts
-                # This is the "current version" - the most recent version of the script
-                latest_script = script_repository.find_latest_version(script.story_id)
-                current_version = latest_script.version if latest_script else 0
+            # Story without a script - skip (invalid state for readability review)
+            continue
+        
+        # Get the script by ID to find the story_id
+        script = script_repository.find_by_id(story.script_id)
+        if script is None:
+            # Script not found - skip (invalid state)
+            continue
+        
+        # Get the current (highest) version for this story's scripts
+        # This is the "current version" - the most recent version of the script
+        latest_script = script_repository.find_latest_version(script.story_id)
+        if latest_script is None:
+            # No scripts found - skip (invalid state)
+            continue
+            
+        current_version = latest_script.version
         
         if current_version < lowest_version:
             lowest_version = current_version

@@ -145,8 +145,8 @@ class TestGetStoryForReview:
         assert result.id == story1.id
         assert result.idea_json == '{"title": "Story 1 - Low Version"}'
     
-    def test_returns_story_without_script_first(self, story_repository, script_repository):
-        """Story without a script should be selected first (treated as version 0)."""
+    def test_skips_stories_without_script(self, story_repository, script_repository):
+        """Stories without a script should be skipped (invalid state for review)."""
         # Create story with no script
         story1 = Story(
             idea_json='{"title": "Story without script"}',
@@ -170,8 +170,28 @@ class TestGetStoryForReview:
         result = get_story_for_review(story_repository, script_repository)
         
         assert result is not None
-        # Story without script (treated as v0) should be selected
-        assert result.id == story1.id
+        # Story without script should be skipped, story with script selected
+        assert result.id == story2.id
+    
+    def test_returns_none_when_all_stories_have_no_script(self, story_repository, script_repository):
+        """Should return None when all stories lack scripts (invalid state)."""
+        # Create stories without scripts
+        story1 = Story(
+            idea_json='{"title": "Story 1 without script"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story_repository.insert(story1)
+        
+        story2 = Story(
+            idea_json='{"title": "Story 2 without script"}',
+            state=STATE_REVIEW_SCRIPT_READABILITY
+        )
+        story_repository.insert(story2)
+        
+        result = get_story_for_review(story_repository, script_repository)
+        
+        # All stories have no script, so none are valid for review
+        assert result is None
 
 
 class TestGetOldestStoryForReview:
@@ -325,14 +345,18 @@ class TestProcessReviewScriptReadability:
         result = process_review_script_readability(db_connection)
         assert result is None
     
-    def test_processes_story_and_returns_result(self, db_connection, story_repository):
+    def test_processes_story_and_returns_result(self, db_connection, story_repository, script_repository):
         """Should process story and return ReviewResult."""
-        # Create a story in the correct state
+        # Create a story in the correct state with a script
         story = Story(
             idea_json='{"title": "Test Story"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         result = process_review_script_readability(
             db_connection,
@@ -345,14 +369,18 @@ class TestProcessReviewScriptReadability:
         assert result.review is not None
         assert isinstance(result.review, Review)
     
-    def test_updates_story_state(self, db_connection, story_repository):
+    def test_updates_story_state(self, db_connection, story_repository, script_repository):
         """Should update story state after processing."""
-        # Create a story
+        # Create a story with a script
         story = Story(
             idea_json='{"title": "Test Story"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
         story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         result = process_review_script_readability(db_connection)
         
@@ -360,13 +388,17 @@ class TestProcessReviewScriptReadability:
         updated_story = story_repository.find_by_id(story.id)
         assert updated_story.state == result.new_state
     
-    def test_accepted_review_transitions_to_story_review(self, db_connection, story_repository):
+    def test_accepted_review_transitions_to_story_review(self, db_connection, story_repository, script_repository):
         """Accepted review should transition to story review state."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         # Use a script that will pass readability
         good_script = """The sun rose over the quiet valley.
@@ -382,13 +414,17 @@ Peace filled the air."""
         if result.accepted:
             assert result.new_state == STATE_STORY_REVIEW
     
-    def test_rejected_review_transitions_to_script_refinement(self, db_connection, story_repository):
+    def test_rejected_review_transitions_to_script_refinement(self, db_connection, story_repository, script_repository):
         """Rejected review should transition to script refinement state."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         # Use a difficult script that will fail readability
         difficult_script = """Peter Piper picked a peck of particularly problematic peppers.
@@ -409,13 +445,17 @@ Subsequently, the methodology employed in the implementation of the aforemention
 class TestReviewResult:
     """Tests for ReviewResult dataclass."""
     
-    def test_review_result_fields(self, db_connection, story_repository):
+    def test_review_result_fields(self, db_connection, story_repository, script_repository):
         """ReviewResult should have all expected fields."""
         story = Story(
             idea_json='{"title": "Test"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
-        story_repository.insert(story)
+        story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         result = process_review_script_readability(db_connection)
         
@@ -449,14 +489,18 @@ class TestConstants:
 class TestReadabilityReviewWorkflowIntegration:
     """Integration tests for the readability review workflow."""
     
-    def test_complete_review_flow_accepted(self, db_connection, story_repository):
+    def test_complete_review_flow_accepted(self, db_connection, story_repository, script_repository):
         """Test complete review flow for accepted script."""
-        # Setup: Create story in correct state
+        # Setup: Create story in correct state with a script
         story = Story(
             idea_json='{"title": "Simple Story", "concept": "A simple tale"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
         story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         # Good script that should pass readability
         good_script = """The morning came quietly to the small town.
@@ -480,14 +524,18 @@ It was going to be a good day."""
         else:
             assert updated.state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
     
-    def test_complete_review_flow_rejected(self, db_connection, story_repository):
+    def test_complete_review_flow_rejected(self, db_connection, story_repository, script_repository):
         """Test complete review flow for rejected script."""
-        # Setup: Create story in correct state
+        # Setup: Create story in correct state with a script
         story = Story(
             idea_json='{"title": "Complex Story", "concept": "A complex tale"}',
             state=STATE_REVIEW_SCRIPT_READABILITY
         )
         story = story_repository.insert(story)
+        script = Script(story_id=story.id, version=0, text="Test script")
+        script = script_repository.insert(script)
+        story.script_id = script.id
+        story_repository.update(story)
         
         # Difficult script that should fail readability
         difficult_script = """Peter Piper picked a peck of particularly problematic peppers from the phosphorescent patch.
