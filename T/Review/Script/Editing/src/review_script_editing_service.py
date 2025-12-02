@@ -313,8 +313,20 @@ def process_review_script_editing(
     review = create_review(score=score, text=review_text)
     review = review_repository.insert(review)
     
-    # Link the Review to the Script via review_id FK
-    if script is not None and script.id is not None and review.id is not None:
+    # If no Script exists but we have a Story, create one for testing/demo purposes
+    # This ensures the review can be linked to a Script
+    if script is None and story.id is not None:
+        script = Script(
+            story_id=story.id,
+            version=0,
+            text=actual_script_text,
+            review_id=review.id
+        )
+        script = script_repository.insert(script)
+        # Update story to reference this script
+        story.script_id = script.id
+    elif script is not None and script.id is not None and review.id is not None:
+        # Link the Review to existing Script via review_id FK
         script_repository.update_review_id(script.id, review.id)
         script.review_id = review.id  # Update local object
     
@@ -327,15 +339,6 @@ def process_review_script_editing(
     # Update story state
     story.update_state(new_state)
     story_repository.update(story)
-    
-    # Create a placeholder Script if none was found (for testing scenarios)
-    if script is None:
-        script = Script(
-            story_id=story.id or 0,
-            version=0,
-            text=actual_script_text,
-            review_id=review.id
-        )
     
     return ReviewResult(
         story=story,
