@@ -41,6 +41,13 @@ Usage:
         print(f"New state: {result.new_state}")
 """
 
+from .title_readability_review import (
+    TitleReadabilityReview,
+    ReadabilityIssue,
+    ReadabilityIssueType,
+    ReadabilitySeverity
+)
+
 from .src import (
     ReviewResult,
     process_review_title_readability,
@@ -57,6 +64,12 @@ from .src import (
 )
 
 __all__ = [
+    # Readability model
+    "TitleReadabilityReview",
+    "ReadabilityIssue",
+    "ReadabilityIssueType",
+    "ReadabilitySeverity",
+    # Workflow functions
     "ReviewResult",
     "process_review_title_readability",
     "process_all_pending_reviews",

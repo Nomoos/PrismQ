@@ -1,7 +1,23 @@
 """PrismQ.T.Review.Script.Tone module.
 
 This module provides script tone review functionality for the PrismQ workflow.
+Stage 15 (MVP-015) in the iterative co-improvement workflow.
+
+The ToneReview model enables:
+- Emotional intensity evaluation
+- Style alignment checking (dark, suspense, dramatic, etc.)
+- Voice and POV consistency validation
+- Tone appropriateness for content type
+- Audience-specific tone tuning
+- Feedback for script refinement
 """
+
+from .tone_review import (
+    ToneReview,
+    ToneIssue,
+    ToneIssueType,
+    ToneSeverity
+)
 
 from T.Review.Script.Tone.src.review_script_tone import (
     ReviewResult,
@@ -21,6 +37,12 @@ from T.Review.Script.Tone.src.review_script_tone import (
 )
 
 __all__ = [
+    # Tone model
+    "ToneReview",
+    "ToneIssue",
+    "ToneIssueType",
+    "ToneSeverity",
+    # Workflow functions
     "ReviewResult",
     "process_review_script_tone",
     "process_all_pending_reviews",
