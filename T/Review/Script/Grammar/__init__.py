@@ -7,6 +7,18 @@ with line-by-line error detection and JSON output.
 This module serves as a quality gate in the workflow:
 - If PASSES: proceed to Stage 15 (Tone Review / MVP-015)
 - If FAILS: return to Script Refinement (Stage 11) with detailed feedback
+
+Usage:
+    # For direct grammar checking:
+    >>> from T.Review.Script.Grammar import review_script_grammar
+    >>> review = review_script_grammar(script_text)
+    >>> if review.passes:
+    ...     print("Script passes grammar review")
+    
+    # For workflow processing:
+    >>> from T.Review.Script.Grammar import ScriptGrammarReviewService
+    >>> service = ScriptGrammarReviewService(connection)
+    >>> result = service.process_oldest_story()
 """
 
 from .script_grammar_review import (
@@ -16,9 +28,29 @@ from .script_grammar_review import (
     get_grammar_feedback
 )
 
+from .script_grammar_service import (
+    ScriptGrammarReviewService,
+    GrammarReviewResult,
+    process_oldest_grammar_review,
+    INPUT_STATE,
+    OUTPUT_STATE_PASS,
+    OUTPUT_STATE_FAIL,
+    DEFAULT_PASS_THRESHOLD
+)
+
 __all__ = [
+    # Grammar checker
     "ScriptGrammarChecker",
     "review_script_grammar",
     "review_script_grammar_to_json",
-    "get_grammar_feedback"
+    "get_grammar_feedback",
+    # Workflow service
+    "ScriptGrammarReviewService",
+    "GrammarReviewResult",
+    "process_oldest_grammar_review",
+    # Constants
+    "INPUT_STATE",
+    "OUTPUT_STATE_PASS",
+    "OUTPUT_STATE_FAIL",
+    "DEFAULT_PASS_THRESHOLD",
 ]
