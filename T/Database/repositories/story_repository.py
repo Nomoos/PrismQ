@@ -373,6 +373,111 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         )
         return cursor.fetchone()[0]
     
+    def find_next_for_processing(self, state: str) -> Optional[Story]:
+        """Find the next story to process for a given state/module.
+        
+        Selection criteria in order:
+        1. Story must have the specified state (full module name)
+        2. Select by lowest version (Script version for script modules,
+           Title version for title modules)
+        3. Select by highest Story score (AVG of Script and Title review scores)
+        4. Select oldest story by created_at timestamp
+        
+        Args:
+            state: The full module name to filter by
+                   (e.g., 'PrismQ.T.Script.From.Idea.Title').
+                   
+        Returns:
+            The next Story to process, or None if no matching stories found.
+            
+        Note:
+            - For script modules (output is Script), uses max Script version
+            - For title modules (output is Title), uses max Title version
+            - Story score is the average of Script and Title review scores (0 if no reviews)
+            - Output type is determined from state pattern: PrismQ.T.<Output>.From.<Input1>...
+            
+        Example:
+            >>> # Find next story for script generation
+            >>> story = repo.find_next_for_processing('PrismQ.T.Script.From.Idea.Title')
+            >>> if story:
+            ...     print(f"Processing story {story.id}")
+        """
+        # Determine if this is a script or title module based on state
+        # State pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...
+        # We need to check the OUTPUT part, not the inputs
+        # Extract the output type from the state (after 'PrismQ.T.' and before '.From.' or end)
+        output_type = ""
+        if state.startswith("PrismQ.T."):
+            rest = state[len("PrismQ.T."):]
+            if ".From." in rest:
+                output_type = rest.split(".From.")[0]
+            else:
+                output_type = rest
+        
+        is_script_module = output_type.startswith("Script")
+        
+        # Build the query with subqueries for version and score calculation
+        # For version: get MAX version from relevant table (Script or Title)
+        # For score: get AVG of latest Script and Title review scores
+        
+        if is_script_module:
+            # For script modules, sort by script version
+            version_subquery = """
+                COALESCE(
+                    (SELECT MAX(s.version) FROM Script s WHERE s.story_id = Story.id),
+                    0
+                )
+            """
+        else:
+            # For title modules, sort by title version
+            version_subquery = """
+                COALESCE(
+                    (SELECT MAX(t.version) FROM Title t WHERE t.story_id = Story.id),
+                    0
+                )
+            """
+        
+        # Story score is average of latest script and title review scores
+        # Latest script/title is determined by MAX version
+        # Review score comes from Review table via review_id FK
+        score_subquery = """
+            (
+                COALESCE(
+                    (SELECT r1.score FROM Review r1
+                     INNER JOIN Script s ON s.review_id = r1.id
+                     WHERE s.story_id = Story.id
+                     ORDER BY s.version DESC LIMIT 1),
+                    0
+                ) +
+                COALESCE(
+                    (SELECT r2.score FROM Review r2
+                     INNER JOIN Title t ON t.review_id = r2.id
+                     WHERE t.story_id = Story.id
+                     ORDER BY t.version DESC LIMIT 1),
+                    0
+                )
+            ) / 2.0
+        """
+        
+        query = f"""
+            SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at
+            FROM Story
+            WHERE state = ?
+            ORDER BY
+                {version_subquery} ASC,
+                {score_subquery} DESC,
+                created_at ASC
+            LIMIT 1
+        """
+        
+        cursor = self._conn.execute(query, (state,))
+        row = cursor.fetchone()
+        
+        if row is None:
+            return None
+        
+        return self._row_to_model(row)
+    
     # === Helper Methods ===
     
     def _row_to_model(self, row: sqlite3.Row) -> Story:
