@@ -440,6 +440,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         # Story score is average of latest script and title review scores
         # Latest script/title is determined by MAX version
         # Review score comes from Review table via review_id FK
+        # Note: Missing reviews are treated as 0 score per the requirement:
+        # "AVG between Script and Title review score" - this means sum/2 always
+        # This favors stories with both reviews over those with only one
         score_subquery = """
             (
                 COALESCE(
@@ -459,6 +462,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             ) / 2.0
         """
         
+        # Build query with parameterized state value
+        # The version and score subqueries are constructed from internal logic only
+        # and do not include any user-provided input
         query = f"""
             SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at
             FROM Story
