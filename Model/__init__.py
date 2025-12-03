@@ -9,13 +9,13 @@ Modules:
     - published: Publishing status model for multi-platform distribution
 
 Example Usage:
-    >>> from T.Model import Story, StoryState, StateNames, Published
+    >>> from Model import Story, StoryState, StateNames, Published
     >>> story = Story(idea_id="1", state=StoryState.IDEA_CREATION)
 """
 
-from T.Model.state import StoryState, StateNames, StateCategory
-from T.Model.story import Story
-from T.Model.published import Published, Language, Platform
+from Model.state import StoryState, StateNames, StateCategory
+from Model.story import Story
+from Model.published import Published, Language, Platform
 
 __all__ = [
     # State

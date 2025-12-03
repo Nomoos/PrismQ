@@ -22,10 +22,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional, Dict, Any, List, TYPE_CHECKING
 
-from T.Model.state import StoryState
+from Model.state import StoryState
 
 if TYPE_CHECKING:
-    from T.Model.published import Published
+    from Model.published import Published
 
 
 @dataclass

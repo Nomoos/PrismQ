@@ -14,7 +14,7 @@ State Categories:
     - Publishing: Final output and publishing states
 
 Example Usage:
-    >>> from T.Model import StateNames, StoryState
+    >>> from Model import StateNames, StoryState
     >>> StateNames.IDEA_CREATION
     'PrismQ.T.Idea.Creation'
     >>> StateNames.TITLE_FROM_IDEA
