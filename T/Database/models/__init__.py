@@ -12,7 +12,7 @@ Models:
     - Script: Script model for versioned content storage
     - Review: Simple review model for content review storage
     - Story: Story model for content workflow management
-    - StoryState: Enum for Story workflow states
+    - StoryState: Enum for Story workflow states (imported from T.State.constants.state_names)
     - StoryReviewModel: Linking table for Story reviews with review types
     - ReviewType: Enum for review types (grammar, tone, content, etc.)
 
@@ -24,7 +24,8 @@ from T.Database.models.base import IReadable, IModel
 from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
-from T.Database.models.story import Story, StoryState
+from T.Database.models.story import Story
+from T.State.constants.state_names import StoryState
 
 try:
     from .story_review import StoryReviewModel, ReviewType

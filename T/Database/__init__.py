@@ -88,7 +88,8 @@ from T.Database.models.story_review import StoryReviewModel, ReviewType
 from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
-from T.Database.models.story import Story, StoryState
+from T.Database.models.story import Story
+from T.State.constants.state_names import StoryState
 from T.Database.repositories.base import (
     IRepository,
     IVersionedRepository,
