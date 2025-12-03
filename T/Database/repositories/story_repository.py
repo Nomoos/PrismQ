@@ -548,6 +548,71 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             # Default to combined version for unknown types
             return combined_version
     
+    def preview_next_for_processing(self, state: str, wait_for_confirm: bool = True) -> Optional[Story]:
+        """Preview the next story to process and optionally wait for confirmation.
+        
+        This method displays the selected story details in a formatted way
+        and waits for user confirmation before returning the story for processing.
+        
+        Args:
+            state: The full module name to filter by
+                   (e.g., 'PrismQ.T.Script.From.Idea.Title').
+            wait_for_confirm: If True, wait for user keystroke before returning.
+                              If False, just display and return immediately.
+                   
+        Returns:
+            The selected Story if found and confirmed, None otherwise.
+            
+        Example:
+            >>> # Preview next story for script generation
+            >>> story = repo.preview_next_for_processing('PrismQ.T.Script.From.Idea.Title')
+            >>> if story:
+            ...     # Process the story
+            ...     pass
+        """
+        story = self.find_next_for_processing(state)
+        
+        if story is None:
+            print(f"\n{'═' * 70}")
+            print(f"  Module: {state}")
+            print(f"{'═' * 70}")
+            print(f"  No stories found for processing in state: {state}")
+            print(f"{'═' * 70}\n")
+            return None
+        
+        # Display story details
+        print(f"\n{'═' * 70}")
+        print(f"  SELECTED STORY FOR PROCESSING")
+        print(f"  Module: {state}")
+        print(f"{'═' * 70}")
+        print(f"  Story ID: {story.id}")
+        print(f"  State: {story.state}")
+        print(f"  Idea ID: {story.idea_id}")
+        print(f"  Title ID: {story.title_id}")
+        print(f"  Script ID: {story.script_id}")
+        print(f"  Created: {story.created_at}")
+        print(f"  Updated: {story.updated_at}")
+        
+        # Show idea_json preview if available
+        if story.idea_json:
+            idea_preview = story.idea_json[:200] + '...' if len(story.idea_json) > 200 else story.idea_json
+            print(f"  Idea JSON: {idea_preview}")
+        
+        print(f"{'═' * 70}")
+        
+        if wait_for_confirm:
+            try:
+                input("  Press ENTER to continue processing or Ctrl+C to cancel...")
+                print(f"{'═' * 70}\n")
+                return story
+            except KeyboardInterrupt:
+                print(f"\n  Processing cancelled by user.")
+                print(f"{'═' * 70}\n")
+                return None
+        else:
+            print(f"{'═' * 70}\n")
+            return story
+    
     def _row_to_model(self, row: sqlite3.Row) -> Story:
         """Convert database row to Story instance.
         

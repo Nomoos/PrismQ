@@ -767,5 +767,51 @@ class TestModuleTypeDetection:
         assert story_repo._get_module_type("InvalidState") == "unknown"
 
 
+class TestPreviewNextForProcessing:
+    """Tests for preview_next_for_processing method."""
+    
+    def test_preview_returns_none_when_no_stories(self, story_repo, capsys):
+        """Test preview returns None and prints message when no stories."""
+        state = "PrismQ.T.Script.From.Idea.Title"
+        
+        result = story_repo.preview_next_for_processing(state, wait_for_confirm=False)
+        
+        assert result is None
+        captured = capsys.readouterr()
+        assert "No stories found for processing" in captured.out
+        assert state in captured.out
+    
+    def test_preview_displays_story_info(self, story_repo, capsys):
+        """Test preview displays story information."""
+        state = "PrismQ.T.Script.From.Idea.Title"
+        story = story_repo.insert(Story(
+            idea_id="1",
+            idea_json='{"title": "Test Story", "concept": "Test concept"}',
+            state=state
+        ))
+        
+        result = story_repo.preview_next_for_processing(state, wait_for_confirm=False)
+        
+        assert result is not None
+        assert result.id == story.id
+        
+        captured = capsys.readouterr()
+        assert "SELECTED STORY FOR PROCESSING" in captured.out
+        assert f"Story ID: {story.id}" in captured.out
+        assert f"State: {state}" in captured.out
+        assert "Test Story" in captured.out
+    
+    def test_preview_returns_selected_story(self, story_repo):
+        """Test preview returns the correctly selected story."""
+        state = "PrismQ.T.Script.From.Idea.Title"
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state="OTHER_STATE"))
+        
+        result = story_repo.preview_next_for_processing(state, wait_for_confirm=False)
+        
+        assert result is not None
+        assert result.id == story1.id
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
