@@ -5,6 +5,11 @@ that can be created by PrismQ.T.Idea.Creation or PrismQ.Idea.Fusion.
 
 The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 
+Score Field:
+    Local AI evaluates each idea and assigns a score from 0-100:
+    - 0: Incoherent or nonsensical idea
+    - 100: Excellent story idea - coherent, complete, best for audience 13-30
+
 Schema:
     -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
     -- Text field contains prompt-like content for content generation
@@ -148,7 +153,8 @@ class IdeaDatabase:
         Args:
             text: Prompt-like text content for content generation
             version: Version number (default: 1, must be >= 0)
-            score: Local AI score (0-100, optional)
+            score: Local AI score (0-100, optional). 0 = incoherent/nonsensical,
+                   100 = excellent story idea, coherent, complete, best for audience 13-30
             created_at: Optional timestamp (auto-generated if not provided)
             
         Returns:
