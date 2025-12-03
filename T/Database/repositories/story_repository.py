@@ -378,8 +378,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         
         Selection criteria in order:
         1. Story must have the specified state (full module name)
-        2. Select by lowest version (Script version for script modules,
-           Title version for title modules)
+        2. Select by lowest version (based on module type - see below)
         3. Select by highest Story score (AVG of Script and Title review scores)
         4. Select oldest story by created_at timestamp
         
@@ -391,51 +390,33 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             The next Story to process, or None if no matching stories found.
             
         Note:
-            - For script modules (output is Script), uses max Script version
-            - For title modules (output is Title), uses max Title version
-            - Story score is the average of Script and Title review scores (0 if no reviews)
-            - Output type is determined from state pattern: PrismQ.T.<Output>.From.<Input1>...
+            Version selection by module type (PrismQ.T.<Type>.*):
+            - PrismQ.T.Script.*: Uses max Script version
+            - PrismQ.T.Title.*: Uses max Title version
+            - PrismQ.T.Review.Script.*: Uses max Script version (reviewing scripts)
+            - PrismQ.T.Review.Title.*: Uses max Title version (reviewing titles)
+            - PrismQ.T.Story.*: Uses max of both Script and Title versions
+            
+            Story score is the average of Script and Title review scores (0 if no reviews)
             
         Example:
             >>> # Find next story for script generation
             >>> story = repo.find_next_for_processing('PrismQ.T.Script.From.Idea.Title')
             >>> if story:
             ...     print(f"Processing story {story.id}")
+            >>> 
+            >>> # Find next story for script review
+            >>> story = repo.find_next_for_processing('PrismQ.T.Review.Script.Grammar')
         """
-        # Determine if this is a script or title module based on state
-        # State pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...
-        # We need to check the OUTPUT part, not the inputs
-        # Extract the output type from the state (after 'PrismQ.T.' and before '.From.' or end)
-        output_type = ""
-        if state.startswith("PrismQ.T."):
-            rest = state[len("PrismQ.T."):]
-            if ".From." in rest:
-                output_type = rest.split(".From.")[0]
-            else:
-                output_type = rest
-        
-        is_script_module = output_type.startswith("Script")
+        # Determine module type from state pattern
+        # Patterns: PrismQ.T.<Type>.* where Type is Script, Title, Review, or Story
+        module_type = self._get_module_type(state)
         
         # Build the query with subqueries for version and score calculation
-        # For version: get MAX version from relevant table (Script or Title)
+        # For version: get MAX version from relevant table based on module type
         # For score: get AVG of latest Script and Title review scores
         
-        if is_script_module:
-            # For script modules, sort by script version
-            version_subquery = """
-                COALESCE(
-                    (SELECT MAX(s.version) FROM Script s WHERE s.story_id = Story.id),
-                    0
-                )
-            """
-        else:
-            # For title modules, sort by title version
-            version_subquery = """
-                COALESCE(
-                    (SELECT MAX(t.version) FROM Title t WHERE t.story_id = Story.id),
-                    0
-                )
-            """
+        version_subquery = self._get_version_subquery(module_type)
         
         # Story score is average of latest script and title review scores
         # Latest script/title is determined by MAX version
@@ -485,6 +466,87 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         return self._row_to_model(row)
     
     # === Helper Methods ===
+    
+    def _get_module_type(self, state: str) -> str:
+        """Determine the module type from the state pattern.
+        
+        Module types:
+        - 'script': PrismQ.T.Script.* modules
+        - 'title': PrismQ.T.Title.* modules
+        - 'review_script': PrismQ.T.Review.Script.* modules
+        - 'review_title': PrismQ.T.Review.Title.* modules
+        - 'story': PrismQ.T.Story.* modules
+        
+        Args:
+            state: The full module name (e.g., 'PrismQ.T.Script.From.Idea.Title')
+            
+        Returns:
+            The module type string
+        """
+        if not state.startswith("PrismQ.T."):
+            return "unknown"
+        
+        rest = state[len("PrismQ.T."):]
+        
+        # Check more specific patterns first before general patterns
+        if rest.startswith("Review.Script"):
+            return "review_script"
+        elif rest.startswith("Review.Title"):
+            return "review_title"
+        elif rest.startswith("Script"):
+            return "script"
+        elif rest.startswith("Title"):
+            return "title"
+        elif rest.startswith("Story"):
+            return "story"
+        else:
+            return "unknown"
+    
+    def _get_version_subquery(self, module_type: str) -> str:
+        """Get the SQL subquery for version calculation based on module type.
+        
+        Args:
+            module_type: The module type from _get_module_type
+            
+        Returns:
+            SQL subquery string for version calculation
+        """
+        script_version = """
+            COALESCE(
+                (SELECT MAX(s.version) FROM Script s WHERE s.story_id = Story.id),
+                0
+            )
+        """
+        
+        title_version = """
+            COALESCE(
+                (SELECT MAX(t.version) FROM Title t WHERE t.story_id = Story.id),
+                0
+            )
+        """
+        
+        # For story modules, use the maximum of both versions
+        combined_version = (
+            "MAX("
+            + script_version.strip()
+            + ", "
+            + title_version.strip()
+            + ")"
+        )
+        
+        if module_type == "script":
+            return script_version
+        elif module_type == "title":
+            return title_version
+        elif module_type == "review_script":
+            return script_version
+        elif module_type == "review_title":
+            return title_version
+        elif module_type == "story":
+            return combined_version
+        else:
+            # Default to combined version for unknown types
+            return combined_version
     
     def _row_to_model(self, row: sqlite3.Row) -> Story:
         """Convert database row to Story instance.

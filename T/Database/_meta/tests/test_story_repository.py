@@ -549,5 +549,223 @@ class TestFindNextForProcessingEdgeCases:
         assert result.id == story3.id  # Lowest title version (0)
 
 
+class TestFindNextForProcessingReviewModules:
+    """Tests for Review module types (PrismQ.T.Review.Script.* and PrismQ.T.Review.Title.*)."""
+    
+    def test_review_script_module_uses_script_version(
+        self, story_repo, script_repo
+    ):
+        """Test PrismQ.T.Review.Script.* uses script version for sorting."""
+        state = "PrismQ.T.Review.Script.Grammar"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        story3 = story_repo.insert(Story(idea_id="3", state=state))
+        
+        # Story 1 has script version 5
+        for v in range(6):
+            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+        
+        # Story 2 has script version 2
+        for v in range(3):
+            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+        
+        # Story 3 has script version 0 (no scripts = 0)
+        # No scripts added
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story3.id  # Lowest script version (0)
+    
+    def test_review_title_module_uses_title_version(
+        self, story_repo, title_repo
+    ):
+        """Test PrismQ.T.Review.Title.* uses title version for sorting."""
+        state = "PrismQ.T.Review.Title.Readability"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        story3 = story_repo.insert(Story(idea_id="3", state=state))
+        
+        # Story 1 has title version 4
+        for v in range(5):
+            title_repo.insert(Title(story_id=story1.id, version=v, text="title"))
+        
+        # Story 2 has title version 1
+        for v in range(2):
+            title_repo.insert(Title(story_id=story2.id, version=v, text="title"))
+        
+        # Story 3 has title version 0 (no titles = 0)
+        # No titles added
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story3.id  # Lowest title version (0)
+    
+    def test_review_script_tone_module(self, story_repo, script_repo):
+        """Test PrismQ.T.Review.Script.Tone uses script version."""
+        state = "PrismQ.T.Review.Script.Tone"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        
+        # Story 1 has script version 3
+        for v in range(4):
+            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+        
+        # Story 2 has script version 0
+        # No scripts added
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story2.id  # Lowest script version (0)
+    
+    def test_review_script_editing_module(self, story_repo, script_repo):
+        """Test PrismQ.T.Review.Script.Editing uses script version."""
+        state = "PrismQ.T.Review.Script.Editing"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        
+        # Story 1 has script version 1
+        for v in range(2):
+            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+        
+        # Story 2 has script version 0
+        # No scripts added
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story2.id  # Lowest script version (0)
+
+
+class TestFindNextForProcessingStoryModules:
+    """Tests for Story module types (PrismQ.T.Story.*)."""
+    
+    def test_story_review_module_uses_max_of_both_versions(
+        self, story_repo, script_repo, title_repo
+    ):
+        """Test PrismQ.T.Story.Review uses max of script and title versions."""
+        state = "PrismQ.T.Story.Review"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        story3 = story_repo.insert(Story(idea_id="3", state=state))
+        
+        # Story 1: script v3, title v1 -> max = 3
+        for v in range(4):
+            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+        for v in range(2):
+            title_repo.insert(Title(story_id=story1.id, version=v, text="title"))
+        
+        # Story 2: script v1, title v4 -> max = 4
+        for v in range(2):
+            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+        for v in range(5):
+            title_repo.insert(Title(story_id=story2.id, version=v, text="title"))
+        
+        # Story 3: script v0, title v0 -> max = 0 (no content)
+        # No scripts or titles added
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story3.id  # Lowest max version (0)
+    
+    def test_story_polish_module_uses_max_of_both_versions(
+        self, story_repo, script_repo, title_repo
+    ):
+        """Test PrismQ.T.Story.Polish uses max of script and title versions."""
+        state = "PrismQ.T.Story.Polish"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        
+        # Story 1: script v2, title v2 -> max = 2
+        for v in range(3):
+            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+        for v in range(3):
+            title_repo.insert(Title(story_id=story1.id, version=v, text="title"))
+        
+        # Story 2: script v0, title v1 -> max = 1
+        for v in range(1):
+            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+        for v in range(2):
+            title_repo.insert(Title(story_id=story2.id, version=v, text="title"))
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story2.id  # Lowest max version (1)
+    
+    def test_story_from_idea_module(self, story_repo, script_repo, title_repo):
+        """Test PrismQ.T.Story.From.Idea uses max of both versions."""
+        state = "PrismQ.T.Story.From.Idea"
+        
+        story1 = story_repo.insert(Story(idea_id="1", state=state))
+        story2 = story_repo.insert(Story(idea_id="2", state=state))
+        
+        # Story 1 has versions: script v1, title v2 -> max = 2
+        script_repo.insert(Script(story_id=story1.id, version=0, text="text"))
+        script_repo.insert(Script(story_id=story1.id, version=1, text="text"))
+        title_repo.insert(Title(story_id=story1.id, version=0, text="title"))
+        title_repo.insert(Title(story_id=story1.id, version=1, text="title"))
+        title_repo.insert(Title(story_id=story1.id, version=2, text="title"))
+        
+        # Story 2 has versions: script v0, title v0 -> max = 0
+        script_repo.insert(Script(story_id=story2.id, version=0, text="text"))
+        title_repo.insert(Title(story_id=story2.id, version=0, text="title"))
+        
+        result = story_repo.find_next_for_processing(state)
+        
+        assert result is not None
+        assert result.id == story2.id  # Lowest max version (0)
+
+
+class TestModuleTypeDetection:
+    """Tests for _get_module_type helper method."""
+    
+    def test_script_module_types(self, story_repo):
+        """Test detection of Script module types."""
+        assert story_repo._get_module_type("PrismQ.T.Script.From.Idea.Title") == "script"
+        assert story_repo._get_module_type("PrismQ.T.Script.From.Title.Review.Script") == "script"
+    
+    def test_title_module_types(self, story_repo):
+        """Test detection of Title module types."""
+        assert story_repo._get_module_type("PrismQ.T.Title.From.Idea") == "title"
+        assert story_repo._get_module_type("PrismQ.T.Title.From.Script.Review.Title") == "title"
+    
+    def test_review_script_module_types(self, story_repo):
+        """Test detection of Review.Script module types."""
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Grammar") == "review_script"
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Tone") == "review_script"
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Content") == "review_script"
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Consistency") == "review_script"
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Editing") == "review_script"
+        assert story_repo._get_module_type("PrismQ.T.Review.Script.Readability") == "review_script"
+    
+    def test_review_title_module_types(self, story_repo):
+        """Test detection of Review.Title module types."""
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.Readability") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Script") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Script.Idea") == "review_title"
+    
+    def test_story_module_types(self, story_repo):
+        """Test detection of Story module types."""
+        assert story_repo._get_module_type("PrismQ.T.Story.Review") == "story"
+        assert story_repo._get_module_type("PrismQ.T.Story.Polish") == "story"
+        assert story_repo._get_module_type("PrismQ.T.Story.From.Idea") == "story"
+    
+    def test_unknown_module_types(self, story_repo):
+        """Test detection of unknown module types."""
+        assert story_repo._get_module_type("PrismQ.T.Publishing") == "unknown"
+        assert story_repo._get_module_type("PrismQ.T.Idea.Creation") == "unknown"
+        assert story_repo._get_module_type("InvalidState") == "unknown"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
