@@ -339,3 +339,161 @@ class TestIdeaDatabaseSearch:
         
         self.db.insert_idea("v2", version=2)
         assert self.db.get_max_version() == 3  # Still 3
+
+
+class TestIdeaDatabaseScore:
+    """Test score field functionality."""
+    
+    def setup_method(self):
+        """Create a temporary database for each test."""
+        self.temp_dir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
+        self.db = setup_idea_database(self.db_path)
+    
+    def teardown_method(self):
+        """Clean up the temporary database."""
+        if self.db.conn:
+            self.db.close()
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+        os.rmdir(self.temp_dir)
+    
+    def test_insert_idea_with_score(self):
+        """Test inserting an idea with a score."""
+        idea_id = self.db.insert_idea(
+            text="High quality idea",
+            version=1,
+            score=85
+        )
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["score"] == 85
+    
+    def test_insert_idea_without_score(self):
+        """Test inserting an idea without a score (should be NULL)."""
+        idea_id = self.db.insert_idea(
+            text="Unscored idea",
+            version=1
+        )
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["score"] is None
+    
+    def test_insert_idea_from_dict_with_score(self):
+        """Test inserting idea from dictionary with score."""
+        idea_dict = {
+            "text": "Test idea with score",
+            "version": 1,
+            "score": 75
+        }
+        
+        idea_id = self.db.insert_idea_from_dict(idea_dict)
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["score"] == 75
+    
+    def test_score_zero_allowed(self):
+        """Test that score of 0 is allowed (edge case for CHECK >= 0)."""
+        idea_id = self.db.insert_idea("Low score idea", version=1, score=0)
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["score"] == 0
+    
+    def test_score_100_allowed(self):
+        """Test that score of 100 is allowed (edge case for CHECK <= 100)."""
+        idea_id = self.db.insert_idea("Perfect score idea", version=1, score=100)
+        
+        idea = self.db.get_idea(idea_id)
+        assert idea is not None
+        assert idea["score"] == 100
+    
+    def test_negative_score_fails(self):
+        """Test that negative score fails at database level due to CHECK constraint."""
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.insert_idea("Test idea", version=1, score=-1)
+    
+    def test_score_over_100_fails(self):
+        """Test that score over 100 fails at database level due to CHECK constraint."""
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.insert_idea("Test idea", version=1, score=101)
+    
+    def test_update_idea_score(self):
+        """Test updating idea score."""
+        idea_id = self.db.insert_idea("Test idea", version=1, score=50)
+        
+        success = self.db.update_idea(idea_id, score=75)
+        
+        assert success is True
+        idea = self.db.get_idea(idea_id)
+        assert idea["score"] == 75
+    
+    def test_update_idea_score_to_zero(self):
+        """Test updating idea score to zero."""
+        idea_id = self.db.insert_idea("Test idea", version=1, score=50)
+        
+        success = self.db.update_idea(idea_id, score=0)
+        
+        assert success is True
+        idea = self.db.get_idea(idea_id)
+        assert idea["score"] == 0
+    
+    def test_update_to_negative_score_fails(self):
+        """Test that updating to negative score fails at database level."""
+        idea_id = self.db.insert_idea("Test idea", version=1, score=50)
+        
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.update_idea(idea_id, score=-1)
+    
+    def test_update_to_over_100_score_fails(self):
+        """Test that updating to score over 100 fails at database level."""
+        idea_id = self.db.insert_idea("Test idea", version=1, score=50)
+        
+        with pytest.raises(sqlite3.IntegrityError):
+            self.db.update_idea(idea_id, score=101)
+    
+    def test_get_ideas_by_score_range(self):
+        """Test getting ideas by score range."""
+        self.db.insert_idea("Low", version=1, score=20)
+        self.db.insert_idea("Medium", version=1, score=50)
+        self.db.insert_idea("High", version=1, score=80)
+        self.db.insert_idea("Unscored", version=1)
+        
+        low_ideas = self.db.get_ideas_by_score_range(0, 30)
+        assert len(low_ideas) == 1
+        assert low_ideas[0]["text"] == "Low"
+        
+        mid_ideas = self.db.get_ideas_by_score_range(40, 60)
+        assert len(mid_ideas) == 1
+        assert mid_ideas[0]["text"] == "Medium"
+        
+        all_scored = self.db.get_ideas_by_score_range(0, 100)
+        assert len(all_scored) == 3  # Excludes unscored
+    
+    def test_get_top_scored_ideas(self):
+        """Test getting top scored ideas."""
+        self.db.insert_idea("Low", version=1, score=20)
+        self.db.insert_idea("Medium", version=1, score=50)
+        self.db.insert_idea("High", version=1, score=80)
+        self.db.insert_idea("Best", version=1, score=95)
+        self.db.insert_idea("Unscored", version=1)
+        
+        top_ideas = self.db.get_top_scored_ideas(limit=2)
+        assert len(top_ideas) == 2
+        assert top_ideas[0]["score"] == 95
+        assert top_ideas[1]["score"] == 80
+    
+    def test_get_unscored_ideas(self):
+        """Test getting unscored ideas."""
+        self.db.insert_idea("Scored 1", version=1, score=80)
+        self.db.insert_idea("Unscored 1", version=1)
+        self.db.insert_idea("Scored 2", version=1, score=60)
+        self.db.insert_idea("Unscored 2", version=1)
+        
+        unscored = self.db.get_unscored_ideas()
+        assert len(unscored) == 2
+        for idea in unscored:
+            assert idea["score"] is None
