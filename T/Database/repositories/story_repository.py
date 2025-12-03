@@ -27,6 +27,7 @@ from datetime import datetime
 
 from T.Database.repositories.base import IUpdatableRepository
 from T.Database.models.story import Story
+from T.State.validators.transition_validator import TransitionValidator
 
 
 class StoryRepository(IUpdatableRepository[Story, int]):
@@ -60,6 +61,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
                 recommended for dictionary-like row access.
         """
         self._conn = connection
+        self._transition_validator = TransitionValidator()
     
     # === READ Operations ===
     
@@ -151,6 +153,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         This method updates an existing story's fields in the database.
         Unlike versioned entities, this modifies the same row.
         
+        State transitions are validated using TransitionValidator before saving.
+        Invalid transitions will print a detailed error message for debugging.
+        
         Args:
             entity: Story to update. Must have a valid ID.
             
@@ -159,9 +164,50 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             
         Raises:
             ValueError: If entity has no ID (not yet persisted).
+            ValueError: If state transition is invalid.
         """
         if entity.id is None:
             raise ValueError("Cannot update story without ID")
+        
+        # Get current state from database to validate transition
+        current_story = self.find_by_id(entity.id)
+        if current_story is None:
+            raise ValueError(f"Story with ID {entity.id} not found")
+        
+        current_state = current_story.state
+        new_state = entity.state
+        
+        # Validate state transition if state is changing
+        if current_state != new_state:
+            validation_result = self._transition_validator.validate(current_state, new_state)
+            
+            if not validation_result.is_valid:
+                # Print detailed error message for debugging (copilot-friendly format)
+                error_msg = (
+                    f"\n"
+                    f"╔══════════════════════════════════════════════════════════════════╗\n"
+                    f"║  INVALID STATE TRANSITION                                        ║\n"
+                    f"╠══════════════════════════════════════════════════════════════════╣\n"
+                    f"║  Story ID: {entity.id}\n"
+                    f"║  From State: {current_state}\n"
+                    f"║  To State: {new_state}\n"
+                    f"║  Error: {validation_result.error_message}\n"
+                    f"╠══════════════════════════════════════════════════════════════════╣\n"
+                    f"║  Valid transitions from '{current_state}':\n"
+                )
+                valid_next = self._transition_validator.get_valid_next_states(current_state)
+                for valid_state in valid_next:
+                    error_msg += f"║    - {valid_state}\n"
+                if not valid_next:
+                    error_msg += f"║    (none - terminal state)\n"
+                error_msg += (
+                    f"╚══════════════════════════════════════════════════════════════════╝\n"
+                )
+                print(error_msg)
+                raise ValueError(
+                    f"Invalid state transition from '{current_state}' to '{new_state}'. "
+                    f"{validation_result.error_message}"
+                )
         
         # Update the updated_at timestamp
         entity.updated_at = datetime.now()

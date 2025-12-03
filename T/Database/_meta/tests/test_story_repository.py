@@ -154,15 +154,40 @@ class TestStoryRepositoryBasicOperations:
         assert len(stories) == 2
     
     def test_update_story_state(self, story_repo):
-        """Test updating story state."""
-        story = Story(idea_id="1", state="CREATED")
+        """Test updating story state with valid transition."""
+        # Use valid state from StateNames - IDEA_CREATION to TITLE_FROM_IDEA
+        story = Story(idea_id="1", state="PrismQ.T.Idea.Creation")
         saved = story_repo.insert(story)
         
-        saved.state = "PROCESSING"
+        # Valid transition from IDEA_CREATION to TITLE_FROM_IDEA
+        saved.state = "PrismQ.T.Title.From.Idea"
         story_repo.update(saved)
         
         found = story_repo.find_by_id(saved.id)
-        assert found.state == "PROCESSING"
+        assert found.state == "PrismQ.T.Title.From.Idea"
+    
+    def test_update_story_invalid_transition_raises_error(self, story_repo, capsys):
+        """Test that invalid state transition raises ValueError with error message."""
+        story = Story(idea_id="1", state="PrismQ.T.Idea.Creation")
+        saved = story_repo.insert(story)
+        
+        # Invalid transition - IDEA_CREATION cannot go directly to PUBLISHING
+        saved.state = "PrismQ.T.Publishing"
+        
+        import pytest
+        with pytest.raises(ValueError) as exc_info:
+            story_repo.update(saved)
+        
+        # Check error message contains useful debugging info
+        assert "Invalid state transition" in str(exc_info.value)
+        assert "PrismQ.T.Idea.Creation" in str(exc_info.value)
+        assert "PrismQ.T.Publishing" in str(exc_info.value)
+        
+        # Check that detailed error was printed to stdout
+        captured = capsys.readouterr()
+        assert "INVALID STATE TRANSITION" in captured.out
+        assert "Story ID:" in captured.out
+        assert "Valid transitions from" in captured.out
 
 
 class TestFindNextForProcessingBasic:
