@@ -19,6 +19,13 @@ Use this space for:
 
 ## Current Research
 
+- **[YouTube Story Analysis: Wedding Rules](./youtube-story-analysis-wedding-rules.md)** (2025-12-03)
+  - Complete narrative structure analysis of viral YouTube story
+  - Beat sheet breakdown with storytelling techniques
+  - Engagement factors and viral potential assessment
+  - Content replication guidelines and platform optimization
+  - Inspiration scoring: 86/100
+
 - **[YouTube Metadata Optimization: SMART Strategy](./youtube-metadata-optimization-smart-strategy.md)** (2025-10-31)
   - Timeline-based approach to video metadata optimization
   - Analysis of YouTube's algorithm behavior and testing phases
