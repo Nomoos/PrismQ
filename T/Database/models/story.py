@@ -17,44 +17,12 @@ Note:
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from typing import Optional, Dict, Any
 
 from .base import IModel
 
-
-class StoryState(str, Enum):
-    """Workflow state constants for Story.
-    
-    These states follow the PrismQ.T naming convention and represent
-    the workflow progression of a Story through the content pipeline.
-    
-    States are string-based for database compatibility and readability.
-    """
-    
-    # Initial state when Story is created
-    CREATED = "CREATED"
-    
-    # Story is ready for title generation from idea (PrismQ.T.Title.From.Idea)
-    TITLE_FROM_IDEA = "PrismQ.T.Title.From.Idea"
-    
-    # Story has completed title generation (version 0)
-    TITLE_V0 = "PrismQ.T.Title.V0"
-    
-    # Story is ready for script generation
-    SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
-    
-    # Story has completed script generation (version 0)
-    SCRIPT_V0 = "PrismQ.T.Script.V0"
-    
-    # Story is ready for review
-    STORY_REVIEW = "PrismQ.T.Story.Review"
-    
-    # Story is being polished
-    STORY_POLISH = "PrismQ.T.Story.Polish"
-    
-    # Story is ready for publishing
-    PUBLISHING = "PrismQ.T.Publishing"
+# Import StoryState from the unified state constants module
+from T.State.constants.state_names import StoryState
 
 
 @dataclass

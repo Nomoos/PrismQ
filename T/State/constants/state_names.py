@@ -14,10 +14,12 @@ State Categories:
     - Publishing: Final output and publishing states
 
 Example Usage:
-    >>> from T.State.constants.state_names import StateNames
+    >>> from T.State.constants.state_names import StateNames, StoryState
     >>> StateNames.IDEA_CREATION
     'PrismQ.T.Idea.Creation'
     >>> StateNames.TITLE_FROM_IDEA
+    'PrismQ.T.Title.From.Idea'
+    >>> StoryState.TITLE_FROM_IDEA.value
     'PrismQ.T.Title.From.Idea'
 """
 
@@ -36,6 +38,69 @@ class StateCategory(Enum):
     REVIEW = "review"
     REFINEMENT = "refinement"
     PUBLISHING = "publishing"
+
+
+# Common prefix for all states
+_STATE_PREFIX = "PrismQ.T"
+
+
+class StoryState(str, Enum):
+    """Workflow state enum for Story entities.
+    
+    This enum provides type-safe state values that match the StateNames constants.
+    Using str as base class allows direct comparison with string state values.
+    
+    States follow the PrismQ.T naming convention:
+        PrismQ.T.<Output>.From.<Input> - for generation states
+        PrismQ.T.<Action>.<Target> - for other states
+    
+    Example:
+        >>> from T.State.constants.state_names import StoryState
+        >>> story.state = StoryState.TITLE_FROM_IDEA.value
+        >>> story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
+    """
+    
+    # Initial state when Story is created
+    CREATED = "CREATED"
+    
+    # Stage 1: Initial Creation
+    IDEA_CREATION = f"{_STATE_PREFIX}.Idea.Creation"
+    
+    # Stage 2-3: Initial Content Generation
+    TITLE_FROM_IDEA = f"{_STATE_PREFIX}.Title.From.Idea"
+    SCRIPT_FROM_IDEA_TITLE = f"{_STATE_PREFIX}.Script.From.Idea.Title"
+    
+    # Stages 4-6: Initial Review Cycle
+    REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{_STATE_PREFIX}.Review.Title.From.Script.Idea"
+    REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{_STATE_PREFIX}.Review.Script.From.Title.Idea"
+    REVIEW_TITLE_FROM_SCRIPT = f"{_STATE_PREFIX}.Review.Title.From.Script"
+    
+    # Stages 7-9: Refinement and Re-review
+    TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Title.From.Title.Review.Script"
+    SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Script.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Script.From.Title.Review.Script"
+    REVIEW_SCRIPT_FROM_TITLE = f"{_STATE_PREFIX}.Review.Script.From.Title"
+    TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Title.From.Script.Review.Title"
+    
+    # Stages 10-16: Quality Review States
+    REVIEW_SCRIPT_GRAMMAR = f"{_STATE_PREFIX}.Review.Script.Grammar"
+    REVIEW_SCRIPT_TONE = f"{_STATE_PREFIX}.Review.Script.Tone"
+    REVIEW_SCRIPT_CONTENT = f"{_STATE_PREFIX}.Review.Script.Content"
+    REVIEW_SCRIPT_CONSISTENCY = f"{_STATE_PREFIX}.Review.Script.Consistency"
+    REVIEW_SCRIPT_EDITING = f"{_STATE_PREFIX}.Review.Script.Editing"
+    REVIEW_TITLE_READABILITY = f"{_STATE_PREFIX}.Review.Title.Readability"
+    REVIEW_SCRIPT_READABILITY = f"{_STATE_PREFIX}.Review.Script.Readability"
+    
+    # Stages 17-18: Expert Review Loop
+    STORY_REVIEW = f"{_STATE_PREFIX}.Story.Review"
+    STORY_POLISH = f"{_STATE_PREFIX}.Story.Polish"
+    
+    # Terminal State
+    PUBLISHING = f"{_STATE_PREFIX}.Publishing"
+    
+    # Legacy states (kept for backward compatibility)
+    TITLE_V0 = f"{_STATE_PREFIX}.Title.V0"
+    SCRIPT_V0 = f"{_STATE_PREFIX}.Script.V0"
 
 
 class StateNames:
