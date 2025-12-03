@@ -362,7 +362,8 @@ class IdeaDatabase:
         
         cursor = self.conn.cursor()
         
-        # Build update query dynamically
+        # Build update query dynamically using parameterized queries
+        # Note: Column names are hardcoded strings, not user input - safe from SQL injection
         updates = []
         params = []
         
@@ -382,6 +383,7 @@ class IdeaDatabase:
             return False
         
         params.append(idea_id)
+        # Query construction is safe: updates list contains only hardcoded column placeholders
         query = f"UPDATE Idea SET {', '.join(updates)} WHERE id = ?"
         
         cursor.execute(query, params)
