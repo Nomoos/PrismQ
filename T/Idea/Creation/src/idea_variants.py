@@ -2971,19 +2971,70 @@ MIN_PADDING_FIELD_LENGTH = 5
 INTERESTS = ["friendship", "school drama", "mystery", "social media", "identity", "family", "competition", "tech", "fantasy", "romance-lite"]
 
 
+def _extract_core_theme(title: str) -> str:
+    """Extract a core theme/subject from a sentence-like input.
+    
+    When users input story ideas like "sister doesn't have social life",
+    this extracts the main subject/theme for use in templates.
+    
+    Args:
+        title: Input text which may be a sentence or topic
+        
+    Returns:
+        Core theme extracted from the input
+    """
+    # Common theme words to look for
+    theme_keywords = {
+        'sister', 'brother', 'mom', 'mother', 'dad', 'father', 'parent', 'family',
+        'friend', 'friends', 'friendship', 'relationship', 'love', 'crush',
+        'school', 'work', 'job', 'college', 'life', 'social', 'anxiety',
+        'fear', 'secret', 'truth', 'lie', 'trust', 'betrayal', 'identity',
+        'body', 'self', 'image', 'confidence', 'lonely', 'isolation',
+        'future', 'past', 'memory', 'change', 'growth', 'loss', 'grief'
+    }
+    
+    # Clean and lowercase for matching
+    words = title.lower().replace('_', ' ').split()
+    
+    # Find theme keywords in the input
+    found_themes = [w for w in words if w in theme_keywords]
+    
+    if found_themes:
+        # Return the first theme found
+        return found_themes[0]
+    
+    # If no theme keyword found, extract the subject (usually first noun)
+    # Filter out common non-theme words
+    skip_words = {'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'our',
+                  'is', 'are', 'was', 'were', 'be', 'been', 'being',
+                  'have', 'has', 'had', 'do', 'does', 'did', 'dont', 'doesnt',
+                  'will', 'would', 'could', 'should', 'can', 'may', 'might',
+                  'not', 'no', 'yes', 'very', 'really', 'just', 'also',
+                  'and', 'or', 'but', 'so', 'if', 'then', 'when', 'while',
+                  'to', 'for', 'of', 'in', 'on', 'at', 'by', 'with', 'about'}
+    
+    content_words = [w for w in words if w not in skip_words and len(w) > 2]
+    
+    if content_words:
+        return content_words[0]
+    
+    # Fallback to "this" for very short or unclear inputs
+    return "this"
+
+
 def _humanize_topic(title: str) -> str:
     """Convert a raw title/topic into a more natural, readable form.
     
     This function makes topics feel conversational by:
     - Converting underscores and camelCase to spaces
     - Lowercasing where appropriate for natural flow
-    - Preserving proper nouns and key terms
+    - For sentence-like inputs, extracting the core theme
     
     Args:
         title: Raw title/topic string
         
     Returns:
-        Humanized, readable topic string
+        Humanized, readable topic string (or extracted theme for sentences)
     """
     # Replace underscores with spaces
     result = title.replace('_', ' ')
@@ -2998,7 +3049,79 @@ def _humanize_topic(title: str) -> str:
     if result.isupper():
         result = result.title()
     
+    # For sentence-like inputs, extract the core theme
+    # This prevents awkward phrases like "about sister dosnt have social life"
+    if _is_sentence_input(result):
+        return _extract_core_theme(result)
+    
     return result
+
+
+def _is_sentence_input(title: str) -> bool:
+    """Determine if the input is a sentence/story idea rather than a simple topic.
+    
+    Args:
+        title: Input text to check
+        
+    Returns:
+        True if the input appears to be a sentence, False if it's a simple topic
+    """
+    words = title.split()
+    
+    # If more than 3 words, likely a sentence
+    if len(words) > 3:
+        return True
+    
+    # Check for verb-like patterns (contains common verbs)
+    verb_indicators = {'is', 'are', 'was', 'were', 'have', 'has', 'had',
+                       'do', 'does', 'did', 'dont', 'doesnt', 'didnt',
+                       'can', 'cant', 'will', 'wont', 'would', 'could', 'should'}
+    
+    lower_words = [w.lower() for w in words]
+    if any(w in verb_indicators for w in lower_words):
+        return True
+    
+    return False
+
+
+def _format_topic_for_template(title: str, template_context: str = "general") -> str:
+    """Format a topic appropriately for use in template phrases.
+    
+    When the input is a sentence (like "sister doesn't have social life"),
+    this function returns a format appropriate for template insertion.
+    
+    Args:
+        title: Raw title/topic input
+        template_context: Context hint for how the topic will be used:
+            - "about": For phrases like "about {topic}"
+            - "connected": For phrases like "connected to {topic}"
+            - "related": For phrases like "related to {topic}"
+            - "general": Default formatting
+            
+    Returns:
+        Formatted topic string suitable for template insertion
+    """
+    if not _is_sentence_input(title):
+        # Simple topic, just humanize it
+        return _humanize_topic(title)
+    
+    # For sentence inputs, extract the core theme
+    theme = _extract_core_theme(title)
+    
+    # Build a more natural phrase based on context
+    humanized = _humanize_topic(title)
+    
+    if template_context == "about":
+        # "about sister's lack of social life" vs "about sister dosnt have social life"
+        return theme
+    elif template_context == "connected":
+        # "connected to isolation" vs "connected to sister dosnt have social life"
+        return theme
+    elif template_context == "related":
+        return theme
+    else:
+        # General: use the extracted theme
+        return theme
 
 
 def _get_topic_essence(title: str, max_words: int = 6) -> str:
@@ -4570,16 +4693,16 @@ def _create_genre_variant(title: str, description: str, kwargs: Dict, seed: int,
 def _create_scene_seed_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create scene seed variant content with variability."""
     # Humanize the topic for natural-sounding content
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
-    # More evocative, creative scene hooks
+    # More evocative, creative scene hooks that don't directly insert the topic
     scene_hooks = [
-        f"FADE IN: You're about to understand {topic.lower()} differently...",
-        f"INT. SOMEWHERE QUIET - NIGHT: The {topic.lower()} story unfolds...",
-        f"EXT. THE WORLD - DAY: How {topic.lower()} changes everything...",
-        f"CLOSE ON: A detail that makes {topic.lower()} suddenly click...",
-        f"MONTAGE: The journey through {topic.lower()}...",
-        f"FLASHBACK: Before anyone understood {topic.lower()}..."
+        "FADE IN: A moment that will change everything...",
+        "INT. SOMEWHERE QUIET - NIGHT: This is where the story begins...",
+        "EXT. THE WORLD - DAY: How one choice changes everything...",
+        "CLOSE ON: A detail that makes everything suddenly click...",
+        "MONTAGE: The journey begins here...",
+        "FLASHBACK: Before anyone understood what would happen..."
     ]
     
     tones = ["cinematic", "intimate", "epic", "documentary", "noir", "suspenseful", "whimsical"]
@@ -5135,7 +5258,7 @@ def _create_urban_quest_variant(title: str, description: str, kwargs: Dict, seed
 
 def _create_magical_aesthetic_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create magical realism + aesthetic variant with wonder."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     magical = _pick_from_pool(MAGICAL_AESTHETICS, seed, variation_index)
     
@@ -5163,13 +5286,21 @@ def _create_magical_aesthetic_variant(title: str, description: str, kwargs: Dict
         "discovering that the magic was always there, just hidden"
     ]
     
+    character_journeys = [
+        "Someone learning to face their feelings",
+        "A person discovering hidden truths about themselves",
+        "Someone healing through unexpected magic",
+        "A journey from isolation to connection",
+        "Finding courage through magical encounters"
+    ]
+    
     return {
-        "magical_element": f"{magical} - revealing truths about {topic.lower()}",
+        "magical_element": magical,
         "aesthetic_world": _pick_from_pool(aesthetic_worlds, seed, variation_index + 1),
         "emotional_theme": _pick_from_pool(emotional_themes, seed, variation_index + 2),
         "rules": "You can only access the magic when you need it most",
-        "character_journey": f"Someone avoiding their feelings about {topic.lower()} finally faces them",
-        "wonder_moment": _pick_from_pool(wonder_moments, seed, variation_index + 3)
+        "character_journey": _pick_from_pool(character_journeys, seed, variation_index + 3),
+        "wonder_moment": _pick_from_pool(wonder_moments, seed, variation_index + 4)
     }
 
 
@@ -5219,7 +5350,7 @@ def _create_family_drama_variant(title: str, description: str, kwargs: Dict, see
 
 def _create_social_home_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create social + home drama variant - digital meets family."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "connected")
     
     trigger = _pick_from_pool(SOCIAL_HOME_TRIGGERS, seed, variation_index)
     
@@ -5247,13 +5378,21 @@ def _create_social_home_variant(title: str, description: str, kwargs: Dict, seed
         "boundaries get established, finally"
     ]
     
+    truth_reveals = [
+        "The 'secret' was actually protection, not betrayal",
+        "What looked like an attack was actually a cry for help",
+        "Everyone was hurting, just showing it differently",
+        "The misunderstanding revealed deeper issues",
+        "Sometimes the truth is more complicated than blame"
+    ]
+    
     return {
-        "digital_trigger": trigger if topic.lower() in trigger.lower() else f"{trigger} It's connected to {topic.lower()}.",
+        "digital_trigger": trigger,
         "family_reaction": _pick_from_pool(family_reactions, seed, variation_index + 1),
         "misunderstanding": _pick_from_pool(misunderstandings, seed, variation_index + 2),
         "emotional_escalation": "One person goes silent, another starts posting cryptically",
-        "truth_reveal": f"The 'secret' about {topic.lower()} was actually protection, not betrayal",
-        "aftermath": _pick_from_pool(aftermaths, seed, variation_index + 3)
+        "truth_reveal": _pick_from_pool(truth_reveals, seed, variation_index + 3),
+        "aftermath": _pick_from_pool(aftermaths, seed, variation_index + 4)
     }
 
 
@@ -6703,7 +6842,7 @@ def _create_fitting_in_variant(title: str, description: str, kwargs: Dict, seed:
 
 def _create_online_connection_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create online friendship/connection variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "connected")
     
     connections = [
         "Friends from a Discord server I've never met",
@@ -6730,8 +6869,8 @@ def _create_online_connection_variant(title: str, description: str, kwargs: Dict
     ]
     
     return {
-        "the_connection": f"{_pick_from_pool(connections, seed, variation_index)} — connected through {topic.lower()}",
-        "how_it_started": "We bonded over something most people don't understand",
+        "the_connection": _pick_from_pool(connections, seed, variation_index),
+        "how_it_started": f"We bonded over {theme}",
         "what_it_provides": _pick_from_pool(what_it_provides, seed, variation_index + 1),
         "others_opinion": "'They're not real friends' - but they showed up when no one else did",
         "defense_of_realness": "We've talked through my worst moments",
@@ -7121,7 +7260,7 @@ def _create_mirror_body_variant(title: str, description: str, kwargs: Dict, seed
 
 def _create_growing_online_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create growing apart + online connection blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "related")
     
     old_friends = [
         "Known her since third grade, but conversations feel like work now",
@@ -7140,7 +7279,7 @@ def _create_growing_online_variant(title: str, description: str, kwargs: Dict, s
     ]
     
     return {
-        "the_old_friend": f"The IRL connection fading, related to {topic.lower()} — {_pick_from_pool(old_friends, seed, variation_index)}",
+        "the_old_friend": _pick_from_pool(old_friends, seed, variation_index),
         "the_new_friend": "Someone online who gets it without explanation",
         "what_changed": "Realized I was excited to go home and text them, not to meet her",
         "the_guilt": "Am I a bad friend? Am I replacing her?",
@@ -7211,7 +7350,7 @@ def _create_chosen_online_variant(title: str, description: str, kwargs: Dict, se
 
 def _create_permission_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create permission to + body acceptance blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     permissions = [
         "To not hate what I see",
@@ -7230,9 +7369,9 @@ def _create_permission_body_variant(title: str, description: str, kwargs: Dict, 
     ]
     
     return {
-        "the_permission": f"Permission about {topic.lower()} — {_pick_from_pool(permissions, seed, variation_index)}",
+        "the_permission": _pick_from_pool(permissions, seed, variation_index),
         "the_war": "Years of monitoring, controlling, hating",
-        "what_triggered": "Realized I don't remember a time I liked my body",
+        "what_triggered": f"Realized {theme} is connected to how I see my body",
         "the_fear": "If I stop fighting, will I 'let myself go'?",
         "the_relief": "What would it be like to just... exist? Without the commentary?",
         "first_step": _pick_from_pool(first_steps, seed, variation_index + 1)
@@ -7241,7 +7380,7 @@ def _create_permission_body_variant(title: str, description: str, kwargs: Dict, 
 
 def _create_small_comparison_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create small moment big + comparison trap blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     small_things = [
         "She got more likes on a similar photo",
@@ -7260,7 +7399,7 @@ def _create_small_comparison_variant(title: str, description: str, kwargs: Dict,
     ]
     
     return {
-        "the_small_thing": f"A tiny thing about {topic.lower()} — {_pick_from_pool(small_things, seed, variation_index)}",
+        "the_small_thing": _pick_from_pool(small_things, seed, variation_index),
         "why_big": "Because it confirmed what I already believed",
         "the_comparison": "Her: effortless. Me: trying so hard and still less",
         "the_spiral": "Maybe I'm just... less likable, less pretty, less everything",
@@ -7271,7 +7410,7 @@ def _create_small_comparison_variant(title: str, description: str, kwargs: Dict,
 
 def _create_identity_fitting_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create identity power + fitting in blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     who_you_are = [
         "Weird interests, strong opinions, too much or not enough",
@@ -7290,7 +7429,7 @@ def _create_identity_fitting_variant(title: str, description: str, kwargs: Dict,
     ]
     
     return {
-        "who_you_are": f"My authentic self with {topic.lower()} — {_pick_from_pool(who_you_are, seed, variation_index)}",
+        "who_you_are": _pick_from_pool(who_you_are, seed, variation_index),
         "what_fitting_requires": "Dulling the edges, caring about the right stuff",
         "the_cost": "Feeling like a ghost in my own life",
         "the_risk": "Being alone, being mocked, being the weird one",
@@ -7301,7 +7440,7 @@ def _create_identity_fitting_variant(title: str, description: str, kwargs: Dict,
 
 def _create_learned_body_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create learned young + body acceptance blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     lessons = [
         "That taking up space was bad, that hunger was weakness",
@@ -7320,7 +7459,7 @@ def _create_learned_body_variant(title: str, description: str, kwargs: Dict, see
     ]
     
     return {
-        "the_lesson": f"What I learned young about {topic.lower()} — {_pick_from_pool(lessons, seed, variation_index)}",
+        "the_lesson": _pick_from_pool(lessons, seed, variation_index),
         "who_taught": "Mom's comments, magazines, everything everywhere",
         "how_it_stuck": "Started monitoring myself before I knew what I was monitoring",
         "the_damage": "Never just... existing. Always calculating, comparing, controlling",
@@ -7483,7 +7622,7 @@ def _create_sibling_truth_variant(title: str, description: str, kwargs: Dict, se
 
 def _create_mentor_moment_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create mentor moment story seed variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "connected")
     
     mentors = [
         "A teacher who saw something in me I couldn't see",
@@ -7494,7 +7633,7 @@ def _create_mentor_moment_variant(title: str, description: str, kwargs: Dict, se
     ]
     
     return {
-        "who_they_were": f"A mentor connected to {topic.lower()} — {_pick_from_pool(mentors, seed, variation_index)}",
+        "who_they_were": _pick_from_pool(mentors, seed, variation_index),
         "first_impression": "What I thought before I understood",
         "what_they_saw": "What they noticed that others missed",
         "the_moment": "The conversation that changed everything",
@@ -7505,7 +7644,7 @@ def _create_mentor_moment_variant(title: str, description: str, kwargs: Dict, se
 
 def _create_money_reality_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create money reality story seed variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     moments = [
         "When I realized not everyone thinks about money before deciding",
@@ -7516,7 +7655,7 @@ def _create_money_reality_variant(title: str, description: str, kwargs: Dict, se
     ]
     
     return {
-        "the_awareness": f"Money reality around {topic.lower()} — {_pick_from_pool(moments, seed, variation_index)}",
+        "the_awareness": _pick_from_pool(moments, seed, variation_index),
         "the_small_thing": "The moment class differences became visible",
         "what_you_couldnt_say": "The explanation too complicated for casual conversation",
         "the_code_switch": "How I adapt in different economic spaces",
@@ -7663,10 +7802,18 @@ def _create_heritage_genre_variant(title: str, description: str, kwargs: Dict, s
 
 def _create_grief_scene_seed_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create grief growth + scene seed blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
+    
+    opening_scenes = [
+        "The moment I realized things would never be the same",
+        "A quiet room that used to be full of life",
+        "Looking at an empty chair at the table",
+        "Finding something that belonged to them",
+        "The first morning after everything changed"
+    ]
     
     return {
-        "opening_scene": f"The scene that captures grief around {topic.lower()}",
+        "opening_scene": _pick_from_pool(opening_scenes, seed, variation_index),
         "sensory_details": "What grief looks/feels/sounds like in this moment",
         "memory_scene": "A scene from before the loss",
         "turning_scene": "The scene where something shifted",
@@ -7677,12 +7824,12 @@ def _create_grief_scene_seed_variant(title: str, description: str, kwargs: Dict,
 
 def _create_pet_personal_voice_variant(title: str, description: str, kwargs: Dict, seed: int, variation_index: int) -> Dict[str, Any]:
     """Create pet bond + personal voice blend variant."""
-    topic = _humanize_topic(title)
+    theme = _format_topic_for_template(title, "about")
     
     voices = ["warm but trying to sound casual", "openly affectionate", "wryly devoted", "quietly grateful", "tenderly honest"]
     
     return {
-        "voice_style": f"The tone for this {topic.lower()} pet story — {_pick_from_pool(voices, seed, variation_index)}",
+        "voice_style": _pick_from_pool(voices, seed, variation_index),
         "direct_address": "Speaking to the pet directly",
         "everyday_observation": "A small daily detail",
         "deeper_meaning": "What this bond represents",
