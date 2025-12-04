@@ -1,18 +1,21 @@
 @echo off
-REM PrismQ.T.Title.From.Idea.Preview.bat - Interactive Title Generation (Preview Mode)
+REM PrismQ.T.Title.From.Idea.Preview.bat - Preview Title Generation from Database Ideas
 REM This script runs in preview mode WITHOUT saving to database
-REM Extensive logging is enabled for testing and tuning purposes
+REM Shows what Ideas would be processed and titles that would be created
 REM
 REM Usage:
 REM   PrismQ.T.Title.From.Idea.Preview.bat
+REM   PrismQ.T.Title.From.Idea.Preview.bat --idea-id 123    Preview specific Idea
+REM   PrismQ.T.Title.From.Idea.Preview.bat --limit 5        Preview max 5 Ideas
+REM   PrismQ.T.Title.From.Idea.Preview.bat --json           Output as JSON
 REM
 REM Features:
-REM   - Generates titles from idea input
-REM   - Does NOT save to database
-REM   - Extensive debug logging to file
+REM   - Picks ideas from database that don't have stories yet
+REM   - Generates title previews (does NOT save to database)
+REM   - Shows what would be created without making changes
 
 set SCRIPT_DIR=%~dp0
-cd /d "%SCRIPT_DIR%"
+set MODULE_SCRIPT_DIR=%SCRIPT_DIR%..\..\..\T\Title\From\Idea\_meta\scripts
 
 REM Setup Python environment
 call "%SCRIPT_DIR%setup_env.bat"
@@ -27,13 +30,13 @@ echo ========================================
 echo PrismQ.T.Title.From.Idea - PREVIEW MODE
 echo ========================================
 echo.
-echo This mode is for TESTING and TUNING.
+echo This mode picks Ideas from the database.
 echo Titles will NOT be saved to database.
-echo Extensive logging enabled.
 echo.
 
-REM Run Python module in preview mode
-python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --preview --debug
+REM Change to the module's script directory and run
+cd /d "%MODULE_SCRIPT_DIR%"
+python run.py --preview %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -42,9 +45,5 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-echo.
-echo ========================================
-echo Check log file for detailed output
-echo ========================================
 echo.
 pause
