@@ -53,6 +53,9 @@ for path in [str(project_root), str(src_dir), str(idea_model_dir), str(envload_d
     if path not in sys.path:
         sys.path.insert(0, path)
 
+# Import Config first before other imports that may modify sys.path
+from src import Config
+
 from idea import Idea, IdeaStatus, ContentGenre
 from idea_db import IdeaDatabase
 from story_title_service import (
@@ -61,7 +64,6 @@ from story_title_service import (
     create_stories_from_idea,
 )
 from title_generator import TitleConfig
-from src import Config
 
 # Default .env file path
 DEFAULT_ENV_FILE = "C:/PrismQ/.env"
