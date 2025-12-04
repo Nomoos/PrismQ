@@ -389,6 +389,227 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print("Press Enter to process next Idea or type 'quit' to exit.\n")
 
 
+def run_single_mode(preview: bool = False, debug: bool = False):
+    """Run a single story creation from idea without interactive prompts.
+    
+    This mode processes one idea automatically and exits.
+    
+    Args:
+        preview: If True, don't save to database (preview/test mode)
+        debug: If True, enable extensive debug logging
+    """
+    import sqlite3
+    
+    # Setup logging
+    logger = None
+    if debug or preview:
+        log_filename = f"story_from_idea_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        log_path = SCRIPT_DIR / log_filename
+        
+        # Create logger with DEBUG level to allow all messages through
+        logger = logging.getLogger('PrismQ.Story.From.Idea')
+        logger.setLevel(logging.DEBUG)
+        
+        # File handler - captures all DEBUG messages
+        file_handler = logging.FileHandler(log_path)
+        file_handler.setLevel(logging.DEBUG if debug else logging.INFO)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
+        
+        # Console handler - only INFO and above
+        if debug:
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+            console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+            logger.addHandler(console_handler)
+        
+        logger.info(f"Session started - Preview: {preview}, Debug: {debug}, Mode: single")
+        print_info(f"Logging to: {log_path}")
+    
+    # Print header
+    mode_text = "PREVIEW MODE" if preview else "RUN MODE"
+    print_header(f"PrismQ Story From Idea - {mode_text}")
+    
+    # Check module availability
+    if not SERVICE_AVAILABLE:
+        print_error(f"Story from idea service not available: {IMPORT_ERROR}")
+        if logger:
+            logger.error(f"Module import failed: {IMPORT_ERROR}")
+        return 1
+    
+    if not IDEA_MODEL_AVAILABLE:
+        print_error("Idea model not available")
+        if logger:
+            logger.error("Idea model import failed")
+        return 1
+    
+    print_success("Story from idea service loaded")
+    if logger:
+        logger.info("Story from idea service loaded successfully")
+    
+    if preview:
+        print_warning("Preview mode - stories will NOT be saved to database")
+        print_info("This mode is for testing. Check logs for details.")
+    
+    # Get database paths
+    story_db_path, idea_db_path = get_database_paths()
+    print_info(f"Story database: {story_db_path}")
+    print_info(f"Idea database: {idea_db_path}")
+    
+    if logger:
+        logger.info(f"Story database path: {story_db_path}")
+        logger.info(f"Idea database path: {idea_db_path}")
+    
+    # Connect to databases
+    print_section("Connecting to Databases")
+    
+    try:
+        # Check if database files exist
+        story_path = Path(story_db_path)
+        idea_path = Path(idea_db_path)
+        
+        if not story_path.exists():
+            print_warning(f"Story database not found: {story_db_path}")
+            if logger:
+                logger.warning(f"Story database not found: {story_db_path}")
+            print_info("Creating new database...")
+        
+        if not idea_path.exists():
+            print_error(f"Idea database not found: {idea_db_path}")
+            if logger:
+                logger.error(f"Idea database not found: {idea_db_path}")
+            return 1
+        
+        # Connect to Story database
+        story_conn = sqlite3.connect(story_db_path)
+        story_conn.row_factory = sqlite3.Row
+        
+        # Connect to Idea database
+        idea_db = SimpleIdeaDatabase(idea_db_path)
+        idea_db.connect()
+        
+        print_success("Connected to databases")
+        if logger:
+            logger.info("Connected to both databases")
+        
+    except Exception as e:
+        print_error(f"Failed to connect to databases: {e}")
+        if logger:
+            logger.exception("Database connection failed")
+        return 1
+    
+    try:
+        # Create service
+        service = StoryFromIdeaService(story_conn, idea_db)
+        
+        # Ensure tables exist
+        service.ensure_tables_exist()
+        
+        # Find oldest unreferenced idea
+        print_section("Finding Unreferenced Ideas")
+        
+        oldest_idea = service.get_oldest_unreferenced_idea()
+        
+        if oldest_idea is None:
+            print_warning("No unreferenced Ideas found")
+            print_info("All Ideas already have Story references.")
+            if logger:
+                logger.info("No unreferenced Ideas found")
+            
+            # Show stats
+            all_ideas = idea_db.get_all_ideas()
+            print_info(f"Total Ideas in database: {len(all_ideas)}")
+            
+            story_conn.close()
+            idea_db.close()
+            return 0
+        
+        # Display idea info
+        print_success(f"Found oldest unreferenced Idea: ID {oldest_idea.id}")
+        print(f"  Text: {oldest_idea.text[:100]}..." if len(oldest_idea.text) > 100 else f"  Text: {oldest_idea.text}")
+        print(f"  Version: {oldest_idea.version}")
+        print(f"  Created: {oldest_idea.created_at}")
+        
+        if logger:
+            logger.info(f"Processing Idea ID {oldest_idea.id}")
+            logger.debug(f"Idea text: {oldest_idea.text}")
+        
+        # Show unreferenced count
+        unreferenced = service.get_unreferenced_ideas()
+        print_info(f"Total unreferenced Ideas: {len(unreferenced)}")
+        
+        if preview:
+            # Preview mode - don't save
+            print_section("Preview Mode - Simulating Story Creation")
+            print_info(f"Would create 10 Stories for Idea ID {oldest_idea.id}")
+            print_info("Stories would have state: TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea)")
+            print_warning("Preview mode - no changes made to database")
+            
+            if logger:
+                logger.info(f"Preview: Would create 10 Stories for Idea ID {oldest_idea.id}")
+            
+            # In preview mode, idea is still unreferenced, so remaining count is same as before
+            print_info(f"Remaining unreferenced Ideas (unchanged): {len(unreferenced)}")
+            
+        else:
+            # Run mode - save to database
+            print_section("Creating Stories")
+            
+            result = service.create_stories_from_idea(
+                idea_id=oldest_idea.id,
+                skip_if_exists=True
+            )
+            
+            if result is None:
+                print_warning(f"Idea ID {oldest_idea.id} already has Stories")
+                if logger:
+                    logger.info(f"Idea ID {oldest_idea.id} already has Stories - skipped")
+            else:
+                print_success(f"Created {result.count} Stories for Idea ID {result.idea_id}")
+                
+                # Display created stories
+                print_section(f"Created {result.count} Story Object(s)")
+                
+                for i, story in enumerate(result.stories):
+                    print(f"\n{Colors.GREEN}{'─' * 50}{Colors.END}")
+                    print(f"{Colors.GREEN}{Colors.BOLD}  Story {i+1}{Colors.END}")
+                    print(f"{Colors.GREEN}{'─' * 50}{Colors.END}")
+                    print(f"  ID: {story.id}")
+                    print(f"  Idea ID: {story.idea_id}")
+                    print(f"  State: {story.state.value if hasattr(story.state, 'value') else story.state}")
+                    print(f"  Created: {story.created_at}")
+                    
+                    if logger:
+                        logger.info(f"Created Story ID {story.id} for Idea ID {story.idea_id}")
+                
+                if logger:
+                    logger.info(f"Successfully created {result.count} Stories")
+            
+            # Get the updated count after processing
+            remaining = service.get_unreferenced_ideas()
+            remaining_count = len(remaining)
+            if remaining_count > 0:
+                print_info(f"Remaining unreferenced Ideas: {remaining_count}")
+            else:
+                print_info("No more unreferenced Ideas remaining")
+        
+        return 0
+        
+    except Exception as e:
+        print_error(f"Error processing idea: {e}")
+        if logger:
+            logger.exception("Error processing idea")
+        return 1
+    
+    finally:
+        # Close connections
+        try:
+            story_conn.close()
+            idea_db.close()
+        except Exception:
+            pass
+
+
 def main():
     """Main entry point."""
     import argparse
@@ -399,6 +620,7 @@ def main():
         epilog="""
 Examples:
   python story_from_idea_interactive.py                    # Interactive mode with DB save
+  python story_from_idea_interactive.py --run              # Run mode - process one idea and exit
   python story_from_idea_interactive.py --preview          # Preview mode (no DB save)
   python story_from_idea_interactive.py --preview --debug  # Debug mode with extensive logging
         """
@@ -408,10 +630,15 @@ Examples:
                        help='Preview mode - do not save to database')
     parser.add_argument('--debug', '-d', action='store_true',
                        help='Enable debug logging (extensive output)')
+    parser.add_argument('--run', '-r', action='store_true',
+                       help='Run mode - process one idea without interactive prompts and exit')
     
     args = parser.parse_args()
     
-    return run_interactive_mode(preview=args.preview, debug=args.debug)
+    if args.run:
+        return run_single_mode(preview=args.preview, debug=args.debug)
+    else:
+        return run_interactive_mode(preview=args.preview, debug=args.debug)
 
 
 if __name__ == '__main__':
