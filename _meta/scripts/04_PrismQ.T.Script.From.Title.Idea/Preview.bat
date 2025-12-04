@@ -16,7 +16,7 @@ echo.
 echo This mode is for TESTING. Scripts will NOT be saved.
 echo.
 
-python ..\..\..\..\T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py --preview --debug
+python ..\..\..\T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -26,7 +26,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\T\Script\From\Idea\Title
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Script\From\Idea\Title
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg

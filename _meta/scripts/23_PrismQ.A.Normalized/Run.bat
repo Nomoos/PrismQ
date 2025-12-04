@@ -14,7 +14,7 @@ echo PrismQ.A.Normalized - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\..\A\Normalized\src\normalized_interactive.py
+python ..\..\..\A\Normalized\src\normalized_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -23,7 +23,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\A\Normalized
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\A\Normalized
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
