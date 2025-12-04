@@ -34,7 +34,7 @@ echo Extensive logging enabled.
 echo.
 
 REM Run Python module with preview and debug flags
-python ..\..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
+python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -54,7 +54,7 @@ exit /b 0
 :setup_env
 setlocal enabledelayedexpansion
 
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\T\Idea\Creation
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Idea\Creation
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
