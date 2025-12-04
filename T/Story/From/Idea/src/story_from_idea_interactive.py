@@ -40,7 +40,6 @@ try:
     from story_from_idea_service import (
         StoryFromIdeaService,
         StoryCreationResult,
-        process_oldest_unreferenced_idea,
     )
     SERVICE_AVAILABLE = True
 except ImportError as e:
@@ -328,6 +327,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 if logger:
                     logger.info(f"Preview: Would create 10 Stories for Idea ID {oldest_idea.id}")
                 
+                # In preview mode, idea is still unreferenced, so remaining count is same as before
+                print_info(f"Remaining unreferenced Ideas (unchanged): {len(unreferenced)}")
+                
             else:
                 # Run mode - save to database
                 print_section("Creating Stories")
@@ -361,14 +363,14 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     
                     if logger:
                         logger.info(f"Successfully created {result.count} Stories")
-            
-            # Show remaining unreferenced count
-            remaining = service.get_unreferenced_ideas()
-            remaining_count = len(remaining) - (0 if preview else 1)  # Subtract 1 if we just processed one
-            if remaining_count > 0:
-                print_info(f"Remaining unreferenced Ideas: {remaining_count}")
-            else:
-                print_info("No more unreferenced Ideas remaining")
+                
+                # Get the updated count after processing
+                remaining = service.get_unreferenced_ideas()
+                remaining_count = len(remaining)
+                if remaining_count > 0:
+                    print_info(f"Remaining unreferenced Ideas: {remaining_count}")
+                else:
+                    print_info("No more unreferenced Ideas remaining")
             
         except Exception as e:
             print_error(f"Error processing idea: {e}")
