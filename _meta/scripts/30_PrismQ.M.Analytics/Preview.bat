@@ -16,7 +16,7 @@ echo.
 echo This mode is for TESTING. Metrics will NOT be saved.
 echo.
 
-python ..\..\..\..\M\src\analytics_interactive.py --preview --debug
+python ..\..\..\M\src\analytics_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -26,7 +26,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\M
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\M
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg

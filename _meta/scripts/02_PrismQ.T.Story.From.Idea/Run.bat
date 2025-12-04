@@ -14,7 +14,7 @@ echo PrismQ.T.Story.From.Idea - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py
+python ..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -23,7 +23,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\T\Story\From\Idea
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Story\From\Idea
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
