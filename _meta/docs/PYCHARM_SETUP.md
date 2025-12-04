@@ -31,7 +31,7 @@ Open PrismQ in PyCharm:
 #### Option A: Use Existing Virtual Environment
 If you've already run `Run.bat` or `Debug.bat` scripts:
 - Select **Existing environment**
-- Navigate to the `.venv` folder in the project (e.g., `T/Story/From/Idea/.venv/Scripts/python.exe` on Windows)
+- Navigate to the `.venv` folder in the project root (e.g., `.venv/Scripts/python.exe` on Windows or `.venv/bin/python` on Unix)
 - Click **OK**
 
 #### Option B: Create New Virtual Environment
@@ -138,7 +138,7 @@ source .venv/bin/activate
 
 ## Related Documentation
 
-- [src Configuration Guide](../../src/README.md) - Environment configuration
+- [src Configuration Guide](../../src/README.md) - Environment and configuration management
 - [Module Structure](./MODULE_STRUCTURE.md) - Project organization
 - [Architecture Overview](./ARCHITECTURE.md) - System architecture
 
