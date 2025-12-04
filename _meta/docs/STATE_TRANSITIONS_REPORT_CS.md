@@ -29,13 +29,12 @@ PrismQ implementuje sekvenční workflow pro tvorbu obsahu s postupným obohacov
 │                           PrismQ Stavový automat                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│   T (Text)  ──►  A (Audio)  ──►  V (Video)  ──►  P (Publikování)            │
-│      │              │               │                │                       │
-│      └──────────────┴───────────────┴────────────────┘                       │
-│                              │                                               │
-│                     M (Metriky/Analytika)                                    │
-│                              │                                               │
-│                     T.IdeaInspiration (zpětná vazba)                         │
+│   T (Text)  ──►  A (Audio)  ──►  V (Video)  ──►  P (Publikování)  ──►  M   │
+│                                                                    (Metriky)│
+│                                        │                                     │
+│                                        ▼                                     │
+│                              T.IdeaInspiration                               │
+│                              (zpětná vazba)                                  │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -44,11 +43,11 @@ PrismQ implementuje sekvenční workflow pro tvorbu obsahu s postupným obohacov
 
 | Princip | Popis |
 |---------|-------|
-| **Sekvenční pipeline** | T → A → V → P (každá fáze staví na předchozí) |
+| **Sekvenční pipeline** | T → A → V → P → M (lineární tok mezi hlavními moduly) |
 | **Kvalitní kontrolní body** | Explicitní kritéria přijetí při každém přechodu |
 | **Iterativní vylepšování** | Smyčky a zpětnovazební cykly v rámci každého modulu |
 | **Postupná publikace** | Možnost uvolnění obsahu v jakékoli fázi |
-| **Průřezová observabilita** | M modul sleduje metriky napříč všemi fázemi |
+| **Zpětná vazba** | M modul poskytuje metriky zpět do T.IdeaInspiration |
 
 ---
 

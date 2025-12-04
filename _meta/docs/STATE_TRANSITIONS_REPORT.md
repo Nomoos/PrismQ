@@ -29,13 +29,12 @@ PrismQ implements a sequential workflow for content production with progressive 
 │                           PrismQ State Machine                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│   T (Text)  ──►  A (Audio)  ──►  V (Video)  ──►  P (Publishing)             │
-│      │              │               │                │                       │
-│      └──────────────┴───────────────┴────────────────┘                       │
-│                              │                                               │
-│                     M (Metrics/Analytics)                                    │
-│                              │                                               │
-│                     T.IdeaInspiration (feedback loop)                        │
+│   T (Text)  ──►  A (Audio)  ──►  V (Video)  ──►  P (Publishing)  ──►  M    │
+│                                                                   (Metrics) │
+│                                        │                                     │
+│                                        ▼                                     │
+│                              T.IdeaInspiration                               │
+│                              (feedback loop)                                 │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -44,11 +43,11 @@ PrismQ implements a sequential workflow for content production with progressive 
 
 | Principle | Description |
 |-----------|-------------|
-| **Sequential Pipeline** | T → A → V → P (each phase builds on previous) |
+| **Sequential Pipeline** | T → A → V → P → M (linear flow between main modules) |
 | **Quality Gates** | Explicit acceptance criteria at each transition |
 | **Iterative Refinement** | Loops and feedback cycles within each module |
 | **Progressive Publication** | Content can be released at any stage |
-| **Cross-Cutting Observability** | M module tracks metrics across all phases |
+| **Feedback Loop** | M module provides metrics back to T.IdeaInspiration |
 
 ---
 
