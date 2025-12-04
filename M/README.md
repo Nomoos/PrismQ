@@ -10,22 +10,19 @@ The Metrics & Analytics module is a **meta-module** that monitors and measures p
 
 ## Architecture Type
 
-Unlike T→A→V→P which are sequential stages, the **M module is cross-cutting**:
+The M module is the **final stage** of the sequential pipeline T→A→V→P→M:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    PrismQ Platform                       │
-├─────────────────────────────────────────────────────────┤
-│                                                          │
-│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publish)  │
-│     ↓             ↓            ↓             ↓          │
-│     └─────────────┴────────────┴─────────────┘          │
-│                         ↓                                │
-│              M (Metrics & Analytics)                     │
-│                         ↓                                │
-│              T.IdeaInspiration (Feedback Loop)          │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         PrismQ Platform                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publish)  →  M (Metrics)  │
+│                                                                          │
+│                                                 ↓                        │
+│                                   T.IdeaInspiration (Feedback Loop)     │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Data Sources
@@ -292,4 +289,4 @@ inspiration = IdeaInspiration.create_from_insights(insights)
 
 ---
 
-*Part of the PrismQ content production platform: T → A → V → P → M (cross-cutting)*
+*Part of the PrismQ content production platform: T → A → V → P → M*
