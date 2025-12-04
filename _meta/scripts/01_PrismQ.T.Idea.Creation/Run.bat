@@ -27,7 +27,7 @@ echo This mode saves ideas to the database.
 echo.
 
 REM Run Python module
-python ..\..\..\..\T\Idea\Creation\src\idea_creation_interactive.py
+python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -43,7 +43,7 @@ exit /b 0
 :setup_env
 setlocal enabledelayedexpansion
 
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\T\Idea\Creation
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Idea\Creation
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
