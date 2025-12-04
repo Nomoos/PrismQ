@@ -2,16 +2,109 @@
 
 This directory contains scripts for the PrismQ content production workflow.
 
-## Workflow Module Scripts
+## New Numbered Module Structure
 
-Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for interactive execution:
+Each module has its own numbered directory with `Run.bat` and `Preview.bat` scripts:
+- **Run.bat** - Runs the module in production mode (saves to database)
+- **Preview.bat** - Runs in preview/testing mode (no database save, extensive logging)
 
-### 01_Idea - Idea Creation
+### T Module - Text Generation Pipeline (01-20)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 01 | `01_PrismQ.T.Idea.Creation/` | Idea creation from inspiration |
+| 02 | `02_PrismQ.T.Story.From.Idea/` | Generate stories from ideas |
+| 03 | `03_PrismQ.T.Title.From.Idea/` | Generate initial titles from ideas |
+| 04 | `04_PrismQ.T.Script.From.Title.Idea/` | Generate scripts from title + idea |
+| 05 | `05_PrismQ.T.Review.Title.By.Script.Idea/` | Review title against script and idea |
+| 06 | `06_PrismQ.T.Review.Script.By.Title.Idea/` | Review script against title and idea |
+| 07 | `07_PrismQ.T.Review.Title.By.Script/` | Review title against script |
+| 08 | `08_PrismQ.T.Title.From.Script.Review.Title/` | Refine title from review feedback |
+| 09 | `09_PrismQ.T.Script.From.Title.Review.Script/` | Refine script from review feedback |
+| 10 | `10_PrismQ.T.Review.Script.By.Title/` | Final script review |
+| 11 | `11_PrismQ.T.Review.Script.Grammar/` | Grammar validation |
+| 12 | `12_PrismQ.T.Review.Script.Tone/` | Tone consistency check |
+| 13 | `13_PrismQ.T.Review.Script.Content/` | Content accuracy validation |
+| 14 | `14_PrismQ.T.Review.Script.Consistency/` | Style consistency check |
+| 15 | `15_PrismQ.T.Review.Script.Editing/` | Final editing pass |
+| 16 | `16_PrismQ.T.Review.Title.Readability/` | Title readability check |
+| 17 | `17_PrismQ.T.Review.Script.Readability/` | Script readability check |
+| 18 | `18_PrismQ.T.Story.Review/` | Expert GPT story review |
+| 19 | `19_PrismQ.T.Story.Polish/` | Expert GPT story polish |
+| 20 | `20_PrismQ.T.Publishing/` | Text publishing with SEO |
+
+### A Module - Audio Generation Pipeline (21-25)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 21 | `21_PrismQ.A.Voiceover/` | Voiceover recording |
+| 22 | `22_PrismQ.A.Narrator/` | Narrator selection |
+| 23 | `23_PrismQ.A.Normalized/` | Audio normalization (LUFS) |
+| 24 | `24_PrismQ.A.Enhancement/` | Audio enhancement (EQ, compression) |
+| 25 | `25_PrismQ.A.Publishing/` | Audio publishing (RSS, platforms) |
+
+### V Module - Video Generation Pipeline (26-28)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 26 | `26_PrismQ.V.Scene/` | Scene planning |
+| 27 | `27_PrismQ.V.Keyframe/` | Keyframe generation |
+| 28 | `28_PrismQ.V.Video/` | Video assembly |
+
+### P Module - Publishing (29)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 29 | `29_PrismQ.P.Publishing/` | Multi-platform publishing |
+
+### M Module - Metrics & Analytics (30)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 30 | `30_PrismQ.M.Analytics/` | Metrics collection and analytics |
+
+## Usage
+
+### Windows
+
+Navigate to any numbered module directory and run:
+
+```batch
+cd _meta\scripts\01_PrismQ.T.Idea.Creation
+Preview.bat   REM For testing (no database save)
+Run.bat       REM For production (saves to database)
+```
+
+### Example Workflow
+
+```batch
+REM Step 1: Create idea
+cd _meta\scripts\01_PrismQ.T.Idea.Creation
+Preview.bat
+
+REM Step 2: Generate story from idea
+cd ..\02_PrismQ.T.Story.From.Idea
+Preview.bat
+
+REM Step 3: Generate title from idea
+cd ..\03_PrismQ.T.Title.From.Idea
+Preview.bat
+
+REM Continue through workflow...
+```
+
+---
+
+## Legacy Scripts (Deprecated)
+
+The following directories contain legacy scripts from the previous structure:
+
+### 01_Idea - Idea Creation (Legacy)
 - `PrismQ.T.Idea.Creation.bat` - Interactive idea creation
 - `PrismQ.T.Idea.Creation.Preview.bat` - Preview mode (no DB save)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
-### 02_Story - Title and Script Generation
+### 02_Story - Title and Script Generation (Legacy)
 - `PrismQ.T.Title.From.Idea.bat` - Generate titles from ideas
 - `PrismQ.T.Title.From.Idea.Preview.bat` - Preview mode
 - `PrismQ.T.Script.From.Idea.Title.bat` - Generate scripts from idea+title
@@ -22,32 +115,27 @@ Each workflow step has batch files (Windows) and shell scripts (Linux/macOS) for
 - `PrismQ.T.Script.From.Title.Review.Script.Preview.bat` - Preview mode
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
-### 03_Review - Title and Script Reviews
+### 03_Review - Title and Script Reviews (Legacy)
 - `PrismQ.T.Review.Title.From.Script.bat` - Review title against script
 - `PrismQ.T.Review.Title.From.Script.Preview.bat` - Preview mode
 - `PrismQ.T.Review.Script.From.Title.bat` - Review script against title
 - `PrismQ.T.Review.Script.From.Title.Preview.bat` - Preview mode
 - `setup_env.bat` / `setup_env.sh` - Environment setup
 
-### 04_Publish_Text - Text Publishing
+### 04_Publish_Text - Text Publishing (Legacy)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
-- *(Batch scripts to be added)*
 
-### 05_Audio - Audio Generation
+### 05_Audio - Audio Generation (Legacy)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
-- *(Batch scripts to be added)*
 
-### 06_Publish_Audio - Audio Publishing
+### 06_Publish_Audio - Audio Publishing (Legacy)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
-- *(Batch scripts to be added)*
 
-### 07_Video - Video Generation
+### 07_Video - Video Generation (Legacy)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
-- *(Batch scripts to be added)*
 
-### 08_Publish_Video - Video Publishing
+### 08_Publish_Video - Video Publishing (Legacy)
 - `setup_env.bat` / `setup_env.sh` - Environment setup
-- *(Batch scripts to be added)*
 
 ## Usage
 
