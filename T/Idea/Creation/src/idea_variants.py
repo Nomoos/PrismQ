@@ -3004,10 +3004,11 @@ def _extract_core_theme(title: str) -> str:
         return found_themes[0]
     
     # If no theme keyword found, extract the subject (usually first noun)
-    # Filter out common non-theme words
+    # Filter out common non-theme words (includes informal spellings to match user typos)
     skip_words = {'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'our',
                   'is', 'are', 'was', 'were', 'be', 'been', 'being',
-                  'have', 'has', 'had', 'do', 'does', 'did', 'dont', 'doesnt',
+                  'have', 'has', 'had', 'do', 'does', 'did', 
+                  'dont', 'doesnt', "don't", "doesn't",  # Both informal and correct
                   'will', 'would', 'could', 'should', 'can', 'may', 'might',
                   'not', 'no', 'yes', 'very', 'really', 'just', 'also',
                   'and', 'or', 'but', 'so', 'if', 'then', 'when', 'while',
@@ -3073,9 +3074,13 @@ def _is_sentence_input(title: str) -> bool:
         return True
     
     # Check for verb-like patterns (contains common verbs)
+    # Includes informal spellings to match common typos
     verb_indicators = {'is', 'are', 'was', 'were', 'have', 'has', 'had',
-                       'do', 'does', 'did', 'dont', 'doesnt', 'didnt',
-                       'can', 'cant', 'will', 'wont', 'would', 'could', 'should'}
+                       'do', 'does', 'did', 
+                       'dont', 'doesnt', 'didnt',  # Common informal
+                       "don't", "doesn't", "didn't",  # Correct forms
+                       'can', 'cant', "can't", 'will', 'wont', "won't", 
+                       'would', 'could', 'should'}
     
     lower_words = [w.lower() for w in words]
     if any(w in verb_indicators for w in lower_words):
@@ -3106,22 +3111,8 @@ def _format_topic_for_template(title: str, template_context: str = "general") ->
         return _humanize_topic(title)
     
     # For sentence inputs, extract the core theme
-    theme = _extract_core_theme(title)
-    
-    # Build a more natural phrase based on context
-    humanized = _humanize_topic(title)
-    
-    if template_context == "about":
-        # "about sister's lack of social life" vs "about sister dosnt have social life"
-        return theme
-    elif template_context == "connected":
-        # "connected to isolation" vs "connected to sister dosnt have social life"
-        return theme
-    elif template_context == "related":
-        return theme
-    else:
-        # General: use the extracted theme
-        return theme
+    # This prevents awkward phrases like "about sister dosnt have social life"
+    return _extract_core_theme(title)
 
 
 def _get_topic_essence(title: str, max_words: int = 6) -> str:
