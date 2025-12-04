@@ -1,6 +1,7 @@
 @echo off
 REM Run.bat - PrismQ.T.Story.From.Idea
 REM Create Story objects from Idea - saves to database
+REM Runs continuously with 1 second pause until cancelled (Ctrl+C or close window)
 REM
 REM Usage: Run.bat
 
@@ -14,7 +15,7 @@ echo PrismQ.T.Story.From.Idea - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py --run
+python ..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py --continuous
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
