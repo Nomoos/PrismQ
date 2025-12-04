@@ -76,6 +76,19 @@ For the detailed 26-stage MVP implementation of the text production phase, see:
 - **Implementation Details**: See [MVP Overview](./mvp-overview.md)
 - **API Integration**: Check [MVP API Reference](./mvp-api.md)
 
+## State Transitions Report
+
+For a comprehensive report on state transitions for each module, see:
+
+- **[State Transitions Report](../STATE_TRANSITIONS_REPORT.md)** - Complete report on state transitions for all modules (English)
+- **[State Transitions Report (CS)](../STATE_TRANSITIONS_REPORT_CS.md)** - Complete report on state transitions for all modules (Czech)
+
+These reports provide:
+- Detailed state transition diagrams for each module (T, A, V, P, M)
+- Transition tables with state names, phases, and targets
+- Quality gates documentation
+- Summary statistics (46 states, 40 linear transitions, 23 backward transitions, 6 loops)
+
 ## Related Documentation
 
 - [ARCHITECTURE.md](../ARCHITECTURE.md) - Overall platform architecture

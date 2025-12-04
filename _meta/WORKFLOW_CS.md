@@ -4,6 +4,12 @@
 
 > 📚 **Toto je indexový dokument.** Dokumentace workflow byla organizována do zaměřených, modulárních souborů pro lepší údržbu a čitelnost.
 
+## Report přechodů stavů
+
+📊 **Nový report!** Pro komplexní přehled přechodů stavů pro každý modul viz:
+- **[Report přechodů stavů (CS)](./docs/STATE_TRANSITIONS_REPORT_CS.md)** - Kompletní dokumentace přechodů stavů pro všechny moduly (česky)
+- **[State Transitions Report](./docs/STATE_TRANSITIONS_REPORT.md)** - Complete state transitions report for all modules (English)
+
 ## Kompletní dokumentace
 
 Veškerá dokumentace workflow je nyní organizována v adresáři [`docs/workflow/`](./docs/workflow/):

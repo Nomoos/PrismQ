@@ -4,6 +4,12 @@
 
 > 📚 **This is an index document.** The workflow documentation has been organized into focused, modular files for better maintainability and readability.
 
+## State Transitions Report
+
+📊 **New Report!** For a comprehensive overview of state transitions for each module, see:
+- **[State Transitions Report](./docs/STATE_TRANSITIONS_REPORT.md)** - Complete state transitions documentation for all modules (English)
+- **[Report přechodů stavů (CS)](./docs/STATE_TRANSITIONS_REPORT_CS.md)** - Complete state transitions report for all modules (Czech)
+
 ## Complete Documentation
 
 All workflow documentation is now organized in the [`docs/workflow/`](./docs/workflow/) directory:
