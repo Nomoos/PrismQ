@@ -14,7 +14,7 @@ echo PrismQ.T.Review.Title.By.Script.Idea - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\..\T\Review\Title\ByScriptIdea\src\review_title_by_script_idea_interactive.py
+python ..\..\..\T\Review\Title\ByScriptIdea\src\review_title_by_script_idea_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -23,7 +23,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\..\T\Review\Title\ByScriptIdea
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByScriptIdea
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
