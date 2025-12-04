@@ -378,12 +378,19 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logger.exception("Error processing idea")
         
         finally:
-            # Close connections
+            # Close connections - log errors but don't fail
             try:
-                story_conn.close()
-                idea_db.close()
-            except Exception:
-                pass
+                if 'story_conn' in dir() and story_conn:
+                    story_conn.close()
+            except Exception as close_error:
+                if logger:
+                    logger.warning(f"Error closing story connection: {close_error}")
+            try:
+                if 'idea_db' in dir() and idea_db:
+                    idea_db.close()
+            except Exception as close_error:
+                if logger:
+                    logger.warning(f"Error closing idea database: {close_error}")
         
         print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
         print("Press Enter to process next Idea or type 'quit' to exit.\n")
@@ -605,12 +612,19 @@ def run_continuous_mode(preview: bool = False, debug: bool = False, interval: fl
                     logger.exception("Error processing idea")
             
             finally:
-                # Close connections
+                # Close connections - log errors but don't fail
                 try:
-                    story_conn.close()
-                    idea_db.close()
-                except Exception:
-                    pass
+                    if 'story_conn' in dir() and story_conn:
+                        story_conn.close()
+                except Exception as close_error:
+                    if logger:
+                        logger.warning(f"Error closing story connection: {close_error}")
+                try:
+                    if 'idea_db' in dir() and idea_db:
+                        idea_db.close()
+                except Exception as close_error:
+                    if logger:
+                        logger.warning(f"Error closing idea database: {close_error}")
             
             # Wait before next iteration
             print_info(f"Waiting {interval} second(s) before next iteration...")
@@ -839,12 +853,19 @@ def run_single_mode(preview: bool = False, debug: bool = False):
         return 1
     
     finally:
-        # Close connections
+        # Close connections - log errors but don't fail
         try:
-            story_conn.close()
-            idea_db.close()
-        except Exception:
-            pass
+            if 'story_conn' in dir() and story_conn:
+                story_conn.close()
+        except Exception as close_error:
+            if logger:
+                logger.warning(f"Error closing story connection: {close_error}")
+        try:
+            if 'idea_db' in dir() and idea_db:
+                idea_db.close()
+        except Exception as close_error:
+            if logger:
+                logger.warning(f"Error closing idea database: {close_error}")
 
 
 def main():
