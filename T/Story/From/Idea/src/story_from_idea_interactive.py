@@ -543,8 +543,17 @@ def run_continuous_mode(preview: bool = False, debug: bool = False, interval: fl
                     all_ideas = idea_db.get_all_ideas()
                     print_info(f"Total Ideas in database: {len(all_ideas)}")
                     
-                    story_conn.close()
-                    idea_db.close()
+                    # Close connections with error handling
+                    try:
+                        story_conn.close()
+                    except Exception as close_error:
+                        if logger:
+                            logger.warning(f"Error closing story connection: {close_error}")
+                    try:
+                        idea_db.close()
+                    except Exception as close_error:
+                        if logger:
+                            logger.warning(f"Error closing idea database: {close_error}")
                     
                     print_info(f"Waiting {interval} second(s) before checking for new ideas...")
                     time.sleep(interval)
