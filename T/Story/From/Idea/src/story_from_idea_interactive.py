@@ -380,13 +380,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         finally:
             # Close connections - log errors but don't fail
             try:
-                if 'story_conn' in dir() and story_conn:
+                if 'story_conn' in locals() and story_conn:
                     story_conn.close()
             except Exception as close_error:
                 if logger:
                     logger.warning(f"Error closing story connection: {close_error}")
             try:
-                if 'idea_db' in dir() and idea_db:
+                if 'idea_db' in locals() and idea_db:
                     idea_db.close()
             except Exception as close_error:
                 if logger:
@@ -614,13 +614,13 @@ def run_continuous_mode(preview: bool = False, debug: bool = False, interval: fl
             finally:
                 # Close connections - log errors but don't fail
                 try:
-                    if 'story_conn' in dir() and story_conn:
+                    if 'story_conn' in locals() and story_conn:
                         story_conn.close()
                 except Exception as close_error:
                     if logger:
                         logger.warning(f"Error closing story connection: {close_error}")
                 try:
-                    if 'idea_db' in dir() and idea_db:
+                    if 'idea_db' in locals() and idea_db:
                         idea_db.close()
                 except Exception as close_error:
                     if logger:
@@ -855,13 +855,13 @@ def run_single_mode(preview: bool = False, debug: bool = False):
     finally:
         # Close connections - log errors but don't fail
         try:
-            if 'story_conn' in dir() and story_conn:
+            if 'story_conn' in locals() and story_conn:
                 story_conn.close()
         except Exception as close_error:
             if logger:
                 logger.warning(f"Error closing story connection: {close_error}")
         try:
-            if 'idea_db' in dir() and idea_db:
+            if 'idea_db' in locals() and idea_db:
                 idea_db.close()
         except Exception as close_error:
             if logger:
