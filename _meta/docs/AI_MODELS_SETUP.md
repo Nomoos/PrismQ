@@ -1501,6 +1501,252 @@ script = Script.from_title_idea(
 )
 ```
 
+### 4) Integrating Iterative Text Refinement in the PrismQ Pipeline
+
+> **Research Summary:** Tento výzkum popisuje, jak implementovat iterativní vylepšování textu v PrismQ při respektování SOLID principů.
+
+#### 🎯 Základní principy
+
+**Striktní oddělení odpovědností:**
+
+| Typ modulu | Příklady | Funkce |
+|------------|----------|--------|
+| **Generation/Rewrite** | `Script.From.Title.Idea`, `Title.From.Script.Review.Title` | Produkují nebo přepisují text |
+| **Review** | `Review.Script.By.Title`, `Review.Title.By.Script.Idea` | Pouze analyzují, nikdy nemění text |
+
+**SOLID iterativní pipeline:**
+```
+Review = Diagnóza (score, issues, suggestions)
+Rewrite = Léčba (aplikace změn na základě review)
+```
+
+#### 📍 Kde použít iterativní refinement v PrismQ
+
+**2.1 Idea / Concept Generation**
+```
+Idea.Inspiration / Idea.Fusion / Idea.Creation
+    ↓
+Review (clarity, story arc potential, brand fit)
+    ↓
+Refine chosen idea (optional)
+```
+
+**2.2 Title Generation**
+```
+Title.From.Idea
+    ↓
+Review.Title.By.Script.Idea (SEO, VO-friendliness, tone)
+    ↓
+Title.From.Script.Review.Title (refinement loop)
+```
+
+**2.3 Script / Outline Generation** (hlavní use case)
+```
+Script.From.Title.Idea
+    ↓
+┌────────────────────────────────────────┐
+│  ITERATIVE REFINEMENT LOOP             │
+├────────────────────────────────────────┤
+│  1. Review.Script.Grammar              │
+│  2. Review.Script.Readability          │
+│  3. Review.Script.Tone                 │
+│  4. Review.Script.VO.Friendliness      │
+│  5. Review.Script.Consistency          │
+│       ↓                                │
+│  Script.From.Title.Review.Script       │
+│  (aplicuje změny z reviews)            │
+│       ↓                                │
+│  Loop until all reviews pass           │
+└────────────────────────────────────────┘
+    ↓
+Final Script
+```
+
+**2.4 Voiceover Text Refinement**
+```
+Script (raw)
+    ↓
+Review.Script.VO.Friendliness
+    - Pacing pro čtení nahlas
+    - Sentence length pro breathing
+    - Pronunciation issues
+    ↓
+Script.VO.Polish
+    ↓
+Final VO-ready text
+```
+
+#### 🔄 Iterativní smyčka - Implementace
+
+```python
+# Příklad iterativního refinement v PrismQ
+class IterativeScriptRefinement:
+    """
+    Iterativní refinement pro Script s SOLID principy.
+    
+    Review moduly = pouze diagnóza
+    Rewrite moduly = pouze léčba
+    """
+    
+    MAX_ITERATIONS = 5
+    QUALITY_THRESHOLD = 8.0  # Minimum score pro pass
+    
+    def __init__(self, script: str, title: str, idea: dict):
+        self.script = script
+        self.title = title
+        self.idea = idea
+        self.iteration = 0
+        self.reviews = []
+    
+    def refine(self) -> str:
+        """Hlavní refinement loop."""
+        while self.iteration < self.MAX_ITERATIONS:
+            self.iteration += 1
+            
+            # 1. REVIEW PHASE (diagnosis only)
+            review_results = self._run_all_reviews()
+            self.reviews.append(review_results)
+            
+            # 2. CHECK IF PASSED
+            if self._all_reviews_passed(review_results):
+                return self.script  # ✅ Quality threshold reached
+            
+            # 3. REWRITE PHASE (treatment)
+            self.script = self._apply_refinements(review_results)
+        
+        return self.script  # Max iterations reached
+    
+    def _run_all_reviews(self) -> dict:
+        """Spustí všechny review moduly (žádné změny textu)."""
+        return {
+            "grammar": Review.Script.Grammar(self.script),
+            "readability": Review.Script.Readability(self.script),
+            "tone": Review.Script.Tone(self.script, self.idea),
+            "vo_friendliness": Review.Script.VO.Friendliness(self.script),
+            "consistency": Review.Script.Consistency(self.script, self.idea),
+        }
+    
+    def _all_reviews_passed(self, reviews: dict) -> bool:
+        """Kontrola, zda všechny reviews prošly."""
+        return all(
+            review.score >= self.QUALITY_THRESHOLD 
+            for review in reviews.values()
+        )
+    
+    def _apply_refinements(self, reviews: dict) -> str:
+        """Aplikuje refinement na základě review výsledků."""
+        # Agreguje issues ze všech reviews
+        all_issues = []
+        for review in reviews.values():
+            all_issues.extend(review.issues)
+        
+        # Volá rewrite modul s issues
+        return Script.From.Title.Review.Script(
+            script=self.script,
+            title=self.title,
+            issues=all_issues,
+            suggestions=[r.suggestions for r in reviews.values()]
+        )
+```
+
+#### 📊 Review Module Interface
+
+```python
+@dataclass
+class ReviewResult:
+    """Standardní výstup review modulu (SOLID - pouze diagnóza)."""
+    
+    score: float           # 0.0 - 10.0
+    passed: bool           # score >= threshold
+    issues: List[str]      # Seznam nalezených problémů
+    suggestions: List[str] # Návrhy na zlepšení
+    metrics: dict          # Detailní metriky
+    
+    # Review NIKDY neobsahuje:
+    # - modified_text
+    # - new_text
+    # - corrections
+
+# Příklad použití
+grammar_review = Review.Script.Grammar(script)
+# Returns:
+# ReviewResult(
+#     score=7.5,
+#     passed=False,
+#     issues=["Run-on sentence in paragraph 3", "Missing comma before 'and'"],
+#     suggestions=["Split long sentences", "Add punctuation"],
+#     metrics={"sentence_count": 45, "avg_length": 18.5}
+# )
+```
+
+#### 🎛️ Konfigurace iterativního refinement
+
+```python
+# Konfigurace pro různé quality levels
+REFINEMENT_CONFIGS = {
+    "draft": {
+        "max_iterations": 2,
+        "quality_threshold": 6.0,
+        "reviews": ["grammar", "readability"]
+    },
+    "standard": {
+        "max_iterations": 3,
+        "quality_threshold": 7.5,
+        "reviews": ["grammar", "readability", "tone", "consistency"]
+    },
+    "premium": {
+        "max_iterations": 5,
+        "quality_threshold": 8.5,
+        "reviews": ["grammar", "readability", "tone", "consistency", "vo_friendliness"]
+    },
+    "voiceover": {
+        "max_iterations": 5,
+        "quality_threshold": 9.0,
+        "reviews": ["grammar", "readability", "vo_friendliness", "pacing", "pronunciation"]
+    }
+}
+```
+
+#### 🔗 Integrace s Moving Window
+
+Iterativní refinement se kombinuje s Moving Window pro dlouhé texty:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  COMBINED PIPELINE: Moving Window + Iterative Refinement   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  FOR EACH BLOCK:                                            │
+│    1. Generate Block (300-500 words)                        │
+│    2. ┌─────────────────────────────────────┐              │
+│       │  ITERATIVE REFINEMENT (per block)   │              │
+│       │  - Review.Grammar                   │              │
+│       │  - Review.Tone                      │              │
+│       │  - Review.Consistency               │              │
+│       │  → Refine until pass                │              │
+│       └─────────────────────────────────────┘              │
+│    3. Summarize Block                                       │
+│    4. Extract Facts                                         │
+│    5. Prepare Directive                                     │
+│    6. Continue to next block                                │
+│                                                             │
+│  FINAL:                                                     │
+│    - Combine all refined blocks                             │
+│    - Final full-text review                                 │
+│    - VO-friendliness pass                                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 📋 Checklist pro implementaci
+
+- [ ] Standardizovat `ReviewResult` interface pro všechny review moduly
+- [ ] Review moduly nikdy nemění text (SOLID)
+- [ ] Rewrite moduly přijímají issues + suggestions jako input
+- [ ] Konfigurovat `max_iterations` a `quality_threshold` per use case
+- [ ] Integrovat s Moving Window pro dlouhé texty
+- [ ] VO-friendliness jako finální quality gate
+
 ### Roadmap implementace
 
 | Fáze | Funkce | Priorita | Závislosti |
@@ -1510,6 +1756,10 @@ script = Script.from_title_idea(
 | **Phase 3** | Moving-Window Engine | 🟡 Střední | Phase 1, 2 |
 | **Phase 4** | Loop Mode v T.Script | 🟠 Nízká | Phase 1, 2, 3 |
 | **Phase 5** | GPT-5.1 orchestrace | 🟠 Nízká | Phase 1-4 |
+| **Phase 6** | ReviewResult interface standardizace | 🟢 Vysoká | Žádné |
+| **Phase 7** | Iterative Refinement Loop | 🟡 Střední | Phase 6 |
+| **Phase 8** | VO-Friendliness review modul | 🟡 Střední | Phase 6 |
+| **Phase 9** | Combined MW + IR pipeline | 🟠 Nízká | Phase 3, 7 |
 
 ---
 
