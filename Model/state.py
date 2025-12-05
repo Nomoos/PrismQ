@@ -379,3 +379,6 @@ class StateNames:
 INITIAL_STATES = [StateNames.IDEA_CREATION]
 TERMINAL_STATES = [StateNames.PUBLISHING]
 EXPERT_REVIEW_STATES = [StateNames.STORY_REVIEW, StateNames.STORY_POLISH]
+
+# Re-export TransitionValidator for convenience
+from Model.State.validators.transition_validator import TransitionValidator

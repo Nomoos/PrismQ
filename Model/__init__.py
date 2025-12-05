@@ -1,34 +1,89 @@
-"""PrismQ Model package - Top level models, state definitions, and database layer.
+"""PrismQ Model package - Domain entities, repositories, and state management.
 
-This package provides the core models, state constants, and database utilities
-for the PrismQ workflow system.
+This package provides the core domain model for the PrismQ workflow system,
+following SOLID principles and clean architecture patterns.
 
-Modules:
-    - state: Workflow state constants and StoryState enum
-    - story: Story model (re-exports from Model.Database.models.story)
-    - published: Publishing status model for multi-platform distribution
-    - State: State machine validators, interfaces, and helpers
-    - Database: Database models, repositories, and connection utilities
+Structure:
+    - entities/: Domain entities (Story, Title, Script, Review, etc.)
+    - repositories/: Data access layer with repository pattern
+    - infrastructure/: Database connection, schema, exceptions
+    - state: Workflow state constants and validators
+
+Main exports for convenience:
+    - Story, Title, Script, Review: Core domain entities
+    - StoryRepository, TitleRepository, etc.: Repository implementations
+    - StoryState, StateNames: State machine constants
+    - TransitionValidator: State transition validation
 
 Example Usage:
-    >>> from Model import Story, StoryState, StateNames, Published
-    >>> story = Story(idea_id="1", state=StoryState.IDEA_CREATION)
+    >>> from Model import Story, StoryState, StoryRepository
+    >>> from Model.infrastructure import get_connection
     >>> 
-    >>> from Model.Database import TitleRepository, ScriptRepository
-    >>> from Model.State.helpers import StateBuilder, parse_state
+    >>> conn = get_connection("prismq.db")
+    >>> repo = StoryRepository(conn)
+    >>> story = Story(idea_id="1", state=StoryState.IDEA_CREATION.value)
 """
 
-from Model.state import StoryState, StateNames, StateCategory
-from Model.Database.models.story import Story
+# State constants and validators
+from Model.state import (
+    StoryState,
+    StateNames,
+    StateCategory,
+    TransitionValidator,
+    INITIAL_STATES,
+    TERMINAL_STATES,
+    EXPERT_REVIEW_STATES,
+)
+
+# Domain entities
+from Model.entities import (
+    Story,
+    Title,
+    Script,
+    Review,
+    IdeaSchema,
+    IModel,
+    IReadable,
+)
+
+# Repositories
+from Model.repositories import (
+    StoryRepository,
+    TitleRepository,
+    ScriptRepository,
+    ReviewRepository,
+    IRepository,
+    IUpdatableRepository,
+)
+
+# Other models
 from Model.published import Published, Language, Platform
 
 __all__ = [
     # State
     "StoryState",
-    "StateNames", 
+    "StateNames",
     "StateCategory",
-    # Models
+    "TransitionValidator",
+    "INITIAL_STATES",
+    "TERMINAL_STATES",
+    "EXPERT_REVIEW_STATES",
+    # Entities
     "Story",
+    "Title",
+    "Script",
+    "Review",
+    "IdeaSchema",
+    "IModel",
+    "IReadable",
+    # Repositories
+    "StoryRepository",
+    "TitleRepository",
+    "ScriptRepository",
+    "ReviewRepository",
+    "IRepository",
+    "IUpdatableRepository",
+    # Other
     "Published",
     "Language",
     "Platform",

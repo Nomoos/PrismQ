@@ -24,9 +24,9 @@ def db_connection():
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idea_id TEXT,
-            idea_json TEXT,
-            title_id INTEGER,
-            script_id INTEGER,
+            
+            
+            
             state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
@@ -59,7 +59,7 @@ class TestPickStoryByModule:
         """Test that None is returned when no stories match the module state."""
         # Create a story in a different state
         story = Story(
-            idea_json='{"title": "Test"}',
+            
             state="PrismQ.T.Review.Script.Tone"
         )
         story_repository.insert(story)
@@ -75,7 +75,7 @@ class TestPickStoryByModule:
         """Test that a story matching the module state is returned."""
         # Create a story in the target state
         story = Story(
-            idea_json='{"title": "Test Story"}',
+            
             state="PrismQ.T.Review.Script.Readability"
         )
         saved = story_repository.insert(story)
@@ -96,7 +96,7 @@ class TestPickStoryByModule:
         
         # Create older story first
         older_story = Story(
-            idea_json='{"title": "Older Story"}',
+            
             state="PrismQ.T.Review.Script.Readability",
             created_at=base_time - timedelta(hours=2)
         )
@@ -104,7 +104,7 @@ class TestPickStoryByModule:
         
         # Create newer story
         newer_story = Story(
-            idea_json='{"title": "Newer Story"}',
+            
             state="PrismQ.T.Review.Script.Readability",
             created_at=base_time - timedelta(hours=1)
         )
@@ -123,7 +123,7 @@ class TestPickStoryByModule:
         """Test that a custom repository can be provided."""
         # Create a story
         story = Story(
-            idea_json='{"title": "Test"}',
+            
             state="PrismQ.T.Review.Script.Tone"
         )
         story_repository.insert(story)
@@ -152,7 +152,7 @@ class TestPickStoryByModule:
         # Create a story for each module state
         for module_name in module_names:
             story = Story(
-                idea_json=f'{{"title": "Story for {module_name}"}}',
+                
                 state=module_name
             )
             story_repository.insert(story)
@@ -182,7 +182,7 @@ class TestCountStoriesByModule:
         """Test that 0 is returned when no stories match the module state."""
         # Create a story in a different state
         story = Story(
-            idea_json='{"title": "Test"}',
+            
             state="PrismQ.T.Review.Script.Tone"
         )
         story_repository.insert(story)
@@ -198,7 +198,7 @@ class TestCountStoriesByModule:
         # Create multiple stories in the target state
         for i in range(5):
             story = Story(
-                idea_json=f'{{"title": "Story {i}"}}',
+                
                 state="PrismQ.T.Review.Script.Editing"
             )
             story_repository.insert(story)
@@ -215,7 +215,7 @@ class TestCountStoriesByModule:
         for state in ["PrismQ.T.Review.Script.Tone", "PrismQ.T.Review.Script.Editing"]:
             for i in range(3):
                 story = Story(
-                    idea_json=f'{{"title": "Story {state} {i}"}}',
+                    
                     state=state
                 )
                 story_repository.insert(story)
@@ -230,7 +230,7 @@ class TestCountStoriesByModule:
     def test_accepts_custom_repository(self, db_connection, story_repository):
         """Test that a custom repository can be provided."""
         story = Story(
-            idea_json='{"title": "Test"}',
+            
             state="PrismQ.T.Review.Script.Grammar"
         )
         story_repository.insert(story)
@@ -251,7 +251,7 @@ class TestIntegration:
         # Create stories to process
         for i in range(3):
             story = Story(
-                idea_json=f'{{"title": "Story {i}"}}',
+                
                 state="PrismQ.T.Review.Script.Readability"
             )
             story_repository.insert(story)

@@ -1,40 +1,26 @@
-"""Database repositories module.
+"""DEPRECATED: Use Model.repositories instead.
 
-This module contains repository interfaces and implementations for data access.
-
-Interfaces:
-    - IRepository: Base interface for Insert + Read operations
-    - IVersionedRepository: Extended interface for versioned entities (Title, Script)
-    - IUpdatableRepository: Extended interface for updatable entities (Story)
-
-Implementations:
-    - TitleRepository: SQLite implementation for Title entities
-    - StoryReviewRepository: SQLite implementation for StoryReview entities
-    - ScriptRepository: SQLite implementation for Script entities
-    - StoryRepository: SQLite implementation for Story entities (with UPDATE)
-    - ReviewRepository: SQLite implementation for Review entities
+This module re-exports from Model.repositories for backward compatibility.
 """
-
-from Model.Database.repositories.base import (
+from Model.repositories import (
     IRepository,
-    IVersionedRepository,
     IUpdatableRepository,
+    StoryRepository,
+    TitleRepository,
+    ScriptRepository,
+    ReviewRepository,
 )
-from Model.Database.repositories.title_repository import TitleRepository
-from Model.Database.repositories.story_review_repository import StoryReviewRepository
-from Model.Database.repositories.script_repository import ScriptRepository
-from Model.Database.repositories.story_repository import StoryRepository
-from Model.Database.repositories.review_repository import ReviewRepository
+
+try:
+    from Model.repositories import StoryReviewRepository
+except (ImportError, TypeError):
+    pass
 
 __all__ = [
-    # Interfaces
     "IRepository",
-    "IVersionedRepository",
     "IUpdatableRepository",
-    # Implementations
-    "TitleRepository",
-    "StoryReviewRepository",
-    "ScriptRepository",
     "StoryRepository",
+    "TitleRepository",
+    "ScriptRepository",
     "ReviewRepository",
 ]
