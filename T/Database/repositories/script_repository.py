@@ -1,18 +1,24 @@
 """ScriptRepository - SQLite implementation for Script entities.
 
 This module provides the SQLite implementation of IVersionedRepository
-for Script entities, following the Repository Pattern for data access.
+for Script entities, handling SQL DML (Data Manipulation Language) operations
+only: SELECT, INSERT, UPDATE (limited to review_id FK).
+
+Note:
+    This repository does NOT handle schema creation (DDL). Use SchemaManager
+    from T.Database.schema_manager for database initialization.
 
 Usage:
     >>> import sqlite3
+    >>> from T.Database.schema_manager import initialize_database
     >>> from T.Database.repositories.script_repository import ScriptRepository
     >>> from T.Database.models.script import Script
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
-    >>> repo = ScriptRepository(conn)
+    >>> initialize_database(conn)  # Creates schema
     >>> 
-    >>> # Insert new script
+    >>> repo = ScriptRepository(conn)
     >>> script = Script(story_id=1, version=0, text="Once upon a time...")
     >>> saved = repo.insert(script)
     >>> 
@@ -31,19 +37,27 @@ from ..models.script import Script
 class ScriptRepository(IVersionedRepository[Script, int]):
     """SQLite implementation of IVersionedRepository for Script entities.
     
-    This repository handles all database operations for Script entities
-    following the INSERT+READ only pattern. New versions are created
-    instead of updating existing rows.
+    This repository handles SQL DML (Data Manipulation Language) operations
+    for Script entities following the INSERT+READ only pattern. New versions
+    are created instead of updating existing rows.
+    
+    Note:
+        This repository does NOT create database tables. Schema initialization
+        must be performed separately using SchemaManager.initialize_schema()
+        before using this repository.
     
     Attributes:
         _conn: SQLite database connection with Row factory enabled.
     
     Example:
+        >>> import sqlite3
+        >>> from T.Database.schema_manager import initialize_database
+        >>> 
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
-        >>> repo = ScriptRepository(conn)
+        >>> initialize_database(conn)  # Create schema first
         >>> 
-        >>> # Create initial script
+        >>> repo = ScriptRepository(conn)
         >>> script = Script(story_id=1, version=0, text="Original content")
         >>> saved = repo.insert(script)
         >>> 
@@ -62,6 +76,11 @@ class ScriptRepository(IVersionedRepository[Script, int]):
         Args:
             connection: SQLite connection with row_factory = sqlite3.Row
                 recommended for dictionary-like row access.
+                
+        Note:
+            The database schema must be initialized before using this
+            repository. Use SchemaManager.initialize_schema() to create
+            the required tables.
         """
         self._conn = connection
     

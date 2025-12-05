@@ -1,19 +1,24 @@
 """Story Repository - SQLite implementation for Story entities.
 
 This module provides SQLite implementation of the IUpdatableRepository interface
-for Story entities, handling all database operations including UPDATE for
-state transitions.
+for Story entities, handling SQL DML (Data Manipulation Language) operations
+only: SELECT, INSERT, UPDATE.
+
+Note:
+    This repository does NOT handle schema creation (DDL). Use SchemaManager
+    from T.Database.schema_manager for database initialization.
 
 Usage:
     >>> import sqlite3
+    >>> from T.Database.schema_manager import initialize_database
     >>> from T.Database.repositories.story_repository import StoryRepository
     >>> from T.Database.models.story import Story
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
-    >>> repo = StoryRepository(conn)
+    >>> initialize_database(conn)  # Creates schema
     >>> 
-    >>> # Insert new story
+    >>> repo = StoryRepository(conn)
     >>> story = Story(idea_json='{"title": "Test", "concept": "Test concept"}')
     >>> saved = repo.insert(story)
     >>> 
@@ -33,21 +38,27 @@ from T.State.validators.transition_validator import TransitionValidator
 class StoryRepository(IUpdatableRepository[Story, int]):
     """SQLite implementation of IUpdatableRepository for Story entities.
     
-    This repository handles all database operations for Story
-    following the CRUD pattern (with UPDATE capability for state changes).
+    This repository handles SQL DML (Data Manipulation Language) operations
+    for Story entities following the CRUD pattern (with UPDATE capability
+    for state changes).
+    
+    Note:
+        This repository does NOT create database tables. Schema initialization
+        must be performed separately using SchemaManager.initialize_schema()
+        before using this repository.
     
     Attributes:
         _conn: SQLite database connection with Row factory enabled.
     
     Example:
+        >>> import sqlite3
+        >>> from T.Database.schema_manager import initialize_database
+        >>> 
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
+        >>> initialize_database(conn)  # Create schema first
+        >>> 
         >>> repo = StoryRepository(conn)
-        >>> 
-        >>> # Create schema
-        >>> conn.executescript(Story.get_sql_schema())
-        >>> 
-        >>> # Insert story
         >>> story = Story(idea_json='{"title": "Test"}')
         >>> saved = repo.insert(story)
         >>> print(saved.id)  # Auto-generated ID
@@ -59,6 +70,11 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         Args:
             connection: SQLite connection with row_factory = sqlite3.Row
                 recommended for dictionary-like row access.
+                
+        Note:
+            The database schema must be initialized before using this
+            repository. Use SchemaManager.initialize_schema() to create
+            the required tables.
         """
         self._conn = connection
         self._transition_validator = TransitionValidator()
