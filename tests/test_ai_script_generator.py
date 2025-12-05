@@ -25,6 +25,11 @@ from T.Script.From.Idea.Title.src.script_generator import (
     ScriptTone
 )
 
+# Patch paths for mocking
+AI_SCRIPT_GEN_REQUESTS_GET = 'T.Script.From.Idea.Title.src.ai_script_generator.requests.get'
+AI_SCRIPT_GEN_REQUESTS_POST = 'T.Script.From.Idea.Title.src.ai_script_generator.requests.post'
+SCRIPT_GEN_AI_MODULE = 'T.Script.From.Idea.Title.src.script_generator._get_ai_generator_module'
+
 # Import Idea for test data
 import sys
 from pathlib import Path
@@ -140,8 +145,8 @@ class TestAIScriptGenerator:
         
         assert result is None
     
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.get')
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.post')
+    @patch(AI_SCRIPT_GEN_REQUESTS_GET)
+    @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_generate_full_script_with_mock_api(self, mock_post, mock_get, sample_idea_data):
         """Test script generation with mocked Ollama API."""
         # Mock API availability check
@@ -171,8 +176,8 @@ class TestAIScriptGenerator:
         # Verify API was called
         mock_post.assert_called_once()
     
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.get')
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.post')
+    @patch(AI_SCRIPT_GEN_REQUESTS_GET)
+    @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_prompt_contains_qwen_model(self, mock_post, mock_get, sample_idea_data):
         """Test that the API call uses Qwen model."""
         mock_get.return_value = MagicMock(status_code=200)
@@ -187,9 +192,15 @@ class TestAIScriptGenerator:
             title="Test Title"
         )
         
-        # Verify the model parameter
+        # Verify the model parameter - safely extract json_data
         call_args = mock_post.call_args
-        json_data = call_args.kwargs.get('json') or call_args[1].get('json')
+        json_data = None
+        if call_args.kwargs:
+            json_data = call_args.kwargs.get('json')
+        if json_data is None and len(call_args) > 1 and call_args[1]:
+            json_data = call_args[1].get('json')
+        
+        assert json_data is not None, "API call should include json parameter"
         assert json_data['model'] == 'qwen2.5:14b-instruct'
 
 
@@ -206,8 +217,8 @@ class TestGenerateAiScriptConvenience:
         )
         assert result is None
     
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.get')
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.post')
+    @patch(AI_SCRIPT_GEN_REQUESTS_GET)
+    @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_generates_script_with_mock_api(self, mock_post, mock_get, sample_idea_data):
         """Test convenience function with mocked API."""
         mock_get.return_value = MagicMock(status_code=200)
@@ -285,7 +296,7 @@ class TestScriptGeneratorAIIntegration:
         assert 'use_ai' in script.metadata['generation_config']
         assert 'ai_model' in script.metadata['generation_config']
     
-    @patch('T.Script.From.Idea.Title.src.script_generator._get_ai_generator_module')
+    @patch(SCRIPT_GEN_AI_MODULE)
     def test_ai_generation_with_mock(self, mock_get_module, sample_idea):
         """Test AI generation with mocked AI module."""
         # Create a mock AI generator
@@ -390,7 +401,7 @@ class TestAIPromptEngineering:
 class TestAIScriptGeneratorRobustness:
     """Tests for AI generator robustness and error handling."""
     
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.get')
+    @patch(AI_SCRIPT_GEN_REQUESTS_GET)
     def test_handles_connection_error(self, mock_get, sample_idea_data):
         """Test handling of connection errors."""
         import requests
@@ -407,8 +418,8 @@ class TestAIScriptGeneratorRobustness:
         # Generator should be unavailable
         assert generator.is_available() is False
     
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.get')
-    @patch('T.Script.From.Idea.Title.src.ai_script_generator.requests.post')
+    @patch(AI_SCRIPT_GEN_REQUESTS_GET)
+    @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_handles_api_error(self, mock_post, mock_get, sample_idea_data):
         """Test handling of API errors."""
         import requests
