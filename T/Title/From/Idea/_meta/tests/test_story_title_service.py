@@ -98,8 +98,8 @@ class TestStoryTitleService:
             assert title.version == 0
             assert len(title.text) > 0
     
-    def test_stories_in_title_v0_state(self):
-        """Test that all stories are transitioned to TITLE_V0 state."""
+    def test_stories_in_script_from_idea_title_state(self):
+        """Test that all stories are transitioned to SCRIPT_FROM_IDEA_TITLE state."""
         idea = Idea(
             title="Blockchain Technology",
             concept="Understanding decentralized systems",
@@ -109,7 +109,7 @@ class TestStoryTitleService:
         result = create_stories_from_idea(idea)
         
         for story in result.stories:
-            assert story.state == StoryState.TITLE_V0
+            assert story.state == StoryState.SCRIPT_FROM_IDEA_TITLE.value
     
     def test_invalid_idea_none(self):
         """Test error handling with None idea."""
@@ -219,10 +219,10 @@ class TestStoryTitleServiceWithDatabase:
         
         result = service.create_stories_with_titles(idea)
         
-        # All stories should have TITLE_V0 state in database
+        # All stories should have SCRIPT_FROM_IDEA_TITLE state in database
         cursor = db_connection.execute(
             "SELECT state FROM Story WHERE state = ?",
-            (StoryState.TITLE_V0.value,)
+            (StoryState.SCRIPT_FROM_IDEA_TITLE.value,)
         )
         rows = cursor.fetchall()
         assert len(rows) == 10
@@ -430,7 +430,7 @@ class TestEdgeCases:
         result = create_stories_from_idea(idea)
         
         assert result.count == 10
-        assert all(s.state == StoryState.TITLE_V0 for s in result.stories)
+        assert all(s.state == StoryState.SCRIPT_FROM_IDEA_TITLE.value for s in result.stories)
     
     def test_very_long_title(self):
         """Test with very long idea title."""
@@ -445,3 +445,176 @@ class TestEdgeCases:
         assert result.count == 10
         # Idea ID should be truncated
         assert len(result.idea_id) <= 50
+
+
+class TestTitleSimilarity:
+    """Tests for title similarity and uniqueness features."""
+    
+    def test_calculate_title_similarity_identical(self):
+        """Test similarity between identical titles."""
+        service = StoryTitleService()
+        
+        similarity = service.calculate_title_similarity(
+            "The Future of AI",
+            "The Future of AI"
+        )
+        
+        assert similarity == 1.0
+    
+    def test_calculate_title_similarity_completely_different(self):
+        """Test similarity between completely different titles."""
+        service = StoryTitleService()
+        
+        similarity = service.calculate_title_similarity(
+            "Quantum Computing Basics",
+            "Music Streaming Apps"
+        )
+        
+        # No common words, should be 0
+        assert similarity == 0.0
+    
+    def test_calculate_title_similarity_partial_overlap(self):
+        """Test similarity with partial word overlap."""
+        service = StoryTitleService()
+        
+        similarity = service.calculate_title_similarity(
+            "The Future of AI Technology",
+            "The History of AI Technology"
+        )
+        
+        # Words: the, future, of, ai, technology vs the, history, of, ai, technology
+        # Intersection: the, of, ai, technology (4)
+        # Union: the, future, of, ai, technology, history (6)
+        # Jaccard: 4/6 = 0.667
+        assert 0.6 < similarity < 0.7
+    
+    def test_calculate_title_similarity_case_insensitive(self):
+        """Test that similarity is case insensitive."""
+        service = StoryTitleService()
+        
+        similarity = service.calculate_title_similarity(
+            "The Future of AI",
+            "THE FUTURE OF AI"
+        )
+        
+        assert similarity == 1.0
+    
+    def test_calculate_title_similarity_empty_strings(self):
+        """Test similarity with empty strings."""
+        service = StoryTitleService()
+        
+        assert service.calculate_title_similarity("", "") == 0.0
+        assert service.calculate_title_similarity("Test", "") == 0.0
+        assert service.calculate_title_similarity("", "Test") == 0.0
+
+
+class TestTitleUniquenessWithDatabase:
+    """Tests for title uniqueness checking with database."""
+    
+    @pytest.fixture
+    def db_connection(self):
+        """Create in-memory SQLite database for testing."""
+        conn = sqlite3.connect(':memory:')
+        conn.row_factory = sqlite3.Row
+        yield conn
+        conn.close()
+    
+    def test_get_sibling_stories(self, db_connection):
+        """Test retrieving sibling stories from the same idea."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test Idea",
+            concept="Testing siblings",
+            status=IdeaStatus.DRAFT
+        )
+        
+        # Create stories from idea
+        result = service.create_stories_with_titles(idea)
+        
+        # Get siblings for the first story
+        first_story = result.stories[0]
+        siblings = service.get_sibling_stories(first_story)
+        
+        # Should have 9 siblings (10 stories - 1 current)
+        assert len(siblings) == 9
+        
+        # All siblings should have the same idea_id
+        for sibling in siblings:
+            assert sibling.idea_id == first_story.idea_id
+            assert sibling.id != first_story.id
+    
+    def test_get_sibling_titles(self, db_connection):
+        """Test retrieving titles from sibling stories."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test Idea",
+            concept="Testing sibling titles",
+            status=IdeaStatus.DRAFT
+        )
+        
+        # Create stories from idea
+        result = service.create_stories_with_titles(idea)
+        
+        # Get sibling titles for the first story
+        first_story = result.stories[0]
+        sibling_titles = service.get_sibling_titles(first_story)
+        
+        # Should have 9 sibling titles (10 titles - 1 for current story)
+        assert len(sibling_titles) == 9
+    
+    def test_check_title_uniqueness_unique(self, db_connection):
+        """Test that a unique title passes uniqueness check."""
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test Idea",
+            concept="Testing uniqueness",
+            status=IdeaStatus.DRAFT
+        )
+        
+        result = service.create_stories_with_titles(idea)
+        first_story = result.stories[0]
+        
+        # Check a completely different title
+        is_unique, similar_titles = service.check_title_uniqueness(
+            "Completely Different Title About Unrelated Topic",
+            first_story
+        )
+        
+        # Should be unique (no similar titles)
+        assert is_unique is True
+        assert len(similar_titles) == 0
+    
+    def test_select_best_title_with_variants(self, db_connection):
+        """Test selecting best title from variants."""
+        from title_generator import TitleVariant
+        
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test",
+            concept="Testing best selection",
+            status=IdeaStatus.DRAFT
+        )
+        
+        result = service.create_stories_with_titles(idea)
+        first_story = result.stories[0]
+        
+        # Create test variants
+        variants = [
+            TitleVariant(text="Option A Title", style="direct", length=14, keywords=["option"], score=0.8),
+            TitleVariant(text="Option B Title", style="question", length=14, keywords=["option"], score=0.85),
+            TitleVariant(text="Option C Title", style="how-to", length=14, keywords=["option"], score=0.9),
+        ]
+        
+        best, similar = service.select_best_title(variants, first_story)
+        
+        # Should select highest scoring variant (Option C with 0.9)
+        assert best.text == "Option C Title"
+        assert best.score == 0.9

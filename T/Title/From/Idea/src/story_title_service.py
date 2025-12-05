@@ -206,6 +206,150 @@ class StoryTitleService:
         # return len(scripts) > 0
         return False
     
+    def get_sibling_stories(self, story: Story) -> List[Story]:
+        """Get other Stories from the same Idea.
+        
+        Args:
+            story: The Story to find siblings for.
+            
+        Returns:
+            List of Story objects from the same Idea (excluding the input story).
+            Returns empty list if no database connection or no idea_id.
+        """
+        if not self._story_repo or not story.idea_id:
+            return []
+        
+        # Get all stories with the same idea_id
+        sibling_stories = self._story_repo.find_by_idea_id(story.idea_id)
+        
+        # Exclude the current story
+        return [s for s in sibling_stories if s.id != story.id]
+    
+    def get_sibling_titles(self, story: Story) -> List[Title]:
+        """Get titles from other Stories with the same Idea.
+        
+        This method retrieves all titles from sibling stories (stories with
+        the same idea_id), useful for checking similarity and avoiding
+        duplicate titles.
+        
+        Args:
+            story: The Story to find sibling titles for.
+            
+        Returns:
+            List of Title objects from sibling Stories.
+            Returns empty list if no database connection.
+        """
+        if not self._title_repo or not self._story_repo:
+            return []
+        
+        sibling_stories = self.get_sibling_stories(story)
+        sibling_titles = []
+        
+        for sibling in sibling_stories:
+            titles = self._title_repo.find_by_story_id(sibling.id)
+            sibling_titles.extend(titles)
+        
+        return sibling_titles
+    
+    def calculate_title_similarity(self, title1: str, title2: str) -> float:
+        """Calculate similarity between two title texts.
+        
+        Uses Jaccard similarity based on word overlap.
+        
+        Args:
+            title1: First title text.
+            title2: Second title text.
+            
+        Returns:
+            Similarity score between 0.0 (no similarity) and 1.0 (identical).
+        """
+        # Normalize: lowercase and split into words
+        words1 = set(title1.lower().split())
+        words2 = set(title2.lower().split())
+        
+        if not words1 or not words2:
+            return 0.0
+        
+        # Jaccard similarity: intersection / union
+        intersection = len(words1 & words2)
+        union = len(words1 | words2)
+        
+        return intersection / union if union > 0 else 0.0
+    
+    def check_title_uniqueness(
+        self,
+        title_text: str,
+        story: Story,
+        similarity_threshold: float = 0.7
+    ) -> Tuple[bool, List[Tuple[str, float]]]:
+        """Check if a title is unique enough compared to sibling titles.
+        
+        Args:
+            title_text: The title text to check.
+            story: The Story this title would belong to.
+            similarity_threshold: Maximum allowed similarity (default 0.7).
+            
+        Returns:
+            Tuple of:
+                - bool: True if title is unique enough, False if too similar.
+                - List of (similar_title, similarity_score) tuples for titles
+                  that exceed the threshold.
+        """
+        sibling_titles = self.get_sibling_titles(story)
+        similar_titles = []
+        
+        for sibling_title in sibling_titles:
+            similarity = self.calculate_title_similarity(title_text, sibling_title.text)
+            if similarity >= similarity_threshold:
+                similar_titles.append((sibling_title.text, similarity))
+        
+        is_unique = len(similar_titles) == 0
+        return is_unique, similar_titles
+    
+    def select_best_title(
+        self,
+        variants: List[TitleVariant],
+        story: Story,
+        similarity_threshold: float = 0.7
+    ) -> Tuple[TitleVariant, List[Tuple[str, float]]]:
+        """Select the best title variant considering similarity to siblings.
+        
+        Selection criteria:
+        1. Filter out titles too similar to existing sibling titles
+        2. From remaining, select by highest score
+        3. If all are too similar, return highest scored with similarity info
+        
+        Args:
+            variants: List of TitleVariant options.
+            story: The Story to select a title for.
+            similarity_threshold: Maximum allowed similarity with siblings.
+            
+        Returns:
+            Tuple of:
+                - Selected TitleVariant
+                - List of (similar_title, similarity_score) for reference
+        """
+        if not variants:
+            raise ValueError("No variants provided")
+        
+        # Score each variant considering uniqueness
+        scored_variants = []
+        for variant in variants:
+            is_unique, similar_titles = self.check_title_uniqueness(
+                variant.text, story, similarity_threshold
+            )
+            # Calculate adjusted score: base score minus penalty for similarity
+            similarity_penalty = len(similar_titles) * 0.1
+            adjusted_score = max(0.0, variant.score - similarity_penalty)
+            scored_variants.append((variant, adjusted_score, similar_titles))
+        
+        # Sort by adjusted score (highest first)
+        scored_variants.sort(key=lambda x: x[1], reverse=True)
+        
+        # Return best variant with similarity info
+        best_variant, _, similar_titles = scored_variants[0]
+        return best_variant, similar_titles
+    
     def generate_title_for_story(
         self,
         story: Story,
@@ -231,10 +375,15 @@ class StoryTitleService:
         if self.story_has_title(story.id):
             return None
         
-        # Generate title variant
+        # Generate title variants
         if idea:
-            variants = self._title_generator.generate_from_idea(idea, num_variants=3)
-            title_text = variants[0].text if variants else f"Story {story.id}"
+            variants = self._title_generator.generate_from_idea(idea, num_variants=10)
+            if variants:
+                # Select best title considering similarity to sibling titles
+                best_variant, similar_titles = self.select_best_title(variants, story)
+                title_text = best_variant.text
+            else:
+                title_text = f"Story {story.id}"
         else:
             # Fallback: generate a simple title
             title_text = f"Story {story.id}: New Content"
@@ -249,8 +398,12 @@ class StoryTitleService:
         # Persist Title
         title = self._title_repo.insert(title)
         
-        # Update Story state to TITLE_V0
-        story.transition_to(StoryState.TITLE_V0)
+        # Update Story's title_id reference
+        story.title_id = title.id
+        
+        # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
+        # The workflow is: TITLE_FROM_IDEA -> SCRIPT_FROM_IDEA_TITLE
+        story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
         self._story_repo.update(story)
         
         return title
@@ -264,7 +417,7 @@ class StoryTitleService:
         This method:
         1. Finds all Stories with state TITLE_FROM_IDEA and no Title references
         2. Generates Title (v0) for each Story
-        3. Updates each Story's state to TITLE_V0
+        3. Updates each Story's state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
         
         Args:
             idea_db: Optional SimpleIdeaDatabase to fetch Idea content.
@@ -399,10 +552,11 @@ class StoryTitleService:
         titles: List[Title] = []
         
         for i, variant in enumerate(title_variants):
-            # Create Story
+            # Create Story with TITLE_FROM_IDEA state (ready for title processing)
+            # Note: This bypasses the Story.From.Idea module for legacy compatibility
             story = Story(
                 idea_id=effective_idea_id,
-                state=StoryState.CREATED
+                state=StoryState.TITLE_FROM_IDEA.value  # Use proper workflow state
             )
             
             # Persist Story if we have a connection
@@ -426,8 +580,11 @@ class StoryTitleService:
                 # Assign a temporary ID for in-memory usage
                 title.id = i + 1
             
-            # Update Story state to TITLE_V0
-            story.transition_to(StoryState.TITLE_V0)
+            # Update Story's title_id reference
+            story.title_id = title.id
+            
+            # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
+            story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
             if self._story_repo:
                 self._story_repo.update(story)
             

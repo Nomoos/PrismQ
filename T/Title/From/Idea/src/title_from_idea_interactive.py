@@ -59,9 +59,19 @@ except ImportError:
 # Try to import database
 try:
     from T.Database.repositories.title_repository import TitleRepository
+    from T.Database.repositories.story_repository import StoryRepository
+    from T.Database.models.story import Story
+    from T.State.constants.state_names import StoryState
     DB_AVAILABLE = True
 except ImportError:
     DB_AVAILABLE = False
+
+# Try to import StoryTitleService for state-based workflow
+try:
+    from story_title_service import StoryTitleService, process_stories_without_titles
+    SERVICE_AVAILABLE = True
+except ImportError:
+    SERVICE_AVAILABLE = False
 
 
 # =============================================================================
@@ -381,6 +391,179 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print("Enter new idea or type 'quit' to exit.\n")
 
 
+def run_state_workflow_mode(db_path: str, preview: bool = False, debug: bool = False):
+    """Run the state-based workflow mode for title generation.
+    
+    This mode automatically processes Stories with state PrismQ.T.Title.From.Idea,
+    generates titles with similarity checking, and transitions to the next state.
+    
+    Args:
+        db_path: Path to the SQLite database file.
+        preview: If True, don't save to database (preview/test mode).
+        debug: If True, enable extensive debug logging.
+    """
+    import sqlite3
+    
+    # Setup logging
+    logger = None
+    if debug or preview:
+        log_filename = f"title_from_idea_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        log_path = SCRIPT_DIR / log_filename
+        
+        logging.basicConfig(
+            level=logging.DEBUG if debug else logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_path),
+                logging.StreamHandler() if debug else logging.NullHandler()
+            ]
+        )
+        logger = logging.getLogger('PrismQ.Title.From.Idea')
+        logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
+        print_info(f"Logging to: {log_path}")
+    
+    # Print header - RUN MODE as specified in problem statement
+    print_header("PrismQ.T.Title.From.Idea - RUN MODE")
+    
+    # Check module availability
+    if not TITLE_GENERATOR_AVAILABLE:
+        print_error(f"Title generator module not available: {IMPORT_ERROR}")
+        return 1
+    
+    if not SERVICE_AVAILABLE:
+        print_error("StoryTitleService not available")
+        return 1
+    
+    if not DB_AVAILABLE:
+        print_error("Database modules not available")
+        return 1
+    
+    print_success("All modules loaded successfully")
+    
+    # Connect to database
+    print_section("Environment Setup")
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        print_success(f"Connected to database: {db_path}")
+    except Exception as e:
+        print_error(f"Failed to connect to database: {e}")
+        return 1
+    
+    # Initialize service
+    service = StoryTitleService(conn)
+    
+    # Find Stories with state TITLE_FROM_IDEA
+    print_section("Finding Stories for Title Generation")
+    stories_to_process = service.get_stories_without_titles()
+    
+    if not stories_to_process:
+        print_info("No Stories found with state PrismQ.T.Title.From.Idea")
+        print_info("Make sure Stories are created using PrismQ.T.Story.From.Idea first")
+        conn.close()
+        return 0
+    
+    print_success(f"Found {len(stories_to_process)} Stories ready for title generation")
+    
+    # Process each story
+    for i, story in enumerate(stories_to_process, 1):
+        print_section(f"Processing Story {i}/{len(stories_to_process)} (ID: {story.id})")
+        print(f"  Idea ID: {story.idea_id}")
+        
+        # Get sibling stories for context
+        siblings = service.get_sibling_stories(story)
+        sibling_titles = service.get_sibling_titles(story)
+        
+        print(f"  Sibling Stories: {len(siblings)}")
+        print(f"  Existing Sibling Titles: {len(sibling_titles)}")
+        
+        if sibling_titles:
+            print(f"\n  {Colors.GRAY}Existing titles from same Idea:{Colors.END}")
+            for st in sibling_titles[:5]:  # Show up to 5
+                print(f"    - {st.text[:60]}{'...' if len(st.text) > 60 else ''}")
+            if len(sibling_titles) > 5:
+                print(f"    ... and {len(sibling_titles) - 5} more")
+        
+        # Create Idea from story.idea_json if available
+        idea = None
+        if story.idea_json:
+            try:
+                idea_data = json.loads(story.idea_json)
+                if IDEA_MODEL_AVAILABLE:
+                    idea = Idea.from_dict(idea_data)
+            except (json.JSONDecodeError, Exception) as e:
+                if logger:
+                    logger.warning(f"Failed to parse idea_json: {e}")
+        
+        # Generate title variants
+        print_section("Generating Title Variants")
+        
+        if idea:
+            print_info(f"Generating 10 variants from Idea: '{idea.title[:50]}...'")
+            variants = generate_titles_from_idea(idea, num_variants=10)
+        else:
+            # Fallback: create variants from scratch
+            print_warning("No Idea data available, generating basic title")
+            variants = []
+        
+        if variants:
+            # Select best title using similarity check
+            print_section("Selecting Best Title (with Similarity Check)")
+            best_variant, similar_titles = service.select_best_title(variants, story)
+            
+            # Display all variants
+            print(f"\n  {Colors.CYAN}Generated {len(variants)} Title Variants:{Colors.END}")
+            for j, v in enumerate(variants, 1):
+                is_best = v.text == best_variant.text
+                marker = f"{Colors.GREEN}★{Colors.END}" if is_best else " "
+                print(f"  {marker} {j}. [{v.style}] {v.text}")
+                print(f"       Length: {v.length} chars | Score: {v.score:.2f}")
+            
+            # Show similarity warnings
+            if similar_titles:
+                print(f"\n  {Colors.YELLOW}⚠ Similarity warnings:{Colors.END}")
+                for sim_title, sim_score in similar_titles:
+                    print(f"    - {sim_score:.0%} similar to: '{sim_title[:50]}...'")
+            
+            # Show selected best
+            print(f"\n  {Colors.GREEN}Selected Best Title:{Colors.END}")
+            print(f"    {best_variant.text}")
+            print(f"    Style: {best_variant.style} | Score: {best_variant.score:.2f}")
+            
+            title_text = best_variant.text
+        else:
+            title_text = f"Story {story.id}: New Content"
+            print_warning(f"Using fallback title: {title_text}")
+        
+        if preview:
+            print_warning("PREVIEW MODE - Title NOT saved to database")
+            print_info(f"Would transition state: TITLE_FROM_IDEA → SCRIPT_FROM_IDEA_TITLE")
+        else:
+            # Save title and update state
+            print_section("Database Operations")
+            try:
+                title = service.generate_title_for_story(story, idea)
+                if title:
+                    print_success(f"Title saved with ID: {title.id}")
+                    print_success(f"State changed to: PrismQ.T.Script.From.Idea.Title")
+                else:
+                    print_warning("Story already has a title, skipped")
+            except Exception as e:
+                print_error(f"Failed to save title: {e}")
+                if logger:
+                    logger.exception("Database save failed")
+    
+    # Summary
+    print_section("Processing Summary")
+    print(f"  Total Stories processed: {len(stories_to_process)}")
+    print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
+    print(f"  Next state: PrismQ.T.Script.From.Idea.Title")
+    
+    conn.close()
+    print_success("Processing complete!")
+    return 0
+
+
 def main():
     """Main entry point."""
     import argparse
@@ -390,9 +573,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # Interactive mode (manual input)
   python title_from_idea_interactive.py                    # Interactive mode with DB save
   python title_from_idea_interactive.py --preview          # Preview mode (no DB save)
   python title_from_idea_interactive.py --preview --debug  # Debug mode with extensive logging
+  
+  # State-based workflow mode (automatic processing)
+  python title_from_idea_interactive.py --run --db prismq.db  # Process Stories from DB
+  python title_from_idea_interactive.py --run --db prismq.db --preview  # Preview without saving
         """
     )
     
@@ -400,10 +588,17 @@ Examples:
                        help='Preview mode - do not save to database')
     parser.add_argument('--debug', '-d', action='store_true',
                        help='Enable debug logging (extensive output)')
+    parser.add_argument('--run', '-r', action='store_true',
+                       help='Run state-based workflow mode (auto-process Stories)')
+    parser.add_argument('--db', type=str, default='prismq.db',
+                       help='Path to SQLite database (default: prismq.db)')
     
     args = parser.parse_args()
     
-    return run_interactive_mode(preview=args.preview, debug=args.debug)
+    if args.run:
+        return run_state_workflow_mode(args.db, preview=args.preview, debug=args.debug)
+    else:
+        return run_interactive_mode(preview=args.preview, debug=args.debug)
 
 
 if __name__ == '__main__':
