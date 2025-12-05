@@ -60,9 +60,9 @@ extraction = extract_keywords(
     method="tfidf"
 )
 
-# Step 2: Configure AI
+# Step 2: Configure AI (using default Qwen 3:30B model)
 config = AIConfig(
-    model="llama3.1:70b-q4_K_M",
+    model="qwen3:30b",  # Default local AI model
     temperature=0.3,  # Lower for more focused output
     max_tokens=500,
     enable_ai=True
@@ -92,7 +92,7 @@ print(metadata.quality_score)
 from T.Publishing.SEO.Keywords import AIConfig
 
 config = AIConfig(
-    model="llama3.1:70b-q4_K_M",  # Ollama model name
+    model="qwen3:30b",  # Default local AI model (Ollama)
     api_base="http://localhost:11434",  # Ollama API URL
     temperature=0.3,  # 0.0-2.0 (lower = more focused)
     max_tokens=500,  # Maximum tokens to generate
@@ -101,13 +101,40 @@ config = AIConfig(
 )
 ```
 
+### Default Local AI Model
+
+PrismQ uses **Qwen 3:30B** (`qwen3:30b`) as the default local AI model. This model provides an excellent balance of quality and speed for content generation tasks.
+
+**Why Qwen 3:30B?**
+- Strong reasoning and instruction-following capabilities
+- Well-suited for content generation and SEO tasks
+- Good balance between model size and inference speed
+- Strong multilingual support
+- Works well with Ollama on consumer hardware
+
+**Setup**:
+```bash
+# Install Ollama
+# Visit: https://ollama.com/
+
+# Pull the default model
+ollama pull qwen3:30b
+
+# Start the server
+ollama serve
+```
+
 ### Model Recommendations
 
-**Best for SEO Tasks (RTX 5090)**:
+**Default Model**:
+- `qwen3:30b` - Default choice, excellent balance of quality and speed
+
+**Alternative Models for Higher Performance (RTX 5090)**:
 - `llama3.1:70b-q4_K_M` - Excellent quality, optimized quantization
 - `llama3.1:70b-q8_0` - Highest quality, more VRAM
 
-**Alternative Models**:
+**Alternative Models for Faster Inference**:
+- `qwen3:8b` - Faster, good quality
 - `llama3.1:8b` - Faster, good quality
 - `mistral:7b` - Fast inference
 - `mixtral:8x7b` - High quality
@@ -407,7 +434,7 @@ python -m T.Publishing.SEO.Keywords._meta.examples.ai_usage_example
 
 **Solutions**:
 1. Install Ollama: https://ollama.com/
-2. Pull a model: `ollama pull llama3.1:70b-q4_K_M`
+2. Pull the default model: `ollama pull qwen3:30b`
 3. Start server: `ollama serve`
 4. Check connection: `curl http://localhost:11434/api/tags`
 
@@ -418,7 +445,7 @@ python -m T.Publishing.SEO.Keywords._meta.examples.ai_usage_example
 **Solutions**:
 1. Check Ollama is running: `ollama list`
 2. Increase timeout in AIConfig
-3. Try smaller model (llama3.1:8b)
+3. Try smaller model (qwen3:8b or llama3.1:8b)
 4. Check system resources (GPU/RAM)
 
 ### Low Quality Scores
