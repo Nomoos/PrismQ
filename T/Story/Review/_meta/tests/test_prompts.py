@@ -4,6 +4,9 @@ import sys
 from pathlib import Path
 
 # Add project root to path
+# Path structure: T/Story/Review/_meta/tests/test_prompts.py
+# Need to go up 5 levels to reach project root:
+#   tests (1) -> _meta (2) -> Review (3) -> Story (4) -> T (5) -> root
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
@@ -123,6 +126,18 @@ class TestGetCriticalReviewPrompt:
         long_story = "The story continues. " * 1000
         prompt = get_critical_review_prompt(long_story)
         assert long_story in prompt
+    
+    def test_story_containing_placeholder(self):
+        """Test handling when story text contains the placeholder string.
+        
+        The function only replaces the first occurrence of the placeholder,
+        so if the story contains [INSERT STORY HERE], it remains in the output.
+        """
+        story_with_placeholder = "The sign read '[INSERT STORY HERE]' in bold letters."
+        prompt = get_critical_review_prompt(story_with_placeholder)
+        # The story should be in the prompt
+        assert story_with_placeholder in prompt
+        # Only one replacement should occur (the original placeholder)
 
 
 class TestGetCriticalReviewPromptTemplate:
@@ -175,6 +190,14 @@ class TestIsReadyForFinalPolish:
         """Test edge case scores."""
         assert is_ready_for_final_polish(0) is False
         assert is_ready_for_final_polish(100) is True
+    
+    def test_float_scores(self):
+        """Test that float scores are handled correctly."""
+        assert is_ready_for_final_polish(75.0) is True
+        assert is_ready_for_final_polish(75.5) is True
+        assert is_ready_for_final_polish(74.9) is False
+        assert is_ready_for_final_polish(74.99) is False
+        assert is_ready_for_final_polish(80.5) is True
 
 
 class TestGetReadinessStatement:
@@ -211,6 +234,11 @@ class TestGetReadinessStatement:
         prompt = CRITICAL_STORY_REVIEW_PROMPT
         assert ready_statement.strip('.') in prompt
         assert "not yet ready for final polish" in not_ready_statement
+    
+    def test_float_scores(self):
+        """Test that float scores are handled correctly."""
+        assert get_readiness_statement(75.5) == "This story is ready for final polish."
+        assert get_readiness_statement(74.9) == "This story is not yet ready for final polish."
 
 
 class TestReviewFocusAreas:

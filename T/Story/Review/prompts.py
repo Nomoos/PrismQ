@@ -80,6 +80,10 @@ Now analyze the following story:
 # HELPER FUNCTIONS
 # =============================================================================
 
+# Unique placeholder that is unlikely to appear in story text
+_STORY_PLACEHOLDER = "[INSERT STORY HERE]"
+
+
 def get_critical_review_prompt(story_text: str) -> str:
     """Generate a critical review prompt with the story text inserted.
     
@@ -89,11 +93,16 @@ def get_critical_review_prompt(story_text: str) -> str:
     Returns:
         The complete prompt with story text inserted
         
+    Note:
+        The placeholder '[INSERT STORY HERE]' is replaced with the story text.
+        If the story text itself contains this exact placeholder string,
+        it will remain in the final prompt as part of the story content.
+        
     Example:
         >>> prompt = get_critical_review_prompt("Once upon a time...")
         >>> # Use prompt with local AI model
     """
-    return CRITICAL_STORY_REVIEW_PROMPT.replace("[INSERT STORY HERE]", story_text)
+    return CRITICAL_STORY_REVIEW_PROMPT.replace(_STORY_PLACEHOLDER, story_text, 1)
 
 
 def get_critical_review_prompt_template() -> str:
@@ -109,15 +118,18 @@ def get_critical_review_prompt_template() -> str:
     return CRITICAL_STORY_REVIEW_PROMPT
 
 
+from typing import Union
+
+
 # Threshold for determining readiness for final polish
 FINAL_POLISH_THRESHOLD = 75  # 75% or higher means ready for final polish
 
 
-def is_ready_for_final_polish(score: int) -> bool:
+def is_ready_for_final_polish(score: Union[int, float]) -> bool:
     """Determine if a story is ready for final polish based on review score.
     
     Args:
-        score: The review score (0-100)
+        score: The review score (0-100), can be int or float
         
     Returns:
         True if score >= 75, False otherwise
@@ -127,15 +139,17 @@ def is_ready_for_final_polish(score: int) -> bool:
         True
         >>> is_ready_for_final_polish(70)
         False
+        >>> is_ready_for_final_polish(75.5)
+        True
     """
     return score >= FINAL_POLISH_THRESHOLD
 
 
-def get_readiness_statement(score: int) -> str:
+def get_readiness_statement(score: Union[int, float]) -> str:
     """Generate the appropriate readiness statement based on score.
     
     Args:
-        score: The review score (0-100)
+        score: The review score (0-100), can be int or float
         
     Returns:
         The readiness statement string
