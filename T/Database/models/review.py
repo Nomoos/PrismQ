@@ -158,6 +158,23 @@ class Review(IModel[int]):
         """String representation of Review."""
         text_preview = self.text[:50] + "..." if len(self.text) > 50 else self.text
         return f"Review(id={self.id}, score={self.score}, text='{text_preview}')"
+    
+    @classmethod
+    def get_sql_schema(cls) -> str:
+        """Get the SQL CREATE TABLE statement for this model.
+        
+        Returns:
+            SQL statement to create the Review table with all
+            constraints (CHECK) for score validation.
+        """
+        return """
+        CREATE TABLE IF NOT EXISTS Review (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT NOT NULL,
+            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        """
 
 
 __all__ = [

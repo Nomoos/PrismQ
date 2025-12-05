@@ -95,6 +95,7 @@ from T.Database.models.story import Story, StoryState
 from T.Database.models.title import Title
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.schema_manager import SchemaManager
 
 
 @dataclass
@@ -158,7 +159,8 @@ class StoryTitleService:
         self, 
         connection: Optional[sqlite3.Connection] = None,
         title_config: Optional[TitleConfig] = None,
-        use_ai: bool = True
+        use_ai: bool = True,
+        auto_create_schema: bool = True
     ):
         """Initialize the service.
         
@@ -169,11 +171,23 @@ class StoryTitleService:
             title_config: Optional configuration for title generation.
             use_ai: Whether to use AI (Qwen2.5-14B-Instruct) for title generation.
                 Defaults to True. Falls back to template-based if AI unavailable.
+            auto_create_schema: If True (default), automatically creates database
+                tables on initialization. Set to False if schema is managed
+                externally via SchemaManager or migration tools.
+        
+        Note:
+            For production environments with proper schema management, set
+            auto_create_schema=False and use SchemaManager.initialize_schema()
+            during application bootstrapping instead.
         """
         self._conn = connection
         self._story_repo = StoryRepository(connection) if connection else None
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
+        
+        # Optionally ensure required tables exist (for convenience in development/testing)
+        if connection and auto_create_schema:
+            self.ensure_tables_exist()
         
         # Initialize AI title generator if requested and available
         self._use_ai = use_ai
@@ -716,10 +730,18 @@ class StoryTitleService:
         return f"idea-{concept_hash}"
     
     def ensure_tables_exist(self) -> None:
-        """Ensure Story and Title tables exist in the database.
+        """Ensure all required database tables exist.
         
-        Call this method to create the required tables if they don't exist.
-        Only works when a database connection was provided.
+        Delegates to SchemaManager for centralized schema management.
+        This method is provided for backward compatibility and convenience
+        in development/testing scenarios.
+        
+        For production environments, prefer using SchemaManager directly
+        during application bootstrapping:
+        
+            from T.Database.schema_manager import SchemaManager
+            schema_manager = SchemaManager(connection)
+            schema_manager.initialize_schema()
         
         Raises:
             RuntimeError: If no database connection is available.
@@ -727,12 +749,9 @@ class StoryTitleService:
         if not self._conn:
             raise RuntimeError("No database connection available")
         
-        # Create Story table
-        self._conn.executescript(Story.get_sql_schema())
-        
-        # Create Title table using Title model's schema
-        self._conn.executescript(Title.get_sql_schema())
-        self._conn.commit()
+        # Delegate to centralized SchemaManager
+        schema_manager = SchemaManager(self._conn)
+        schema_manager.initialize_schema()
 
 
 def create_stories_from_idea(

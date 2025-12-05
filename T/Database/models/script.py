@@ -228,3 +228,29 @@ class Script(IModel[int]):
             v2 (story_id=1)
         """
         return f"v{self.version} (story_id={self.story_id})"
+    
+    @classmethod
+    def get_sql_schema(cls) -> str:
+        """Get the SQL CREATE TABLE statement for this model.
+        
+        Returns:
+            SQL statement to create the Script table with all
+            constraints (CHECK, UNIQUE, FOREIGN KEY) and performance indexes.
+        """
+        return """
+        CREATE TABLE IF NOT EXISTS Script (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            story_id INTEGER NOT NULL,
+            version INTEGER NOT NULL CHECK (version >= 0),
+            text TEXT NOT NULL,
+            review_id INTEGER NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            UNIQUE(story_id, version),
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
+        );
+        
+        -- Performance indexes for common query patterns
+        CREATE INDEX IF NOT EXISTS idx_script_story_id ON Script(story_id);
+        CREATE INDEX IF NOT EXISTS idx_script_story_version ON Script(story_id, version);
+        """
