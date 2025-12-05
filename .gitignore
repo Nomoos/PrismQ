@@ -55,6 +55,12 @@ Thumbs.db
 
 # Working directory (data storage)
 PrismQ_WD/
+C:/PrismQ/
+
+# Database files
+*.s3db
+*.db
+db.s3db
 
 # Logs
 *.log

@@ -3,7 +3,7 @@ REM Run.bat - PrismQ.T.Title.From.Idea
 REM Generate title from idea - saves to database
 REM
 REM Usage: Run.bat [database_path]
-REM   database_path - Optional path to database file (default: prismq.db)
+REM   database_path - Optional path to database file (default: from Config or C:/PrismQ/db.s3db)
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
@@ -15,11 +15,12 @@ echo PrismQ.T.Title.From.Idea - RUN MODE
 echo ========================================
 echo.
 
-REM Get database path from argument or use default
-set DB_PATH=prismq.db
-if not "%~1"=="" set DB_PATH=%~1
-
-python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --run --db "%DB_PATH%"
+REM Get database path from argument or let Python use the default
+if not "%~1"=="" (
+    python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --run --db "%~1"
+) else (
+    python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --run
+)
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
