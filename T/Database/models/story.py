@@ -36,12 +36,18 @@ class Story(IModel[int]):
     
     Attributes:
         id: Primary key (auto-generated)
-        idea_id: FK to Idea table (INTEGER)
+        idea_id: External idea reference (TEXT)
+        idea_json: Serialized idea data for offline access (TEXT)
+        title_id: Convenience reference to latest title version (INTEGER)
+        script_id: Convenience reference to latest script version (INTEGER)
         state: Current workflow state (next process name)
         created_at: Timestamp of creation
+        updated_at: Timestamp of last update
     
     Note:
-        - idea_id references the Idea table via FOREIGN KEY
+        - idea_id stores external idea reference as TEXT
+        - idea_json stores serialized idea data for offline access
+        - title_id and script_id are convenience references to latest versions
         - state stores the next process name (pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...)
         - Current title/script versions are implicit (highest version in respective tables)
         - state can be updated (UPDATE operation allowed)
@@ -50,16 +56,19 @@ class Story(IModel[int]):
         ```sql
         Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id INTEGER NULL,
-            state TEXT NOT NULL,
+            idea_id TEXT NULL,
+            idea_json TEXT NULL,
+            title_id INTEGER NULL,
+            script_id INTEGER NULL,
+            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (idea_id) REFERENCES Idea(id)
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
         ```
     
     Example:
         >>> story = Story(
-        ...     idea_id=1,
+        ...     idea_id="idea-123",
         ...     state=StoryState.TITLE_FROM_IDEA
         ... )
         >>> print(f"Story state: {story.state}")
@@ -192,7 +201,9 @@ class Story(IModel[int]):
             constraints and performance indexes.
         
         Note:
-            - idea_id is INTEGER FK to Idea(id)
+            - idea_id is TEXT for external idea references
+            - idea_json stores serialized idea data for offline access
+            - title_id and script_id are convenience references to latest versions
             - state stores the next process name (pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...)
             - Current title/script versions are implicit - determined by highest version
               in Title/Script tables via ORDER BY version DESC LIMIT 1
@@ -200,10 +211,13 @@ class Story(IModel[int]):
         return """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id INTEGER NULL,
+            idea_id TEXT NULL,
+            idea_json TEXT NULL,
+            title_id INTEGER NULL,
+            script_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (idea_id) REFERENCES Idea(id)
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
         
         -- Performance indexes for common query patterns
