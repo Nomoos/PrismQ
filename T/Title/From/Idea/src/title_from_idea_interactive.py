@@ -77,6 +77,13 @@ except ImportError:
     class AIUnavailableError(Exception):
         pass
 
+# Try to import AI title generator for local Ollama-based generation
+try:
+    from ai_title_generator import AITitleGenerator, AITitleConfig, generate_ai_titles_from_idea
+    AI_TITLE_GENERATOR_AVAILABLE = True
+except ImportError:
+    AI_TITLE_GENERATOR_AVAILABLE = False
+
 # Try to import SimpleIdeaDatabase for fetching Idea content
 try:
     from simple_idea_db import SimpleIdeaDatabase
@@ -366,12 +373,46 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print_section("Generating Title Variants")
         
         titles = []
+        ai_generator = None
+        use_ai = False
+        
+        # Try to use AI title generator (Ollama) if available
+        if AI_TITLE_GENERATOR_AVAILABLE:
+            try:
+                ai_generator = AITitleGenerator()
+                if ai_generator.is_available():
+                    use_ai = True
+                    print_success("AI title generation available (Ollama)")
+                    if logger:
+                        logger.info("AI title generation available via Ollama")
+                else:
+                    print_warning("AI (Ollama) not available - using template-based generation")
+                    if logger:
+                        logger.warning("Ollama not available, falling back to template-based generation")
+            except Exception as e:
+                print_warning(f"AI generator init failed: {e} - using template-based generation")
+                if logger:
+                    logger.warning(f"AI generator initialization failed: {e}")
+        else:
+            print_warning("AI title generator module not available - using template-based generation")
+            if logger:
+                logger.warning("AI title generator module not imported")
+        
         try:
-            config = TitleConfig(num_variants=10)
             print_info(f"Creating 10 title variants...")
             if logger:
                 logger.info("Creating 10 title variants")
-            titles = generate_titles_from_idea(idea, num_variants=10, config=config)
+            
+            if use_ai and ai_generator:
+                # Use AI-powered title generation via Ollama
+                print_info("Using local AI (Ollama) for title generation...")
+                if logger:
+                    logger.info("Generating titles using AI (Ollama)")
+                titles = ai_generator.generate_from_idea(idea, num_variants=10)
+            else:
+                # Fallback to template-based generation
+                config = TitleConfig(num_variants=10)
+                titles = generate_titles_from_idea(idea, num_variants=10, config=config)
                 
         except Exception as e:
             print_error(f"Error creating title variants: {e}")
