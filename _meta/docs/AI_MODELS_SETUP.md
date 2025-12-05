@@ -698,7 +698,360 @@ block1 = generator.generate_block("Introduce Clara arriving at the house")
 - [ ] Fact extractor připraven
 - [ ] Directive template vytvořen
 
-### RTX 5090 Optimal Configuration
+### 🔗 Integrace Moving Window do PrismQ Workflow
+
+Moving Window technika se hodí do **specifických kroků** PrismQ pipeline:
+
+#### Kde použít Moving Window v PrismQ.T
+
+| Stage | Moving Window? | Důvod |
+|-------|----------------|-------|
+| **PrismQ.T.Idea.Creation** | ❌ Ne | Krátký výstup (koncept) |
+| **PrismQ.T.Story.From.Idea** | ⚠️ Volitelně | Pro detailnější Story Bible |
+| **PrismQ.T.Title.From.Idea** | ❌ Ne | Krátký výstup (titulky) |
+| **PrismQ.T.Script.From.Title.Idea** | ✅ **ANO** | 🏆 **HLAVNÍ USE CASE** |
+| **PrismQ.T.Script.From.Title.Review.Script** | ✅ **ANO** | Refinement dlouhého scriptu |
+| **PrismQ.T.Story.Polish** | ✅ **ANO** | Finální polish dlouhého textu |
+| Review stages | ❌ Ne | Analytické, ne generativní |
+
+#### 🏆 Primární integrace: Script Generation
+
+```
+PrismQ.T.Script.From.Title.Idea
+    ↓
+┌─────────────────────────────────────────────────────┐
+│ 📖 MOVING WINDOW INTEGRATION                        │
+├─────────────────────────────────────────────────────┤
+│ 1. Načti Idea + Title jako "Story Bible"            │
+│ 2. Vygeneruj Outline (10-18 beats) z Idea           │
+│ 3. Pro každý beat:                                  │
+│    a) Generate Block (300-500 slov)                 │
+│    b) Summarize Block                               │
+│    c) Extract Facts                                 │
+│    d) Prepare Directive pro další beat              │
+│    e) Reinjekce context + continue                  │
+│ 4. Spojení bloků → Script v1                        │
+└─────────────────────────────────────────────────────┘
+    ↓
+PrismQ.T.Review.Title.By.Script.Idea
+```
+
+#### Návrh integrace do PrismQ.T.Script
+
+**Nový modul:** `T/Script/From/Idea/Title/MovingWindow/`
+
+```python
+# T/Script/From/Idea/Title/MovingWindow/generator.py
+
+from dataclasses import dataclass
+from typing import List, Optional
+import ollama
+
+@dataclass
+class StoryBeat:
+    """Jeden beat (segment) příběhu."""
+    number: int
+    directive: str
+    content: str = ""
+    summary: str = ""
+    facts: List[str] = None
+
+class PrismQMovingWindowScript:
+    """
+    Moving Window Script Generator pro PrismQ.T.Script.From.Title.Idea
+    
+    Integrace do workflow:
+    - Input: Idea + Title z předchozích stages
+    - Output: Script v1 (dlouhý text bez memory drift)
+    """
+    
+    def __init__(
+        self, 
+        model: str = "qwen2.5:32b",
+        window_size: int = 1200,  # tokens
+        block_words: int = 400    # target words per block
+    ):
+        self.model = model
+        self.window_size = window_size
+        self.block_words = block_words
+        self.story_bible = ""
+        self.outline: List[StoryBeat] = []
+        self.generated_blocks: List[str] = []
+        self.summaries: List[str] = []
+        self.facts: List[str] = []
+    
+    def from_idea_and_title(self, idea: dict, title: str) -> str:
+        """
+        Hlavní entry point pro PrismQ.T.Script.From.Title.Idea
+        
+        Args:
+            idea: Idea objekt z PrismQ.T.Idea.Creation
+            title: Title z PrismQ.T.Title.From.Idea
+            
+        Returns:
+            Kompletní Script v1
+        """
+        # 1. Build Story Bible from Idea
+        self.story_bible = self._build_story_bible(idea, title)
+        
+        # 2. Generate Outline (10-18 beats)
+        self.outline = self._generate_outline(idea, title)
+        
+        # 3. Generate each beat using Moving Window
+        for beat in self.outline:
+            block = self._generate_block(beat)
+            self.generated_blocks.append(block)
+            
+            # Summarize and extract facts
+            summary = self._summarize_block(block)
+            self.summaries.append(summary)
+            
+            facts = self._extract_facts(block)
+            self.facts.extend(facts)
+        
+        # 4. Combine into final script
+        return self._combine_script()
+    
+    def _build_story_bible(self, idea: dict, title: str) -> str:
+        """Vytvoří Story Bible z Idea a Title."""
+        return f'''
+# Story Bible
+
+## Title
+{title}
+
+## Core Concept
+{idea.get("concept", "")}
+
+## Target Audience
+{idea.get("audience", "Teen/YA, 10-20, US women")}
+
+## Tone
+{idea.get("tone", "Engaging, emotional, relatable")}
+
+## Characters
+{idea.get("characters", "")}
+
+## Setting
+{idea.get("setting", "")}
+
+## Rules
+- No explicit content
+- Consistent voice throughout
+- Relatable situations for target audience
+- Clear emotional arc
+'''
+    
+    def _generate_outline(self, idea: dict, title: str) -> List[StoryBeat]:
+        """Generuje 10-18 beat outline."""
+        prompt = f'''Based on this idea and title, create a detailed story outline.
+
+Title: {title}
+Concept: {idea.get("concept", "")}
+
+Write exactly 12 beats (story segments) that form a complete narrative arc:
+- Beat 1-2: Setup and introduction
+- Beat 3-4: Rising action begins
+- Beat 5-6: Complications
+- Beat 7-8: Midpoint twist
+- Beat 9-10: Escalation
+- Beat 11: Climax
+- Beat 12: Resolution
+
+For each beat, provide a 1-2 sentence directive of what should happen.
+'''
+        response = ollama.chat(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        # Parse response into StoryBeat objects
+        return self._parse_outline(response["message"]["content"])
+    
+    def _generate_block(self, beat: StoryBeat) -> str:
+        """Generuje jeden blok pomocí Moving Window."""
+        # Build context from recent summaries and facts
+        recent_context = self._build_recent_context()
+        
+        prompt = f'''
+{self.story_bible}
+
+## Previous Context
+{recent_context}
+
+## Current Directive (Beat {beat.number})
+{beat.directive}
+
+## Instructions
+Write the next segment of the story (~{self.block_words} words).
+- Continue naturally from previous context
+- Follow the directive
+- Maintain consistent voice and tone
+- End at a natural pause point
+
+Now continue the story:
+'''
+        response = ollama.chat(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            options={"num_predict": self.window_size}
+        )
+        
+        return response["message"]["content"]
+    
+    def _build_recent_context(self) -> str:
+        """Sestaví kontext z posledních shrnutí a faktů."""
+        recent_summaries = self.summaries[-3:] if self.summaries else []
+        recent_facts = self.facts[-15:] if self.facts else []
+        
+        context = ""
+        if recent_summaries:
+            context += "### Recent Summaries\n"
+            context += "\n".join(recent_summaries)
+            context += "\n\n"
+        
+        if recent_facts:
+            context += "### Story Facts So Far\n"
+            context += "\n".join(f"- {fact}" for fact in recent_facts)
+        
+        return context if context else "This is the beginning of the story."
+    
+    def _summarize_block(self, block: str) -> str:
+        """Vytvoří shrnutí bloku."""
+        prompt = f'''Summarize this story segment in 2-3 sentences:
+
+{block}
+
+Summary:'''
+        
+        response = ollama.chat(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            options={"num_predict": 200}
+        )
+        
+        return response["message"]["content"]
+    
+    def _extract_facts(self, block: str) -> List[str]:
+        """Extrahuje klíčová fakta z bloku."""
+        prompt = f'''Extract 3-5 key facts from this story segment.
+Format as simple bullet points.
+
+{block}
+
+Facts:'''
+        
+        response = ollama.chat(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            options={"num_predict": 300}
+        )
+        
+        # Parse bullet points
+        lines = response["message"]["content"].strip().split("\n")
+        return [line.strip("- ").strip() for line in lines if line.strip()]
+    
+    def _combine_script(self) -> str:
+        """Spojí všechny bloky do finálního scriptu."""
+        return "\n\n".join(self.generated_blocks)
+    
+    def _parse_outline(self, outline_text: str) -> List[StoryBeat]:
+        """Parsuje outline text do StoryBeat objektů."""
+        beats = []
+        lines = outline_text.strip().split("\n")
+        beat_num = 0
+        
+        for line in lines:
+            line = line.strip()
+            if line and any(line.startswith(f"Beat {i}") or line.startswith(f"{i}.") or line.startswith(f"{i}:") for i in range(1, 19)):
+                beat_num += 1
+                directive = line.split(":", 1)[-1].strip() if ":" in line else line
+                beats.append(StoryBeat(number=beat_num, directive=directive))
+        
+        return beats if beats else [StoryBeat(number=1, directive="Write the story")]
+
+
+# Integrace do PrismQ workflow
+def script_from_idea_title_moving_window(idea: dict, title: str) -> str:
+    """
+    Entry point pro PrismQ.T.Script.From.Title.Idea s Moving Window.
+    
+    Použití:
+        from T.Script.From.Idea.Title.MovingWindow import script_from_idea_title_moving_window
+        
+        script = script_from_idea_title_moving_window(idea, title)
+    """
+    generator = PrismQMovingWindowScript(
+        model="qwen2.5:32b",
+        window_size=1200,
+        block_words=400
+    )
+    return generator.from_idea_and_title(idea, title)
+```
+
+#### Konfigurace pro různé délky scriptu
+
+| Délka scriptu | Počet beats | Block size | Celkem slov |
+|---------------|-------------|------------|-------------|
+| **Krátký** (Reddit story) | 5-8 | 300 slov | 1,500-2,400 |
+| **Střední** (Short story) | 10-12 | 400 slov | 4,000-4,800 |
+| **Dlouhý** (Novella) | 15-20 | 500 slov | 7,500-10,000 |
+| **Velmi dlouhý** (Novel chapter) | 20-30 | 600 slov | 12,000-18,000 |
+
+#### Doporučený workflow s Moving Window
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    PrismQ.T Pipeline                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. Idea.Creation                                           │
+│       ↓                                                     │
+│  2. Story.From.Idea (creates Story Bible)                   │
+│       ↓                                                     │
+│  3. Title.From.Idea                                         │
+│       ↓                                                     │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ 4. Script.From.Title.Idea                            │   │
+│  │    ┌─────────────────────────────────────────────┐   │   │
+│  │    │ 📖 MOVING WINDOW GENERATOR                  │   │   │
+│  │    │                                             │   │   │
+│  │    │  • Story Bible ← Idea + Title               │   │   │
+│  │    │  • Outline (12 beats)                       │   │   │
+│  │    │  • For each beat:                           │   │   │
+│  │    │    → Generate Block                         │   │   │
+│  │    │    → Summarize                              │   │   │
+│  │    │    → Extract Facts                          │   │   │
+│  │    │    → Prepare Directive                      │   │   │
+│  │    │  • Combine → Script v1                      │   │   │
+│  │    └─────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────┘   │
+│       ↓                                                     │
+│  5. Review.Title.By.Script.Idea                             │
+│       ↓                                                     │
+│  6-16. Quality Reviews (Grammar, Tone, Content...)          │
+│       ↓                                                     │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ 17-18. Story.Review + Story.Polish                   │   │
+│  │    (Moving Window pro Polish refinement)             │   │
+│  └─────────────────────────────────────────────────────┘   │
+│       ↓                                                     │
+│  Publishing                                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Kdy použít Moving Window vs Standard Generation
+
+| Situace | Metoda | Důvod |
+|---------|--------|-------|
+| Reddit Stories (<2000 slov) | Standard | Rychlejší, kontext stačí |
+| Short Stories (2000-5000 slov) | Moving Window | Prevence memory drift |
+| Novellas (5000-15000 slov) | Moving Window | **Povinné** |
+| Novel chapters (15000+ slov) | Moving Window | **Povinné** |
+| Title generation | Standard | Krátký výstup |
+| Reviews | Standard | Analytické, ne generativní |
+| Script refinement | Moving Window | Zachování konzistence |
 
 For RTX 5090 with 32GB VRAM, we recommend:
 
