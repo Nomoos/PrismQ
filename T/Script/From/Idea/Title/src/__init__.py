@@ -5,6 +5,7 @@ from an Idea object and a title variant.
 
 Key Components:
     - ScriptGenerator: Generates ScriptV1 from Idea and Title
+    - AIScriptGenerator: AI-powered script generation using Qwen2.5-14B-Instruct
     - StoryScriptService: Service to process stories needing scripts
     - ScriptFromIdeaTitleService: State-based service for PrismQ.T.Script.From.Idea.Title
     - process_oldest_from_idea_title: Process oldest story in the state
@@ -32,6 +33,11 @@ from .story_script_service import (
     STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
     INITIAL_SCRIPT_VERSION
 )
+from .ai_script_generator import (
+    AIScriptGenerator,
+    AIScriptGeneratorConfig,
+    generate_ai_script
+)
 
 __all__ = [
     # Script Generator
@@ -42,6 +48,10 @@ __all__ = [
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
+    # AI Script Generator (Qwen2.5-14B-Instruct)
+    "AIScriptGenerator",
+    "AIScriptGeneratorConfig",
+    "generate_ai_script",
     # Story Script Service (legacy)
     "StoryScriptService",
     "ScriptGenerationResult",

@@ -5,6 +5,7 @@ This module implements the script generation logic for MVP-003:
 - Generates structured script with intro, body, and conclusion
 - Optimizes for platform requirements (YouTube shorts < 180s)
 - Maintains coherence with title promises and idea intent
+- Supports AI-powered generation using Qwen2.5-14B-Instruct via Ollama
 """
 
 from dataclasses import dataclass, field
@@ -14,6 +15,9 @@ from enum import Enum
 import string
 import sys
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
 # Path: T/Script/From/Idea/Title/src/script_generator.py
@@ -27,6 +31,21 @@ try:
 except ImportError:
     # Fallback for testing or development
     pass
+
+# Import AI script generator (lazy import to avoid circular dependency)
+_ai_generator_module = None
+
+
+def _get_ai_generator_module():
+    """Lazy import of AI script generator module."""
+    global _ai_generator_module
+    if _ai_generator_module is None:
+        try:
+            from . import ai_script_generator as _ai_generator_module
+        except ImportError:
+            logger.warning("AI script generator module not available")
+            _ai_generator_module = False
+    return _ai_generator_module if _ai_generator_module else None
 
 
 class ScriptStructure(Enum):
@@ -163,6 +182,11 @@ class ScriptGeneratorConfig:
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
         tone: Script tone (engaging, mysterious, educational, etc.)
+        use_ai: Whether to use AI-powered generation (default: True)
+        ai_model: AI model to use for generation (default: Qwen2.5-14B-Instruct)
+        ai_api_base: Base URL for Ollama API
+        ai_temperature: AI generation temperature (0.0-2.0)
+        ai_timeout: AI request timeout in seconds
     """
     
     platform_target: PlatformTarget = PlatformTarget.YOUTUBE_MEDIUM
@@ -171,6 +195,12 @@ class ScriptGeneratorConfig:
     words_per_second: float = 2.5  # Average speaking rate
     include_cta: bool = True
     tone: ScriptTone = ScriptTone.ENGAGING
+    # AI generation settings
+    use_ai: bool = True
+    ai_model: str = "qwen2.5:14b-instruct"
+    ai_api_base: str = "http://localhost:11434"
+    ai_temperature: float = 0.7
+    ai_timeout: int = 120
 
 
 class ScriptGenerator:
@@ -178,6 +208,9 @@ class ScriptGenerator:
     
     This class implements the MVP-003 functionality to create structured
     scripts from an Idea object and a title variant.
+    
+    The generator supports AI-powered script generation using Qwen2.5-14B-Instruct
+    via Ollama, with automatic fallback to rule-based generation when AI is unavailable.
     """
     
     def __init__(self, config: Optional[ScriptGeneratorConfig] = None):
@@ -187,6 +220,48 @@ class ScriptGenerator:
             config: Optional generation configuration
         """
         self.config = config or ScriptGeneratorConfig()
+        self._ai_generator = None
+        self._ai_available = False
+        self._init_ai_generator()
+    
+    def _init_ai_generator(self):
+        """Initialize AI generator if available and enabled."""
+        if not self.config.use_ai:
+            logger.info("AI generation disabled in config")
+            return
+        
+        ai_module = _get_ai_generator_module()
+        if ai_module is None:
+            logger.info("AI script generator module not available")
+            return
+        
+        try:
+            ai_config = ai_module.AIScriptGeneratorConfig(
+                model=self.config.ai_model,
+                api_base=self.config.ai_api_base,
+                temperature=self.config.ai_temperature,
+                timeout=self.config.ai_timeout,
+                enable_ai=True
+            )
+            self._ai_generator = ai_module.AIScriptGenerator(config=ai_config)
+            self._ai_available = self._ai_generator.is_available()
+            
+            if self._ai_available:
+                logger.info(f"AI script generation enabled with model: {self.config.ai_model}")
+            else:
+                logger.info("AI script generator initialized but Ollama not available")
+        except Exception as e:
+            logger.warning(f"Failed to initialize AI generator: {e}")
+            self._ai_generator = None
+            self._ai_available = False
+    
+    def is_ai_available(self) -> bool:
+        """Check if AI-powered script generation is available.
+        
+        Returns:
+            True if AI generation is available, False otherwise
+        """
+        return self._ai_available
     
     def generate_script_v1(
         self,
@@ -196,6 +271,9 @@ class ScriptGenerator:
         **kwargs
     ) -> ScriptV1:
         """Generate initial script (v1) from idea and title.
+        
+        This method attempts AI-powered generation using Qwen2.5-14B-Instruct
+        if available, with automatic fallback to rule-based generation.
         
         Args:
             idea: Source Idea object
@@ -224,11 +302,24 @@ class ScriptGenerator:
         # Analyze idea and title to extract key elements
         analysis = self._analyze_inputs(idea, title)
         
-        # Generate script sections
-        sections = self._generate_sections(idea, title, analysis, config)
+        # Try AI-powered generation first
+        ai_generated = False
+        full_text = None
+        sections = None
         
-        # Combine sections into full text
-        full_text = self._assemble_full_text(sections)
+        if self._ai_available and config.use_ai:
+            logger.info(f"Attempting AI-powered script generation for '{title}'")
+            full_text, sections = self._generate_with_ai(idea, title, analysis, config)
+            if full_text is not None:
+                ai_generated = True
+                logger.info("AI script generation successful")
+            else:
+                logger.info("AI generation failed, falling back to rule-based generation")
+        
+        # Fallback to rule-based generation
+        if full_text is None:
+            sections = self._generate_sections(idea, title, analysis, config)
+            full_text = self._assemble_full_text(sections)
         
         # Calculate total duration
         total_duration = sum(s.estimated_duration_seconds for s in sections)
@@ -248,15 +339,149 @@ class ScriptGenerator:
                 "idea_genre": idea.genre.value if hasattr(idea, 'genre') else "unknown",
                 "target_audience": getattr(idea, 'target_audience', 'general'),
                 "generation_config": {
-                    "tone": config.tone,
+                    "tone": config.tone.value if hasattr(config.tone, 'value') else str(config.tone),
                     "target_duration": config.target_duration_seconds,
-                    "words_per_second": config.words_per_second
-                }
+                    "words_per_second": config.words_per_second,
+                    "use_ai": config.use_ai,
+                    "ai_model": config.ai_model
+                },
+                "ai_generated": ai_generated
             },
             notes=f"Generated from idea '{getattr(idea, 'title', 'untitled')}' with title '{title}'"
+                  f"{' (AI-powered)' if ai_generated else ' (rule-based)'}"
         )
         
         return script
+    
+    def _generate_with_ai(
+        self,
+        idea: 'Idea',
+        title: str,
+        analysis: Dict[str, Any],
+        config: ScriptGeneratorConfig
+    ) -> tuple:
+        """Generate script content using AI.
+        
+        Args:
+            idea: Source Idea object
+            title: Script title
+            analysis: Pre-analyzed idea and title data
+            config: Generation configuration
+        
+        Returns:
+            Tuple of (full_text, sections) if successful, (None, None) otherwise
+        """
+        if not self._ai_generator:
+            return None, None
+        
+        try:
+            # Convert idea to dictionary for AI generation
+            idea_data = {
+                "concept": getattr(idea, 'concept', ''),
+                "synopsis": getattr(idea, 'synopsis', ''),
+                "hook": getattr(idea, 'hook', ''),
+                "premise": getattr(idea, 'premise', ''),
+                "genre": idea.genre.value if hasattr(idea, 'genre') and hasattr(idea.genre, 'value') else 'general',
+                "target_audience": getattr(idea, 'target_audience', 'general audience'),
+                "themes": getattr(idea, 'themes', []),
+                "keywords": getattr(idea, 'keywords', [])
+            }
+            
+            # Get platform string
+            platform = config.platform_target.value if hasattr(config.platform_target, 'value') else str(config.platform_target)
+            
+            # Get tone string
+            tone = config.tone.value if hasattr(config.tone, 'value') else str(config.tone)
+            
+            # Generate full script using AI
+            full_text = self._ai_generator.generate_full_script(
+                idea_data=idea_data,
+                title=title,
+                target_duration_seconds=config.target_duration_seconds,
+                platform=platform,
+                tone=tone
+            )
+            
+            if full_text is None:
+                return None, None
+            
+            # Create sections from AI-generated text
+            sections = self._create_sections_from_ai_text(full_text, config)
+            
+            return full_text, sections
+            
+        except Exception as e:
+            logger.error(f"AI script generation error: {e}")
+            return None, None
+    
+    def _create_sections_from_ai_text(
+        self,
+        full_text: str,
+        config: ScriptGeneratorConfig
+    ) -> List[ScriptSection]:
+        """Create section objects from AI-generated text.
+        
+        Since AI generates a cohesive script, we estimate section boundaries
+        based on the target duration ratios.
+        
+        Args:
+            full_text: AI-generated script text
+            config: Generation configuration
+        
+        Returns:
+            List of ScriptSection objects
+        """
+        # Calculate section durations based on structure type
+        if config.structure_type == ScriptStructure.HOOK_DELIVER_CTA:
+            intro_ratio, body_ratio, conclusion_ratio = 0.15, 0.70, 0.15
+        elif config.structure_type == ScriptStructure.THREE_ACT:
+            intro_ratio, body_ratio, conclusion_ratio = 0.25, 0.50, 0.25
+        elif config.structure_type == ScriptStructure.PROBLEM_SOLUTION:
+            intro_ratio, body_ratio, conclusion_ratio = 0.30, 0.50, 0.20
+        else:
+            intro_ratio, body_ratio, conclusion_ratio = 0.20, 0.60, 0.20
+        
+        total_words = len(full_text.split())
+        
+        # Split text roughly by word count
+        words = full_text.split()
+        intro_words = int(total_words * intro_ratio)
+        body_words = int(total_words * body_ratio)
+        
+        intro_text = ' '.join(words[:intro_words])
+        body_text = ' '.join(words[intro_words:intro_words + body_words])
+        conclusion_text = ' '.join(words[intro_words + body_words:])
+        
+        # Calculate durations
+        intro_duration = int(config.target_duration_seconds * intro_ratio)
+        body_duration = int(config.target_duration_seconds * body_ratio)
+        conclusion_duration = int(config.target_duration_seconds * conclusion_ratio)
+        
+        sections = [
+            ScriptSection(
+                section_type="introduction",
+                content=intro_text,
+                estimated_duration_seconds=intro_duration,
+                purpose="AI-generated hook to grab attention",
+                notes="Generated with Qwen2.5-14B-Instruct"
+            ),
+            ScriptSection(
+                section_type="body",
+                content=body_text,
+                estimated_duration_seconds=body_duration,
+                purpose="AI-generated main content",
+                notes="Generated with Qwen2.5-14B-Instruct"
+            ),
+            ScriptSection(
+                section_type="conclusion",
+                content=conclusion_text,
+                estimated_duration_seconds=conclusion_duration,
+                purpose="AI-generated conclusion",
+                notes="Generated with Qwen2.5-14B-Instruct"
+            )
+        ]
+        
+        return sections
     
     def _apply_config_overrides(self, kwargs: Dict[str, Any]) -> ScriptGeneratorConfig:
         """Apply configuration overrides from kwargs."""
@@ -266,7 +491,13 @@ class ScriptGenerator:
             structure_type=kwargs.get('structure_type', self.config.structure_type),
             words_per_second=kwargs.get('words_per_second', self.config.words_per_second),
             include_cta=kwargs.get('include_cta', self.config.include_cta),
-            tone=kwargs.get('tone', self.config.tone)
+            tone=kwargs.get('tone', self.config.tone),
+            # AI settings
+            use_ai=kwargs.get('use_ai', self.config.use_ai),
+            ai_model=kwargs.get('ai_model', self.config.ai_model),
+            ai_api_base=kwargs.get('ai_api_base', self.config.ai_api_base),
+            ai_temperature=kwargs.get('ai_temperature', self.config.ai_temperature),
+            ai_timeout=kwargs.get('ai_timeout', self.config.ai_timeout)
         )
         return config
     

@@ -8,6 +8,81 @@ Generate initial script draft from the idea and initial title.
 
 Create the first version (v1) of the script based on the original idea and the initial title (v1).
 
+## 🤖 AI-Powered Script Generation
+
+This module implements **Qwen2.5-14B-Instruct** for AI-powered script generation via Ollama. The AI generates compelling, contextually-aware scripts using prompt engineering best practices.
+
+### Features
+- **Qwen2.5-14B-Instruct Model**: High-quality script generation optimized for storytelling
+- **Platform Optimization**: YouTube Shorts, TikTok, Instagram Reels support
+- **Automatic Fallback**: Rule-based generation when AI is unavailable
+- **Prompt Engineering**: Role-based prompts with clear constraints and guidelines
+
+### Quick Start
+
+```python
+from T.Script.From.Idea.Title.src import (
+    ScriptGenerator,
+    ScriptGeneratorConfig,
+    AIScriptGenerator,
+    AIScriptGeneratorConfig,
+    generate_ai_script
+)
+
+# Option 1: Use ScriptGenerator with AI enabled (default)
+config = ScriptGeneratorConfig(
+    use_ai=True,  # AI enabled by default
+    ai_model="qwen2.5:14b-instruct",
+    target_duration_seconds=90
+)
+generator = ScriptGenerator(config=config)
+script = generator.generate_script_v1(idea, title)
+
+# Check if AI was used
+print(f"AI Generated: {script.metadata.get('ai_generated')}")
+
+# Option 2: Use AI directly
+ai_script = generate_ai_script(
+    idea_data={"concept": "...", "synopsis": "..."},
+    title="Your Title",
+    target_duration_seconds=90
+)
+```
+
+### Configuration
+
+```python
+# ScriptGeneratorConfig AI settings
+config = ScriptGeneratorConfig(
+    use_ai=True,                          # Enable AI generation
+    ai_model="qwen2.5:14b-instruct",      # Default model
+    ai_api_base="http://localhost:11434", # Ollama API URL
+    ai_temperature=0.7,                   # Generation creativity
+    ai_timeout=120                        # Request timeout (seconds)
+)
+
+# AIScriptGeneratorConfig for direct AI usage
+ai_config = AIScriptGeneratorConfig(
+    model="qwen2.5:14b-instruct",
+    temperature=0.7,
+    max_tokens=2000,
+    enable_ai=True
+)
+```
+
+### Fallback Behavior
+
+When AI is unavailable (Ollama not running or disabled), the system automatically falls back to rule-based generation:
+
+```python
+# Check AI availability
+generator = ScriptGenerator()
+if generator.is_ai_available():
+    print("AI generation enabled")
+else:
+    print("Using rule-based fallback")
+```
+
 ## Workflow Position
 
 **Stage 3** in MVP workflow: `PrismQ.T.Script.Draft (v1)`
