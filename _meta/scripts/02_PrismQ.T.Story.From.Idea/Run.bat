@@ -15,7 +15,7 @@ echo PrismQ.T.Story.From.Idea - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py --continuous
+python ..\..\..\T\Story\From\Idea\src\story_from_idea_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
