@@ -13,7 +13,7 @@ Features:
     - AI-enhanced title tag optimization
     - Context-aware keyword suggestions
     - Intelligent Open Graph metadata
-    - Fallback to rule-based generation
+    - Raises AIUnavailableError when AI is not available (no fallback)
 """
 
 import json
@@ -28,6 +28,16 @@ from .metadata_generator import SEOMetadata
 logger = logging.getLogger(__name__)
 
 
+class AIUnavailableError(Exception):
+    """Exception raised when AI service (Ollama) is unavailable.
+    
+    This exception is raised instead of falling back to alternative methods,
+    as per the requirement to not perform fallback when AI is unavailable.
+    The caller should handle this exception and wait for AI to become available.
+    """
+    pass
+
+
 @dataclass
 class AIConfig:
     """Configuration for AI-powered metadata generation.
@@ -38,7 +48,7 @@ class AIConfig:
         temperature: Sampling temperature (0.0-2.0, lower = more focused)
         max_tokens: Maximum tokens to generate
         timeout: Request timeout in seconds
-        enable_ai: Whether to use AI generation (fallback to rule-based if False)
+        enable_ai: Whether to use AI generation (raises error if False or unavailable)
     """
     model: str = "llama3.1:70b-q4_K_M"  # Best for SEO tasks on RTX 5090
     api_base: str = "http://localhost:11434"
@@ -96,7 +106,7 @@ class AIMetadataGenerator:
             )
             return response.status_code == 200
         except Exception as e:
-            logger.warning(f"Ollama not available: {e}")
+            logger.error(f"Ollama not available: {e}")
             return False
     
     def generate_meta_description(
@@ -119,10 +129,14 @@ class AIMetadataGenerator:
         
         Returns:
             AI-generated meta description (150-160 characters)
+            
+        Raises:
+            AIUnavailableError: If AI is unavailable or generation fails
         """
         if not self.available:
-            logger.info("AI not available, using fallback")
-            return self._fallback_meta_description(title, script, primary_keywords)
+            error_msg = "AI meta description generation unavailable: Ollama not running"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
         prompt = self._create_meta_description_prompt(
             title=title,
@@ -139,12 +153,16 @@ class AIMetadataGenerator:
             if self.META_DESCRIPTION_MIN <= len(description) <= self.META_DESCRIPTION_MAX:
                 return description
             else:
-                logger.warning(f"AI meta description length invalid ({len(description)} chars), using fallback")
-                return self._fallback_meta_description(title, script, primary_keywords)
+                error_msg = f"AI meta description length invalid ({len(description)} chars)"
+                logger.error(error_msg)
+                raise AIUnavailableError(error_msg)
                 
+        except AIUnavailableError:
+            raise
         except Exception as e:
-            logger.error(f"AI meta description generation failed: {e}")
-            return self._fallback_meta_description(title, script, primary_keywords)
+            error_msg = f"AI meta description generation failed: {e}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg) from e
     
     def generate_title_tag(
         self,
@@ -159,9 +177,14 @@ class AIMetadataGenerator:
         
         Returns:
             AI-enhanced title tag (<60 characters)
+            
+        Raises:
+            AIUnavailableError: If AI is unavailable or generation fails
         """
         if not self.available:
-            return self._fallback_title_tag(title, primary_keywords)
+            error_msg = "AI title tag generation unavailable: Ollama not running"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
         prompt = self._create_title_tag_prompt(
             title=title,
@@ -177,12 +200,16 @@ class AIMetadataGenerator:
             if len(title_tag) <= self.TITLE_TAG_MAX:
                 return title_tag
             else:
-                logger.warning(f"AI title tag too long ({len(title_tag)} chars), using fallback")
-                return self._fallback_title_tag(title, primary_keywords)
+                error_msg = f"AI title tag too long ({len(title_tag)} chars)"
+                logger.error(error_msg)
+                raise AIUnavailableError(error_msg)
                 
+        except AIUnavailableError:
+            raise
         except Exception as e:
-            logger.error(f"AI title tag generation failed: {e}")
-            return self._fallback_title_tag(title, primary_keywords)
+            error_msg = f"AI title tag generation failed: {e}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg) from e
     
     def suggest_related_keywords(
         self,
@@ -201,9 +228,14 @@ class AIMetadataGenerator:
         
         Returns:
             List of AI-suggested related keywords
+            
+        Raises:
+            AIUnavailableError: If AI is unavailable or generation fails
         """
         if not self.available:
-            return []
+            error_msg = "AI related keywords generation unavailable: Ollama not running"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
         prompt = self._create_related_keywords_prompt(
             title=title,
@@ -217,9 +249,12 @@ class AIMetadataGenerator:
             keywords = self._extract_keywords_list(response)
             return keywords[:max_suggestions]
                 
+        except AIUnavailableError:
+            raise
         except Exception as e:
-            logger.error(f"AI related keywords generation failed: {e}")
-            return []
+            error_msg = f"AI related keywords generation failed: {e}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg) from e
     
     def generate_og_description(
         self,
@@ -238,9 +273,14 @@ class AIMetadataGenerator:
         
         Returns:
             AI-generated OG description (up to 200 characters)
+            
+        Raises:
+            AIUnavailableError: If AI is unavailable or generation fails
         """
         if not self.available:
-            return meta_description  # Fallback to meta description
+            error_msg = "AI OG description generation unavailable: Ollama not running"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
         prompt = self._create_og_description_prompt(
             title=title,
@@ -259,9 +299,12 @@ class AIMetadataGenerator:
             else:
                 return og_desc[:self.OG_DESCRIPTION_MAX].rsplit(' ', 1)[0] + "..."
                 
+        except AIUnavailableError:
+            raise
         except Exception as e:
-            logger.error(f"AI OG description generation failed: {e}")
-            return meta_description
+            error_msg = f"AI OG description generation failed: {e}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg) from e
     
     def _create_meta_description_prompt(
         self,

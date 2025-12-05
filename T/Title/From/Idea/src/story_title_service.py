@@ -66,12 +66,13 @@ from idea import Idea
 # Import TitleGenerator from same directory
 from title_generator import TitleGenerator, TitleVariant, TitleConfig
 
-# Import AI title generator (optional - falls back to template-based if unavailable)
+# Import AI title generator (required - no fallback when AI unavailable)
 try:
-    from ai_title_generator import AITitleGenerator, AITitleConfig
+    from ai_title_generator import AITitleGenerator, AITitleConfig, AIUnavailableError
     AI_TITLE_AVAILABLE = True
 except ImportError:
     AI_TITLE_AVAILABLE = False
+    AIUnavailableError = Exception  # Fallback for type hints when import fails
 
 # Import database models and repositories
 from T.Database.models.story import Story, StoryState
@@ -181,8 +182,8 @@ class StoryTitleService:
     ) -> List[TitleVariant]:
         """Generate title variants from an Idea.
         
-        Uses AI (Qwen2.5-14B-Instruct) if available, otherwise falls back to
-        template-based generation.
+        Uses AI (Qwen2.5-14B-Instruct) for title generation. Raises an error
+        if AI is unavailable - no fallback to template-based generation.
         
         Args:
             idea: Idea object to generate titles from
@@ -190,24 +191,21 @@ class StoryTitleService:
             
         Returns:
             List of TitleVariant instances
+            
+        Raises:
+            AIUnavailableError: If AI title generation is not available
         """
         n_variants = num_variants or self.NUM_VARIANTS
         
-        # Try AI generation first if available
-        if self._ai_title_generator and self._ai_title_generator.is_available():
-            try:
-                variants = self._ai_title_generator.generate_from_idea(idea, n_variants)
-                if variants:
-                    return variants
-            except Exception as e:
-                # Log and fall back to template-based
-                import logging
-                logging.getLogger(__name__).warning(
-                    f"AI title generation failed, falling back to templates: {e}"
-                )
+        # Check if AI is available - raise error if not
+        if not self._ai_title_generator or not self._ai_title_generator.is_available():
+            import logging
+            error_msg = "AI title generation unavailable: Ollama not running or not configured"
+            logging.getLogger(__name__).error(error_msg)
+            raise AIUnavailableError(error_msg)
         
-        # Fallback to template-based generation
-        return self._title_generator.generate_from_idea(idea, n_variants)
+        # Use AI generation (will raise AIUnavailableError if it fails)
+        return self._ai_title_generator.generate_from_idea(idea, n_variants)
     
     def get_stories_without_titles(self) -> List[Story]:
         """Get Stories that are ready for title generation but don't have titles.

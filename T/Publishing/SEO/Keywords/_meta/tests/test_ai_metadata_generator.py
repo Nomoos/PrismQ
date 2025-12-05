@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch, MagicMock
 from T.Publishing.SEO.Keywords.ai_metadata_generator import (
     AIMetadataGenerator,
     AIConfig,
+    AIUnavailableError,
     generate_ai_seo_metadata
 )
 from T.Publishing.SEO.Keywords.metadata_generator import SEOMetadata
@@ -138,54 +139,44 @@ class TestAIMetadataGenerator:
         assert isinstance(title_tag, str)
         assert len(title_tag) <= 60
     
-    def test_generate_meta_description_fallback(self, generator, sample_content):
-        """Test meta description generation with fallback."""
-        description = generator.generate_meta_description(
-            title=sample_content['title'],
-            script=sample_content['script'],
-            primary_keywords=sample_content['primary_keywords']
-        )
-        
-        assert isinstance(description, str)
-        # Allow more lenient range since fallback may not hit exact target
-        assert 100 <= len(description) <= 170  # Allow slight variance
+    def test_generate_meta_description_raises_when_unavailable(self, generator, sample_content):
+        """Test meta description generation raises AIUnavailableError when AI unavailable."""
+        with pytest.raises(AIUnavailableError):
+            generator.generate_meta_description(
+                title=sample_content['title'],
+                script=sample_content['script'],
+                primary_keywords=sample_content['primary_keywords']
+            )
 
     
-    def test_generate_title_tag_fallback(self, generator, sample_content):
-        """Test title tag generation with fallback."""
-        title_tag = generator.generate_title_tag(
-            title=sample_content['title'],
-            primary_keywords=sample_content['primary_keywords']
-        )
-        
-        assert isinstance(title_tag, str)
-        assert len(title_tag) <= 70  # Allow slight variance for brand
+    def test_generate_title_tag_raises_when_unavailable(self, generator, sample_content):
+        """Test title tag generation raises AIUnavailableError when AI unavailable."""
+        with pytest.raises(AIUnavailableError):
+            generator.generate_title_tag(
+                title=sample_content['title'],
+                primary_keywords=sample_content['primary_keywords']
+            )
     
-    def test_suggest_related_keywords_no_ai(self, generator, sample_content):
-        """Test related keywords when AI is not available."""
-        keywords = generator.suggest_related_keywords(
-            title=sample_content['title'],
-            script=sample_content['script'],
-            primary_keywords=sample_content['primary_keywords']
-        )
-        
-        # Should return empty list when AI is not available
-        assert isinstance(keywords, list)
-        assert len(keywords) == 0
+    def test_suggest_related_keywords_raises_when_unavailable(self, generator, sample_content):
+        """Test related keywords raises AIUnavailableError when AI is not available."""
+        with pytest.raises(AIUnavailableError):
+            generator.suggest_related_keywords(
+                title=sample_content['title'],
+                script=sample_content['script'],
+                primary_keywords=sample_content['primary_keywords']
+            )
     
-    def test_generate_og_description_fallback(self, generator, sample_content):
-        """Test OG description generation with fallback."""
+    def test_generate_og_description_raises_when_unavailable(self, generator, sample_content):
+        """Test OG description generation raises AIUnavailableError when AI unavailable."""
         meta_description = "Learn Python programming in 2024 with this comprehensive guide for beginners. Master syntax, libraries, data structures, and popular frameworks."
         
-        og_description = generator.generate_og_description(
-            title=sample_content['title'],
-            script=sample_content['script'],
-            meta_description=meta_description,
-            primary_keywords=sample_content['primary_keywords']
-        )
-        
-        assert isinstance(og_description, str)
-        assert len(og_description) <= 210  # Allow slight variance
+        with pytest.raises(AIUnavailableError):
+            generator.generate_og_description(
+                title=sample_content['title'],
+                script=sample_content['script'],
+                meta_description=meta_description,
+                primary_keywords=sample_content['primary_keywords']
+            )
     
     def test_extract_meta_description(self, generator):
         """Test extraction of meta description from AI response."""
@@ -401,58 +392,49 @@ class TestGenerateAISEOMetadata:
         }
     
     def test_generate_ai_seo_metadata_fallback(self, sample_data):
-        """Test AI metadata generation with fallback."""
+        """Test AI metadata generation raises error when AI is unavailable."""
         config = AIConfig(enable_ai=False)
         
-        metadata = generate_ai_seo_metadata(
-            title=sample_data['title'],
-            script=sample_data['script'],
-            primary_keywords=sample_data['primary_keywords'],
-            secondary_keywords=sample_data['secondary_keywords'],
-            keyword_density=sample_data['keyword_density'],
-            config=config,
-            brand_name="TechEdu"
-        )
-        
-        # Check metadata structure
-        assert isinstance(metadata, SEOMetadata)
-        assert metadata.meta_description != ""
-        assert metadata.title_tag != ""
-        assert len(metadata.primary_keywords) > 0
-        assert metadata.quality_score >= 0
-        assert metadata.quality_score <= 100
+        with pytest.raises(AIUnavailableError):
+            generate_ai_seo_metadata(
+                title=sample_data['title'],
+                script=sample_data['script'],
+                primary_keywords=sample_data['primary_keywords'],
+                secondary_keywords=sample_data['secondary_keywords'],
+                keyword_density=sample_data['keyword_density'],
+                config=config,
+                brand_name="TechEdu"
+            )
     
-    def test_generate_ai_seo_metadata_with_brand(self, sample_data):
-        """Test metadata generation with brand name."""
+    def test_generate_ai_seo_metadata_with_brand_raises_when_unavailable(self, sample_data):
+        """Test metadata generation raises error when AI unavailable."""
         config = AIConfig(enable_ai=False)
         
-        metadata = generate_ai_seo_metadata(
-            title=sample_data['title'],
-            script=sample_data['script'],
-            primary_keywords=sample_data['primary_keywords'],
-            secondary_keywords=sample_data['secondary_keywords'],
-            keyword_density=sample_data['keyword_density'],
-            config=config,
-            brand_name="CodeMaster"
-        )
-        
-        assert "CodeMaster" in metadata.title_tag
+        with pytest.raises(AIUnavailableError):
+            generate_ai_seo_metadata(
+                title=sample_data['title'],
+                script=sample_data['script'],
+                primary_keywords=sample_data['primary_keywords'],
+                secondary_keywords=sample_data['secondary_keywords'],
+                keyword_density=sample_data['keyword_density'],
+                config=config,
+                brand_name="CodeMaster"
+            )
     
-    def test_generate_ai_seo_metadata_without_related(self, sample_data):
-        """Test metadata generation without related keywords."""
+    def test_generate_ai_seo_metadata_without_related_raises_when_unavailable(self, sample_data):
+        """Test metadata generation raises error when AI unavailable."""
         config = AIConfig(enable_ai=False)
         
-        metadata = generate_ai_seo_metadata(
-            title=sample_data['title'],
-            script=sample_data['script'],
-            primary_keywords=sample_data['primary_keywords'],
-            secondary_keywords=sample_data['secondary_keywords'],
-            keyword_density=sample_data['keyword_density'],
-            config=config,
-            generate_related=False
-        )
-        
-        assert isinstance(metadata.related_keywords, list)
+        with pytest.raises(AIUnavailableError):
+            generate_ai_seo_metadata(
+                title=sample_data['title'],
+                script=sample_data['script'],
+                primary_keywords=sample_data['primary_keywords'],
+                secondary_keywords=sample_data['secondary_keywords'],
+                keyword_density=sample_data['keyword_density'],
+                config=config,
+                generate_related=False
+            )
 
 
 class TestAIQualityScore:
