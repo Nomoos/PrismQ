@@ -122,6 +122,17 @@ from T.Database.connection import (
     create_database,
     verify_connection,
 )
+from T.Database.exceptions import (
+    DatabaseException,
+    EntityNotFoundError,
+    DuplicateEntityError,
+    ForeignKeyViolationError,
+    ConstraintViolationError,
+    DatabaseConnectionError,
+    DataIntegrityError,
+    InvalidStateTransitionError,
+    map_sqlite_error,
+)
 
 __all__ = [
     # Model interfaces
@@ -157,4 +168,14 @@ __all__ = [
     "connection_context",
     "create_database",
     "verify_connection",
+    # Domain exceptions
+    "DatabaseException",
+    "EntityNotFoundError",
+    "DuplicateEntityError",
+    "ForeignKeyViolationError",
+    "ConstraintViolationError",
+    "DatabaseConnectionError",
+    "DataIntegrityError",
+    "InvalidStateTransitionError",
+    "map_sqlite_error",
 ]

@@ -33,6 +33,13 @@ from datetime import datetime
 from T.Database.repositories.base import IUpdatableRepository
 from T.Database.models.story import Story
 from T.State.validators.transition_validator import TransitionValidator
+from T.Database.exceptions import (
+    EntityNotFoundError,
+    ForeignKeyViolationError,
+    ConstraintViolationError,
+    InvalidStateTransitionError,
+    map_sqlite_error,
+)
 
 
 class StoryRepository(IUpdatableRepository[Story, int]):
@@ -141,25 +148,40 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             
         Returns:
             The inserted Story with id populated.
+            
+        Raises:
+            ForeignKeyViolationError: If idea_id references non-existent Idea.
+            ConstraintViolationError: If any constraint is violated.
         """
-        cursor = self._conn.execute(
-            "INSERT INTO Story (idea_id, idea_json, title_id, script_id, state, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (
-                entity.idea_id,
-                entity.idea_json,
-                entity.title_id,
-                entity.script_id,
-                entity.state,
-                entity.created_at.isoformat(),
-                entity.updated_at.isoformat()
+        try:
+            cursor = self._conn.execute(
+                "INSERT INTO Story (idea_id, idea_json, title_id, script_id, state, created_at, updated_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (
+                    entity.idea_id,
+                    entity.idea_json,
+                    entity.title_id,
+                    entity.script_id,
+                    entity.state,
+                    entity.created_at.isoformat(),
+                    entity.updated_at.isoformat()
+                )
             )
-        )
-        self._conn.commit()
-        
-        # Update entity with generated ID
-        entity.id = cursor.lastrowid
-        return entity
+            self._conn.commit()
+            
+            # Update entity with generated ID
+            entity.id = cursor.lastrowid
+            return entity
+        except sqlite3.IntegrityError as e:
+            error_str = str(e).lower()
+            if "foreign key" in error_str:
+                raise ForeignKeyViolationError(
+                    column="idea_id",
+                    value=entity.idea_id,
+                    referenced_table="Idea",
+                    original_error=e
+                )
+            raise map_sqlite_error(e, {"entity_type": "Story"})
     
     # === UPDATE Operation ===
     
@@ -179,16 +201,17 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             The updated Story (same instance with changes persisted).
             
         Raises:
-            ValueError: If entity has no ID (not yet persisted).
-            ValueError: If state transition is invalid.
+            EntityNotFoundError: If entity has no ID or is not found.
+            InvalidStateTransitionError: If state transition is invalid.
+            ForeignKeyViolationError: If foreign key constraint is violated.
         """
         if entity.id is None:
-            raise ValueError("Cannot update story without ID")
+            raise EntityNotFoundError("Story", None, None)
         
         # Get current state from database to validate transition
         current_story = self.find_by_id(entity.id)
         if current_story is None:
-            raise ValueError(f"Story with ID {entity.id} not found")
+            raise EntityNotFoundError("Story", entity.id, None)
         
         current_state = current_story.state
         new_state = entity.state
@@ -220,28 +243,40 @@ class StoryRepository(IUpdatableRepository[Story, int]):
                     f"╚══════════════════════════════════════════════════════════════════╝\n"
                 )
                 print(error_msg)
-                raise ValueError(
-                    f"Invalid state transition from '{current_state}' to '{new_state}'. "
-                    f"{validation_result.error_message}"
+                raise InvalidStateTransitionError(
+                    from_state=current_state,
+                    to_state=new_state,
+                    entity_id=entity.id
                 )
         
         # Update the updated_at timestamp
         entity.updated_at = datetime.now()
         
-        self._conn.execute(
-            "UPDATE Story SET idea_id = ?, idea_json = ?, title_id = ?, script_id = ?, "
-            "state = ?, updated_at = ? WHERE id = ?",
-            (
-                entity.idea_id,
-                entity.idea_json,
-                entity.title_id,
-                entity.script_id,
-                entity.state,
-                entity.updated_at.isoformat(),
-                entity.id
+        try:
+            self._conn.execute(
+                "UPDATE Story SET idea_id = ?, idea_json = ?, title_id = ?, script_id = ?, "
+                "state = ?, updated_at = ? WHERE id = ?",
+                (
+                    entity.idea_id,
+                    entity.idea_json,
+                    entity.title_id,
+                    entity.script_id,
+                    entity.state,
+                    entity.updated_at.isoformat(),
+                    entity.id
+                )
             )
-        )
-        self._conn.commit()
+            self._conn.commit()
+        except sqlite3.IntegrityError as e:
+            error_str = str(e).lower()
+            if "foreign key" in error_str:
+                raise ForeignKeyViolationError(
+                    column="idea_id",
+                    value=entity.idea_id,
+                    referenced_table="Idea",
+                    original_error=e
+                )
+            raise map_sqlite_error(e, {"entity_type": "Story", "entity_id": entity.id})
         
         return entity
     

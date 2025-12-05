@@ -32,6 +32,11 @@ from datetime import datetime
 
 from .base import IVersionedRepository
 from ..models.title import Title
+from ..exceptions import (
+    DuplicateEntityError,
+    ForeignKeyViolationError,
+    map_sqlite_error,
+)
 
 
 class TitleRepository(IVersionedRepository[Title, int]):
@@ -148,23 +153,44 @@ class TitleRepository(IVersionedRepository[Title, int]):
             
         Returns:
             The inserted Title with id populated.
+            
+        Raises:
+            DuplicateEntityError: If (story_id, version) already exists.
+            ForeignKeyViolationError: If story_id or review_id references non-existent entity.
         """
-        cursor = self._conn.execute(
-            "INSERT INTO Title (story_id, version, text, review_id, created_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (
-                entity.story_id,
-                entity.version,
-                entity.text,
-                entity.review_id,
-                entity.created_at.isoformat()
+        try:
+            cursor = self._conn.execute(
+                "INSERT INTO Title (story_id, version, text, review_id, created_at) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (
+                    entity.story_id,
+                    entity.version,
+                    entity.text,
+                    entity.review_id,
+                    entity.created_at.isoformat()
+                )
             )
-        )
-        self._conn.commit()
-        
-        # Update entity with generated ID
-        entity.id = cursor.lastrowid
-        return entity
+            self._conn.commit()
+            
+            # Update entity with generated ID
+            entity.id = cursor.lastrowid
+            return entity
+        except sqlite3.IntegrityError as e:
+            error_str = str(e).lower()
+            if "foreign key" in error_str:
+                raise ForeignKeyViolationError(
+                    column="story_id",
+                    value=entity.story_id,
+                    referenced_table="Story",
+                    original_error=e
+                )
+            if "unique" in error_str:
+                raise DuplicateEntityError(
+                    entity_type="Title",
+                    constraint="story_id, version",
+                    original_error=e
+                )
+            raise map_sqlite_error(e, {"entity_type": "Title"})
     
     # === IVersionedRepository Operations ===
     

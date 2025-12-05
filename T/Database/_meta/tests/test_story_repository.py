@@ -24,6 +24,7 @@ from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.title_repository import TitleRepository
 from T.Database.repositories.review_repository import ReviewRepository
+from T.Database.exceptions import InvalidStateTransitionError
 
 
 @pytest.fixture
@@ -167,7 +168,7 @@ class TestStoryRepositoryBasicOperations:
         assert found.state == "PrismQ.T.Title.From.Idea"
     
     def test_update_story_invalid_transition_raises_error(self, story_repo, capsys):
-        """Test that invalid state transition raises ValueError with error message."""
+        """Test that invalid state transition raises InvalidStateTransitionError with error message."""
         story = Story(idea_id="1", state="PrismQ.T.Idea.Creation")
         saved = story_repo.insert(story)
         
@@ -175,7 +176,7 @@ class TestStoryRepositoryBasicOperations:
         saved.state = "PrismQ.T.Publishing"
         
         import pytest
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(InvalidStateTransitionError) as exc_info:
             story_repo.update(saved)
         
         # Check error message contains useful debugging info

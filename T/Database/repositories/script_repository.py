@@ -32,6 +32,12 @@ from datetime import datetime
 
 from .base import IVersionedRepository
 from ..models.script import Script
+from ..exceptions import (
+    DuplicateEntityError,
+    ForeignKeyViolationError,
+    EntityNotFoundError,
+    map_sqlite_error,
+)
 
 
 class ScriptRepository(IVersionedRepository[Script, int]):
@@ -148,23 +154,44 @@ class ScriptRepository(IVersionedRepository[Script, int]):
             
         Returns:
             The inserted Script with id populated.
+            
+        Raises:
+            DuplicateEntityError: If (story_id, version) already exists.
+            ForeignKeyViolationError: If story_id or review_id references non-existent entity.
         """
-        cursor = self._conn.execute(
-            "INSERT INTO Script (story_id, version, text, review_id, created_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (
-                entity.story_id,
-                entity.version,
-                entity.text,
-                entity.review_id,
-                entity.created_at.isoformat()
+        try:
+            cursor = self._conn.execute(
+                "INSERT INTO Script (story_id, version, text, review_id, created_at) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (
+                    entity.story_id,
+                    entity.version,
+                    entity.text,
+                    entity.review_id,
+                    entity.created_at.isoformat()
+                )
             )
-        )
-        self._conn.commit()
-        
-        # Update entity with generated ID
-        entity.id = cursor.lastrowid
-        return entity
+            self._conn.commit()
+            
+            # Update entity with generated ID
+            entity.id = cursor.lastrowid
+            return entity
+        except sqlite3.IntegrityError as e:
+            error_str = str(e).lower()
+            if "foreign key" in error_str:
+                raise ForeignKeyViolationError(
+                    column="story_id",
+                    value=entity.story_id,
+                    referenced_table="Story",
+                    original_error=e
+                )
+            if "unique" in error_str:
+                raise DuplicateEntityError(
+                    entity_type="Script",
+                    constraint="story_id, version",
+                    original_error=e
+                )
+            raise map_sqlite_error(e, {"entity_type": "Script"})
     
     # === IVersionedRepository Operations ===
     
@@ -277,13 +304,32 @@ class ScriptRepository(IVersionedRepository[Script, int]):
             
         Returns:
             True if the script was updated, False if not found.
+            
+        Raises:
+            ForeignKeyViolationError: If review_id references non-existent Review.
+            EntityNotFoundError: If script_id is not found.
         """
-        cursor = self._conn.execute(
-            "UPDATE Script SET review_id = ? WHERE id = ?",
-            (review_id, script_id)
-        )
-        self._conn.commit()
-        return cursor.rowcount > 0
+        try:
+            cursor = self._conn.execute(
+                "UPDATE Script SET review_id = ? WHERE id = ?",
+                (review_id, script_id)
+            )
+            self._conn.commit()
+            
+            if cursor.rowcount == 0:
+                raise EntityNotFoundError("Script", script_id)
+            
+            return True
+        except sqlite3.IntegrityError as e:
+            error_str = str(e).lower()
+            if "foreign key" in error_str:
+                raise ForeignKeyViolationError(
+                    column="review_id",
+                    value=review_id,
+                    referenced_table="Review",
+                    original_error=e
+                )
+            raise map_sqlite_error(e, {"entity_type": "Script", "entity_id": script_id})
     
     # === Helper Methods ===
     
