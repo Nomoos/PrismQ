@@ -35,10 +35,13 @@ Example:
 """
 
 import sqlite3
+import logging
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple, TYPE_CHECKING
 from pathlib import Path
 import sys
+
+logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
 current_file = Path(__file__)
@@ -66,9 +69,23 @@ from idea import Idea
 # Import TitleGenerator from same directory
 from title_generator import TitleGenerator, TitleVariant, TitleConfig
 
-# Import AI title generator (optional - falls back to template-based if unavailable)
+
+class AIUnavailableError(Exception):
+    """Exception raised when AI service (Ollama) is unavailable.
+    
+    This exception is raised instead of falling back to alternative methods,
+    as per the requirement to not perform fallback when AI is unavailable.
+    The caller should handle this exception and wait for AI to become available.
+    """
+    pass
+
+
+# Import AI title generator (required - no fallback when AI unavailable)
 try:
     from ai_title_generator import AITitleGenerator, AITitleConfig
+    from ai_title_generator import AIUnavailableError as _AIUnavailableError
+    # Use the imported exception to keep consistent error handling
+    AIUnavailableError = _AIUnavailableError
     AI_TITLE_AVAILABLE = True
 except ImportError:
     AI_TITLE_AVAILABLE = False
@@ -181,8 +198,8 @@ class StoryTitleService:
     ) -> List[TitleVariant]:
         """Generate title variants from an Idea.
         
-        Uses AI (Qwen2.5-14B-Instruct) if available, otherwise falls back to
-        template-based generation.
+        Uses AI (Qwen2.5-14B-Instruct) for title generation. Raises an error
+        if AI is unavailable - no fallback to template-based generation.
         
         Args:
             idea: Idea object to generate titles from
@@ -190,24 +207,20 @@ class StoryTitleService:
             
         Returns:
             List of TitleVariant instances
+            
+        Raises:
+            AIUnavailableError: If AI title generation is not available
         """
         n_variants = num_variants or self.NUM_VARIANTS
         
-        # Try AI generation first if available
-        if self._ai_title_generator and self._ai_title_generator.is_available():
-            try:
-                variants = self._ai_title_generator.generate_from_idea(idea, n_variants)
-                if variants:
-                    return variants
-            except Exception as e:
-                # Log and fall back to template-based
-                import logging
-                logging.getLogger(__name__).warning(
-                    f"AI title generation failed, falling back to templates: {e}"
-                )
+        # Check if AI is available - raise error if not
+        if not self._ai_title_generator or not self._ai_title_generator.is_available():
+            error_msg = "AI title generation unavailable: Ollama not running or not configured"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
-        # Fallback to template-based generation
-        return self._title_generator.generate_from_idea(idea, n_variants)
+        # Use AI generation (will raise AIUnavailableError if it fails)
+        return self._ai_title_generator.generate_from_idea(idea, n_variants)
     
     def get_stories_without_titles(self) -> List[Story]:
         """Get Stories that are ready for title generation but don't have titles.

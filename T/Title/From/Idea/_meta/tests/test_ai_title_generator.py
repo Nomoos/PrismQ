@@ -22,7 +22,7 @@ sys.path.insert(0, str(_idea_model_path))
 sys.path.insert(0, str(_src_path))
 
 from idea import Idea, ContentGenre, IdeaStatus
-from ai_title_generator import AITitleGenerator, AITitleConfig, generate_ai_titles_from_idea
+from ai_title_generator import AITitleGenerator, AITitleConfig, AIUnavailableError, generate_ai_titles_from_idea
 from title_generator import TitleVariant
 
 
@@ -249,8 +249,8 @@ class TestAITitleGeneratorResponse:
         assert variants[0].text == "Title A"
     
     @patch('ai_title_generator.requests.get')
-    def test_returns_empty_when_unavailable(self, mock_get):
-        """Test returns empty list when Ollama unavailable."""
+    def test_raises_error_when_unavailable(self, mock_get):
+        """Test raises AIUnavailableError when Ollama unavailable."""
         mock_get.side_effect = Exception("Connection refused")
         
         idea = Idea(
@@ -260,9 +260,9 @@ class TestAITitleGeneratorResponse:
         )
         
         generator = AITitleGenerator()
-        variants = generator.generate_from_idea(idea, num_variants=3)
         
-        assert variants == []
+        with pytest.raises(AIUnavailableError):
+            generator.generate_from_idea(idea, num_variants=3)
 
 
 class TestAITitleGeneratorVariantCreation:

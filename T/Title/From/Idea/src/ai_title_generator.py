@@ -26,6 +26,16 @@ from title_generator import TitleVariant, TitleConfig
 logger = logging.getLogger(__name__)
 
 
+class AIUnavailableError(Exception):
+    """Exception raised when AI service (Ollama) is unavailable.
+    
+    This exception is raised instead of falling back to alternative methods,
+    as per the requirement to not perform fallback when AI is unavailable.
+    The caller should handle this exception and wait for AI to become available.
+    """
+    pass
+
+
 @dataclass
 class AITitleConfig:
     """Configuration for AI title generation.
@@ -106,9 +116,9 @@ Example format:
         self._custom_prompt_template: Optional[str] = None
         
         if not self.available:
-            logger.warning(
+            logger.error(
                 f"Ollama not available at {self.config.api_base}. "
-                "Title generation will fall back to template-based generation."
+                "AI title generation will not be possible until Ollama is available."
             )
     
     def _check_ollama_availability(self) -> bool:
@@ -188,8 +198,9 @@ Example format:
             raise ValueError("num_variants must be between 3 and 10")
         
         if not self.available:
-            logger.warning("Ollama not available, returning empty list")
-            return []
+            error_msg = f"AI title generation unavailable: Ollama not running at {self.config.api_base}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg)
         
         # Build prompt from idea
         prompt = self._create_prompt(idea, n_variants)
@@ -200,8 +211,9 @@ Example format:
             variants = self._parse_response(response_text, idea, n_variants)
             return variants
         except Exception as e:
-            logger.error(f"AI title generation failed: {e}")
-            return []
+            error_msg = f"AI title generation failed: {e}"
+            logger.error(error_msg)
+            raise AIUnavailableError(error_msg) from e
     
     def _create_prompt(self, idea: Idea, num_variants: int) -> str:
         """Create the prompt for title generation.
@@ -385,4 +397,4 @@ def generate_ai_titles_from_idea(
 
 
 # Export public classes for the module
-__all__ = ["AITitleGenerator", "AITitleConfig", "generate_ai_titles_from_idea"]
+__all__ = ["AITitleGenerator", "AITitleConfig", "AIUnavailableError", "generate_ai_titles_from_idea"]
