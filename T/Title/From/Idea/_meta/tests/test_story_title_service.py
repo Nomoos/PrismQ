@@ -31,8 +31,8 @@ from story_title_service import (
 )
 
 # Import database models
-from T.Database.models.story import Story, StoryState
-from T.Database.models.title import Title
+from Model.Database.models.story import Story, StoryState
+from Model.Database.models.title import Title
 
 
 class TestStoryTitleService:
@@ -622,8 +622,8 @@ class TestTitleUniquenessWithDatabase:
     def test_select_best_title_skips_similar(self, db_connection):
         """Test that select_best_title skips similar titles and picks next best."""
         from title_generator import TitleVariant
-        from T.Database.models.title import Title
-        from T.Database.repositories.title_repository import TitleRepository
+        from Model.Database.models.title import Title
+        from Model.Database.repositories.title_repository import TitleRepository
         
         service = StoryTitleService(db_connection)
         service.ensure_tables_exist()
@@ -659,8 +659,8 @@ class TestTitleUniquenessWithDatabase:
     def test_select_best_title_fallback_when_all_similar(self, db_connection):
         """Test that select_best_title falls back to best when all are similar."""
         from title_generator import TitleVariant
-        from T.Database.models.title import Title
-        from T.Database.repositories.title_repository import TitleRepository
+        from Model.Database.models.title import Title
+        from Model.Database.repositories.title_repository import TitleRepository
         
         service = StoryTitleService(db_connection)
         service.ensure_tables_exist()

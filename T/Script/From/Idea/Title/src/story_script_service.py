@@ -32,12 +32,12 @@ from dataclasses import dataclass
 from typing import List, Optional
 from datetime import datetime
 
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.script_repository import ScriptRepository
-from T.Database.repositories.title_repository import TitleRepository
-from T.Database.models.story import Story
-from T.Database.models.script import Script as ScriptModel
-from T.State.constants.state_names import StateNames
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.title_repository import TitleRepository
+from Model.Database.models.story import Story
+from Model.Database.models.script import Script as ScriptModel
+from Model.State.constants.state_names import StateNames
 
 # Import ScriptGenerator from local module
 from .script_generator import (

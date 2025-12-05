@@ -33,8 +33,8 @@ import sqlite3
 from enum import Enum
 from typing import Optional
 
-from T.Database.models.story import Story
-from T.Database.repositories.story_repository import StoryRepository
+from Model.Database.models.story import Story
+from Model.Database.repositories.story_repository import StoryRepository
 
 
 class ReviewSeverity(Enum):
@@ -110,7 +110,7 @@ def pick_story_by_module(
         ...     print(f"Processing story {story.id}")
         
         >>> # Using with existing repository
-        >>> from T.Database.repositories.story_repository import StoryRepository
+        >>> from Model.Database.repositories.story_repository import StoryRepository
         >>> repo = StoryRepository(conn)
         >>> story = pick_story_by_module(
         ...     connection=conn,

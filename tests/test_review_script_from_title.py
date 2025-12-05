@@ -18,10 +18,10 @@ _test_dir = Path(__file__).parent
 _project_root = _test_dir.parent
 sys.path.insert(0, str(_project_root))
 
-from T.Database.models.story import Story
-from T.Database.models.review import Review
-from T.Database.repositories.story_repository import StoryRepository
-from T.State.constants.state_names import StateNames
+from Model.Database.models.story import Story
+from Model.Database.models.review import Review
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.State.constants.state_names import StateNames
 
 
 # Import the module to test using direct file loading to avoid circular import

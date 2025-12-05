@@ -36,12 +36,12 @@ from dataclasses import dataclass
 from typing import List, Optional
 from datetime import datetime
 
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.script_repository import ScriptRepository
-from T.Database.repositories.review_repository import ReviewRepository
-from T.Database.models.story import Story
-from T.Database.models.review import Review
-from T.State.constants.state_names import StateNames
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.review_repository import ReviewRepository
+from Model.Database.models.story import Story
+from Model.Database.models.review import Review
+from Model.State.constants.state_names import StateNames
 
 # Import the grammar checker from the same package
 from .script_grammar_review import (

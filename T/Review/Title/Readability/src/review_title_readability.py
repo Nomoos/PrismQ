@@ -38,11 +38,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Tuple
 
-from T.Database.models.review import Review
-from T.Database.models.story import Story
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.script_repository import ScriptRepository
-from T.State.constants.state_names import StateNames
+from Model.Database.models.review import Review
+from Model.Database.models.story import Story
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.script_repository import ScriptRepository
+from Model.State.constants.state_names import StateNames
 
 
 # Score threshold for accepting a title readability review

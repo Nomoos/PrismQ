@@ -59,10 +59,10 @@ except ImportError:
 
 # Try to import database
 try:
-    from T.Database.repositories.title_repository import TitleRepository
-    from T.Database.repositories.story_repository import StoryRepository
-    from T.Database.models.story import Story
-    from T.State.constants.state_names import StoryState
+    from Model.Database.repositories.title_repository import TitleRepository
+    from Model.Database.repositories.story_repository import StoryRepository
+    from Model.Database.models.story import Story
+    from Model.State.constants.state_names import StoryState
     DB_AVAILABLE = True
 except ImportError:
     DB_AVAILABLE = False

@@ -91,11 +91,11 @@ except ImportError:
     AI_TITLE_AVAILABLE = False
 
 # Import database models and repositories
-from T.Database.models.story import Story, StoryState
-from T.Database.models.title import Title
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.title_repository import TitleRepository
-from T.Database.schema_manager import SchemaManager
+from Model.Database.models.story import Story, StoryState
+from Model.Database.models.title import Title
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.title_repository import TitleRepository
+from Model.Database.schema_manager import SchemaManager
 
 
 @dataclass
@@ -739,7 +739,7 @@ class StoryTitleService:
         For production environments, prefer using SchemaManager directly
         during application bootstrapping:
         
-            from T.Database.schema_manager import SchemaManager
+            from Model.Database.schema_manager import SchemaManager
             schema_manager = SchemaManager(connection)
             schema_manager.initialize_schema()
         
