@@ -1,12 +1,12 @@
 """Startup - Safe database schema initialization for PrismQ application startup.
 
-This module provides a safe, transaction-based database schema initialization
+This module provides a safe database schema initialization function
 that should ONLY be called during application startup, not during normal
 repository or business logic operations.
 
 The module ensures:
-- Schema initialization runs in a single transaction
-- Database errors are caught and logged appropriately
+- Schema initialization with proper error handling and logging
+- Idempotent initialization (safe to call multiple times)
 - Clear separation between startup initialization and runtime operations
 
 Usage:
@@ -77,9 +77,9 @@ def initialize_application_database(
 ) -> bool:
     """Initialize the database schema safely during application startup.
     
-    This function performs database schema initialization within a single
-    transaction. If any step fails, the transaction is rolled back and
-    the error is logged.
+    This function performs database schema initialization with proper
+    error handling and logging. If any step fails, the error is logged
+    and the function returns False.
     
     This function should ONLY be called during application startup:
     - Main entry point initialization
@@ -95,11 +95,6 @@ def initialize_application_database(
     Returns:
         True if initialization succeeded, False if it failed.
         Errors are logged via the module logger.
-        
-    Raises:
-        DatabaseInitializationError: If initialization fails and caller
-            prefers exception handling over boolean return value.
-            Only raised if error is not recoverable (e.g., connection closed).
     
     Example:
         >>> conn = sqlite3.connect("prismq.db")
@@ -119,14 +114,16 @@ def initialize_application_database(
             logger.info("Database schema already exists - skipping initialization")
             return True
         
-        # Log missing tables
+        # Log missing tables for visibility
         missing_tables = schema_manager.get_missing_tables()
         if missing_tables:
             logger.info(f"Missing tables to create: {', '.join(missing_tables)}")
         
-        # Initialize schema within transaction
-        # Note: SchemaManager.initialize_schema() handles the transaction
-        # and commits on success
+        # Initialize schema
+        # Note: SchemaManager.initialize_schema() uses executescript() which
+        # auto-commits each script and calls commit() at the end. If an error
+        # occurs mid-way, partial tables may have been created (which is safe
+        # since CREATE TABLE IF NOT EXISTS is idempotent).
         schema_manager.initialize_schema()
         
         # Verify schema if requested
@@ -143,12 +140,13 @@ def initialize_application_database(
         # Handle SQLite-specific errors
         logger.error(f"Database error during schema initialization: {e}")
         
-        # Attempt rollback if possible
+        # Attempt rollback for any uncommitted changes
+        # Note: Due to executescript auto-commit behavior, this may not
+        # have any effect, but is included for completeness
         try:
             connection.rollback()
-            logger.info("Transaction rolled back successfully")
-        except sqlite3.Error as rollback_error:
-            logger.warning(f"Rollback failed: {rollback_error}")
+        except sqlite3.Error:
+            pass  # Rollback failure is expected if nothing to rollback
         
         return False
         
@@ -156,12 +154,11 @@ def initialize_application_database(
         # Handle unexpected errors
         logger.error(f"Unexpected error during schema initialization: {e}")
         
-        # Attempt rollback if possible
+        # Attempt rollback for any uncommitted changes
         try:
             connection.rollback()
-            logger.info("Transaction rolled back successfully")
-        except Exception as rollback_error:
-            logger.warning(f"Rollback failed: {rollback_error}")
+        except Exception:
+            pass  # Rollback failure is expected if nothing to rollback
         
         return False
 
