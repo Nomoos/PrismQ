@@ -35,7 +35,11 @@ from Model.entities.review import Review
 from Model.entities.story import Story
 from Model.entities.title import Title
 from Model.entities.script import Script
-from Model.Database.models.story_review import StoryReviewModel
+
+try:
+    from Model.entities.story_review import StoryReviewModel
+except ImportError:
+    StoryReviewModel = None
 
 
 class SchemaManager:

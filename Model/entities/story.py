@@ -38,12 +38,12 @@ class Story(IModel[int]):
     
     Attributes:
         id: Primary key (auto-generated)
-        idea_id: FK to Idea table (INTEGER)
+        idea_id: Reference to Idea table (TEXT for flexibility)
         state: Current workflow state (next process name)
         created_at: Timestamp of creation
     
     Note:
-        - idea_id references the Idea table via FOREIGN KEY
+        - idea_id can be a string or numeric ID for flexibility
         - state stores the next process name (pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...)
         - Current title/script versions are implicit (highest version in respective tables)
         - state can be updated (UPDATE operation allowed)
@@ -52,16 +52,15 @@ class Story(IModel[int]):
         ```sql
         Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id INTEGER NULL,
+            idea_id TEXT NULL,
             state TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (idea_id) REFERENCES Idea(id)
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
         ```
     
     Example:
         >>> story = Story(
-        ...     idea_id=1,
+        ...     idea_id="1",
         ...     state=StoryState.TITLE_FROM_IDEA
         ... )
         >>> print(f"Story state: {story.state}")

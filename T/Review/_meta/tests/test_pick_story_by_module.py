@@ -273,8 +273,8 @@ class TestIntegration:
             if story is None:
                 break
             
-            # Update state to simulate processing
-            story.state = "PrismQ.T.Review.Title.Readability"
+            # Update state to simulate processing - use valid next state
+            story.state = "PrismQ.T.Story.Review"
             story_repository.update(story)
             processed.append(story.id)
         
