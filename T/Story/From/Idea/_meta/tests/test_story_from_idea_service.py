@@ -381,3 +381,64 @@ class TestStoryCreationResult:
         
         assert result.count == 0
         assert result.stories == []
+
+
+class TestWaitIntervalFunctions:
+    """Tests for the dynamic wait interval functions."""
+    
+    def test_get_wait_interval_zero_ideas(self):
+        """Test that 0 unreferenced ideas returns 30 seconds."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        assert get_wait_interval(0) == 30.0
+    
+    def test_get_wait_interval_one_idea(self):
+        """Test that 1 unreferenced idea returns ~1 second."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        assert get_wait_interval(1) == 1.0
+    
+    def test_get_wait_interval_hundred_ideas(self):
+        """Test that 100 unreferenced ideas returns 1 ms."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        assert get_wait_interval(100) == 0.001
+    
+    def test_get_wait_interval_many_ideas(self):
+        """Test that > 100 unreferenced ideas returns 1 ms."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        assert get_wait_interval(1000) == 0.001
+        assert get_wait_interval(500) == 0.001
+    
+    def test_get_wait_interval_fifty_ideas(self):
+        """Test that 50 unreferenced ideas returns ~0.5 seconds."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        interval = get_wait_interval(50)
+        assert 0.4 < interval < 0.6  # Approximately 0.5 seconds
+    
+    def test_get_wait_interval_gradual_increase(self):
+        """Test that interval increases as count decreases."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
+        
+        # Interval should increase as count decreases
+        assert get_wait_interval(99) < get_wait_interval(50)
+        assert get_wait_interval(50) < get_wait_interval(25)
+        assert get_wait_interval(25) < get_wait_interval(1)
+    
+    def test_format_wait_time_seconds(self):
+        """Test format_wait_time for values >= 1 second."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import format_wait_time
+        
+        assert format_wait_time(30.0) == "30.0 second(s)"
+        assert format_wait_time(1.0) == "1.0 second(s)"
+        assert format_wait_time(5.5) == "5.5 second(s)"
+    
+    def test_format_wait_time_milliseconds(self):
+        """Test format_wait_time for values < 1 second."""
+        from T.Story.From.Idea.src.story_from_idea_interactive import format_wait_time
+        
+        assert format_wait_time(0.001) == "1.0 ms"
+        assert format_wait_time(0.5) == "500.0 ms"
+        assert format_wait_time(0.1) == "100.0 ms"
