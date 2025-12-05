@@ -127,6 +127,9 @@ class StoryTitleService:
     """
     
     NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
+    NUM_VARIANTS = 10  # Number of title variants to generate
+    DEFAULT_SIMILARITY_THRESHOLD = 0.7  # Threshold for similarity detection
+    SIMILARITY_PENALTY = 0.1  # Score penalty per similar title found
     
     def __init__(
         self, 
@@ -280,14 +283,14 @@ class StoryTitleService:
         self,
         title_text: str,
         story: Story,
-        similarity_threshold: float = 0.7
+        similarity_threshold: float = None
     ) -> Tuple[bool, List[Tuple[str, float]]]:
         """Check if a title is unique enough compared to sibling titles.
         
         Args:
             title_text: The title text to check.
             story: The Story this title would belong to.
-            similarity_threshold: Maximum allowed similarity (default 0.7).
+            similarity_threshold: Maximum allowed similarity (default: DEFAULT_SIMILARITY_THRESHOLD).
             
         Returns:
             Tuple of:
@@ -295,6 +298,9 @@ class StoryTitleService:
                 - List of (similar_title, similarity_score) tuples for titles
                   that exceed the threshold.
         """
+        if similarity_threshold is None:
+            similarity_threshold = self.DEFAULT_SIMILARITY_THRESHOLD
+            
         sibling_titles = self.get_sibling_titles(story)
         similar_titles = []
         
@@ -310,7 +316,7 @@ class StoryTitleService:
         self,
         variants: List[TitleVariant],
         story: Story,
-        similarity_threshold: float = 0.7
+        similarity_threshold: float = None
     ) -> Tuple[TitleVariant, List[Tuple[str, float]]]:
         """Select the best title variant considering similarity to siblings.
         
@@ -322,7 +328,8 @@ class StoryTitleService:
         Args:
             variants: List of TitleVariant options.
             story: The Story to select a title for.
-            similarity_threshold: Maximum allowed similarity with siblings.
+            similarity_threshold: Maximum allowed similarity with siblings
+                                  (default: DEFAULT_SIMILARITY_THRESHOLD).
             
         Returns:
             Tuple of:
@@ -332,6 +339,9 @@ class StoryTitleService:
         if not variants:
             raise ValueError("No variants provided")
         
+        if similarity_threshold is None:
+            similarity_threshold = self.DEFAULT_SIMILARITY_THRESHOLD
+        
         # Score each variant considering uniqueness
         scored_variants = []
         for variant in variants:
@@ -339,7 +349,7 @@ class StoryTitleService:
                 variant.text, story, similarity_threshold
             )
             # Calculate adjusted score: base score minus penalty for similarity
-            similarity_penalty = len(similar_titles) * 0.1
+            similarity_penalty = len(similar_titles) * self.SIMILARITY_PENALTY
             adjusted_score = max(0.0, variant.score - similarity_penalty)
             scored_variants.append((variant, adjusted_score, similar_titles))
         
@@ -377,7 +387,7 @@ class StoryTitleService:
         
         # Generate title variants
         if idea:
-            variants = self._title_generator.generate_from_idea(idea, num_variants=10)
+            variants = self._title_generator.generate_from_idea(idea, num_variants=self.NUM_VARIANTS)
             if variants:
                 # Select best title considering similarity to sibling titles
                 best_variant, similar_titles = self.select_best_title(variants, story)

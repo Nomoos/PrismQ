@@ -498,9 +498,12 @@ def run_state_workflow_mode(db_path: str, preview: bool = False, debug: bool = F
         # Generate title variants
         print_section("Generating Title Variants")
         
+        # Use service constant for number of variants
+        num_variants = StoryTitleService.NUM_VARIANTS
+        
         if idea:
-            print_info(f"Generating 10 variants from Idea: '{idea.title[:50]}...'")
-            variants = generate_titles_from_idea(idea, num_variants=10)
+            print_info(f"Generating {num_variants} variants from Idea: '{idea.title[:50]}...'")
+            variants = generate_titles_from_idea(idea, num_variants=num_variants)
         else:
             # Fallback: create variants from scratch
             print_warning("No Idea data available, generating basic title")
