@@ -11,36 +11,13 @@ Note:
 Schema:
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        concept TEXT NOT NULL,
-        synopsis TEXT,
-        story_premise TEXT,
-        purpose TEXT,
-        emotional_quality TEXT,
-        target_audience TEXT,
-        target_demographics TEXT,  -- JSON string
-        target_platforms TEXT,     -- JSON string (list of platforms)
-        target_formats TEXT,       -- JSON string (list of formats)
-        genre TEXT,
-        style TEXT,
-        keywords TEXT,             -- JSON string (list of keywords)
-        themes TEXT,               -- JSON string (list of themes)
-        character_notes TEXT,
-        setting_notes TEXT,
-        tone_guidance TEXT,
-        length_target TEXT,
-        outline TEXT,
-        skeleton TEXT,
-        original_language TEXT DEFAULT 'en',
-        potential_scores TEXT,     -- JSON string
-        metadata TEXT,             -- JSON string
-        version INTEGER DEFAULT 1,
-        status TEXT DEFAULT 'draft',
-        notes TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        created_by TEXT
+        text TEXT,                                      -- Prompt-like text describing the idea
+        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
+
+The Idea table stores simple prompt-based idea data for content generation.
+Story references Idea via FK in Story.idea_id.
 """
 
 
@@ -50,13 +27,13 @@ class IdeaSchema:
     This class provides the SQL CREATE TABLE statement for the Idea table.
     It is designed to be used by SchemaManager for database initialization.
     
-    The Idea table stores creative content ideas that serve as the foundation
-    for the PrismQ content generation pipeline.
+    The Idea table stores simple prompt-based idea data that serves as
+    input for the PrismQ content generation pipeline. Story entities
+    reference Ideas via foreign key (Story.idea_id).
     
     Note:
         This class contains ONLY DDL operations - no business logic.
-        For the full Idea data model with business logic, see 
-        T/Idea/Model/src/idea.py
+        Version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
     
     Attributes:
         None - this is a schema-only class
@@ -76,47 +53,19 @@ class IdeaSchema:
             for idempotent operations.
         
         Note:
-            - The table uses TEXT type for JSON-serialized complex fields
-            - No foreign keys in this table (Idea is a base table)
-            - Includes indexes for common query patterns
+            - The table is a base table with no foreign key dependencies
+            - version uses INTEGER with CHECK >= 0 to simulate unsigned integer
+            - Story references this table via Story.idea_id FK
         """
         return """
         CREATE TABLE IF NOT EXISTS Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            concept TEXT NOT NULL,
-            synopsis TEXT,
-            story_premise TEXT,
-            purpose TEXT,
-            emotional_quality TEXT,
-            target_audience TEXT,
-            target_demographics TEXT,
-            target_platforms TEXT,
-            target_formats TEXT,
-            genre TEXT,
-            style TEXT,
-            keywords TEXT,
-            themes TEXT,
-            character_notes TEXT,
-            setting_notes TEXT,
-            tone_guidance TEXT,
-            length_target TEXT,
-            outline TEXT,
-            skeleton TEXT,
-            original_language TEXT DEFAULT 'en',
-            potential_scores TEXT,
-            metadata TEXT,
-            version INTEGER DEFAULT 1,
-            status TEXT DEFAULT 'draft',
-            notes TEXT,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            created_by TEXT
+            text TEXT,
+            version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
         
         -- Performance indexes for common query patterns
-        CREATE INDEX IF NOT EXISTS idx_idea_status ON Idea(status);
-        CREATE INDEX IF NOT EXISTS idx_idea_genre ON Idea(genre);
         CREATE INDEX IF NOT EXISTS idx_idea_created_at ON Idea(created_at);
         """
 

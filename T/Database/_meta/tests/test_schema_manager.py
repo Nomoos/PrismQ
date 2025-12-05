@@ -220,8 +220,6 @@ class TestTableSchemas:
         columns = [row[1] for row in info]
         
         assert "id" in columns
-        assert "title" in columns
-        assert "concept" in columns
-        assert "synopsis" in columns
-        assert "status" in columns
+        assert "text" in columns
+        assert "version" in columns
         assert "created_at" in columns
