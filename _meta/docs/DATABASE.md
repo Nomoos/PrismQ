@@ -281,6 +281,21 @@ PrismQ uses the Repository Pattern to separate domain models from data access lo
 | StoryRepository | Story | `T/Database/repositories/story_repository.py` |
 | StoryReviewRepository | StoryReview | `T/Database/repositories/story_review_repository.py` |
 
+### Version Query Methods
+
+All repositories that handle versioned entities provide consistent methods for querying the current (latest) version:
+
+**TitleRepository & ScriptRepository:**
+- `find_latest_version(story_id)` - Returns the entity with the highest version number (using `ORDER BY version DESC LIMIT 1`)
+- `get_current_title(story_id)` / `get_current_script(story_id)` - Convenience aliases for `find_latest_version()`
+
+**StoryReviewRepository:**
+- `find_latest_version(story_id)` - Returns the highest version number for a story's reviews
+- `find_latest_reviews(story_id)` - Returns all reviews for the latest version
+- `find_latest_review_by_type(story_id, review_type)` - Returns the latest review of a specific type
+- `get_current_story_reviews(story_id)` - Convenience alias for `find_latest_reviews()`
+- `get_current_story_review(story_id, review_type)` - Convenience alias for `find_latest_review_by_type()`
+
 ## Usage Examples
 
 ### Creating and Saving a Title
@@ -300,6 +315,10 @@ print(f"Saved with ID: {saved_title.id}")
 # Create next version (instead of updating)
 title_v1 = saved_title.create_next_version("10 Essential Tips for Python Excellence")
 repo.insert(title_v1)
+
+# Get current (latest) title for a story
+current_title = repo.get_current_title(story_id=1)
+print(f"Current title: {current_title.text}")
 ```
 
 ### Working with Story State
@@ -317,6 +336,21 @@ saved = repo.insert(story)
 # Update state (Story is the only entity that supports UPDATE)
 saved.transition_to(StoryState.TITLE_V0)
 repo.update(saved)
+```
+
+### Working with Story Reviews
+
+```python
+from T.Database.models.story_review import StoryReviewModel, ReviewType
+from T.Database.repositories.story_review_repository import StoryReviewRepository
+
+repo = StoryReviewRepository(db_connection)
+
+# Get all current reviews for a story
+current_reviews = repo.get_current_story_reviews(story_id=1)
+
+# Get the latest grammar review for a story
+grammar_review = repo.get_current_story_review(story_id=1, review_type=ReviewType.GRAMMAR)
 ```
 
 ## Testing

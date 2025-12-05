@@ -278,6 +278,36 @@ class TestTitleRepositoryIntegration:
         assert isinstance(found.created_at, datetime)
         # Compare down to second (microseconds may differ due to ISO format)
         assert found.created_at.date() == saved.created_at.date()
+    
+    # === GET_CURRENT_TITLE Tests ===
+    
+    def test_get_current_title(self, repo):
+        """Test get_current_title returns latest version."""
+        repo.insert(Title(story_id=1, version=0, text="Version 0"))
+        repo.insert(Title(story_id=1, version=1, text="Version 1"))
+        repo.insert(Title(story_id=1, version=2, text="Version 2"))
+        
+        current = repo.get_current_title(story_id=1)
+        
+        assert current is not None
+        assert current.version == 2
+        assert current.text == "Version 2"
+    
+    def test_get_current_title_no_titles(self, repo):
+        """Test get_current_title when no titles exist."""
+        current = repo.get_current_title(story_id=9999)
+        
+        assert current is None
+    
+    def test_get_current_title_single(self, repo):
+        """Test get_current_title with only one version."""
+        repo.insert(Title(story_id=1, version=0, text="Only Title"))
+        
+        current = repo.get_current_title(story_id=1)
+        
+        assert current is not None
+        assert current.version == 0
+        assert current.text == "Only Title"
 
 
 if __name__ == "__main__":
