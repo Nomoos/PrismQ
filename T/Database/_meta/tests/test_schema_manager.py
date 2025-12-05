@@ -164,9 +164,8 @@ class TestTableSchemas:
         
         assert "id" in columns
         assert "idea_id" in columns
-        assert "title_id" in columns
-        assert "script_id" in columns
         assert "state" in columns
+        assert "created_at" in columns
     
     def test_script_table_schema(self, db_connection):
         """Test Script table has correct columns."""

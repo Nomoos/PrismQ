@@ -56,7 +56,7 @@ class SchemaManager:
     Table Creation Order (respecting FK dependencies):
         1. Idea - base table (no FK dependencies)
         2. Review - base table (no FK dependencies)
-        3. Story - references Title/Script (nullable FKs)
+        3. Story - references Idea via idea_id (FK)
         4. Title - depends on Story and Review
         5. Script - depends on Story and Review
         6. StoryReview - depends on Story and Review
