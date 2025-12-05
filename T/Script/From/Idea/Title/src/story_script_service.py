@@ -271,7 +271,7 @@ class StoryScriptService:
             
             # Update the story with script reference and transition state
             story.script_id = saved_script.id
-            story.update_state(StateNames.REVIEW_TITLE_FROM_SCRIPT)
+            story.update_state(StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA)
             self.story_repo.update(story)
             
             # Populate result

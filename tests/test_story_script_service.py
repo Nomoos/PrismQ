@@ -616,6 +616,33 @@ class TestStoryScriptServiceStateBased:
         from datetime import timedelta
         
         service = StoryScriptService(db_connection)
+        story_repo = StoryRepository(db_connection)
+        
+        base_time = datetime.now()
+        
+        # Create story with wrong state (oldest)
+        story1 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state='CREATED',  # Wrong state
+            created_at=base_time - timedelta(hours=2)
+        )
+        story_repo.insert(story1)
+        
+        # Create story with correct state (newer)
+        story2 = Story(
+            idea_json=json.dumps(sample_idea.to_dict()),
+            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            created_at=base_time - timedelta(hours=1)
+        )
+        story_repo.insert(story2)
+        
+        result = service.get_oldest_story_by_state()
+        
+        assert result is not None
+        assert result.id == story2.id
+        assert result.state == StateNames.SCRIPT_FROM_IDEA_TITLE
+
+
 # =============================================================================
 # Tests for ScriptFromIdeaTitleService (PrismQ.T.Script.From.Idea.Title)
 # =============================================================================
@@ -683,7 +710,7 @@ class TestStoryRepositoryFindOldestByState:
         
         assert oldest is None
     
-    def test_find_oldest_by_state_ignores_other_states(self, db_connection):
+    def test_find_oldest_by_state_ignores_other_states(self, db_connection, sample_idea):
         """Test that find_oldest_by_state only considers the specified state."""
         from datetime import timedelta
         story_repo = StoryRepository(db_connection)
@@ -693,7 +720,7 @@ class TestStoryRepositoryFindOldestByState:
         # Create story with wrong state (oldest)
         story1 = Story(
             idea_json=json.dumps(sample_idea.to_dict()),
-            state='CREATED',  # Wrong state
+            state='DIFFERENT_STATE',  # Wrong state
             created_at=base_time - timedelta(hours=2)
         )
         story_repo.insert(story1)
@@ -701,16 +728,17 @@ class TestStoryRepositoryFindOldestByState:
         # Create story with correct state (newer)
         story2 = Story(
             idea_json=json.dumps(sample_idea.to_dict()),
-            state=StateNames.SCRIPT_FROM_IDEA_TITLE,
+            state=STATE_SCRIPT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=1)
         )
         story_repo.insert(story2)
         
-        result = service.get_oldest_story_by_state()
+        # Find oldest in target state
+        oldest = story_repo.find_oldest_by_state(STATE_SCRIPT_FROM_IDEA_TITLE)
         
-        assert result is not None
-        assert result.id == story2.id
-        assert result.state == StateNames.SCRIPT_FROM_IDEA_TITLE
+        assert oldest is not None
+        assert oldest.id == story2.id
+        assert oldest.state == STATE_SCRIPT_FROM_IDEA_TITLE
     
     def test_count_stories_by_state(self, db_connection, sample_idea):
         """Test counting stories with the correct state."""
@@ -747,9 +775,13 @@ class TestStoryRepositoryFindOldestByState:
     
     def test_process_oldest_story_success(self, db_connection, sample_idea):
         """Test successful processing of the oldest story."""
+        from datetime import timedelta
+        
         service = StoryScriptService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
+        
+        base_time = datetime.now()
         
         # Create story with correct state
         story = Story(
@@ -758,27 +790,26 @@ class TestStoryRepositoryFindOldestByState:
         )
         story_repo.insert(story)
         
-        # Create very old story in different state
-        story_different = Story(
-            idea_json='{"title": "Very Old Different State"}',
-            state='DIFFERENT_STATE',
-            created_at=base_time - timedelta(hours=10)
-        )
-        story_repo.insert(story_different)
+        # Add title reference to make the story complete
+        title = title_repo.insert(Title(
+            story_id=story.id,
+            version=0,
+            text="Test Title"
+        ))
+        story.title_id = title.id
+        story_repo.update(story)
         
-        # Create newer story in target state
-        story_target = Story(
-            idea_json='{"title": "Target State"}',
-            state=STATE_SCRIPT_FROM_IDEA_TITLE,
-            created_at=base_time
-        )
-        story_repo.insert(story_target)
+        # Process
+        result = service.process_oldest_story()
         
-        # Find oldest in target state
-        oldest = story_repo.find_oldest_by_state(STATE_SCRIPT_FROM_IDEA_TITLE)
+        assert result is not None
+        assert result.success is True
+        assert result.script_id is not None
         
-        assert oldest is not None
-        assert oldest.id == story_target.id
+        # Verify state changed to REVIEW_TITLE_FROM_SCRIPT_IDEA
+        updated_story = story_repo.find_by_id(story.id)
+        assert updated_story.state == StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA
+        assert updated_story.script_id == result.script_id
 
 
 class TestScriptFromIdeaTitleService:
@@ -881,7 +912,7 @@ class TestScriptFromIdeaTitleService:
         
         # Verify state changed
         updated_story = story_repo.find_by_id(story.id)
-        assert updated_story.state == StateNames.REVIEW_TITLE_FROM_SCRIPT
+        assert updated_story.state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
         assert updated_story.script_id == result.script_id
     
     def test_process_oldest_story_missing_idea(self, db_connection):
@@ -966,22 +997,7 @@ class TestScriptFromIdeaTitleService:
         # Verify all states changed
         for story in stories:
             updated = story_repo.find_by_id(story.id)
-            assert updated.state == StateNames.REVIEW_TITLE_FROM_SCRIPT
-        # Process the story
-        result = service.process_oldest_story()
-        
-        assert result.success is True
-        assert result.story_id == story.id
-        assert result.script_id is not None
-        assert result.previous_state == STATE_SCRIPT_FROM_IDEA_TITLE
-        assert result.new_state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
-        assert result.script_v1 is not None
-        assert result.error is None
-        
-        # Verify story state was updated
-        updated_story = story_repo.find_by_id(story.id)
-        assert updated_story.state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
-        assert updated_story.script_id == result.script_id
+            assert updated.state == StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA
     
     def test_process_oldest_story_no_stories(self, db_connection):
         """Test processing when no stories are pending."""
