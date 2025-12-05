@@ -19,12 +19,16 @@ Note:
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
 from Model.entities.base import IModel
 
 # Import StoryState from the unified state constants module
 from Model.state import StoryState
+
+if TYPE_CHECKING:
+    from Model.repositories.title_repository import TitleRepository
+    from Model.repositories.script_repository import ScriptRepository
 
 
 @dataclass
@@ -211,6 +215,61 @@ class Story(IModel[int]):
             bool: True if idea_id is set.
         """
         return bool(self.idea_id)
+    
+    def has_title(self, title_repo: "TitleRepository") -> bool:
+        """Check if this story has a title generated.
+        
+        Queries the Title table to check if any title exists for this story.
+        
+        Args:
+            title_repo: TitleRepository instance to query titles.
+            
+        Returns:
+            bool: True if at least one title exists for this story.
+        """
+        if self.id is None:
+            return False
+        return title_repo.find_latest_version(self.id) is not None
+    
+    def has_script(self, script_repo: "ScriptRepository") -> bool:
+        """Check if this story has a script generated.
+        
+        Queries the Script table to check if any script exists for this story.
+        
+        Args:
+            script_repo: ScriptRepository instance to query scripts.
+            
+        Returns:
+            bool: True if at least one script exists for this story.
+        """
+        if self.id is None:
+            return False
+        return script_repo.find_latest_version(self.id) is not None
+    
+    def needs_script(
+        self,
+        title_repo: "TitleRepository",
+        script_repo: "ScriptRepository"
+    ) -> bool:
+        """Check if this story needs a script to be generated.
+        
+        A story needs a script if:
+        - It has an idea (idea_id is set)
+        - It has a title (title exists in Title table)
+        - It does not have a script (no script in Script table)
+        
+        Args:
+            title_repo: TitleRepository instance to check for titles.
+            script_repo: ScriptRepository instance to check for scripts.
+            
+        Returns:
+            bool: True if story is ready for script generation.
+        """
+        return (
+            self.has_idea() and
+            self.has_title(title_repo) and
+            not self.has_script(script_repo)
+        )
     
     def update_state(self, new_state: str) -> None:
         """Update the workflow state.
