@@ -93,6 +93,9 @@ except ImportError:
 # Import database models and repositories
 from T.Database.models.story import Story, StoryState
 from T.Database.models.title import Title
+from T.Database.models.script import Script
+from T.Database.models.review import Review
+from T.Database.models.story_review import StoryReviewModel
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.title_repository import TitleRepository
 
@@ -174,6 +177,10 @@ class StoryTitleService:
         self._story_repo = StoryRepository(connection) if connection else None
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
+        
+        # Ensure required tables exist when connection is provided
+        if connection:
+            self.ensure_tables_exist()
         
         # Initialize AI title generator if requested and available
         self._use_ai = use_ai
@@ -716,7 +723,19 @@ class StoryTitleService:
         return f"idea-{concept_hash}"
     
     def ensure_tables_exist(self) -> None:
-        """Ensure Story and Title tables exist in the database.
+        """Ensure all required database tables exist.
+        
+        Creates the following tables in the correct order:
+        1. Review - base table (no FK dependencies)
+        2. Story - references Title/Script but those are NULL initially
+        3. Title - depends on Story and Review
+        4. Script - depends on Story and Review
+        5. StoryReview - depends on Story and Review
+        
+        Note: Story has FK references to Title and Script, but these columns
+        are nullable and populated after the referenced records are created.
+        SQLite does not enforce FK constraints by default (PRAGMA foreign_keys = OFF),
+        so the circular dependency between Story<->Title/Script is handled correctly.
         
         Call this method to create the required tables if they don't exist.
         Only works when a database connection was provided.
@@ -727,11 +746,26 @@ class StoryTitleService:
         if not self._conn:
             raise RuntimeError("No database connection available")
         
-        # Create Story table
+        # Create tables in order of dependencies
+        # Note: SQLite FK constraints are not enforced by default,
+        # so we can create Story before Title/Script even though
+        # Story has FK references to them (nullable columns).
+        
+        # 1. Review table (no FK dependencies)
+        self._conn.executescript(Review.get_sql_schema())
+        
+        # 2. Story table (FK to Title/Script are nullable, created later)
         self._conn.executescript(Story.get_sql_schema())
         
-        # Create Title table using Title model's schema
+        # 3. Title table (depends on Story and Review)
         self._conn.executescript(Title.get_sql_schema())
+        
+        # 4. Script table (depends on Story and Review)
+        self._conn.executescript(Script.get_sql_schema())
+        
+        # 5. StoryReview linking table (depends on Story and Review)
+        self._conn.executescript(StoryReviewModel.get_sql_schema())
+        
         self._conn.commit()
 
 
