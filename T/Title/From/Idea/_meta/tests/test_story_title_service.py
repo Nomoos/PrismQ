@@ -618,3 +618,76 @@ class TestTitleUniquenessWithDatabase:
         # Should select highest scoring variant (Option C with 0.9)
         assert best.text == "Option C Title"
         assert best.score == 0.9
+    
+    def test_select_best_title_skips_similar(self, db_connection):
+        """Test that select_best_title skips similar titles and picks next best."""
+        from title_generator import TitleVariant
+        from T.Database.models.title import Title
+        from T.Database.repositories.title_repository import TitleRepository
+        
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test",
+            concept="Testing skip similar",
+            status=IdeaStatus.DRAFT
+        )
+        
+        result = service.create_stories_with_titles(idea)
+        first_story = result.stories[0]
+        second_story = result.stories[1]
+        
+        # Get existing title from first story (sibling of second)
+        title_repo = TitleRepository(db_connection)
+        existing_title = title_repo.find_by_story_id(first_story.id)[0]
+        
+        # Create variants where highest-scored is similar to existing sibling title
+        variants = [
+            TitleVariant(text="Completely Different Unique Title", style="direct", length=33, keywords=["different"], score=0.8),
+            TitleVariant(text="Another Unique Option", style="question", length=21, keywords=["another"], score=0.85),
+            TitleVariant(text=existing_title.text, style="how-to", length=len(existing_title.text), keywords=["test"], score=0.95),  # Highest score but identical to sibling
+        ]
+        
+        best, similar = service.select_best_title(variants, second_story)
+        
+        # Should NOT select highest scoring variant because it's identical to sibling
+        # Instead should select "Another Unique Option" (0.85) - second best that is unique
+        assert best.text == "Another Unique Option"
+        assert best.score == 0.85
+    
+    def test_select_best_title_fallback_when_all_similar(self, db_connection):
+        """Test that select_best_title falls back to best when all are similar."""
+        from title_generator import TitleVariant
+        from T.Database.models.title import Title
+        from T.Database.repositories.title_repository import TitleRepository
+        
+        service = StoryTitleService(db_connection)
+        service.ensure_tables_exist()
+        
+        idea = Idea(
+            title="Test",
+            concept="Testing fallback",
+            status=IdeaStatus.DRAFT
+        )
+        
+        result = service.create_stories_with_titles(idea)
+        first_story = result.stories[0]
+        second_story = result.stories[1]
+        
+        # Get existing title from first story
+        title_repo = TitleRepository(db_connection)
+        existing_title = title_repo.find_by_story_id(first_story.id)[0]
+        
+        # All variants are similar to existing title (same words, different order)
+        existing_words = existing_title.text.split()
+        variants = [
+            TitleVariant(text=existing_title.text, style="direct", length=len(existing_title.text), keywords=["test"], score=0.9),
+            TitleVariant(text=existing_title.text, style="question", length=len(existing_title.text), keywords=["test"], score=0.85),
+            TitleVariant(text=existing_title.text, style="how-to", length=len(existing_title.text), keywords=["test"], score=0.8),
+        ]
+        
+        best, similar = service.select_best_title(variants, second_story)
+        
+        # Should fall back to highest scored since all are similar
+        assert best.score == 0.9

@@ -129,7 +129,6 @@ class StoryTitleService:
     NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
     NUM_VARIANTS = 10  # Number of title variants to generate
     DEFAULT_SIMILARITY_THRESHOLD = 0.7  # Threshold for similarity detection
-    SIMILARITY_PENALTY = 0.1  # Score penalty per similar title found
     
     def __init__(
         self, 
@@ -318,12 +317,14 @@ class StoryTitleService:
         story: Story,
         similarity_threshold: float = None
     ) -> Tuple[TitleVariant, List[Tuple[str, float]]]:
-        """Select the best title variant considering similarity to siblings.
+        """Select the best title variant that is not too similar to siblings.
         
         Selection criteria:
-        1. Filter out titles too similar to existing sibling titles
-        2. From remaining, select by highest score
-        3. If all are too similar, return highest scored with similarity info
+        1. Sort variants by score (highest first)
+        2. Check each variant for similarity to existing sibling titles
+        3. If best title is too similar, remove it and try second best
+        4. Repeat until a unique title is found or all exhausted
+        5. If all are too similar, return the highest scored as fallback
         
         Args:
             variants: List of TitleVariant options.
@@ -342,23 +343,29 @@ class StoryTitleService:
         if similarity_threshold is None:
             similarity_threshold = self.DEFAULT_SIMILARITY_THRESHOLD
         
-        # Score each variant considering uniqueness
-        scored_variants = []
-        for variant in variants:
+        # Sort variants by original score (highest first)
+        sorted_variants = sorted(variants, key=lambda v: v.score, reverse=True)
+        
+        # Track the best variant as fallback (highest score, even if similar)
+        fallback_variant = sorted_variants[0]
+        fallback_similar_titles = []
+        
+        # Iterate through variants in score order, pick first unique one
+        for variant in sorted_variants:
             is_unique, similar_titles = self.check_title_uniqueness(
                 variant.text, story, similarity_threshold
             )
-            # Calculate adjusted score: base score minus penalty for similarity
-            similarity_penalty = len(similar_titles) * self.SIMILARITY_PENALTY
-            adjusted_score = max(0.0, variant.score - similarity_penalty)
-            scored_variants.append((variant, adjusted_score, similar_titles))
+            
+            # Keep track of fallback info from best variant
+            if variant == fallback_variant:
+                fallback_similar_titles = similar_titles
+            
+            # If this title is unique enough, select it
+            if is_unique:
+                return variant, similar_titles
         
-        # Sort by adjusted score (highest first)
-        scored_variants.sort(key=lambda x: x[1], reverse=True)
-        
-        # Return best variant with similarity info
-        best_variant, _, similar_titles = scored_variants[0]
-        return best_variant, similar_titles
+        # All variants are too similar - return the highest scored as fallback
+        return fallback_variant, fallback_similar_titles
     
     def generate_title_for_story(
         self,
