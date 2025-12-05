@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Interactive Title Generation CLI for PrismQ.
+"""Title Generation CLI for PrismQ (AI-powered).
 
-This script provides an interactive mode for generating titles from ideas.
-It waits for user input, processes it through the title variant system, and
-optionally saves to the database.
+This script provides title generation from ideas using local AI (Ollama).
+AI is REQUIRED - no template-based fallback is available.
 
 Usage:
-    python title_from_idea_interactive.py                    # Interactive mode with DB save
+    python title_from_idea_interactive.py                    # Continuous mode (default)
     python title_from_idea_interactive.py --preview          # Preview mode (no DB save)
-    python title_from_idea_interactive.py --preview --debug  # Debug mode with extensive logging
+    python title_from_idea_interactive.py --interactive      # Interactive mode (manual input)
 
 Modes:
-    Default: Creates titles and saves to database
+    Default (Continuous): Auto-processes Stories from database without user input
+    Interactive: Manual input mode for testing single ideas
     Preview: Creates titles for testing without saving (extensive logging)
+
+Requirements:
+    - Ollama must be running with qwen2.5:14b-instruct model
+    - AI is required - script will fail if Ollama is unavailable
 """
 
 import sys
@@ -372,60 +376,60 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print(f"  Concept: {concept_preview}")
         print(f"  Genre: {idea.genre.value if hasattr(idea.genre, 'value') else idea.genre}")
         
-        # Generate title variants
+        # Generate title variants using AI (required - no fallback)
         print_section("Generating Title Variants")
         
         titles = []
         ai_generator = None
-        use_ai = False
         
-        # Try to use AI title generator (Ollama) if available
-        if AI_TITLE_GENERATOR_AVAILABLE:
-            try:
-                ai_generator = AITitleGenerator()
-                if ai_generator.is_available():
-                    use_ai = True
-                    print_success("AI title generation available (Ollama)")
-                    if logger:
-                        logger.info("AI title generation available via Ollama")
-                else:
-                    print_warning("AI (Ollama) not available - using template-based generation")
-                    if logger:
-                        logger.warning("Ollama not available, falling back to template-based generation")
-            except Exception as e:
-                print_warning(f"AI generator init failed: {e} - using template-based generation")
-                if logger:
-                    logger.warning(f"AI generator initialization failed: {e}")
-        else:
-            print_warning("AI title generator module not available - using template-based generation")
+        # AI title generator is required - no fallback to template-based generation
+        if not AI_TITLE_GENERATOR_AVAILABLE:
+            print_error("AI title generator module not available")
+            print_error("AI generation is required - no fallback available")
             if logger:
-                logger.warning("AI title generator module not imported")
+                logger.error("AI title generator module not imported - cannot proceed")
+            raise AIGenUnavailableError("AI title generator module not available")
+        
+        try:
+            ai_generator = AITitleGenerator()
+            if not ai_generator.is_available():
+                print_error("AI (Ollama) not available")
+                print_error("Please ensure Ollama is running with the required model")
+                print_info("  1. Start Ollama: ollama serve")
+                print_info("  2. Pull model: ollama pull qwen2.5:14b-instruct")
+                if logger:
+                    logger.error("Ollama not available - cannot proceed")
+                raise AIGenUnavailableError("Ollama not available - AI is required for title generation")
+            
+            print_success("AI title generation available (Ollama)")
+            if logger:
+                logger.info("AI title generation available via Ollama")
+                
+        except AIGenUnavailableError:
+            raise  # Re-raise AIGenUnavailableError
+        except Exception as e:
+            print_error(f"AI generator init failed: {e}")
+            if logger:
+                logger.error(f"AI generator initialization failed: {e}")
+            raise AIGenUnavailableError(f"AI generator initialization failed: {e}") from e
         
         try:
             print_info(f"Creating 10 title variants...")
             if logger:
                 logger.info("Creating 10 title variants")
             
-            if use_ai:
-                # Use AI-powered title generation via Ollama
-                print_info("Using local AI (Ollama) for title generation...")
-                if logger:
-                    logger.info("Generating titles using AI (Ollama)")
-                try:
-                    titles = ai_generator.generate_from_idea(idea, num_variants=10)
-                except AIGenUnavailableError as ai_err:
-                    # AI became unavailable during generation - fall back to template
-                    print_warning(f"AI generation failed: {ai_err}")
-                    print_warning("Falling back to template-based generation...")
-                    if logger:
-                        logger.warning(f"AI generation failed: {ai_err}, falling back to template")
-                    config = TitleConfig(num_variants=10)
-                    titles = generate_titles_from_idea(idea, num_variants=10, config=config)
-            else:
-                # Fallback to template-based generation
-                config = TitleConfig(num_variants=10)
-                titles = generate_titles_from_idea(idea, num_variants=10, config=config)
+            # Use AI-powered title generation via Ollama (required)
+            print_info("Using local AI (Ollama) for title generation...")
+            if logger:
+                logger.info("Generating titles using AI (Ollama)")
+            titles = ai_generator.generate_from_idea(idea, num_variants=10)
                 
+        except AIGenUnavailableError as ai_err:
+            print_error(f"AI generation failed: {ai_err}")
+            print_error("AI is required - no fallback available")
+            if logger:
+                logger.error(f"AI generation failed: {ai_err}")
+            raise
         except Exception as e:
             print_error(f"Error creating title variants: {e}")
             if logger:
@@ -756,19 +760,21 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(
-        description='Interactive Title Generation from Idea for PrismQ',
+        description='Title Generation from Idea for PrismQ (AI-powered)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Interactive mode (manual input)
-  python title_from_idea_interactive.py                    # Interactive mode with DB save
-  python title_from_idea_interactive.py --preview          # Preview mode (no DB save)
-  python title_from_idea_interactive.py --preview --debug  # Debug mode with extensive logging
+  # Continuous mode (default - automatic processing without user input)
+  python title_from_idea_interactive.py                    # Process Stories from default DB
+  python title_from_idea_interactive.py --db /path/to/db.s3db  # Use custom DB
+  python title_from_idea_interactive.py --preview          # Preview without saving
   
-  # State-based workflow mode (automatic processing)
-  python title_from_idea_interactive.py --run              # Process Stories from default DB
-  python title_from_idea_interactive.py --run --db /path/to/db.s3db  # Use custom DB
-  python title_from_idea_interactive.py --run --preview    # Preview without saving
+  # Interactive mode (manual input)
+  python title_from_idea_interactive.py --interactive      # Interactive mode with DB save
+  python title_from_idea_interactive.py --interactive --preview  # Preview mode (no DB save)
+  python title_from_idea_interactive.py --interactive --debug    # Debug mode with extensive logging
+
+Note: AI (Ollama) is REQUIRED for title generation. No template fallback available.
         """
     )
     
@@ -776,17 +782,18 @@ Examples:
                        help='Preview mode - do not save to database')
     parser.add_argument('--debug', '-d', action='store_true',
                        help='Enable debug logging (extensive output)')
-    parser.add_argument('--run', '-r', action='store_true',
-                       help='Run state-based workflow mode (auto-process Stories)')
+    parser.add_argument('--interactive', '-i', action='store_true',
+                       help='Run interactive mode (manual input instead of continuous)')
     parser.add_argument('--db', type=str, default=None,
                        help='Path to SQLite database (default: from Config or C:/PrismQ/db.s3db)')
     
     args = parser.parse_args()
     
-    if args.run:
-        return run_state_workflow_mode(args.db, preview=args.preview, debug=args.debug)
-    else:
+    if args.interactive:
         return run_interactive_mode(preview=args.preview, debug=args.debug)
+    else:
+        # Default: continuous mode (auto-process Stories without user input)
+        return run_state_workflow_mode(args.db, preview=args.preview, debug=args.debug)
 
 
 if __name__ == '__main__':
