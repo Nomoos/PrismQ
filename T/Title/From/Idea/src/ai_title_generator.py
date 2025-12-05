@@ -3,15 +3,18 @@
 This module provides AI generation capabilities for creating title variants
 from Ideas using local LLM models (Qwen2.5-14B-Instruct) through Ollama API.
 Optimized for RTX 5090 and other high-end GPUs.
+
+Prompts are stored as separate text files in _meta/prompts/ for easier
+maintenance and editing.
 """
 
 import json
 import requests
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 import logging
 import sys
-from pathlib import Path
 
 # Add parent directories to path for imports
 current_file = Path(__file__)
@@ -24,6 +27,29 @@ from idea import Idea, ContentGenre
 from title_generator import TitleVariant, TitleConfig
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# PROMPT FILE LOADING
+# =============================================================================
+
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
+
+
+def _load_prompt(filename: str) -> str:
+    """Load a prompt from the prompts directory.
+    
+    Args:
+        filename: Name of the prompt file (e.g., 'title_generation.txt')
+        
+    Returns:
+        The prompt text content
+        
+    Raises:
+        FileNotFoundError: If the prompt file doesn't exist
+    """
+    prompt_path = _PROMPTS_DIR / filename
+    return prompt_path.read_text(encoding="utf-8")
 
 
 class AIUnavailableError(Exception):
@@ -64,47 +90,6 @@ class AITitleGenerator:
     Falls back to template-based generation if Ollama is unavailable.
     """
     
-    # Default prompt template for title generation
-    DEFAULT_PROMPT_TEMPLATE = """You are an expert content strategist and SEO specialist. Generate {num_variants} unique, compelling title variants for the following content idea.
-
-IDEA INFORMATION:
-- Title/Topic: {title}
-- Concept: {concept}
-- Genre: {genre}
-- Keywords: {keywords}
-- Themes: {themes}
-
-REQUIREMENTS:
-1. Each title must be unique and distinct from the others
-2. Titles should be 20-100 characters long
-3. Optimize for engagement and clickability
-4. Include relevant keywords naturally
-5. Use different title styles:
-   - Direct/straightforward
-   - Question-based
-   - How-to/actionable
-   - Curiosity-inducing
-   - Authoritative/expert
-   - Listicle/numbered
-   - Problem-solution
-   - Comparison
-   - Ultimate guide
-   - Benefit-focused
-
-For each title, provide a JSON object with:
-- "text": The title text (string)
-- "style": The style used (string: direct, question, how-to, curiosity, authoritative, listicle, problem-solution, comparison, ultimate-guide, benefit)
-- "score": Quality score 0.0-1.0 based on engagement potential (float)
-- "keywords": Relevant keywords in this title (array of strings)
-
-Format your response as a JSON array of {num_variants} objects.
-Return ONLY the JSON array, no additional text or explanation.
-
-Example format:
-[
-  {{"text": "Example Title Here", "style": "direct", "score": 0.85, "keywords": ["keyword1", "keyword2"]}}
-]"""
-
     def __init__(self, config: Optional[AITitleConfig] = None):
         """Initialize AI title generator with configuration.
         
@@ -166,9 +151,11 @@ Example format:
         """Get the current prompt template.
         
         Returns:
-            The current prompt template (custom or default)
+            The current prompt template (custom or default from file)
         """
-        return self._custom_prompt_template or self.DEFAULT_PROMPT_TEMPLATE
+        if self._custom_prompt_template:
+            return self._custom_prompt_template
+        return _load_prompt("title_generation.txt")
     
     def generate_from_idea(
         self,

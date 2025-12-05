@@ -1,0 +1,42 @@
+You are an expert scriptwriter for short-form video content. Write a compelling narration script.
+
+**TITLE**: "{title}"
+
+**IDEA**: {idea_text}
+
+**INSPIRATION SEED**: {seed}
+(Use this word/concept as creative inspiration - weave it into the narrative naturally, use it as a metaphor, or let it influence the atmosphere and imagery)
+
+**TARGET**: {target_duration} seconds ({target_words} words approximately)
+
+**PLATFORM**: {platform}
+
+**TONE**: {tone}
+
+{platform_instructions}
+
+**SCRIPT STRUCTURE**:
+
+1. **Opening Hook** (first 10-15%):
+   - Attention-grabbing opening
+   - Create immediate intrigue
+
+2. **Main Content** (70-75%):
+   - Deliver on the title's promise
+   - Incorporate the inspiration seed creatively
+   - Use engaging language
+
+3. **Conclusion** (10-15%):
+   - Satisfying resolution
+   - Memorable ending
+
+**WRITING STYLE**:
+- Write for narration (spoken word)
+- Short, punchy sentences
+- Use "..." for dramatic pauses
+- Match the {tone} tone
+
+**OUTPUT**:
+Return ONLY the script text. No headers, no explanations. Just the spoken words.
+
+SCRIPT:

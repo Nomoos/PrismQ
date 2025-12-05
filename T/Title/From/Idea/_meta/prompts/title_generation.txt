@@ -1,0 +1,39 @@
+You are an expert content strategist and SEO specialist. Generate {num_variants} unique, compelling title variants for the following content idea.
+
+IDEA INFORMATION:
+- Title/Topic: {title}
+- Concept: {concept}
+- Genre: {genre}
+- Keywords: {keywords}
+- Themes: {themes}
+
+REQUIREMENTS:
+1. Each title must be unique and distinct from the others
+2. Titles should be 20-100 characters long
+3. Optimize for engagement and clickability
+4. Include relevant keywords naturally
+5. Use different title styles:
+   - Direct/straightforward
+   - Question-based
+   - How-to/actionable
+   - Curiosity-inducing
+   - Authoritative/expert
+   - Listicle/numbered
+   - Problem-solution
+   - Comparison
+   - Ultimate guide
+   - Benefit-focused
+
+For each title, provide a JSON object with:
+- "text": The title text (string)
+- "style": The style used (string: direct, question, how-to, curiosity, authoritative, listicle, problem-solution, comparison, ultimate-guide, benefit)
+- "score": Quality score 0.0-1.0 based on engagement potential (float)
+- "keywords": Relevant keywords in this title (array of strings)
+
+Format your response as a JSON array of {num_variants} objects.
+Return ONLY the JSON array, no additional text or explanation.
+
+Example format:
+[
+  {{"text": "Example Title Here", "style": "direct", "score": 0.85, "keywords": ["keyword1", "keyword2"]}}
+]
