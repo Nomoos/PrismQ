@@ -4,6 +4,8 @@ REM Preview mode - does NOT save to database, extensive logging enabled
 REM
 REM Usage: Preview.bat
 REM
+REM Requires: Ollama must be running for AI-powered idea generation
+REM
 REM Features:
 REM   - Creates ideas from text input
 REM   - Does NOT save to database
@@ -15,6 +17,10 @@ REM   Dependencies: T\Idea\Creation\requirements.txt
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
+
+REM Start Ollama if not running
+call ..\common\start_ollama.bat
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 REM Setup Python virtual environment
 call :setup_env
