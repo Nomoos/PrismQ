@@ -1,23 +1,24 @@
-"""Concrete repository implementations for PrismQ database entities.
+"""TitleRepository - SQLite implementation for Title entities.
 
-This module provides SQLite implementations of the repository interfaces
-defined in base.py, following the Repository Pattern for data access.
+This module provides SQLite implementations of the IVersionedRepository interface
+for Title entities, handling SQL DML (Data Manipulation Language) operations
+only: SELECT, INSERT.
 
-Implementations:
-    - TitleRepository: IVersionedRepository for Title entities
-    - (Future) ScriptRepository: IVersionedRepository for Script entities
-    - (Future) StoryRepository: IUpdatableRepository for Story entities
+Note:
+    This repository does NOT handle schema creation (DDL). Use SchemaManager
+    from T.Database.schema_manager for database initialization.
 
 Usage:
     >>> import sqlite3
+    >>> from T.Database.schema_manager import initialize_database
     >>> from T.Database.repositories.title_repository import TitleRepository
     >>> from T.Database.models.title import Title
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
-    >>> repo = TitleRepository(conn)
+    >>> initialize_database(conn)  # Creates schema
     >>> 
-    >>> # Insert new title
+    >>> repo = TitleRepository(conn)
     >>> title = Title(story_id=1, version=0, text="My Title")
     >>> saved = repo.insert(title)
     >>> 
@@ -36,19 +37,27 @@ from ..models.title import Title
 class TitleRepository(IVersionedRepository[Title, int]):
     """SQLite implementation of IVersionedRepository for Title entities.
     
-    This repository handles all database operations for Title entities
-    following the INSERT+READ only pattern. New versions are created
-    instead of updating existing rows.
+    This repository handles SQL DML (Data Manipulation Language) operations
+    for Title entities following the INSERT+READ only pattern. New versions
+    are created instead of updating existing rows.
+    
+    Note:
+        This repository does NOT create database tables. Schema initialization
+        must be performed separately using SchemaManager.initialize_schema()
+        before using this repository.
     
     Attributes:
         _conn: SQLite database connection with Row factory enabled.
     
     Example:
+        >>> import sqlite3
+        >>> from T.Database.schema_manager import initialize_database
+        >>> 
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
-        >>> repo = TitleRepository(conn)
+        >>> initialize_database(conn)  # Create schema first
         >>> 
-        >>> # Create initial title
+        >>> repo = TitleRepository(conn)
         >>> title = Title(story_id=1, version=0, text="Original Title")
         >>> saved = repo.insert(title)
         >>> 
@@ -67,6 +76,11 @@ class TitleRepository(IVersionedRepository[Title, int]):
         Args:
             connection: SQLite connection with row_factory = sqlite3.Row
                 recommended for dictionary-like row access.
+                
+        Note:
+            The database schema must be initialized before using this
+            repository. Use SchemaManager.initialize_schema() to create
+            the required tables.
         """
         self._conn = connection
     
