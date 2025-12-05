@@ -578,7 +578,7 @@ def run_state_workflow_mode(db_path: Optional[str] = None, preview: bool = False
                     logger.warning(f"Failed to parse idea_json: {e}")
         
         # If no idea_json, fetch from Idea database using story.idea_id
-        if idea is None and story.idea_id:
+        if idea is None and story.idea_id is not None:
             try:
                 idea_id = int(story.idea_id)
                 idea_dict = idea_db.get_idea(idea_id)
@@ -586,8 +586,14 @@ def run_state_workflow_mode(db_path: Optional[str] = None, preview: bool = False
                     # Create Idea object from SimpleIdea data
                     idea_text = idea_dict.get('text', '')
                     if idea_text and IDEA_MODEL_AVAILABLE:
+                        # Truncate title to reasonable length (max 100 chars)
+                        MAX_TITLE_LENGTH = 100
+                        if len(idea_text) <= MAX_TITLE_LENGTH:
+                            title = idea_text
+                        else:
+                            title = idea_text[:MAX_TITLE_LENGTH - 3] + "..."
                         idea = Idea(
-                            title=idea_text[:100] if len(idea_text) <= 100 else idea_text[:97] + "...",
+                            title=title,
                             concept=idea_text,
                             genre=ContentGenre.OTHER
                         )

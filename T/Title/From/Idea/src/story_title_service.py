@@ -487,8 +487,8 @@ class StoryTitleService:
         # Idea is required for AI title generation - no fallback
         if not idea:
             raise ValueError(
-                f"Idea is required for AI title generation (Story ID: {story.id}). "
-                "Ensure the Idea database is accessible and story.idea_id is valid."
+                f"Idea object is required for AI title generation (Story ID: {story.id}). "
+                "The caller must provide a valid Idea object."
             )
         
         # Generate title variants using AI (will raise AIUnavailableError if AI is unavailable)
