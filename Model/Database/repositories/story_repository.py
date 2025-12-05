@@ -19,11 +19,8 @@ Usage:
     >>> initialize_database(conn)  # Creates schema
     >>> 
     >>> repo = StoryRepository(conn)
-    >>> story = Story(idea_json='{"title": "Test", "concept": "Test concept"}')
+    >>> story = Story(idea_id=1, state="PrismQ.T.Title.From.Idea")
     >>> saved = repo.insert(story)
-    >>> 
-    >>> # Find stories needing scripts
-    >>> stories = repo.find_needing_script()
 """
 
 import sqlite3
@@ -66,7 +63,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         >>> initialize_database(conn)  # Create schema first
         >>> 
         >>> repo = StoryRepository(conn)
-        >>> story = Story(idea_json='{"title": "Test"}')
+        >>> story = Story(idea_id=1)
         >>> saved = repo.insert(story)
         >>> print(saved.id)  # Auto-generated ID
     """
@@ -98,7 +95,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             Story if found, None otherwise.
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story WHERE id = ?",
             (id,)
         )
@@ -116,7 +113,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             List of all Story entities, ordered by id.
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story ORDER BY id"
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
@@ -155,13 +152,10 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         """
         try:
             cursor = self._conn.execute(
-                "INSERT INTO Story (idea_id, idea_json, title_id, script_id, state, created_at, updated_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO Story (idea_id, state, created_at, updated_at) "
+                "VALUES (?, ?, ?, ?)",
                 (
                     entity.idea_id,
-                    entity.idea_json,
-                    entity.title_id,
-                    entity.script_id,
                     entity.state,
                     entity.created_at.isoformat(),
                     entity.updated_at.isoformat()
@@ -251,13 +245,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         
         try:
             self._conn.execute(
-                "UPDATE Story SET idea_id = ?, idea_json = ?, title_id = ?, script_id = ?, "
-                "state = ?, updated_at = ? WHERE id = ?",
+                "UPDATE Story SET idea_id = ?, state = ?, updated_at = ? WHERE id = ?",
                 (
                     entity.idea_id,
-                    entity.idea_json,
-                    entity.title_id,
-                    entity.script_id,
                     entity.state,
                     entity.updated_at.isoformat(),
                     entity.id
@@ -287,7 +277,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             List of Story entities in the specified state.
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story WHERE state = ? ORDER BY id",
             (state,)
         )
@@ -303,7 +293,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             List of Story entities for the specified idea.
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story WHERE idea_id = ? ORDER BY id",
             (idea_id,)
         )
@@ -346,63 +336,9 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         """
         order = "ASC" if ascending else "DESC"
         cursor = self._conn.execute(
-            f"SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            f"SELECT id, idea_id, state, created_at, updated_at "
             f"FROM Story WHERE state = ? ORDER BY created_at {order}",
             (state,)
-        )
-        return [self._row_to_model(row) for row in cursor.fetchall()]
-    
-    def find_needing_script(self) -> List[Story]:
-        """Find all stories that need script generation.
-        
-        A story needs a script if:
-        - It has an idea (idea_id IS NOT NULL or idea_json IS NOT NULL)
-        - It has a title (title_id IS NOT NULL)
-        - It does not have a script (script_id IS NULL)
-        
-        Returns:
-            List of Story entities ready for script generation.
-        """
-        cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
-            "FROM Story "
-            "WHERE (idea_id IS NOT NULL OR idea_json IS NOT NULL) "
-            "AND title_id IS NOT NULL "
-            "AND script_id IS NULL "
-            "ORDER BY id"
-        )
-        return [self._row_to_model(row) for row in cursor.fetchall()]
-    
-    def find_needing_title(self) -> List[Story]:
-        """Find all stories that need title generation.
-        
-        A story needs a title if:
-        - It has an idea (idea_id IS NOT NULL or idea_json IS NOT NULL)
-        - It does not have a title (title_id IS NULL)
-        
-        Returns:
-            List of Story entities ready for title generation.
-        """
-        cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
-            "FROM Story "
-            "WHERE (idea_id IS NOT NULL OR idea_json IS NOT NULL) "
-            "AND title_id IS NULL "
-            "ORDER BY id"
-        )
-        return [self._row_to_model(row) for row in cursor.fetchall()]
-    
-    def find_with_script(self) -> List[Story]:
-        """Find all stories that have a script.
-        
-        Returns:
-            List of Story entities that have script_id set.
-        """
-        cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
-            "FROM Story "
-            "WHERE script_id IS NOT NULL "
-            "ORDER BY id"
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
     
@@ -425,7 +361,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             ...     print(f"Processing story {story.id}")
         """
         cursor = self._conn.execute(
-            "SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at "
+            "SELECT id, idea_id, state, created_at, updated_at "
             "FROM Story WHERE state = ? ORDER BY created_at ASC LIMIT 1",
             (state,)
         )
@@ -448,20 +384,6 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         cursor = self._conn.execute(
             "SELECT COUNT(*) FROM Story WHERE state = ?",
             (state,)
-        )
-        return cursor.fetchone()[0]
-    
-    def count_needing_script(self) -> int:
-        """Count stories that need script generation.
-        
-        Returns:
-            Number of stories ready for script generation.
-        """
-        cursor = self._conn.execute(
-            "SELECT COUNT(*) FROM Story "
-            "WHERE (idea_id IS NOT NULL OR idea_json IS NOT NULL) "
-            "AND title_id IS NOT NULL "
-            "AND script_id IS NULL"
         )
         return cursor.fetchone()[0]
     
@@ -539,7 +461,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         # The version and score subqueries are constructed from internal logic only
         # and do not include any user-provided input
         query = f"""
-            SELECT id, idea_id, idea_json, title_id, script_id, state, created_at, updated_at
+            SELECT id, idea_id, state, created_at, updated_at
             FROM Story
             WHERE state = ?
             ORDER BY
@@ -680,16 +602,8 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         print(f"  Story ID: {story.id}")
         print(f"  State: {story.state}")
         print(f"  Idea ID: {story.idea_id}")
-        print(f"  Title ID: {story.title_id}")
-        print(f"  Script ID: {story.script_id}")
         print(f"  Created: {story.created_at}")
         print(f"  Updated: {story.updated_at}")
-        
-        # Show idea_json preview if available
-        if story.idea_json:
-            idea_preview = story.idea_json[:200] + '...' if len(story.idea_json) > 200 else story.idea_json
-            print(f"  Idea JSON: {idea_preview}")
-        
         print(f"{'═' * 70}")
         
         if wait_for_confirm:
@@ -725,9 +639,6 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         return Story(
             id=row["id"],
             idea_id=row["idea_id"],
-            idea_json=row["idea_json"],
-            title_id=row["title_id"],
-            script_id=row["script_id"],
             state=row["state"],
             created_at=created_at,
             updated_at=updated_at

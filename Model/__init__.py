@@ -5,7 +5,7 @@ for the PrismQ workflow system.
 
 Modules:
     - state: Workflow state constants and StoryState enum
-    - story: Story model with publishing flags
+    - story: Story model (re-exports from Model.Database.models.story)
     - published: Publishing status model for multi-platform distribution
     - State: State machine validators, interfaces, and helpers
     - Database: Database models, repositories, and connection utilities
@@ -19,7 +19,7 @@ Example Usage:
 """
 
 from Model.state import StoryState, StateNames, StateCategory
-from Model.story import Story
+from Model.Database.models.story import Story
 from Model.published import Published, Language, Platform
 
 __all__ = [

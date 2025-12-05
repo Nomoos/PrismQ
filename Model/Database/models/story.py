@@ -8,11 +8,13 @@ Relationship Pattern:
     - Story 1:N Title (one story has many title versions)
     - Story 1:N Script (one story has many script versions)
     - Story stores idea_id as reference to Idea table
-    - Story stores idea_json as serialized Idea data (optional)
 
 Note:
     Story is the only model that supports UPDATE operations
     (for state transitions). Other models use INSERT-only pattern.
+    
+    Current title/script versions are implicit - determined by highest version
+    in Title/Script tables via ORDER BY version DESC LIMIT 1.
 """
 
 from dataclasses import dataclass, field
@@ -67,9 +69,6 @@ class Story(IModel[int]):
     """
     
     idea_id: Optional[str] = None
-    idea_json: Optional[str] = None
-    title_id: Optional[int] = None
-    script_id: Optional[int] = None
     state: str = "CREATED"
     id: Optional[int] = None
     created_at: datetime = field(default_factory=datetime.now)
@@ -144,9 +143,6 @@ class Story(IModel[int]):
         return {
             "id": self.id,
             "idea_id": self.idea_id,
-            "idea_json": self.idea_json,
-            "title_id": self.title_id,
-            "script_id": self.script_id,
             "state": self.state,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
@@ -158,8 +154,7 @@ class Story(IModel[int]):
         
         Args:
             data: Dictionary containing story field values.
-                Optional: id, idea_id, idea_json, title_id, script_id, state,
-                          created_at, updated_at
+                Optional: id, idea_id, state, created_at, updated_at
         
         Returns:
             Story: New Story instance.
@@ -175,9 +170,6 @@ class Story(IModel[int]):
         return cls(
             id=data.get("id"),
             idea_id=data.get("idea_id"),
-            idea_json=data.get("idea_json"),
-            title_id=data.get("title_id"),
-            script_id=data.get("script_id"),
             state=data.get("state", "CREATED"),
             created_at=created_at or datetime.now(),
             updated_at=updated_at or datetime.now(),
@@ -217,38 +209,9 @@ class Story(IModel[int]):
         """Check if this story has an idea set.
         
         Returns:
-            bool: True if idea_id is set or idea_json is not None and not empty.
+            bool: True if idea_id is set.
         """
-        return bool(self.idea_id) or bool(self.idea_json)
-    
-    def has_title(self) -> bool:
-        """Check if this story has a title generated.
-        
-        Returns:
-            bool: True if title_id is set.
-        """
-        return self.title_id is not None
-    
-    def has_script(self) -> bool:
-        """Check if this story has a script generated.
-        
-        Returns:
-            bool: True if script_id is set.
-        """
-        return self.script_id is not None
-    
-    def needs_script(self) -> bool:
-        """Check if this story needs a script to be generated.
-        
-        A story needs a script if:
-        - It has an idea (idea_json is set)
-        - It has a title (title_id is set)
-        - It does not have a script (script_id is None)
-        
-        Returns:
-            bool: True if story is ready for script generation.
-        """
-        return self.has_idea() and self.has_title() and not self.has_script()
+        return bool(self.idea_id)
     
     def update_state(self, new_state: str) -> None:
         """Update the workflow state.
@@ -257,26 +220,6 @@ class Story(IModel[int]):
             new_state: The new state value.
         """
         self.state = new_state
-        self.updated_at = datetime.now()
-    
-    def set_script(self, script_id: int) -> None:
-        """Set the script reference and update state.
-        
-        Args:
-            script_id: ID of the generated script.
-        """
-        self.script_id = script_id
-        self.state = "SCRIPT"
-        self.updated_at = datetime.now()
-    
-    def set_title(self, title_id: int) -> None:
-        """Set the title reference and update state.
-        
-        Args:
-            title_id: ID of the generated title.
-        """
-        self.title_id = title_id
-        self.state = "TITLE"
         self.updated_at = datetime.now()
     
     def transition_to(self, new_state: "StoryState") -> None:
