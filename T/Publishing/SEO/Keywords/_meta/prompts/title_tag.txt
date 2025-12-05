@@ -1,0 +1,20 @@
+You are an expert SEO specialist optimizing a title tag for search engines.
+
+**Original Title**: "{title}"
+
+**Target Keywords**: {keywords}
+
+**Brand Name**: {brand_name}
+
+**Task**: Create an SEO-optimized title tag that:
+1. Is MAXIMUM {max_title_length} characters (before brand suffix)
+2. Incorporates at least ONE primary keyword naturally
+3. Is compelling and click-worthy
+4. Accurately represents the content
+5. Front-loads important keywords when possible
+6. Avoids keyword stuffing
+
+**Output Format**:
+Return ONLY the optimized title (without brand suffix), nothing else. No quotes, no explanations.
+
+Optimized Title:

@@ -1,0 +1,28 @@
+You are an expert SEO specialist tasked with writing a compelling meta description.
+
+**Content Title**: "{title}"
+
+**Primary Keywords**: {keywords}
+
+**Content Preview**:
+{script_context}
+
+**Task**: Write a meta description that:
+1. Is EXACTLY between 150-160 characters (target: {target_length} characters)
+2. Naturally incorporates at least ONE primary keyword
+3. Compels users to click through from search results
+4. Accurately summarizes the content
+5. Uses active voice and includes a call-to-action when appropriate
+6. Avoids keyword stuffing or unnatural phrasing
+
+**SEO Best Practices**:
+- Start with the most important information
+- Include benefit-driven language
+- Match search intent
+- Be specific and concise
+- Avoid generic descriptions
+
+**Output Format**: 
+Return ONLY the meta description text, nothing else. No quotes, no explanations.
+
+Meta Description:

@@ -3,15 +3,42 @@
 This module provides AI generation capabilities for creating Ideas using
 local LLM models through Ollama API. It supports various high-quality models
 optimized for RTX 5090 and other high-end GPUs.
+
+Prompts are stored as separate text files in _meta/prompts/ for easier
+maintenance and editing.
 """
 
 import json
 import requests
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Literal
 from dataclasses import dataclass
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# PROMPT FILE LOADING
+# =============================================================================
+
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
+
+
+def _load_prompt(filename: str) -> str:
+    """Load a prompt from the prompts directory.
+    
+    Args:
+        filename: Name of the prompt file (e.g., 'idea_from_title.txt')
+        
+    Returns:
+        The prompt text content
+        
+    Raises:
+        FileNotFoundError: If the prompt file doesn't exist
+    """
+    prompt_path = _PROMPTS_DIR / filename
+    return prompt_path.read_text(encoding="utf-8")
 
 
 @dataclass
@@ -42,86 +69,6 @@ class AIIdeaGenerator:
     
     # Minimum length for generated idea text in characters
     MIN_IDEA_TEXT_LENGTH = 100
-    
-    # Default prompt template for title-based generation
-    DEFAULT_TITLE_PROMPT_TEMPLATE = """You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on the title: "{input}"
-
-Target platforms: {platforms}
-Target formats: {formats}
-Genre: {genre}
-Length target: {length}
-
-For each idea, provide:
-1. A unique title variation
-2. A compelling concept (1-2 sentences)
-3. A detailed premise (2-3 sentences)
-4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening, minimum 50 characters)
-6. A synopsis (2-3 paragraphs, 150-300 words)
-7. A skeleton (5-7 key points)
-8. An outline (detailed structure with sections)
-9. 5-10 relevant keywords
-10. 3-5 main themes
-11. An idea_text field: A rich, detailed description of the idea combining the hook, premise, and key emotional appeal. This MUST be at least 100 characters long and capture the essence of the idea in an engaging way.
-
-IMPORTANT: The idea_text field must be substantive and descriptive - at least 100 characters. It should be a compelling paragraph that makes someone want to learn more.
-
-Make each idea distinct and engaging for the target platforms and formats.
-
-Format your response as a JSON array of {num_ideas} objects, each with these fields:
-- title
-- concept
-- premise
-- logline
-- hook
-- synopsis
-- skeleton
-- outline
-- keywords (array of strings)
-- themes (array of strings)
-- idea_text (at least 100 characters, combining hook and premise into an engaging description)
-
-Return ONLY the JSON array, no additional text."""
-
-    # Default prompt template for description-based generation
-    DEFAULT_DESCRIPTION_PROMPT_TEMPLATE = """You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on this description: "{input}"
-
-Target platforms: {platforms}
-Target formats: {formats}
-Genre: {genre}
-Length target: {length}
-
-For each idea, provide:
-1. A unique title
-2. A compelling concept (1-2 sentences)
-3. A detailed premise (2-3 sentences)
-4. A logline (one impactful sentence)
-5. A hook (attention-grabbing opening, minimum 50 characters)
-6. A synopsis (2-3 paragraphs, 150-300 words)
-7. A skeleton (5-7 key points)
-8. An outline (detailed structure with sections)
-9. 5-10 relevant keywords
-10. 3-5 main themes
-11. An idea_text field: A rich, detailed description of the idea combining the hook, premise, and key emotional appeal. This MUST be at least 100 characters long and capture the essence of the idea in an engaging way.
-
-IMPORTANT: The idea_text field must be substantive and descriptive - at least 100 characters. It should be a compelling paragraph that makes someone want to learn more.
-
-Make each idea distinct and engaging for the target platforms and formats.
-
-Format your response as a JSON array of {num_ideas} objects, each with these fields:
-- title
-- concept
-- premise
-- logline
-- hook
-- synopsis
-- skeleton
-- outline
-- keywords (array of strings)
-- themes (array of strings)
-- idea_text (at least 100 characters, combining hook and premise into an engaging description)
-
-Return ONLY the JSON array, no additional text."""
 
     def __init__(self, config: Optional[AIConfig] = None):
         """Initialize AI generator with configuration.
@@ -157,11 +104,12 @@ Return ONLY the JSON array, no additional text."""
             for_description: If True, return template for description-based generation
             
         Returns:
-            The current prompt template (custom or default)
+            The current prompt template (custom or default from file)
         """
         if self._custom_prompt_template:
             return self._custom_prompt_template
-        return self.DEFAULT_DESCRIPTION_PROMPT_TEMPLATE if for_description else self.DEFAULT_TITLE_PROMPT_TEMPLATE
+        filename = "idea_from_description.txt" if for_description else "idea_from_title.txt"
+        return _load_prompt(filename)
     
     def _check_ollama_availability(self) -> bool:
         """Check if Ollama is available and running.

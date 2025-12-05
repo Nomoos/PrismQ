@@ -14,16 +14,42 @@ Features:
     - Context-aware keyword suggestions
     - Intelligent Open Graph metadata
     - Raises AIUnavailableError when AI is not available (no fallback)
+
+Prompts are stored as separate text files in _meta/prompts/ for easier
+maintenance and editing.
 """
 
 import json
 import re
 import requests
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 
 from .metadata_generator import SEOMetadata
+
+# =============================================================================
+# PROMPT FILE LOADING
+# =============================================================================
+
+_PROMPTS_DIR = Path(__file__).parent / "_meta" / "prompts"
+
+
+def _load_prompt(filename: str) -> str:
+    """Load a prompt from the prompts directory.
+    
+    Args:
+        filename: Name of the prompt file (e.g., 'meta_description.txt')
+        
+    Returns:
+        The prompt text content
+        
+    Raises:
+        FileNotFoundError: If the prompt file doesn't exist
+    """
+    prompt_path = _PROMPTS_DIR / filename
+    return prompt_path.read_text(encoding="utf-8")
 
 logger = logging.getLogger(__name__)
 
@@ -337,36 +363,14 @@ class AIMetadataGenerator:
         if len(script) > 700:
             script_context += "..." + script[-200:]
         
-        prompt = f"""You are an expert SEO specialist tasked with writing a compelling meta description.
-
-**Content Title**: "{title}"
-
-**Primary Keywords**: {keywords_str}
-
-**Content Preview**:
-{script_context}
-
-**Task**: Write a meta description that:
-1. Is EXACTLY between 150-160 characters (target: {target_length} characters)
-2. Naturally incorporates at least ONE primary keyword
-3. Compels users to click through from search results
-4. Accurately summarizes the content
-5. Uses active voice and includes a call-to-action when appropriate
-6. Avoids keyword stuffing or unnatural phrasing
-
-**SEO Best Practices**:
-- Start with the most important information
-- Include benefit-driven language
-- Match search intent
-- Be specific and concise
-- Avoid generic descriptions
-
-**Output Format**: 
-Return ONLY the meta description text, nothing else. No quotes, no explanations.
-
-Meta Description:"""
+        prompt_template = _load_prompt("meta_description.txt")
         
-        return prompt
+        return prompt_template.format(
+            title=title,
+            keywords=keywords_str,
+            script_context=script_context,
+            target_length=target_length
+        )
     
     def _create_title_tag_prompt(
         self,
@@ -388,28 +392,14 @@ Meta Description:"""
         brand_suffix = f" | {brand_name}" if brand_name else ""
         max_title_length = self.TITLE_TAG_MAX - len(brand_suffix)
         
-        prompt = f"""You are an expert SEO specialist optimizing a title tag for search engines.
-
-**Original Title**: "{title}"
-
-**Target Keywords**: {keywords_str}
-
-**Brand Name**: {brand_name if brand_name else "None"}
-
-**Task**: Create an SEO-optimized title tag that:
-1. Is MAXIMUM {max_title_length} characters (before brand suffix)
-2. Incorporates at least ONE primary keyword naturally
-3. Is compelling and click-worthy
-4. Accurately represents the content
-5. Front-loads important keywords when possible
-6. Avoids keyword stuffing
-
-**Output Format**:
-Return ONLY the optimized title (without brand suffix), nothing else. No quotes, no explanations.
-
-Optimized Title:"""
+        prompt_template = _load_prompt("title_tag.txt")
         
-        return prompt
+        return prompt_template.format(
+            title=title,
+            keywords=keywords_str,
+            brand_name=brand_name if brand_name else "None",
+            max_title_length=max_title_length
+        )
     
     def _create_related_keywords_prompt(
         self,
@@ -432,30 +422,14 @@ Optimized Title:"""
         keywords_str = ", ".join(keywords[:5])
         script_preview = script[:400]
         
-        prompt = f"""You are an SEO specialist suggesting related keywords for content optimization.
-
-**Title**: "{title}"
-
-**Current Keywords**: {keywords_str}
-
-**Content Preview**:
-{script_preview}...
-
-**Task**: Suggest {max_count} related keywords or phrases that:
-1. Are semantically related to the current keywords
-2. Would improve SEO and topical relevance
-3. Reflect user search intent
-4. Are commonly searched terms in this topic area
-5. Are NOT already in the current keyword list
-6. Are specific and actionable (not too generic)
-
-**Output Format**:
-Return a JSON array of keyword strings, nothing else.
-Example: ["keyword1", "keyword2", "keyword3"]
-
-Related Keywords:"""
+        prompt_template = _load_prompt("related_keywords.txt")
         
-        return prompt
+        return prompt_template.format(
+            title=title,
+            keywords=keywords_str,
+            script_preview=script_preview,
+            max_count=max_count
+        )
     
     def _create_og_description_prompt(
         self,
@@ -478,31 +452,14 @@ Related Keywords:"""
         keywords_str = ", ".join(keywords[:3])
         script_preview = script[:300]
         
-        prompt = f"""You are a social media optimization specialist creating an Open Graph description.
-
-**Title**: "{title}"
-
-**SEO Meta Description**: "{meta_description}"
-
-**Keywords**: {keywords_str}
-
-**Content Preview**:
-{script_preview}...
-
-**Task**: Create an engaging Open Graph description for social media that:
-1. Is MAXIMUM 200 characters
-2. Is more engaging and conversational than the SEO meta description
-3. Optimized for social sharing (Facebook, LinkedIn, Twitter)
-4. Includes emotional hooks or curiosity gaps
-5. Encourages social engagement and clicks
-6. Can be slightly longer and more descriptive than the meta description
-
-**Output Format**:
-Return ONLY the OG description text, nothing else. No quotes, no explanations.
-
-OG Description:"""
+        prompt_template = _load_prompt("og_description.txt")
         
-        return prompt
+        return prompt_template.format(
+            title=title,
+            meta_description=meta_description,
+            keywords=keywords_str,
+            script_preview=script_preview
+        )
     
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate content.

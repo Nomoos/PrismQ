@@ -13,15 +13,42 @@ Input to AI:
 Workflow Position:
     Stage: PrismQ.T.Script.From.Idea.Title
     Input: Title + Idea + Seed → AI Generation → Output: Script v1
+
+Prompts are stored as separate text files in _meta/prompts/ for easier
+maintenance and editing.
 """
 
 import random
 import requests
 import logging
+from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# PROMPT FILE LOADING
+# =============================================================================
+
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
+
+
+def _load_prompt(filename: str) -> str:
+    """Load a prompt from the prompts directory.
+    
+    Args:
+        filename: Name of the prompt file (e.g., 'script_generation.txt')
+        
+    Returns:
+        The prompt text content
+        
+    Raises:
+        FileNotFoundError: If the prompt file doesn't exist
+    """
+    prompt_path = _PROMPTS_DIR / filename
+    return prompt_path.read_text(encoding="utf-8")
 
 
 # 500 predefined seed variations - simple words/concepts for creative inspiration
@@ -298,50 +325,18 @@ class AIScriptGenerator:
         # Platform-specific instructions
         platform_instructions = self._get_platform_instructions(platform)
         
-        prompt = f"""You are an expert scriptwriter for short-form video content. Write a compelling narration script.
-
-**TITLE**: "{title}"
-
-**IDEA**: {idea_text}
-
-**INSPIRATION SEED**: {seed}
-(Use this word/concept as creative inspiration - weave it into the narrative naturally, use it as a metaphor, or let it influence the atmosphere and imagery)
-
-**TARGET**: {target_duration} seconds ({target_words} words approximately)
-
-**PLATFORM**: {platform}
-
-**TONE**: {tone}
-
-{platform_instructions}
-
-**SCRIPT STRUCTURE**:
-
-1. **Opening Hook** (first 10-15%):
-   - Attention-grabbing opening
-   - Create immediate intrigue
-
-2. **Main Content** (70-75%):
-   - Deliver on the title's promise
-   - Incorporate the inspiration seed creatively
-   - Use engaging language
-
-3. **Conclusion** (10-15%):
-   - Satisfying resolution
-   - Memorable ending
-
-**WRITING STYLE**:
-- Write for narration (spoken word)
-- Short, punchy sentences
-- Use "..." for dramatic pauses
-- Match the {tone} tone
-
-**OUTPUT**:
-Return ONLY the script text. No headers, no explanations. Just the spoken words.
-
-SCRIPT:"""
+        prompt_template = _load_prompt("script_generation.txt")
         
-        return prompt
+        return prompt_template.format(
+            title=title,
+            idea_text=idea_text,
+            seed=seed,
+            target_duration=target_duration,
+            target_words=target_words,
+            platform=platform,
+            tone=tone,
+            platform_instructions=platform_instructions
+        )
     
     def _get_platform_instructions(self, platform: str) -> str:
         """Get platform-specific writing instructions."""

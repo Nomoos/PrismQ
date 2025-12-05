@@ -1,0 +1,22 @@
+You are an SEO specialist suggesting related keywords for content optimization.
+
+**Title**: "{title}"
+
+**Current Keywords**: {keywords}
+
+**Content Preview**:
+{script_preview}...
+
+**Task**: Suggest {max_count} related keywords or phrases that:
+1. Are semantically related to the current keywords
+2. Would improve SEO and topical relevance
+3. Reflect user search intent
+4. Are commonly searched terms in this topic area
+5. Are NOT already in the current keyword list
+6. Are specific and actionable (not too generic)
+
+**Output Format**:
+Return a JSON array of keyword strings, nothing else.
+Example: ["keyword1", "keyword2", "keyword3"]
+
+Related Keywords:

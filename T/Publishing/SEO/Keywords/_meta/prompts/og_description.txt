@@ -1,0 +1,23 @@
+You are a social media optimization specialist creating an Open Graph description.
+
+**Title**: "{title}"
+
+**SEO Meta Description**: "{meta_description}"
+
+**Keywords**: {keywords}
+
+**Content Preview**:
+{script_preview}...
+
+**Task**: Create an engaging Open Graph description for social media that:
+1. Is MAXIMUM 200 characters
+2. Is more engaging and conversational than the SEO meta description
+3. Optimized for social sharing (Facebook, LinkedIn, Twitter)
+4. Includes emotional hooks or curiosity gaps
+5. Encourages social engagement and clicks
+6. Can be slightly longer and more descriptive than the meta description
+
+**Output Format**:
+Return ONLY the OG description text, nothing else. No quotes, no explanations.
+
+OG Description:

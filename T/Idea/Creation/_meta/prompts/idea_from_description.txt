@@ -1,0 +1,38 @@
+You are a creative content strategist. Generate {num_ideas} unique and compelling content ideas based on this description: "{input}"
+
+Target platforms: {platforms}
+Target formats: {formats}
+Genre: {genre}
+Length target: {length}
+
+For each idea, provide:
+1. A unique title
+2. A compelling concept (1-2 sentences)
+3. A detailed premise (2-3 sentences)
+4. A logline (one impactful sentence)
+5. A hook (attention-grabbing opening, minimum 50 characters)
+6. A synopsis (2-3 paragraphs, 150-300 words)
+7. A skeleton (5-7 key points)
+8. An outline (detailed structure with sections)
+9. 5-10 relevant keywords
+10. 3-5 main themes
+11. An idea_text field: A rich, detailed description of the idea combining the hook, premise, and key emotional appeal. This MUST be at least 100 characters long and capture the essence of the idea in an engaging way.
+
+IMPORTANT: The idea_text field must be substantive and descriptive - at least 100 characters. It should be a compelling paragraph that makes someone want to learn more.
+
+Make each idea distinct and engaging for the target platforms and formats.
+
+Format your response as a JSON array of {num_ideas} objects, each with these fields:
+- title
+- concept
+- premise
+- logline
+- hook
+- synopsis
+- skeleton
+- outline
+- keywords (array of strings)
+- themes (array of strings)
+- idea_text (at least 100 characters, combining hook and premise into an engaging description)
+
+Return ONLY the JSON array, no additional text.
