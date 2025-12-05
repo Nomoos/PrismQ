@@ -1,91 +1,127 @@
-# T/Script/From/Idea/Title - Initial Script Draft
+# T/Script/From/Idea/Title - AI Script Generation
 
 **Namespace**: `PrismQ.T.Script.From.Idea.Title`
 
-Generate initial script draft from the idea and initial title.
+Generate script drafts from idea and title using **local AI models only**.
 
 ## Purpose
 
-Create the first version (v1) of the script based on the original idea and the initial title (v1).
+Create script (v1) from the original idea and title using Qwen2.5-14B-Instruct via Ollama.
+
+**ALL generation goes through local AI models. No fallback to rule-based generation.**
 
 ## 🤖 AI-Powered Script Generation
 
-This module implements **Qwen2.5-14B-Instruct** for AI-powered script generation via Ollama. The AI generates compelling, contextually-aware scripts using prompt engineering best practices.
+### Input to AI
+- **Title** (Titulek) - the script title
+- **Idea text** - concept, synopsis, premise from the Idea object  
+- **Seed** - one word randomly picked from 500 predefined variations (e.g., "pudding", "fire", "ocean", "Chicago", "Germany", "chill")
 
 ### Features
-- **Qwen2.5-14B-Instruct Model**: High-quality script generation optimized for storytelling
-- **Platform Optimization**: YouTube Shorts, TikTok, Instagram Reels support
-- **Automatic Fallback**: Rule-based generation when AI is unavailable
-- **Prompt Engineering**: Role-based prompts with clear constraints and guidelines
+- **Qwen2.5-14B-Instruct Model**: High-quality script generation
+- **500 Seed Variations**: Simple words for creative inspiration (food, places, feelings, colors, etc.)
+- **Platform Optimization**: YouTube Shorts, TikTok, Instagram Reels
+- **No Fallback**: Error if AI unavailable (ensures AI is always used)
 
-### Quick Start
+## Quick Start
 
 ```python
 from T.Script.From.Idea.Title.src import (
     ScriptGenerator,
     ScriptGeneratorConfig,
-    AIScriptGenerator,
-    AIScriptGeneratorConfig,
-    generate_ai_script
+    generate_script,
+    get_random_seed,
+    SEED_VARIATIONS
 )
 
-# Option 1: Use ScriptGenerator with AI enabled (default)
+# Option 1: Use ScriptGenerator (requires Idea object)
 config = ScriptGeneratorConfig(
-    use_ai=True,  # AI enabled by default
     ai_model="qwen2.5:14b-instruct",
     target_duration_seconds=90
 )
 generator = ScriptGenerator(config=config)
 script = generator.generate_script_v1(idea, title)
 
-# Check if AI was used
-print(f"AI Generated: {script.metadata.get('ai_generated')}")
-
-# Option 2: Use AI directly
-ai_script = generate_ai_script(
-    idea_data={"concept": "...", "synopsis": "..."},
-    title="Your Title",
-    target_duration_seconds=90
+# Option 2: Use generate_script directly (simpler)
+script_text = generate_script(
+    title="The Mystery of the Abandoned House",
+    idea_text="A girl discovers a time-loop in an abandoned house",
+    target_duration_seconds=90,
+    seed="midnight"  # Optional: specify seed, otherwise random
 )
+
+# Check available seeds
+print(f"Total seeds: {len(SEED_VARIATIONS)}")  # ~500
+print(f"Random seed: {get_random_seed()}")  # e.g., "ocean"
 ```
 
-### Configuration
+## Seed Variations
+
+The module includes ~500 simple seed words organized by category:
+
+| Category | Examples |
+|----------|----------|
+| Food & Drinks | pudding, chocolate, coffee, honey, cheese |
+| Elements & Nature | fire, water, ocean, mountain, forest |
+| Family & People | sister, brother, mother, friend, hero |
+| US Cities | Chicago, New York, Los Angeles, Miami |
+| Countries | Germany, Japan, France, Brazil, Egypt |
+| Continents | Asia, Europe, Africa, America |
+| Feelings & Moods | chill, warm, happy, sad, brave |
+| Time & Seasons | morning, midnight, spring, winter |
+| Colors | red, blue, golden, crimson, azure |
+| Animals | lion, eagle, dolphin, dragon, phoenix |
+| Objects | mirror, clock, sword, crown, candle |
+| Abstract | dream, secret, magic, destiny, freedom |
+
+## Configuration
 
 ```python
-# ScriptGeneratorConfig AI settings
+# ScriptGeneratorConfig
 config = ScriptGeneratorConfig(
-    use_ai=True,                          # Enable AI generation
-    ai_model="qwen2.5:14b-instruct",      # Default model
-    ai_api_base="http://localhost:11434", # Ollama API URL
-    ai_temperature=0.7,                   # Generation creativity
-    ai_timeout=120                        # Request timeout (seconds)
+    platform_target=PlatformTarget.YOUTUBE_MEDIUM,
+    target_duration_seconds=90,
+    structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+    tone=ScriptTone.ENGAGING,
+    ai_model="qwen2.5:14b-instruct",
+    ai_api_base="http://localhost:11434",
+    ai_temperature=0.7,
+    ai_timeout=120
 )
 
-# AIScriptGeneratorConfig for direct AI usage
+# AIScriptGeneratorConfig (for direct use)
 ai_config = AIScriptGeneratorConfig(
     model="qwen2.5:14b-instruct",
+    api_base="http://localhost:11434",
     temperature=0.7,
     max_tokens=2000,
-    enable_ai=True
+    timeout=120
 )
 ```
 
-### Fallback Behavior
+## Error Handling
 
-When AI is unavailable (Ollama not running or disabled), the system automatically falls back to rule-based generation:
+AI is **required**. If Ollama is not running, a `RuntimeError` is raised:
 
 ```python
-# Check AI availability
+from T.Script.From.Idea.Title.src import ScriptGenerator
+
 generator = ScriptGenerator()
-if generator.is_ai_available():
-    print("AI generation enabled")
-else:
-    print("Using rule-based fallback")
+
+# Check availability
+if not generator.is_ai_available():
+    print("ERROR: Start Ollama with: ollama run qwen2.5:14b-instruct")
+
+# This raises RuntimeError if AI unavailable
+try:
+    script = generator.generate_script_v1(idea, title)
+except RuntimeError as e:
+    print(f"AI required but not available: {e}")
 ```
 
 ## Workflow Position
 
-**Stage 3** in MVP workflow: `PrismQ.T.Script.Draft (v1)`
+**Stage 3** in MVP workflow:
 
 ```
 Stage 1: PrismQ.T.Idea.Creation
@@ -97,160 +133,38 @@ Stage 3: PrismQ.T.Script.From.Idea.Title (v1) ← THIS STATE
 Stage 4: PrismQ.T.Review.Title.ByScript
 ```
 
-## Input Components
+## Module Structure
 
-### Primary Inputs
-- **Idea Object**:
-  - Core concept
-  - Target audience (e.g., US female 14-29)
-  - Content theme (e.g., horror, mystery)
-  - Key message
-  - Inspiration source
-
-- **Title v1** (from Title.From.Idea):
-  - Selected title variant
-  - Title promises and expectations
-  - Engagement angle
-
-### Context
-- **Platform Requirements** (YouTube short: < 180 seconds)
-- **Content Type** (narration, voiceover)
-- **Style Guidelines** (tone, pacing)
-
-## Process
-
-1. **Analyze inputs**:
-   - Understand idea core concept
-   - Study title promises
-   - Identify target audience expectations
-
-2. **Structure content**:
-   - **Introduction/Hook** (10-15 seconds)
-     - Grab attention immediately
-     - Set up intrigue
-     - Establish tone
-   
-   - **Main Content/Body** (60-150 seconds)
-     - Deliver on title promise
-     - Build narrative or argument
-     - Maintain engagement
-     - Develop story/concept
-   
-   - **Conclusion/Call-to-Action** (10-20 seconds)
-     - Satisfying resolution
-     - Memorable ending
-     - Optional CTA
-
-3. **Format for platform**:
-   - Optimize for YouTube short length
-   - Structure for voiceover narration
-   - Consider pacing and pauses
-   - Estimate timing
-
-4. **Store and link**:
-   - Save script v1
-   - Link to source idea
-   - Link to title v1
-   - Add metadata
-
-## Output
-
-- **Script v1** (initial draft)
-- **Structure Metadata**:
-  - Section breakdown (intro, body, conclusion)
-  - Timing estimates per section
-  - Total estimated duration
-- **References**:
-  - Link to source idea
-  - Link to title v1
-- **Platform Tags**:
-  - Content type
-  - Target length
-  - Format
-
-## Key Principle
-
-Creates script that **delivers on title promises** while **staying true to idea intent**.
-
-## Next Stage
-
-Script v1 flows to:
-- **Stage 4**: Review.Title.ByScript (reviews Title v1 against Script v1)
-- **Stage 5**: Review.Script.ByTitle (reviews Script v1 against Title v1)
-
-## Example Creation
-
-**Inputs:**
-- Idea: "Abandoned house with time-loop paranormal activity"
-- Title v1: "The Mystery of the Abandoned House"
-- Target: 90-second horror short for US female 14-29
-
-**Process:**
-- Hook: "Every night at midnight, she returns..." (12s)
-- Body: Narrator describes the time-loop discovery (75s)
-- Conclusion: "Some mysteries repeat forever" (8s)
-- Total: 95 seconds
-
-**Output:**
-- Script v1: Full narration text
-- Metadata: 3 sections, 95s total
-- Ready for review
-
-## State-Based Processing
-
-The module implements state-based processing following the PrismQ workflow state machine:
-
-- **Input State**: `PrismQ.T.Script.From.Idea.Title`
-- **Output State**: `PrismQ.T.Review.Title.From.Script.Idea`
-
-### Usage with ScriptFromIdeaTitleService
-
-```python
-import sqlite3
-from T.Script.From.Idea.Title.src.story_script_service import (
-    ScriptFromIdeaTitleService,
-    process_oldest_from_idea_title,
-    STATE_SCRIPT_FROM_IDEA_TITLE,
-    STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
-)
-
-# Connect to database
-conn = sqlite3.connect("prismq.db")
-conn.row_factory = sqlite3.Row
-
-# Option 1: Use convenience function to process oldest story
-result = process_oldest_from_idea_title(conn)
-if result.success:
-    print(f"Generated script {result.script_id} for story {result.story_id}")
-    print(f"Story state changed from {result.previous_state} to {result.new_state}")
-else:
-    print(f"Error: {result.error}")
-
-# Option 2: Use service for more control
-service = ScriptFromIdeaTitleService(conn)
-
-# Count pending stories
-pending_count = service.count_pending()
-print(f"Stories waiting: {pending_count}")
-
-# Process all pending stories
-results = service.process_all_pending()
-summary = service.get_processing_summary(results)
-print(f"Processed {summary['successful']} stories successfully")
+```
+T/Script/From/Idea/Title/
+├── README.md
+└── src/
+    ├── __init__.py              # Exports
+    ├── ai_script_generator.py   # AI generation (Qwen2.5-14B-Instruct)
+    │   ├── SEED_VARIATIONS      # 500 seed words
+    │   ├── get_random_seed()    # Pick random seed
+    │   ├── AIScriptGenerator    # Main AI class
+    │   └── generate_script()    # Convenience function
+    ├── script_generator.py      # ScriptGenerator class
+    └── story_script_service.py  # State-based processing
 ```
 
-### Processing Behavior
+## Example
 
-1. **FIFO Order**: Stories are processed in FIFO order (oldest first) based on `created_at`
-2. **State Transition**: On success, story state changes from `PrismQ.T.Script.From.Idea.Title` to `PrismQ.T.Review.Title.From.Script.Idea`
-3. **Script Creation**: Generates Script v0 from the story's Idea and Title
+**Input:**
+- Title: "The Mystery of the Abandoned House"
+- Idea: "A girl discovers a time-loop in an abandoned house"
+- Seed: "midnight" (randomly selected)
 
-## Module Metadata
+**AI Prompt includes:**
+```
+TITLE: "The Mystery of the Abandoned House"
+IDEA: A girl discovers a time-loop in an abandoned house
+INSPIRATION SEED: midnight
+TARGET: 90 seconds
+```
 
-**[→ View From/Idea/Title/_meta/docs/](./_meta/docs/)**
-**[→ View From/Idea/Title/_meta/examples/](./_meta/examples/)**
-**[→ View From/Idea/Title/_meta/tests/](./_meta/tests/)**
-
-## Navigation
-
-**[← Back to Script](../../../README.md)** | **[→ Script/_meta](../../../_meta/)**
+**Output:**
+- AI-generated script text (~225 words for 90s)
+- Sections: introduction, body, conclusion
+- Metadata: ai_generated=True

@@ -1,18 +1,17 @@
 """Script Generator for creating v1 scripts from ideas and titles.
 
-This module implements the script generation logic for MVP-003:
+This module implements the script generation logic using local AI models:
 - Takes Idea object and Title v1 as input
-- Generates structured script with intro, body, and conclusion
+- Generates structured script with intro, body, and conclusion using Qwen2.5-14B-Instruct
 - Optimizes for platform requirements (YouTube shorts < 180s)
 - Maintains coherence with title promises and idea intent
-- Supports AI-powered generation using Qwen2.5-14B-Instruct via Ollama
+- ALL generation goes through local AI models via Ollama
 """
 
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Any
 from datetime import datetime
 from enum import Enum
-import string
 import sys
 import os
 import logging
@@ -76,22 +75,6 @@ class ScriptTone(Enum):
     EDUCATIONAL = "educational"
     DRAMATIC = "dramatic"
     CONVERSATIONAL = "conversational"
-
-
-# Common English stop words for keyword extraction
-STOP_WORDS = {
-    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", 
-    "of", "with", "is", "are", "was", "were", "been", "be", "have", "has", 
-    "had", "do", "does", "did", "will", "would", "could", "should", "may",
-    "might", "can", "must", "shall"
-}
-
-# Tone detection keywords mapping
-TONE_KEYWORDS = {
-    "mysterious": ["mystery", "secrets", "hidden", "unknown"],
-    "dramatic": ["shocking", "unbelievable", "terrifying"],
-    "educational": ["how", "why", "what", "explained"]
-}
 
 
 @dataclass
@@ -173,7 +156,9 @@ class ScriptV1:
 
 @dataclass
 class ScriptGeneratorConfig:
-    """Configuration for script generation.
+    """Configuration for AI-powered script generation.
+    
+    All script generation uses local AI models via Ollama.
     
     Attributes:
         platform_target: Target platform for optimization
@@ -182,7 +167,6 @@ class ScriptGeneratorConfig:
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
         tone: Script tone (engaging, mysterious, educational, etc.)
-        use_ai: Whether to use AI-powered generation (default: True)
         ai_model: AI model to use for generation (default: Qwen2.5-14B-Instruct)
         ai_api_base: Base URL for Ollama API
         ai_temperature: AI generation temperature (0.0-2.0)
@@ -195,8 +179,7 @@ class ScriptGeneratorConfig:
     words_per_second: float = 2.5  # Average speaking rate
     include_cta: bool = True
     tone: ScriptTone = ScriptTone.ENGAGING
-    # AI generation settings
-    use_ai: bool = True
+    # AI generation settings (required - all generation uses AI)
     ai_model: str = "qwen2.5:14b-instruct"
     ai_api_base: str = "http://localhost:11434"
     ai_temperature: float = 0.7
@@ -204,13 +187,10 @@ class ScriptGeneratorConfig:
 
 
 class ScriptGenerator:
-    """Generate initial script drafts (v1) from ideas and titles.
+    """Generate script drafts (v1) from ideas and titles using local AI models.
     
-    This class implements the MVP-003 functionality to create structured
-    scripts from an Idea object and a title variant.
-    
-    The generator supports AI-powered script generation using Qwen2.5-14B-Instruct
-    via Ollama, with automatic fallback to rule-based generation when AI is unavailable.
+    This class uses Qwen2.5-14B-Instruct via Ollama for all script generation.
+    AI availability is required - an error is raised if AI is not available.
     """
     
     def __init__(self, config: Optional[ScriptGeneratorConfig] = None):
@@ -218,6 +198,9 @@ class ScriptGenerator:
         
         Args:
             config: Optional generation configuration
+            
+        Raises:
+            RuntimeError: If AI module is not available
         """
         self.config = config or ScriptGeneratorConfig()
         self._ai_generator = None
@@ -225,15 +208,12 @@ class ScriptGenerator:
         self._init_ai_generator()
     
     def _init_ai_generator(self):
-        """Initialize AI generator if available and enabled."""
-        if not self.config.use_ai:
-            logger.info("AI generation disabled in config")
-            return
-        
+        """Initialize AI generator."""
         ai_module = _get_ai_generator_module()
         if ai_module is None:
-            logger.info("AI script generator module not available")
-            return
+            error_msg = "AI script generator module not available. Cannot proceed without AI."
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
         
         try:
             ai_config = ai_module.AIScriptGeneratorConfig(
@@ -247,11 +227,11 @@ class ScriptGenerator:
             self._ai_available = self._ai_generator.is_available()
             
             if self._ai_available:
-                logger.info(f"AI script generation enabled with model: {self.config.ai_model}")
+                logger.info(f"AI script generation initialized with model: {self.config.ai_model}")
             else:
-                logger.info("AI script generator initialized but Ollama not available")
+                logger.warning(f"AI model '{self.config.ai_model}' not available at {self.config.ai_api_base}")
         except Exception as e:
-            logger.warning(f"Failed to initialize AI generator: {e}")
+            logger.error(f"Failed to initialize AI generator: {e}")
             self._ai_generator = None
             self._ai_available = False
     
@@ -270,10 +250,10 @@ class ScriptGenerator:
         script_id: Optional[str] = None,
         **kwargs
     ) -> ScriptV1:
-        """Generate initial script (v1) from idea and title.
+        """Generate initial script (v1) from idea and title using AI.
         
-        This method attempts AI-powered generation using Qwen2.5-14B-Instruct
-        if available, with automatic fallback to rule-based generation.
+        All generation uses local AI models (Qwen2.5-14B-Instruct).
+        An error is raised if AI is not available.
         
         Args:
             idea: Source Idea object
@@ -282,10 +262,11 @@ class ScriptGenerator:
             **kwargs: Additional configuration overrides
             
         Returns:
-            ScriptV1 object with structured script
+            ScriptV1 object with AI-generated structured script
             
         Raises:
             ValueError: If idea or title is invalid
+            RuntimeError: If AI generation is unavailable or fails
         """
         if not idea:
             raise ValueError("Idea cannot be None")
@@ -295,31 +276,31 @@ class ScriptGenerator:
         # Override config with kwargs
         config = self._apply_config_overrides(kwargs)
         
+        # Check if AI is available
+        if not self._ai_available:
+            error_msg = (
+                f"AI script generation is not available. "
+                f"Please ensure Ollama is running with model '{config.ai_model}' at {config.ai_api_base}"
+            )
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        
         # Generate script ID if not provided
         if not script_id:
             script_id = self._generate_script_id(idea, title)
         
-        # Analyze idea and title to extract key elements
-        analysis = self._analyze_inputs(idea, title)
+        logger.info(f"Generating script with AI for '{title}'")
+        full_text, sections = self._generate_with_ai(idea, title, config)
         
-        # Try AI-powered generation first
-        ai_generated = False
-        full_text = None
-        sections = None
-        
-        if self._ai_available and config.use_ai:
-            logger.info(f"Attempting AI-powered script generation for '{title}'")
-            full_text, sections = self._generate_with_ai(idea, title, analysis, config)
-            if full_text is not None:
-                ai_generated = True
-                logger.info("AI script generation successful")
-            else:
-                logger.info("AI generation failed, falling back to rule-based generation")
-        
-        # Fallback to rule-based generation
         if full_text is None:
-            sections = self._generate_sections(idea, title, analysis, config)
-            full_text = self._assemble_full_text(sections)
+            error_msg = (
+                f"AI script generation failed for '{title}'. "
+                f"Please check that Ollama is running and the model '{config.ai_model}' is available."
+            )
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        
+        logger.info("AI script generation successful")
         
         # Calculate total duration
         total_duration = sum(s.estimated_duration_seconds for s in sections)
@@ -342,13 +323,11 @@ class ScriptGenerator:
                     "tone": config.tone.value if hasattr(config.tone, 'value') else str(config.tone),
                     "target_duration": config.target_duration_seconds,
                     "words_per_second": config.words_per_second,
-                    "use_ai": config.use_ai,
                     "ai_model": config.ai_model
                 },
-                "ai_generated": ai_generated
+                "ai_generated": True
             },
-            notes=f"Generated from idea '{getattr(idea, 'title', 'untitled')}' with title '{title}'"
-                  f"{' (AI-powered)' if ai_generated else ' (rule-based)'}"
+            notes=f"Generated from idea '{getattr(idea, 'title', 'untitled')}' with title '{title}' (AI-powered)"
         )
         
         return script
@@ -357,7 +336,6 @@ class ScriptGenerator:
         self,
         idea: 'Idea',
         title: str,
-        analysis: Dict[str, Any],
         config: ScriptGeneratorConfig
     ) -> tuple:
         """Generate script content using AI.
@@ -365,7 +343,6 @@ class ScriptGenerator:
         Args:
             idea: Source Idea object
             title: Script title
-            analysis: Pre-analyzed idea and title data
             config: Generation configuration
         
         Returns:
@@ -375,17 +352,23 @@ class ScriptGenerator:
             return None, None
         
         try:
-            # Convert idea to dictionary for AI generation
-            idea_data = {
-                "concept": getattr(idea, 'concept', ''),
-                "synopsis": getattr(idea, 'synopsis', ''),
-                "hook": getattr(idea, 'hook', ''),
-                "premise": getattr(idea, 'premise', ''),
-                "genre": idea.genre.value if hasattr(idea, 'genre') and hasattr(idea.genre, 'value') else 'general',
-                "target_audience": getattr(idea, 'target_audience', 'general audience'),
-                "themes": getattr(idea, 'themes', []),
-                "keywords": getattr(idea, 'keywords', [])
-            }
+            # Build idea text from Idea object
+            idea_parts = []
+            if hasattr(idea, 'concept') and idea.concept:
+                idea_parts.append(f"Concept: {idea.concept}")
+            if hasattr(idea, 'synopsis') and idea.synopsis:
+                idea_parts.append(f"Synopsis: {idea.synopsis}")
+            if hasattr(idea, 'hook') and idea.hook:
+                idea_parts.append(f"Hook: {idea.hook}")
+            if hasattr(idea, 'premise') and idea.premise:
+                idea_parts.append(f"Premise: {idea.premise}")
+            if hasattr(idea, 'genre'):
+                genre_value = idea.genre.value if hasattr(idea.genre, 'value') else str(idea.genre)
+                idea_parts.append(f"Genre: {genre_value}")
+            if hasattr(idea, 'target_audience') and idea.target_audience:
+                idea_parts.append(f"Target audience: {idea.target_audience}")
+            
+            idea_text = " | ".join(idea_parts) if idea_parts else "General content"
             
             # Get platform string
             platform = config.platform_target.value if hasattr(config.platform_target, 'value') else str(config.platform_target)
@@ -393,10 +376,10 @@ class ScriptGenerator:
             # Get tone string
             tone = config.tone.value if hasattr(config.tone, 'value') else str(config.tone)
             
-            # Generate full script using AI
-            full_text = self._ai_generator.generate_full_script(
-                idea_data=idea_data,
+            # Generate full script using AI (title + idea_text + random seed)
+            full_text = self._ai_generator.generate_script(
                 title=title,
+                idea_text=idea_text,
                 target_duration_seconds=config.target_duration_seconds,
                 platform=platform,
                 tone=tone
@@ -463,21 +446,21 @@ class ScriptGenerator:
                 content=intro_text,
                 estimated_duration_seconds=intro_duration,
                 purpose="AI-generated hook to grab attention",
-                notes="Generated with Qwen2.5-14B-Instruct"
+                notes=f"Generated with {config.ai_model}"
             ),
             ScriptSection(
                 section_type="body",
                 content=body_text,
                 estimated_duration_seconds=body_duration,
                 purpose="AI-generated main content",
-                notes="Generated with Qwen2.5-14B-Instruct"
+                notes=f"Generated with {config.ai_model}"
             ),
             ScriptSection(
                 section_type="conclusion",
                 content=conclusion_text,
                 estimated_duration_seconds=conclusion_duration,
                 purpose="AI-generated conclusion",
-                notes="Generated with Qwen2.5-14B-Instruct"
+                notes=f"Generated with {config.ai_model}"
             )
         ]
         
@@ -493,7 +476,6 @@ class ScriptGenerator:
             include_cta=kwargs.get('include_cta', self.config.include_cta),
             tone=kwargs.get('tone', self.config.tone),
             # AI settings
-            use_ai=kwargs.get('use_ai', self.config.use_ai),
             ai_model=kwargs.get('ai_model', self.config.ai_model),
             ai_api_base=kwargs.get('ai_api_base', self.config.ai_api_base),
             ai_temperature=kwargs.get('ai_temperature', self.config.ai_temperature),
@@ -506,411 +488,6 @@ class ScriptGenerator:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         idea_id = getattr(idea, 'id', 'unknown')
         return f"script_v1_{idea_id}_{timestamp}"
-    
-    def _analyze_inputs(self, idea: 'Idea', title: str) -> Dict[str, Any]:
-        """Analyze idea and title to extract key elements.
-        
-        Args:
-            idea: Source Idea object
-            title: Title to analyze
-            
-        Returns:
-            Dictionary with analysis results
-        """
-        analysis = {
-            "title_keywords": self._extract_keywords(title),
-            "title_tone": self._detect_tone(title),
-            "idea_themes": getattr(idea, 'themes', []),
-            "idea_keywords": getattr(idea, 'keywords', []),
-            "core_concept": getattr(idea, 'concept', ''),
-            "hook": getattr(idea, 'hook', ''),
-            "premise": getattr(idea, 'premise', ''),
-            "synopsis": getattr(idea, 'synopsis', ''),
-        }
-        return analysis
-    
-    def _extract_keywords(self, text: str) -> List[str]:
-        """Extract keywords from text."""
-        # Simple keyword extraction (in production, would use NLP)
-        words = text.lower().split()
-        # Filter out common words and punctuation
-        keywords = [w.strip(string.punctuation) for w in words if w not in STOP_WORDS and len(w) > 3]
-        return keywords[:5]
-    
-    def _detect_tone(self, title: str) -> str:
-        """Detect tone from title."""
-        title_lower = title.lower()
-        
-        # Simple tone detection based on keywords
-        for tone, keywords in TONE_KEYWORDS.items():
-            if any(word in title_lower for word in keywords):
-                return tone
-        
-        return "engaging"
-    
-    def _generate_sections(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
-        """Generate script sections based on structure type."""
-        
-        if config.structure_type == ScriptStructure.HOOK_DELIVER_CTA:
-            return self._generate_hook_deliver_cta(idea, title, analysis, config)
-        elif config.structure_type == ScriptStructure.THREE_ACT:
-            return self._generate_three_act(idea, title, analysis, config)
-        elif config.structure_type == ScriptStructure.PROBLEM_SOLUTION:
-            return self._generate_problem_solution(idea, title, analysis, config)
-        elif config.structure_type == ScriptStructure.STORY:
-            return self._generate_story(idea, title, analysis, config)
-        else:
-            return self._generate_hook_deliver_cta(idea, title, analysis, config)
-    
-    def _generate_hook_deliver_cta(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
-        """Generate hook-deliver-cta structure."""
-        
-        # Calculate section durations (percentages of target)
-        hook_duration = int(config.target_duration_seconds * 0.15)  # 15%
-        deliver_duration = int(config.target_duration_seconds * 0.70)  # 70%
-        cta_duration = int(config.target_duration_seconds * 0.15)  # 15%
-        
-        sections = []
-        
-        # Hook/Introduction (10-15 seconds)
-        hook_content = self._generate_hook_content(idea, title, analysis, hook_duration, config)
-        sections.append(ScriptSection(
-            section_type="introduction",
-            content=hook_content,
-            estimated_duration_seconds=hook_duration,
-            purpose="Grab attention and set up intrigue",
-            notes="Opening hook to engage viewer immediately"
-        ))
-        
-        # Main Content/Delivery (60-150 seconds)
-        main_content = self._generate_main_content(idea, title, analysis, deliver_duration, config)
-        sections.append(ScriptSection(
-            section_type="body",
-            content=main_content,
-            estimated_duration_seconds=deliver_duration,
-            purpose="Deliver on title promise and develop content",
-            notes="Main narrative delivering value"
-        ))
-        
-        # Conclusion/CTA (10-20 seconds)
-        if config.include_cta:
-            conclusion_content = self._generate_conclusion_cta(idea, title, analysis, cta_duration, config)
-            sections.append(ScriptSection(
-                section_type="conclusion",
-                content=conclusion_content,
-                estimated_duration_seconds=cta_duration,
-                purpose="Provide satisfying ending and call to action",
-                notes="Memorable conclusion with optional CTA"
-            ))
-        
-        return sections
-    
-    def _generate_three_act(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
-        """Generate three-act structure."""
-        
-        # Calculate section durations
-        act1_duration = int(config.target_duration_seconds * 0.25)  # 25%
-        act2_duration = int(config.target_duration_seconds * 0.50)  # 50%
-        act3_duration = int(config.target_duration_seconds * 0.25)  # 25%
-        
-        sections = []
-        
-        # Act 1: Setup
-        act1_content = self._generate_hook_content(idea, title, analysis, act1_duration, config)
-        sections.append(ScriptSection(
-            section_type="introduction",
-            content=act1_content,
-            estimated_duration_seconds=act1_duration,
-            purpose="Setup and establish context",
-            notes="Act 1: Introduction"
-        ))
-        
-        # Act 2: Development
-        act2_content = self._generate_main_content(idea, title, analysis, act2_duration, config)
-        sections.append(ScriptSection(
-            section_type="body",
-            content=act2_content,
-            estimated_duration_seconds=act2_duration,
-            purpose="Develop narrative and build tension",
-            notes="Act 2: Development"
-        ))
-        
-        # Act 3: Resolution
-        act3_content = self._generate_conclusion_cta(idea, title, analysis, act3_duration, config)
-        sections.append(ScriptSection(
-            section_type="conclusion",
-            content=act3_content,
-            estimated_duration_seconds=act3_duration,
-            purpose="Resolve and conclude",
-            notes="Act 3: Resolution"
-        ))
-        
-        return sections
-    
-    def _generate_problem_solution(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
-        """Generate problem-solution structure."""
-        
-        problem_duration = int(config.target_duration_seconds * 0.30)
-        investigation_duration = int(config.target_duration_seconds * 0.50)
-        solution_duration = int(config.target_duration_seconds * 0.20)
-        
-        sections = []
-        
-        # Problem
-        problem_content = self._generate_problem_content(idea, title, analysis, problem_duration, config)
-        sections.append(ScriptSection(
-            section_type="introduction",
-            content=problem_content,
-            estimated_duration_seconds=problem_duration,
-            purpose="Establish the problem or question",
-            notes="Problem statement"
-        ))
-        
-        # Investigation
-        investigation_content = self._generate_main_content(idea, title, analysis, investigation_duration, config)
-        sections.append(ScriptSection(
-            section_type="body",
-            content=investigation_content,
-            estimated_duration_seconds=investigation_duration,
-            purpose="Explore the problem and investigate",
-            notes="Investigation and exploration"
-        ))
-        
-        # Solution
-        solution_content = self._generate_solution_content(idea, title, analysis, solution_duration, config)
-        sections.append(ScriptSection(
-            section_type="conclusion",
-            content=solution_content,
-            estimated_duration_seconds=solution_duration,
-            purpose="Present solution or conclusion",
-            notes="Solution and resolution"
-        ))
-        
-        return sections
-    
-    def _generate_story(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
-        """Generate story structure (beginning, middle, end)."""
-        # Similar to three-act but with story focus
-        return self._generate_three_act(idea, title, analysis, config)
-    
-    def _generate_hook_content(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        duration: int,
-        config: ScriptGeneratorConfig
-    ) -> str:
-        """Generate hook/introduction content.
-        
-        In production, this would use AI to generate compelling hooks.
-        For MVP, we create structured content based on idea and title.
-        """
-        hook = analysis.get('hook', '')
-        premise = analysis.get('premise', '')
-        
-        # Calculate target word count
-        target_words = int(duration * config.words_per_second)
-        
-        # Build hook content
-        hook_lines = []
-        
-        # Use existing hook if available
-        if hook:
-            hook_lines.append(hook)
-        else:
-            # Generate hook from title
-            hook_lines.append(f"What if I told you about {title.lower()}?")
-        
-        # Add intrigue
-        if premise:
-            hook_lines.append(premise[:100] + "...")
-        
-        hook_content = " ".join(hook_lines)
-        
-        # Adjust length to target
-        words = hook_content.split()
-        if len(words) > target_words:
-            hook_content = " ".join(words[:target_words]) + "..."
-        
-        return hook_content
-    
-    def _generate_main_content(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        duration: int,
-        config: ScriptGeneratorConfig
-    ) -> str:
-        """Generate main content/body.
-        
-        In production, this would use AI to generate detailed content.
-        For MVP, we create structured content based on idea elements.
-        """
-        synopsis = analysis.get('synopsis', '')
-        core_concept = analysis.get('core_concept', '')
-        
-        # Calculate target word count
-        target_words = int(duration * config.words_per_second)
-        
-        # Build main content
-        content_lines = []
-        
-        # Use synopsis if available
-        if synopsis:
-            content_lines.append(synopsis)
-        
-        # Add core concept development
-        if core_concept:
-            content_lines.append(f"\n\nAt its core, this is about {core_concept.lower()}.")
-        
-        # Add theme exploration
-        themes = analysis.get('idea_themes', [])
-        if themes:
-            content_lines.append(f"\n\nThis touches on themes of {', '.join(themes)}.")
-        
-        # Add detailed exploration (placeholder for AI generation)
-        content_lines.append("\n\nLet me walk you through the key aspects.")
-        content_lines.append("First, we need to understand the context.")
-        content_lines.append("Then, we can explore the implications.")
-        content_lines.append("Finally, we'll see how this all connects.")
-        
-        main_content = " ".join(content_lines)
-        
-        # Adjust length to target
-        words = main_content.split()
-        if len(words) > target_words:
-            main_content = " ".join(words[:target_words])
-        elif len(words) < target_words * 0.8:
-            # Pad if too short (in production, AI would generate more)
-            padding = " This is a fascinating topic that deserves deeper exploration."
-            word_count = len(words)
-            min_words = int(target_words * 0.8)
-            while word_count < min_words:
-                main_content += padding
-                word_count += len(padding.split())
-        
-        return main_content
-    
-    def _generate_conclusion_cta(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        duration: int,
-        config: ScriptGeneratorConfig
-    ) -> str:
-        """Generate conclusion with call-to-action."""
-        
-        target_words = int(duration * config.words_per_second)
-        
-        conclusion_lines = []
-        
-        # Wrap up main point
-        conclusion_lines.append(f"So that's the story behind {title.lower()}.")
-        
-        # Key takeaway
-        conclusion_lines.append("The key thing to remember is how interconnected everything is.")
-        
-        # CTA if enabled
-        if config.include_cta:
-            conclusion_lines.append("If you found this interesting, let me know in the comments.")
-            conclusion_lines.append("And don't forget to subscribe for more content like this.")
-        
-        conclusion = " ".join(conclusion_lines)
-        
-        # Adjust length
-        words = conclusion.split()
-        if len(words) > target_words:
-            conclusion = " ".join(words[:target_words])
-        
-        return conclusion
-    
-    def _generate_problem_content(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        duration: int,
-        config: ScriptGeneratorConfig
-    ) -> str:
-        """Generate problem statement content."""
-        target_words = int(duration * config.words_per_second)
-        
-        problem_lines = []
-        problem_lines.append(f"There's a question that many people ask: {title.lower()}?")
-        problem_lines.append("This isn't just a simple curiosity. It's a complex problem that affects many people.")
-        
-        premise = analysis.get('premise', '')
-        if premise:
-            problem_lines.append(premise)
-        
-        problem = " ".join(problem_lines)
-        words = problem.split()
-        if len(words) > target_words:
-            problem = " ".join(words[:target_words])
-        
-        return problem
-    
-    def _generate_solution_content(
-        self,
-        idea: 'Idea',
-        title: str,
-        analysis: Dict[str, Any],
-        duration: int,
-        config: ScriptGeneratorConfig
-    ) -> str:
-        """Generate solution content."""
-        target_words = int(duration * config.words_per_second)
-        
-        solution_lines = []
-        solution_lines.append("After examining all the evidence, the answer becomes clear.")
-        solution_lines.append(f"The solution to {title.lower()} lies in understanding the bigger picture.")
-        
-        if config.include_cta:
-            solution_lines.append("What do you think? Share your thoughts below.")
-        
-        solution = " ".join(solution_lines)
-        words = solution.split()
-        if len(words) > target_words:
-            solution = " ".join(words[:target_words])
-        
-        return solution
-    
-    def _assemble_full_text(self, sections: List[ScriptSection]) -> str:
-        """Assemble full script text from sections."""
-        return "\n\n".join(section.content for section in sections)
 
 
 __all__ = ["ScriptGenerator", "ScriptGeneratorConfig", "ScriptV1", "ScriptSection", "ScriptStructure", "PlatformTarget", "ScriptTone"]
