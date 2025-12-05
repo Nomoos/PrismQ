@@ -173,15 +173,12 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             entity.id = cursor.lastrowid
             return entity
         except sqlite3.IntegrityError as e:
-            error_str = str(e).lower()
-            if "foreign key" in error_str:
-                raise ForeignKeyViolationError(
-                    column="idea_id",
-                    value=entity.idea_id,
-                    referenced_table="Idea",
-                    original_error=e
-                )
-            raise map_sqlite_error(e, {"entity_type": "Story"})
+            raise map_sqlite_error(e, {
+                "entity_type": "Story",
+                "column": "idea_id",
+                "value": entity.idea_id,
+                "table": "Idea"
+            })
     
     # === UPDATE Operation ===
     
@@ -268,15 +265,13 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             )
             self._conn.commit()
         except sqlite3.IntegrityError as e:
-            error_str = str(e).lower()
-            if "foreign key" in error_str:
-                raise ForeignKeyViolationError(
-                    column="idea_id",
-                    value=entity.idea_id,
-                    referenced_table="Idea",
-                    original_error=e
-                )
-            raise map_sqlite_error(e, {"entity_type": "Story", "entity_id": entity.id})
+            raise map_sqlite_error(e, {
+                "entity_type": "Story",
+                "entity_id": entity.id,
+                "column": "idea_id",
+                "value": entity.idea_id,
+                "table": "Idea"
+            })
         
         return entity
     

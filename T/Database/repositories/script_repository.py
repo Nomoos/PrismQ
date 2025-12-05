@@ -177,21 +177,13 @@ class ScriptRepository(IVersionedRepository[Script, int]):
             entity.id = cursor.lastrowid
             return entity
         except sqlite3.IntegrityError as e:
-            error_str = str(e).lower()
-            if "foreign key" in error_str:
-                raise ForeignKeyViolationError(
-                    column="story_id",
-                    value=entity.story_id,
-                    referenced_table="Story",
-                    original_error=e
-                )
-            if "unique" in error_str:
-                raise DuplicateEntityError(
-                    entity_type="Script",
-                    constraint="story_id, version",
-                    original_error=e
-                )
-            raise map_sqlite_error(e, {"entity_type": "Script"})
+            raise map_sqlite_error(e, {
+                "entity_type": "Script",
+                "column": "story_id",
+                "value": entity.story_id,
+                "table": "Story",
+                "constraint": "story_id, version"
+            })
     
     # === IVersionedRepository Operations ===
     
@@ -321,15 +313,13 @@ class ScriptRepository(IVersionedRepository[Script, int]):
             
             return True
         except sqlite3.IntegrityError as e:
-            error_str = str(e).lower()
-            if "foreign key" in error_str:
-                raise ForeignKeyViolationError(
-                    column="review_id",
-                    value=review_id,
-                    referenced_table="Review",
-                    original_error=e
-                )
-            raise map_sqlite_error(e, {"entity_type": "Script", "entity_id": script_id})
+            raise map_sqlite_error(e, {
+                "entity_type": "Script",
+                "entity_id": script_id,
+                "column": "review_id",
+                "value": review_id,
+                "table": "Review"
+            })
     
     # === Helper Methods ===
     

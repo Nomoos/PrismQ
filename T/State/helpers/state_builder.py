@@ -59,14 +59,14 @@ class StateParts:
         prefix: The state prefix ("PrismQ.T")
         output: The output/target entity (e.g., "Title", "Script", "Review")
         action: The action keyword if present ("From", "By", etc.)
-        inputs: List of input sources (e.g., ["Idea", "Title"])
+        inputs: Tuple of input sources (e.g., ("Idea", "Title"))
         raw: The original state string
         
     Example:
         >>> parts = parse_state("PrismQ.T.Script.From.Idea.Title")
         >>> parts.output  # 'Script'
         >>> parts.action  # 'From'
-        >>> parts.inputs  # ['Idea', 'Title']
+        >>> parts.inputs  # ('Idea', 'Title')
     """
     prefix: str
     output: str
@@ -81,11 +81,12 @@ class StateParts:
     
     @property
     def is_review_state(self) -> bool:
-        """Check if this state is a review state."""
-        return self.output == "Review" or (
-            len(self.inputs) == 0 and self.action is None and 
-            "Review" in self.raw
-        )
+        """Check if this state is a review state.
+        
+        A state is considered a review state if the output is 'Review'
+        (e.g., PrismQ.T.Review.Script.Grammar).
+        """
+        return self.output == "Review"
     
     @property
     def components_after_output(self) -> Tuple[str, ...]:

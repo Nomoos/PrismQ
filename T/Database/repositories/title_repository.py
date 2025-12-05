@@ -176,21 +176,13 @@ class TitleRepository(IVersionedRepository[Title, int]):
             entity.id = cursor.lastrowid
             return entity
         except sqlite3.IntegrityError as e:
-            error_str = str(e).lower()
-            if "foreign key" in error_str:
-                raise ForeignKeyViolationError(
-                    column="story_id",
-                    value=entity.story_id,
-                    referenced_table="Story",
-                    original_error=e
-                )
-            if "unique" in error_str:
-                raise DuplicateEntityError(
-                    entity_type="Title",
-                    constraint="story_id, version",
-                    original_error=e
-                )
-            raise map_sqlite_error(e, {"entity_type": "Title"})
+            raise map_sqlite_error(e, {
+                "entity_type": "Title",
+                "column": "story_id",
+                "value": entity.story_id,
+                "table": "Story",
+                "constraint": "story_id, version"
+            })
     
     # === IVersionedRepository Operations ===
     
