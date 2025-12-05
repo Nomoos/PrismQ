@@ -35,10 +35,13 @@ Example:
 """
 
 import sqlite3
+import logging
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple, TYPE_CHECKING
 from pathlib import Path
 import sys
+
+logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
 current_file = Path(__file__)
@@ -66,13 +69,26 @@ from idea import Idea
 # Import TitleGenerator from same directory
 from title_generator import TitleGenerator, TitleVariant, TitleConfig
 
+
+class AIUnavailableError(Exception):
+    """Exception raised when AI service (Ollama) is unavailable.
+    
+    This exception is raised instead of falling back to alternative methods,
+    as per the requirement to not perform fallback when AI is unavailable.
+    The caller should handle this exception and wait for AI to become available.
+    """
+    pass
+
+
 # Import AI title generator (required - no fallback when AI unavailable)
 try:
-    from ai_title_generator import AITitleGenerator, AITitleConfig, AIUnavailableError
+    from ai_title_generator import AITitleGenerator, AITitleConfig
+    from ai_title_generator import AIUnavailableError as _AIUnavailableError
+    # Use the imported exception to keep consistent error handling
+    AIUnavailableError = _AIUnavailableError
     AI_TITLE_AVAILABLE = True
 except ImportError:
     AI_TITLE_AVAILABLE = False
-    AIUnavailableError = Exception  # Fallback for type hints when import fails
 
 # Import database models and repositories
 from T.Database.models.story import Story, StoryState
@@ -199,9 +215,8 @@ class StoryTitleService:
         
         # Check if AI is available - raise error if not
         if not self._ai_title_generator or not self._ai_title_generator.is_available():
-            import logging
             error_msg = "AI title generation unavailable: Ollama not running or not configured"
-            logging.getLogger(__name__).error(error_msg)
+            logger.error(error_msg)
             raise AIUnavailableError(error_msg)
         
         # Use AI generation (will raise AIUnavailableError if it fails)
