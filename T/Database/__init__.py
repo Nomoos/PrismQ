@@ -52,17 +52,27 @@ Design Decisions:
     - Story state updated in place (workflow progression)
     - IReadable separate from IModel: Allows read-only consumers to use minimal interface
 
+Connection Utilities (PEP 249 Compliant):
+    - get_connection(): Create SQLite connection with recommended settings
+    - connection_context(): Context manager for automatic cleanup
+    - create_database(): Create new database file with parent directories
+    - verify_connection(): Verify connection is valid and configured
+
 Example:
     >>> from T.Database import (
-    ...     IRepository, IVersionedRepository,
+    ...     get_connection, IRepository, IVersionedRepository,
     ...     TitleRepository, ScriptRepository, StoryReviewRepository,
     ...     Title, Script, StoryReviewModel, ReviewType
     ... )
     >>> 
+    >>> # Create connection using PEP 249 compliant get_connection
+    >>> conn = get_connection("prismq.s3db")
+    >>> # Foreign keys are enabled, Row factory is set
+    >>> 
     >>> # Create repositories with SQLite connection
-    >>> title_repo = TitleRepository(connection)
-    >>> script_repo = ScriptRepository(connection)
-    >>> review_repo = StoryReviewRepository(connection)
+    >>> title_repo = TitleRepository(conn)
+    >>> script_repo = ScriptRepository(conn)
+    >>> review_repo = StoryReviewRepository(conn)
     >>> 
     >>> # Insert new title and script
     >>> title = Title(story_id=1, version=0, text="My Title")
@@ -101,6 +111,12 @@ from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.review_repository import ReviewRepository
 from T.Database.schema_manager import SchemaManager, initialize_database
+from T.Database.connection import (
+    get_connection,
+    connection_context,
+    create_database,
+    verify_connection,
+)
 
 __all__ = [
     # Model interfaces
@@ -127,4 +143,9 @@ __all__ = [
     # Schema management
     "SchemaManager",
     "initialize_database",
+    # Connection utilities
+    "get_connection",
+    "connection_context",
+    "create_database",
+    "verify_connection",
 ]
