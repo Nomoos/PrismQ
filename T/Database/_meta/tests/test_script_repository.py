@@ -251,6 +251,36 @@ class TestScriptRepositoryIntegration:
         assert isinstance(found.created_at, datetime)
         # Allow small time difference due to serialization
         assert abs((found.created_at - saved.created_at).total_seconds()) < 1
+    
+    # === GET_CURRENT_SCRIPT Tests ===
+    
+    def test_get_current_script(self, repo):
+        """Test get_current_script returns latest version."""
+        repo.insert(Script(story_id=1, version=0, text="Version 0"))
+        repo.insert(Script(story_id=1, version=1, text="Version 1"))
+        repo.insert(Script(story_id=1, version=2, text="Version 2"))
+        
+        current = repo.get_current_script(story_id=1)
+        
+        assert current is not None
+        assert current.version == 2
+        assert current.text == "Version 2"
+    
+    def test_get_current_script_no_scripts(self, repo):
+        """Test get_current_script when no scripts exist."""
+        current = repo.get_current_script(story_id=9999)
+        
+        assert current is None
+    
+    def test_get_current_script_single(self, repo):
+        """Test get_current_script with only one version."""
+        repo.insert(Script(story_id=1, version=0, text="Only Script"))
+        
+        current = repo.get_current_script(story_id=1)
+        
+        assert current is not None
+        assert current.version == 0
+        assert current.text == "Only Script"
 
 
 if __name__ == "__main__":

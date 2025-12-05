@@ -154,6 +154,77 @@ class StoryReviewRepository(IRepository[StoryReviewModel, int]):
     
     # === Custom Query Methods ===
     
+    def find_latest_version(self, story_id: int) -> Optional[int]:
+        """Find the latest (highest) version number for a story's reviews.
+        
+        Determines the current version by querying with ORDER BY version DESC LIMIT 1.
+        
+        Args:
+            story_id: The story identifier.
+            
+        Returns:
+            The highest version number if reviews exist, None otherwise.
+        """
+        cursor = self._conn.execute(
+            "SELECT version FROM StoryReview WHERE story_id = ? "
+            "ORDER BY version DESC LIMIT 1",
+            (story_id,)
+        )
+        row = cursor.fetchone()
+        
+        if row is None:
+            return None
+        
+        return row["version"]
+    
+    def find_latest_reviews(self, story_id: int) -> List[StoryReviewModel]:
+        """Find all reviews for the latest version of a story.
+        
+        Gets the current version using ORDER BY version DESC LIMIT 1,
+        then returns all reviews for that version.
+        
+        Args:
+            story_id: The story identifier.
+            
+        Returns:
+            List of all StoryReviewModel entities for the latest story version,
+            ordered by review_type. Returns empty list if no reviews exist.
+        """
+        latest_version = self.find_latest_version(story_id)
+        
+        if latest_version is None:
+            return []
+        
+        return self.find_by_story_and_version(story_id, latest_version)
+    
+    def find_latest_review_by_type(
+        self, story_id: int, review_type: ReviewType
+    ) -> Optional[StoryReviewModel]:
+        """Find the latest review of a specific type for a story.
+        
+        Gets the current version for the given review type using 
+        ORDER BY version DESC LIMIT 1.
+        
+        Args:
+            story_id: The story identifier.
+            review_type: The type of review (grammar, tone, content, etc.).
+            
+        Returns:
+            The latest StoryReviewModel of the specified type, or None if not found.
+        """
+        cursor = self._conn.execute(
+            "SELECT id, story_id, review_id, version, review_type, created_at "
+            "FROM StoryReview WHERE story_id = ? AND review_type = ? "
+            "ORDER BY version DESC LIMIT 1",
+            (story_id, review_type.value)
+        )
+        row = cursor.fetchone()
+        
+        if row is None:
+            return None
+        
+        return self._row_to_model(row)
+    
     def find_by_story_id(self, story_id: int) -> List[StoryReviewModel]:
         """Find all reviews for a specific story.
         
@@ -255,6 +326,40 @@ class StoryReviewRepository(IRepository[StoryReviewModel, int]):
             (review_type.value,)
         )
         return [self._row_to_model(row) for row in cursor.fetchall()]
+    
+    # === Current Version Convenience Methods ===
+    
+    def get_current_story_reviews(self, story_id: int) -> List[StoryReviewModel]:
+        """Get all reviews for the current (latest) version of a story.
+        
+        Convenience alias for find_latest_reviews(). Uses 
+        ORDER BY version DESC LIMIT 1 to determine the current version.
+        
+        Args:
+            story_id: The story identifier.
+            
+        Returns:
+            List of all StoryReviewModel entities for the current story version,
+            ordered by review_type. Returns empty list if no reviews exist.
+        """
+        return self.find_latest_reviews(story_id)
+    
+    def get_current_story_review(
+        self, story_id: int, review_type: ReviewType
+    ) -> Optional[StoryReviewModel]:
+        """Get the current (latest) review of a specific type for a story.
+        
+        Convenience alias for find_latest_review_by_type(). Uses 
+        ORDER BY version DESC LIMIT 1 to find the most recent review.
+        
+        Args:
+            story_id: The story identifier.
+            review_type: The type of review (grammar, tone, content, etc.).
+            
+        Returns:
+            The current StoryReviewModel of the specified type, or None if not found.
+        """
+        return self.find_latest_review_by_type(story_id, review_type)
     
     # === Helper Methods ===
     

@@ -325,5 +325,145 @@ class TestStoryReviewRepositoryDatetimePersistence:
         assert found.created_at == created_at
 
 
+class TestStoryReviewRepositoryVersionMethods:
+    """Tests for version-related methods."""
+    
+    def test_find_latest_version(self, repo):
+        """Test find_latest_version returns highest version number."""
+        # Insert reviews for different versions
+        for version in [0, 1, 2]:
+            review = StoryReviewModel(
+                story_id=1,
+                review_id=version + 1,
+                version=version,
+                review_type=ReviewType.GRAMMAR
+            )
+            repo.insert(review)
+        
+        latest_version = repo.find_latest_version(1)
+        
+        assert latest_version == 2
+    
+    def test_find_latest_version_no_reviews(self, repo):
+        """Test find_latest_version returns None when no reviews exist."""
+        latest_version = repo.find_latest_version(999)
+        assert latest_version is None
+    
+    def test_find_latest_reviews(self, repo):
+        """Test find_latest_reviews returns all reviews for latest version."""
+        # Insert reviews for version 0
+        for review_type in [ReviewType.GRAMMAR, ReviewType.TONE]:
+            review = StoryReviewModel(
+                story_id=1,
+                review_id=1,
+                version=0,
+                review_type=review_type
+            )
+            repo.insert(review)
+        
+        # Insert reviews for version 1 (latest)
+        for review_type in [ReviewType.GRAMMAR, ReviewType.CONTENT]:
+            review = StoryReviewModel(
+                story_id=1,
+                review_id=2,
+                version=1,
+                review_type=review_type
+            )
+            repo.insert(review)
+        
+        latest = repo.find_latest_reviews(1)
+        
+        assert len(latest) == 2
+        assert all(r.version == 1 for r in latest)
+    
+    def test_find_latest_reviews_empty(self, repo):
+        """Test find_latest_reviews returns empty list when no reviews exist."""
+        latest = repo.find_latest_reviews(999)
+        assert latest == []
+    
+    def test_find_latest_review_by_type(self, repo):
+        """Test find_latest_review_by_type returns latest review of given type."""
+        # Insert grammar reviews for different versions
+        for version in [0, 1, 2]:
+            review = StoryReviewModel(
+                story_id=1,
+                review_id=version + 1,
+                version=version,
+                review_type=ReviewType.GRAMMAR
+            )
+            repo.insert(review)
+        
+        latest_grammar = repo.find_latest_review_by_type(1, ReviewType.GRAMMAR)
+        
+        assert latest_grammar is not None
+        assert latest_grammar.version == 2
+        assert latest_grammar.review_type == ReviewType.GRAMMAR
+    
+    def test_find_latest_review_by_type_not_found(self, repo):
+        """Test find_latest_review_by_type returns None when type not found."""
+        # Insert only grammar review
+        review = StoryReviewModel(
+            story_id=1,
+            review_id=1,
+            version=0,
+            review_type=ReviewType.GRAMMAR
+        )
+        repo.insert(review)
+        
+        # Look for tone review
+        latest_tone = repo.find_latest_review_by_type(1, ReviewType.TONE)
+        assert latest_tone is None
+
+
+class TestStoryReviewRepositoryConvenienceMethods:
+    """Tests for convenience alias methods."""
+    
+    def test_get_current_story_reviews(self, repo):
+        """Test get_current_story_reviews returns reviews for latest version."""
+        # Insert reviews for version 0 and 1
+        for version in [0, 1]:
+            for review_type in [ReviewType.GRAMMAR, ReviewType.TONE]:
+                review = StoryReviewModel(
+                    story_id=1,
+                    review_id=version + 1,
+                    version=version,
+                    review_type=review_type
+                )
+                repo.insert(review)
+        
+        current = repo.get_current_story_reviews(1)
+        
+        assert len(current) == 2
+        assert all(r.version == 1 for r in current)
+    
+    def test_get_current_story_reviews_empty(self, repo):
+        """Test get_current_story_reviews returns empty list when no reviews."""
+        current = repo.get_current_story_reviews(999)
+        assert current == []
+    
+    def test_get_current_story_review(self, repo):
+        """Test get_current_story_review returns latest review of given type."""
+        # Insert grammar reviews for versions 0, 1, 2
+        for version in [0, 1, 2]:
+            review = StoryReviewModel(
+                story_id=1,
+                review_id=version + 1,
+                version=version,
+                review_type=ReviewType.GRAMMAR
+            )
+            repo.insert(review)
+        
+        current = repo.get_current_story_review(1, ReviewType.GRAMMAR)
+        
+        assert current is not None
+        assert current.version == 2
+        assert current.review_type == ReviewType.GRAMMAR
+    
+    def test_get_current_story_review_not_found(self, repo):
+        """Test get_current_story_review returns None when not found."""
+        current = repo.get_current_story_review(999, ReviewType.GRAMMAR)
+        assert current is None
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

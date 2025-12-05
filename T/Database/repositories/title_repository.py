@@ -229,6 +229,22 @@ class TitleRepository(IVersionedRepository[Title, int]):
         """
         return self.find_versions(story_id)
     
+    # === Current Version Convenience Methods ===
+    
+    def get_current_title(self, story_id: int) -> Optional[Title]:
+        """Get the current (latest) title for a story.
+        
+        Convenience alias for find_latest_version(). Gets the title with
+        the highest version number using ORDER BY version DESC LIMIT 1.
+        
+        Args:
+            story_id: The story identifier.
+            
+        Returns:
+            The current Title for the story, or None if no titles exist.
+        """
+        return self.find_latest_version(story_id)
+    
     # === Helper Methods ===
     
     def _row_to_title(self, row: sqlite3.Row) -> Title:
