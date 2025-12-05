@@ -98,6 +98,37 @@ For users with an NVIDIA RTX 5090 (32GB VRAM), you have access to the most power
 | **Local RTX 5090** | ❌ Too large | ✅ With quantization |
 | **Ollama Support** | ❌ Cloud/API only | ✅ `ollama pull llama3.3:70b` |
 
+### Understanding Quantization
+
+**Co je kvantizace?** Kvantizace je technika komprese modelu, která snižuje přesnost vah (např. z 16-bit na 4-bit). To výrazně zmenší velikost modelu a VRAM požadavky.
+
+| Kvantizace | Kvalita vs Originál | VRAM úspora | Doporučení |
+|------------|---------------------|-------------|------------|
+| **FP16** (bez kvantizace) | 100% | 0% | Nejlepší kvalita, nejvíce VRAM |
+| **Q8** (8-bit) | ~99% | ~50% | Téměř identická kvalita |
+| **Q6_K** (6-bit) | ~98% | ~60% | Výborná kvalita |
+| **Q5_K_M** (5-bit) | ~97% | ~70% | Velmi dobrá kvalita |
+| **Q4_K_M** (4-bit) | ~95% | ~75% | **Doporučeno pro RTX 5090** ✅ |
+| **Q3** (3-bit) | ~90% | ~80% | Znatelná ztráta kvality |
+
+**Pro RTX 5090 doporučuji:**
+- **Q4_K_M** nebo **Q5_K_M** - minimální ztráta kvality (~3-5%), velká úspora VRAM
+- Ztráta kvality je téměř nepostřehnutelná pro kreativní psaní
+
+**Pokud preferujete maximální kvalitu bez kompromisů:**
+```bash
+# Nejvyšší kvalita s Q8 (vyžaduje více VRAM)
+ollama pull llama3.3:70b-q8_0
+
+# Dobrý kompromis s Q5
+ollama pull llama3.3:70b-q5_K_M
+
+# Standardní Q4 (nejčastější volba)
+ollama pull llama3.3:70b-q4_K_M
+```
+
+> **Tip:** Pro RTX 5090 s 32GB VRAM můžete bez problémů použít Q5_K_M variantu pro lepší kvalitu. Rozdíl v rychlosti je minimální.
+
 ### Model Recommendations by PrismQ Task
 
 | Task | Best Model | Alternative | Why |
