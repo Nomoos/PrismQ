@@ -1381,6 +1381,138 @@ result = response.json()
 print(result["response"])
 ```
 
+---
+
+## 🚀 After-Completion Feature / Future Enhancement
+
+> **Poznámka od GPT:** Následující sekce popisuje budoucí rozšíření PrismQ systému, která navazují na Moving Window techniku dokumentovanou výše. Tyto funkce jsou navrženy jako nadstavba současné architektury bez breaking changes.
+
+### 1) Moving-Window Engine pro dlouhé generování skriptů
+
+Do budoucna lze nad textovým modulem PrismQ (`T → Script`) postavit specializovaný **moving-window engine**, který bude generovat příběhy nebo scénáře po blocích (300–600 slov) místo jednorázového dlouhého výstupu. 
+
+**Klíčové vlastnosti:**
+- Využívá **outline** a **story bible** vytvořené silným modelem (GPT-5.1 / Sonnet)
+- Vede lokální modely (Qwen / Mistral) přes sekvenční generování
+- Proces: shrnutí → extrakce faktů → plánování dalšího děje
+- **Výsledek:** Lokální modely produkují delší a kvalitnější text bez ztráty konzistence
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│           MOVING-WINDOW ENGINE (Future)                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  GPT-5.1/Sonnet                                             │
+│       │                                                     │
+│       ├── Outline (10-18 beats)                             │
+│       └── Story Bible                                       │
+│              │                                              │
+│              ▼                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Local Model (Qwen/Mistral) - Moving Window Loop    │   │
+│  │                                                      │   │
+│  │  Block 1 → Summary → Facts → Directive → Block 2    │   │
+│  │  Block 2 → Summary → Facts → Directive → Block 3    │   │
+│  │  ...                                                 │   │
+│  │  Block N → Final Script                              │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2) Story Bible, Block Memory a Directives jako nové datové vrstvy
+
+Do struktury PrismQ lze doplnit volitelné budoucí objekty, které budou tvořit **persistentní "paměť" příběhu**:
+
+| Objekt | Popis | Ukládání |
+|--------|-------|----------|
+| **StoryOutline** | Kostra příběhu (10-18 beats) | `T/{id}/Text/outline.json` |
+| **StoryBible** | Postavy, pravidla, tone guide | `T/{id}/Text/bible.json` |
+| **StoryBlock** | Jednotlivé bloky textu | `T/{id}/Text/blocks/` |
+| **BlockSummary** | Shrnutí každého bloku | `T/{id}/Text/blocks/{n}/summary.txt` |
+| **BlockFacts** | Extrahovaná fakta | `T/{id}/Text/blocks/{n}/facts.json` |
+| **BlockDirective** | Instrukce pro další blok | `T/{id}/Text/blocks/{n}/directive.txt` |
+
+**Ukládání a řízení:**
+- Artefakty ukládány do `T/{id}/Text/...`
+- Metadatově řízeny přes SQLite (`db.s3db`)
+- Umožňuje sledovat a řídit dlouhodobou kontinuitu textu
+
+**Integrace:**
+```python
+# Budoucí datová struktura
+class StoryMemory:
+    outline: StoryOutline        # 10-18 beats
+    bible: StoryBible            # Characters, rules, tone
+    blocks: List[StoryBlock]     # Generated blocks
+    
+class StoryBlock:
+    number: int
+    content: str                 # 300-600 slov
+    summary: str                 # Kondenzovaná paměť
+    facts: List[str]             # Klíčová fakta
+    directive: str               # Instrukce pro další blok
+```
+
+> **Důležité:** Přidání těchto objektů rozšíří PrismQ o možnost sledovat a řídit dlouhodobou kontinuitu textu, **aniž by se měnila současná architektura** – jde o nadstavbu, ne o zásah do existujícího workflow.
+
+### 3) Orchestrace blokového psaní jako volitelný Script-Draft mód
+
+Moving-window systém může být v budoucnu zaveden jako **alternativní nebo pokročilý režim** pro fázi `T.Script`:
+
+**Kdy se aktivuje:**
+- Uživatel chce generovat dlouhé scénáře (5000+ slov)
+- Povídky nebo podcastové epizody
+- Serialized content (série)
+
+**Zachování kompatibility:**
+```
+Současné workflow (beze změn):
+    Idea → Title → Script → Reviews → Refinements
+
+Nový "Loop Mode" (volitelný):
+    Idea → Title → Script[Loop Mode] → Reviews → Refinements
+                        │
+                        ├── Block 1 → Summary → Facts
+                        ├── Block 2 → Summary → Facts
+                        ├── Block 3 → Summary → Facts
+                        └── ... → Final Script
+```
+
+**Klíčové vlastnosti Loop Mode:**
+- Sekvenčně orchestruje: **generování bloku → shrnutí → fakta → direktiva → další blok**
+- Aktivuje se pouze na vyžádání
+- **Žádné breaking changes** v současném workflow
+- Umožní PrismQ růst směrem k robustnímu systémovému psaní delších textů
+
+**Navržený API interface:**
+
+```python
+# Současný způsob (zachován)
+script = Script.from_title_idea(title, idea)
+
+# Nový Loop Mode (budoucí rozšíření)
+script = Script.from_title_idea(
+    title, 
+    idea,
+    mode="loop",           # Aktivuje Moving Window
+    block_size=400,        # Slov na blok
+    target_length=5000     # Celková délka
+)
+```
+
+### Roadmap implementace
+
+| Fáze | Funkce | Priorita | Závislosti |
+|------|--------|----------|------------|
+| **Phase 1** | StoryOutline + StoryBible objekty | 🟢 Vysoká | Žádné |
+| **Phase 2** | StoryBlock + Memory persistence | 🟡 Střední | Phase 1 |
+| **Phase 3** | Moving-Window Engine | 🟡 Střední | Phase 1, 2 |
+| **Phase 4** | Loop Mode v T.Script | 🟠 Nízká | Phase 1, 2, 3 |
+| **Phase 5** | GPT-5.1 orchestrace | 🟠 Nízká | Phase 1-4 |
+
+---
+
 ## Related Documentation
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture overview
