@@ -4,12 +4,18 @@ REM Interactive idea creation - saves to database
 REM
 REM Usage: Run.bat
 REM
+REM Requires: Ollama must be running for AI-powered idea generation
+REM
 REM Environment:
 REM   Virtual environment: T\Idea\Creation\.venv (created automatically)
 REM   Dependencies: T\Idea\Creation\requirements.txt
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
+
+REM Start Ollama if not running
+call ..\common\start_ollama.bat
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 REM Setup Python virtual environment
 call :setup_env
