@@ -103,6 +103,7 @@ Foundational research and strategic planning documents.
 - **[Proposals](./_meta/proposals/)** - Architecture and design proposals
   - [Module Reorganization](./_meta/proposals/module-reorganization.md)
 - **[Documentation](./_meta/docs/)** - Project-wide documentation
+  - [AI Models Setup](./_meta/docs/AI_MODELS_SETUP.md) - Ollama and Qwen2.5 setup guide
   - [Database Objects](./_meta/docs/DATABASE.md) - Database schema and models reference
   - [Storytelling Guide](./_meta/docs/STORYTELLING_GUIDE.md)
 
@@ -211,9 +212,10 @@ For detailed AI configuration options, see [AI Metadata Documentation](./T/Publi
 
 1. **Explore a Pipeline**: Start with [T/README.md](./T/README.md) to understand text generation
 2. **Configure Environment**: See [src/README.md](./src/README.md) for setup
-3. **Review Workflow**: Read [WORKFLOW.md](./_meta/WORKFLOW.md) for the complete state machine
-4. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
-5. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
+3. **Setup AI Models**: See [AI Models Setup](./_meta/docs/AI_MODELS_SETUP.md) for Ollama and Qwen2.5 configuration
+4. **Review Workflow**: Read [WORKFLOW.md](./_meta/WORKFLOW.md) for the complete state machine
+5. **Check Research**: Browse [_meta/research/](./_meta/research/) for strategic insights
+6. **Use Client**: See [Client/README.md](./Client/README.md) for web interface setup
 
 ## 🔄 State Machine Architecture
 
