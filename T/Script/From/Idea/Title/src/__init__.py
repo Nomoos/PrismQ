@@ -1,14 +1,18 @@
-"""Script generation from idea and title.
+"""Script generation from idea and title using AI.
 
-This module provides functionality to generate initial script drafts (v1)
-from an Idea object and a title variant.
+This module provides AI-powered script generation using Qwen2.5-14B-Instruct.
+ALL generation goes through local AI models via Ollama.
+
+Input to AI:
+    - Title (Titulek)
+    - Idea text
+    - One seed (randomly picked from 500 predefined variations like "pudding", "fire", "ocean", etc.)
 
 Key Components:
-    - ScriptGenerator: Generates ScriptV1 from Idea and Title
-    - StoryScriptService: Service to process stories needing scripts
-    - ScriptFromIdeaTitleService: State-based service for PrismQ.T.Script.From.Idea.Title
-    - process_oldest_from_idea_title: Process oldest story in the state
-    - process_all_pending_stories: Convenience function for batch processing
+    - ScriptGenerator: Generates ScriptV1 from Idea and Title using AI
+    - AIScriptGenerator: Direct AI script generation interface
+    - generate_script: Convenience function for AI script generation
+    - SEED_VARIATIONS: 500 predefined seed words for creative variation
 """
 
 from .script_generator import (
@@ -32,9 +36,17 @@ from .story_script_service import (
     STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
     INITIAL_SCRIPT_VERSION
 )
+from .ai_script_generator import (
+    AIScriptGenerator,
+    AIScriptGeneratorConfig,
+    generate_script,
+    get_random_seed,
+    get_seed_by_index,
+    SEED_VARIATIONS
+)
 
 __all__ = [
-    # Script Generator
+    # Script Generator (AI-powered)
     "ScriptGenerator",
     "ScriptGeneratorConfig",
     "ScriptV1",
@@ -42,6 +54,13 @@ __all__ = [
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
+    # AI Script Generator (Qwen2.5-14B-Instruct)
+    "AIScriptGenerator",
+    "AIScriptGeneratorConfig",
+    "generate_script",
+    "get_random_seed",
+    "get_seed_by_index",
+    "SEED_VARIATIONS",
     # Story Script Service (legacy)
     "StoryScriptService",
     "ScriptGenerationResult",
