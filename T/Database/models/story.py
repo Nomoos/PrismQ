@@ -30,44 +30,36 @@ class Story(IModel[int]):
     """Story model for content workflow management.
     
     Represents a content piece in the PrismQ workflow. Story maintains
-    references to Title and Script versions, stores serialized Idea data,
-    and tracks workflow state.
+    reference to Idea and tracks workflow state. Current title/script
+    versions are implicit - determined by highest version in Title/Script
+    tables via ORDER BY version DESC LIMIT 1.
     
     Attributes:
         id: Primary key (auto-generated)
-        idea_id: FK to Idea table (TEXT for flexibility)
-        idea_json: Serialized Idea data (JSON string) - optional, populated when idea is set
-        title_id: FK to latest Title version (optional, populated when title is generated)
-        script_id: FK to latest Script version (optional, populated when script is generated)
-        state: Current workflow state (e.g., StoryState.TITLE_FROM_IDEA)
+        idea_id: FK to Idea table (INTEGER)
+        state: Current workflow state (next process name)
         created_at: Timestamp of creation
-        updated_at: Timestamp of last update
     
     Note:
-        - idea_id references the Idea table (stored as TEXT for flexibility)
-        - idea_json optionally stores the Idea as JSON for decoupled access
-        - title_id and script_id reference the latest versions
+        - idea_id references the Idea table via FOREIGN KEY
+        - state stores the next process name (pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...)
+        - Current title/script versions are implicit (highest version in respective tables)
         - state can be updated (UPDATE operation allowed)
     
     Schema:
         ```sql
         Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
-            state TEXT NOT NULL DEFAULT 'CREATED',
+            idea_id INTEGER NULL,
+            state TEXT NOT NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         )
         ```
     
     Example:
         >>> story = Story(
-        ...     idea_id="1",
+        ...     idea_id=1,
         ...     state=StoryState.TITLE_FROM_IDEA
         ... )
         >>> print(f"Story state: {story.state}")
@@ -198,26 +190,25 @@ class Story(IModel[int]):
         Returns:
             SQL statement to create the Story table with all
             constraints and performance indexes.
+        
+        Note:
+            - idea_id is INTEGER FK to Idea(id)
+            - state stores the next process name (pattern: PrismQ.T.<Output>.From.<Input1>.<Input2>...)
+            - Current title/script versions are implicit - determined by highest version
+              in Title/Script tables via ORDER BY version DESC LIMIT 1
         """
         return """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
-            state TEXT NOT NULL DEFAULT 'CREATED',
+            idea_id INTEGER NULL,
+            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         );
         
         -- Performance indexes for common query patterns
         CREATE INDEX IF NOT EXISTS idx_story_state ON Story(state);
         CREATE INDEX IF NOT EXISTS idx_story_idea_id ON Story(idea_id);
-        CREATE INDEX IF NOT EXISTS idx_story_title_id ON Story(title_id);
-        CREATE INDEX IF NOT EXISTS idx_story_script_id ON Story(script_id);
         """
     
     # === Query Helpers ===
