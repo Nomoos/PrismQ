@@ -620,10 +620,10 @@ class TestStoryScriptServiceStateBased:
         
         base_time = datetime.now()
         
-        # Create story with wrong state (oldest)
+        # Create story with different state (oldest) - to verify filtering by state
         story1 = Story(
             idea_json=json.dumps(sample_idea.to_dict()),
-            state='CREATED',  # Wrong state
+            state='CREATED',  # Different state to test filtering
             created_at=base_time - timedelta(hours=2)
         )
         story_repo.insert(story1)
