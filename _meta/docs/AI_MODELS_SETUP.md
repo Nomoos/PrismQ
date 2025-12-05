@@ -228,6 +228,34 @@ The [MPT-7B-StoryWriter](https://huggingface.co/mosaicml/mpt-7b-storywriter) is 
 
 Pro kreativní psaní a tvorbu příběhů existují specializované modely s lepším výkonem než obecné LLM:
 
+#### 🧪 Reálné testy modelů (English YA Fiction)
+
+Na základě interního testování PrismQ s anglickými příběhy pro US/CA publikum:
+
+| Model | Test příběh | Skóre | Struktura | Dialog | Postavy | Napětí | Konzistence | Čitelnost | Poznámka |
+|-------|-------------|-------|-----------|--------|---------|--------|-------------|-----------|----------|
+| **qwen2.5:32b (EN)** | The Lighthouse Keeper's Secret | **7.8/10** | 8 | 9 | 6.5 | 8 | 7 | 7.5 | 7 | 🏆 Překvapivě čisté, soudržné, čtivé — mnohem lepší než CZ |
+| **mistral-nemo:12b (EN)** | The Whispering Grove | **7.5/10** | 8 | 9 | 6 | 7.5 | 6 | 7 | 6 | Angličtina výrazně zvedá kvalitu, dobré YA-fantasy |
+
+> **Klíčové zjištění:** Anglická verze výrazně převyšuje českou u obou modelů. Pro US/CA publikum doporučujeme vždy generovat v angličtině.
+
+#### 🏆 Finální doporučení pro English YA Fiction
+
+Na základě testů doporučujeme pro **americké/kanadské teen publikum**:
+
+| Priorita | Model | Skóre | Nejlepší pro |
+|----------|-------|-------|--------------|
+| **#1** | **Qwen2.5:32b** | 7.8/10 | Family Drama, Teen Drama, Mystery |
+| **#2** | **Mistral-Nemo:12b** | 7.5/10 | YA Fantasy, Slice of Life, Reddit Stories |
+
+```bash
+# Primární model pro EN YA content
+ollama pull qwen2.5:32b
+
+# Sekundární/rychlejší model
+ollama pull mistral-nemo:12b
+```
+
 #### 🔍 Srovnání 32B modelů pro kreativní psaní
 
 | Model | Fine-tuning | Kvalita prózy | Kontext | Angličtina | Ollama | Benchmarks |
