@@ -228,6 +228,134 @@ The [MPT-7B-StoryWriter](https://huggingface.co/mosaicml/mpt-7b-storywriter) is 
 
 Pro kreativní psaní a tvorbu příběhů existují specializované modely s lepším výkonem než obecné LLM:
 
+#### 🔍 Srovnání 32B modelů pro kreativní psaní
+
+| Model | Fine-tuning | Kvalita prózy | Kontext | Angličtina | Ollama | Benchmarks |
+|-------|-------------|---------------|---------|------------|--------|------------|
+| **Qwen2.5:32b-Instruct** | General | ⭐⭐⭐⭐⭐ | 32K | Výborná | ✅ | MMLU: 83.5 |
+| **Yi-1.5-34B-Chat** | Chat/Creative | ⭐⭐⭐⭐⭐ | 32K | Výborná | ✅ | MMLU: 81.2 |
+| **DeepSeek-V2-Lite (27B)** | General | ⭐⭐⭐⭐ | 128K | Dobrá | ✅ | MMLU: 79.8 |
+| **Mixtral-8x7B (47B MoE)** | Instruct | ⭐⭐⭐⭐⭐ | 32K | Výborná | ✅ | MMLU: 81.1 |
+| **Command-R (35B)** | RAG/Chat | ⭐⭐⭐⭐ | 128K | Výborná | ✅ | MMLU: 78.5 |
+
+#### 📖 Fine-tuned modely pro kreativní psaní (32B třída)
+
+| Model | Specializace | Kvalita | VRAM | Zdroj |
+|-------|--------------|---------|------|-------|
+| **Nous-Hermes-2-Yi-34B** | Creative writing, RP | ⭐⭐⭐⭐⭐ | ~22GB | HuggingFace |
+| **Airoboros-34B** | Creative, storytelling | ⭐⭐⭐⭐⭐ | ~22GB | HuggingFace |
+| **Dolphin-2.6-Yi-34B** | Uncensored creative | ⭐⭐⭐⭐⭐ | ~22GB | HuggingFace |
+| **Goliath-120B** (merged) | Premium creative | ⭐⭐⭐⭐⭐ | ~70GB | HuggingFace |
+| **Chronos-Hermes-34B** | Long-form fiction | ⭐⭐⭐⭐⭐ | ~22GB | HuggingFace |
+| **StellarBright-Qwen2.5-32B** | Creative writing | ⭐⭐⭐⭐⭐ | ~20GB | HuggingFace |
+
+> **Poznámka:** Fine-tuned modely pro kreativní psaní často překonávají větší obecné modely v kvalitě narativu.
+
+#### 🎯 Doporučení pro cílové publikum: Teen/Young Adult (10-20, US ženy)
+
+Pro americké a kanadské anglicky mluvící publikum (především mladé ženy 10-20 let):
+
+| Žánr | 🏆 Doporučený model | Alternativa | Proč |
+|------|---------------------|-------------|------|
+| **Reddit Stories** | Nous-Hermes-2-Yi-34B | Qwen2.5:32b | Autentický Reddit styl, relatable |
+| **Family Drama** | Qwen2.5:32b | Airoboros-34B | Emocionální hloubka, realistické dialogy |
+| **Teen Drama** | Dolphin-2.6-Yi-34B | Nous-Hermes-2-Yi-34B | Teen hlas, moderní slang |
+| **Teen Stories** | Nous-Hermes-2-Yi-34B | Mistral-Nemo | YA narativ, engagement |
+| **Romance (YA)** | Chronos-Hermes-34B | Qwen2.5:32b | Emotivní, clean romance |
+| **Thriller/Mystery** | Qwen2.5:32b | Command-R | Napětí, twist endings |
+| **AITA/Confession** | Nous-Hermes-2-Yi-34B | Dolphin-2.6-Yi-34B | Autentický POV |
+| **Slice of Life** | Mistral-Nemo | Qwen2.5:32b | Každodenní situace, relatability |
+
+#### 🏆 TOP 3 pro Teen/YA obsah na RTX 5090
+
+**1. Nous-Hermes-2-Yi-34B** - Nejlepší pro Reddit/Teen stories
+```bash
+ollama pull nous-hermes2:yi-34b-q4_K_M
+```
+- Specializovaný na creative writing a roleplay
+- Přirozený teen dialog a POV
+- Výborný pro AITA, relationship drama, confession stories
+- ~22GB VRAM (Q4)
+
+**2. Qwen2.5:32b** - Univerzální vysoká kvalita
+```bash
+ollama pull qwen2.5:32b
+```
+- Nejlepší balance kvality a rychlosti
+- Výborná angličtina, emotivní próza
+- Ideální pro family drama, romance
+- ~20GB VRAM
+
+**3. Dolphin-2.6-Yi-34B** - Pro autentický teen hlas
+```bash
+ollama pull dolphin2.6:yi-34b-q4_K_M
+```
+- Uncensored, přirozené dialogy
+- Moderní slang a teen expressions
+- Vhodný pro edgier teen drama
+- ~22GB VRAM (Q4)
+
+#### 📊 Statistiky a benchmarky 32B modelů (creative writing)
+
+Na základě komunitních testů a r/LocalLLaMA:
+
+| Model | Reddit Stories | Dialogy | Emotivnost | Konzistence | Celkově |
+|-------|----------------|---------|------------|-------------|---------|
+| Nous-Hermes-2-Yi-34B | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | **#1** |
+| Qwen2.5:32b | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **#2** |
+| Airoboros-34B | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | **#3** |
+| Yi-34B-Chat | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **#4** |
+
+#### Konfigurace pro Teen/YA content
+
+```python
+from T.Publishing.SEO.Keywords import AIConfig
+
+# Reddit Stories / AITA style
+reddit_config = AIConfig(
+    model="nous-hermes2:yi-34b-q4_K_M",
+    temperature=0.85,           # Vyšší pro autenticitu
+    max_tokens=3000,
+    enable_ai=True
+)
+
+# Teen Drama / Family Drama
+drama_config = AIConfig(
+    model="qwen2.5:32b",
+    temperature=0.75,
+    max_tokens=4000,
+    enable_ai=True
+)
+
+# Teen Stories (YA fiction)
+teen_stories_config = AIConfig(
+    model="nous-hermes2:yi-34b-q4_K_M",
+    temperature=0.8,
+    max_tokens=5000,           # Delší kapitoly
+    enable_ai=True
+)
+```
+
+#### Instalace modelů pro Teen/YA content
+
+```bash
+# Kompletní sada pro Teen/YA publikum na RTX 5090
+
+# 1. Primární pro Reddit stories a teen drama
+ollama pull nous-hermes2:yi-34b-q4_K_M
+
+# 2. Univerzální vysoká kvalita
+ollama pull qwen2.5:32b
+
+# 3. Pro edgier teen content
+ollama pull dolphin2.6:yi-34b-q4_K_M
+
+# 4. Pro dlouhé série
+ollama pull yi:34b-chat-q4_K_M
+```
+
+> **Tip pro US teen publikum:** Používejte `temperature=0.8-0.9` pro autentičtější dialogy. Teen content vyžaduje současný slang, pop culture reference a relatable situace.
+
 #### Srovnání modelů pro psaní příběhů
 
 | Model | Parametry | VRAM | Kvalita příběhů | Kontext | Ollama | Doporučení |
