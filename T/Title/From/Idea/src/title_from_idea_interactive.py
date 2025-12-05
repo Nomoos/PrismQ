@@ -79,10 +79,13 @@ except ImportError:
 
 # Try to import AI title generator for local Ollama-based generation
 try:
-    from ai_title_generator import AITitleGenerator, AITitleConfig, generate_ai_titles_from_idea
+    from ai_title_generator import AITitleGenerator, AITitleConfig, generate_ai_titles_from_idea, AIUnavailableError as AIGenUnavailableError
     AI_TITLE_GENERATOR_AVAILABLE = True
 except ImportError:
     AI_TITLE_GENERATOR_AVAILABLE = False
+    # Define a placeholder exception if import fails
+    class AIGenUnavailableError(Exception):
+        pass
 
 # Try to import SimpleIdeaDatabase for fetching Idea content
 try:
@@ -403,12 +406,21 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             if logger:
                 logger.info("Creating 10 title variants")
             
-            if use_ai and ai_generator:
+            if use_ai:
                 # Use AI-powered title generation via Ollama
                 print_info("Using local AI (Ollama) for title generation...")
                 if logger:
                     logger.info("Generating titles using AI (Ollama)")
-                titles = ai_generator.generate_from_idea(idea, num_variants=10)
+                try:
+                    titles = ai_generator.generate_from_idea(idea, num_variants=10)
+                except AIGenUnavailableError as ai_err:
+                    # AI became unavailable during generation - fall back to template
+                    print_warning(f"AI generation failed: {ai_err}")
+                    print_warning("Falling back to template-based generation...")
+                    if logger:
+                        logger.warning(f"AI generation failed: {ai_err}, falling back to template")
+                    config = TitleConfig(num_variants=10)
+                    titles = generate_titles_from_idea(idea, num_variants=10, config=config)
             else:
                 # Fallback to template-based generation
                 config = TitleConfig(num_variants=10)
