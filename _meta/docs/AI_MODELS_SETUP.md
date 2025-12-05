@@ -224,6 +224,114 @@ The [MPT-7B-StoryWriter](https://huggingface.co/mosaicml/mpt-7b-storywriter) is 
 - Prefer easy Ollama integration
 - Want highest quality output
 
+### 📚 Modely optimalizované pro tvorbu příběhů
+
+Pro kreativní psaní a tvorbu příběhů existují specializované modely s lepším výkonem než obecné LLM:
+
+#### Srovnání modelů pro psaní příběhů
+
+| Model | Parametry | VRAM | Kvalita příběhů | Kontext | Ollama | Doporučení |
+|-------|-----------|------|-----------------|---------|--------|------------|
+| **Mistral-Nemo-Instruct-2407** | 12B | ~8GB | ⭐⭐⭐⭐⭐ | 128K | ✅ | 🏆 **NEJLEPŠÍ pro příběhy** |
+| **Qwen2.5:32b** | 32B | ~20GB | ⭐⭐⭐⭐⭐ | 32K | ✅ | Výborná kvalita, versatilní |
+| **Llama-3.1-Storm-8B** | 8B | ~6GB | ⭐⭐⭐⭐ | 8K | ✅ | Kreativní, rychlý |
+| **Nous-Hermes-2-Mixtral** | 47B | ~28GB | ⭐⭐⭐⭐⭐ | 32K | ✅ | Nejlepší MoE pro příběhy |
+| **Yi-34B-Chat** | 34B | ~22GB | ⭐⭐⭐⭐⭐ | 200K | ✅ | Extrémní kontext |
+| **DeepSeek-Coder-V2-Lite** | 16B | ~10GB | ⭐⭐⭐⭐ | 128K | ✅ | Dobrý pro dialogy |
+| **MPT-7B-StoryWriter** | 7B | ~8GB | ⭐⭐⭐⭐ | 65K | ❌ | Specializovaný na romány |
+| **Fimbulvetr-11B** | 11B | ~8GB | ⭐⭐⭐⭐⭐ | 8K | ⚠️ | Výjimečný pro RP/fiction |
+
+#### 🏆 Top 3 doporučené modely pro příběhy na RTX 5090
+
+**1. Mistral-Nemo-Instruct-2407** - Nejlepší volba
+```bash
+ollama pull mistral-nemo:12b
+```
+- 128K tokenů kontextu (perfektní pro dlouhé příběhy)
+- Výjimečná kreativita a koherence
+- Optimalizováno pro narativní úlohy
+- Vejde se do 32GB VRAM bez kvantizace
+
+**2. Nous-Hermes-2-Mixtral-8x7B** - Premium kvalita
+```bash
+ollama pull nous-hermes2-mixtral:8x7b-q4_K_M
+```
+- MoE architektura (efektivní využití parametrů)
+- Špičková kvalita prózy
+- Vyžaduje ~28GB VRAM
+
+**3. Yi-34B-Chat** - Pro extrémně dlouhé příběhy
+```bash
+ollama pull yi:34b-chat-q4_K_M
+```
+- 200K tokenů kontextu (nejdelší)
+- Ideální pro romány a série
+- Vyžaduje ~22GB VRAM (Q4)
+
+#### Specializované modely pro různé žánry
+
+| Žánr | Doporučený model | Alternativa |
+|------|------------------|-------------|
+| **Horror/Dark Fantasy** | Mistral-Nemo | Fimbulvetr-11B |
+| **Romantika** | Qwen2.5:32b | Yi-34B-Chat |
+| **Sci-Fi** | Nous-Hermes-2-Mixtral | DeepSeek-V2 |
+| **Detektivky** | Llama 3.3:70b | Mistral-Nemo |
+| **Dětské příběhy** | Qwen2.5:14b | Mistral-Nemo |
+| **Epická fantasy** | Yi-34B-Chat | Nous-Hermes-2 |
+| **Krátké povídky** | Mistral-Nemo | Qwen2.5:32b |
+| **Dialogy/Scénáře** | Llama 3.3:70b | Qwen2.5:32b |
+
+#### Instalace nejlepších modelů pro příběhy
+
+```bash
+# Kompletní sada pro profesionální tvorbu příběhů na RTX 5090
+
+# 1. Primární model pro příběhy (doporučeno)
+ollama pull mistral-nemo:12b
+
+# 2. Pro dlouhé romány
+ollama pull yi:34b-chat-q4_K_M
+
+# 3. Pro premium kvalitu prózy
+ollama pull nous-hermes2-mixtral:8x7b-q4_K_M
+
+# 4. Univerzální záloha
+ollama pull qwen2.5:32b
+```
+
+#### Konfigurace pro tvorbu příběhů
+
+```python
+from T.Publishing.SEO.Keywords import AIConfig
+
+# Optimální konfigurace pro kreativní psaní příběhů
+story_writing_config = AIConfig(
+    model="mistral-nemo:12b",  # Nejlepší pro příběhy
+    api_base="http://localhost:11434",
+    temperature=0.8,           # Vyšší pro kreativitu
+    max_tokens=4000,           # Dlouhé kapitoly
+    enable_ai=True
+)
+
+# Pro velmi dlouhé příběhy (romány)
+novel_config = AIConfig(
+    model="yi:34b-chat-q4_K_M",
+    temperature=0.7,
+    max_tokens=8000,           # Celé kapitoly
+    enable_ai=True
+)
+
+# Pro dialogy a scénáře
+dialogue_config = AIConfig(
+    model="llama3.3:70b-q4_K_M",
+    temperature=0.6,           # Konzistentnější dialogy
+    max_tokens=2000,
+    enable_ai=True
+)
+```
+
+> **Tip pro tvorbu příběhů:** Používejte vyšší `temperature` (0.7-0.9) pro kreativnější výstup. Pro konzistentní postavy a zápletky udržujte kontext a používejte modely s dlouhým kontextovým oknem (Yi-34B, Mistral-Nemo).
+
 ### RTX 5090 Optimal Configuration
 
 For RTX 5090 with 32GB VRAM, we recommend:
