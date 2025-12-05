@@ -32,6 +32,7 @@ T_ROOT = TITLE_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
+sys.path.insert(0, str(REPO_ROOT))  # Repository root for T.Database, T.State imports
 sys.path.insert(0, str(SCRIPT_DIR))  # Current directory for local imports
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
