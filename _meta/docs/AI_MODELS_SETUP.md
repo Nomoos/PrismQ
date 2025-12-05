@@ -82,8 +82,83 @@ For users with an NVIDIA RTX 5090 (32GB VRAM), you have access to the most power
 | **Qwen2.5:32b** | 32B | ~20GB | ⭐⭐⭐⭐⭐ | Medium | **Best overall for creative writing** |
 | **Qwen2.5:14b** | 14B | ~9GB | ⭐⭐⭐⭐ | Fast | Balanced quality and speed |
 | **Llama3.1:70b-q4** | 70B | ~40GB | ⭐⭐⭐⭐⭐ | Slow | Highest quality, requires quantization |
+| **Llama3.3:70b** | 70B | ~40GB | ⭐⭐⭐⭐⭐ | Slow | Latest Llama, improved reasoning |
 | **Mistral-Large** | 123B | ~32GB | ⭐⭐⭐⭐⭐ | Slow | Complex narratives |
 | **DeepSeek-V2** | 236B | ~32GB | ⭐⭐⭐⭐ | Medium | Long-form content |
+
+### Llama 3.1 405B vs Llama 3.3 70B
+
+| Aspect | Llama 3.1 — 405B | Llama 3.3 — 70B |
+|--------|------------------|-----------------|
+| **Parameters** | 405B | 70B |
+| **VRAM Required** | ~200GB+ (requires multi-GPU or cloud) | ~40GB (Q4 quantized) |
+| **Context Length** | 128K tokens | 128K tokens |
+| **Quality** | ⭐⭐⭐⭐⭐ (best-in-class) | ⭐⭐⭐⭐⭐ (excellent) |
+| **Speed** | Very Slow | Medium |
+| **Local RTX 5090** | ❌ Too large | ✅ With quantization |
+| **Ollama Support** | ❌ Cloud/API only | ✅ `ollama pull llama3.3:70b` |
+
+### Model Recommendations by PrismQ Task
+
+| Task | Best Model | Alternative | Why |
+|------|------------|-------------|-----|
+| **Idea Generation** | Llama 3.3:70b | Qwen2.5:32b | Strong creative reasoning, diverse ideas |
+| **Title Creation** | Qwen2.5:14b | Llama 3.3:70b | Fast, concise outputs, good for iteration |
+| **Script Writing** | Qwen2.5:32b | Llama 3.1:70b-q4 | Best narrative quality, instruction following |
+| **Review/Editing** | Llama 3.3:70b | Llama 3.1:70b-q4 | Superior analytical and reasoning capabilities |
+| **SEO Metadata** | Llama 3.1:70b-q4 | Qwen2.5:14b | Consistent, structured outputs |
+
+#### Task-Specific Configuration:
+
+```python
+from T.Publishing.SEO.Keywords import AIConfig
+
+# Idea Generation - creative, diverse
+idea_config = AIConfig(
+    model="llama3.3:70b",
+    temperature=0.8,  # Higher for creativity
+    enable_ai=True
+)
+
+# Title Creation - fast iteration
+title_config = AIConfig(
+    model="qwen2.5:14b",
+    temperature=0.5,
+    enable_ai=True
+)
+
+# Script Writing - high quality narrative
+script_config = AIConfig(
+    model="qwen2.5:32b",
+    temperature=0.7,
+    max_tokens=4000,
+    enable_ai=True
+)
+
+# Review/Editing - analytical
+review_config = AIConfig(
+    model="llama3.3:70b",
+    temperature=0.3,  # Lower for consistent analysis
+    enable_ai=True
+)
+```
+
+#### When to Use Llama 3.1 405B:
+- Cloud/API access (Together AI, Fireworks, Groq)
+- Maximum quality requirements
+- Complex reasoning tasks
+- Enterprise production workflows
+
+#### When to Use Llama 3.3 70B:
+- **Recommended for local RTX 5090** ✅
+- Best balance of quality and local inference
+- Reviews and analytical tasks
+- Idea generation with strong reasoning
+
+```bash
+# Install Llama 3.3 70B for local use
+ollama pull llama3.3:70b-q4_K_M
+```
 
 ### MPT-7B-StoryWriter (HuggingFace)
 
