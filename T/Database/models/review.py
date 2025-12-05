@@ -171,7 +171,7 @@ class Review(IModel[int]):
         CREATE TABLE IF NOT EXISTS Review (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
-            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+            score INTEGER CHECK (score >= 0 AND score <= 100),
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
         """
