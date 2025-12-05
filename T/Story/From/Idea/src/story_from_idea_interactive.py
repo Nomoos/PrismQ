@@ -267,6 +267,9 @@ def run_continuous_mode(preview: bool = False):
     try:
         while True:
             iteration += 1
+            # Initialize remaining_count for this iteration (default to 100 for fast retry on errors)
+            remaining_count = 100
+            
             print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
             print(f"{Colors.CYAN}{Colors.BOLD}  Iteration {iteration}{Colors.END}")
             print(f"{Colors.CYAN}{'─' * 60}{Colors.END}")
@@ -410,7 +413,7 @@ def run_continuous_mode(preview: bool = False):
                 print_error(f"Error processing idea: {e}")
                 if logger:
                     logger.exception("Error processing idea")
-                remaining_count = 100  # Use default fast interval on error
+                # remaining_count already initialized to 100 at start of iteration
             
             finally:
                 # Close connections - log errors but don't fail
@@ -428,7 +431,7 @@ def run_continuous_mode(preview: bool = False):
                         logger.warning(f"Error closing idea database: {close_error}")
             
             # Calculate dynamic wait interval based on remaining unreferenced ideas
-            wait_interval = get_wait_interval(remaining_count if 'remaining_count' in locals() else 100)
+            wait_interval = get_wait_interval(remaining_count)
             print_info(f"Waiting {format_wait_time(wait_interval)} before next iteration...")
             time.sleep(wait_interval)
     
