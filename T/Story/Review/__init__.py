@@ -29,6 +29,18 @@ from .review import (
     get_expert_feedback
 )
 
+from .prompts import (
+    CRITICAL_STORY_REVIEW_PROMPT,
+    FINAL_POLISH_THRESHOLD,
+    REVIEW_FOCUS_AREAS,
+    REVIEW_OUTPUT_STRUCTURE,
+    REVIEW_CONSTRAINTS,
+    get_critical_review_prompt,
+    get_critical_review_prompt_template,
+    is_ready_for_final_polish,
+    get_readiness_statement
+)
+
 __all__ = [
     # Main review class
     "ExpertReview",
@@ -55,5 +67,16 @@ __all__ = [
     # Convenience functions
     "review_story_with_gpt",
     "review_story_to_json",
-    "get_expert_feedback"
+    "get_expert_feedback",
+    
+    # Prompt templates and utilities
+    "CRITICAL_STORY_REVIEW_PROMPT",
+    "FINAL_POLISH_THRESHOLD",
+    "REVIEW_FOCUS_AREAS",
+    "REVIEW_OUTPUT_STRUCTURE",
+    "REVIEW_CONSTRAINTS",
+    "get_critical_review_prompt",
+    "get_critical_review_prompt_template",
+    "is_ready_for_final_polish",
+    "get_readiness_statement"
 ]
