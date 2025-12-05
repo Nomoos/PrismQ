@@ -100,6 +100,7 @@ from T.Database.repositories.story_review_repository import StoryReviewRepositor
 from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.review_repository import ReviewRepository
+from T.Database.schema_manager import SchemaManager, initialize_database
 
 __all__ = [
     # Model interfaces
@@ -123,4 +124,7 @@ __all__ = [
     "StoryReviewRepository",
     "StoryRepository",
     "ReviewRepository",
+    # Schema management
+    "SchemaManager",
+    "initialize_database",
 ]

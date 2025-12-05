@@ -93,11 +93,9 @@ except ImportError:
 # Import database models and repositories
 from T.Database.models.story import Story, StoryState
 from T.Database.models.title import Title
-from T.Database.models.script import Script
-from T.Database.models.review import Review
-from T.Database.models.story_review import StoryReviewModel
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.title_repository import TitleRepository
+from T.Database.schema_manager import SchemaManager
 
 
 @dataclass
@@ -161,7 +159,8 @@ class StoryTitleService:
         self, 
         connection: Optional[sqlite3.Connection] = None,
         title_config: Optional[TitleConfig] = None,
-        use_ai: bool = True
+        use_ai: bool = True,
+        auto_create_schema: bool = True
     ):
         """Initialize the service.
         
@@ -172,14 +171,22 @@ class StoryTitleService:
             title_config: Optional configuration for title generation.
             use_ai: Whether to use AI (Qwen2.5-14B-Instruct) for title generation.
                 Defaults to True. Falls back to template-based if AI unavailable.
+            auto_create_schema: If True (default), automatically creates database
+                tables on initialization. Set to False if schema is managed
+                externally via SchemaManager or migration tools.
+        
+        Note:
+            For production environments with proper schema management, set
+            auto_create_schema=False and use SchemaManager.initialize_schema()
+            during application bootstrapping instead.
         """
         self._conn = connection
         self._story_repo = StoryRepository(connection) if connection else None
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
         
-        # Ensure required tables exist when connection is provided
-        if connection:
+        # Optionally ensure required tables exist (for convenience in development/testing)
+        if connection and auto_create_schema:
             self.ensure_tables_exist()
         
         # Initialize AI title generator if requested and available
@@ -725,20 +732,16 @@ class StoryTitleService:
     def ensure_tables_exist(self) -> None:
         """Ensure all required database tables exist.
         
-        Creates the following tables in the correct order:
-        1. Review - base table (no FK dependencies)
-        2. Story - references Title/Script but those are NULL initially
-        3. Title - depends on Story and Review
-        4. Script - depends on Story and Review
-        5. StoryReview - depends on Story and Review
+        Delegates to SchemaManager for centralized schema management.
+        This method is provided for backward compatibility and convenience
+        in development/testing scenarios.
         
-        Note: Story has FK references to Title and Script, but these columns
-        are nullable and populated after the referenced records are created.
-        SQLite does not enforce FK constraints by default (PRAGMA foreign_keys = OFF),
-        so the circular dependency between Story<->Title/Script is handled correctly.
+        For production environments, prefer using SchemaManager directly
+        during application bootstrapping:
         
-        Call this method to create the required tables if they don't exist.
-        Only works when a database connection was provided.
+            from T.Database.schema_manager import SchemaManager
+            schema_manager = SchemaManager(connection)
+            schema_manager.initialize_schema()
         
         Raises:
             RuntimeError: If no database connection is available.
@@ -746,27 +749,9 @@ class StoryTitleService:
         if not self._conn:
             raise RuntimeError("No database connection available")
         
-        # Create tables in order of dependencies
-        # Note: SQLite FK constraints are not enforced by default,
-        # so we can create Story before Title/Script even though
-        # Story has FK references to them (nullable columns).
-        
-        # 1. Review table (no FK dependencies)
-        self._conn.executescript(Review.get_sql_schema())
-        
-        # 2. Story table (FK to Title/Script are nullable, created later)
-        self._conn.executescript(Story.get_sql_schema())
-        
-        # 3. Title table (depends on Story and Review)
-        self._conn.executescript(Title.get_sql_schema())
-        
-        # 4. Script table (depends on Story and Review)
-        self._conn.executescript(Script.get_sql_schema())
-        
-        # 5. StoryReview linking table (depends on Story and Review)
-        self._conn.executescript(StoryReviewModel.get_sql_schema())
-        
-        self._conn.commit()
+        # Delegate to centralized SchemaManager
+        schema_manager = SchemaManager(self._conn)
+        schema_manager.initialize_schema()
 
 
 def create_stories_from_idea(
