@@ -8,6 +8,7 @@ Model Interfaces:
     - IModel: Interface for full persistence operations (extends IReadable)
 
 Models:
+    - IdeaSchema: SQL schema definition for Idea table
     - Title: Versioned title content with review FK
     - Script: Script model for versioned content storage
     - Review: Simple review model for content review storage
@@ -21,6 +22,7 @@ on the IModel abstraction rather than concrete database implementations.
 """
 
 from T.Database.models.base import IReadable, IModel
+from T.Database.models.idea import IdeaSchema
 from T.Database.models.review import Review
 from T.Database.models.script import Script
 from T.Database.models.title import Title
@@ -37,6 +39,8 @@ __all__ = [
     # Interfaces
     "IReadable",
     "IModel",
+    # Schema definitions
+    "IdeaSchema",
     # Models
     "StoryReviewModel",
     "ReviewType",
