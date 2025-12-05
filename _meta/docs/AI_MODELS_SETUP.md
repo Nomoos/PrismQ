@@ -71,6 +71,117 @@ To pull this model:
 ollama pull llama3.1:70b-q4_K_M
 ```
 
+## Model Comparison for High-End Systems (RTX 5090)
+
+For users with an NVIDIA RTX 5090 (32GB VRAM), you have access to the most powerful local AI models. Here's a comprehensive comparison for story writing and content generation:
+
+### Recommended Models for RTX 5090
+
+| Model | Parameters | VRAM Usage | Story Quality | Speed | Best For |
+|-------|------------|------------|---------------|-------|----------|
+| **Qwen2.5:32b** | 32B | ~20GB | ⭐⭐⭐⭐⭐ | Medium | **Best overall for creative writing** |
+| **Qwen2.5:14b** | 14B | ~9GB | ⭐⭐⭐⭐ | Fast | Balanced quality and speed |
+| **Llama3.1:70b-q4** | 70B | ~40GB | ⭐⭐⭐⭐⭐ | Slow | Highest quality, requires quantization |
+| **Mistral-Large** | 123B | ~32GB | ⭐⭐⭐⭐⭐ | Slow | Complex narratives |
+| **DeepSeek-V2** | 236B | ~32GB | ⭐⭐⭐⭐ | Medium | Long-form content |
+
+### MPT-7B-StoryWriter (HuggingFace)
+
+The [MPT-7B-StoryWriter](https://huggingface.co/mosaicml/mpt-7b-storywriter) is a specialized model fine-tuned specifically for story writing with an impressive 65K context length.
+
+| Aspect | MPT-7B-StoryWriter | Qwen2.5:32b |
+|--------|-------------------|-------------|
+| **Parameters** | 7B | 32B |
+| **VRAM Required** | ~8GB | ~20GB |
+| **Context Length** | 65,536 tokens | 32,768 tokens |
+| **Story Quality** | ⭐⭐⭐⭐ (specialized) | ⭐⭐⭐⭐⭐ (general) |
+| **Inference Speed** | Very Fast | Medium |
+| **Ollama Support** | ❌ (requires manual setup) | ✅ Native |
+| **Best Use Case** | Long-form novels, extended narratives | All creative content |
+
+#### When to Choose MPT-7B-StoryWriter:
+- Writing very long stories (novels, extended series)
+- Need 65K context for maintaining consistency
+- Prefer faster inference over raw quality
+- Working with HuggingFace Transformers directly
+
+#### When to Choose Qwen2.5:32b:
+- General creative writing (stories, scripts, dialogue)
+- Need better instruction following
+- Prefer easy Ollama integration
+- Want highest quality output
+
+### RTX 5090 Optimal Configuration
+
+For RTX 5090 with 32GB VRAM, we recommend:
+
+```bash
+# Best quality for story writing
+ollama pull qwen2.5:32b
+
+# Alternative for SEO and metadata
+ollama pull llama3.1:70b-q4_K_M
+```
+
+**PrismQ Configuration for RTX 5090:**
+
+```python
+from T.Publishing.SEO.Keywords import AIConfig
+
+# High-quality story generation config
+story_config = AIConfig(
+    model="qwen2.5:32b",
+    api_base="http://localhost:11434",
+    temperature=0.7,  # Higher for creative writing
+    max_tokens=2000,
+    enable_ai=True
+)
+
+# SEO metadata config
+seo_config = AIConfig(
+    model="llama3.1:70b-q4_K_M",
+    api_base="http://localhost:11434",
+    temperature=0.3,  # Lower for consistent SEO output
+    enable_ai=True
+)
+```
+
+### Using MPT-7B-StoryWriter with HuggingFace
+
+If you prefer the specialized MPT-7B-StoryWriter model:
+
+```bash
+pip install transformers torch accelerate
+```
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_name = "mosaicml/mpt-7b-storywriter"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+    trust_remote_code=True
+)
+
+prompt = "Write the opening chapter of a dark horror story set in a small Czech town:"
+inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+
+outputs = model.generate(
+    **inputs,
+    max_new_tokens=1000,
+    temperature=0.7,
+    do_sample=True
+)
+
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+```
+
+> **Note**: MPT-7B-StoryWriter requires manual setup with HuggingFace Transformers and is not directly supported by Ollama. For easier integration with PrismQ, we recommend Qwen2.5:32b.
+
 ## Step 3 – Test the Model
 
 After the download finishes, verify the installation:
