@@ -181,6 +181,32 @@ C:\PrismQ/              # Working Directory (Windows) or ~/PrismQ (Unix)
 
 See [src/README.md](./src/README.md) for complete configuration documentation.
 
+## 🤖 Local AI Model
+
+PrismQ uses **Qwen 3:30B** (`qwen3:30b`) as the default local AI model for content generation and SEO optimization tasks. This model is run locally via [Ollama](https://ollama.com/) and provides an excellent balance of quality and speed.
+
+### Quick Setup
+
+```bash
+# 1. Install Ollama
+# Visit: https://ollama.com/
+
+# 2. Pull the default model
+ollama pull qwen3:30b
+
+# 3. Start the server
+ollama serve
+```
+
+### Why Qwen 3:30B?
+- Strong reasoning and instruction-following capabilities
+- Well-suited for content generation and SEO tasks
+- Good balance between model size and inference speed
+- Strong multilingual support
+- Works well on consumer hardware
+
+For detailed AI configuration options, see [AI Metadata Documentation](./T/Publishing/SEO/Keywords/_meta/docs/AI_METADATA.md).
+
 ## 🚀 Quick Start
 
 1. **Explore a Pipeline**: Start with [T/README.md](./T/README.md) to understand text generation

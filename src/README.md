@@ -111,6 +111,39 @@ src manages the following environment variables in the .env file:
 | `YOUTUBE_CHANNEL_URL` | YouTube channel URL (optional) | None |
 | `PRISMQ_WORKING_DIRECTORY` | Override for working directory | None |
 
+## Local AI Model Configuration
+
+PrismQ uses **Qwen 3:30B** (`qwen3:30b`) as the default local AI model for content generation and SEO optimization. The AI functionality is powered by [Ollama](https://ollama.com/).
+
+### Quick Setup
+
+```bash
+# Install Ollama (visit https://ollama.com/)
+# Then pull the default model:
+ollama pull qwen3:30b
+
+# Start the Ollama server:
+ollama serve
+```
+
+### AI Configuration
+
+AI settings can be configured programmatically using `AIConfig`:
+
+```python
+from T.Publishing.SEO.Keywords import AIConfig
+
+config = AIConfig(
+    model="qwen3:30b",  # Default local AI model
+    api_base="http://localhost:11434",  # Ollama API URL
+    temperature=0.3,  # Lower for focused output
+    max_tokens=500,
+    enable_ai=True
+)
+```
+
+For detailed AI configuration options, see [AI Metadata Documentation](../T/Publishing/SEO/Keywords/_meta/docs/AI_METADATA.md).
+
 ## Configuration Class
 
 ### Methods

@@ -120,7 +120,7 @@ def example_3_custom_ai_config():
     
     # Create custom AI configuration
     custom_config = AIConfig(
-        model="llama3.1:70b-q4_K_M",  # Specific model
+        model="qwen3:30b",  # Default local AI model (can be customized)
         temperature=0.2,  # More focused output
         max_tokens=400,
         timeout=30,
@@ -308,7 +308,7 @@ def main():
     print("If Ollama is not running, examples will use rule-based fallback.")
     print("\nTo enable AI generation:")
     print("1. Install Ollama: https://ollama.com/")
-    print("2. Pull a model: ollama pull llama3.1:70b-q4_K_M")
+    print("2. Pull the default model: ollama pull qwen3:30b")
     print("3. Run the server: ollama serve")
     
     try:
