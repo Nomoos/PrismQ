@@ -33,12 +33,12 @@ from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
 
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.script_repository import ScriptRepository
-from T.Database.models.story import Story
-from T.Database.models.script import Script
-from T.Database.models.review import Review
-from T.State.constants.state_names import StateNames
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.models.story import Story
+from Model.Database.models.script import Script
+from Model.Database.models.review import Review
+from Model.State.constants.state_names import StateNames
 
 # Import ContentReview model from local module
 from .content_review import (

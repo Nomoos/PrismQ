@@ -22,13 +22,13 @@ _project_root = _test_dir.parent
 # Ensure project root is in path
 sys.path.insert(0, str(_project_root))
 
-from T.Database.models.story import Story
-from T.Database.models.script import Script
-from T.Database.models.review import Review
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.script_repository import ScriptRepository
-from T.Database.repositories.review_repository import ReviewRepository
-from T.State.constants.state_names import StateNames
+from Model.Database.models.story import Story
+from Model.Database.models.script import Script
+from Model.Database.models.review import Review
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.review_repository import ReviewRepository
+from Model.State.constants.state_names import StateNames
 
 
 # Import the module to test using direct file loading to avoid circular import

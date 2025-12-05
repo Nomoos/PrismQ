@@ -9,8 +9,8 @@ import pytest
 from datetime import datetime, timedelta
 
 from T.Review import pick_story_by_module, count_stories_by_module
-from T.Database.models.story import Story
-from T.Database.repositories.story_repository import StoryRepository
+from Model.Database.models.story import Story
+from Model.Database.repositories.story_repository import StoryRepository
 
 
 @pytest.fixture

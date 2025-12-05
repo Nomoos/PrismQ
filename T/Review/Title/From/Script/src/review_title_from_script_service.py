@@ -30,14 +30,14 @@ if _repo_root not in sys.path:
 if _t_root not in sys.path:
     sys.path.insert(0, _t_root)
 
-from T.State.constants.state_names import StateNames
-from T.Database.models.review import Review
-from T.Database.models.story import Story
-from T.Database.models.title import Title
-from T.Database.models.script import Script
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.title_repository import TitleRepository
-from T.Database.repositories.script_repository import ScriptRepository
+from Model.State.constants.state_names import StateNames
+from Model.Database.models.review import Review
+from Model.Database.models.story import Story
+from Model.Database.models.title import Title
+from Model.Database.models.script import Script
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.title_repository import TitleRepository
+from Model.Database.repositories.script_repository import ScriptRepository
 
 # Try to import the review function
 try:

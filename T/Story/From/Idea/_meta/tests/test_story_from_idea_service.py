@@ -32,8 +32,8 @@ idea_model_path = t_module_dir / 'Idea' / 'Model' / 'src'
 if str(idea_model_path) not in sys.path:
     sys.path.insert(0, str(idea_model_path))
 
-from T.Database.models.story import Story, StoryState
-from T.Database.repositories.story_repository import StoryRepository
+from Model.Database.models.story import Story, StoryState
+from Model.Database.repositories.story_repository import StoryRepository
 from simple_idea import SimpleIdea
 from simple_idea_db import SimpleIdeaDatabase
 

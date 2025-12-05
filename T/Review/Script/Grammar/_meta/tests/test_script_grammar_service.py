@@ -28,8 +28,8 @@ from T.Review.Script.Grammar import (
     OUTPUT_STATE_FAIL,
     DEFAULT_PASS_THRESHOLD
 )
-from T.State.constants.state_names import StateNames
-from T.Database.models.review import Review
+from Model.State.constants.state_names import StateNames
+from Model.Database.models.review import Review
 
 
 @pytest.fixture

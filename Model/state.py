@@ -55,7 +55,7 @@ class StoryState(str, Enum):
         PrismQ.T.<Action>.<Target> - for other states
     
     Example:
-        >>> from T.State.constants.state_names import StoryState
+        >>> from Model.State.constants.state_names import StoryState
         >>> story.state = StoryState.TITLE_FROM_IDEA.value
         >>> story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
     """

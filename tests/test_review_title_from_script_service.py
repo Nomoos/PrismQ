@@ -16,13 +16,13 @@ _repo_root = os.path.dirname(_current_dir)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
-from T.State.constants.state_names import StateNames
-from T.Database.models.story import Story
-from T.Database.models.title import Title
-from T.Database.models.script import Script
-from T.Database.repositories.story_repository import StoryRepository
-from T.Database.repositories.title_repository import TitleRepository
-from T.Database.repositories.script_repository import ScriptRepository
+from Model.State.constants.state_names import StateNames
+from Model.Database.models.story import Story
+from Model.Database.models.title import Title
+from Model.Database.models.script import Script
+from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.repositories.title_repository import TitleRepository
+from Model.Database.repositories.script_repository import ScriptRepository
 from T.Review.Title.From.Script.src.review_title_from_script_service import (
     ReviewTitleFromScriptService,
     ReviewTitleFromScriptResult,
@@ -110,7 +110,7 @@ class TestReviewRepository:
     def test_insert_review(self, db_connection):
         """Test inserting a review."""
         repo = ReviewRepository(db_connection)
-        from T.Database.models.review import Review
+        from Model.Database.models.review import Review
         
         review = Review(
             text="Great title, well aligned with script.",
@@ -127,7 +127,7 @@ class TestReviewRepository:
     def test_find_review_by_id(self, db_connection):
         """Test finding a review by ID."""
         repo = ReviewRepository(db_connection)
-        from T.Database.models.review import Review
+        from Model.Database.models.review import Review
         
         review = Review(text="Test review", score=75)
         saved = repo.insert(review)

@@ -62,7 +62,7 @@ except ImportError:
 
 # Try to import database
 try:
-    from T.Database.repositories.script_repository import ScriptRepository
+    from Model.Database.repositories.script_repository import ScriptRepository
     DB_AVAILABLE = True
 except ImportError:
     DB_AVAILABLE = False

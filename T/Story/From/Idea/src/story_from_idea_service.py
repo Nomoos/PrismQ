@@ -59,8 +59,8 @@ if str(t_module_dir) not in sys.path:
     sys.path.insert(0, str(t_module_dir))
 
 # Import database models and repositories
-from T.Database.models.story import Story, StoryState
-from T.Database.repositories.story_repository import StoryRepository
+from Model.Database.models.story import Story, StoryState
+from Model.Database.repositories.story_repository import StoryRepository
 
 # Import SimpleIdea model and database
 from simple_idea import SimpleIdea

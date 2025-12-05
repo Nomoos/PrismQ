@@ -36,10 +36,10 @@ ContentReviewResult = _scr_module.ContentReviewResult
 review_oldest_story_content = _scr_module.review_oldest_story_content
 
 from T.Review.Model.src.content_review import ContentReview
-from T.Database.models.story import Story
-from T.Database.models.script import Script
-from T.Database.models.review import Review
-from T.State.constants.state_names import StateNames
+from Model.Database.models.story import Story
+from Model.Database.models.script import Script
+from Model.Database.models.review import Review
+from Model.State.constants.state_names import StateNames
 
 
 @pytest.fixture
