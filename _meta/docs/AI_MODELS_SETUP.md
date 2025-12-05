@@ -1747,6 +1747,192 @@ Iterativní refinement se kombinuje s Moving Window pro dlouhé texty:
 - [ ] Integrovat s Moving Window pro dlouhé texty
 - [ ] VO-friendliness jako finální quality gate
 
+### 5) Local AI Review Prompt for Qwen 3:30B
+
+> **Recommended Model:** Qwen 3:30B for local AI generation and review tasks on RTX 5090.
+
+This is the standard prompt for local AI story review using Qwen 3:30B. Use this prompt to get critical, actionable feedback on story drafts.
+
+#### 📝 Story Review Prompt Template
+
+```
+Write a critical review of the following story that focuses exclusively on its biggest flaws in structure, pacing, worldbuilding, logic, thematic execution, and character development.
+
+Requirements:
+
+Length: Maximum 1200 words. Do NOT exceed.
+
+Tone: analytical, objective, constructive; avoid excessive praise.
+
+Do NOT summarize the entire plot.
+
+Focus your critique on:
+
+Major pacing and narrative-flow issues
+
+Worldbuilding inconsistencies or contradictions
+
+Logical gaps in the story's rules or mechanics
+
+Underdeveloped or unclear character motivations
+
+Thematic weaknesses or missed opportunities
+
+Structural problems that reduce emotional impact
+
+Use specific examples from the story for each flaw.
+
+Provide actionable suggestions explaining how the author can improve or fix each issue.
+
+Avoid:
+
+Superlatives
+
+Unjustified praise
+
+Invention of scenes not present in the text
+
+Vague criticism without evidence
+
+Structure your review as follows:
+
+Introduction: brief statement of what the story attempts to accomplish
+
+Major Flaws: bullet points or subsections with evidence
+
+Suggestions for Improvement: clear and practical
+
+Conclusion: short summary of why the weaknesses matter
+
+Final Score: Give a numerical score 0–100% based on overall effectiveness in light of its flaws
+
+Readiness Statement:
+
+If the score is 75% or higher, explicitly state: "This story is ready for final polish."
+
+If the score is below 75%, explicitly state: "This story is not yet ready for final polish."
+
+Now analyze the following story:
+[INSERT STORY HERE]
+```
+
+#### 🔧 Usage in PrismQ
+
+```python
+import ollama
+
+def review_story_local(story_text: str) -> dict:
+    """
+    Review a story using local Qwen 3:30B model.
+    
+    Args:
+        story_text: The complete story text to review
+        
+    Returns:
+        dict with review, score, and readiness status
+    """
+    
+    REVIEW_PROMPT = """Write a critical review of the following story that focuses exclusively on its biggest flaws in structure, pacing, worldbuilding, logic, thematic execution, and character development.
+
+Requirements:
+- Length: Maximum 1200 words. Do NOT exceed.
+- Tone: analytical, objective, constructive; avoid excessive praise.
+- Do NOT summarize the entire plot.
+
+Focus your critique on:
+- Major pacing and narrative-flow issues
+- Worldbuilding inconsistencies or contradictions
+- Logical gaps in the story's rules or mechanics
+- Underdeveloped or unclear character motivations
+- Thematic weaknesses or missed opportunities
+- Structural problems that reduce emotional impact
+
+Use specific examples from the story for each flaw.
+Provide actionable suggestions explaining how the author can improve or fix each issue.
+
+Avoid:
+- Superlatives
+- Unjustified praise
+- Invention of scenes not present in the text
+- Vague criticism without evidence
+
+Structure your review as follows:
+1. Introduction: brief statement of what the story attempts to accomplish
+2. Major Flaws: bullet points or subsections with evidence
+3. Suggestions for Improvement: clear and practical
+4. Conclusion: short summary of why the weaknesses matter
+5. Final Score: Give a numerical score 0–100% based on overall effectiveness in light of its flaws
+
+Readiness Statement:
+- If the score is 75% or higher, explicitly state: "This story is ready for final polish."
+- If the score is below 75%, explicitly state: "This story is not yet ready for final polish."
+
+Now analyze the following story:
+"""
+    
+    response = ollama.chat(
+        model="qwen3:30b",  # Qwen 3:30B for local review
+        messages=[
+            {"role": "user", "content": REVIEW_PROMPT + story_text}
+        ]
+    )
+    
+    review_text = response["message"]["content"]
+    
+    # Parse score from review
+    import re
+    score_match = re.search(r'(\d+)%', review_text)
+    score = int(score_match.group(1)) if score_match else 0
+    
+    return {
+        "review": review_text,
+        "score": score,
+        "ready_for_polish": score >= 75,
+        "model": "qwen3:30b"
+    }
+```
+
+#### 📊 Integration with Iterative Refinement
+
+This review prompt integrates with the iterative refinement pipeline:
+
+```
+Story Draft
+    ↓
+┌─────────────────────────────────────────┐
+│  LOCAL REVIEW (Qwen 3:30B)              │
+│  - Critical analysis                     │
+│  - Score 0-100%                          │
+│  - Actionable suggestions                │
+└─────────────────────────────────────────┘
+    ↓
+Score >= 75%? ──→ YES → "Ready for final polish"
+    │
+    NO
+    ↓
+┌─────────────────────────────────────────┐
+│  REWRITE (apply suggestions)            │
+│  - Fix major flaws                       │
+│  - Address pacing issues                 │
+│  - Strengthen character motivations      │
+└─────────────────────────────────────────┘
+    ↓
+Loop back to LOCAL REVIEW
+```
+
+#### ⚙️ Ollama Setup for Qwen 3:30B
+
+```bash
+# Pull Qwen 3:30B model
+ollama pull qwen3:30b
+
+# Or with specific quantization for RTX 5090 (32GB VRAM)
+ollama pull qwen3:30b-q4_K_M
+
+# Set keep-alive for efficient batch processing
+export OLLAMA_KEEP_ALIVE=60m
+```
+
 ### Roadmap implementace
 
 | Fáze | Funkce | Priorita | Závislosti |
@@ -1760,6 +1946,7 @@ Iterativní refinement se kombinuje s Moving Window pro dlouhé texty:
 | **Phase 7** | Iterative Refinement Loop | 🟡 Střední | Phase 6 |
 | **Phase 8** | VO-Friendliness review modul | 🟡 Střední | Phase 6 |
 | **Phase 9** | Combined MW + IR pipeline | 🟠 Nízká | Phase 3, 7 |
+| **Phase 10** | Local AI Review with Qwen 3:30B | 🟢 Vysoká | Phase 6 |
 
 ---
 
