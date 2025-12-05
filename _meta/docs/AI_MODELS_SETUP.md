@@ -102,32 +102,39 @@ For users with an NVIDIA RTX 5090 (32GB VRAM), you have access to the most power
 
 **Co je kvantizace?** Kvantizace je technika komprese modelu, která snižuje přesnost vah (např. z 16-bit na 4-bit). To výrazně zmenší velikost modelu a VRAM požadavky.
 
-| Kvantizace | Kvalita vs Originál | VRAM úspora | Doporučení |
-|------------|---------------------|-------------|------------|
-| **FP16** (bez kvantizace) | 100% | 0% | Nejlepší kvalita, nejvíce VRAM |
-| **Q8** (8-bit) | ~99% | ~50% | Téměř identická kvalita |
-| **Q6_K** (6-bit) | ~98% | ~60% | Výborná kvalita |
-| **Q5_K_M** (5-bit) | ~97% | ~70% | Velmi dobrá kvalita |
-| **Q4_K_M** (4-bit) | ~95% | ~75% | **Doporučeno pro RTX 5090** ✅ |
-| **Q3** (3-bit) | ~90% | ~80% | Znatelná ztráta kvality |
+#### Kompletní přehled kvantizačních variant
 
-**Pro RTX 5090 doporučuji:**
-- **Q4_K_M** nebo **Q5_K_M** - minimální ztráta kvality (~3-5%), velká úspora VRAM
-- Ztráta kvality je téměř nepostřehnutelná pro kreativní psaní
+| Kvantizace | Kvalita vs Originál | VRAM (70B model) | Rychlost | Doporučení |
+|------------|---------------------|------------------|----------|------------|
+| **FP16** (bez kvantizace) | 100% | ~140GB | Nejpomalejší | ❌ Příliš velké pro RTX 5090 |
+| **Q8_0** (8-bit) | ~99.5% | ~70GB | Pomalá | ❌ Příliš velké pro RTX 5090 |
+| **Q6_K** (6-bit) | ~98.5% | ~54GB | Střední | ⚠️ Na hranici, může fungovat s offloadingem |
+| **Q5_K_M** (5-bit) | ~97% | ~47GB | Rychlá | ✅ Dobrá volba pro kvalitu |
+| **Q5_K_S** (5-bit small) | ~96% | ~45GB | Rychlá | ✅ Dobrá alternativa |
+| **Q4_K_M** (4-bit medium) | ~95% | ~40GB | Velmi rychlá | ✅ **DOPORUČENO pro RTX 5090** |
+| **Q4_K_S** (4-bit small) | ~94% | ~38GB | Velmi rychlá | ✅ Nejrychlejší kvalitní varianta |
+| **Q3_K_M** (3-bit) | ~90% | ~33GB | Extrémně rychlá | ⚠️ Znatelná ztráta kvality |
+| **IQ4_XS** (4-bit i-quant) | ~94.5% | ~36GB | Velmi rychlá | ✅ Moderní alternativa k Q4 |
 
-**Pokud preferujete maximální kvalitu bez kompromisů:**
+#### 🏆 Finální doporučení pro RTX 5090 (32GB VRAM)
+
+**Pro maximální kvalitu:** `Q4_K_M` nebo `Q5_K_S`
+- Q4_K_M nabízí nejlepší poměr kvalita/VRAM pro 32GB karty
+- Rozdíl mezi Q4_K_M a Q6_K je v praxi téměř nepostřehnutelný pro kreativní psaní
+- Q6_K je příliš velký pro RTX 5090 bez CPU offloadingu
+
 ```bash
-# Nejvyšší kvalita s Q8 (vyžaduje více VRAM)
-ollama pull llama3.3:70b-q8_0
-
-# Dobrý kompromis s Q5
-ollama pull llama3.3:70b-q5_K_M
-
-# Standardní Q4 (nejčastější volba)
+# 🏆 NEJLEPŠÍ VOLBA pro RTX 5090 32GB - Llama 3.3 70B Q4_K_M
 ollama pull llama3.3:70b-q4_K_M
+
+# Alternativa pro o něco vyšší kvalitu (pomalejší)
+ollama pull llama3.3:70b-q5_K_S
+
+# Pro Qwen2.5 32B (vejde se celý bez kvantizace)
+ollama pull qwen2.5:32b
 ```
 
-> **Tip:** Pro RTX 5090 s 32GB VRAM můžete bez problémů použít Q5_K_M variantu pro lepší kvalitu. Rozdíl v rychlosti je minimální.
+> **Poznámka ke Q6_K:** I když Q6_K nabízí ~98.5% kvality, vyžaduje ~54GB VRAM pro 70B model. Na RTX 5090 (32GB) by musel použít CPU offloading, což dramaticky zpomalí inference. Pro vaši sestavu doporučuji Q4_K_M - ztráta kvality je minimální (~5%) a rychlost bude výrazně lepší.
 
 ### Model Recommendations by PrismQ Task
 
@@ -251,6 +258,107 @@ seo_config = AIConfig(
     enable_ai=True
 )
 ```
+
+### Optimalizace načítání modelu (Model Loading Optimization)
+
+Pro zamezení opakovaného načítání modelu do VRAM během běhu PrismQ:
+
+#### Ollama Keep-Alive nastavení
+
+Ollama standardně udržuje model v paměti 5 minut po posledním dotazu. Pro delší workflow:
+
+```bash
+# Nastavte OLLAMA_KEEP_ALIVE na delší dobu (např. 60 minut)
+export OLLAMA_KEEP_ALIVE=60m
+
+# Nebo permanentně v .bashrc / .zshrc
+echo 'export OLLAMA_KEEP_ALIVE=60m' >> ~/.bashrc
+```
+
+**Windows (PowerShell):**
+```powershell
+# Nastavte proměnnou prostředí
+$env:OLLAMA_KEEP_ALIVE = "60m"
+
+# Nebo permanentně
+[System.Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "60m", "User")
+```
+
+#### PrismQ Model Manager (doporučený přístup)
+
+Pro optimální výkon použijte jednotný model pro celý workflow:
+
+```python
+import ollama
+
+class PrismQModelManager:
+    """Správce modelu pro efektivní využití VRAM."""
+    
+    _instance = None
+    _current_model = None
+    
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+    
+    def ensure_model_loaded(self, model_name: str):
+        """Načte model pouze pokud ještě není v paměti."""
+        if self._current_model != model_name:
+            # Warmup dotaz pro načtení modelu do VRAM
+            ollama.chat(
+                model=model_name,
+                messages=[{"role": "user", "content": "Hello"}],
+                options={"num_predict": 1}
+            )
+            self._current_model = model_name
+            print(f"Model {model_name} načten do VRAM")
+        return self._current_model
+
+# Použití na začátku workflow
+manager = PrismQModelManager.get_instance()
+manager.ensure_model_loaded("qwen2.5:32b")
+
+# Všechny následující dotazy použijí již načtený model
+```
+
+#### Doporučená strategie pro celý PrismQ workflow
+
+| Fáze | Model | Důvod |
+|------|-------|-------|
+| **Idea → Title → Script → Review** | `qwen2.5:32b` | Jeden model pro celý workflow, bez přepínání |
+| **SEO Metadata** (volitelně) | Přepnout na `llama3.3:70b-q4_K_M` | Pouze pokud je nutná lepší SEO kvalita |
+
+> **Tip:** Pro maximální efektivitu používejte jeden model pro celý běh. Přepínání mezi modely vyžaduje uvolnění a načtení ~20-40GB dat, což trvá 10-30 sekund.
+
+### Optimální konfigurace pro Ryzen 9 9900X3D + RTX 5090
+
+Pro váš konkrétní hardware (AMD Ryzen 9 9900X3D + RTX 5090 32GB):
+
+| Parametr | Doporučená hodnota | Důvod |
+|----------|-------------------|-------|
+| **Model** | `qwen2.5:32b` nebo `llama3.3:70b-q4_K_M` | Plně využije 32GB VRAM |
+| **Kvantizace (70B)** | Q4_K_M | Optimální pro 32GB VRAM |
+| **Context Length** | 8192-16384 | Využije 3D V-Cache pro KV cache |
+| **Batch Size** | 1 | Standardní pro generování |
+| **GPU Layers** | All (auto) | Celý model na GPU |
+
+```bash
+# Optimální Ollama konfigurace pro Ryzen 9 9900X3D + RTX 5090
+export OLLAMA_NUM_PARALLEL=1          # Jeden request najednou
+export OLLAMA_KEEP_ALIVE=60m          # Model zůstane v paměti
+export OLLAMA_MAX_LOADED_MODELS=1     # Jeden model najednou (šetří VRAM)
+
+# Spusťte Ollama
+ollama serve
+```
+
+**Využití 3D V-Cache (141MB):**
+Ryzen 9 9900X3D má masivní L3 cache, která pomáhá s:
+- Rychlejším tokenizačním pre/post-processingem
+- Efektivnějším CPU offloadingem (pokud potřebný)
+- Nižší latencí při komunikaci s GPU
 
 ### Using MPT-7B-StoryWriter with HuggingFace
 
