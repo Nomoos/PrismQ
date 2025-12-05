@@ -81,6 +81,10 @@ def initialize_application_database(
     error handling and logging. If any step fails, the error is logged
     and the function returns False.
     
+    This function configures SQLite following PrismQ database design:
+    - Enables WAL mode for better concurrency
+    - Enables foreign key constraints
+    
     This function should ONLY be called during application startup:
     - Main entry point initialization
     - CLI tool initialization  
@@ -106,6 +110,12 @@ def initialize_application_database(
     logger.info("Starting database schema initialization")
     
     try:
+        # Configure SQLite following PrismQ database design
+        # See: T/_meta/docs/DATABASE_DESIGN.md
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA foreign_keys=ON")
+        logger.info("SQLite configured: WAL mode enabled, foreign keys enabled")
+        
         # Create schema manager
         schema_manager = SchemaManager(connection)
         

@@ -239,6 +239,20 @@ class TestIntegrationWithSchemaManager:
         assert "story_id" in title_columns
         assert "version" in title_columns
         assert "text" in title_columns
+    
+    def test_configures_sqlite_pragmas(self, db_connection):
+        """Test that SQLite is configured per DATABASE_DESIGN.md.
+        
+        Per T/_meta/docs/DATABASE_DESIGN.md, initialization should:
+        - Enable WAL mode for better concurrency
+        - Enable foreign key constraints
+        """
+        initialize_application_database(db_connection)
+        
+        # Check foreign keys are enabled
+        cursor = db_connection.execute("PRAGMA foreign_keys")
+        fk_result = cursor.fetchone()
+        assert fk_result[0] == 1, "Foreign keys should be enabled"
 
 
 class TestStartupOnlyUsage:
