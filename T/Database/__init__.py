@@ -101,6 +101,11 @@ from T.Database.repositories.script_repository import ScriptRepository
 from T.Database.repositories.story_repository import StoryRepository
 from T.Database.repositories.review_repository import ReviewRepository
 from T.Database.schema_manager import SchemaManager, initialize_database
+from T.Database.startup import (
+    DatabaseInitializationError,
+    initialize_application_database,
+    safe_initialize_database,
+)
 
 __all__ = [
     # Model interfaces
@@ -127,4 +132,8 @@ __all__ = [
     # Schema management
     "SchemaManager",
     "initialize_database",
+    # Application startup
+    "DatabaseInitializationError",
+    "initialize_application_database",
+    "safe_initialize_database",
 ]
