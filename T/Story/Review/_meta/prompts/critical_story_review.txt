@@ -1,0 +1,58 @@
+Write a critical review of the following story that focuses exclusively on its biggest flaws in structure, pacing, worldbuilding, logic, thematic execution, and character development.
+
+Requirements:
+
+Length: Maximum 1200 words. Do NOT exceed.
+
+Tone: analytical, objective, constructive; avoid excessive praise.
+
+Do NOT summarize the entire plot.
+
+Focus your critique on:
+
+Major pacing and narrative-flow issues
+
+Worldbuilding inconsistencies or contradictions
+
+Logical gaps in the story's rules or mechanics
+
+Underdeveloped or unclear character motivations
+
+Thematic weaknesses or missed opportunities
+
+Structural problems that reduce emotional impact
+
+Use specific examples from the story for each flaw.
+
+Provide actionable suggestions explaining how the author can improve or fix each issue.
+
+Avoid:
+
+Superlatives
+
+Unjustified praise
+
+Invention of scenes not present in the text
+
+Vague criticism without evidence
+
+Structure your review as follows:
+
+Introduction: brief statement of what the story attempts to accomplish
+
+Major Flaws: bullet points or subsections with evidence
+
+Suggestions for Improvement: clear and practical
+
+Conclusion: short summary of why the weaknesses matter
+
+Final Score: Give a numerical score 0–100% based on overall effectiveness in light of its flaws
+
+Readiness Statement:
+
+If the score is 75% or higher, explicitly state: "This story is ready for final polish."
+
+If the score is below 75%, explicitly state: "This story is not yet ready for final polish."
+
+Now analyze the following story:
+[INSERT STORY HERE]

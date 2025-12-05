@@ -201,6 +201,66 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 
 **Decision**: Send to Polish for small improvements (92% → 95%+ target)
 
+## Critical Story Review Prompt
+
+The module includes a specialized prompt template for local AI critical story reviews. This prompt focuses exclusively on identifying flaws and providing actionable feedback.
+
+### Prompt Storage
+
+The prompt is stored as a separate text file for easier maintenance and editing:
+- **Location**: `_meta/prompts/critical_story_review.txt`
+- **Loaded at module import** and exposed as `CRITICAL_STORY_REVIEW_PROMPT`
+
+### Using the Critical Review Prompt
+
+```python
+from T.Story.Review import (
+    get_critical_review_prompt,
+    is_ready_for_final_polish,
+    get_readiness_statement,
+    CRITICAL_STORY_REVIEW_PROMPT
+)
+
+# Get the prompt with your story inserted
+story_text = "Your complete story text here..."
+prompt = get_critical_review_prompt(story_text)
+
+# Use with your local AI model
+# response = local_ai.generate(prompt)
+
+# Check if story is ready for final polish based on score
+score = 80  # Score from AI review
+if is_ready_for_final_polish(score):
+    print(get_readiness_statement(score))  # "This story is ready for final polish."
+else:
+    print(get_readiness_statement(score))  # "This story is not yet ready for final polish."
+```
+
+### Review Focus Areas
+
+The critical review prompt focuses on:
+- **Pacing and narrative flow issues**
+- **Worldbuilding inconsistencies or contradictions**
+- **Logical gaps in story rules or mechanics**
+- **Underdeveloped or unclear character motivations**
+- **Thematic weaknesses or missed opportunities**
+- **Structural problems that reduce emotional impact**
+
+### Review Output Structure
+
+The prompt generates reviews with:
+1. **Introduction**: Brief statement of what the story attempts to accomplish
+2. **Major Flaws**: Bullet points or subsections with evidence
+3. **Suggestions for Improvement**: Clear and practical
+4. **Conclusion**: Short summary of why the weaknesses matter
+5. **Final Score**: Numerical score 0-100%
+6. **Readiness Statement**: Whether the story is ready for final polish (75%+ threshold)
+
+### Readiness Threshold
+
+- **Score >= 75%**: "This story is ready for final polish."
+- **Score < 75%**: "This story is not yet ready for final polish."
+
 ## Module Metadata
 
 **[→ View Review/_meta/docs/](./_meta/docs/)**
