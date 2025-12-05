@@ -74,6 +74,32 @@ try:
 except ImportError:
     SERVICE_AVAILABLE = False
 
+# Try to import Config for database path management
+try:
+    from src.config import Config
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
+
+
+def get_database_paths() -> tuple:
+    """Get the database paths for Title and Story databases.
+    
+    Returns database paths from Config if available, otherwise falls back
+    to C:/PrismQ/db.s3db for both.
+    
+    Returns:
+        Tuple of (title_db_path, story_db_path)
+    """
+    if CONFIG_AVAILABLE:
+        config = Config(interactive=False)
+        # Both Title and Story use the same database file
+        return config.database_path, config.database_path
+    else:
+        # Fallback to C:/PrismQ/db.s3db
+        default_path = str(Path("C:/PrismQ") / "db.s3db")
+        return default_path, default_path
+
 
 # =============================================================================
 # ANSI Colors for Terminal Output
@@ -392,18 +418,24 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print("Enter new idea or type 'quit' to exit.\n")
 
 
-def run_state_workflow_mode(db_path: str, preview: bool = False, debug: bool = False):
+def run_state_workflow_mode(db_path: Optional[str] = None, preview: bool = False, debug: bool = False):
     """Run the state-based workflow mode for title generation.
     
     This mode automatically processes Stories with state PrismQ.T.Title.From.Idea,
     generates titles with similarity checking, and transitions to the next state.
     
     Args:
-        db_path: Path to the SQLite database file.
+        db_path: Path to the SQLite database file. If None, uses default from
+                 Config (C:/PrismQ/db.s3db).
         preview: If True, don't save to database (preview/test mode).
         debug: If True, enable extensive debug logging.
     """
     import sqlite3
+    
+    # Use default database paths if not provided
+    if db_path is None:
+        title_db_path, story_db_path = get_database_paths()
+        db_path = title_db_path  # Both use the same database
     
     # Setup logging
     logger = None
@@ -443,6 +475,7 @@ def run_state_workflow_mode(db_path: str, preview: bool = False, debug: bool = F
     
     # Connect to database
     print_section("Environment Setup")
+    print_info(f"Database path: {db_path}")
     try:
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
@@ -583,8 +616,9 @@ Examples:
   python title_from_idea_interactive.py --preview --debug  # Debug mode with extensive logging
   
   # State-based workflow mode (automatic processing)
-  python title_from_idea_interactive.py --run --db prismq.db  # Process Stories from DB
-  python title_from_idea_interactive.py --run --db prismq.db --preview  # Preview without saving
+  python title_from_idea_interactive.py --run              # Process Stories from default DB
+  python title_from_idea_interactive.py --run --db /path/to/db.s3db  # Use custom DB
+  python title_from_idea_interactive.py --run --preview    # Preview without saving
         """
     )
     
@@ -594,8 +628,8 @@ Examples:
                        help='Enable debug logging (extensive output)')
     parser.add_argument('--run', '-r', action='store_true',
                        help='Run state-based workflow mode (auto-process Stories)')
-    parser.add_argument('--db', type=str, default='prismq.db',
-                       help='Path to SQLite database (default: prismq.db)')
+    parser.add_argument('--db', type=str, default=None,
+                       help='Path to SQLite database (default: from Config or C:/PrismQ/db.s3db)')
     
     args = parser.parse_args()
     
