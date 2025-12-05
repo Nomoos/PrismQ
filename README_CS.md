@@ -152,6 +152,32 @@ PrismQ/
 │   └── WORKFLOW_CS.md # Dokumentace stavového automatu
 ```
 
+## 🤖 Lokální AI model
+
+PrismQ používá **Qwen 3:30B** (`qwen3:30b`) jako výchozí lokální AI model pro generování obsahu a SEO optimalizaci. Tento model běží lokálně přes [Ollama](https://ollama.com/) a poskytuje výborný poměr mezi kvalitou a rychlostí.
+
+### Rychlá instalace
+
+```bash
+# 1. Nainstalujte Ollama
+# Navštivte: https://ollama.com/
+
+# 2. Stáhněte výchozí model
+ollama pull qwen3:30b
+
+# 3. Spusťte server
+ollama serve
+```
+
+### Proč Qwen 3:30B?
+- Silné schopnosti uvažování a sledování instrukcí
+- Vhodný pro generování obsahu a SEO úlohy
+- Dobrý poměr mezi velikostí modelu a rychlostí inference
+- Silná vícejazyčná podpora
+- Funguje dobře na běžném hardwaru
+
+Pro detailní možnosti konfigurace AI viz [dokumentace AI metadat](./T/Publishing/SEO/Keywords/_meta/docs/AI_METADATA.md).
+
 ## 🚀 Rychlý start
 
 1. **Prozkoumejte pipeline**: Začněte s [T/README.md](./T/README.md) pro pochopení generování textu
