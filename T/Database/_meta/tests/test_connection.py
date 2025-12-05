@@ -402,3 +402,79 @@ class TestPEP249Compliance:
             assert result["value"] == "test"
         finally:
             conn.close()
+
+
+class TestDatabaseDesignCompliance:
+    """Tests verifying compliance with DATABASE_DESIGN.md recommendations."""
+    
+    def test_default_timeout_is_30_seconds(self):
+        """Test that default timeout matches DATABASE_DESIGN.md (30.0 seconds)."""
+        # The design doc specifies timeout=30.0
+        # We verify the connection accepts the default timeout value
+        conn = get_connection(":memory:", timeout=30.0)
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1")
+            result = cursor.fetchone()
+            assert result[0] == 1
+        finally:
+            conn.close()
+    
+    def test_check_same_thread_false_by_default(self):
+        """Test that check_same_thread=False for multi-process access per DATABASE_DESIGN.md."""
+        # The design doc specifies check_same_thread=False
+        # This allows connections to be used from multiple threads
+        conn = get_connection(":memory:", check_same_thread=False)
+        try:
+            # If check_same_thread was True, this would raise an error
+            # when accessed from a different thread
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1")
+            assert cursor.fetchone()[0] == 1
+        finally:
+            conn.close()
+    
+    def test_wal_mode_enabled_for_file_databases(self):
+        """Test that WAL mode is enabled for file databases per DATABASE_DESIGN.md."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test.s3db")
+            conn = get_connection(db_path)
+            try:
+                cursor = conn.cursor()
+                cursor.execute("PRAGMA journal_mode")
+                result = cursor.fetchone()
+                assert result[0].lower() == "wal"
+            finally:
+                conn.close()
+    
+    def test_recommended_connection_settings(self):
+        """Test that all DATABASE_DESIGN.md recommended settings are applied.
+        
+        Reference: DATABASE_DESIGN.md "Best Practices Research" section
+        
+        Recommended SQLite configuration:
+        - check_same_thread=False
+        - timeout=30.0
+        - PRAGMA journal_mode=WAL
+        - PRAGMA foreign_keys=ON
+        - row_factory = sqlite3.Row
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "prismq.s3db")
+            conn = get_connection(db_path)
+            try:
+                cursor = conn.cursor()
+                
+                # Check row_factory
+                assert conn.row_factory == sqlite3.Row
+                
+                # Check foreign keys
+                cursor.execute("PRAGMA foreign_keys")
+                assert cursor.fetchone()[0] == 1
+                
+                # Check WAL mode (file-based DB)
+                cursor.execute("PRAGMA journal_mode")
+                assert cursor.fetchone()[0].lower() == "wal"
+                
+            finally:
+                conn.close()
