@@ -30,6 +30,7 @@ Example:
 import sqlite3
 from typing import List, Tuple
 
+from T.Database.models.idea import IdeaSchema
 from T.Database.models.review import Review
 from T.Database.models.story import Story
 from T.Database.models.title import Title
@@ -53,11 +54,12 @@ class SchemaManager:
         _conn: SQLite database connection
     
     Table Creation Order (respecting FK dependencies):
-        1. Review - base table (no FK dependencies)
-        2. Story - references Title/Script (nullable FKs)
-        3. Title - depends on Story and Review
-        4. Script - depends on Story and Review
-        5. StoryReview - depends on Story and Review
+        1. Idea - base table (no FK dependencies)
+        2. Review - base table (no FK dependencies)
+        3. Story - references Title/Script (nullable FKs)
+        4. Title - depends on Story and Review
+        5. Script - depends on Story and Review
+        6. StoryReview - depends on Story and Review
     
     Example:
         >>> conn = sqlite3.connect(":memory:")
@@ -67,7 +69,7 @@ class SchemaManager:
     """
     
     # Table names in creation order (respecting FK dependencies)
-    TABLE_ORDER: List[str] = ["Review", "Story", "Title", "Script", "StoryReview"]
+    TABLE_ORDER: List[str] = ["Idea", "Review", "Story", "Title", "Script", "StoryReview"]
     
     def __init__(self, connection: sqlite3.Connection):
         """Initialize schema manager with database connection.
@@ -89,19 +91,22 @@ class SchemaManager:
             between Story<->Title/Script are handled correctly.
         """
         # Create tables in dependency order
-        # 1. Review table (no FK dependencies)
+        # 1. Idea table (no FK dependencies)
+        self._conn.executescript(IdeaSchema.get_sql_schema())
+        
+        # 2. Review table (no FK dependencies)
         self._conn.executescript(Review.get_sql_schema())
         
-        # 2. Story table (FK to Title/Script are nullable)
+        # 3. Story table (FK to Title/Script are nullable)
         self._conn.executescript(Story.get_sql_schema())
         
-        # 3. Title table (depends on Story and Review)
+        # 4. Title table (depends on Story and Review)
         self._conn.executescript(Title.get_sql_schema())
         
-        # 4. Script table (depends on Story and Review)
+        # 5. Script table (depends on Story and Review)
         self._conn.executescript(Script.get_sql_schema())
         
-        # 5. StoryReview linking table (depends on Story and Review)
+        # 6. StoryReview linking table (depends on Story and Review)
         self._conn.executescript(StoryReviewModel.get_sql_schema())
         
         self._conn.commit()

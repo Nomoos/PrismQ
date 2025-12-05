@@ -35,7 +35,7 @@ class TestSchemaManager:
         )
         tables = [row[0] for row in cursor.fetchall()]
         
-        expected_tables = ["Review", "Script", "Story", "StoryReview", "Title"]
+        expected_tables = ["Idea", "Review", "Script", "Story", "StoryReview", "Title"]
         for table in expected_tables:
             assert table in tables, f"Table {table} should exist"
     
@@ -58,7 +58,7 @@ class TestSchemaManager:
         
         missing = manager.get_missing_tables()
         
-        assert set(missing) == {"Review", "Story", "Title", "Script", "StoryReview"}
+        assert set(missing) == {"Idea", "Review", "Story", "Title", "Script", "StoryReview"}
     
     def test_get_missing_tables_after_init(self, db_connection):
         """Test get_missing_tables returns empty after initialization."""
@@ -102,7 +102,7 @@ class TestSchemaManager:
     
     def test_table_order_constant(self):
         """Test that TABLE_ORDER contains all expected tables."""
-        expected = ["Review", "Story", "Title", "Script", "StoryReview"]
+        expected = ["Idea", "Review", "Story", "Title", "Script", "StoryReview"]
         assert SchemaManager.TABLE_ORDER == expected
 
 
@@ -182,6 +182,21 @@ class TestTableSchemas:
         assert "text" in columns
         assert "review_id" in columns
     
+    def test_title_table_schema(self, db_connection):
+        """Test Title table has correct columns."""
+        manager = SchemaManager(db_connection)
+        manager.initialize_schema()
+        
+        info = manager.get_table_info("Title")
+        columns = [row[1] for row in info]
+        
+        assert "id" in columns
+        assert "story_id" in columns
+        assert "version" in columns
+        assert "text" in columns
+        assert "review_id" in columns
+        assert "created_at" in columns
+    
     def test_story_review_table_schema(self, db_connection):
         """Test StoryReview table has correct columns."""
         manager = SchemaManager(db_connection)
@@ -195,3 +210,18 @@ class TestTableSchemas:
         assert "review_id" in columns
         assert "version" in columns
         assert "review_type" in columns
+    
+    def test_idea_table_schema(self, db_connection):
+        """Test Idea table has correct columns."""
+        manager = SchemaManager(db_connection)
+        manager.initialize_schema()
+        
+        info = manager.get_table_info("Idea")
+        columns = [row[1] for row in info]
+        
+        assert "id" in columns
+        assert "title" in columns
+        assert "concept" in columns
+        assert "synopsis" in columns
+        assert "status" in columns
+        assert "created_at" in columns
