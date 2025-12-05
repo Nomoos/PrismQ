@@ -1,18 +1,24 @@
 """Review Repository - SQLite implementation for Review entities.
 
 This module provides SQLite implementation of the IRepository interface
-for Review entities, handling all database operations for reviews.
+for Review entities, handling SQL DML (Data Manipulation Language) operations
+only: SELECT, INSERT.
+
+Note:
+    This repository does NOT handle schema creation (DDL). Use SchemaManager
+    from T.Database.schema_manager for database initialization.
 
 Usage:
     >>> import sqlite3
+    >>> from T.Database.schema_manager import initialize_database
     >>> from T.Database.repositories.review_repository import ReviewRepository
     >>> from T.Database.models.review import Review
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
-    >>> repo = ReviewRepository(conn)
+    >>> initialize_database(conn)  # Creates schema
     >>> 
-    >>> # Insert new review
+    >>> repo = ReviewRepository(conn)
     >>> review = Review(text="Great script!", score=85)
     >>> saved = repo.insert(review)
     >>> print(saved.id)
@@ -29,21 +35,26 @@ from T.Database.models.review import Review
 class ReviewRepository(IRepository[Review, int]):
     """SQLite implementation of IRepository for Review entities.
     
-    This repository handles all database operations for Review
-    following the INSERT+READ only pattern.
+    This repository handles SQL DML (Data Manipulation Language) operations
+    for Review entities following the INSERT+READ only pattern.
+    
+    Note:
+        This repository does NOT create database tables. Schema initialization
+        must be performed separately using SchemaManager.initialize_schema()
+        before using this repository.
     
     Attributes:
         _conn: SQLite database connection with Row factory enabled.
     
     Example:
+        >>> import sqlite3
+        >>> from T.Database.schema_manager import initialize_database
+        >>> 
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
+        >>> initialize_database(conn)  # Create schema first
+        >>> 
         >>> repo = ReviewRepository(conn)
-        >>> 
-        >>> # Create schema
-        >>> repo.create_table()
-        >>> 
-        >>> # Insert review
         >>> review = Review(text="Good quality script", score=80)
         >>> saved = repo.insert(review)
         >>> print(saved.id)
@@ -55,27 +66,13 @@ class ReviewRepository(IRepository[Review, int]):
         Args:
             connection: SQLite connection with row_factory = sqlite3.Row
                 recommended for dictionary-like row access.
+                
+        Note:
+            The database schema must be initialized before using this
+            repository. Use SchemaManager.initialize_schema() to create
+            the required tables.
         """
         self._conn = connection
-    
-    def create_table(self) -> None:
-        """Create the Review table if it doesn't exist.
-        
-        Creates the Review table with schema:
-            - id INTEGER PRIMARY KEY AUTOINCREMENT
-            - text TEXT NOT NULL
-            - score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100)
-            - created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        """
-        self._conn.execute("""
-            CREATE TABLE IF NOT EXISTS Review (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
-            )
-        """)
-        self._conn.commit()
     
     # === READ Operations ===
     
