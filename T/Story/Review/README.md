@@ -205,6 +205,12 @@ Unlike local AI reviews that focus on specific dimensions, expert review assesse
 
 The module includes a specialized prompt template for local AI critical story reviews. This prompt focuses exclusively on identifying flaws and providing actionable feedback.
 
+### Prompt Storage
+
+The prompt is stored as a separate text file for easier maintenance and editing:
+- **Location**: `_meta/prompts/critical_story_review.txt`
+- **Loaded at module import** and exposed as `CRITICAL_STORY_REVIEW_PROMPT`
+
 ### Using the Critical Review Prompt
 
 ```python
