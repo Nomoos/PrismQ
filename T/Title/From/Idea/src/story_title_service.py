@@ -66,6 +66,13 @@ from idea import Idea
 # Import TitleGenerator from same directory
 from title_generator import TitleGenerator, TitleVariant, TitleConfig
 
+# Import AI title generator (optional - falls back to template-based if unavailable)
+try:
+    from ai_title_generator import AITitleGenerator, AITitleConfig
+    AI_TITLE_AVAILABLE = True
+except ImportError:
+    AI_TITLE_AVAILABLE = False
+
 # Import database models and repositories
 from T.Database.models.story import Story, StoryState
 from T.Database.models.title import Title
@@ -133,7 +140,8 @@ class StoryTitleService:
     def __init__(
         self, 
         connection: Optional[sqlite3.Connection] = None,
-        title_config: Optional[TitleConfig] = None
+        title_config: Optional[TitleConfig] = None,
+        use_ai: bool = True
     ):
         """Initialize the service.
         
@@ -142,11 +150,64 @@ class StoryTitleService:
                 Required for new workflow (process_stories_without_titles).
                 Optional for backward compatibility (create_stories_with_titles).
             title_config: Optional configuration for title generation.
+            use_ai: Whether to use AI (Qwen2.5-14B-Instruct) for title generation.
+                Defaults to True. Falls back to template-based if AI unavailable.
         """
         self._conn = connection
         self._story_repo = StoryRepository(connection) if connection else None
         self._title_repo = TitleRepository(connection) if connection else None
         self._title_generator = TitleGenerator(title_config)
+        
+        # Initialize AI title generator if requested and available
+        self._use_ai = use_ai
+        self._ai_title_generator = None
+        if use_ai and AI_TITLE_AVAILABLE:
+            self._ai_title_generator = AITitleGenerator()
+            if not self._ai_title_generator.is_available():
+                self._ai_title_generator = None
+    
+    def is_ai_available(self) -> bool:
+        """Check if AI title generation is available.
+        
+        Returns:
+            True if AI generation is configured and Ollama is running
+        """
+        return self._ai_title_generator is not None and self._ai_title_generator.is_available()
+    
+    def generate_title_variants(
+        self,
+        idea: Idea,
+        num_variants: Optional[int] = None
+    ) -> List[TitleVariant]:
+        """Generate title variants from an Idea.
+        
+        Uses AI (Qwen2.5-14B-Instruct) if available, otherwise falls back to
+        template-based generation.
+        
+        Args:
+            idea: Idea object to generate titles from
+            num_variants: Number of variants to generate (3-10)
+            
+        Returns:
+            List of TitleVariant instances
+        """
+        n_variants = num_variants or self.NUM_VARIANTS
+        
+        # Try AI generation first if available
+        if self._ai_title_generator and self._ai_title_generator.is_available():
+            try:
+                variants = self._ai_title_generator.generate_from_idea(idea, n_variants)
+                if variants:
+                    return variants
+            except Exception as e:
+                # Log and fall back to template-based
+                import logging
+                logging.getLogger(__name__).warning(
+                    f"AI title generation failed, falling back to templates: {e}"
+                )
+        
+        # Fallback to template-based generation
+        return self._title_generator.generate_from_idea(idea, n_variants)
     
     def get_stories_without_titles(self) -> List[Story]:
         """Get Stories that are ready for title generation but don't have titles.
@@ -374,6 +435,9 @@ class StoryTitleService:
     ) -> Optional[Title]:
         """Generate a Title (v0) for a single Story.
         
+        Uses AI (Qwen2.5-14B-Instruct) if available, otherwise falls back to
+        template-based generation.
+        
         Args:
             story: The Story to generate a title for.
             idea: Optional Idea object for context. If not provided,
@@ -392,9 +456,9 @@ class StoryTitleService:
         if self.story_has_title(story.id):
             return None
         
-        # Generate title variants
+        # Generate title variants (uses AI if available, falls back to templates)
         if idea:
-            variants = self._title_generator.generate_from_idea(idea, num_variants=self.NUM_VARIANTS)
+            variants = self.generate_title_variants(idea, num_variants=self.NUM_VARIANTS)
             if variants:
                 # Select best title considering similarity to sibling titles
                 best_variant, similar_titles = self.select_best_title(variants, story)
