@@ -21,14 +21,14 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional, Dict, Any, TYPE_CHECKING
 
-from Model.entities.base import IModel
+from Model.Entities.base import IModel
 
 # Import StoryState from the unified state constants module
 from Model.state import StoryState
 
 if TYPE_CHECKING:
-    from Model.repositories.title_repository import TitleRepository
-    from Model.repositories.script_repository import ScriptRepository
+    from Model.Repositories.title_repository import TitleRepository
+    from Model.Repositories.script_repository import ScriptRepository
 
 
 @dataclass

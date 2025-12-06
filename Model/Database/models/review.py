@@ -1,3 +1,3 @@
-"""DEPRECATED: Use Model.entities.review instead."""
-from Model.entities.review import Review
+"""DEPRECATED: Use Model.Entities.review instead."""
+from Model.Entities.review import Review
 __all__ = ["Review"]

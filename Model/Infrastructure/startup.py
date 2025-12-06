@@ -41,7 +41,7 @@ import sqlite3
 import logging
 from typing import Optional
 
-from Model.infrastructure.schema import SchemaManager
+from Model.Infrastructure.schema import SchemaManager
 
 # Module logger
 logger = logging.getLogger(__name__)

@@ -30,14 +30,14 @@ Example:
 import sqlite3
 from typing import List, Tuple
 
-from Model.entities.idea import IdeaSchema
-from Model.entities.review import Review
-from Model.entities.story import Story
-from Model.entities.title import Title
-from Model.entities.script import Script
+from Model.Entities.idea import IdeaSchema
+from Model.Entities.review import Review
+from Model.Entities.story import Story
+from Model.Entities.title import Title
+from Model.Entities.script import Script
 
 try:
-    from Model.entities.story_review import StoryReviewModel
+    from Model.Entities.story_review import StoryReviewModel
 except ImportError:
     StoryReviewModel = None
 

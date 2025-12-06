@@ -1,7 +1,7 @@
-"""DEPRECATED: Use Model.repositories.story_repository instead.
+"""DEPRECATED: Use Model.Repositories.story_repository instead.
 
-This module re-exports from Model.repositories.story_repository for backward compatibility.
+This module re-exports from Model.Repositories.story_repository for backward compatibility.
 """
-from Model.repositories.story_repository import StoryRepository
+from Model.Repositories.story_repository import StoryRepository
 
 __all__ = ["StoryRepository"]
