@@ -38,9 +38,6 @@ def db_connection():
         CREATE TABLE Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'CREATED',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
@@ -124,7 +121,6 @@ class TestStoryRepositoryBasicOperations:
         """Test inserting a new story."""
         story = Story(
             idea_id="1",
-            idea_json='{"title": "Test"}',
             state="CREATED"
         )
         saved = story_repo.insert(story)
@@ -812,7 +808,6 @@ class TestPreviewNextForProcessing:
         state = "PrismQ.T.Script.From.Idea.Title"
         story = story_repo.insert(Story(
             idea_id="1",
-            idea_json='{"title": "Test Story", "concept": "Test concept"}',
             state=state
         ))
         
@@ -825,7 +820,6 @@ class TestPreviewNextForProcessing:
         assert "SELECTED STORY FOR PROCESSING" in captured.out
         assert f"Story ID: {story.id}" in captured.out
         assert f"State: {state}" in captured.out
-        assert "Test Story" in captured.out
     
     def test_preview_returns_selected_story(self, story_repo):
         """Test preview returns the correctly selected story."""
