@@ -15,19 +15,19 @@ Interfaces:
     - IUpdatableRepository: Extended interface with update capability
 
 Example:
-    >>> from Model.repositories import StoryRepository
+    >>> from Model.Repositories import StoryRepository
     >>> repo = StoryRepository(connection)
     >>> story = repo.find_by_id(1)
 """
 
-from Model.repositories.base import IRepository, IUpdatableRepository
-from Model.repositories.story_repository import StoryRepository
-from Model.repositories.title_repository import TitleRepository
-from Model.repositories.script_repository import ScriptRepository
-from Model.repositories.review_repository import ReviewRepository
+from Model.Repositories.base import IRepository, IUpdatableRepository
+from Model.Repositories.story_repository import StoryRepository
+from Model.Repositories.title_repository import TitleRepository
+from Model.Repositories.script_repository import ScriptRepository
+from Model.Repositories.review_repository import ReviewRepository
 
 try:
-    from Model.repositories.story_review_repository import StoryReviewRepository
+    from Model.Repositories.story_review_repository import StoryReviewRepository
 except ImportError:
     StoryReviewRepository = None
 

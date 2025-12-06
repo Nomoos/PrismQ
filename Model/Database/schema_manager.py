@@ -1,3 +1,3 @@
-"""DEPRECATED: Use Model.infrastructure.schema instead."""
-from Model.infrastructure.schema import SchemaManager, initialize_database
+"""DEPRECATED: Use Model.Infrastructure.schema instead."""
+from Model.Infrastructure.schema import SchemaManager, initialize_database
 __all__ = ["SchemaManager", "initialize_database"]

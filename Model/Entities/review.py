@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from Model.entities.base import IModel
+from Model.Entities.base import IModel
 
 
 # Score range constants (integer 0-100)

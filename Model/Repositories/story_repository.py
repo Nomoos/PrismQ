@@ -12,7 +12,7 @@ Usage:
     >>> import sqlite3
     >>> from Model.Database.schema_manager import initialize_database
     >>> from Model.Database.repositories.story_repository import StoryRepository
-    >>> from Model.entities.story import Story
+    >>> from Model.Entities.story import Story
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -27,10 +27,10 @@ import sqlite3
 from typing import Optional, List
 from datetime import datetime
 
-from Model.repositories.base import IUpdatableRepository
-from Model.entities.story import Story
+from Model.Repositories.base import IUpdatableRepository
+from Model.Entities.story import Story
 from Model.state import TransitionValidator
-from Model.infrastructure.exceptions import (
+from Model.Infrastructure.exceptions import (
     EntityNotFoundError,
     ForeignKeyViolationError,
     ConstraintViolationError,

@@ -4,10 +4,10 @@ This package provides the core domain model for the PrismQ workflow system,
 following SOLID principles and clean architecture patterns.
 
 Structure:
-    - entities/: Domain entities (Story, Title, Script, Review, etc.)
-    - repositories/: Data access layer with repository pattern
-    - infrastructure/: Database connection, schema, exceptions
-    - state: Workflow state constants and validators
+    - Entities/: Domain entities (Story, Title, Script, Review, etc.)
+    - Repositories/: Data access layer with repository pattern
+    - Infrastructure/: Database connection, schema, exceptions
+    - State: Workflow state constants and validators
 
 Main exports for convenience:
     - Story, Title, Script, Review: Core domain entities
@@ -17,7 +17,7 @@ Main exports for convenience:
 
 Example Usage:
     >>> from Model import Story, StoryState, StoryRepository
-    >>> from Model.infrastructure import get_connection
+    >>> from Model.Infrastructure import get_connection
     >>> 
     >>> conn = get_connection("prismq.db")
     >>> repo = StoryRepository(conn)
@@ -36,7 +36,7 @@ from Model.state import (
 )
 
 # Domain entities
-from Model.entities import (
+from Model.Entities import (
     Story,
     Title,
     Script,
@@ -47,7 +47,7 @@ from Model.entities import (
 )
 
 # Repositories
-from Model.repositories import (
+from Model.Repositories import (
     StoryRepository,
     TitleRepository,
     ScriptRepository,

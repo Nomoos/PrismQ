@@ -12,7 +12,7 @@ Usage:
     >>> import sqlite3
     >>> from Model.Database.schema_manager import initialize_database
     >>> from Model.Database.repositories.review_repository import ReviewRepository
-    >>> from Model.entities.review import Review
+    >>> from Model.Entities.review import Review
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -28,8 +28,8 @@ import sqlite3
 from typing import Optional, List
 from datetime import datetime
 
-from Model.repositories.base import IRepository
-from Model.entities.review import Review
+from Model.Repositories.base import IRepository
+from Model.Entities.review import Review
 
 
 class ReviewRepository(IRepository[Review, int]):

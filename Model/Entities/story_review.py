@@ -34,7 +34,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from Model.Database.models.base import IModel
+from Model.Entities.base import IModel
 
 
 class ReviewType(str, Enum):

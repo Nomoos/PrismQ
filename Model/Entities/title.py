@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from Model.entities.base import IModel
+from Model.Entities.base import IModel
 
 
 @dataclass

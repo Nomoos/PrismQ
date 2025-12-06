@@ -16,19 +16,19 @@ Interfaces:
     - IModel: Interface for full persistence operations
 
 Example:
-    >>> from Model.entities import Story, Title, Script
+    >>> from Model.Entities import Story, Title, Script
     >>> story = Story(idea_id="1", state="CREATED")
 """
 
-from Model.entities.base import IReadable, IModel
-from Model.entities.story import Story
-from Model.entities.title import Title
-from Model.entities.script import Script
-from Model.entities.review import Review
-from Model.entities.idea import IdeaSchema
+from Model.Entities.base import IReadable, IModel
+from Model.Entities.story import Story
+from Model.Entities.title import Title
+from Model.Entities.script import Script
+from Model.Entities.review import Review
+from Model.Entities.idea import IdeaSchema
 
 try:
-    from Model.entities.story_review import StoryReviewModel, ReviewType
+    from Model.Entities.story_review import StoryReviewModel, ReviewType
 except ImportError:
     StoryReviewModel = None
     ReviewType = None

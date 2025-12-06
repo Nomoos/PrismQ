@@ -1,5 +1,5 @@
-"""DEPRECATED: Use Model.infrastructure.exceptions instead."""
-from Model.infrastructure.exceptions import (
+"""DEPRECATED: Use Model.Infrastructure.exceptions instead."""
+from Model.Infrastructure.exceptions import (
     DatabaseException,
     EntityNotFoundError,
     DuplicateEntityError,

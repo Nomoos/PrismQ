@@ -1,3 +1,3 @@
-"""DEPRECATED: Use Model.repositories.title_repository instead."""
-from Model.repositories.title_repository import TitleRepository
+"""DEPRECATED: Use Model.Repositories.title_repository instead."""
+from Model.Repositories.title_repository import TitleRepository
 __all__ = ["TitleRepository"]
