@@ -1,8 +1,8 @@
-"""DEPRECATED: Use Model.repositories instead.
+"""DEPRECATED: Use Model.Repositories instead.
 
-This module re-exports from Model.repositories for backward compatibility.
+This module re-exports from Model.Repositories for backward compatibility.
 """
-from Model.repositories import (
+from Model.Repositories import (
     IRepository,
     IUpdatableRepository,
     StoryRepository,
@@ -12,7 +12,7 @@ from Model.repositories import (
 )
 
 try:
-    from Model.repositories import StoryReviewRepository
+    from Model.Repositories import StoryReviewRepository
 except (ImportError, TypeError):
     pass
 

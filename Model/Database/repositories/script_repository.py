@@ -1,3 +1,3 @@
-"""DEPRECATED: Use Model.repositories.script_repository instead."""
-from Model.repositories.script_repository import ScriptRepository
+"""DEPRECATED: Use Model.Repositories.script_repository instead."""
+from Model.Repositories.script_repository import ScriptRepository
 __all__ = ["ScriptRepository"]

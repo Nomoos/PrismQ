@@ -1,3 +1,3 @@
-"""DEPRECATED: Use Model.entities.title instead."""
-from Model.entities.title import Title
+"""DEPRECATED: Use Model.Entities.title instead."""
+from Model.Entities.title import Title
 __all__ = ["Title"]

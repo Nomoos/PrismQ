@@ -1,8 +1,8 @@
-"""DEPRECATED: Use Model.entities instead.
+"""DEPRECATED: Use Model.Entities instead.
 
-This module re-exports from Model.entities for backward compatibility.
+This module re-exports from Model.Entities for backward compatibility.
 """
-from Model.entities import (
+from Model.Entities import (
     IReadable,
     IModel,
     IdeaSchema,
@@ -14,7 +14,7 @@ from Model.entities import (
 from Model.state import StoryState
 
 try:
-    from Model.entities import StoryReviewModel, ReviewType
+    from Model.Entities import StoryReviewModel, ReviewType
 except (ImportError, TypeError):
     pass
 

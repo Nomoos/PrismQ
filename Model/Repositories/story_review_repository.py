@@ -7,7 +7,7 @@ StoryReview linking table.
 Usage:
     >>> import sqlite3
     >>> from Model.Database.repositories.story_review_repository import StoryReviewRepository
-    >>> from Model.entities.story_review import StoryReviewModel, ReviewType
+    >>> from Model.Entities.story_review import StoryReviewModel, ReviewType
     >>> 
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -27,8 +27,8 @@ import sqlite3
 from typing import Optional, List
 from datetime import datetime
 
-from Model.repositories.base import IRepository
-from Model.entities.story_review import StoryReviewModel, ReviewType
+from Model.Repositories.base import IRepository
+from Model.Entities.story_review import StoryReviewModel, ReviewType
 
 
 class StoryReviewRepository(IRepository[StoryReviewModel, int]):
