@@ -232,7 +232,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
 │                    Stavový automat PrismQ                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publikování) -> M (Metriky/Analytika)                          │
+│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publikování) → M (Metriky/Analytika)                          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -278,7 +278,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Funkce**: Sledování výkonu publikovaného obsahu, sběr KPI, metriky zapojení, výsledky A/B testování
    - **Výstup**: Poznatky zpětně směřující do generování nápadů
    - **Zpětnovazební smyčka pro inspiraci** 
-    - **Sběr dat o výkonu z publikovaných věcí** 
+     - **Sběr dat o výkonu z publikovaných věcí** 
    - **struktura uvnitř pracovního adresáře** M/{Year}/{Month}/{00-10/10-20/20-end}/{day}/{hour}/{id}/Metrics/{platform}
    - **[📄 Zobrazit dokumentaci M stavového automatu](./M/STATE_MACHINE.md)** *(Připravuje se)*
 
