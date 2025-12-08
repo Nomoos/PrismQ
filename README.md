@@ -92,7 +92,12 @@ Each format can be published independently:
 ### Research & Strategy
 Foundational research and strategic planning documents.
 
-- **[Research Documents](./_meta/research/)** - Content production research
+- **[📊 Research Hub](./_meta/research/README.md)** - **Comprehensive AI content creation research**
+  - [Similar Repositories Analysis](./_meta/research/similar-repositories-research.md) - 38+ repositories analyzed with extractable mechanics
+  - [Individual Repository Profiles](./_meta/research/repositories/) - 21 detailed profiles with implementation priorities
+  - 40+ extractable mechanics across 10 categories
+  - 4-phase implementation roadmap
+- **Platform & Workflow Research**
   - [Content Production Workflow States](./_meta/research/content-production-workflow-states.md)
   - [YouTube Metadata Optimization](./_meta/research/youtube-metadata-optimization-smart-strategy.md)
   - [Popular Media Platforms Research](./_meta/research/popular-media-platforms-research.md)
