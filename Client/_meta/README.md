@@ -1,27 +1,40 @@
-# Module Metadata
+# Client Module Metadata
 
-This `_meta` directory contains metadata, documentation, examples, tests, and issue tracking for this module.
+This directory contains documentation, examples, and resources specific to the Web Management Interface.
 
-## Structure
+## 📖 Documentation
 
-- **docs/** - Module documentation and guides
-- **examples/** - Usage examples and sample code
-- **tests/** - Module tests and test data
-- **research/** - Research documents and analysis
-- **issues/** - Issue tracking organized by state
-  - **new/** - Newly created issues
-  - **blocked/** - Issues that are blocked
-  - **wip/** - Work in progress issues
-  - **done/** - Completed issues
+- **[docs/](./docs/)** - Complete documentation organized by role
+  - [Getting Started](./docs/getting-started/README.md) - Installation and setup
+  - [Development](./docs/development/README.md) - Contributing guide
+  - [Architecture](./docs/architecture/README.md) - System design
+  - [Operations](./docs/operations/README.md) - Deployment and releases
 
-## Purpose
+## 📚 Key Documents
 
-The `_meta` directory keeps module-related metadata organized and separate from the main module content, providing a standardized location for documentation, examples, testing artifacts, and issue management.
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Deployment procedures
+- **[IMPLEMENTATION_COMPLETE.md](./IMPLEMENTATION_COMPLETE.md)** - Implementation status
+- **[STRUCTURE_OVERVIEW.md](./STRUCTURE_OVERVIEW.md)** - Module structure
 
-## Usage
+## 💡 Examples & Resources
 
-- Add documentation to `docs/` as the module develops
-- Place working examples in `examples/`
-- Store test files in `tests/`
-- Keep research and analysis in `research/`
-- Track issues in `issues/` using the state subfolders
+- **[examples/](./examples/)** - Production-ready examples
+  - [Worker Examples](./examples/workers/README.md) - Python and PHP workers
+- **[templates/](./templates/)** - Standard templates
+
+## 🧪 Testing
+
+- **[tests/](./tests/)** - Test suites and test data
+
+## 🔬 Research & Development
+
+- **[research/](./research/)** - Client research and analysis
+- **[_scripts/](./_scripts/)** - Utility scripts
+
+## 🔍 Issue Tracking
+
+- **[issues/](./issues/)** - Module-specific issue tracking
+
+## 📚 Module Documentation
+
+For module overview and navigation, see **[Client/README.md](../README.md)**

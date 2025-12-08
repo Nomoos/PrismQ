@@ -1,27 +1,41 @@
-# Module Metadata
+# Project Metadata
 
-This `_meta` directory contains metadata, documentation, examples, tests, and issue tracking for this module.
+This directory contains project-wide documentation, research, proposals, and issue tracking.
 
-## Structure
+## 📖 Core Documentation
 
-- **docs/** - Module documentation and guides
-- **examples/** - Usage examples and sample code
-- **tests/** - Module tests and test data
-- **research/** - Research documents and analysis
-- **issues/** - Issue tracking organized by state
-  - **new/** - Newly created issues
-  - **blocked/** - Issues that are blocked
-  - **wip/** - Work in progress issues
-  - **done/** - Completed issues
+- **[WORKFLOW.md](./WORKFLOW.md)** - Complete state machine documentation
+- **[MVP_WORKFLOW_DOCUMENTATION.md](./MVP_WORKFLOW_DOCUMENTATION.md)** - MVP workflow guide
 
-## Purpose
+## 📚 Documentation
 
-The `_meta` directory keeps module-related metadata organized and separate from the main module content, providing a standardized location for documentation, examples, testing artifacts, and issue management.
+### Technical Documentation
+- **[docs/](./docs/)** - Technical guides and setup instructions
+  - [AI Models Setup](./docs/AI_MODELS_SETUP.md) - Ollama and AI configuration
+  - [Database Objects](./docs/DATABASE.md) - Database schema reference
+  - [Storytelling Guide](./docs/STORYTELLING_GUIDE.md) - Content creation guide
 
-## Usage
+### Research & Strategy
+- **[research/](./research/)** - Research documents and analysis
+  - [Research Hub](./research/README.md) - Comprehensive research index
+  - [Similar Repositories](./research/similar-repositories-research.md) - Repository analysis
+  - [Content Production Workflow](./research/content-production-workflow-states.md) - Workflow research
 
-- Add documentation to `docs/` as the module develops
-- Place working examples in `examples/`
-- Store test files in `tests/`
-- Keep research and analysis in `research/`
-- Track issues in `issues/` using the state subfolders
+### Architecture & Design
+- **[proposals/](./proposals/)** - Architecture proposals and design documents
+  - [Module Reorganization](./proposals/module-reorganization.md) - Structural proposals
+
+## 🔍 Project Management
+
+### Issues & Tasks
+- **[issues/](./issues/)** - Project-wide issue tracking
+  - [PARALLEL_RUN_NEXT.md](./issues/PARALLEL_RUN_NEXT.md) - Current sprint tasks
+  - [PARALLEL_RUN_NEXT_FULL.md](./issues/PARALLEL_RUN_NEXT_FULL.md) - Complete issue breakdown
+
+### Examples & Scripts
+- **[examples/](./examples/)** - Project-wide examples
+- **[scripts/](./scripts/)** - Utility scripts
+
+## 📂 Structure
+
+This `_meta` directory follows the standard metadata structure, keeping project-wide content organized and separate from module-specific code.

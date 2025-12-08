@@ -1,27 +1,31 @@
-# Module Metadata
+# T Module Metadata
 
-This `_meta` directory contains metadata, documentation, examples, tests, and issue tracking for this module.
+This directory contains documentation, research, and resources specific to the Text Generation Pipeline.
 
-## Structure
+## 📖 Documentation
 
-- **docs/** - Module documentation and guides
-- **examples/** - Usage examples and sample code
-- **tests/** - Module tests and test data
-- **research/** - Research documents and analysis
-- **issues/** - Issue tracking organized by state
+- **[docs/](./docs/)** - Technical documentation and implementation guides
+- **[examples/](./examples/)** - Usage examples and sample code
+
+## 🔬 Research & Development
+
+- **[research/](./research/)** - Text generation research and analysis
+- **[reviews/](./reviews/)** - Module reviews and assessments
+- **[scripts/](./scripts/)** - Utility scripts for text processing
+
+## 🔍 Issue Tracking
+
+- **[issues/](./issues/)** - Module-specific issue tracking
   - **new/** - Newly created issues
-  - **blocked/** - Issues that are blocked
-  - **wip/** - Work in progress issues
+  - **blocked/** - Blocked issues
+  - **wip/** - Work in progress
   - **done/** - Completed issues
 
-## Purpose
+## 📚 Module Documentation
 
-The `_meta` directory keeps module-related metadata organized and separate from the main module content, providing a standardized location for documentation, examples, testing artifacts, and issue management.
+For module overview and navigation, see **[T/README.md](../README.md)**
 
-## Usage
-
-- Add documentation to `docs/` as the module develops
-- Place working examples in `examples/`
-- Store test files in `tests/`
-- Keep research and analysis in `research/`
-- Track issues in `issues/` using the state subfolders
+For workflow details, see:
+- **[TITLE_SCRIPT_WORKFLOW.md](../TITLE_SCRIPT_WORKFLOW.md)** - Title & script creation guide
+- **[WORKFLOW_DETAILED.md](../WORKFLOW_DETAILED.md)** - Complete iterative workflow
+- **[WORKFLOW_STATE_MACHINE.md](../WORKFLOW_STATE_MACHINE.md)** - State diagram
