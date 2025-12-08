@@ -605,7 +605,7 @@ workflow = {
         {"id": "1", "type": "trigger", "name": "idea_created"},
         {"id": "2", "type": "action", "module": "T.Idea", "function": "develop"},
         {"id": "3", "type": "condition", "check": "quality_score > 7"},
-        {"id": "4", "type": "action", "module": "T.Script", "function": "draft"}
+        {"id": "4", "type": "action", "module": "T.Content", "function": "draft"}
     ],
     "edges": [
         {"from": "1", "to": "2"},
@@ -1424,20 +1424,20 @@ Based on usefulness and effort, recommended implementation order:
 1. **Idea Creation** (`01_PrismQ.T.Idea.Creation`)
 2. **Story from Idea** (`02_PrismQ.T.Story.From.Idea`) - Generate 10 story variations
 3. **Title from Idea** (`03_PrismQ.T.Title.From.Idea`) - Initial title generation (v1)
-4. **Script from Title & Idea** (`04_PrismQ.T.Script.From.Title.Idea`) - Initial script (v1)
-5. **Review Title by Script & Idea** (`05_PrismQ.T.Review.Title.By.Script.Idea`)
-6. **Review Script by Title & Idea** (`06_PrismQ.T.Review.Script.By.Title.Idea`)
-7. **Review Title by Script** (`07_PrismQ.T.Review.Title.By.Script`)
-8. **Refine Title** (`08_PrismQ.T.Title.From.Script.Review.Title`)
-9. **Refine Script** (`09_PrismQ.T.Script.From.Title.Review.Script`)
-10. **Review Script by Title** (`10_PrismQ.T.Review.Script.By.Title`)
-11. **Grammar Check** (`11_PrismQ.T.Review.Script.Grammar`)
-12. **Tone Check** (`12_PrismQ.T.Review.Script.Tone`)
-13. **Content Check** (`13_PrismQ.T.Review.Script.Content`)
-14. **Consistency Check** (`14_PrismQ.T.Review.Script.Consistency`)
-15. **Editing Pass** (`15_PrismQ.T.Review.Script.Editing`)
+4. **Content from Title & Idea** (`04_PrismQ.T.Content.From.Title.Idea`) - Initial content (v1)
+5. **Review Title by Content & Idea** (`05_PrismQ.T.Review.Title.By.Content.Idea`)
+6. **Review Content by Title & Idea** (`06_PrismQ.T.Review.Content.By.Title.Idea`)
+7. **Review Title by Content** (`07_PrismQ.T.Review.Title.By.Content`)
+8. **Refine Title** (`08_PrismQ.T.Title.From.Content.Review.Title`)
+9. **Refine Content** (`09_PrismQ.T.Content.From.Title.Review.Content`)
+10. **Review Content by Title** (`10_PrismQ.T.Review.Content.By.Title`)
+11. **Grammar Check** (`11_PrismQ.T.Review.Content.Grammar`)
+12. **Tone Check** (`12_PrismQ.T.Review.Content.Tone`)
+13. **Content Check** (`13_PrismQ.T.Review.Content.Content`)
+14. **Consistency Check** (`14_PrismQ.T.Review.Content.Consistency`)
+15. **Editing Pass** (`15_PrismQ.T.Review.Content.Editing`)
 16. **Title Readability** (`16_PrismQ.T.Review.Title.Readability`)
-17. **Script Readability** (`17_PrismQ.T.Review.Script.Readability`)
+17. **Content Readability** (`17_PrismQ.T.Review.Content.Readability`)
 18. **Story Review** (`18_PrismQ.T.Story.Review`) - Expert GPT review
 19. **Story Polish** (`19_PrismQ.T.Story.Polish`) - Expert GPT polish
 20. **Publishing** (`20_PrismQ.T.Publishing`) - SEO & multi-platform prep

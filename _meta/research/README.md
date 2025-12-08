@@ -140,30 +140,30 @@ The main research document includes **40+ extractable mechanics** organized into
    - Apply best practices from YouTube automation repos
    - Located: `T/Title/From/Idea/`
 
-4. **Script Generation from Title and Idea** (`04_PrismQ.T.Script.From.Title.Idea`)
-   - Transform story, title, and idea into complete script (v1)
+4. **Content Generation from Title and Idea** (`04_PrismQ.T.Content.From.Title.Idea`)
+   - Transform story, title, and idea into complete content (v1)
    - Apply multi-pass refinement patterns from BlogSmith-AI
    - Integrate research agent patterns from Multi-Agent-Blog-Generation
-   - Template-based script generation (how-to, listicle, case study patterns)
-   - Located: `T/Script/From/Idea/Title/`
+   - Template-based content generation (how-to, listicle, case study patterns)
+   - Located: `T/Content/From/Idea/Title/`
 
 5. **Iterative Review and Refinement Cycle** (`05-10_PrismQ.T.Review.*`)
-   - **Title Review by Script and Idea** (`05_PrismQ.T.Review.Title.By.Script.Idea`)
-   - **Script Review by Title and Idea** (`06_PrismQ.T.Review.Script.By.Title.Idea`)
-   - **Title Refinement** (`08_PrismQ.T.Title.From.Script.Review.Title`)
-   - **Script Refinement** (`09_PrismQ.T.Script.From.Title.Review.Script`)
-   - **Final Script Review** (`10_PrismQ.T.Review.Script.By.Title`)
+   - **Title Review by Content and Idea** (`05_PrismQ.T.Review.Title.By.Content.Idea`)
+   - **Content Review by Title and Idea** (`06_PrismQ.T.Review.Content.By.Title.Idea`)
+   - **Title Refinement** (`08_PrismQ.T.Title.From.Content.Review.Title`)
+   - **Content Refinement** (`09_PrismQ.T.Content.From.Title.Review.Content`)
+   - **Final Content Review** (`10_PrismQ.T.Review.Content.By.Title`)
    - Iterative improvement through multiple review cycles
    - Quality gates ensure content meets standards
 
-6. **Quality Assurance Reviews** (`11-17_PrismQ.T.Review.Script.*`)
-   - **Grammar Check** (`11_PrismQ.T.Review.Script.Grammar`)
-   - **Tone Consistency** (`12_PrismQ.T.Review.Script.Tone`)
-   - **Content Accuracy** (`13_PrismQ.T.Review.Script.Content`)
-   - **Style Consistency** (`14_PrismQ.T.Review.Script.Consistency`)
-   - **Final Editing** (`15_PrismQ.T.Review.Script.Editing`)
+6. **Quality Assurance Reviews** (`11-17_PrismQ.T.Review.Content.*`)
+   - **Grammar Check** (`11_PrismQ.T.Review.Content.Grammar`)
+   - **Tone Consistency** (`12_PrismQ.T.Review.Content.Tone`)
+   - **Content Accuracy** (`13_PrismQ.T.Review.Content.Content`)
+   - **Style Consistency** (`14_PrismQ.T.Review.Content.Consistency`)
+   - **Final Editing** (`15_PrismQ.T.Review.Content.Editing`)
    - **Title Readability** (`16_PrismQ.T.Review.Title.Readability`)
-   - **Script Readability** (`17_PrismQ.T.Review.Script.Readability`)
+   - **Content Readability** (`17_PrismQ.T.Review.Content.Readability`)
    - Implement readability scoring (Flesch Reading Ease, Grade Level)
    - Apply patterns from content generation best practices
 
