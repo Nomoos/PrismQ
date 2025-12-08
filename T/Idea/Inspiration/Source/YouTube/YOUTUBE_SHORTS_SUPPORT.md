@@ -98,7 +98,7 @@ All URL formats support query parameters (e.g., `?si=`, `?feature=`). The regex 
 ### Running Tests
 
 ```bash
-cd /home/runner/work/PrismQ/PrismQ/T/Idea/Inspiration/Source/YouTube/Video
+cd T/Idea/Inspiration/Source/YouTube/Video
 python -m pytest tests/test_youtube_shorts_url.py -v
 ```
 
@@ -218,6 +218,5 @@ https://youtube.com/shorts/FIZdGdagbeE?si=5De3nxrCKcjK2BsT
 ---
 
 **Last Updated**: 2025-12-08  
-**Validated By**: Copilot Agent  
-**Test Suite**: tests/test_youtube_shorts_url.py  
+**Test Suite**: tests/test_youtube_shorts_url.py (7 tests, all passing)  
 **Status**: ✅ Production Ready
