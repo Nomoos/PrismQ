@@ -14,8 +14,9 @@ This research identifies repositories and projects similar to PrismQ's vision of
 - **Marketing and SEO optimization platforms**
 - **YouTube and video automation tools**
 - **Podcast and TTS generation systems**
+- **AI story generation and narrative creation systems**
 
-**Key Finding:** While many projects address individual aspects of content creation, few attempt the comprehensive, sequential enrichment workflow that PrismQ implements across Text → Audio → Video → Publishing → Analytics.
+**Key Finding:** While many projects address individual aspects of content creation, few attempt the comprehensive, sequential enrichment workflow that PrismQ implements across Text → Audio → Video → Publishing → Analytics. AI story generation is primarily focused on gaming/interactive fiction rather than content marketing.
 
 ---
 
@@ -348,6 +349,153 @@ This research identifies repositories and projects similar to PrismQ's vision of
 
 ---
 
+## 8. AI Story Generation and Narrative Creation
+
+### 8.1 DeboJp/StoryTeller
+- **URL:** https://github.com/DeboJp/StoryTeller
+- **Stars:** 0
+- **Description:** Automated video storytelling pipeline that turns online articles into narrated clips
+- **Language:** HTML
+- **Topics:** api, automation, llm, moviepy, pil, prompt-engineering, ranking, top-k, tts, video-synthesis, webscraping
+- **Last Updated:** August 24, 2025
+- **Key Features:**
+  - Web scraping for content
+  - Summarization
+  - Custom scripts and titles generation
+  - TTS narration
+  - Video generation with MoviePy
+  - Ideal for tech news recaps and AI-powered media channels
+
+**Comparison to PrismQ:**
+- ✅ Complete pipeline: Article → Script → Audio → Video
+- ✅ TTS and video generation
+- ✅ Automation-focused
+- ❌ Input is existing articles (not original content)
+- ❌ No publishing or analytics
+- ❌ Limited to news/article format
+
+### 8.2 mattocad/Story-Forge-Backend
+- **URL:** https://github.com/mattocad/Story-Forge-Backend
+- **Stars:** 2
+- **Description:** Interactive fiction platform transforming storybooks into AI-powered text-adventure games
+- **Language:** Python
+- **Key Features:**
+  - Uses Ollama framework (like PrismQ!)
+  - Local LLM support
+  - FastAPI backend
+  - Narrative generation
+  - Interactive storytelling
+
+**Comparison to PrismQ:**
+- ✅ Uses Ollama (same as PrismQ)
+- ✅ Narrative generation
+- ✅ Python-based
+- ❌ Interactive game focus (not publishing)
+- ❌ No audio/video generation
+- ❌ Different use case (games vs content marketing)
+
+### 8.3 Sivaraghavi/EchoVerse-A-Generative-AI-Powered-Interactive-Audiobook-Platform
+- **URL:** https://github.com/Sivaraghavi/EchoVerse-A-Generative-AI-Powered-Interactive-Audiobook-Platform
+- **Stars:** 0
+- **Description:** Generative AI-powered interactive audiobooks prototype
+- **Language:** Python
+- **Key Features:**
+  - Interactive audiobooks
+  - Personalized story weaving
+  - Fan fiction generation
+  - Collaborative story jam
+  - Built with Dash and Streamlit
+  - Voice interaction
+  - AI-driven narratives
+
+**Comparison to PrismQ:**
+- ✅ Story generation + audio creation
+- ✅ AI-driven narratives
+- ✅ Voice interaction
+- ❌ Audiobook-specific (not general content)
+- ❌ No video component
+- ❌ No publishing workflow
+
+### 8.4 Shan533/D-D-Game
+- **URL:** https://github.com/Shan533/D-D-Game
+- **Stars:** 5
+- **Description:** AI-powered interactive D&D-style storytelling game
+- **Language:** TypeScript
+- **Key Features:**
+  - Triple dice mechanics
+  - Character customization
+  - Dynamic narrative progression
+  - Built with Next.js, React, TypeScript
+  - Uses OpenAI API
+
+**Comparison to PrismQ:**
+- ✅ AI-powered narrative generation
+- ✅ Dynamic storytelling
+- ❌ Gaming focus (not content production)
+- ❌ No audio/video generation
+- ❌ Different tech stack (TypeScript vs Python)
+
+### 8.5 buzz/llm-gamebook
+- **URL:** https://github.com/buzz/llm-gamebook
+- **Stars:** 3
+- **Description:** Interactive storytelling framework using LLMs
+- **Language:** Python
+- **Topics:** ai, game-engine, gamebook, interactive-fiction, llm, narrative-generation, python, storytelling
+- **Last Updated:** December 4, 2025 (very recent!)
+- **Key Features:**
+  - Graph-based story paths
+  - LLM-driven narrative generation
+  - Dynamic narratives
+  - Python framework
+
+**Comparison to PrismQ:**
+- ✅ LLM-driven narrative generation
+- ✅ Python-based
+- ✅ Structured story paths (similar to state machine)
+- ❌ Gaming/interactive fiction focus
+- ❌ No audio/video pipeline
+- ❌ No publishing workflow
+
+### 8.6 mazinnadaf/fiction-dialogue-AI-assistant
+- **URL:** https://github.com/mazinnadaf/fiction-dialogue-AI-assistant
+- **Stars:** 0
+- **Description:** Creative Writing Fiction Dialogue AI Assistant
+- **Language:** Python
+- **Key Features:**
+  - Fiction dialogue generation
+  - Creative writing assistance
+
+**Comparison to PrismQ:**
+- ✅ AI-powered creative writing
+- ✅ Python-based
+- ❌ Dialogue-only (narrow focus)
+- ❌ No complete story generation
+- ❌ No multimedia pipeline
+
+### Key Insights from AI Story Generation Systems
+
+**Common Patterns:**
+1. **Interactive Fiction Dominance** - Most AI story projects focus on games and interactive experiences rather than content marketing
+2. **Local LLM Adoption** - Several projects (Story-Forge, llm-gamebook) use local LLMs, validating PrismQ's Ollama approach
+3. **Limited Content Pipeline** - Most story generators stop at text, very few extend to audio/video
+4. **Gaming vs Publishing** - Story generation is primarily explored for gaming, not content marketing/publishing
+
+**Gaps PrismQ Can Fill:**
+1. **Marketing-focused story generation** - Most story AI is for entertainment, not marketing content
+2. **Story → Audio → Video pipeline** - No story generator has this complete workflow
+3. **Multi-platform publishing** - Story generators lack distribution capabilities
+4. **SEO-optimized narratives** - No story generator focuses on discoverability
+5. **Analytics on story performance** - No feedback loop for story effectiveness
+
+**Opportunities for PrismQ:**
+- Position as **"story-driven content marketing platform"**
+- Leverage narrative techniques for more engaging blog posts, videos, podcasts
+- Add "storytelling mode" to T module for narrative-style content
+- Consider interactive elements (inspired by gaming projects) for engagement
+- Maintain advantage: only platform doing Story → Audio → Video → Publishing → Analytics
+
+---
+
 ## Key Differentiators of PrismQ
 
 Based on this research, **PrismQ stands out** in several ways:
@@ -416,6 +564,9 @@ Based on this research, **PrismQ stands out** in several ways:
 | ARON | Python | Multiple | Custom | ✅ | ✅ |
 | ai-content-automation-n8n | n8n | OpenAI | n8n | ✅ | ✅ |
 | YouTube-AI-Automation-Pipeline | Python | OpenAI | Custom | ElevenLabs | ✅ |
+| StoryTeller | HTML/Python | LLM | Custom | ✅ | ✅ |
+| Story-Forge | Python | Ollama | Custom | ❌ | ❌ |
+| EchoVerse | Python | GenAI | Custom | ✅ | ❌ |
 | AllInApp | Python | GPT-Neo | Custom | Coqui TTS | ❌ |
 | MarketGeni-AI | Java | Various | Custom | ❌ | ❌ |
 | BlogSmith-AI | Python | LLM | Multi-agent | ❌ | ❌ |
@@ -433,6 +584,8 @@ Based on this research, **PrismQ stands out** in several ways:
    - **n8n workflow pattern** (visual workflow design) - consider adding visual workflow editor
    - **Multi-agent systems** (BlogSmith, Autogen) - enhance T module with multiple specialized agents
    - **Multi-cloud TTS** (AWS/Azure/GCP) - add cloud TTS options for scalability
+   - **Story-driven content** (DeboJp/StoryTeller, Story-Forge) - add narrative techniques to make content more engaging
+   - **Interactive elements** (D&D Game, llm-gamebook) - consider engagement features inspired by gaming projects
 
 ### 3. **Address Common Pain Points**
    - **Easier onboarding** (most projects lack good documentation)
@@ -478,7 +631,11 @@ While many projects address individual aspects of content creation (scripts, TTS
 5. GitHub Search: "AI content creation workflow LLM"
 6. GitHub Search: "youtube video automation script generation"
 7. GitHub Search: "podcast generation automation TTS"
+8. GitHub Search: "AI story generation narrative creative writing"
+9. GitHub Search: "automated storytelling content generation LLM"
+10. GitHub Search: "narrative generation AI fiction story"
+11. GitHub Search: "interactive storytelling AI game narrative"
 
-**Total Repositories Analyzed:** 35+  
-**Detailed Analysis:** 20 repositories  
+**Total Repositories Analyzed:** 41+  
+**Detailed Analysis:** 26 repositories  
 **Last Research Update:** December 8, 2024
