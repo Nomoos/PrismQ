@@ -98,21 +98,21 @@ Základní výzkumné a strategické plánovací dokumenty.
   - [Výzkum populárních mediálních platforem](./_meta/research/popular-media-platforms-research.md)
   - [Obsahové platformy podle kategorie a věku](./_meta/research/content-platforms-by-category-and-age.md)
   - [Strategie pro teenagerské publikum](./_meta/research/teen-audience-platform-strategy.md)
+- **[Výzkum audia](./A/Narrator/_meta/research/)** - Výzkum vypravěče a hlasového komentáře
+  - [Výchozí profil hlasu vypravěče](./A/Narrator/_meta/research/default-narrator-voice-profile.md) - Šablona vypravěče v první osobě (teenagerská dívka)
 - **[Návrhy](./_meta/proposals/)** - Architektonické a designové návrhy
   - [Reorganizace modulů](./_meta/proposals/module-reorganization.md)
 - **[Dokumentace](./_meta/docs/)** - Celoplošná projektová dokumentace
+  - [Nastavení AI modelů](./_meta/docs/AI_MODELS_SETUP.md) - Průvodce nastavením Ollama a Qwen2.5
+  - [Databázové objekty](./_meta/docs/DATABASE.md) - Schéma databáze a reference modelů
   - [Průvodce storytellingem](./_meta/docs/STORYTELLING_GUIDE.md)
-  - [Architektura](./_meta/docs/ARCHITECTURE.md)
-  - [Postupné obohacování](./_meta/docs/PROGRESSIVE_ENRICHMENT.md)
-  - [Kvalitní kontrolní body](./_meta/docs/QUALITY_GATES.md)
-  - [Struktura modulů](./_meta/docs/MODULE_STRUCTURE.md)
 
 ### Dokumentace workflow
-- **[WORKFLOW_CS.md](./_meta/WORKFLOW_CS.md)** - Kompletní dokumentace stavového automatu
+- **[WORKFLOW.md](./_meta/WORKFLOW.md)** - Kompletní dokumentace stavového automatu
   - Fáze workflow a přechody stavů
   - Model postupného obohacování
   - Kvalitní kontrolní body a osvědčené postupy
-  - **[Ultra-Clean Pipeline](./_meta/docs/workflow/ultra-clean-pipeline_CS.md)** - Zjednodušená reprezentace běhu
+  - **[Ultra-Clean Pipeline](./_meta/docs/workflow/ultra-clean-pipeline.md)** - Zjednodušená reprezentace běhu
 
 ## 🏗️ Struktura projektu
 
@@ -145,12 +145,46 @@ PrismQ/
 │   ├── Backend/       # Backend API (TaskManager)
 │   ├── Frontend/      # Frontend UI (TaskManager)
 │   └── _meta/         # Metadata modulu
-├── _meta/             # Celoplošná metadata projektu
-│   ├── docs/         # Dokumentace
-│   ├── research/     # Výzkumné dokumenty
-│   ├── proposals/    # Designové návrhy
-│   └── WORKFLOW_CS.md # Dokumentace stavového automatu
+├── src/           # Správa prostředí a konfigurace
+│   ├── config.py      # Centralizovaná konfigurace
+│   ├── tests/         # Testovací sada
+│   └── README.md      # Dokumentace konfigurace src
+└── _meta/             # Celoplošná metadata projektu
+    ├── docs/         # Dokumentace
+    ├── research/     # Výzkumné dokumenty
+    ├── proposals/    # Designové návrhy
+    └── WORKFLOW.md   # Dokumentace stavového automatu
 ```
+
+## 📁 Struktura pracovního adresáře
+
+PrismQ používá standardizovaný pracovní adresář pro všechna runtime data a výstupy:
+
+- **Windows**: `C:\PrismQ` (permanentní umístění MVP)
+- **Unix-like**: `~/PrismQ` (domovský adresář uživatele)
+
+Pracovní adresář obsahuje:
+
+```
+C:\PrismQ/              # Pracovní adresář (Windows) nebo ~/PrismQ (Unix)
+├── .env                # Konfigurace (spravováno src modulem)
+├── db.s3db             # Databáze
+├── T/{id}/             # Textový obsah podle ID
+│   ├── {Platform}/    # Výstup specifický pro platformu
+│   └── Text/          # Finální textový obsah
+├── A/{id}/             # Audio obsah podle ID
+│   ├── {Platform}/    # Výstup specifický pro platformu
+│   └── Audio/         # Finální audio soubory
+├── V/{id}/             # Video obsah podle ID
+│   ├── {Platform}/    # Výstup specifický pro platformu
+│   └── Video/         # Finální video soubory
+├── P/                  # Záznamy o publikování (podle hierarchie data)
+│   └── {Year}/{Month}/{day-range}/{day}/{hour}/{id}/{platform}/
+└── M/                  # Data metrik (podle hierarchie data)
+    └── {Year}/{Month}/{day-range}/{day}/{hour}/{id}/Metrics/{platform}/
+```
+
+Viz [src/README.md](./src/README.md) pro kompletní dokumentaci konfigurace.
 
 ## 🤖 Lokální AI model
 
@@ -181,9 +215,11 @@ Pro detailní možnosti konfigurace AI viz [dokumentace AI metadat](./T/Publishi
 ## 🚀 Rychlý start
 
 1. **Prozkoumejte pipeline**: Začněte s [T/README.md](./T/README.md) pro pochopení generování textu
-2. **Prohlédněte si workflow**: Přečtěte si [WORKFLOW_CS.md](./_meta/WORKFLOW_CS.md) pro kompletní stavový automat
-3. **Prostudujte výzkum**: Procházejte [_meta/research/](./_meta/research/) pro strategické poznatky
-4. **Použijte Client**: Podívejte se na [Client/README.md](./Client/README.md) pro nastavení webového rozhraní
+2. **Nakonfigurujte prostředí**: Viz [src/README.md](./src/README.md) pro nastavení
+3. **Nastavte AI modely**: Viz [Nastavení AI modelů](./_meta/docs/AI_MODELS_SETUP.md) pro konfiguraci Ollama a Qwen2.5
+4. **Prohlédněte si workflow**: Přečtěte si [WORKFLOW.md](./_meta/WORKFLOW.md) pro kompletní stavový automat
+5. **Prostudujte výzkum**: Procházejte [_meta/research/](./_meta/research/) pro strategické poznatky
+6. **Použijte Client**: Podívejte se na [Client/README.md](./Client/README.md) pro nastavení webového rozhraní
 
 ## 🔄 Architektura stavového automatu
 
@@ -196,11 +232,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
 │                    Stavový automat PrismQ                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publikování)      │
-│     ↓              ↓             ↓              ↓                │
-│     └──────────────┴─────────────┴──────────────┘                │
-│                          ↓                                       │
-│                   M (Metriky/Analytika)                          │
+│  T (Text)  →  A (Audio)  →  V (Video)  →  P (Publikování) → M (Metriky/Analytika)                          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -213,6 +245,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Klíčové stavy**: Idea.Creation → Title.Draft → Script.Draft → Revize → Vylepšení → Vybrušování → Publikování
    - **Kvalitní kontrolní body**: Schválení titulku, schválení skriptu, validace čitelnosti
    - **Výstup**: SEO-optimalizovaný publikovaný text
+   - **struktura uvnitř pracovního adresáře** T/{id}/{Platform}, T/{id}/Text (zde bude hotový text)
    - **[📄 Zobrazit dokumentaci T stavového automatu](./T/STATE_MACHINE.md)** *(Připravuje se)*
 
 2. **A (Generování audia)**
@@ -220,6 +253,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Stavový automat**: Generování hlasu, vylepšení a publikace podcastu *(K implementaci)*
    - **Vstup**: Publikovaný text z modulu T
    - **Výstup**: Profesionální audio soubory, podcastové epizody
+   - **struktura uvnitř pracovního adresáře** A/{id}/{Platform}, A/{id}/Audio
    - **[📄 Zobrazit dokumentaci A stavového automatu](./A/STATE_MACHINE.md)** *(Připravuje se)*
 
 3. **V (Generování videa)**
@@ -227,6 +261,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Stavový automat**: Plánování scén, generování klíčových snímků, skládání videa *(K implementaci)*
    - **Vstup**: Publikované audio z modulu A
    - **Výstup**: Videa optimalizovaná pro platformy (YouTube, TikTok, Instagram)
+   - **struktura uvnitř pracovního adresáře** V/{id}/{Platform}, V/{id}/Video
    - **[📄 Zobrazit dokumentaci V stavového automatu](./V/STATE_MACHINE.md)** *(Připravuje se)*
 
 4. **P (Publikování)**
@@ -234,6 +269,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Stavový automat**: Publikování na více platformách, plánování, křížové zveřejňování *(K implementaci)*
    - **Vstup**: Dokončený obsah z modulů T, A, V
    - **Výstup**: Publikovaný obsah napříč všemi cílovými platformami
+   - **struktura uvnitř pracovního adresáře** P/{Year}/{Month}/{00-10/10-20/20-end}/{day}/{hour}/{id}/{platform}
    - **[📄 Zobrazit dokumentaci P stavového automatu](./P/STATE_MACHINE.md)** *(Připravuje se)*
 
 5. **M (Metriky/Analytika)**
@@ -241,6 +277,9 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
    - **Typ**: Meta-modul (monitoruje publikovaný obsah z T/A/V/P)
    - **Funkce**: Sledování výkonu publikovaného obsahu, sběr KPI, metriky zapojení, výsledky A/B testování
    - **Výstup**: Poznatky zpětně směřující do generování nápadů
+   - **Zpětnovazební smyčka pro inspiraci** 
+     - **Sběr dat o výkonu z publikovaných věcí** 
+   - **struktura uvnitř pracovního adresáře** M/{Year}/{Month}/{00-10/10-20/20-end}/{day}/{hour}/{id}/Metrics/{platform}
    - **[📄 Zobrazit dokumentaci M stavového automatu](./M/STATE_MACHINE.md)** *(Připravuje se)*
 
 ### Principy stavového automatu
@@ -290,4 +329,4 @@ Proprietární - Všechna práva vyhrazena - Copyright (c) 2025 PrismQ
 
 ---
 
-**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./_meta/WORKFLOW_CS.md)
+**Začněte prozkoumávat**: [T modul](./T/README.md) | [A modul](./A/README.md) | [V modul](./V/README.md) | [Client](./Client/README.md) | [Workflow](./_meta/WORKFLOW.md)
