@@ -1425,16 +1425,16 @@ Based on usefulness and effort, recommended implementation order:
 2. **Title Generation from Idea** (`PrismQ.T.Title.From.Idea`)
    - Generate compelling titles optimized for engagement
    - Multiple title variations with A/B testing potential
-3. **Outline Generation from Idea** (`PrismQ.T.Outline.From.Idea`)
-   - Structured content outline creation
-   - Section-based organization for progressive development
-4. **Script Drafting from Story/Outline** (`PrismQ.T.Script.Draft`)
-   - Transform story/outline into complete script
+3. **Script Drafting from Title and Idea** (`PrismQ.T.Script.From.Title`)
+   - Transform story and title into complete script
    - Apply multi-pass refinement patterns
-5. **Content Optimization** (`PrismQ.T.Script.Optimize`)
-   - Readability scoring and improvement
-   - Content quality gates
-   - Progressive refinement
+4. **Script Review and Refinement** (`PrismQ.T.Review.Script`)
+   - Grammar, tone, content, consistency checks
+   - Iterative improvement through review cycles
+5. **Story Review and Publishing Preparation** (`PrismQ.T.Story.Review` → `PrismQ.T.Publishing`)
+   - Final quality validation
+   - Content optimization and readability scoring
+   - Prepare for publication
 
 **Phase 1 - Quick Wins (High Value, Low Effort):**
 1. Template-based content generation (Section 2.2)

@@ -132,20 +132,20 @@ The main research document includes **40+ extractable mechanics** organized into
    - Multiple title variations for A/B testing
    - Apply best practices from YouTube automation repos
 
-3. **Outline Generation from Idea** (`PrismQ.T.Outline.From.Idea`)
-   - Structured content outline creation
-   - Section-based organization for progressive development
-   - Template-based structuring (how-to, listicle, case study patterns)
-
-4. **Script Drafting from Story/Outline** (`PrismQ.T.Script.Draft`)
-   - Transform story/outline into complete script
+3. **Script Drafting from Title and Idea** (`PrismQ.T.Script.From.Title`)
+   - Transform story and title into complete script
    - Apply multi-pass refinement patterns from BlogSmith-AI
    - Integrate research agent patterns from Multi-Agent-Blog-Generation
 
-5. **Content Optimization** (`PrismQ.T.Script.Optimize`)
-   - Readability scoring and improvement
-   - Content quality gates
-   - Progressive refinement using multi-agent approach
+4. **Script Review and Refinement** (`PrismQ.T.Review.Script`)
+   - Grammar, tone, content, consistency, and readability checks
+   - Iterative improvement through review cycles
+   - Quality gates ensure content meets standards
+
+5. **Story Review and Publishing Preparation** (`PrismQ.T.Story.Review` → `PrismQ.T.Publishing`)
+   - Final quality validation and story polish
+   - Content optimization and readability scoring
+   - Prepare for publication across platforms
 
 **Rationale:** This phase establishes PrismQ's core value proposition - transforming ideas into high-quality text content using the existing T module structure. All subsequent phases build upon this foundation.
 
