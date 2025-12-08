@@ -117,6 +117,40 @@ The main research document includes **40+ extractable mechanics** organized into
 
 ## 🗺️ Implementation Roadmap
 
+### Phase 0 - Top Priority: Core Text Generation Pipeline
+
+**Focus:** Implement the foundational T (Text) module workflow from manual idea to optimized content.
+
+1. **Manual Idea to Story Generation** (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea`)
+   - Implement idea-to-story transformation using local LLM (Qwen/Ollama)
+   - Apply narrative arc structure from analyzed story generation repositories
+   - Support multiple content types (how-to, listicle, case study, narrative story)
+   - Leverage patterns from Story-Forge-Backend and StoryTeller repos
+
+2. **Title Generation from Idea** (`PrismQ.T.Title.From.Idea`)
+   - Generate compelling, engagement-optimized titles
+   - Multiple title variations for A/B testing
+   - Apply best practices from YouTube automation repos
+
+3. **Outline Generation from Idea** (`PrismQ.T.Outline.From.Idea`)
+   - Structured content outline creation
+   - Section-based organization for progressive development
+   - Template-based structuring (how-to, listicle, case study patterns)
+
+4. **Script Drafting from Story/Outline** (`PrismQ.T.Script.Draft`)
+   - Transform story/outline into complete script
+   - Apply multi-pass refinement patterns from BlogSmith-AI
+   - Integrate research agent patterns from Multi-Agent-Blog-Generation
+
+5. **Content Optimization** (`PrismQ.T.Script.Optimize`)
+   - Readability scoring and improvement
+   - Content quality gates
+   - Progressive refinement using multi-agent approach
+
+**Rationale:** This phase establishes PrismQ's core value proposition - transforming ideas into high-quality text content using the existing T module structure. All subsequent phases build upon this foundation.
+
+---
+
 ### Phase 1 - Quick Wins (High Value, Low Effort)
 1. Template-based content generation
 2. Readability scoring
@@ -176,6 +210,10 @@ The main research document includes **40+ extractable mechanics** organized into
 2. **Most structured** - State machine architecture unique among competitors
 3. **Most flexible** - Progressive publication at any stage
 4. **Most privacy-friendly** - Local AI option (Ollama)
+
+### Implementation Priority
+
+**Phase 0 (Top Priority)** focuses on the core text generation pipeline (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea` → `PrismQ.T.Title.From.Idea` → etc.), establishing PrismQ's foundation before building audio/video capabilities. This aligns with the progressive enrichment model and ensures quality text content as the base for all subsequent formats.
 
 ### Market Gaps PrismQ Can Fill
 

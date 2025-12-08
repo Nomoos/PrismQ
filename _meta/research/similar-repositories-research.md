@@ -1417,6 +1417,25 @@ Benefits:
 
 Based on usefulness and effort, recommended implementation order:
 
+**Phase 0 - Top Priority: Core Text Generation Pipeline**
+1. **Manual Idea to Story Generation** (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea`)
+   - Implement idea-to-story transformation using local LLM (Qwen/Ollama)
+   - Apply narrative arc structure from analyzed story generation repos
+   - Support multiple content types (how-to, listicle, case study, story)
+2. **Title Generation from Idea** (`PrismQ.T.Title.From.Idea`)
+   - Generate compelling titles optimized for engagement
+   - Multiple title variations with A/B testing potential
+3. **Outline Generation from Idea** (`PrismQ.T.Outline.From.Idea`)
+   - Structured content outline creation
+   - Section-based organization for progressive development
+4. **Script Drafting from Story/Outline** (`PrismQ.T.Script.Draft`)
+   - Transform story/outline into complete script
+   - Apply multi-pass refinement patterns
+5. **Content Optimization** (`PrismQ.T.Script.Optimize`)
+   - Readability scoring and improvement
+   - Content quality gates
+   - Progressive refinement
+
 **Phase 1 - Quick Wins (High Value, Low Effort):**
 1. Template-based content generation (Section 2.2)
 2. Readability scoring (Section 8.1)
