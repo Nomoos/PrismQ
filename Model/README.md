@@ -23,7 +23,7 @@ State management and transitions
 
 ## 📖 Module Metadata
 
-For detailed documentation, see **[Model/_meta/](./Model/_meta/README.md)**
+For detailed documentation, see **[_meta/README.md](./_meta/README.md)**
 
 ## 📚 Key Files
 
