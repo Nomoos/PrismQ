@@ -117,37 +117,77 @@ The main research document includes **40+ extractable mechanics** organized into
 
 ## 🗺️ Implementation Roadmap
 
-### Phase 0 - Top Priority: Core Text Generation Pipeline
+**Phase 0 - Top Priority: Core Text Generation Pipeline**
 
-**Focus:** Implement the foundational T (Text) module workflow from manual idea to optimized content.
+**Focus:** Implement the foundational T (Text) module workflow from manual idea to optimized content following the exact numbered worker structure in `_meta/scripts/`.
 
-1. **Manual Idea to Story Generation** (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea`)
+1. **Manual Idea Creation** (`01_PrismQ.T.Idea.Creation`)
+   - Manual idea capture and initial inspiration
+   - Foundation for all content generation
+   - Located: `T/Idea/Creation/`
+
+2. **Story Generation from Idea** (`02_PrismQ.T.Story.From.Idea`)
    - Implement idea-to-story transformation using local LLM (Qwen/Ollama)
+   - Generate 10 story variations per idea
    - Apply narrative arc structure from analyzed story generation repositories
    - Support multiple content types (how-to, listicle, case study, narrative story)
    - Leverage patterns from Story-Forge-Backend and StoryTeller repos
+   - Located: `T/Story/From/Idea/`
 
-2. **Title Generation from Idea** (`PrismQ.T.Title.From.Idea`)
-   - Generate compelling, engagement-optimized titles
+3. **Title Generation from Idea** (`03_PrismQ.T.Title.From.Idea`)
+   - Generate compelling, engagement-optimized titles (v1)
    - Multiple title variations for A/B testing
    - Apply best practices from YouTube automation repos
+   - Located: `T/Title/From/Idea/`
 
-3. **Script Drafting from Title and Idea** (`PrismQ.T.Script.From.Title`)
-   - Transform story and title into complete script
+4. **Script Generation from Title and Idea** (`04_PrismQ.T.Script.From.Title.Idea`)
+   - Transform story, title, and idea into complete script (v1)
    - Apply multi-pass refinement patterns from BlogSmith-AI
    - Integrate research agent patterns from Multi-Agent-Blog-Generation
+   - Template-based script generation (how-to, listicle, case study patterns)
+   - Located: `T/Script/From/Idea/Title/`
 
-4. **Script Review and Refinement** (`PrismQ.T.Review.Script`)
-   - Grammar, tone, content, consistency, and readability checks
-   - Iterative improvement through review cycles
+5. **Iterative Review and Refinement Cycle** (`05-10_PrismQ.T.Review.*`)
+   - **Title Review by Script and Idea** (`05_PrismQ.T.Review.Title.By.Script.Idea`)
+   - **Script Review by Title and Idea** (`06_PrismQ.T.Review.Script.By.Title.Idea`)
+   - **Title Refinement** (`08_PrismQ.T.Title.From.Script.Review.Title`)
+   - **Script Refinement** (`09_PrismQ.T.Script.From.Title.Review.Script`)
+   - **Final Script Review** (`10_PrismQ.T.Review.Script.By.Title`)
+   - Iterative improvement through multiple review cycles
    - Quality gates ensure content meets standards
 
-5. **Story Review and Publishing Preparation** (`PrismQ.T.Story.Review` → `PrismQ.T.Publishing`)
-   - Final quality validation and story polish
-   - Content optimization and readability scoring
-   - Prepare for publication across platforms
+6. **Quality Assurance Reviews** (`11-17_PrismQ.T.Review.Script.*`)
+   - **Grammar Check** (`11_PrismQ.T.Review.Script.Grammar`)
+   - **Tone Consistency** (`12_PrismQ.T.Review.Script.Tone`)
+   - **Content Accuracy** (`13_PrismQ.T.Review.Script.Content`)
+   - **Style Consistency** (`14_PrismQ.T.Review.Script.Consistency`)
+   - **Final Editing** (`15_PrismQ.T.Review.Script.Editing`)
+   - **Title Readability** (`16_PrismQ.T.Review.Title.Readability`)
+   - **Script Readability** (`17_PrismQ.T.Review.Script.Readability`)
+   - Implement readability scoring (Flesch Reading Ease, Grade Level)
+   - Apply patterns from content generation best practices
 
-**Rationale:** This phase establishes PrismQ's core value proposition - transforming ideas into high-quality text content using the existing T module structure. All subsequent phases build upon this foundation.
+7. **Story Expert Review and Polish** (`18-19_PrismQ.T.Story.*`)
+   - **Story Review** (`18_PrismQ.T.Story.Review`) - Expert GPT review
+   - **Story Polish** (`19_PrismQ.T.Story.Polish`) - Expert GPT polish
+   - Final quality validation and narrative enhancement
+   - Content optimization using multi-agent approach
+
+8. **Publishing Preparation** (`20_PrismQ.T.Publishing`)
+   - SEO optimization and metadata generation
+   - Multi-platform formatting (blog, social media)
+   - Content export and finalization
+   - Located: `T/Publishing/`
+
+**Possible Improvements Around Top Priority:**
+- **Template Library Enhancement** - Expand content type templates (Phase 1 integration)
+- **Intelligent Caching** - Cache LLM responses for similar prompts (Phase 1 integration)
+- **Multi-pass Refinement** - Implement specialized agents per review stage (Phase 2 enhancement)
+- **Story-driven Mode Toggle** - Allow switching between factual and narrative styles (Phase 2 enhancement)
+- **Performance Prediction** - Predict content engagement before publishing (Phase 3 addition)
+- **A/B Testing Integration** - Built-in title/content variation testing (Phase 3 addition)
+
+**Rationale:** This phase establishes PrismQ's core value proposition - transforming ideas into high-quality text content using the exact T module structure with 20 sequential steps. All subsequent phases (audio, video, publishing) build upon this foundation.
 
 ---
 

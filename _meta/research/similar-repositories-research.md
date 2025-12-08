@@ -1418,23 +1418,44 @@ Benefits:
 Based on usefulness and effort, recommended implementation order:
 
 **Phase 0 - Top Priority: Core Text Generation Pipeline**
-1. **Manual Idea to Story Generation** (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea`)
-   - Implement idea-to-story transformation using local LLM (Qwen/Ollama)
-   - Apply narrative arc structure from analyzed story generation repos
-   - Support multiple content types (how-to, listicle, case study, story)
-2. **Title Generation from Idea** (`PrismQ.T.Title.From.Idea`)
-   - Generate compelling titles optimized for engagement
-   - Multiple title variations with A/B testing potential
-3. **Script Drafting from Title and Idea** (`PrismQ.T.Script.From.Title`)
-   - Transform story and title into complete script
-   - Apply multi-pass refinement patterns
-4. **Script Review and Refinement** (`PrismQ.T.Review.Script`)
-   - Grammar, tone, content, consistency checks
-   - Iterative improvement through review cycles
-5. **Story Review and Publishing Preparation** (`PrismQ.T.Story.Review` → `PrismQ.T.Publishing`)
-   - Final quality validation
-   - Content optimization and readability scoring
-   - Prepare for publication
+
+**Complete 20-step workflow following the exact structure in `_meta/scripts/`:**
+
+1. **Idea Creation** (`01_PrismQ.T.Idea.Creation`)
+2. **Story from Idea** (`02_PrismQ.T.Story.From.Idea`) - Generate 10 story variations
+3. **Title from Idea** (`03_PrismQ.T.Title.From.Idea`) - Initial title generation (v1)
+4. **Script from Title & Idea** (`04_PrismQ.T.Script.From.Title.Idea`) - Initial script (v1)
+5. **Review Title by Script & Idea** (`05_PrismQ.T.Review.Title.By.Script.Idea`)
+6. **Review Script by Title & Idea** (`06_PrismQ.T.Review.Script.By.Title.Idea`)
+7. **Review Title by Script** (`07_PrismQ.T.Review.Title.By.Script`)
+8. **Refine Title** (`08_PrismQ.T.Title.From.Script.Review.Title`)
+9. **Refine Script** (`09_PrismQ.T.Script.From.Title.Review.Script`)
+10. **Review Script by Title** (`10_PrismQ.T.Review.Script.By.Title`)
+11. **Grammar Check** (`11_PrismQ.T.Review.Script.Grammar`)
+12. **Tone Check** (`12_PrismQ.T.Review.Script.Tone`)
+13. **Content Check** (`13_PrismQ.T.Review.Script.Content`)
+14. **Consistency Check** (`14_PrismQ.T.Review.Script.Consistency`)
+15. **Editing Pass** (`15_PrismQ.T.Review.Script.Editing`)
+16. **Title Readability** (`16_PrismQ.T.Review.Title.Readability`)
+17. **Script Readability** (`17_PrismQ.T.Review.Script.Readability`)
+18. **Story Review** (`18_PrismQ.T.Story.Review`) - Expert GPT review
+19. **Story Polish** (`19_PrismQ.T.Story.Polish`) - Expert GPT polish
+20. **Publishing** (`20_PrismQ.T.Publishing`) - SEO & multi-platform prep
+
+**Key Implementation Priorities:**
+- Use Qwen/Ollama for local LLM processing
+- Apply narrative techniques from Story-Forge-Backend, StoryTeller, llm-gamebook
+- Implement multi-pass refinement from BlogSmith-AI, Multi-Agent-Blog-Generation
+- Template-based generation (how-to, listicle, case study, narrative)
+- Readability scoring (Flesch Reading Ease, Grade Level)
+
+**Possible Improvements:**
+- Template library expansion (Phase 1)
+- Intelligent caching for LLM responses (Phase 1)
+- Multi-agent specialized reviewers (Phase 2)
+- Story-driven mode toggle (Phase 2)
+- Performance prediction pre-publish (Phase 3)
+- Built-in A/B testing (Phase 3)
 
 **Phase 1 - Quick Wins (High Value, Low Effort):**
 1. Template-based content generation (Section 2.2)
