@@ -16,8 +16,8 @@ Each documentation file has one clear purpose:
 
 ### Keep Files Small
 All navigation files are concise:
-- Main README: 46 lines
-- _meta READMEs: 20-41 lines each
+- Main README: Focused and minimal
+- Module _meta READMEs: Consistently small (< 50 lines)
 - One clear purpose per file
 
 ### Clean Documentation
@@ -185,8 +185,8 @@ Navigate to:
 ## Statistics
 
 - **Main README**: Significantly simplified (pure navigation focus)
-- **Module count**: 8 (T, A, V, Client, P, M, Model, src)
-- **_meta directories**: 8 module-specific + 1 project-wide
+- **Module structure**: All core and supporting modules documented
+- **_meta directories**: Present in all modules with consistent structure
 - **Documentation approach**: Navigation-focused, clean, SOLID
 
 ## Validation
