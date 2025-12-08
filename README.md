@@ -13,7 +13,7 @@
 - **[P - Publishing Module](./P/README.md)** - Multi-platform content distribution
 - **[M - Metrics & Analytics Module](./M/README.md)** - Performance tracking and insights
 - **[Client - Web Management Interface](./Client/README.md)** - Task queue and workflow coordination
-- **[Model - Data Models](./Model/)** - Core data structures and state management
+- **[Model - Data Models](./Model/README.md)** - Core data structures and state management
 - **[src - Configuration Management](./src/README.md)** - Environment and configuration setup
 
 ## 📖 Documentation

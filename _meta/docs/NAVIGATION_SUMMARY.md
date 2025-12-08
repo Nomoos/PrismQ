@@ -184,7 +184,7 @@ Navigate to:
 
 ## Statistics
 
-- **Main README**: 46 lines (simplified from 334)
+- **Main README**: Significantly simplified (pure navigation focus)
 - **Module count**: 8 (T, A, V, Client, P, M, Model, src)
 - **_meta directories**: 8 module-specific + 1 project-wide
 - **Documentation approach**: Navigation-focused, clean, SOLID
