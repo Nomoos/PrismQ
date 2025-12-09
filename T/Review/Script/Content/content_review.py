@@ -14,7 +14,7 @@ The ContentReview model enables:
 
 Workflow Position:
     Stage 16 (MVP-016): Content Review
-    Script v3+ → ContentReview (AI Reviewer) → Script Refinement (if fails) → Stage 17
+    Content v3+ → ContentReview (AI Reviewer) → Content Refinement (if fails) → Stage 17
 """
 
 from dataclasses import asdict, dataclass, field
@@ -77,7 +77,7 @@ class ContentReview:
     returns to refinement (Stage 11) with content feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall narrative coherence score (0-100)
         pass_threshold: Minimum score required to pass (default 75)
@@ -109,7 +109,7 @@ class ContentReview:
 
     Example:
         >>> review = ContentReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=85,
         ...     logic_score=90,
@@ -128,10 +128,10 @@ class ContentReview:
         >>> if review.passes:
         ...     print("Ready for Stage 17: Consistency Review")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 75  # Minimum score to pass
@@ -323,7 +323,7 @@ class ContentReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 75),
@@ -351,7 +351,7 @@ class ContentReview:
     def __repr__(self) -> str:
         """String representation of ContentReview."""
         return (
-            f"ContentReview(script={self.script_id}, "
+            f"ContentReview(script={self.content_id}, "
             f"version={self.script_version}, "
             f"score={self.overall_score}%, "
             f"passes={'YES' if self.passes else 'NO'}, "

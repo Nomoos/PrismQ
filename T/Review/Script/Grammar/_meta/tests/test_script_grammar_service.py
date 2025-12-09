@@ -1,12 +1,12 @@
-"""Tests for Script Grammar Review Service (PrismQ.T.Review.Script.Grammar).
+"""Tests for Content Grammar Review Service (PrismQ.T.Review.Content.Grammar).
 
 Tests the grammar review service functionality including:
-- Processing stories in PrismQ.T.Review.Script.Grammar state
+- Processing stories in PrismQ.T.Review.Content.Grammar state
 - Creating Review records
-- Linking Reviews to Script via FK (Script.review_id)
+- Linking Reviews to Content via FK (Content.review_id)
 - State transitions based on review outcome
 
-Note: StoryReview linking table is not used for Script reviews.
+Note: StoryReview linking table is not used for Content reviews.
 """
 
 import sqlite3
@@ -22,13 +22,13 @@ import pytest
 
 from Model.Database.models.review import Review
 from Model.State.constants.state_names import StateNames
-from T.Review.Script.Grammar import (
+from T.Review.Content.Grammar import (
     DEFAULT_PASS_THRESHOLD,
     INPUT_STATE,
     OUTPUT_STATE_FAIL,
     OUTPUT_STATE_PASS,
     GrammarReviewResult,
-    ScriptGrammarReviewService,
+    ContentGrammarReviewService,
     process_oldest_grammar_review,
 )
 
@@ -40,7 +40,7 @@ def db_connection():
     conn.row_factory = sqlite3.Row
 
     # Create required tables
-    conn.executescript(
+    conn.executecontent(
         """
         CREATE TABLE IF NOT EXISTS Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,21 +51,17 @@ def db_connection():
         
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
+            idea_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'PrismQ.T.Title.From.Idea',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         );
         
         CREATE INDEX IF NOT EXISTS idx_story_state ON Story(state);
         CREATE INDEX IF NOT EXISTS idx_story_created_at ON Story(created_at);
         
-        CREATE TABLE IF NOT EXISTS Script (
+        CREATE TABLE IF NOT EXISTS Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
@@ -77,7 +73,7 @@ def db_connection():
             FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
-        CREATE INDEX IF NOT EXISTS idx_script_story_id ON Script(story_id);
+        CREATE INDEX IF NOT EXISTS idx_content_story_id ON Content(story_id);
         
         CREATE TABLE IF NOT EXISTS Review (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,26 +92,26 @@ def db_connection():
 
 @pytest.fixture
 def service(db_connection):
-    """Create a ScriptGrammarReviewService with the test database."""
-    return ScriptGrammarReviewService(db_connection)
+    """Create a ContentGrammarReviewService with the test database."""
+    return ContentGrammarReviewService(db_connection)
 
 
-class TestScriptGrammarReviewService:
-    """Test the ScriptGrammarReviewService class."""
+class TestContentGrammarReviewService:
+    """Test the ContentGrammarReviewService class."""
 
     def test_service_initialization(self, db_connection):
         """Test that service initializes correctly."""
-        service = ScriptGrammarReviewService(db_connection)
+        service = ContentGrammarReviewService(db_connection)
 
         assert service.story_repo is not None
-        assert service.script_repo is not None
+        assert service.content_repo is not None
         assert service.review_repo is not None
         assert service.grammar_checker is not None
         assert service.pass_threshold == DEFAULT_PASS_THRESHOLD
 
     def test_service_with_custom_threshold(self, db_connection):
         """Test service with custom pass threshold."""
-        service = ScriptGrammarReviewService(db_connection, pass_threshold=90)
+        service = ContentGrammarReviewService(db_connection, pass_threshold=90)
 
         assert service.pass_threshold == 90
         assert service.grammar_checker.pass_threshold == 90
@@ -145,10 +141,10 @@ class TestScriptGrammarReviewService:
 class TestGrammarReviewProcessing:
     """Test grammar review processing workflow."""
 
-    def _create_test_story_with_script(
-        self, conn, script_text: str, state: str = INPUT_STATE, created_at: str = None
+    def _create_test_story_with_content(
+        self, conn, content_text: str, state: str = INPUT_STATE, created_at: str = None
     ) -> int:
-        """Helper to create a test story with a script."""
+        """Helper to create a test story with a content."""
         cursor = conn.cursor()
 
         # Create story
@@ -161,23 +157,23 @@ class TestGrammarReviewProcessing:
             cursor.execute("INSERT INTO Story (state) VALUES (?)", (state,))
         story_id = cursor.lastrowid
 
-        # Create script for the story
+        # Create content for the story
         cursor.execute(
-            "INSERT INTO Script (story_id, version, text) VALUES (?, ?, ?)",
-            (story_id, 0, script_text),
+            "INSERT INTO Content (story_id, version, text) VALUES (?, ?, ?)",
+            (story_id, 0, content_text),
         )
 
         conn.commit()
         return story_id
 
     def test_process_story_with_correct_grammar(self, db_connection, service):
-        """Test processing a story with grammatically correct script."""
+        """Test processing a story with grammatically correct content."""
         # Create a story with correct grammar
-        script_text = """The hero walked into the sunset.
+        content_text = """The hero walked into the sunset.
 Birds sang their evening songs.
 Nature welcomed the night."""
 
-        story_id = self._create_test_story_with_script(db_connection, script_text)
+        story_id = self._create_test_story_with_content(db_connection, content_text)
 
         # Process the story
         result = service.process_oldest_story()
@@ -198,11 +194,11 @@ Nature welcomed the night."""
     def test_process_story_with_grammar_errors(self, db_connection, service):
         """Test processing a story with grammar errors."""
         # Create a story with grammar errors
-        script_text = """He were walking down the street.
+        content_text = """He were walking down the street.
 I recieved a message yesterday.
 They was very happy about it."""
 
-        story_id = self._create_test_story_with_script(db_connection, script_text)
+        story_id = self._create_test_story_with_content(db_connection, content_text)
 
         # Process the story
         result = service.process_oldest_story()
@@ -223,8 +219,8 @@ They was very happy about it."""
 
     def test_review_record_created(self, db_connection, service):
         """Test that a Review record is created."""
-        script_text = "The hero walks into the room."
-        story_id = self._create_test_story_with_script(db_connection, script_text)
+        content_text = "The hero walks into the room."
+        story_id = self._create_test_story_with_content(db_connection, content_text)
 
         # Process the story
         result = service.process_oldest_story()
@@ -238,29 +234,29 @@ They was very happy about it."""
         assert review_row["score"] <= 100
         assert "Grammar Review" in review_row["text"]
 
-    def test_script_review_id_set(self, db_connection, service):
-        """Test that Script.review_id FK is set to link Review directly."""
-        script_text = "The hero saves the day."
-        story_id = self._create_test_story_with_script(db_connection, script_text)
+    def test_content_review_id_set(self, db_connection, service):
+        """Test that Content.review_id FK is set to link Review directly."""
+        content_text = "The hero saves the day."
+        story_id = self._create_test_story_with_content(db_connection, content_text)
 
         # Process the story
         result = service.process_oldest_story()
 
-        # Verify Script.review_id is set
-        cursor = db_connection.execute("SELECT * FROM Script WHERE story_id = ?", (story_id,))
-        script_row = cursor.fetchone()
+        # Verify Content.review_id is set
+        cursor = db_connection.execute("SELECT * FROM Content WHERE story_id = ?", (story_id,))
+        content_row = cursor.fetchone()
 
-        assert script_row is not None
-        assert script_row["review_id"] == result.review_id
+        assert content_row is not None
+        assert content_row["review_id"] == result.review_id
 
 
 class TestFIFOOrdering:
     """Test that stories are processed in FIFO order (oldest first)."""
 
-    def _create_test_story_with_script(
-        self, conn, script_text: str, state: str, created_at: str
+    def _create_test_story_with_content(
+        self, conn, content_text: str, state: str, created_at: str
     ) -> int:
-        """Helper to create a test story with a script."""
+        """Helper to create a test story with a content."""
         cursor = conn.cursor()
 
         cursor.execute(
@@ -270,8 +266,8 @@ class TestFIFOOrdering:
         story_id = cursor.lastrowid
 
         cursor.execute(
-            "INSERT INTO Script (story_id, version, text) VALUES (?, ?, ?)",
-            (story_id, 0, script_text),
+            "INSERT INTO Content (story_id, version, text) VALUES (?, ?, ?)",
+            (story_id, 0, content_text),
         )
 
         conn.commit()
@@ -287,13 +283,13 @@ class TestFIFOOrdering:
         new_time = base_time.isoformat()
 
         # Create in non-chronological order
-        story2 = self._create_test_story_with_script(
+        story2 = self._create_test_story_with_content(
             db_connection, "Story 2 text.", INPUT_STATE, mid_time
         )
-        story1 = self._create_test_story_with_script(
+        story1 = self._create_test_story_with_content(
             db_connection, "Story 1 text.", INPUT_STATE, old_time
         )
-        story3 = self._create_test_story_with_script(
+        story3 = self._create_test_story_with_content(
             db_connection, "Story 3 text.", INPUT_STATE, new_time
         )
 
@@ -315,7 +311,7 @@ class TestFIFOOrdering:
         base_time = datetime.now()
 
         # Story in correct state
-        story1 = self._create_test_story_with_script(
+        story1 = self._create_test_story_with_content(
             db_connection,
             "Correct state story.",
             INPUT_STATE,
@@ -330,7 +326,7 @@ class TestFIFOOrdering:
         )
         story2 = cursor.lastrowid
         cursor.execute(
-            "INSERT INTO Script (story_id, version, text) VALUES (?, ?, ?)",
+            "INSERT INTO Content (story_id, version, text) VALUES (?, ?, ?)",
             (story2, 0, "Different state story."),
         )
         db_connection.commit()
@@ -347,15 +343,15 @@ class TestFIFOOrdering:
 class TestProcessAllPending:
     """Test processing all pending stories."""
 
-    def _create_test_story_with_script(self, conn, script_text: str) -> int:
-        """Helper to create a test story with a script."""
+    def _create_test_story_with_content(self, conn, content_text: str) -> int:
+        """Helper to create a test story with a content."""
         cursor = conn.cursor()
         cursor.execute("INSERT INTO Story (state) VALUES (?)", (INPUT_STATE,))
         story_id = cursor.lastrowid
 
         cursor.execute(
-            "INSERT INTO Script (story_id, version, text) VALUES (?, ?, ?)",
-            (story_id, 0, script_text),
+            "INSERT INTO Content (story_id, version, text) VALUES (?, ?, ?)",
+            (story_id, 0, content_text),
         )
         conn.commit()
         return story_id
@@ -364,7 +360,7 @@ class TestProcessAllPending:
         """Test processing all pending stories."""
         # Create multiple stories
         story_ids = [
-            self._create_test_story_with_script(db_connection, f"Story {i} text.") for i in range(3)
+            self._create_test_story_with_content(db_connection, f"Story {i} text.") for i in range(3)
         ]
 
         # Process all
@@ -379,7 +375,7 @@ class TestProcessAllPending:
         """Test processing with limit."""
         # Create 5 stories
         for i in range(5):
-            self._create_test_story_with_script(db_connection, f"Story {i} text.")
+            self._create_test_story_with_content(db_connection, f"Story {i} text.")
 
         # Process with limit of 2
         results = service.process_all_pending(limit=2)
@@ -390,9 +386,9 @@ class TestProcessAllPending:
         """Test getting processing summary."""
         # Create stories with different outcomes
         # Good grammar
-        self._create_test_story_with_script(db_connection, "Perfect grammar here.")
+        self._create_test_story_with_content(db_connection, "Perfect grammar here.")
         # Bad grammar
-        self._create_test_story_with_script(db_connection, "He were happy. I recieved gifts.")
+        self._create_test_story_with_content(db_connection, "He were happy. I recieved gifts.")
 
         # Process all
         results = service.process_all_pending()
@@ -419,7 +415,7 @@ class TestConvenienceFunction:
         story_id = cursor.lastrowid
 
         cursor.execute(
-            "INSERT INTO Script (story_id, version, text) VALUES (?, ?, ?)",
+            "INSERT INTO Content (story_id, version, text) VALUES (?, ?, ?)",
             (story_id, 0, "The hero walks away."),
         )
         db_connection.commit()
@@ -437,17 +433,17 @@ class TestStateConstants:
     def test_input_state(self):
         """Test input state constant."""
         assert INPUT_STATE == StateNames.REVIEW_SCRIPT_GRAMMAR
-        assert INPUT_STATE == "PrismQ.T.Review.Script.Grammar"
+        assert INPUT_STATE == "PrismQ.T.Review.Content.Grammar"
 
     def test_output_state_pass(self):
         """Test output state for passing reviews."""
         assert OUTPUT_STATE_PASS == StateNames.REVIEW_SCRIPT_CONSISTENCY
-        assert OUTPUT_STATE_PASS == "PrismQ.T.Review.Script.Consistency"
+        assert OUTPUT_STATE_PASS == "PrismQ.T.Review.Content.Consistency"
 
     def test_output_state_fail(self):
         """Test output state for failing reviews."""
         assert OUTPUT_STATE_FAIL == StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-        assert OUTPUT_STATE_FAIL == "PrismQ.T.Script.From.Title.Review.Script"
+        assert OUTPUT_STATE_FAIL == "PrismQ.T.Content.From.Title.Review.Content"
 
 
 if __name__ == "__main__":

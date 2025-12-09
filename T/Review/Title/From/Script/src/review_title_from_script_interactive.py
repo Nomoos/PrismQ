@@ -5,9 +5,9 @@ This script provides an interactive mode for reviewing titles against scripts.
 It analyzes title-script alignment and provides improvement recommendations.
 
 Usage:
-    python review_title_from_script_interactive.py                    # Interactive mode
-    python review_title_from_script_interactive.py --preview          # Preview mode (no DB save)
-    python review_title_from_script_interactive.py --preview --debug  # Debug mode
+    python review_title_from_content_interactive.py                    # Interactive mode
+    python review_title_from_content_interactive.py --preview          # Preview mode (no DB save)
+    python review_title_from_content_interactive.py --preview --debug  # Debug mode
 
 Modes:
     Default: Reviews titles and saves results to database
@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent.absolute()
-REVIEW_TITLE_FROM_SCRIPT_ROOT = SCRIPT_DIR.parent  # T/Review/Title/From/Script
+REVIEW_TITLE_FROM_SCRIPT_ROOT = SCRIPT_DIR.parent  # T/Review/Title/From/Content
 REVIEW_TITLE_FROM_ROOT = REVIEW_TITLE_FROM_SCRIPT_ROOT.parent  # T/Review/Title/From
 REVIEW_TITLE_ROOT = REVIEW_TITLE_FROM_ROOT.parent  # T/Review/Title
 REVIEW_ROOT = REVIEW_TITLE_ROOT.parent  # T/Review
@@ -39,10 +39,10 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 
 # Import review modules
 try:
-    from by_script_v2 import (
+    from by_content_v2 import (
         compare_reviews,
         get_improvement_summary,
-        review_title_by_script_v2,
+        review_title_by_content_v2,
     )
 
     REVIEW_V2_AVAILABLE = True
@@ -51,12 +51,12 @@ except ImportError as e:
     IMPORT_ERROR_V2 = str(e)
 
 try:
-    from Idea.by_script_and_idea import (
+    from Idea.by_content_and_idea import (
         analyze_engagement,
         analyze_seo,
-        analyze_title_script_alignment,
+        analyze_title_content_alignment,
         extract_keywords,
-        review_title_by_script_and_idea,
+        review_title_by_content_and_idea,
     )
     from Idea.title_review import TitleReview, TitleReviewCategory
 
@@ -141,11 +141,11 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
     """Parse input text for title review.
 
     Handles:
-    - JSON with title_text, script_text fields
+    - JSON with title_text, content_text fields
     - Plain text separated by newlines
 
     Returns:
-        Tuple of (title_text, script_text, idea) or (None, None, None)
+        Tuple of (title_text, content_text, idea) or (None, None, None)
     """
     text = text.strip()
 
@@ -160,7 +160,7 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
                 logger.info(f"Detected JSON input")
 
             title_text = data.get("title_text") or data.get("title") or ""
-            script_text = data.get("script_text") or data.get("script") or ""
+            content_text = data.get("content_text") or data.get("script") or ""
 
             # Create idea if provided
             idea = None
@@ -175,7 +175,7 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
                         genre=ContentGenre.OTHER,
                     )
 
-            return title_text, script_text, idea
+            return title_text, content_text, idea
 
         except json.JSONDecodeError as e:
             if logger:
@@ -185,8 +185,8 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
     parts = text.split("\n\n", 1)
     if len(parts) >= 2:
         title_text = parts[0].strip()
-        script_text = parts[1].strip()
-        return title_text, script_text, None
+        content_text = parts[1].strip()
+        return title_text, content_text, None
 
     # Single line - treat as title, ask for script
     return text, "", None
@@ -202,7 +202,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     # Setup logging
     logger = None
     if debug or preview:
-        log_filename = f"review_title_from_script_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        log_filename = f"review_title_from_content_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         log_path = SCRIPT_DIR / log_filename
 
         logging.basicConfig(
@@ -213,13 +213,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logging.StreamHandler() if debug else logging.NullHandler(),
             ],
         )
-        logger = logging.getLogger("PrismQ.Review.Title.From.Script")
+        logger = logging.getLogger("PrismQ.Review.Title.From.Content")
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
     # Print header
     mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
-    print_header(f"PrismQ Review Title From Script - {mode_text}")
+    print_header(f"PrismQ Review Title From Content - {mode_text}")
 
     # Check module availability
     if not REVIEW_AVAILABLE:
@@ -239,7 +239,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     # Interactive loop
     print_section("Enter Review Input")
     print("Enter title and script as JSON or separated by blank line:")
-    print('JSON: {"title_text": "Title", "script_text": "Script content..."}')
+    print('JSON: {"title_text": "Title", "content_text": "Content content..."}')
     print("Or enter title, press Enter twice, then script.")
     print("Type 'quit' to exit.\n")
 
@@ -257,7 +257,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
             # If JSON, process immediately
             if first_line.startswith("{"):
-                title_text, script_text, idea = parse_review_input(first_line, logger)
+                title_text, content_text, idea = parse_review_input(first_line, logger)
             else:
                 # Get script text
                 title_text = first_line
@@ -268,7 +268,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     if line == "":
                         break
                     script_lines.append(line)
-                script_text = "\n".join(script_lines)
+                content_text = "\n".join(script_lines)
                 idea = None
 
         except EOFError:
@@ -279,7 +279,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_info("Interrupted. Type 'quit' to exit.")
             continue
 
-        if not title_text or not script_text:
+        if not title_text or not content_text:
             print_error("Both title and script are required")
             continue
 
@@ -289,18 +289,18 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         # Display input
         print_section("Review Input")
         print(f"  Title: {Colors.BOLD}{title_text}{Colors.END}")
-        script_preview = script_text[:200] + "..." if len(script_text) > 200 else script_text
-        print(f"  Script: {script_preview}")
+        script_preview = content_text[:200] + "..." if len(content_text) > 200 else content_text
+        print(f"  Content: {script_preview}")
 
         # Perform review
-        print_section("Analyzing Title-Script Alignment")
+        print_section("Analyzing Title-Content Alignment")
 
         try:
             # Use basic review if idea not available
             review = (
-                review_title_by_script_v2(
+                review_title_by_content_v2(
                     title_text=title_text,
-                    script_text=script_text,
+                    content_text=content_text,
                     title_version="v1",
                     script_version="v1",
                 )
@@ -310,14 +310,14 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
             if not review and REVIEW_AVAILABLE:
                 # Use direct analysis functions
-                alignment = analyze_title_script_alignment(title_text, script_text)
+                alignment = analyze_title_content_alignment(title_text, content_text)
                 engagement = analyze_engagement(title_text)
-                keywords = extract_keywords(script_text)
+                keywords = extract_keywords(content_text)
                 seo = analyze_seo(title_text, keywords)
 
                 # Display results directly
                 print_section("Review Results")
-                print(f"  Script Alignment: {format_score(alignment.score)}")
+                print(f"  Content Alignment: {format_score(alignment.score)}")
                 print(f"  Engagement Score: {format_score(engagement['engagement_score'])}")
                 print(f"  SEO Score: {format_score(seo['seo_score'])}")
                 print(f"  Length Score: {format_score(seo['length_score'])}")
@@ -349,7 +349,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 # Display review results
                 print_section("Review Results")
                 print(f"  Overall Score: {format_score(review.overall_score)}")
-                print(f"  Script Alignment: {format_score(review.script_alignment_score)}")
+                print(f"  Content Alignment: {format_score(review.script_alignment_score)}")
                 print(f"  Engagement Score: {format_score(review.engagement_score)}")
                 print(f"  SEO Score: {format_score(review.seo_score)}")
                 print(f"  Length Score: {format_score(review.length_score)}")
@@ -425,13 +425,13 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Interactive Title Review against Script for PrismQ",
+        description="Interactive Title Review against Content for PrismQ",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python review_title_from_script_interactive.py                    # Interactive mode
-  python review_title_from_script_interactive.py --preview          # Preview mode
-  python review_title_from_script_interactive.py --preview --debug  # Debug mode
+  python review_title_from_content_interactive.py                    # Interactive mode
+  python review_title_from_content_interactive.py --preview          # Preview mode
+  python review_title_from_content_interactive.py --preview --debug  # Debug mode
         """,
     )
 

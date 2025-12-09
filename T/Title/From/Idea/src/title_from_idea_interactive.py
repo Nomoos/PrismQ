@@ -756,7 +756,7 @@ def run_state_workflow_mode(
                     title = service.generate_title_for_story(story, idea)
                     if title:
                         print_success(f"Title saved with ID: {title.id}")
-                        print_success(f"State changed to: PrismQ.T.Script.From.Idea.Title")
+                        print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
                         processed_count += 1
                     else:
                         print_warning("Story already has a title, skipped")
@@ -781,7 +781,7 @@ def run_state_workflow_mode(
     print(f"  Successfully processed: {processed_count}")
     print(f"  Errors: {error_count}")
     print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
-    print(f"  Next state: PrismQ.T.Script.From.Idea.Title")
+    print(f"  Next state: PrismQ.T.Content.From.Idea.Title")
 
     idea_db.close()
     conn.close()

@@ -1,1 +1,1 @@
-"""Tests for PrismQ.T.Review.Script.Content module."""
+"""Tests for PrismQ.T.Review.Content.Content module."""

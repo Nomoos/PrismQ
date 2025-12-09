@@ -18,14 +18,14 @@ import pytest
 from T.Review.Title.ByScriptAndIdea import (
     TitleReview,
     TitleReviewCategory,
-    review_title_by_script_and_idea,
+    review_title_by_content_and_idea,
 )
 
 
 class TestAcceptanceCriteria:
     """Test acceptance criteria for Worker10 implementation."""
 
-    def test_ac1_review_title_against_script_and_idea(self):
+    def test_ac1_review_title_against_content_and_idea(self):
         """AC1: Review title v1 against script v1 and idea."""
         title = "The Mysterious Echo"
         script = """
@@ -36,8 +36,8 @@ class TestAcceptanceCriteria:
         idea = "Mystery story about echoes revealing secrets in an old house"
 
         # Should be able to review title against both script and idea
-        review = review_title_by_script_and_idea(
-            title_text=title, script_text=script, idea_summary=idea
+        review = review_title_by_content_and_idea(
+            title_text=title, content_text=script, idea_summary=idea
         )
 
         assert isinstance(review, TitleReview)
@@ -50,16 +50,16 @@ class TestAcceptanceCriteria:
         assert review.idea_alignment_score <= 100
 
         # Should reference the script and idea
-        assert review.script_id is not None
+        assert review.content_id is not None
         assert review.idea_id is not None
 
         print("✓ AC1: Reviews title v1 against script v1 and idea")
 
     def test_ac2_generate_structured_feedback(self):
         """AC2: Generate structured feedback (alignment, clarity, engagement)."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The Echo Mystery",
-            script_text="A mystery about echoes in a haunted house",
+            content_text="A mystery about echoes in a haunted house",
             idea_summary="Mystery horror with echoes",
         )
 
@@ -97,8 +97,8 @@ class TestAcceptanceCriteria:
         """
         idea = "Horror mystery about echoes"
 
-        review = review_title_by_script_and_idea(
-            title_text=title, script_text=script, idea_summary=idea
+        review = review_title_by_content_and_idea(
+            title_text=title, content_text=script, idea_summary=idea
         )
 
         # Should identify poor alignment (mismatches)
@@ -128,9 +128,9 @@ class TestAcceptanceCriteria:
 
     def test_ac4_suggest_improvements(self):
         """AC4: Suggest improvements for title."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="A Title",  # Intentionally weak title
-            script_text="A complex story about echoes revealing mysteries",
+            content_text="A complex story about echoes revealing mysteries",
             idea_summary="Mystery with echoes",
         )
 
@@ -162,9 +162,9 @@ class TestAcceptanceCriteria:
 
     def test_ac5_json_output_format(self):
         """AC5: Output JSON format with feedback categories."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The Echo Mystery",
-            script_text="A mysterious echo in an old house reveals secrets",
+            content_text="A mysterious echo in an old house reveals secrets",
             idea_summary="Mystery about echoes and secrets",
         )
 
@@ -211,7 +211,7 @@ class TestAcceptanceCriteria:
 
         print("✓ AC5: Outputs JSON format with feedback categories")
 
-    def test_ac6_sample_title_script_pairs(self):
+    def test_ac6_sample_title_content_pairs(self):
         """AC6: Tests review sample title/script pairs."""
 
         # Sample 1: Well-aligned title and script
@@ -225,8 +225,8 @@ class TestAcceptanceCriteria:
             "idea": "Mystery horror about echoes revealing secrets in an old house",
         }
 
-        review1 = review_title_by_script_and_idea(
-            title_text=sample1["title"], script_text=sample1["script"], idea_summary=sample1["idea"]
+        review1 = review_title_by_content_and_idea(
+            title_text=sample1["title"], content_text=sample1["script"], idea_summary=sample1["idea"]
         )
 
         # Should score reasonably well (good alignment)
@@ -240,8 +240,8 @@ class TestAcceptanceCriteria:
             "idea": "Horror story about ghosts",
         }
 
-        review2 = review_title_by_script_and_idea(
-            title_text=sample2["title"], script_text=sample2["script"], idea_summary=sample2["idea"]
+        review2 = review_title_by_content_and_idea(
+            title_text=sample2["title"], content_text=sample2["script"], idea_summary=sample2["idea"]
         )
 
         # Should score poorly (bad alignment)
@@ -255,8 +255,8 @@ class TestAcceptanceCriteria:
             "idea": "Discovery story about hidden secrets",
         }
 
-        review3 = review_title_by_script_and_idea(
-            title_text=sample3["title"], script_text=sample3["script"], idea_summary=sample3["idea"]
+        review3 = review_title_by_content_and_idea(
+            title_text=sample3["title"], content_text=sample3["script"], idea_summary=sample3["idea"]
         )
 
         # Should have high engagement scores
@@ -277,9 +277,9 @@ class TestWorkflowIntegration:
         idea_summary = "Mystery about echoes revealing secrets"
 
         # Review should work with v1 versions
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text=title_v1,
-            script_text=script_v1_text,
+            content_text=script_v1_text,
             idea_summary=idea_summary,
             title_version="v1",
             script_version="v1",
@@ -293,9 +293,9 @@ class TestWorkflowIntegration:
 
     def test_feedback_for_title_v2(self):
         """Test that review provides feedback suitable for generating title v2."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The House",
-            script_text="Echoes in an abandoned house reveal dark secrets and mysteries",
+            content_text="Echoes in an abandoned house reveal dark secrets and mysteries",
             idea_summary="Horror mystery with echoes revealing secrets",
         )
 

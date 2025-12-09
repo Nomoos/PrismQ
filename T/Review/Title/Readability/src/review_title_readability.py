@@ -3,13 +3,13 @@
 
 This module implements the title readability review workflow stage that:
 1. Selects the Story with state 'PrismQ.T.Review.Title.Readability' that has
-   the Script with the lowest current version number (highest version per story_id)
+   the Content with the lowest current version number (highest version per story_id)
 2. Reviews the title for readability (voiceover suitability)
 3. Outputs a Review model (simple: text, score, created_at)
 4. Updates the Story state based on review acceptance
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script' (return to script refinement)
+- If review doesn't accept title → 'PrismQ.T.Content.From.Title.Review.Content' (return to script refinement)
 - If review accepts title → 'PrismQ.T.Story.Review' (proceed to story review)
 
 Review Model Output:
@@ -40,7 +40,7 @@ from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
 from Model.Database.models.story import Story
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
 
@@ -73,10 +73,10 @@ class ReviewResult:
 def get_story_for_review(
     connection: sqlite3.Connection, story_repository: StoryRepository
 ) -> Optional[Story]:
-    """Get the Story with lowest Script version for review.
+    """Get the Story with lowest Content version for review.
 
     Selects the Story in 'PrismQ.T.Review.Title.Readability' state that has
-    the Script with the lowest current version number. The "current version"
+    the Content with the lowest current version number. The "current version"
     is the highest version number among all scripts for a given story_id.
 
     This ensures stories with less refined scripts (fewer iterations) are
@@ -88,20 +88,20 @@ def get_story_for_review(
         story_repository: Repository for Story database operations
 
     Returns:
-        Story with lowest Script version in the review state, or None if none found
+        Story with lowest Content version in the review state, or None if none found
     """
     # Query to find stories in the correct state, joined with their scripts,
     # and ordered by the MAX(version) for each story_id (lowest first)
     # COALESCE handles NULL versions (stories without scripts) consistently
     query = """
-        SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.script_id, 
+        SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.content_id, 
                s.state, s.created_at, s.updated_at,
-               MAX(sc.version) as max_script_version
+               MAX(sc.version) as max_content_version
         FROM Story s
-        LEFT JOIN Script sc ON s.id = sc.story_id
+        LEFT JOIN Content sc ON s.id = sc.story_id
         WHERE s.state = ?
         GROUP BY s.id
-        ORDER BY COALESCE(max_script_version, -1) ASC, s.created_at ASC
+        ORDER BY COALESCE(max_content_version, -1) ASC, s.created_at ASC
         LIMIT 1
     """
 
@@ -125,7 +125,7 @@ def get_story_for_review(
         idea_id=row["idea_id"],
         idea_json=row["idea_json"],
         title_id=row["title_id"],
-        script_id=row["script_id"],
+        content_id=row["content_id"],
         state=row["state"],
         created_at=created_at,
         updated_at=updated_at,
@@ -136,7 +136,7 @@ def get_oldest_story_for_review(story_repository: StoryRepository) -> Optional[S
     """Get the oldest Story with state 'PrismQ.T.Review.Title.Readability'.
 
     DEPRECATED: This function is kept for backward compatibility.
-    Use get_story_for_review() instead which selects by lowest Script version.
+    Use get_story_for_review() instead which selects by lowest Content version.
 
     Args:
         story_repository: Repository for Story database operations
@@ -312,7 +312,7 @@ def process_review_title_readability(
 
     This function:
     1. Finds the Story with state 'PrismQ.T.Review.Title.Readability' that has
-       the Script with the lowest current version number
+       the Content with the lowest current version number
     2. Evaluates the title for voiceover readability
     3. Creates a Review record
     4. Updates the Story state based on review outcome

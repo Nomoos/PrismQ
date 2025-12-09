@@ -2,13 +2,13 @@
 
 This module provides the title readability review workflow stage:
 - Selects the Story with state 'PrismQ.T.Review.Title.Readability' that has
-  the Script with the lowest current version number
+  the Content with the lowest current version number
 - Evaluates the title for voiceover readability
 - Outputs a Review model (text, score, created_at)
 - Updates the Story state based on review acceptance
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script'
+- If review doesn't accept title → 'PrismQ.T.Content.From.Title.Review.Content'
 - If review accepts title → 'PrismQ.T.Story.Review'
 """
 

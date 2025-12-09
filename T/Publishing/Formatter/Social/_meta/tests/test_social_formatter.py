@@ -1,4 +1,4 @@
-"""Tests for PrismQ.T.Script.Formatter.Social module.
+"""Tests for PrismQ.T.Content.Formatter.Social module.
 
 Tests cover:
 - Base formatter utilities
@@ -12,7 +12,7 @@ Tests cover:
 
 import pytest
 
-from T.Script.Formatter.Social import (  # Base classes; Twitter; LinkedIn; Instagram; Facebook
+from T.Content.Formatter.Social import (  # Base classes; Twitter; LinkedIn; Instagram; Facebook
     BaseSocialFormatter,
     FacebookFormatter,
     InstagramFormatter,
@@ -340,25 +340,25 @@ class TestFacebookFormatter:
 class TestEdgeCases:
     """Test edge cases and error handling."""
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test handling of empty script."""
         result = format_twitter_thread(script="", content_id="edge-001")
         # Should handle gracefully
         assert isinstance(result, SocialMediaContent)
 
-    def test_very_short_script(self):
+    def test_very_short_content(self):
         """Test handling of very short script."""
         result = format_linkedin_post(script="Short.", content_id="edge-002")
         assert result.success is True
         assert len(result.formatted_content) > 0
 
-    def test_script_with_special_characters(self):
+    def test_content_with_special_characters(self):
         """Test handling of special characters."""
         script = "Test with special chars: @#$%^&*()"
         result = format_instagram_caption(script=script, content_id="edge-003")
         assert result.success is True
 
-    def test_script_with_urls(self):
+    def test_content_with_urls(self):
         """Test handling of URLs in script."""
         script = "Check out https://example.com for more info."
         result = format_facebook_post(script=script, content_id="edge-004")

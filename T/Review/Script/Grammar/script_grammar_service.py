@@ -1,23 +1,23 @@
-"""Script Grammar Review Service - Process stories in PrismQ.T.Review.Script.Grammar state.
+"""Content Grammar Review Service - Process stories in PrismQ.T.Review.Content.Grammar state.
 
 This module implements the workflow step that:
-1. Selects the oldest Story where state is PrismQ.T.Review.Script.Grammar
+1. Selects the oldest Story where state is PrismQ.T.Review.Content.Grammar
 2. Reviews the script for grammar issues
 3. Creates a Review record with the results
-4. Links the Review to Script directly via FK (Script.review_id)
+4. Links the Review to Content directly via FK (Content.review_id)
 5. Updates the Story state based on review outcome:
-   - If review passes: PrismQ.T.Review.Script.Consistency
-   - If review fails: PrismQ.T.Script.From.Title.Review.Script
+   - If review passes: PrismQ.T.Review.Content.Consistency
+   - If review fails: PrismQ.T.Content.From.Title.Review.Content
 
 Note: This module reviews Scripts, not Stories. The Review is linked directly
-to Script via Script.review_id FK. StoryReview linking table is not used here
+to Content via Content.review_id FK. StoryReview linking table is not used here
 as it is reserved for Story-level reviews only.
 
 This is the main entry point for grammar review in the quality review workflow.
 
 Usage:
     >>> import sqlite3
-    >>> from T.Review.Script.Grammar.script_grammar_service import ScriptGrammarReviewService
+    >>> from T.Review.Content.Grammar.script_grammar_service import ScriptGrammarReviewService
     >>>
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
@@ -39,7 +39,7 @@ from typing import List, Optional
 from Model.Database.models.review import Review
 from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
 
@@ -47,15 +47,15 @@ from Model.State.constants.state_names import StateNames
 from .script_grammar_review import (
     ScriptGrammarChecker,
     get_grammar_feedback,
-    review_script_grammar,
+    review_content_grammar,
 )
 
 # State constants for this module
-INPUT_STATE = StateNames.REVIEW_SCRIPT_GRAMMAR  # PrismQ.T.Review.Script.Grammar
-OUTPUT_STATE_PASS = StateNames.REVIEW_SCRIPT_CONSISTENCY  # PrismQ.T.Review.Script.Consistency
+INPUT_STATE = StateNames.REVIEW_SCRIPT_GRAMMAR  # PrismQ.T.Review.Content.Grammar
+OUTPUT_STATE_PASS = StateNames.REVIEW_SCRIPT_CONSISTENCY  # PrismQ.T.Review.Content.Consistency
 OUTPUT_STATE_FAIL = (
     StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-)  # PrismQ.T.Script.From.Title.Review.Script
+)  # PrismQ.T.Content.From.Title.Review.Content
 
 # Default pass threshold for grammar review
 DEFAULT_PASS_THRESHOLD = 85
@@ -67,7 +67,7 @@ class GrammarReviewResult:
 
     Attributes:
         story_id: ID of the processed story
-        script_id: ID of the script that was reviewed
+        content_id: ID of the script that was reviewed
         review_id: ID of the created review (if successful)
         previous_state: The state before processing
         new_state: The state after processing
@@ -80,7 +80,7 @@ class GrammarReviewResult:
     """
 
     story_id: Optional[int] = None
-    script_id: Optional[int] = None
+    content_id: Optional[int] = None
     review_id: Optional[int] = None
     previous_state: Optional[str] = None
     new_state: Optional[str] = None
@@ -93,16 +93,16 @@ class GrammarReviewResult:
 
 
 class ScriptGrammarReviewService:
-    """Service for PrismQ.T.Review.Script.Grammar workflow state.
+    """Service for PrismQ.T.Review.Content.Grammar workflow state.
 
     This service implements the grammar review step that:
-    1. Selects the oldest Story where state is PrismQ.T.Review.Script.Grammar
+    1. Selects the oldest Story where state is PrismQ.T.Review.Content.Grammar
     2. Reviews the script for grammar, spelling, punctuation, and tense issues
     3. Creates a Review record with the results
-    4. Links the Review to Script directly via FK (Script.review_id)
+    4. Links the Review to Content directly via FK (Content.review_id)
     5. Updates the Story state based on review outcome:
-       - PASS: PrismQ.T.Review.Script.Consistency
-       - FAIL: PrismQ.T.Script.From.Title.Review.Script
+       - PASS: PrismQ.T.Review.Content.Consistency
+       - FAIL: PrismQ.T.Content.From.Title.Review.Content
 
     Note: This reviews Scripts, not Stories. StoryReview linking table is not
     used here as it is reserved for Story-level reviews only.
@@ -112,7 +112,7 @@ class ScriptGrammarReviewService:
 
     Attributes:
         story_repo: Repository for Story operations
-        script_repo: Repository for Script operations
+        content_repo: Repository for Content operations
         review_repo: Repository for Review operations
         grammar_checker: Grammar checker for reviewing scripts
 
@@ -140,7 +140,7 @@ class ScriptGrammarReviewService:
         """
         self._conn = connection
         self.story_repo = StoryRepository(connection)
-        self.script_repo = ScriptRepository(connection)
+        self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
         self.grammar_checker = ScriptGrammarChecker(pass_threshold=pass_threshold)
         self.pass_threshold = pass_threshold
@@ -149,7 +149,7 @@ class ScriptGrammarReviewService:
         """Count stories waiting in the grammar review state.
 
         Returns:
-            Number of stories with state PrismQ.T.Review.Script.Grammar.
+            Number of stories with state PrismQ.T.Review.Content.Grammar.
         """
         return self.story_repo.count_by_state(INPUT_STATE)
 
@@ -157,7 +157,7 @@ class ScriptGrammarReviewService:
         """Get the oldest story in the grammar review state.
 
         Returns:
-            The oldest Story in state PrismQ.T.Review.Script.Grammar,
+            The oldest Story in state PrismQ.T.Review.Content.Grammar,
             or None if no stories are in this state.
         """
         return self.story_repo.find_oldest_by_state(INPUT_STATE)
@@ -166,14 +166,14 @@ class ScriptGrammarReviewService:
         """Process the oldest story in the grammar review state.
 
         This method:
-        1. Finds the oldest Story with state PrismQ.T.Review.Script.Grammar
+        1. Finds the oldest Story with state PrismQ.T.Review.Content.Grammar
         2. Gets the current script for the story
         3. Performs grammar review on the script
         4. Creates a Review record with the results
-        5. Links the Review to Script via FK (Script.review_id)
+        5. Links the Review to Content via FK (Content.review_id)
         6. Updates the Story state:
-           - PASS: PrismQ.T.Review.Script.Consistency
-           - FAIL: PrismQ.T.Script.From.Title.Review.Script
+           - PASS: PrismQ.T.Review.Content.Consistency
+           - FAIL: PrismQ.T.Content.From.Title.Review.Content
 
         Returns:
             GrammarReviewResult with processing details.
@@ -185,7 +185,7 @@ class ScriptGrammarReviewService:
         story = self.get_oldest_story()
 
         if story is None:
-            result.error = "No stories found in state PrismQ.T.Review.Script.Grammar"
+            result.error = "No stories found in state PrismQ.T.Review.Content.Grammar"
             return result
 
         result.story_id = story.id
@@ -193,20 +193,20 @@ class ScriptGrammarReviewService:
 
         # Get the current script for the story
         try:
-            scripts = self.script_repo.find_by_story_id(story.id)
+            scripts = self.content_repo.find_by_story_id(story.id)
             if not scripts:
                 result.error = f"Story {story.id} has no scripts"
                 return result
 
             # Get the latest script (highest version)
-            current_script = max(scripts, key=lambda s: s.version)
-            result.script_id = current_script.id
+            current_content = max(scripts, key=lambda s: s.version)
+            result.content_id = current_content.id
 
             # Perform grammar review
-            grammar_review = self.grammar_checker.review_script(
-                script_text=current_script.text,
-                script_id=str(current_script.id),
-                script_version=f"v{current_script.version}",
+            grammar_review = self.grammar_checker.review_content(
+                content_text=current_content.text,
+                content_id=str(current_content.id),
+                script_version=f"v{current_content.version}",
             )
 
             # Get structured feedback
@@ -220,9 +220,9 @@ class ScriptGrammarReviewService:
             saved_review = self.review_repo.insert(review)
             result.review_id = saved_review.id
 
-            # Link Review to Script directly via FK (Script.review_id)
-            # Note: StoryReview linking table is not used for Script reviews
-            self.script_repo.update_review_id(current_script.id, saved_review.id)
+            # Link Review to Content directly via FK (Content.review_id)
+            # Note: StoryReview linking table is not used for Content reviews
+            self.content_repo.update_review_id(current_content.id, saved_review.id)
 
             # Update result with review outcome
             result.score = grammar_review.overall_score
@@ -359,9 +359,9 @@ class ScriptGrammarReviewService:
 def process_oldest_grammar_review(
     connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
 ) -> GrammarReviewResult:
-    """Process the oldest story in PrismQ.T.Review.Script.Grammar state.
+    """Process the oldest story in PrismQ.T.Review.Content.Grammar state.
 
-    This is the main entry point for the PrismQ.T.Review.Script.Grammar module.
+    This is the main entry point for the PrismQ.T.Review.Content.Grammar module.
     It finds the oldest story in the state, performs grammar review, and updates
     the story state based on the review outcome.
 

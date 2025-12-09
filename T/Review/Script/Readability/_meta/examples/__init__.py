@@ -1,1 +1,1 @@
-"""Examples for Script Readability Review module."""
+"""Examples for Content Readability Review module."""

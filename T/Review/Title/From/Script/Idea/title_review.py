@@ -13,7 +13,7 @@ The TitleReview model enables:
 - Feedback for title improvement iterations
 
 Workflow Position:
-    Title v1 + Script v1 + Idea → TitleReview (AI Reviewer) → Title v2 (with feedback)
+    Title v1 + Content v1 + Idea → TitleReview (AI Reviewer) → Title v2 (with feedback)
 """
 
 from dataclasses import asdict, dataclass, field
@@ -68,7 +68,7 @@ class TitleReview:
     - Overall quality score (0-100%)
     - Category-specific scores and analysis
     - Prioritized improvement recommendations
-    - Script alignment assessment
+    - Content alignment assessment
     - Idea intent verification
     - Audience engagement evaluation
 
@@ -83,13 +83,13 @@ class TitleReview:
         category_scores: Scores for each evaluation category
         improvement_points: Prioritized list of improvements
 
-        Script Context:
-            script_id: Identifier of the associated script
+        Content Context:
+            content_id: Identifier of the associated script
             script_title: Title of the script for reference
             script_summary: Brief summary of script content
             script_version: Version of script being reviewed against
             script_alignment_score: How well title matches script (0-100)
-            key_script_elements: Key elements from script that title should reflect
+            key_content_elements: Key elements from script that title should reflect
 
         Idea Context:
             idea_id: Identifier of the original idea
@@ -137,7 +137,7 @@ class TitleReview:
         ...     title_text="The Echo - A Haunting Discovery",
         ...     title_version="v1",
         ...     overall_score=78,
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_title="The Echo",
         ...     script_summary="A horror short about mysterious echoes",
         ...     script_alignment_score=85,
@@ -160,13 +160,13 @@ class TitleReview:
     category_scores: List[TitleCategoryScore] = field(default_factory=list)
     improvement_points: List[TitleImprovementPoint] = field(default_factory=list)
 
-    # Script Context
-    script_id: str = ""
+    # Content Context
+    content_id: str = ""
     script_title: str = ""
     script_summary: str = ""
     script_version: str = "v1"
     script_alignment_score: int = 0  # 0-100
-    key_script_elements: List[str] = field(default_factory=list)
+    key_content_elements: List[str] = field(default_factory=list)
 
     # Idea Context
     idea_id: str = ""
@@ -422,12 +422,12 @@ class TitleReview:
             overall_score=data.get("overall_score", 0),
             category_scores=category_scores,
             improvement_points=improvement_points,
-            script_id=data.get("script_id", ""),
+            content_id=data.get("content_id", ""),
             script_title=data.get("script_title", ""),
             script_summary=data.get("script_summary", ""),
             script_version=data.get("script_version", "v1"),
             script_alignment_score=data.get("script_alignment_score", 0),
-            key_script_elements=data.get("key_script_elements", []),
+            key_content_elements=data.get("key_content_elements", []),
             idea_id=data.get("idea_id", ""),
             idea_summary=data.get("idea_summary", ""),
             idea_intent=data.get("idea_intent", ""),

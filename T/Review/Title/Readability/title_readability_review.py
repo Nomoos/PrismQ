@@ -14,7 +14,7 @@ The TitleReadabilityReview model enables:
 
 Workflow Position:
     Stage 19 (MVP-019): Title Readability Review
-    Title (vN) + Script (vN) → TitleReadabilityReview (AI Reviewer) → {
+    Title (vN) + Content (vN) → TitleReadabilityReview (AI Reviewer) → {
         PASS: Ready for finalization
         FAIL: Return to Title Refinement
     }

@@ -38,7 +38,7 @@ def example_basic_polish():
     polish = polish_story_with_gpt(
         story_id="horror_short_001",
         current_title="The House That Remembers: and Hunts",
-        current_script="Every night at midnight, she returns.\nNot as a ghost. Not as a memory.\nAs herself.",
+        current_content="Every night at midnight, she returns.\nNot as a ghost. Not as a memory.\nAs herself.",
         expert_review_data=review_data,
         iteration_number=1,
     )
@@ -55,8 +55,8 @@ def example_basic_polish():
     print(f"After:  {polish.polished_title}")
 
     print(f"\n--- SCRIPT ---")
-    print(f"Before: {polish.original_script[:80]}...")
-    print(f"After:  {polish.polished_script[:120]}...")
+    print(f"Before: {polish.original_content[:80]}...")
+    print(f"After:  {polish.polished_content[:120]}...")
 
     print(f"\n--- CHANGES ---")
     for i, change in enumerate(polish.change_log, 1):

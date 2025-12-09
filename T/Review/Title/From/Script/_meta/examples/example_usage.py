@@ -11,8 +11,8 @@ import sys
 # Add parent directories to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
-from T.Review.Title.ByScript import get_improvement_summary, review_title_by_script_v2
-from T.Review.Title.ByScriptAndIdea import review_title_by_script_and_idea
+from T.Review.Title.ByScript import get_improvement_summary, review_title_by_content_v2
+from T.Review.Title.ByScriptAndIdea import review_title_by_content_and_idea
 
 
 def example_basic_v2_review():
@@ -32,14 +32,14 @@ def example_basic_v2_review():
     to a shocking revelation about the true nature of the phenomena.
     """
 
-    review = review_title_by_script_v2(
-        title_text=title_v2, script_text=script_v2, title_version="v2", script_version="v2"
+    review = review_title_by_content_v2(
+        title_text=title_v2, content_text=script_v2, title_version="v2", script_version="v2"
     )
 
     print(f"\nTitle: {review.title_text}")
     print(f"Version: {review.title_version}")
     print(f"Overall Score: {review.overall_score}%")
-    print(f"Script Alignment: {review.script_alignment_score}%")
+    print(f"Content Alignment: {review.script_alignment_score}%")
     print(f"Engagement Score: {review.engagement_score}%")
     print(f"\nTop Improvements:")
     for imp in review.improvement_points[:3]:
@@ -63,9 +63,9 @@ def example_v1_to_v2_comparison():
     idea = "A psychological horror story about mysterious sounds in an abandoned hospital"
 
     # Create v1 review
-    v1_review = review_title_by_script_and_idea(
+    v1_review = review_title_by_content_and_idea(
         title_text=title_v1,
-        script_text=script_v1,
+        content_text=script_v1,
         idea_summary=idea,
         title_version="v1",
         script_version="v1",
@@ -73,7 +73,7 @@ def example_v1_to_v2_comparison():
 
     print(f"\nv1 Title: {title_v1}")
     print(f"v1 Overall Score: {v1_review.overall_score}%")
-    print(f"v1 Script Alignment: {v1_review.script_alignment_score}%")
+    print(f"v1 Content Alignment: {v1_review.script_alignment_score}%")
 
     # Improved v2 title and script
     title_v2 = "The Echo - A Haunting Discovery"
@@ -88,9 +88,9 @@ def example_v1_to_v2_comparison():
     """
 
     # Create v2 review with v1 comparison
-    v2_review = review_title_by_script_v2(
+    v2_review = review_title_by_content_v2(
         title_text=title_v2,
-        script_text=script_v2,
+        content_text=script_v2,
         title_version="v2",
         script_version="v2",
         previous_review=v1_review,
@@ -98,7 +98,7 @@ def example_v1_to_v2_comparison():
 
     print(f"\nv2 Title: {title_v2}")
     print(f"v2 Overall Score: {v2_review.overall_score}%")
-    print(f"v2 Script Alignment: {v2_review.script_alignment_score}%")
+    print(f"v2 Content Alignment: {v2_review.script_alignment_score}%")
     print(f"Iteration Number: {v2_review.iteration_number}")
 
     # Get improvement summary
@@ -140,7 +140,7 @@ def example_json_export():
     her thoughts. A suspenseful journey into the paranormal.
     """
 
-    review = review_title_by_script_v2(title_text=title_v2, script_text=script_v2)
+    review = review_title_by_content_v2(title_text=title_v2, content_text=script_v2)
 
     # Convert to JSON
     review_dict = review.to_dict()
@@ -163,8 +163,8 @@ def example_multiple_iterations():
     title_v1 = "The Echo"
     script_v1 = "A horror short about mysterious sounds in an abandoned hospital."
 
-    v1_review = review_title_by_script_and_idea(
-        title_text=title_v1, script_text=script_v1, idea_summary=idea
+    v1_review = review_title_by_content_and_idea(
+        title_text=title_v1, content_text=script_v1, idea_summary=idea
     )
 
     print(f"\nv1: {title_v1}")
@@ -174,8 +174,8 @@ def example_multiple_iterations():
     title_v2 = "The Echo - A Haunting Discovery"
     script_v2 = "The Echo follows Sarah as she explores an abandoned hospital, uncovering mysterious echoes and haunting discoveries."
 
-    v2_review = review_title_by_script_v2(
-        title_text=title_v2, script_text=script_v2, title_version="v2", previous_review=v1_review
+    v2_review = review_title_by_content_v2(
+        title_text=title_v2, content_text=script_v2, title_version="v2", previous_review=v1_review
     )
 
     print(f"\nv2: {title_v2}")
@@ -187,8 +187,8 @@ def example_multiple_iterations():
     title_v3 = "The Echo - Uncovering Dark Secrets in the Abandoned Hospital"
     script_v3 = "The Echo - A suspenseful horror journey as Sarah investigates paranormal echoes in the abandoned Mercy Hospital, uncovering dark secrets and haunting discoveries."
 
-    v3_review = review_title_by_script_v2(
-        title_text=title_v3, script_text=script_v3, title_version="v3", previous_review=v2_review
+    v3_review = review_title_by_content_v2(
+        title_text=title_v3, content_text=script_v3, title_version="v3", previous_review=v2_review
     )
 
     print(f"\nv3: {title_v3}")
@@ -217,8 +217,8 @@ def example_regression_detection():
 
     # Good v1
     title_v1 = "The Echo - Mysterious Sounds in the Abandoned Hospital"
-    v1_review = review_title_by_script_and_idea(
-        title_text=title_v1, script_text=script_v1, idea_summary=idea
+    v1_review = review_title_by_content_and_idea(
+        title_text=title_v1, content_text=script_v1, idea_summary=idea
     )
 
     print(f"\nv1 Title: {title_v1}")
@@ -230,8 +230,8 @@ def example_regression_detection():
         "A horror short about mysterious sounds in an abandoned hospital with haunting echoes."
     )
 
-    v2_review = review_title_by_script_v2(
-        title_text=title_v2, script_text=script_v2, previous_review=v1_review
+    v2_review = review_title_by_content_v2(
+        title_text=title_v2, content_text=script_v2, previous_review=v1_review
     )
 
     print(f"\nv2 Title: {title_v2}")

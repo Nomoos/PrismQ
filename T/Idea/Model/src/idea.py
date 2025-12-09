@@ -9,7 +9,7 @@ allowing multiple inspirations to be blended into a single cohesive concept that
 serves as the seed for original stories, scripts, and content.
 
 Workflow Position:
-    IdeaInspiration → Idea → Script → Proofreading → Publishing
+    IdeaInspiration → Idea → Content → Proofreading → Publishing
 """
 
 from dataclasses import asdict, dataclass, field
@@ -33,7 +33,7 @@ class IdeaStatus(Enum):
     Progressive Multi-Format Workflow:
         IdeaInspiration → Idea → Outline → Skeleton → Title
           ↓
-        Script → ScriptDraft → ScriptReview → ScriptApproved
+        Content → ScriptDraft → ScriptReview → ScriptApproved
           ↓
         TextPublishing → PublishedText (text is published & used for voiceover)
           ├─→ AnalyticsReviewText (optional early analytics)
@@ -70,7 +70,7 @@ class IdeaStatus(Enum):
     SKELETON = "skeleton"
     TITLE = "title"
 
-    # Script Development Phase
+    # Content Development Phase
     SCRIPT = "script"
     SCRIPT_DRAFT = "script_draft"
     SCRIPT_REVIEW = "script_review"

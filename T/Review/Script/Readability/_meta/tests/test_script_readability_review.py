@@ -11,15 +11,15 @@ import json
 
 import pytest
 
-from T.Review.Script.Readability import (
+from T.Review.Content.Readability import (
     ReadabilityIssue,
     ReadabilityIssueType,
     ReadabilityReview,
     ReadabilitySeverity,
     ScriptReadabilityChecker,
     get_readability_feedback,
-    review_script_readability,
-    review_script_readability_to_json,
+    review_content_readability,
+    review_content_readability_to_json,
 )
 
 
@@ -29,7 +29,7 @@ class TestReadabilityReviewBasic:
     def test_create_basic_review(self):
         """Test creating a basic ReadabilityReview instance."""
         review = ReadabilityReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=90,
             pronunciation_score=92,
@@ -38,7 +38,7 @@ class TestReadabilityReviewBasic:
             mouthfeel_score=91,
         )
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_version == "v3"
         assert review.overall_score == 90
         assert review.pass_threshold == 85
@@ -57,15 +57,15 @@ class TestReadabilityReviewBasic:
     def test_create_failing_review(self):
         """Test creating a review that fails."""
         review = ReadabilityReview(
-            script_id="script-002", script_version="v3", overall_score=75  # Below threshold of 85
+            content_id="script-002", script_version="v3", overall_score=75  # Below threshold of 85
         )
 
         assert review.passes is False
 
-    def test_readable_script_passes(self):
+    def test_readable_content_passes(self):
         """Test that a readable script passes review."""
         review = ReadabilityReview(
-            script_id="script-readable",
+            content_id="script-readable",
             script_version="v3",
             overall_score=95,
             pronunciation_score=98,
@@ -132,7 +132,7 @@ class TestReadabilityReviewIssueManagement:
 
     def test_add_issue_updates_counts(self):
         """Test that adding issues updates severity counts."""
-        review = ReadabilityReview(script_id="script-001", script_version="v3")
+        review = ReadabilityReview(content_id="script-001", script_version="v3")
 
         # Add a high severity issue
         issue1 = ReadabilityIssue(
@@ -167,7 +167,7 @@ class TestReadabilityReviewIssueManagement:
 
     def test_get_issues_by_severity(self):
         """Test filtering issues by severity."""
-        review = ReadabilityReview(script_id="script-001")
+        review = ReadabilityReview(content_id="script-001")
 
         issue_high = ReadabilityIssue(
             issue_type=ReadabilityIssueType.PACING,
@@ -199,7 +199,7 @@ class TestReadabilityReviewIssueManagement:
 
     def test_get_issues_by_type(self):
         """Test filtering issues by type."""
-        review = ReadabilityReview(script_id="script-001")
+        review = ReadabilityReview(content_id="script-001")
 
         issue_pronunciation = ReadabilityIssue(
             issue_type=ReadabilityIssueType.PRONUNCIATION,
@@ -232,12 +232,12 @@ class TestReadabilityReviewIssueManagement:
 class TestScriptReadabilityChecker:
     """Test ScriptReadabilityChecker functionality."""
 
-    def test_simple_script_passes(self):
+    def test_simple_content_passes(self):
         """Test that a simple, readable script passes."""
         checker = ScriptReadabilityChecker(pass_threshold=85)
         script = "This is a simple script.\nIt has short sentences.\nEasy to read and speak."
 
-        review = checker.review_script(script, "test-001", "v3")
+        review = checker.review_content(script, "test-001", "v3")
 
         assert review.passes is True
         assert review.overall_score >= 85
@@ -248,7 +248,7 @@ class TestScriptReadabilityChecker:
         checker = ScriptReadabilityChecker(pass_threshold=85)
         script = "She sells seashells by the seashore, specifically selecting superior specimens."
 
-        review = checker.review_script(script, "test-002", "v3")
+        review = checker.review_content(script, "test-002", "v3")
 
         # Should detect tongue twister pattern
         twister_issues = [
@@ -262,7 +262,7 @@ class TestScriptReadabilityChecker:
         # Create a sentence with more than 20 words
         script = "This is a very long sentence that goes on and on without any natural pauses or breathing points making it difficult for voiceover."
 
-        review = checker.review_script(script, "test-003", "v3")
+        review = checker.review_content(script, "test-003", "v3")
 
         # Should detect pacing issue
         pacing_issues = [i for i in review.issues if i.issue_type == ReadabilityIssueType.PACING]
@@ -273,7 +273,7 @@ class TestScriptReadabilityChecker:
         checker = ScriptReadabilityChecker(pass_threshold=85)
         script = "The methodology employed in the implementation was quintessential."
 
-        review = checker.review_script(script, "test-004", "v3")
+        review = checker.review_content(script, "test-004", "v3")
 
         # Should detect complex word issues
         mouthfeel_issues = [
@@ -286,7 +286,7 @@ class TestScriptReadabilityChecker:
         checker = ScriptReadabilityChecker(pass_threshold=85)
         script = "[Stage direction with complex words]\nINT. Very long location description with many words.\nNormal dialogue line here."
 
-        review = checker.review_script(script, "test-005", "v3")
+        review = checker.review_content(script, "test-005", "v3")
 
         # Should not flag stage directions
         assert review.overall_score >= 85
@@ -294,7 +294,7 @@ class TestScriptReadabilityChecker:
     def test_critical_issue_fails_review(self):
         """Test that critical issues cause review to fail."""
         review = ReadabilityReview(
-            script_id="script-critical", script_version="v3", overall_score=90  # Good score but...
+            content_id="script-critical", script_version="v3", overall_score=90  # Good score but...
         )
 
         # Add a critical issue
@@ -315,23 +315,23 @@ class TestScriptReadabilityChecker:
 class TestConvenienceFunctions:
     """Test convenience functions."""
 
-    def test_review_script_readability(self):
+    def test_review_content_readability(self):
         """Test the convenience function."""
         script = "This is a simple test script."
-        review = review_script_readability(script, "test-001", "v3")
+        review = review_content_readability(script, "test-001", "v3")
 
         assert isinstance(review, ReadabilityReview)
-        assert review.script_id == "test-001"
+        assert review.content_id == "test-001"
         assert review.script_version == "v3"
 
-    def test_review_script_readability_to_json(self):
+    def test_review_content_readability_to_json(self):
         """Test JSON conversion."""
         script = "This is a simple test script."
-        json_str = review_script_readability_to_json(script, "test-001", "v3")
+        json_str = review_content_readability_to_json(script, "test-001", "v3")
 
         # Should be valid JSON
         data = json.loads(json_str)
-        assert data["script_id"] == "test-001"
+        assert data["content_id"] == "test-001"
         assert data["script_version"] == "v3"
         assert "overall_score" in data
         assert "issues" in data
@@ -339,10 +339,10 @@ class TestConvenienceFunctions:
     def test_get_readability_feedback(self):
         """Test feedback extraction."""
         script = "She sells seashells by the seashore."
-        review = review_script_readability(script, "test-001", "v3")
+        review = review_content_readability(script, "test-001", "v3")
         feedback = get_readability_feedback(review)
 
-        assert "script_id" in feedback
+        assert "content_id" in feedback
         assert "passes" in feedback
         assert "overall_score" in feedback
         assert "voiceover_notes" in feedback
@@ -357,7 +357,7 @@ class TestScoreCalculation:
         checker = ScriptReadabilityChecker(pass_threshold=85)
         script = "The strengths of this method remained unclear."
 
-        review = checker.review_script(script, "test-001", "v3")
+        review = checker.review_content(script, "test-001", "v3")
 
         # Should have good overall score for one issue
         assert 0 <= review.pronunciation_score <= 100
@@ -367,13 +367,13 @@ class TestScoreCalculation:
         """Test that multiple issues lower the score."""
         checker = ScriptReadabilityChecker(pass_threshold=85)
 
-        # Script with multiple issues
+        # Content with multiple issues
         script = """Peter Piper picked particularly problematic peppers persistently.
 She sells seashells specifically by the seashore.
 This is a very long sentence that goes on and on and on without any natural pauses or breathing points whatsoever making it extremely difficult for any voiceover artist to deliver smoothly.
 The methodology employed in the implementation of the aforementioned functionality was quintessential."""
 
-        review = checker.review_script(script, "test-001", "v3")
+        review = checker.review_content(script, "test-001", "v3")
 
         # Should have lower score due to multiple issues
         assert len(review.issues) > 0
@@ -385,7 +385,7 @@ class TestSerializationDeserialization:
 
     def test_to_dict_and_from_dict(self):
         """Test converting to dict and back."""
-        review1 = ReadabilityReview(script_id="script-001", script_version="v3", overall_score=90)
+        review1 = ReadabilityReview(content_id="script-001", script_version="v3", overall_score=90)
 
         issue = ReadabilityIssue(
             issue_type=ReadabilityIssueType.PACING,
@@ -403,7 +403,7 @@ class TestSerializationDeserialization:
         # Convert back
         review2 = ReadabilityReview.from_dict(data)
 
-        assert review2.script_id == review1.script_id
+        assert review2.content_id == review1.content_id
         assert review2.script_version == review1.script_version
         assert review2.overall_score == review1.overall_score
         assert len(review2.issues) == len(review1.issues)

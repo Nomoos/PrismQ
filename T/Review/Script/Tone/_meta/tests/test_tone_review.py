@@ -9,7 +9,7 @@ sys.path.insert(0, str(project_root))
 
 import pytest
 
-from T.Review.Script.Tone import ToneIssue, ToneIssueType, ToneReview, ToneSeverity
+from T.Review.Content.Tone import ToneIssue, ToneIssueType, ToneReview, ToneSeverity
 
 
 class TestToneReviewBasic:
@@ -18,14 +18,14 @@ class TestToneReviewBasic:
     def test_create_basic_review(self):
         """Test creating a basic ToneReview instance."""
         review = ToneReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=88,
             target_tone="dark suspense",
             target_audience="US female 14-29",
         )
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_version == "v3"
         assert review.overall_score == 88
         assert review.pass_threshold == 80
@@ -42,7 +42,7 @@ class TestToneReviewBasic:
     def test_create_failing_review(self):
         """Test creating a review that fails."""
         review = ToneReview(
-            script_id="script-002", script_version="v3", overall_score=70  # Below threshold
+            content_id="script-002", script_version="v3", overall_score=70  # Below threshold
         )
 
         assert review.passes is False
@@ -50,7 +50,7 @@ class TestToneReviewBasic:
     def test_tone_metrics_initialization(self):
         """Test tone-specific metrics are initialized."""
         review = ToneReview(
-            script_id="script-001",
+            content_id="script-001",
             emotional_intensity_score=85,
             style_alignment_score=90,
             voice_consistency_score=88,
@@ -113,7 +113,7 @@ class TestToneReviewMethods:
 
     def test_add_issue(self):
         """Test adding issues to review."""
-        review = ToneReview(script_id="script-001", overall_score=88)
+        review = ToneReview(content_id="script-001", overall_score=88)
 
         issue = ToneIssue(
             issue_type=ToneIssueType.EMOTIONAL_INTENSITY,
@@ -132,7 +132,7 @@ class TestToneReviewMethods:
 
     def test_add_critical_issue_fails_review(self):
         """Test that adding critical issue fails review."""
-        review = ToneReview(script_id="script-001", overall_score=88)  # Good score
+        review = ToneReview(content_id="script-001", overall_score=88)  # Good score
 
         assert review.passes is True
 
@@ -152,7 +152,7 @@ class TestToneReviewMethods:
 
     def test_get_issues_by_severity(self):
         """Test filtering issues by severity."""
-        review = ToneReview(script_id="script-001")
+        review = ToneReview(content_id="script-001")
 
         review.add_issue(
             ToneIssue(
@@ -186,7 +186,7 @@ class TestToneReviewMethods:
 
     def test_get_issues_by_type(self):
         """Test filtering issues by type."""
-        review = ToneReview(script_id="script-001")
+        review = ToneReview(content_id="script-001")
 
         review.add_issue(
             ToneIssue(
@@ -215,7 +215,7 @@ class TestToneReviewMethods:
 
     def test_get_critical_issues(self):
         """Test getting critical issues."""
-        review = ToneReview(script_id="script-001")
+        review = ToneReview(content_id="script-001")
 
         review.add_issue(
             ToneIssue(
@@ -245,7 +245,7 @@ class TestToneReviewMethods:
 
     def test_get_high_priority_issues(self):
         """Test getting high priority issues."""
-        review = ToneReview(script_id="script-001")
+        review = ToneReview(content_id="script-001")
 
         review.add_issue(
             ToneIssue(
@@ -290,7 +290,7 @@ class TestToneReviewSerialization:
     def test_to_dict(self):
         """Test converting review to dictionary."""
         review = ToneReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=88,
             target_tone="dark suspense",
@@ -310,7 +310,7 @@ class TestToneReviewSerialization:
 
         data = review.to_dict()
 
-        assert data["script_id"] == "script-001"
+        assert data["content_id"] == "script-001"
         assert data["script_version"] == "v3"
         assert data["overall_score"] == 88
         assert data["target_tone"] == "dark suspense"
@@ -322,7 +322,7 @@ class TestToneReviewSerialization:
     def test_from_dict(self):
         """Test creating review from dictionary."""
         data = {
-            "script_id": "script-001",
+            "content_id": "script-001",
             "script_version": "v3",
             "overall_score": 88,
             "target_tone": "dark suspense",
@@ -343,7 +343,7 @@ class TestToneReviewSerialization:
 
         review = ToneReview.from_dict(data)
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_version == "v3"
         assert review.overall_score == 88
         assert review.target_tone == "dark suspense"
@@ -355,7 +355,7 @@ class TestToneReviewSerialization:
     def test_round_trip_serialization(self):
         """Test that serialization preserves all data."""
         original = ToneReview(
-            script_id="script-001",
+            content_id="script-001",
             overall_score=85,
             emotional_intensity_score=82,
             style_alignment_score=88,
@@ -380,7 +380,7 @@ class TestToneReviewSerialization:
         data = original.to_dict()
         restored = ToneReview.from_dict(data)
 
-        assert restored.script_id == original.script_id
+        assert restored.content_id == original.content_id
         assert restored.overall_score == original.overall_score
         assert restored.emotional_intensity_score == original.emotional_intensity_score
         assert restored.style_alignment_score == original.style_alignment_score
@@ -397,7 +397,7 @@ class TestToneReviewAcceptanceCriteria:
 
     def test_emotional_intensity_checking(self):
         """Test checking emotional intensity."""
-        review = ToneReview(script_id="script-001", emotional_intensity_score=85)
+        review = ToneReview(content_id="script-001", emotional_intensity_score=85)
 
         issue = ToneIssue(
             issue_type=ToneIssueType.EMOTIONAL_INTENSITY,
@@ -415,7 +415,7 @@ class TestToneReviewAcceptanceCriteria:
 
     def test_style_alignment_checking(self):
         """Test evaluating style alignment."""
-        review = ToneReview(script_id="script-001", style_alignment_score=78)
+        review = ToneReview(content_id="script-001", style_alignment_score=78)
 
         issue = ToneIssue(
             issue_type=ToneIssueType.STYLE_ALIGNMENT,
@@ -433,7 +433,7 @@ class TestToneReviewAcceptanceCriteria:
 
     def test_voice_consistency_checking(self):
         """Test checking voice consistency."""
-        review = ToneReview(script_id="script-001", voice_consistency_score=82)
+        review = ToneReview(content_id="script-001", voice_consistency_score=82)
 
         issue = ToneIssue(
             issue_type=ToneIssueType.VOICE_CONSISTENCY,
@@ -452,7 +452,7 @@ class TestToneReviewAcceptanceCriteria:
     def test_tone_appropriateness_evaluation(self):
         """Test evaluating tone appropriateness for content type."""
         review = ToneReview(
-            script_id="script-001", target_tone="dark suspense", target_audience="US female 14-29"
+            content_id="script-001", target_tone="dark suspense", target_audience="US female 14-29"
         )
 
         issue = ToneIssue(
@@ -471,14 +471,14 @@ class TestToneReviewAcceptanceCriteria:
 
     def test_pass_proceed_to_mvp_016(self):
         """Test that passing review proceeds to MVP-016."""
-        review = ToneReview(script_id="script-001", overall_score=88)
+        review = ToneReview(content_id="script-001", overall_score=88)
 
         assert review.passes is True
         assert review.overall_score >= review.pass_threshold
 
-    def test_fail_return_to_script_refinement(self):
+    def test_fail_return_to_content_refinement(self):
         """Test that failing review returns to script refinement."""
-        review = ToneReview(script_id="script-001", overall_score=75)  # Below threshold
+        review = ToneReview(content_id="script-001", overall_score=75)  # Below threshold
 
         assert review.passes is False
         assert review.overall_score < review.pass_threshold
@@ -486,7 +486,7 @@ class TestToneReviewAcceptanceCriteria:
     def test_output_json_format(self):
         """Test output as JSON with tone analysis."""
         review = ToneReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=88,
             emotional_intensity_score=85,
@@ -512,7 +512,7 @@ class TestToneReviewAcceptanceCriteria:
 
         # Verify JSON-serializable structure
         assert isinstance(data, dict)
-        assert "script_id" in data
+        assert "content_id" in data
         assert "overall_score" in data
         assert "emotional_intensity_score" in data
         assert "style_alignment_score" in data
@@ -541,7 +541,7 @@ class TestToneReviewAcceptanceCriteria:
 
         for tone_style in tone_styles:
             review = ToneReview(
-                script_id=f"script-{tone_style}", target_tone=tone_style, overall_score=85
+                content_id=f"script-{tone_style}", target_tone=tone_style, overall_score=85
             )
 
             assert review.target_tone == tone_style

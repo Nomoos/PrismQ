@@ -1,1 +1,1 @@
-"""Tests for Script Grammar Review (MVP-014)."""
+"""Tests for Content Grammar Review (MVP-014)."""

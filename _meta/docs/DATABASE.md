@@ -10,7 +10,7 @@ PrismQ uses SQLite for data persistence following a dual-pattern architecture:
 
 | Pattern | Tables | Operations | Use Case |
 |---------|--------|------------|----------|
-| **INSERT+READ Only** | Title, Script, Review, StoryReview | Insert, Read | Immutable versioned content |
+| **INSERT+READ Only** | Title, Content, Review, StoryReview | Insert, Read | Immutable versioned content |
 | **Full CRUD** | Story | Create, Read, Update | State machine transitions |
 
 ## Database Location
@@ -27,32 +27,26 @@ All database models are located in the **[T/Database/](../../T/Database/)** modu
 
 **File**: `T/Database/models/story.py`
 
-The central entity in PrismQ that ties together Ideas, Titles, Scripts, and Reviews.
+The central entity in PrismQ that ties together Ideas, Titles, Contents, and Reviews.
 
 ```sql
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_json TEXT NULL,
-    title_id INTEGER NULL,
-    script_id INTEGER NULL,
+    idea_id INTEGER NULL,
     state TEXT NOT NULL DEFAULT 'CREATED',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (title_id) REFERENCES Title(id),
-    FOREIGN KEY (script_id) REFERENCES Script(id)
+    FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
 
 -- Performance indexes
 CREATE INDEX idx_story_state ON Story(state);
-CREATE INDEX idx_story_title_id ON Story(title_id);
-CREATE INDEX idx_story_script_id ON Story(script_id);
+CREATE INDEX idx_story_idea_id ON Story(idea_id);
 ```
 
 **Fields:**
 - `id`: Primary key (auto-generated)
-- `idea_json`: Serialized Idea data (JSON string)
-- `title_id`: FK to latest Title version (optional)
-- `script_id`: FK to latest Script version (optional)
+- `idea_id`: FK to Idea table (references source idea)
 - `state`: Current workflow state (module-based state name)
 - `created_at`: Creation timestamp
 - `updated_at`: Last state change timestamp
@@ -60,11 +54,11 @@ CREATE INDEX idx_story_script_id ON Story(script_id);
 **States:** States represent the processing module and follow the pattern `PrismQ.T.<Module>.From.<Input>` or `PrismQ.T.<Action>.<Target>`. Valid states include:
 - `PrismQ.T.Idea.Creation` - Initial idea creation
 - `PrismQ.T.Title.From.Idea` - Title generation from idea
-- `PrismQ.T.Script.From.Idea.Title` - Script generation from idea and title
-- `PrismQ.T.Review.Title.ByScriptAndIdea` - Title review using script and idea
-- `PrismQ.T.Title.From.Title.Review.Script` - Title refinement from review
-- `PrismQ.T.Script.From.Script.Review.Title` - Script refinement from review
-- `PrismQ.T.Review.Script.Grammar` - Grammar review
+- `PrismQ.T.Content.From.Idea.Title` - Content generation from idea and title
+- `PrismQ.T.Review.Title.ByContentAndIdea` - Title review using content and idea
+- `PrismQ.T.Title.From.Title.Review.Content` - Title refinement from review
+- `PrismQ.T.Content.From.Content.Review.Title` - Content refinement from review
+- `PrismQ.T.Review.Content.Grammar` - Grammar review
 - `PrismQ.T.Story.Review` - Expert story review
 - `PrismQ.T.Story.Polish` - Story polishing
 - `PrismQ.T.Publishing` - Publishing (terminal state)
@@ -111,14 +105,14 @@ CREATE INDEX idx_title_story_version ON Title(story_id, version);
 
 ---
 
-### Script
+### Content
 
-**File**: `T/Database/models/script.py`
+**File**: `T/Database/models/content.py`
 
-Versioned script content with optional review reference.
+Versioned content content with optional review reference.
 
 ```sql
-Script (
+Content (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     story_id INTEGER NOT NULL,
     version INTEGER NOT NULL CHECK (version >= 0),
@@ -131,15 +125,15 @@ Script (
 )
 
 -- Performance indexes
-CREATE INDEX idx_script_story_id ON Script(story_id);
-CREATE INDEX idx_script_story_version ON Script(story_id, version);
+CREATE INDEX idx_content_story_id ON Content(story_id);
+CREATE INDEX idx_content_story_version ON Content(story_id, version);
 ```
 
 **Fields:**
 - `id`: Primary key (auto-generated)
 - `story_id`: FK to Story
-- `version`: Script version number (>= 0)
-- `text`: Script content text
+- `version`: Content version number (>= 0)
+- `text`: Content content text
 - `review_id`: FK to Review (optional)
 - `created_at`: Timestamp of creation
 
@@ -149,7 +143,7 @@ CREATE INDEX idx_script_story_version ON Script(story_id, version);
 
 **File**: `T/Database/models/review.py`
 
-Review content with score for evaluating Title/Script content.
+Review content with score for evaluating Title/Content content.
 
 ```sql
 Review (
@@ -229,7 +223,7 @@ CREATE INDEX idx_storyreview_story_version ON StoryReview(story_id, version);
 │   │ 1:N               1:N                                       │
 │   ▼                     ▼                                       │
 │ ┌───────┐           ┌────────┐                                  │
-│ │ Title │           │ Script │                                  │
+│ │ Title │           │ Content │                                  │
 │ └───┬───┘           └───┬────┘                                  │
 │     │                   │                                       │
 │     │ N:1 (FK)          │ N:1 (FK)                              │
@@ -269,7 +263,7 @@ PrismQ uses the Repository Pattern to separate domain models from data access lo
 **File**: `T/Database/repositories/base.py`
 
 - **IRepository**: Base interface with find_by_id, find_all, exists, insert
-- **IVersionedRepository**: Extended for versioned entities (Title, Script) with find_latest_version, find_versions
+- **IVersionedRepository**: Extended for versioned entities (Title, Content) with find_latest_version, find_versions
 - **IUpdatableRepository**: Extended for updatable entities (Story) with update method
 
 ### Concrete Repositories
@@ -277,7 +271,7 @@ PrismQ uses the Repository Pattern to separate domain models from data access lo
 | Repository | Entity | Location |
 |------------|--------|----------|
 | TitleRepository | Title | `T/Database/repositories/title_repository.py` |
-| ScriptRepository | Script | `T/Database/repositories/script_repository.py` |
+| ContentRepository | Content | `T/Database/repositories/content_repository.py` |
 | StoryRepository | Story | `T/Database/repositories/story_repository.py` |
 | StoryReviewRepository | StoryReview | `T/Database/repositories/story_review_repository.py` |
 
@@ -285,9 +279,9 @@ PrismQ uses the Repository Pattern to separate domain models from data access lo
 
 All repositories that handle versioned entities provide consistent methods for querying the current (latest) version:
 
-**TitleRepository & ScriptRepository:**
+**TitleRepository & ContentRepository:**
 - `find_latest_version(story_id)` - Returns the entity with the highest version number (using `ORDER BY version DESC LIMIT 1`)
-- `get_current_title(story_id)` / `get_current_script(story_id)` - Convenience aliases for `find_latest_version()`
+- `get_current_title(story_id)` / `get_current_content(story_id)` - Convenience aliases for `find_latest_version()`
 
 **StoryReviewRepository:**
 - `find_latest_version(story_id)` - Returns the highest version number for a story's reviews

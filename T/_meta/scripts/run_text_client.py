@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Interactive Text Client for PrismQ.T Text Generation Pipeline.
 
-This script provides a quick, interactive way to work with the PrismQ Text
+This content provides a quick, interactive way to work with the PrismQ Text
 Generation Pipeline. It allows you to:
 - Create and manage Ideas
 - Generate Titles from Ideas
-- Generate Scripts from Titles and Ideas
+- Generate Contents from Titles and Ideas
 - Review and iterate on content
 - Track versions through the workflow
 
@@ -28,13 +28,13 @@ from typing import Any, Dict, Optional
 
 # Add module paths for imports
 SCRIPT_DIR = Path(__file__).parent.absolute()
-REPO_ROOT = SCRIPT_DIR.parent.parent.parent  # T/_meta/scripts -> T -> repo root
-T_ROOT = SCRIPT_DIR.parent.parent  # T/_meta/scripts -> T
+REPO_ROOT = SCRIPT_DIR.parent.parent.parent  # T/_meta/contents -> T -> repo root
+T_ROOT = SCRIPT_DIR.parent.parent  # T/_meta/contents -> T
 
 # Add paths for imports
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
-sys.path.insert(0, str(T_ROOT / "Script" / "src"))
+sys.path.insert(0, str(T_ROOT / "Content" / "src"))
 
 # Try to import PrismQ modules
 try:
@@ -45,7 +45,7 @@ except ImportError:
     IDEA_AVAILABLE = False
 
 try:
-    from script_writer import OptimizationStrategy, ScriptWriter
+    from content_writer import OptimizationStrategy, ContentWriter
 
     SCRIPT_WRITER_AVAILABLE = True
 except ImportError:
@@ -106,13 +106,13 @@ class TextClient:
 
     This client provides an interactive REPL interface for working with
     the text generation workflow, including Idea creation, Title generation,
-    and Script development.
+    and Content development.
 
     Version tracking is used to determine which item to process next,
     with the lowest version count being selected for processing.
 
     State is persisted to a SQLite database to allow running each step
-    as a separate process (for batch script workflows).
+    as a separate process (for batch content workflows).
     """
 
     STATE_DB = "text_client_state.db"
@@ -125,15 +125,15 @@ class TextClient:
         """
         self.current_idea: Optional[Any] = None
         self.current_title: Optional[str] = None
-        self.current_script: Optional[str] = None
-        self.script_writer: Optional[Any] = None
+        self.current_content: Optional[str] = None
+        self.content_writer: Optional[Any] = None
         self.history: list = []
         self.session_start = datetime.now()
 
         # Version tracking for each content type
         self.idea_version: int = 0
         self.title_version: int = 0
-        self.script_version: int = 0
+        self.content_version: int = 0
 
         # Idea data for persistence (since Idea objects may not serialize directly)
         self._idea_data: Optional[Dict[str, Any]] = None
@@ -265,9 +265,9 @@ class TextClient:
     PROCESS_STATES = {
         "initial": "PrismQ.T.Idea.Creation",  # Initial state - awaiting idea creation
         "idea_created": "PrismQ.T.Title.From.Idea",  # After idea, next is title generation
-        "title_generated": "PrismQ.T.Script.FromIdeaAndTitle",  # After title, next is script
-        "script_generated": "PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle",  # Script iteration
-        "script_iterated": "PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle",  # Continue iteration
+        "title_generated": "PrismQ.T.Content.FromIdeaAndTitle",  # After title, next is content
+        "content_generated": "PrismQ.T.Content.FromOriginalContentAndReviewAndTitle",  # Content iteration
+        "content_iterated": "PrismQ.T.Content.FromOriginalContentAndReviewAndTitle",  # Continue iteration
         "exported": "PrismQ.T.Publishing",  # Final state
     }
 
@@ -278,7 +278,7 @@ class TextClient:
         - Idea: Idea data (referenced by Story via FK)
         - Story: Main object with state (next process name) and idea_id FK
         - TitleVersion: Version history for titles (with direct review_id FK)
-        - ScriptVersion: Version history for scripts (with direct review_id FK)
+        - ContentVersion: Version history for contents (with direct review_id FK)
         - Review: Simple review content
         - StoryReview: Linking table for Story reviews (many-to-many)
 
@@ -303,8 +303,8 @@ class TextClient:
             )
 
             # Story: Main table with state as string (next process name) and idea_id FK
-            # Note: current_title_version_id and current_script_version_id are removed
-            # because they are implicit - filter from TitleVersion/ScriptVersion tables
+            # Note: current_title_version_id and current_content_version_id are removed
+            # because they are implicit - filter from TitleVersion/ContentVersion tables
             # by highest version integer instead
             cursor.execute(
                 """
@@ -313,20 +313,21 @@ class TextClient:
                     idea_id INTEGER NULL,
                     state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (idea_id) REFERENCES Idea(id)
                 )
             """
             )
 
             # Review: Simple review content (no relationship tracking)
-            # Title/Script reference Review directly via FK
+            # Title/Content reference Review directly via FK
             # Story references Review via StoryReview linking table
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS Review (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     text TEXT NOT NULL,
-                    score INTEGER CHECK (score >= 0 AND score <= 100),
+                    score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
                     created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """
@@ -350,11 +351,11 @@ class TextClient:
             """
             )
 
-            # ScriptVersion: Version history for scripts with direct review FK
+            # ContentVersion: Version history for contents with direct review FK
             # version uses CHECK >= 0 to simulate unsigned integer
             cursor.execute(
                 """
-                CREATE TABLE IF NOT EXISTS ScriptVersion (
+                CREATE TABLE IF NOT EXISTS ContentVersion (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     story_id INTEGER NOT NULL,
                     version INTEGER NOT NULL CHECK (version >= 0),
@@ -393,7 +394,7 @@ class TextClient:
     def _save_state(self) -> None:
         """Save current state to SQLite database for persistence between processes.
 
-        Uses the core tables: Idea, Story, TitleVersion, ScriptVersion.
+        Uses the core tables: Idea, Story, TitleVersion, ContentVersion.
         - Idea data is stored in Idea table
         - Story references Idea via idea_id FK
         - State is stored as a process name string on the Story object
@@ -405,11 +406,11 @@ class TextClient:
             cursor = conn.cursor()
 
             # Determine current state based on workflow progress
-            if self.current_script is not None:
-                if self.script_version > 1:
-                    state = self.PROCESS_STATES["script_iterated"]
+            if self.current_content is not None:
+                if self.content_version > 1:
+                    state = self.PROCESS_STATES["content_iterated"]
                 else:
-                    state = self.PROCESS_STATES["script_generated"]
+                    state = self.PROCESS_STATES["content_generated"]
             elif self.current_title is not None:
                 state = self.PROCESS_STATES["title_generated"]
             elif self.current_idea is not None:
@@ -495,24 +496,24 @@ class TextClient:
                         (story_id, self.title_version, self.current_title),
                     )
 
-            # Save ScriptVersion if we have a new script
-            # Note: current_script_version_id is implicit (use MAX(version) query)
-            if self.current_script:
+            # Save ContentVersion if we have a new content
+            # Note: current_content_version_id is implicit (use MAX(version) query)
+            if self.current_content:
                 cursor.execute(
                     """
-                    SELECT MAX(version) FROM ScriptVersion WHERE story_id = ?
+                    SELECT MAX(version) FROM ContentVersion WHERE story_id = ?
                 """,
                     (story_id,),
                 )
                 max_version = cursor.fetchone()[0] or 0
 
-                if self.script_version > max_version:
+                if self.content_version > max_version:
                     cursor.execute(
                         """
-                        INSERT INTO ScriptVersion (story_id, version, text)
+                        INSERT INTO ContentVersion (story_id, version, text)
                         VALUES (?, ?, ?)
                     """,
-                        (story_id, self.script_version, self.current_script),
+                        (story_id, self.content_version, self.current_content),
                     )
 
             conn.commit()
@@ -522,7 +523,7 @@ class TextClient:
     def _load_state(self) -> bool:
         """Load state from SQLite database if it exists.
 
-        Loads from the core tables: Idea, Story, TitleVersion, ScriptVersion.
+        Loads from the core tables: Idea, Story, TitleVersion, ContentVersion.
         - Idea data is loaded from Idea table via Story.idea_id FK
 
         Returns:
@@ -561,7 +562,7 @@ class TextClient:
                     if state_idx >= state_order.index(self.PROCESS_STATES["idea_created"]):
                         self.idea_version = 1
                     # Title version from TitleVersion table
-                    # Script version from ScriptVersion table
+                    # Content version from ContentVersion table
 
                 # Load idea data from Idea table via FK (simplified schema: text, version, created_at)
                 if idea_id and IDEA_AVAILABLE:
@@ -603,20 +604,20 @@ class TextClient:
                     self.current_title = title_row["text"]
                     self.title_version = title_row["version"]
 
-                # Load current ScriptVersion (highest version is implicit current)
+                # Load current ContentVersion (highest version is implicit current)
                 # Using ORDER BY version DESC LIMIT 1 which is equivalent to MAX(version)
                 # for the INTEGER version column
                 cursor.execute(
                     """
-                    SELECT text, version FROM ScriptVersion 
+                    SELECT text, version FROM ContentVersion 
                     WHERE story_id = ? ORDER BY version DESC LIMIT 1
                 """,
                     (story_id,),
                 )
-                script_row = cursor.fetchone()
-                if script_row:
-                    self.current_script = script_row["text"]
-                    self.script_version = script_row["version"]
+                content_row = cursor.fetchone()
+                if content_row:
+                    self.current_content = content_row["text"]
+                    self.content_version = content_row["version"]
 
             print_info(f"State loaded from {db_path.name} (state: {current_state})")
             return True
@@ -649,9 +650,9 @@ class TextClient:
             print_warning("Idea model not available - some features limited")
 
         if SCRIPT_WRITER_AVAILABLE:
-            print_success("ScriptWriter loaded (T/Script)")
+            print_success("ContentWriter loaded (T/Content)")
         else:
-            print_warning("ScriptWriter not available - some features limited")
+            print_warning("ContentWriter not available - some features limited")
 
         print()
 
@@ -671,10 +672,10 @@ class TextClient:
   5. Generate Title from Idea
   6. View current Title
 
-{Colors.BOLD}Script Development:{Colors.END}
-  7. Generate Script draft
-  8. View current Script
-  9. Iterate on Script (unlimited feedback loop)
+{Colors.BOLD}Content Development:{Colors.END}
+  7. Generate Content draft
+  8. View current Content
+  9. Iterate on Content (unlimited feedback loop)
 
 {Colors.BOLD}Workflow:{Colors.END}
   10. Show workflow status (next to process by lowest version)
@@ -922,8 +923,8 @@ class TextClient:
         print(f"  {self.current_title}")
         print()
 
-    def generate_script(self) -> None:
-        """Generate a Script draft from Idea and Title."""
+    def generate_content(self) -> None:
+        """Generate a Content draft from Idea and Title."""
         if self.current_idea is None:
             print_warning("No Idea loaded. Create or load one first.")
             return
@@ -932,124 +933,124 @@ class TextClient:
             print_warning("No Title generated. Generate one first.")
             return
 
-        print_section("Generate Script Draft")
+        print_section("Generate Content Draft")
 
         idea = self.current_idea
 
-        # Build script structure
-        script_parts = []
+        # Build content structure
+        content_parts = []
 
         # Hook opening
         if idea.hook:
-            script_parts.append(f"[HOOK]\n{idea.hook}\n")
+            content_parts.append(f"[HOOK]\n{idea.hook}\n")
 
         # Main content from skeleton/outline
         if idea.skeleton:
-            script_parts.append("[STRUCTURE]")
+            content_parts.append("[STRUCTURE]")
             for line in idea.skeleton.split("\n"):
                 if line.strip():
-                    script_parts.append(f"• {line.strip()}")
-            script_parts.append("")
+                    content_parts.append(f"• {line.strip()}")
+            content_parts.append("")
 
         # Emotional arc guidance
         if idea.emotional_arc:
-            script_parts.append(f"[EMOTIONAL ARC]\n{idea.emotional_arc}\n")
+            content_parts.append(f"[EMOTIONAL ARC]\n{idea.emotional_arc}\n")
 
         # Climax
         if idea.climax:
-            script_parts.append(f"[CLIMAX]\n{idea.climax}\n")
+            content_parts.append(f"[CLIMAX]\n{idea.climax}\n")
 
         # Twist/Ending
         if idea.twist:
-            script_parts.append(f"[TWIST]\n{idea.twist}\n")
+            content_parts.append(f"[TWIST]\n{idea.twist}\n")
 
         # Tone guidance
         if idea.tone_guidance:
-            script_parts.append(f"[TONE GUIDANCE]\n{idea.tone_guidance}\n")
+            content_parts.append(f"[TONE GUIDANCE]\n{idea.tone_guidance}\n")
 
-        self.current_script = "\n".join(script_parts)
+        self.current_content = "\n".join(content_parts)
 
-        # Increment script version
-        self.script_version += 1
+        # Increment content version
+        self.content_version += 1
 
-        # Initialize script writer if available (unlimited iterations)
+        # Initialize content writer if available (unlimited iterations)
         if SCRIPT_WRITER_AVAILABLE:
-            # Create ScriptWriter with a very high max_iterations value to effectively allow unlimited iterations
-            # Note: ScriptWriter doesn't have a native "unlimited" mode, so we use a large integer
-            self.script_writer = ScriptWriter(
+            # Create ContentWriter with a very high max_iterations value to effectively allow unlimited iterations
+            # Note: ContentWriter doesn't have a native "unlimited" mode, so we use a large integer
+            self.content_writer = ContentWriter(
                 writer_id="text_client_writer",
                 target_score_threshold=80,
                 max_iterations=999999,  # Effectively unlimited
             )
-            print_info("ScriptWriter initialized for unlimited iteration support")
+            print_info("ContentWriter initialized for unlimited iteration support")
 
         self.history.append(
             {
-                "action": "generate_script",
+                "action": "generate_content",
                 "timestamp": datetime.now().isoformat(),
-                "version": self.script_version,
+                "version": self.content_version,
             }
         )
 
-        print_success(f"Script draft generated! (version {self.script_version})")
-        self.show_script()
+        print_success(f"Content draft generated! (version {self.content_version})")
+        self.show_content()
         self._save_state()
 
-    def show_script(self) -> None:
-        """Display the current Script."""
-        if self.current_script is None:
-            print_warning("No Script generated. Generate one first.")
+    def show_content(self) -> None:
+        """Display the current Content."""
+        if self.current_content is None:
+            print_warning("No Content generated. Generate one first.")
             return
 
-        print_section("Current Script")
-        print(self.current_script)
+        print_section("Current Content")
+        print(self.current_content)
 
-        print(f"\n{Colors.CYAN}Script Version:{Colors.END} {self.script_version}")
-        if self.script_writer:
+        print(f"\n{Colors.CYAN}Content Version:{Colors.END} {self.content_version}")
+        if self.content_writer:
             print(f"{Colors.CYAN}Writer Status:{Colors.END}")
-            print(f"  Iteration: {self.script_writer.current_iteration} (unlimited)")
-            print(f"  Target Score: {self.script_writer.target_score_threshold}%")
+            print(f"  Iteration: {self.content_writer.current_iteration} (unlimited)")
+            print(f"  Target Score: {self.content_writer.target_score_threshold}%")
 
-    def iterate_script(self) -> None:
-        """Run feedback loop iteration on the script (unlimited iterations)."""
-        if self.current_script is None:
-            print_warning("No Script generated. Generate one first.")
+    def iterate_content(self) -> None:
+        """Run feedback loop iteration on the content (unlimited iterations)."""
+        if self.current_content is None:
+            print_warning("No Content generated. Generate one first.")
             return
 
         if not SCRIPT_WRITER_AVAILABLE:
-            print_warning("ScriptWriter not available. Cannot iterate.")
+            print_warning("ContentWriter not available. Cannot iterate.")
             return
 
-        print_section("Script Iteration (Feedback Loop - Unlimited)")
+        print_section("Content Iteration (Feedback Loop - Unlimited)")
 
-        print("Provide feedback on the current script:")
+        print("Provide feedback on the current content:")
         print("(Enter areas to improve, or 'skip' for auto-improvement)\n")
 
         feedback = input("Feedback: ").strip()
 
         if feedback.lower() != "skip" and feedback:
-            # Apply user feedback to script
-            self.current_script += (
-                f"\n\n[USER FEEDBACK - Iteration {self.script_writer.current_iteration + 1}]\n"
+            # Apply user feedback to content
+            self.current_content += (
+                f"\n\n[USER FEEDBACK - Iteration {self.content_writer.current_iteration + 1}]\n"
             )
-            self.current_script += f"Improvements requested: {feedback}\n"
+            self.current_content += f"Improvements requested: {feedback}\n"
 
-        # Track iteration and increment script version
-        if self.script_writer:
-            self.script_writer.current_iteration += 1
-        self.script_version += 1
+        # Track iteration and increment content version
+        if self.content_writer:
+            self.content_writer.current_iteration += 1
+        self.content_version += 1
 
         self.history.append(
             {
-                "action": "iterate_script",
+                "action": "iterate_content",
                 "timestamp": datetime.now().isoformat(),
                 "feedback": feedback,
-                "version": self.script_version,
+                "version": self.content_version,
             }
         )
 
         print_success(
-            f"Script iteration {self.script_writer.current_iteration} recorded (version {self.script_version})"
+            f"Content iteration {self.content_writer.current_iteration} recorded (version {self.content_version})"
         )
         print_info("Unlimited iterations available - continue as needed")
         self._save_state()
@@ -1059,18 +1060,18 @@ class TextClient:
 
         The workflow prioritizes items with the lowest version count to ensure
         balanced progression. When multiple items have the same version count,
-        the priority order is: Idea > Title > Script (following the natural
+        the priority order is: Idea > Title > Content (following the natural
         workflow sequence).
 
         Returns:
-            The name of the item type (Idea, Title, or Script) with lowest version.
-            On tie, returns in workflow order: Idea first, then Title, then Script.
+            The name of the item type (Idea, Title, or Content) with lowest version.
+            On tie, returns in workflow order: Idea first, then Title, then Content.
         """
         # List in workflow priority order - when versions are equal, earlier items win
         versions = [
             ("Idea", self.idea_version),
             ("Title", self.title_version),
-            ("Script", self.script_version),
+            ("Content", self.content_version),
         ]
         # Sort by version count (ascending); stable sort preserves original order on ties
         versions.sort(key=lambda x: x[1])
@@ -1083,7 +1084,7 @@ class TextClient:
         stages = [
             ("Idea", self.current_idea is not None, self.idea_version),
             ("Title", self.current_title is not None, self.title_version),
-            ("Script", self.current_script is not None, self.script_version),
+            ("Content", self.current_content is not None, self.content_version),
         ]
 
         print(f"\n{Colors.BOLD}Content Status & Version Counts:{Colors.END}")
@@ -1104,7 +1105,7 @@ class TextClient:
         """Export current content to a file."""
         print_section("Export Content")
 
-        if not any([self.current_idea, self.current_title, self.current_script]):
+        if not any([self.current_idea, self.current_title, self.current_content]):
             print_warning("No content to export.")
             return
 
@@ -1125,8 +1126,8 @@ class TextClient:
         if self.current_title:
             content.append(f"\n[TITLE]\n{self.current_title}")
 
-        if self.current_script:
-            content.append(f"\n[SCRIPT]\n{self.current_script}")
+        if self.current_content:
+            content.append(f"\n[SCRIPT]\n{self.current_content}")
 
         # Write to file
         export_path = Path.cwd() / filename
@@ -1143,14 +1144,14 @@ class TextClient:
         if confirm == "y":
             self.current_idea = None
             self.current_title = None
-            self.current_script = None
-            self.script_writer = None
+            self.current_content = None
+            self.content_writer = None
             self.history.clear()
             self.session_start = datetime.now()
             # Reset version counts
             self.idea_version = 0
             self.title_version = 0
-            self.script_version = 0
+            self.content_version = 0
             # Clear state file
             self.clear_state()
             print_success("Session reset! (all versions reset to 0)")
@@ -1193,11 +1194,11 @@ class TextClient:
                 elif choice == "6":
                     self.show_title()
                 elif choice == "7":
-                    self.generate_script()
+                    self.generate_content()
                 elif choice == "8":
-                    self.show_script()
+                    self.show_content()
                 elif choice == "9":
-                    self.iterate_script()
+                    self.iterate_content()
                 elif choice == "10":
                     self.show_workflow_status()
                 elif choice == "11":
@@ -1235,8 +1236,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="PrismQ.T Interactive Text Client",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        decontention="PrismQ.T Interactive Text Client",
+        formatter_class=argparse.RawDecontentionHelpFormatter,
         epilog="""
 Examples:
   python run_text_client.py                    # Start interactive client
@@ -1244,8 +1245,8 @@ Examples:
   python run_text_client.py --check            # Check module availability
   python run_text_client.py --action create_idea    # Run create idea step
   python run_text_client.py --action generate_title # Run generate title step
-  python run_text_client.py --action generate_script # Run generate script step
-  python run_text_client.py --action iterate_script  # Run iterate script step
+  python run_text_client.py --action generate_content # Run generate content step
+  python run_text_client.py --action iterate_content  # Run iterate content step
   python run_text_client.py --action export          # Export content
   python run_text_client.py --action status          # Show workflow status
   python run_text_client.py --action load_demo       # Load demo idea
@@ -1261,14 +1262,14 @@ Examples:
         choices=[
             "create_idea",
             "generate_title",
-            "generate_script",
-            "iterate_script",
+            "generate_content",
+            "iterate_content",
             "export",
             "status",
             "load_demo",
             "reset",
         ],
-        help="Run a specific action (for batch script workflows)",
+        help="Run a specific action (for batch content workflows)",
     )
 
     args = parser.parse_args()
@@ -1277,12 +1278,12 @@ Examples:
         print("PrismQ.T Module Availability Check")
         print("=" * 40)
         print(f"Idea Model:    {'✓ Available' if IDEA_AVAILABLE else '✗ Not available'}")
-        print(f"ScriptWriter:  {'✓ Available' if SCRIPT_WRITER_AVAILABLE else '✗ Not available'}")
+        print(f"ContentWriter:  {'✓ Available' if SCRIPT_WRITER_AVAILABLE else '✗ Not available'}")
         print(f"\nRepository Root: {REPO_ROOT}")
         print(f"T Module Root:   {T_ROOT}")
         return
 
-    # Handle --action mode for batch scripts (each step as separate process)
+    # Handle --action mode for batch contents (each step as separate process)
     if args.action:
         # Load state from previous steps
         client = TextClient(load_state=True)
@@ -1290,8 +1291,8 @@ Examples:
         action_map = {
             "create_idea": client.create_idea,
             "generate_title": client.generate_title,
-            "generate_script": client.generate_script,
-            "iterate_script": client.iterate_script,
+            "generate_content": client.generate_content,
+            "iterate_content": client.iterate_content,
             "export": client.export_content,
             "status": client.show_workflow_status,
             "load_demo": client.load_demo_idea,

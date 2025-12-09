@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent.absolute()
-TITLE_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Title/From/Title/Review/Script
+TITLE_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Title/From/Title/Review/Content
 T_TITLE_ROOT = TITLE_FROM_REVIEW_ROOT.parent.parent.parent  # T/Title
 T_ROOT = T_TITLE_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
@@ -33,8 +33,8 @@ REPO_ROOT = T_ROOT.parent  # repo root
 sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(TITLE_FROM_REVIEW_ROOT))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
-sys.path.insert(0, str(T_ROOT / "Review" / "Title" / "From" / "Script" / "Idea"))
-sys.path.insert(0, str(T_ROOT / "Review" / "Script"))
+sys.path.insert(0, str(T_ROOT / "Review" / "Title" / "From" / "Content" / "Idea"))
+sys.path.insert(0, str(T_ROOT / "Review" / "Content"))
 
 # Import modules
 try:
@@ -177,19 +177,19 @@ def create_mock_title_review(title: str, script: str, score: int = 70) -> Option
         engagement_score=score,
         seo_score=score,
         length_score=80,
-        key_script_elements=["story", "mystery", "discovery"],
+        key_content_elements=["story", "mystery", "discovery"],
         suggested_keywords=["untold", "hidden", "revealed"],
     )
 
 
-def create_mock_script_review(script: str, title: str, score: int = 70) -> Optional["ScriptReview"]:
+def create_mock_content_review(script: str, title: str, score: int = 70) -> Optional["ScriptReview"]:
     """Create a mock script review for testing."""
     if not SCRIPT_REVIEW_AVAILABLE:
         return None
 
     return ScriptReview(
-        script_id=f"script-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-        script_text=script,
+        content_id=f"script-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        content_text=script,
         script_version="v1",
         overall_score=score,
         category_scores=[],
@@ -197,7 +197,7 @@ def create_mock_script_review(script: str, title: str, score: int = 70) -> Optio
             ImprovementPoint(
                 category=ReviewCategory.STRUCTURE,
                 title="Improve title alignment",
-                description="Script opening could better match title promise",
+                description="Content opening could better match title promise",
                 priority="medium",
                 impact_score=65,
                 suggested_fix="Enhance opening to match title expectations",
@@ -234,7 +234,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
     # Print header
     mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
-    print_header(f"PrismQ Title From Script Review - {mode_text}")
+    print_header(f"PrismQ Title From Content Review - {mode_text}")
 
     # Check module availability
     if not IMPROVER_AVAILABLE:
@@ -254,7 +254,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     # Interactive loop
     print_section("Enter Improvement Input")
     print("Enter original title, script, and optionally reviews as JSON:")
-    print('JSON: {"title": "Original Title", "script": "Script content...", "score": 65}')
+    print('JSON: {"title": "Original Title", "script": "Content content...", "score": 65}')
     print("Or enter step by step (title, then script).")
     print("Type 'quit' to exit.\n")
 
@@ -275,7 +275,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 try:
                     data = json.loads(first_line)
                     original_title = data.get("title", "")
-                    script_text = data.get("script", "")
+                    content_text = data.get("script", "")
                     mock_score = data.get("score", 65)
                 except json.JSONDecodeError:
                     print_error("Invalid JSON format")
@@ -290,7 +290,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     if line == "":
                         break
                     script_lines.append(line)
-                script_text = "\n".join(script_lines)
+                content_text = "\n".join(script_lines)
                 mock_score = 65
 
         except EOFError:
@@ -301,7 +301,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_info("Interrupted. Type 'quit' to exit.")
             continue
 
-        if not original_title or not script_text:
+        if not original_title or not content_text:
             print_error("Both title and script are required")
             continue
 
@@ -311,13 +311,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         # Display input
         print_section("Improvement Input")
         print(f"  Original Title: {Colors.BOLD}{original_title}{Colors.END}")
-        script_preview = script_text[:200] + "..." if len(script_text) > 200 else script_text
-        print(f"  Script: {script_preview}")
+        script_preview = content_text[:200] + "..." if len(content_text) > 200 else content_text
+        print(f"  Content: {script_preview}")
 
         # Create reviews (mock or real)
         print_section("Creating Reviews")
-        title_review = create_mock_title_review(original_title, script_text, mock_score)
-        script_review = create_mock_script_review(script_text, original_title, mock_score)
+        title_review = create_mock_title_review(original_title, content_text, mock_score)
+        script_review = create_mock_content_review(content_text, original_title, mock_score)
 
         if not title_review or not script_review:
             print_error("Could not create reviews - check dependencies")
@@ -333,7 +333,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             improver = TitleImprover()
             result = improver.improve_title(
                 original_title=original_title,
-                script_text=script_text,
+                content_text=content_text,
                 title_review=title_review,
                 script_review=script_review,
                 original_version_number="v1",
@@ -356,7 +356,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     print(f"  • {imp}")
 
             if result.script_alignment_notes:
-                print_section("Script Alignment Notes")
+                print_section("Content Alignment Notes")
                 for line in result.script_alignment_notes.split("\n"):
                     print(f"    {line}")
 

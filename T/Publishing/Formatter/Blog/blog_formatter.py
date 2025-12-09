@@ -1,4 +1,4 @@
-"""Blog Format Optimizer for PrismQ.T.Script.Formatter.Blog.
+"""Blog Format Optimizer for PrismQ.T.Content.Formatter.Blog.
 
 This module transforms scripts into blog-optimized format with proper heading
 hierarchy, sections, and formatting suitable for platforms like Medium,
@@ -6,7 +6,7 @@ WordPress, Ghost, and others.
 
 Workflow Position:
     Post-MVP Enhancement (POST-003): Blog Format Optimization
-    Published Script → Blog Formatter → Platform-Ready Blog Content
+    Published Content → Blog Formatter → Platform-Ready Blog Content
 """
 
 import re

@@ -1,4 +1,4 @@
-"""Script generation from idea and title using AI.
+"""Content generation from idea and title using AI.
 
 This module provides AI-powered script generation using Qwen3:30b.
 ALL generation goes through local AI models via Ollama.
@@ -11,15 +11,15 @@ Input to AI:
 Key Components:
     - ScriptGenerator: Generates ScriptV1 from Idea and Title using AI
     - AIScriptGenerator: Direct AI script generation interface
-    - generate_script: Convenience function for AI script generation
+    - generate_content: Convenience function for AI script generation
     - SEED_VARIATIONS: 500 predefined seed words for creative variation
 """
 
-from .ai_script_generator import (
+from .ai_content_generator import (
     SEED_VARIATIONS,
     AIScriptGenerator,
     AIScriptGeneratorConfig,
-    generate_script,
+    generate_content,
     get_random_seed,
     get_seed_by_index,
 )
@@ -32,7 +32,7 @@ from .script_generator import (
     ScriptTone,
     ScriptV1,
 )
-from .story_script_service import (  # State-based processing
+from .story_content_service import (  # State-based processing
     INITIAL_SCRIPT_VERSION,
     STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
     STATE_SCRIPT_FROM_IDEA_TITLE,
@@ -45,7 +45,7 @@ from .story_script_service import (  # State-based processing
 )
 
 __all__ = [
-    # Script Generator (AI-powered)
+    # Content Generator (AI-powered)
     "ScriptGenerator",
     "ScriptGeneratorConfig",
     "ScriptV1",
@@ -53,18 +53,18 @@ __all__ = [
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
-    # AI Script Generator (Qwen3:30b)
+    # AI Content Generator (Qwen3:30b)
     "AIScriptGenerator",
     "AIScriptGeneratorConfig",
-    "generate_script",
+    "generate_content",
     "get_random_seed",
     "get_seed_by_index",
     "SEED_VARIATIONS",
-    # Story Script Service (legacy)
+    # Story Content Service (legacy)
     "StoryScriptService",
     "ScriptGenerationResult",
     "process_all_pending_stories",
-    # State-based Script Service (PrismQ.T.Script.From.Idea.Title)
+    # State-based Content Service (PrismQ.T.Content.From.Idea.Title)
     "ScriptFromIdeaTitleService",
     "StateBasedScriptResult",
     "process_oldest_from_idea_title",

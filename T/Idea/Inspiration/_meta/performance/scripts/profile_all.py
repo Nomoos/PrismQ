@@ -82,7 +82,7 @@ def run_profiling():
     print_header("Running CPU and Memory Profiling")
 
     scripts_dir = Path(__file__).parent
-    profiling_scripts = [
+    profiling_contents = [
         "profile_client.py",
         "profile_scoring.py",
         "profile_classification.py",
@@ -90,7 +90,7 @@ def run_profiling():
 
     results = []
 
-    for script in profiling_scripts:
+    for script in profiling_contents:
         script_path = scripts_dir / script
         if not script_path.exists():
             print(f"⚠️  Profiling script not found: {script}")

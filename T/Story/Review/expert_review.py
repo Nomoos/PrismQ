@@ -118,14 +118,14 @@ class StoryCoherence:
 
     score: int  # 0-100
     feedback: str
-    title_script_alignment: AlignmentLevel
+    title_content_alignment: AlignmentLevel
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "score": self.score,
             "feedback": self.feedback,
-            "title_script_alignment": self.title_script_alignment.value,
+            "title_content_alignment": self.title_content_alignment.value,
         }
 
 
@@ -368,7 +368,7 @@ class StoryExpertReviewer:
         review.story_coherence = StoryCoherence(
             score=quality_score,
             feedback="Title and script align well. Story flows coherently from beginning to end.",
-            title_script_alignment=(
+            title_content_alignment=(
                 AlignmentLevel.GOOD if quality_score >= 90 else AlignmentLevel.NEEDS_WORK
             ),
         )
@@ -383,7 +383,7 @@ class StoryExpertReviewer:
         # Professional quality
         review.professional_quality = ProfessionalQuality(
             score=quality_score - 3,
-            feedback="Production quality meets professional standards. Script is ready for production.",
+            feedback="Production quality meets professional standards. Content is ready for production.",
             production_ready=(quality_score >= self.publish_threshold),
         )
 
@@ -591,7 +591,7 @@ def get_expert_feedback(review: ExpertReview) -> Dict[str, Any]:
 if __name__ == "__main__":
     # Example usage
     test_title = "The House That Remembers: and Hunts"
-    test_script = """We've all driven past abandoned houses and wondered about their stories.
+    test_content = """We've all driven past abandoned houses and wondered about their stories.
     
 But what if the house remembered too?
 
@@ -626,13 +626,13 @@ Forever."""
 
     print("=== Expert Story Review ===\n")
     print(f"Title: {test_title}")
-    print(f"\nScript:\n{test_script}")
+    print(f"\nScript:\n{test_content}")
     print(f"\nAudience: {test_audience}")
     print("\n" + "=" * 70 + "\n")
 
     review = review_story_with_gpt(
         title=test_title,
-        script=test_script,
+        script=test_content,
         audience_context=test_audience,
         original_idea=test_idea,
         story_id="test-001",

@@ -1,6 +1,6 @@
-"""Example usage of Script Readability Review for voiceover suitability checking.
+"""Example usage of Content Readability Review for voiceover suitability checking.
 
-This example demonstrates how to use the PrismQ.T.Review.Script.Readability module
+This example demonstrates how to use the PrismQ.T.Review.Content.Readability module
 to check if a script is suitable for voiceover narration.
 """
 
@@ -11,10 +11,10 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Review.Script.Readability import (
+from T.Review.Content.Readability import (
     get_readability_feedback,
-    review_script_readability,
-    review_script_readability_to_json,
+    review_content_readability,
+    review_content_readability_to_json,
 )
 
 
@@ -29,12 +29,12 @@ She walked into the laboratory early one morning.
 The equipment was ready for the experiment.
 Everything went according to plan."""
 
-    print("Script:")
+    print("Content:")
     print(script)
     print("\n" + "-" * 60 + "\n")
 
-    review = review_script_readability(
-        script_text=script, script_id="example-001", script_version="v3"
+    review = review_content_readability(
+        content_text=script, content_id="example-001", script_version="v3"
     )
 
     print(f"Overall Score: {review.overall_score}/100")
@@ -47,10 +47,10 @@ Everything went according to plan."""
     print("\n")
 
 
-def example_problematic_script():
-    """Example: Script with voiceover issues."""
+def example_problematic_content():
+    """Example: Content with voiceover issues."""
     print("=" * 60)
-    print("Example 2: Script with Voiceover Issues")
+    print("Example 2: Content with Voiceover Issues")
     print("=" * 60 + "\n")
 
     script = """Peter Piper picked particularly problematic peppers from the phosphorescent patch.
@@ -58,12 +58,12 @@ The phenomenon of phosphorescence perplexed physicists persistently pursuing pra
 This is an extraordinarily long sentence that continues on and on without providing any natural breathing pauses or places for the voiceover artist to take a breath making it extremely difficult to deliver this narration smoothly and naturally without running out of breath.
 Subsequently, the methodology employed in the implementation of the aforementioned functionality was unequivocally quintessential for the contemporaneous understanding of the phenomenon."""
 
-    print("Script:")
+    print("Content:")
     print(script[:200] + "...")
     print("\n" + "-" * 60 + "\n")
 
-    review = review_script_readability(
-        script_text=script, script_id="example-002", script_version="v3"
+    review = review_content_readability(
+        content_text=script, content_id="example-002", script_version="v3"
     )
 
     print(f"Overall Score: {review.overall_score}/100")
@@ -103,8 +103,8 @@ def example_json_output():
 
     script = "She sells seashells by the seashore, specifically selecting superior specimens."
 
-    json_output = review_script_readability_to_json(
-        script_text=script, script_id="example-003", script_version="v3"
+    json_output = review_content_readability_to_json(
+        content_text=script, content_id="example-003", script_version="v3"
     )
 
     print("JSON Output (first 500 characters):")
@@ -115,16 +115,16 @@ def example_json_output():
 def example_feedback_extraction():
     """Example: Extracting structured feedback."""
     print("=" * 60)
-    print("Example 4: Structured Feedback for Script Writers")
+    print("Example 4: Structured Feedback for Content Writers")
     print("=" * 60 + "\n")
 
     script = """The strengths of the sixth method remained unclear despite extensive testing.
 This extraordinarily complex and convoluted sentence structure makes comprehension difficult."""
 
-    review = review_script_readability(script, "example-004", "v3")
+    review = review_content_readability(script, "example-004", "v3")
     feedback = get_readability_feedback(review)
 
-    print(f"Script ID: {feedback['script_id']}")
+    print(f"Content ID: {feedback['content_id']}")
     print(f"Passes: {feedback['passes']}")
     print(f"Overall Score: {feedback['overall_score']}/100")
     print(f"\nBreakdown:")
@@ -148,11 +148,11 @@ def example_workflow_integration():
     print("Example 5: Workflow Integration (Stage 20)")
     print("=" * 60 + "\n")
 
-    print("Script Review Workflow:")
+    print("Content Review Workflow:")
     print("  Stage 17: Consistency Review → PASS")
     print("  Stage 18: Editing Review → PASS")
     print("  Stage 19: Title Readability → PASS")
-    print("  Stage 20: Script Readability (MVP-020) → CHECKING...")
+    print("  Stage 20: Content Readability (MVP-020) → CHECKING...")
     print()
 
     script = """A young inventor discovers a revolutionary technology.
@@ -160,17 +160,17 @@ He tests it carefully in his workshop.
 The results exceed all expectations.
 The world will never be the same."""
 
-    review = review_script_readability(script, "workflow-001", "v3")
+    review = review_content_readability(script, "workflow-001", "v3")
 
     print(f"  Result: {'PASS ✓' if review.passes else 'FAIL ✗'}")
     print(f"  Score: {review.overall_score}/100")
 
     if review.passes:
-        print("\n  ✓ Script is ready for voiceover")
+        print("\n  ✓ Content is ready for voiceover")
         print("  → Proceed to Stage 21: Expert Review (MVP-021)")
     else:
-        print("\n  ✗ Script needs voiceover improvements")
-        print("  → Return to Stage 11: Script Refinement")
+        print("\n  ✗ Content needs voiceover improvements")
+        print("  → Return to Stage 11: Content Refinement")
         print(f"\n  Issues to address: {len(review.issues)}")
         for issue in review.get_high_priority_issues():
             print(f"    • Line {issue.line_number}: {issue.explanation}")
@@ -181,12 +181,12 @@ The world will never be the same."""
 def main():
     """Run all examples."""
     print("\n" + "=" * 60)
-    print("PrismQ Script Readability Review - Example Usage")
+    print("PrismQ Content Readability Review - Example Usage")
     print("Stage 20 (MVP-020): Voiceover Suitability Checking")
     print("=" * 60 + "\n")
 
     example_basic_review()
-    example_problematic_script()
+    example_problematic_content()
     example_json_output()
     example_feedback_extraction()
     example_workflow_integration()

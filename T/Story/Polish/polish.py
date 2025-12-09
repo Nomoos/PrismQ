@@ -113,8 +113,8 @@ class StoryPolish:
     story_id: str
     original_title: str
     polished_title: str
-    original_script: str
-    polished_script: str
+    original_content: str
+    polished_content: str
 
     change_log: List[ChangeLogEntry] = field(default_factory=list)
     improvements_applied: List[str] = field(default_factory=list)
@@ -137,8 +137,8 @@ class StoryPolish:
             "story_id": self.story_id,
             "original_title": self.original_title,
             "polished_title": self.polished_title,
-            "original_script": self.original_script,
-            "polished_script": self.polished_script,
+            "original_content": self.original_content,
+            "polished_content": self.polished_content,
             "change_log": [entry.to_dict() for entry in self.change_log],
             "improvements_applied": self.improvements_applied,
             "quality_delta": self.quality_delta,
@@ -165,8 +165,8 @@ class StoryPolish:
             story_id=data["story_id"],
             original_title=data["original_title"],
             polished_title=data["polished_title"],
-            original_script=data["original_script"],
-            polished_script=data["polished_script"],
+            original_content=data["original_content"],
+            polished_content=data["polished_content"],
             change_log=change_log,
             improvements_applied=data.get("improvements_applied", []),
             quality_delta=data.get("quality_delta", 0),
@@ -196,7 +196,7 @@ class StoryPolisher:
         self,
         story_id: str,
         current_title: str,
-        current_script: str,
+        current_content: str,
         expert_review_data: Dict[str, Any],
         iteration_number: int = 1,
         audience_context: Optional[Dict[str, Any]] = None,
@@ -207,7 +207,7 @@ class StoryPolisher:
         Args:
             story_id: Identifier of the story
             current_title: Current title text
-            current_script: Current script text
+            current_content: Current script text
             expert_review_data: Expert review feedback with suggestions
             iteration_number: Which polish iteration this is (1, 2, etc.)
             audience_context: Target audience information
@@ -229,7 +229,7 @@ class StoryPolisher:
 
         # Apply improvements
         polished_title = current_title
-        polished_script = current_script
+        polished_content = current_content
         change_log = []
         improvements_applied = []
 
@@ -243,8 +243,8 @@ class StoryPolisher:
 
         # Polish script if suggestions exist
         if script_suggestions:
-            polished_script, script_changes = self._polish_script(
-                current_script, script_suggestions, audience_context, original_idea
+            polished_content, script_changes = self._polish_content(
+                current_content, script_suggestions, audience_context, original_idea
             )
             change_log.extend(script_changes)
             improvements_applied.extend([f"script_{i}" for i in range(len(script_changes))])
@@ -258,8 +258,8 @@ class StoryPolisher:
             story_id=story_id,
             original_title=current_title,
             polished_title=polished_title,
-            original_script=current_script,
-            polished_script=polished_script,
+            original_content=current_content,
+            polished_content=polished_content,
             change_log=change_log,
             improvements_applied=improvements_applied,
             quality_delta=quality_delta,
@@ -324,15 +324,15 @@ class StoryPolisher:
 
         return polished_title, changes
 
-    def _polish_script(
+    def _polish_content(
         self,
-        current_script: str,
+        current_content: str,
         suggestions: List[Dict[str, Any]],
         audience_context: Optional[Dict[str, Any]],
         original_idea: Optional[str],
     ) -> Tuple[str, List[ChangeLogEntry]]:
         """Apply expert improvements to script."""
-        polished_script = current_script
+        polished_content = current_content
         changes = []
 
         # Apply each suggestion systematically
@@ -343,25 +343,25 @@ class StoryPolisher:
             if ("opening" in suggestion_text and "relatable" in suggestion_text) or (
                 "add" in suggestion_text and "context" in suggestion_text
             ):
-                lines = polished_script.split("\n")
+                lines = polished_content.split("\n")
                 if lines and not lines[0].startswith("We've all"):
-                    before = polished_script
+                    before = polished_content
                     # Add relatable opening
                     relatable_intro = "We've all driven past abandoned houses. But this one? "
                     lines[0] = relatable_intro + lines[0]
-                    polished_script = "\n".join(lines)
+                    polished_content = "\n".join(lines)
                     changes.append(
                         ChangeLogEntry(
                             component=ComponentType.SCRIPT,
                             change_type=ChangeType.OPENING_ENHANCEMENT,
                             before=before[:100] + "...",
-                            after=polished_script[:150] + "...",
+                            after=polished_content[:150] + "...",
                             rationale=suggestion.get("suggestion", ""),
                             suggestion_reference=suggestion.get("suggestion", "")[:50],
                         )
                     )
 
-        return polished_script, changes
+        return polished_content, changes
 
     def _estimate_quality_increase(
         self, changes_count: int, suggestions: List[Dict[str, Any]]
@@ -380,7 +380,7 @@ class StoryPolisher:
 def polish_story_with_gpt(
     story_id: str,
     current_title: str,
-    current_script: str,
+    current_content: str,
     expert_review_data: Dict[str, Any],
     config: Optional[PolishConfig] = None,
     iteration_number: int = 1,
@@ -390,7 +390,7 @@ def polish_story_with_gpt(
     Args:
         story_id: Identifier of the story
         current_title: Current title text
-        current_script: Current script text
+        current_content: Current script text
         expert_review_data: Expert review feedback with suggestions
         config: Polish configuration (uses defaults if None)
         iteration_number: Which polish iteration this is
@@ -402,7 +402,7 @@ def polish_story_with_gpt(
     return polisher.polish_story(
         story_id=story_id,
         current_title=current_title,
-        current_script=current_script,
+        current_content=current_content,
         expert_review_data=expert_review_data,
         iteration_number=iteration_number,
     )

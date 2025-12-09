@@ -18,8 +18,8 @@ sys.path.insert(0, str(test_dir / "../../src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model/src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model"))
 sys.path.insert(0, str(test_dir / "../../../../Review/Title/ByScriptAndIdea"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Script/ByTitle"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Script"))
+sys.path.insert(0, str(test_dir / "../../../../Review/Content/ByTitle"))
+sys.path.insert(0, str(test_dir / "../../../../Review/Content"))
 
 from script_review import ContentLength, ImprovementPoint, ReviewCategory, ScriptReview
 from title_improver import (
@@ -65,8 +65,8 @@ class TestMVP009AcceptanceCriteria:
             script_alignment_score=85,
             idea_alignment_score=84,
             engagement_score=80,
-            script_id="script-v2-001",
-            key_script_elements=["curse", "warning", "Victorian", "danger"],
+            content_id="script-v2-001",
+            key_content_elements=["curse", "warning", "Victorian", "danger"],
             suggested_keywords=["curse", "warning"],
             current_length_chars=len(title_v2),
             optimal_length_chars=60,
@@ -77,7 +77,7 @@ class TestMVP009AcceptanceCriteria:
             TitleImprovementPoint(
                 category=TitleReviewCategory.ENGAGEMENT,
                 title="Could emphasize the warning/danger aspect",
-                description="Script emphasizes souls are warning of danger, not just trapped",
+                description="Content emphasizes souls are warning of danger, not just trapped",
                 priority="medium",
                 impact_score=75,
                 suggested_fix="Consider emphasizing 'warning' or 'curse' more prominently",
@@ -93,13 +93,13 @@ class TestMVP009AcceptanceCriteria:
         ]
 
         script_review_v2 = ScriptReview(
-            script_id="script-v2-001", script_title=title_v2, overall_score=85
+            content_id="script-v2-001", script_title=title_v2, overall_score=85
         )
 
         # Generate v3 from v2
         result = improver.improve_title(
             original_title=title_v2,
-            script_text=script_v2,
+            content_text=script_v2,
             title_review=title_review_v2,
             script_review=script_review_v2,
             original_version_number="v2",
@@ -141,7 +141,7 @@ class TestMVP009AcceptanceCriteria:
             overall_score=85,
             script_alignment_score=88,
             engagement_score=82,
-            key_script_elements=["Victorian", "mystery", "echoes"],
+            key_content_elements=["Victorian", "mystery", "echoes"],
         )
 
         title_review_v2.improvement_points = [
@@ -163,11 +163,11 @@ class TestMVP009AcceptanceCriteria:
             ),
         ]
 
-        script_review_v2 = ScriptReview(script_id="test-2", script_title=title_v2, overall_score=86)
+        script_review_v2 = ScriptReview(content_id="test-2", script_title=title_v2, overall_score=86)
 
         result = improver.improve_title(
             original_title=title_v2,
-            script_text=script_v2,
+            content_text=script_v2,
             title_review=title_review_v2,
             script_review=script_review_v2,
             original_version_number="v2",
@@ -191,21 +191,21 @@ class TestMVP009AcceptanceCriteria:
         improver = TitleImprover()
 
         title_v2 = "Title Version 2"
-        script_v2 = "Script content for v2 refinement."
+        script_v2 = "Content content for v2 refinement."
 
         title_review = TitleReview(
             title_id="mvp009-test-3",
             title_text=title_v2,
             title_version="v2",
             overall_score=83,
-            key_script_elements=["content", "refinement"],
+            key_content_elements=["content", "refinement"],
         )
 
-        script_review = ScriptReview(script_id="test-3", script_title=title_v2, overall_score=84)
+        script_review = ScriptReview(content_id="test-3", script_title=title_v2, overall_score=84)
 
         result = improver.improve_title(
             original_title=title_v2,
-            script_text=script_v2,
+            content_text=script_v2,
             title_review=title_review,
             script_review=script_review,
             original_version_number="v2",
@@ -255,16 +255,16 @@ class TestMVP009AcceptanceCriteria:
                 title_text=title,
                 title_version=orig_ver,
                 overall_score=80,
-                key_script_elements=["test"],
+                key_content_elements=["test"],
             )
 
             script_review = ScriptReview(
-                script_id=f"test-{new_ver}", script_title=title, overall_score=80
+                content_id=f"test-{new_ver}", script_title=title, overall_score=80
             )
 
             result = improver.improve_title(
                 original_title=title,
-                script_text=script,
+                content_text=script,
                 title_review=title_review,
                 script_review=script_review,
                 original_version_number=orig_ver,
@@ -303,7 +303,7 @@ class TestMVP009AcceptanceCriteria:
             overall_score=84,
             script_alignment_score=86,
             engagement_score=82,
-            key_script_elements=["curse", "trapped souls", "time running out", "Sarah"],
+            key_content_elements=["curse", "trapped souls", "time running out", "Sarah"],
             suggested_keywords=["curse", "countdown"],
             current_length_chars=len(title_v2),
             optimal_length_chars=60,
@@ -314,7 +314,7 @@ class TestMVP009AcceptanceCriteria:
             TitleImprovementPoint(
                 category=TitleReviewCategory.SCRIPT_ALIGNMENT,
                 title="Missing urgency element",
-                description="Script has time pressure ('running out') not reflected in title",
+                description="Content has time pressure ('running out') not reflected in title",
                 priority="high",
                 impact_score=85,
                 suggested_fix="Add sense of urgency or countdown",
@@ -322,7 +322,7 @@ class TestMVP009AcceptanceCriteria:
         ]
 
         script_review_v2 = ScriptReview(
-            script_id="mvp009-test-5", script_title=title_v2, overall_score=86
+            content_id="mvp009-test-5", script_title=title_v2, overall_score=86
         )
 
         script_review_v2.improvement_points = [
@@ -338,7 +338,7 @@ class TestMVP009AcceptanceCriteria:
 
         result = improver.improve_title(
             original_title=title_v2,
-            script_text=script_v2,
+            content_text=script_v2,
             title_review=title_review_v2,
             script_review=script_review_v2,
             original_version_number="v2",
@@ -375,18 +375,18 @@ class TestMVP009AcceptanceCriteria:
                 title_text=current_title,
                 title_version=old_ver,
                 overall_score=70 + (i * 5),
-                key_script_elements=["refinement", "progressive"],
+                key_content_elements=["refinement", "progressive"],
             )
 
             script_review = ScriptReview(
-                script_id=f"history-test-{i}",
+                content_id=f"history-test-{i}",
                 script_title=current_title,
                 overall_score=75 + (i * 5),
             )
 
             result = improver.improve_title(
                 original_title=current_title,
-                script_text=script,
+                content_text=script,
                 title_review=title_review,
                 script_review=script_review,
                 original_version_number=old_ver,
@@ -427,16 +427,16 @@ class TestConvenienceFunctionForV3:
             title_text=title_v2,
             title_version="v2",
             overall_score=85,
-            key_script_elements=["test", "refinement"],
+            key_content_elements=["test", "refinement"],
         )
 
         script_review = ScriptReview(
-            script_id="convenience-test", script_title=title_v2, overall_score=85
+            content_id="convenience-test", script_title=title_v2, overall_score=85
         )
 
         result = improve_title_from_reviews(
             original_title=title_v2,
-            script_text=script_v2,
+            content_text=script_v2,
             title_review=title_review,
             script_review=script_review,
             original_version="v2",

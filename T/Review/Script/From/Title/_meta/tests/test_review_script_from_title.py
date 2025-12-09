@@ -1,4 +1,4 @@
-"""Tests for PrismQ.T.Review.Script.From.Title module.
+"""Tests for PrismQ.T.Review.Content.From.Title module.
 
 These tests verify the review script from title workflow stage:
 1. Selecting oldest Story with correct state
@@ -29,22 +29,22 @@ _module_path = (
     _project_root
     / "T"
     / "Review"
-    / "Script"
+    / "Content"
     / "From"
     / "Title"
     / "src"
-    / "review_script_from_title.py"
+    / "review_content_from_title.py"
 )
-_spec = importlib.util.spec_from_file_location("review_script_from_title", _module_path)
+_spec = importlib.util.spec_from_file_location("review_content_from_title", _module_path)
 _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)
 
 ReviewResult = _module.ReviewResult
-process_review_script_from_title = _module.process_review_script_from_title
+process_review_content_from_title = _module.process_review_content_from_title
 get_oldest_story_for_review = _module.get_oldest_story_for_review
 determine_next_state = _module.determine_next_state
 create_review = _module.create_review
-evaluate_script = _module.evaluate_script
+evaluate_content = _module.evaluate_content
 ACCEPTANCE_THRESHOLD = _module.ACCEPTANCE_THRESHOLD
 STATE_REVIEW_SCRIPT_FROM_TITLE = _module.STATE_REVIEW_SCRIPT_FROM_TITLE
 STATE_REVIEW_TITLE_FROM_SCRIPT = _module.STATE_REVIEW_TITLE_FROM_SCRIPT
@@ -112,7 +112,7 @@ class TestDetermineNextState:
     """Tests for determine_next_state function."""
 
     def test_first_review_goes_to_title_review(self):
-        """First review should transition to Review.Title.From.Script."""
+        """First review should transition to Review.Title.From.Content."""
         result = determine_next_state(accepted=True, is_first_review=True)
         assert result == STATE_REVIEW_TITLE_FROM_SCRIPT
 
@@ -168,12 +168,12 @@ class TestCreateReview:
 
 
 class TestEvaluateScript:
-    """Tests for evaluate_script function."""
+    """Tests for evaluate_content function."""
 
     def test_returns_score_and_text(self):
         """Should return tuple of score and review text."""
-        score, text = evaluate_script(
-            script_text="This is a test script about horror.",
+        score, text = evaluate_content(
+            content_text="This is a test script about horror.",
             title_text="Horror Story",
             is_first_review=True,
         )
@@ -185,42 +185,42 @@ class TestEvaluateScript:
 
     def test_first_review_prefix(self):
         """First review should have appropriate prefix."""
-        score, text = evaluate_script(
-            script_text="Test script content", title_text="Test Title", is_first_review=True
+        score, text = evaluate_content(
+            content_text="Test script content", title_text="Test Title", is_first_review=True
         )
 
         assert "Initial script review" in text
 
     def test_follow_up_review_prefix(self):
         """Follow-up review should have appropriate prefix."""
-        score, text = evaluate_script(
-            script_text="Test script content", title_text="Test Title", is_first_review=False
+        score, text = evaluate_content(
+            content_text="Test script content", title_text="Test Title", is_first_review=False
         )
 
         assert "Follow-up script review" in text
 
-    def test_short_script_penalized(self):
+    def test_short_content_penalized(self):
         """Short scripts should have lower scores."""
-        short_score, _ = evaluate_script(
-            script_text="Too short.", title_text="Test", is_first_review=True
+        short_score, _ = evaluate_content(
+            content_text="Too short.", title_text="Test", is_first_review=True
         )
 
-        normal_score, _ = evaluate_script(
-            script_text=" ".join(["word"] * 150), title_text="Test", is_first_review=True
+        normal_score, _ = evaluate_content(
+            content_text=" ".join(["word"] * 150), title_text="Test", is_first_review=True
         )
 
         assert short_score < normal_score
 
     def test_title_alignment_affects_score(self):
         """Scripts aligned with title should score higher."""
-        aligned_score, _ = evaluate_script(
-            script_text="The horror story began in a dark castle with mysterious echoes.",
+        aligned_score, _ = evaluate_content(
+            content_text="The horror story began in a dark castle with mysterious echoes.",
             title_text="Horror Castle Mystery",
             is_first_review=True,
         )
 
-        unaligned_score, _ = evaluate_script(
-            script_text="The sun was shining on a beautiful summer day.",
+        unaligned_score, _ = evaluate_content(
+            content_text="The sun was shining on a beautiful summer day.",
             title_text="Horror Castle Mystery",
             is_first_review=True,
         )
@@ -229,11 +229,11 @@ class TestEvaluateScript:
 
 
 class TestProcessReviewScriptFromTitle:
-    """Tests for process_review_script_from_title function."""
+    """Tests for process_review_content_from_title function."""
 
     def test_returns_none_when_no_stories(self, db_connection):
         """Should return None when no stories to process."""
-        result = process_review_script_from_title(db_connection)
+        result = process_review_content_from_title(db_connection)
         assert result is None
 
     def test_processes_story_and_returns_result(self, db_connection, story_repository):
@@ -242,10 +242,10 @@ class TestProcessReviewScriptFromTitle:
         story = Story(idea_json='{"title": "Test Story"}', state=STATE_REVIEW_SCRIPT_FROM_TITLE)
         story_repository.insert(story)
 
-        result = process_review_script_from_title(
+        result = process_review_content_from_title(
             db_connection,
             is_first_review=True,
-            script_text="This is a test script with good content about the topic.",
+            content_text="This is a test script with good content about the topic.",
             title_text="Test Story",
         )
 
@@ -262,7 +262,7 @@ class TestProcessReviewScriptFromTitle:
         story = Story(idea_json='{"title": "Test Story"}', state=STATE_REVIEW_SCRIPT_FROM_TITLE)
         story = story_repository.insert(story)
 
-        result = process_review_script_from_title(db_connection, is_first_review=True)
+        result = process_review_content_from_title(db_connection, is_first_review=True)
 
         # Verify state was updated
         updated_story = story_repository.find_by_id(story.id)
@@ -273,7 +273,7 @@ class TestProcessReviewScriptFromTitle:
         story = Story(idea_json='{"title": "Test"}', state=STATE_REVIEW_SCRIPT_FROM_TITLE)
         story_repository.insert(story)
 
-        result = process_review_script_from_title(db_connection, is_first_review=True)
+        result = process_review_content_from_title(db_connection, is_first_review=True)
 
         assert result.new_state == STATE_REVIEW_TITLE_FROM_SCRIPT
 
@@ -283,10 +283,10 @@ class TestProcessReviewScriptFromTitle:
         story_repository.insert(story)
 
         # Use a script that will score above threshold
-        result = process_review_script_from_title(
+        result = process_review_content_from_title(
             db_connection,
             is_first_review=False,
-            script_text=" ".join(["good content about the main topic"] * 50),
+            content_text=" ".join(["good content about the main topic"] * 50),
             title_text="main topic",
         )
 
@@ -304,7 +304,7 @@ class TestReviewResult:
         story = Story(idea_json='{"title": "Test"}', state=STATE_REVIEW_SCRIPT_FROM_TITLE)
         story_repository.insert(story)
 
-        result = process_review_script_from_title(db_connection, is_first_review=True)
+        result = process_review_content_from_title(db_connection, is_first_review=True)
 
         assert hasattr(result, "story")
         assert hasattr(result, "review")
@@ -347,10 +347,10 @@ class TestReviewWorkflowIntegration:
         story = story_repository.insert(story)
 
         # Process: Execute review
-        result = process_review_script_from_title(
+        result = process_review_content_from_title(
             db_connection,
             is_first_review=True,
-            script_text="The horror began on a dark night. " * 20,
+            content_text="The horror began on a dark night. " * 20,
             title_text="Horror Story",
         )
 
@@ -373,13 +373,13 @@ class TestReviewWorkflowIntegration:
         story2 = story_repository.insert(story2)
 
         # Process first story
-        result1 = process_review_script_from_title(db_connection, is_first_review=True)
+        result1 = process_review_content_from_title(db_connection, is_first_review=True)
         assert result1.story.id == story1.id
 
         # Process second story
-        result2 = process_review_script_from_title(db_connection, is_first_review=True)
+        result2 = process_review_content_from_title(db_connection, is_first_review=True)
         assert result2.story.id == story2.id
 
         # No more stories to process
-        result3 = process_review_script_from_title(db_connection, is_first_review=True)
+        result3 = process_review_content_from_title(db_connection, is_first_review=True)
         assert result3 is None

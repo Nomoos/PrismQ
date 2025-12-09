@@ -1,4 +1,4 @@
-"""Twitter/X thread formatter for PrismQ.T.Script.Formatter.Social.
+"""Twitter/X thread formatter for PrismQ.T.Content.Formatter.Social.
 
 This module transforms scripts into Twitter/X thread format with optimal
 tweet breaks, thread numbering, and engagement optimization.
@@ -42,7 +42,7 @@ class TwitterFormatter(BaseSocialFormatter):
         """Format script into Twitter thread.
 
         Args:
-            script: Script content to format
+            script: Content content to format
             content_id: Unique identifier for content
             hook_type: Type of hook (question, statement, stat)
             add_cta: Whether to add CTA in final tweet
@@ -267,13 +267,13 @@ class TwitterFormatter(BaseSocialFormatter):
         return hook
 
     def _generate_twitter_metadata(
-        self, tweets: List[str], original_script: str
+        self, tweets: List[str], original_content: str
     ) -> SocialMediaMetadata:
         """Generate metadata for Twitter thread.
 
         Args:
             tweets: List of tweets
-            original_script: Original script content
+            original_content: Original script content
 
         Returns:
             SocialMediaMetadata
@@ -282,7 +282,7 @@ class TwitterFormatter(BaseSocialFormatter):
         total_chars = sum(len(t) for t in tweets)
 
         # Word count from original script
-        word_count = len(original_script.split())
+        word_count = len(original_content.split())
 
         metadata = SocialMediaMetadata(
             platform="twitter",
@@ -339,7 +339,7 @@ def format_twitter_thread(
     """Convenience function to format script as Twitter thread.
 
     Args:
-        script: Script content to format
+        script: Content content to format
         content_id: Unique identifier for content
         hook_type: Type of hook (question, statement, stat)
         add_cta: Whether to add CTA in final tweet

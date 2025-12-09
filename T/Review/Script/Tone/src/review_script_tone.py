@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
-"""PrismQ.T.Review.Script.Tone - Script tone review module.
+"""PrismQ.T.Review.Content.Tone - Content tone review module.
 
 This module implements the script tone review workflow stage that:
-1. Selects the Story with lowest current script version in state 'PrismQ.T.Review.Script.Tone'
+1. Selects the Story with lowest current script version in state 'PrismQ.T.Review.Content.Tone'
    (current version = highest version number for that story_id)
-2. Gets the Script (latest version) for the Story
+2. Gets the Content (latest version) for the Story
 3. Reviews the script for tone and style consistency
 4. Outputs a Review model (simple: text, score, created_at)
-5. Links the Review to the Script via Script.review_id FK
+5. Links the Review to the Content via Content.review_id FK
 6. Updates the Story state based on review acceptance
 
 State Transitions:
-- If review doesn't accept script → 'PrismQ.T.Script.From.Title.Review.Script' (for rewrite)
-- If review accepts script → 'PrismQ.T.Review.Script.Editing' (proceed to editing review)
+- If review doesn't accept script → 'PrismQ.T.Content.From.Title.Review.Content' (for rewrite)
+- If review accepts script → 'PrismQ.T.Review.Content.Editing' (proceed to editing review)
 
 Usage:
-    from T.Review.Script.Tone.src.review_script_tone import (
-        process_review_script_tone,
+    from T.Review.Content.Tone.src.review_content_tone import (
+        process_review_content_tone,
         ReviewResult
     )
 
     # Using database connection
-    result = process_review_script_tone(conn)
+    result = process_review_content_tone(conn)
     if result:
         print(f"Review created with score: {result.review.score}")
-        print(f"Script reviewed: {result.script.id}")
+        print(f"Content reviewed: {result.script.id}")
         print(f"Story state changed to: {result.new_state}")
 """
 
@@ -34,9 +34,9 @@ from datetime import datetime
 from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.story import Story
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
 
@@ -55,26 +55,26 @@ class ReviewResult:
 
     Attributes:
         story: The Story that was reviewed
-        script: The Script that was reviewed
+        script: The Content that was reviewed
         review: The Review that was created
         new_state: The new state the story was transitioned to
         accepted: Whether the script was accepted
     """
 
     story: Story
-    script: Script
+    script: Content
     review: Review
     new_state: str
     accepted: bool
 
 
-def get_story_with_lowest_script_version(
+def get_story_with_lowest_content_version(
     connection: sqlite3.Connection, story_repository: StoryRepository
 ) -> Optional[Story]:
     """Get the Story with the lowest current script version for review.
 
-    Selects from Stories with state 'PrismQ.T.Review.Script.Tone',
-    picking the one whose Script has the lowest current version number.
+    Selects from Stories with state 'PrismQ.T.Review.Content.Tone',
+    picking the one whose Content has the lowest current version number.
     Current version = highest version number across same story_id.
 
     Args:
@@ -90,7 +90,7 @@ def get_story_with_lowest_script_version(
         """
         SELECT s.id as story_id
         FROM Story s
-        INNER JOIN Script sc ON s.id = sc.story_id
+        INNER JOIN Content sc ON s.id = sc.story_id
         WHERE s.state = ?
         GROUP BY s.id
         ORDER BY MAX(sc.version) ASC
@@ -117,10 +117,10 @@ def determine_next_state(accepted: bool) -> str:
         The next state name
     """
     if not accepted:
-        # Script not accepted - send back for rewrite
+        # Content not accepted - send back for rewrite
         return STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 
-    # Script accepted - proceed to editing review
+    # Content accepted - proceed to editing review
     return STATE_REVIEW_SCRIPT_EDITING
 
 
@@ -147,14 +147,14 @@ def create_review(score: int, text: str) -> Review:
     return Review(text=text, score=score, created_at=datetime.now())
 
 
-def evaluate_tone(script_text: str, target_tone: str = "") -> Tuple[int, str]:
+def evaluate_tone(content_text: str, target_tone: str = "") -> Tuple[int, str]:
     """Evaluate a script's tone and style consistency.
 
     This is a simple evaluation that checks basic tone aspects.
     In production, this could be replaced with AI-powered review.
 
     Args:
-        script_text: The script content to review
+        content_text: The script content to review
         target_tone: Optional target tone description (e.g., "dark", "suspense")
 
     Returns:
@@ -165,19 +165,19 @@ def evaluate_tone(script_text: str, target_tone: str = "") -> Tuple[int, str]:
     review_points = []
 
     # Word count analysis
-    word_count = len(script_text.split())
+    word_count = len(content_text.split())
 
     if word_count < 50:
         score -= 15
-        review_points.append("Script is too short for meaningful tone assessment.")
+        review_points.append("Content is too short for meaningful tone assessment.")
     elif word_count < 100:
         score -= 5
-        review_points.append("Script could be more developed for better tone assessment.")
+        review_points.append("Content could be more developed for better tone assessment.")
     else:
         score += 5
-        review_points.append("Script has adequate length for tone assessment.")
+        review_points.append("Content has adequate length for tone assessment.")
 
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
 
     # Check for tone-related keywords (emotional intensity)
     positive_tone_words = {
@@ -207,13 +207,13 @@ def evaluate_tone(script_text: str, target_tone: str = "") -> Tuple[int, str]:
 
     # Check for tone consistency
     if positive_count > 2 and negative_count < 2:
-        review_points.append("Script maintains consistent positive tone.")
+        review_points.append("Content maintains consistent positive tone.")
         score += 10
     elif negative_count > 2 and positive_count < 2:
-        review_points.append("Script maintains consistent dark/dramatic tone.")
+        review_points.append("Content maintains consistent dark/dramatic tone.")
         score += 10
     elif positive_count <= 2 and negative_count <= 2:
-        review_points.append("Script maintains neutral/informative tone.")
+        review_points.append("Content maintains neutral/informative tone.")
         score += 5
     else:
         review_points.append("Mixed tone detected - consider making tone more consistent.")
@@ -298,55 +298,55 @@ def save_review(connection: sqlite3.Connection, review: Review) -> Review:
     return review
 
 
-def update_script_review_id(connection: sqlite3.Connection, script_id: int, review_id: int) -> None:
-    """Update a Script's review_id to link it to a Review.
+def update_content_review_id(connection: sqlite3.Connection, content_id: int, review_id: int) -> None:
+    """Update a Content's review_id to link it to a Review.
 
     This updates the existing script's review_id without creating a new version,
     since adding a review reference doesn't change the script content.
 
     Args:
         connection: SQLite database connection
-        script_id: ID of the Script to update
+        content_id: ID of the Content to update
         review_id: ID of the Review to link to
     """
-    connection.execute("UPDATE Script SET review_id = ? WHERE id = ?", (review_id, script_id))
+    connection.execute("UPDATE Content SET review_id = ? WHERE id = ?", (review_id, content_id))
     connection.commit()
 
 
-def get_script_for_story(script_repository: ScriptRepository, story: Story) -> Optional[Script]:
-    """Get the current Script for a Story.
+def get_content_for_story(content_repository: ContentRepository, story: Story) -> Optional[Content]:
+    """Get the current Content for a Story.
 
     Args:
-        script_repository: Repository for Script database operations
-        story: The Story to get Script for
+        content_repository: Repository for Content database operations
+        story: The Story to get Content for
 
     Returns:
-        The Script if found, None otherwise
+        The Content if found, None otherwise
     """
-    if story.script_id is not None:
-        return script_repository.find_by_id(story.script_id)
-    # If no script_id, try to find latest version for story
-    return script_repository.find_latest_version(story.id)
+    if story.content_id is not None:
+        return content_repository.find_by_id(story.content_id)
+    # If no content_id, try to find latest version for story
+    return content_repository.find_latest_version(story.id)
 
 
-def process_review_script_tone(
+def process_review_content_tone(
     connection: sqlite3.Connection,
-    script_text: Optional[str] = None,
+    content_text: Optional[str] = None,
     target_tone: Optional[str] = None,
 ) -> Optional[ReviewResult]:
     """Process the script tone review workflow stage.
 
     This function:
-    1. Finds the Story with lowest current script version in state 'PrismQ.T.Review.Script.Tone'
-    2. Gets the Script associated with the Story (latest version)
+    1. Finds the Story with lowest current script version in state 'PrismQ.T.Review.Content.Tone'
+    2. Gets the Content associated with the Story (latest version)
     3. Evaluates the script's tone consistency
     4. Creates a Review record and saves it to database
-    5. Links the Review to the Script via Script.review_id FK
+    5. Links the Review to the Content via Content.review_id FK
     6. Updates the Story state based on review outcome
 
     Args:
         connection: SQLite database connection
-        script_text: Optional script text override (for testing)
+        content_text: Optional script text override (for testing)
         target_tone: Optional target tone description (for testing)
 
     Returns:
@@ -356,30 +356,30 @@ def process_review_script_tone(
     connection.row_factory = sqlite3.Row
 
     story_repository = StoryRepository(connection)
-    script_repository = ScriptRepository(connection)
+    content_repository = ContentRepository(connection)
 
     # Get story with lowest current script version in review state
-    story = get_story_with_lowest_script_version(connection, story_repository)
+    story = get_story_with_lowest_content_version(connection, story_repository)
 
     if story is None:
         return None
 
     # Get the script for this story
-    script = get_script_for_story(script_repository, story)
+    script = get_content_for_story(content_repository, story)
 
-    # Get script text from the Script entity, or use override if provided (for testing)
-    if script_text is not None:
-        actual_script_text = script_text
+    # Get script text from the Content entity, or use override if provided (for testing)
+    if content_text is not None:
+        actual_content_text = content_text
     elif script is not None:
-        actual_script_text = script.text
+        actual_content_text = script.text
     else:
-        actual_script_text = "Sample script content for tone review"
+        actual_content_text = "Sample script content for tone review"
 
     actual_target_tone = target_tone or ""
 
     # Evaluate the script tone
     score, review_text = evaluate_tone(
-        script_text=actual_script_text, target_tone=actual_target_tone
+        content_text=actual_content_text, target_tone=actual_target_tone
     )
 
     # Create and save review to database
@@ -389,19 +389,19 @@ def process_review_script_tone(
     # Determine if accepted
     accepted = score >= ACCEPTANCE_THRESHOLD
 
-    # Link Review to Script by updating the script's review_id
+    # Link Review to Content by updating the script's review_id
     if script is not None:
         # Update existing script's review_id directly (no need to create new version)
-        update_script_review_id(connection, script.id, review.id)
+        update_content_review_id(connection, script.id, review.id)
         script.review_id = review.id
-        reviewed_script = script
+        reviewed_content = script
     else:
         # If no script exists, create one with the review reference
-        reviewed_script = Script(
-            story_id=story.id, version=0, text=actual_script_text, review_id=review.id
+        reviewed_content = Content(
+            story_id=story.id, version=0, text=actual_content_text, review_id=review.id
         )
-        reviewed_script = script_repository.insert(reviewed_script)
-        story.script_id = reviewed_script.id
+        reviewed_content = content_repository.insert(reviewed_content)
+        story.content_id = reviewed_content.id
 
     # Determine next state
     new_state = determine_next_state(accepted=accepted)
@@ -411,7 +411,7 @@ def process_review_script_tone(
     story_repository.update(story)
 
     return ReviewResult(
-        story=story, script=reviewed_script, review=review, new_state=new_state, accepted=accepted
+        story=story, script=reviewed_content, review=review, new_state=new_state, accepted=accepted
     )
 
 
@@ -430,7 +430,7 @@ def process_all_pending_reviews(
     results = []
 
     while True:
-        result = process_review_script_tone(connection=connection, target_tone=target_tone)
+        result = process_review_content_tone(connection=connection, target_tone=target_tone)
 
         if result is None:
             break
@@ -442,12 +442,12 @@ def process_all_pending_reviews(
 
 __all__ = [
     "ReviewResult",
-    "process_review_script_tone",
+    "process_review_content_tone",
     "process_all_pending_reviews",
-    "get_story_with_lowest_script_version",
-    "get_script_for_story",
+    "get_story_with_lowest_content_version",
+    "get_content_for_story",
     "save_review",
-    "update_script_review_id",
+    "update_content_review_id",
     "determine_next_state",
     "create_review",
     "evaluate_tone",

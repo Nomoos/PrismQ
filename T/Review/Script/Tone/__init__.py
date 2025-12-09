@@ -1,4 +1,4 @@
-"""PrismQ.T.Review.Script.Tone module.
+"""PrismQ.T.Review.Content.Tone module.
 
 This module provides script tone review functionality for the PrismQ workflow.
 Stage 15 (MVP-015) in the iterative co-improvement workflow.
@@ -12,7 +12,7 @@ The ToneReview model enables:
 - Feedback for script refinement
 """
 
-from T.Review.Script.Tone.src.review_script_tone import (
+from T.Review.Content.Tone.src.review_content_tone import (
     ACCEPTANCE_THRESHOLD,
     STATE_REVIEW_SCRIPT_EDITING,
     STATE_REVIEW_SCRIPT_TONE,
@@ -21,12 +21,12 @@ from T.Review.Script.Tone.src.review_script_tone import (
     create_review,
     determine_next_state,
     evaluate_tone,
-    get_script_for_story,
-    get_story_with_lowest_script_version,
+    get_content_for_story,
+    get_story_with_lowest_content_version,
     process_all_pending_reviews,
-    process_review_script_tone,
+    process_review_content_tone,
     save_review,
-    update_script_review_id,
+    update_content_review_id,
 )
 
 from .tone_review import ToneIssue, ToneIssueType, ToneReview, ToneSeverity
@@ -39,12 +39,12 @@ __all__ = [
     "ToneSeverity",
     # Workflow functions
     "ReviewResult",
-    "process_review_script_tone",
+    "process_review_content_tone",
     "process_all_pending_reviews",
-    "get_story_with_lowest_script_version",
-    "get_script_for_story",
+    "get_story_with_lowest_content_version",
+    "get_content_for_story",
     "save_review",
-    "update_script_review_id",
+    "update_content_review_id",
     "determine_next_state",
     "create_review",
     "evaluate_tone",

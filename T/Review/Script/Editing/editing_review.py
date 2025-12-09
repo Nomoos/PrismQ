@@ -14,7 +14,7 @@ The EditingReview model enables:
 
 Workflow Position:
     Stage 18 (MVP-018): Editing Review
-    Script v3+ → EditingReview (AI Reviewer) → Script Refinement (if fails) → Stage 19
+    Content v3+ → EditingReview (AI Reviewer) → Content Refinement (if fails) → Stage 19
 """
 
 from dataclasses import asdict, dataclass, field
@@ -74,7 +74,7 @@ class EditingReview:
     returns to refinement (Stage 11) with editing feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall editing quality score (0-100)
         pass_threshold: Minimum score required to pass (default 85)
@@ -100,7 +100,7 @@ class EditingReview:
 
     Example:
         >>> review = EditingReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=92
         ... )
@@ -115,10 +115,10 @@ class EditingReview:
         >>> if review.passes:
         ...     print("Ready for Stage 19: Title Readability")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 85  # Minimum score to pass

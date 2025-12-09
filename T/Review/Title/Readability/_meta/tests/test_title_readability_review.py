@@ -614,11 +614,11 @@ class TestWorkflowIntegration:
             title_id="title-018", title_text="Metadata Test", title_version="v3", overall_score=90
         )
 
-        review.metadata["script_id"] = "script-123"
+        review.metadata["content_id"] = "script-123"
         review.metadata["script_version"] = "v3"
         review.metadata["workflow_stage"] = "MVP-019"
 
-        assert review.metadata["script_id"] == "script-123"
+        assert review.metadata["content_id"] == "script-123"
         assert review.metadata["workflow_stage"] == "MVP-019"
 
         print("✓ Metadata tracking works")

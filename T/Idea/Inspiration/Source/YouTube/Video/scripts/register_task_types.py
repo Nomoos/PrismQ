@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-YouTube Video Task Type Registration Script
+YouTube Video Task Type Registration Content
 
 Registers the youtube_video_scrape task type with the TaskManager API.
 

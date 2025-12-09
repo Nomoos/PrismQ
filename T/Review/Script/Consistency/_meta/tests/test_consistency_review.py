@@ -11,15 +11,15 @@ import json
 
 import pytest
 
-from T.Review.Script.Consistency import (
+from T.Review.Content.Consistency import (
     ConsistencyIssue,
     ConsistencyIssueType,
     ConsistencyReview,
     ConsistencySeverity,
     ScriptConsistencyChecker,
     get_consistency_feedback,
-    review_script_consistency,
-    review_script_consistency_to_json,
+    review_content_consistency,
+    review_content_consistency_to_json,
 )
 
 
@@ -29,7 +29,7 @@ class TestConsistencyReviewBasic:
     def test_create_basic_review(self):
         """Test creating a basic ConsistencyReview instance."""
         review = ConsistencyReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=85,
             character_score=90,
@@ -38,7 +38,7 @@ class TestConsistencyReviewBasic:
             detail_score=85,
         )
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_version == "v3"
         assert review.overall_score == 85
         assert review.pass_threshold == 80
@@ -57,15 +57,15 @@ class TestConsistencyReviewBasic:
     def test_create_failing_review(self):
         """Test creating a review that fails."""
         review = ConsistencyReview(
-            script_id="script-002", script_version="v3", overall_score=75  # Below threshold of 80
+            content_id="script-002", script_version="v3", overall_score=75  # Below threshold of 80
         )
 
         assert review.passes is False
 
-    def test_consistent_script_passes(self):
+    def test_consistent_content_passes(self):
         """Test that a consistent script passes review."""
         review = ConsistencyReview(
-            script_id="script-consistent",
+            content_id="script-consistent",
             script_version="v3",
             overall_score=90,
             character_score=95,
@@ -147,7 +147,7 @@ class TestConsistencyReviewMethods:
 
     def test_add_issue(self):
         """Test adding issues to review."""
-        review = ConsistencyReview(script_id="script-001", overall_score=85)
+        review = ConsistencyReview(content_id="script-001", overall_score=85)
 
         issue = ConsistencyIssue(
             issue_type=ConsistencyIssueType.CHARACTER_NAME,
@@ -166,7 +166,7 @@ class TestConsistencyReviewMethods:
 
     def test_add_critical_issue_fails_review(self):
         """Test that adding critical issue fails review."""
-        review = ConsistencyReview(script_id="script-001", overall_score=85)  # Good score
+        review = ConsistencyReview(content_id="script-001", overall_score=85)  # Good score
 
         assert review.passes is True
 
@@ -186,7 +186,7 @@ class TestConsistencyReviewMethods:
 
     def test_multiple_high_severity_fails(self):
         """Test that 3+ high severity issues fail review."""
-        review = ConsistencyReview(script_id="script-001", overall_score=85)
+        review = ConsistencyReview(content_id="script-001", overall_score=85)
 
         assert review.passes is True
 
@@ -209,7 +209,7 @@ class TestConsistencyReviewMethods:
     def test_configurable_max_high_severity(self):
         """Test configurable max high severity threshold."""
         # Default threshold is 3
-        review = ConsistencyReview(script_id="script-001", overall_score=85)
+        review = ConsistencyReview(content_id="script-001", overall_score=85)
 
         # Add 2 high severity issues (below default threshold)
         for i in range(2):
@@ -228,7 +228,7 @@ class TestConsistencyReviewMethods:
 
         # Now test with custom threshold of 2
         review2 = ConsistencyReview(
-            script_id="script-002", overall_score=85, max_high_severity_issues=2
+            content_id="script-002", overall_score=85, max_high_severity_issues=2
         )
 
         # Add 2 high severity issues (at threshold)
@@ -248,7 +248,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_issues_by_severity(self):
         """Test filtering issues by severity."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -282,7 +282,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_issues_by_type(self):
         """Test filtering issues by type."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -311,7 +311,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_critical_issues(self):
         """Test getting critical issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -341,7 +341,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_high_priority_issues(self):
         """Test getting high priority issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -381,7 +381,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_character_issues(self):
         """Test getting character issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -411,7 +411,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_timeline_issues(self):
         """Test getting timeline issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -430,7 +430,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_location_issues(self):
         """Test getting location issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -449,7 +449,7 @@ class TestConsistencyReviewMethods:
 
     def test_get_contradiction_issues(self):
         """Test getting contradiction issues."""
-        review = ConsistencyReview(script_id="script-001")
+        review = ConsistencyReview(content_id="script-001")
 
         review.add_issue(
             ConsistencyIssue(
@@ -470,7 +470,7 @@ class TestConsistencyReviewMethods:
 class TestScriptConsistencyChecker:
     """Test ScriptConsistencyChecker functionality."""
 
-    def test_check_consistent_script(self):
+    def test_check_consistent_content(self):
         """Test checking a consistent script."""
         script = """Sarah walked into the library.
 The library was quiet and peaceful.
@@ -478,9 +478,9 @@ Sarah found a book and sat down to read.
 After an hour, Sarah left the library."""
 
         checker = ScriptConsistencyChecker(pass_threshold=80)
-        review = checker.review_script(script, "test-001", "v3")
+        review = checker.review_content(script, "test-001", "v3")
 
-        assert review.script_id == "test-001"
+        assert review.content_id == "test-001"
         assert review.script_version == "v3"
         assert review.passes is True
         assert review.overall_score >= 80
@@ -493,7 +493,7 @@ Johnny picked up the book.
 John left the building."""
 
         checker = ScriptConsistencyChecker(pass_threshold=80)
-        review = checker.review_script(script, "test-002", "v3")
+        review = checker.review_content(script, "test-002", "v3")
 
         character_issues = review.get_character_issues()
         assert len(character_issues) > 0
@@ -508,17 +508,17 @@ They talked for hours.
 Alice enjoyed the conversation."""
 
         checker = ScriptConsistencyChecker(pass_threshold=80)
-        review = checker.review_script(script, "test-003", "v3")
+        review = checker.review_content(script, "test-003", "v3")
 
         assert "Alice" in review.characters_found
         assert "Bob" in review.characters_found
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test with empty script."""
         script = ""
 
         checker = ScriptConsistencyChecker(pass_threshold=80)
-        review = checker.review_script(script, "test-004", "v3")
+        review = checker.review_content(script, "test-004", "v3")
 
         assert review.overall_score >= 0
         assert len(review.issues) == 0
@@ -530,7 +530,7 @@ class TestConsistencyReviewSerialization:
     def test_to_dict(self):
         """Test converting review to dictionary."""
         review = ConsistencyReview(
-            script_id="script-001",
+            content_id="script-001",
             script_version="v3",
             overall_score=85,
             character_score=90,
@@ -550,7 +550,7 @@ class TestConsistencyReviewSerialization:
 
         data = review.to_dict()
 
-        assert data["script_id"] == "script-001"
+        assert data["content_id"] == "script-001"
         assert data["script_version"] == "v3"
         assert data["overall_score"] == 85
         assert data["character_score"] == 90
@@ -562,7 +562,7 @@ class TestConsistencyReviewSerialization:
     def test_from_dict(self):
         """Test creating review from dictionary."""
         data = {
-            "script_id": "script-001",
+            "content_id": "script-001",
             "script_version": "v3",
             "overall_score": 85,
             "character_score": 90,
@@ -588,7 +588,7 @@ class TestConsistencyReviewSerialization:
 
         review = ConsistencyReview.from_dict(data)
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_version == "v3"
         assert review.overall_score == 85
         assert review.character_score == 90
@@ -601,7 +601,7 @@ class TestConsistencyReviewSerialization:
     def test_round_trip_serialization(self):
         """Test that serialization preserves all data."""
         original = ConsistencyReview(
-            script_id="script-001",
+            content_id="script-001",
             overall_score=80,
             character_score=85,
             timeline_score=80,
@@ -624,7 +624,7 @@ class TestConsistencyReviewSerialization:
         data = original.to_dict()
         restored = ConsistencyReview.from_dict(data)
 
-        assert restored.script_id == original.script_id
+        assert restored.content_id == original.content_id
         assert restored.overall_score == original.overall_score
         assert restored.character_score == original.character_score
         assert restored.timeline_score == original.timeline_score
@@ -635,35 +635,35 @@ class TestConsistencyReviewSerialization:
 class TestConvenienceFunctions:
     """Test convenience functions."""
 
-    def test_review_script_consistency(self):
-        """Test review_script_consistency function."""
+    def test_review_content_consistency(self):
+        """Test review_content_consistency function."""
         script = """Emma walked through the forest.
 The trees were tall and ancient.
 Emma found a clearing and rested."""
 
-        review = review_script_consistency(script, "test-001", "v3", 80)
+        review = review_content_consistency(script, "test-001", "v3", 80)
 
-        assert review.script_id == "test-001"
+        assert review.content_id == "test-001"
         assert review.script_version == "v3"
         assert review.overall_score >= 0
         assert review.passes is not None
 
-    def test_review_script_consistency_to_json(self):
-        """Test review_script_consistency_to_json function."""
+    def test_review_content_consistency_to_json(self):
+        """Test review_content_consistency_to_json function."""
         script = "Alice met Bob. They talked."
 
-        json_result = review_script_consistency_to_json(script, "test-002", "v3", 80)
+        json_result = review_content_consistency_to_json(script, "test-002", "v3", 80)
 
         assert json_result is not None
         data = json.loads(json_result)
-        assert data["script_id"] == "test-002"
+        assert data["content_id"] == "test-002"
         assert data["script_version"] == "v3"
         assert "overall_score" in data
         assert "passes" in data
 
     def test_get_consistency_feedback(self):
         """Test get_consistency_feedback function."""
-        review = ConsistencyReview(script_id="script-001", overall_score=85, passes=True)
+        review = ConsistencyReview(content_id="script-001", overall_score=85, passes=True)
 
         review.add_issue(
             ConsistencyIssue(
@@ -678,7 +678,7 @@ Emma found a clearing and rested."""
 
         feedback = get_consistency_feedback(review)
 
-        assert feedback["script_id"] == "script-001"
+        assert feedback["content_id"] == "script-001"
         assert feedback["passes"] is True
         assert feedback["overall_score"] == 85
         assert "next_action" in feedback
@@ -689,14 +689,14 @@ Emma found a clearing and rested."""
 class TestInconsistentScript:
     """Test with inconsistent scripts."""
 
-    def test_inconsistent_script_with_multiple_issues(self):
+    def test_inconsistent_content_with_multiple_issues(self):
         """Test that a script with multiple issues gets proper review."""
         script = """John walked into the house.
 Johnny picked up the phone.
 John left the building.
 Later, Johnny came back."""
 
-        review = review_script_consistency(script, "test-001", "v3", 80)
+        review = review_content_consistency(script, "test-001", "v3", 80)
 
         # Should have character name issues
         character_issues = review.get_character_issues()

@@ -1,1 +1,1 @@
-"""Metadata, tests, and examples for Script Readability Review module."""
+"""Metadata, tests, and examples for Content Readability Review module."""

@@ -1,1 +1,1 @@
-"""Tests for T.Script.Formatter.Blog module."""
+"""Tests for T.Content.Formatter.Blog module."""

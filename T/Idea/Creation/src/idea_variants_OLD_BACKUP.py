@@ -269,13 +269,13 @@ VARIANT_SCENE_SEED = {
         "scene_hook": "1 sentence scene opener",
         "audience": "Target audience",
         "tone": "Scene tone",
-        "target_script_length": "Target script length",
+        "target_content_length": "Target script length",
     },
     "example": {
         "scene_hook": "FADE IN: The moment everything changes...",
         "audience": "General audience",
         "tone": "cinematic",
-        "target_script_length": "5-10 minutes",
+        "target_content_length": "5-10 minutes",
     },
 }
 
@@ -1495,7 +1495,7 @@ VARIANT_MIRROR_BODY = {
     "description": "A moment in the mirror that changes how you see yourself - for better or worse.",
     "fields": {
         "the_moment": "The specific mirror moment",
-        "usual_script": "What you usually think/see",
+        "usual_content": "What you usually think/see",
         "the_shift": "What was different this time",
         "new_thought": "A thought you've never had before",
         "what_it_means": "What this might change",
@@ -1503,7 +1503,7 @@ VARIANT_MIRROR_BODY = {
     },
     "example": {
         "the_moment": "Getting out of the shower, not avoiding the mirror for once",
-        "usual_script": "Catalog of flaws, comparison to an impossible standard",
+        "usual_content": "Catalog of flaws, comparison to an impossible standard",
         "the_shift": "Seeing tired eyes instead of 'wrong' features",
         "new_thought": "This body has been fighting for me while I've been fighting against it",
         "what_it_means": "Maybe we can be on the same team",
@@ -3862,8 +3862,8 @@ def format_idea_as_text(variant: Dict[str, Any]) -> str:
             lines.append(f"Audience: {variant['audience']}")
         if variant.get("tone"):
             lines.append(f"Tone: {variant['tone']}")
-        if variant.get("target_script_length"):
-            lines.append(f"Target length: {variant['target_script_length']}")
+        if variant.get("target_content_length"):
+            lines.append(f"Target length: {variant['target_content_length']}")
 
     elif variant_type == "soft_supernatural":
         lines.append(variant.get("supernatural_element", ""))
@@ -4869,8 +4869,8 @@ def _create_scene_seed_variant(
         "scene_hook": _pick_from_pool(scene_hooks, seed, variation_index),
         "audience": kwargs.get("audience", "General audience"),
         "tone": kwargs.get("tone", _pick_from_pool(tones, seed, variation_index + 1)),
-        "target_script_length": kwargs.get(
-            "target_script_length", _pick_from_pool(lengths, seed, variation_index + 2)
+        "target_content_length": kwargs.get(
+            "target_content_length", _pick_from_pool(lengths, seed, variation_index + 2)
         ),
     }
 
@@ -7533,7 +7533,7 @@ def _create_mirror_body_variant(
 
     return {
         "the_moment": f"A mirror moment about {topic.lower()} — {_pick_from_pool(moments, seed, variation_index)}",
-        "usual_script": "Catalog of flaws, comparison to an impossible standard",
+        "usual_content": "Catalog of flaws, comparison to an impossible standard",
         "the_shift": "Something was different this time",
         "new_thought": _pick_from_pool(new_thoughts, seed, variation_index + 1),
         "what_it_means": "Maybe a truce is possible",

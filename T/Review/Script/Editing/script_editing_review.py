@@ -1,6 +1,6 @@
-"""Script Editing Review - AI-powered editing validation for scripts.
+"""Content Editing Review - AI-powered editing validation for scripts.
 
-This module implements PrismQ.T.Review.Script.Editing for Stage 18 (MVP-018).
+This module implements PrismQ.T.Review.Content.Editing for Stage 18 (MVP-018).
 Provides comprehensive editing checks including clarity, flow, redundancy,
 structure, and transitions with line-by-line improvement suggestions.
 
@@ -10,7 +10,7 @@ refinement with detailed feedback.
 
 Workflow Position:
     Stage 18 (MVP-018): Editing Review
-    Script v3+ → Editing Review → [PASS: Stage 19] or [FAIL: Script Refinement]
+    Content v3+ → Editing Review → [PASS: Stage 19] or [FAIL: Content Refinement]
 """
 
 import json
@@ -138,25 +138,25 @@ class ScriptEditingChecker:
             "actual fact",
         ]
 
-    def review_script(
-        self, script_text: str, script_id: str = "script-001", script_version: str = "v3"
+    def review_content(
+        self, content_text: str, content_id: str = "script-001", script_version: str = "v3"
     ) -> EditingReview:
         """Review a script for editing quality, clarity, and flow.
 
         Args:
-            script_text: The script text to review
-            script_id: Identifier for the script
+            content_text: The script text to review
+            content_id: Identifier for the script
             script_version: Version of the script (v3, v4, etc.)
 
         Returns:
             EditingReview object with all detected issues
         """
         review = EditingReview(
-            script_id=script_id, script_version=script_version, pass_threshold=self.pass_threshold
+            content_id=content_id, script_version=script_version, pass_threshold=self.pass_threshold
         )
 
         # Split script into lines for line-by-line analysis
-        lines = script_text.split("\n")
+        lines = content_text.split("\n")
 
         # Check each line
         for line_num, line in enumerate(lines, start=1):
@@ -417,17 +417,17 @@ class ScriptEditingChecker:
         total_issues = len(review.issues)
 
         if total_issues == 0:
-            review.summary = "Excellent! Script is clear, concise, and well-structured. No editing issues detected."
+            review.summary = "Excellent! Content is clear, concise, and well-structured. No editing issues detected."
             review.passes = True
             return
 
         # Generate summary
         if review.passes:
             review.summary = (
-                f"Script passes editing review with {total_issues} minor issue(s) detected."
+                f"Content passes editing review with {total_issues} minor issue(s) detected."
             )
         else:
-            review.summary = f"Script requires revision. {total_issues} editing issue(s) detected, including {review.critical_count} critical issue(s)."
+            review.summary = f"Content requires revision. {total_issues} editing issue(s) detected, including {review.critical_count} critical issue(s)."
 
         # Identify primary concerns
         if review.critical_count > 0:
@@ -458,17 +458,17 @@ class ScriptEditingChecker:
             review.quick_fixes.append(f"Strengthen {transition_count} transition(s)")
 
 
-def review_script_editing(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_editing(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> EditingReview:
     """Convenience function to review script editing quality.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -477,27 +477,27 @@ def review_script_editing(
 
     Example:
         >>> script = "In order to make a decision, we need to give consideration to all options."
-        >>> review = review_script_editing(script)
+        >>> review = review_content_editing(script)
         >>> print(f"Score: {review.overall_score}")
         >>> print(f"Passes: {review.passes}")
         >>> for issue in review.issues:
         ...     print(f"Line {issue.line_number}: {issue.explanation}")
     """
     checker = ScriptEditingChecker(pass_threshold=pass_threshold)
-    return checker.review_script(script_text, script_id, script_version)
+    return checker.review_content(content_text, content_id, script_version)
 
 
-def review_script_editing_to_json(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_editing_to_json(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> str:
     """Review script editing and return results as JSON string.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -506,13 +506,13 @@ def review_script_editing_to_json(
 
     Example:
         >>> script = "In order to walk, I was walking down the street."
-        >>> json_result = review_script_editing_to_json(script)
+        >>> json_result = review_content_editing_to_json(script)
         >>> import json
         >>> result = json.loads(json_result)
         >>> print(result['overall_score'])
         >>> print(result['passes'])
     """
-    review = review_script_editing(script_text, script_id, script_version, pass_threshold)
+    review = review_content_editing(content_text, content_id, script_version, pass_threshold)
     return json.dumps(review.to_dict(), indent=2)
 
 
@@ -526,15 +526,15 @@ def get_editing_feedback(review: EditingReview) -> Dict[str, Any]:
         Dictionary with structured feedback for script writers
 
     Example:
-        >>> review = review_script_editing(script_text)
+        >>> review = review_content_editing(content_text)
         >>> feedback = get_editing_feedback(review)
         >>> if not feedback['passes']:
-        ...     print("Script needs revision:")
+        ...     print("Content needs revision:")
         ...     for issue in feedback['critical_issues']:
         ...         print(f"  Line {issue['line']}: {issue['explanation']}")
     """
     return {
-        "script_id": review.script_id,
+        "content_id": review.content_id,
         "script_version": review.script_version,
         "passes": review.passes,
         "overall_score": review.overall_score,
@@ -566,14 +566,14 @@ def get_editing_feedback(review: EditingReview) -> Dict[str, Any]:
         "next_action": (
             "Proceed to Stage 19 (Title Readability)"
             if review.passes
-            else "Return to Script Refinement (Stage 11)"
+            else "Return to Content Refinement (Stage 11)"
         ),
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    test_script = """In order to understand the situation, we need to give consideration to all the facts.
+    test_content = """In order to understand the situation, we need to give consideration to all the facts.
 The decision was made by the committee at this point in time.
 Due to the fact that the weather was bad, the event was cancelled cancelled.
 In close proximity to the building, there is a very unique statue.
@@ -581,12 +581,12 @@ And then we walked down the street and then we saw the building and so we entere
 The hero makes a decision to fight the villain in spite of the fact that he is outnumbered.
 """
 
-    print("=== Script Editing Review ===\n")
-    print("Script:")
-    print(test_script)
+    print("=== Content Editing Review ===\n")
+    print("Content:")
+    print(test_content)
     print("\n" + "=" * 50 + "\n")
 
-    review = review_script_editing(test_script, script_id="test-001", script_version="v3")
+    review = review_content_editing(test_content, content_id="test-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Passes: {'YES' if review.passes else 'NO'}")
@@ -605,4 +605,4 @@ The hero makes a decision to fight the villain in spite of the fact that he is o
 
     print("\n" + "=" * 50)
     print("\nJSON Output:")
-    print(review_script_editing_to_json(test_script, script_id="test-001"))
+    print(review_content_editing_to_json(test_content, content_id="test-001"))

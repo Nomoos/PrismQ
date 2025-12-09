@@ -31,8 +31,8 @@ def example_basic_review():
         title_text="The Echo",
         title_version="v1",
         overall_score=68,
-        # Script context
-        script_id="script-horror-001",
+        # Content context
+        content_id="script-horror-001",
         script_title="The Echo",
         script_summary="A horror short about mysterious echoes in an abandoned house",
         script_alignment_score=75,
@@ -47,7 +47,7 @@ def example_basic_review():
 
     print(f"\nTitle: '{review.title_text}'")
     print(f"Overall Score: {review.overall_score}%")
-    print(f"Script Alignment: {review.script_alignment_score}%")
+    print(f"Content Alignment: {review.script_alignment_score}%")
     print(f"Idea Alignment: {review.idea_alignment_score}%")
     print(f"Engagement: {review.engagement_score}%")
     print()
@@ -64,13 +64,13 @@ def example_complete_review():
         title_text="The Echo - A Haunting Discovery",
         title_version="v1",
         overall_score=78,
-        # Script context
-        script_id="script-horror-001",
+        # Content context
+        content_id="script-horror-001",
         script_title="The Echo",
         script_summary="A horror short about mysterious echoes in an abandoned house that reveal dark secrets",
         script_version="v1",
         script_alignment_score=85,
-        key_script_elements=["echo", "haunting", "abandoned house", "discovery", "secrets"],
+        key_content_elements=["echo", "haunting", "abandoned house", "discovery", "secrets"],
         # Idea context
         idea_id="idea-horror-001",
         idea_summary="Horror story about sounds that repeat with increasing intensity",
@@ -243,7 +243,7 @@ def example_complete_review():
     print(f"Confidence: {review.confidence_score}%")
 
     print(f"\n--- ALIGNMENT SCORES ---")
-    print(f"Script Alignment: {review.script_alignment_score}%")
+    print(f"Content Alignment: {review.script_alignment_score}%")
     print(f"Idea Alignment: {review.idea_alignment_score}%")
 
     alignment_summary = review.get_alignment_summary()
@@ -347,14 +347,14 @@ def example_workflow_integration():
 
     # Stage 4: Review title v1 against script v1 and idea
     print("\n[Stage 4: Title Review - MVP-004]")
-    print("Input: Title v1 + Script v1 + Idea")
+    print("Input: Title v1 + Content v1 + Idea")
 
     review = TitleReview(
         title_id="title-wf-001",
         title_text="The Forgotten Voice",
         title_version="v1",
         overall_score=72,
-        script_id="script-wf-001",
+        content_id="script-wf-001",
         script_alignment_score=78,
         idea_id="idea-wf-001",
         idea_alignment_score=75,
@@ -378,15 +378,15 @@ def example_workflow_integration():
     # Check if ready for next stage
     if review.is_ready_for_improvement():
         print("\n✓ Review complete - ready for Stage 6 (Title Improvements v2)")
-        print(f"  Script alignment: {review.script_alignment_score}%")
+        print(f"  Content alignment: {review.script_alignment_score}%")
         print(f"  Idea alignment: {review.idea_alignment_score}%")
         print(f"  Feedback available: {len(review.improvement_points)} improvements")
 
         # Stage 6 would use this review to generate title v2
         print("\n[Stage 6: Title Improvements v2]")
-        print("Input: Title v1 + Review Feedback + Script v1")
+        print("Input: Title v1 + Review Feedback + Content v1")
         print("Output: Title v2 (improved version)")
-        print("Module: T/Title/From/Title/Review/Script")
+        print("Module: T/Title/From/Title/Review/Content")
     else:
         print("\n✗ Review incomplete - cannot proceed to Stage 6")
 

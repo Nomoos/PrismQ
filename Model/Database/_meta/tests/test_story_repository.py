@@ -17,11 +17,11 @@ project_root = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from Model.Database.models.story import Story
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.title import Title
 from Model.Database.models.review import Review
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.exceptions import InvalidStateTransitionError
@@ -50,7 +50,7 @@ def db_connection():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
             score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
     """)
     
@@ -62,22 +62,22 @@ def db_connection():
             version INTEGER NOT NULL CHECK (version >= 0),
             text TEXT NOT NULL,
             review_id INTEGER NULL,
-            created_at TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
             UNIQUE(story_id, version),
             FOREIGN KEY (story_id) REFERENCES Story(id),
             FOREIGN KEY (review_id) REFERENCES Review(id)
         )
     """)
     
-    # Create Script table
+    # Create Content table
     conn.execute("""
-        CREATE TABLE Script (
+        CREATE TABLE Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
             text TEXT NOT NULL,
             review_id INTEGER NULL,
-            created_at TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
             UNIQUE(story_id, version),
             FOREIGN KEY (story_id) REFERENCES Story(id),
             FOREIGN KEY (review_id) REFERENCES Review(id)
@@ -97,9 +97,9 @@ def story_repo(db_connection):
 
 
 @pytest.fixture
-def script_repo(db_connection):
-    """Create ScriptRepository instance."""
-    return ScriptRepository(db_connection)
+def content_repo(db_connection):
+    """Create ContentRepository instance."""
+    return ContentRepository(db_connection)
 
 
 @pytest.fixture
@@ -192,19 +192,19 @@ class TestFindNextForProcessingBasic:
     
     def test_no_stories_returns_none(self, story_repo):
         """Test that no matching stories returns None."""
-        result = story_repo.find_next_for_processing("PrismQ.T.Script.From.Idea.Title")
+        result = story_repo.find_next_for_processing("PrismQ.T.Content.From.Idea.Title")
         assert result is None
     
     def test_no_matching_state_returns_none(self, story_repo):
         """Test that no stories with matching state returns None."""
         story_repo.insert(Story(idea_id="1", state="DIFFERENT_STATE"))
         
-        result = story_repo.find_next_for_processing("PrismQ.T.Script.From.Idea.Title")
+        result = story_repo.find_next_for_processing("PrismQ.T.Content.From.Idea.Title")
         assert result is None
     
     def test_finds_story_with_matching_state(self, story_repo):
         """Test finding story with matching state."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         story = Story(idea_id="1", state=state)
         saved = story_repo.insert(story)
         
@@ -215,7 +215,7 @@ class TestFindNextForProcessingBasic:
     
     def test_returns_only_one_story(self, story_repo):
         """Test that only one story is returned."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         story_repo.insert(Story(idea_id="1", state=state))
         story_repo.insert(Story(idea_id="2", state=state))
         story_repo.insert(Story(idea_id="3", state=state))
@@ -229,27 +229,27 @@ class TestFindNextForProcessingBasic:
 class TestFindNextForProcessingVersionPriority:
     """Tests for version-based priority in find_next_for_processing."""
     
-    def test_script_module_selects_lowest_script_version(
-        self, story_repo, script_repo
+    def test_content_module_selects_lowest_content_version(
+        self, story_repo, content_repo
     ):
-        """Test script module selects story with lowest script version."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        """Test content module selects story with lowest content version."""
+        state = "PrismQ.T.Content.From.Idea.Title"
         
-        # Create stories with different script versions
+        # Create stories with different content versions
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         story3 = story_repo.insert(Story(idea_id="3", state=state))
         
-        # Story 1 has script version 5
+        # Story 1 has content version 5
         for v in range(6):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         
-        # Story 2 has script version 2
+        # Story 2 has content version 2
         for v in range(3):
-            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story2.id, version=v, text="text"))
         
-        # Story 3 has script version 0 (no scripts = 0)
-        # No scripts added
+        # Story 3 has content version 0 (no contents = 0)
+        # No contents added
         
         result = story_repo.find_next_for_processing(state)
         
@@ -260,7 +260,7 @@ class TestFindNextForProcessingVersionPriority:
         self, story_repo, title_repo
     ):
         """Test title module selects story with lowest title version."""
-        state = "PrismQ.T.Title.From.Script.Review"
+        state = "PrismQ.T.Title.From.Content.Review"
         
         # Create stories with different title versions
         story1 = story_repo.insert(Story(idea_id="1", state=state))
@@ -288,12 +288,12 @@ class TestFindNextForProcessingScorePriority:
     """Tests for score-based priority in find_next_for_processing."""
     
     def test_higher_score_has_priority_when_same_version(
-        self, story_repo, script_repo, title_repo, review_repo
+        self, story_repo, content_repo, title_repo, review_repo
     ):
         """Test that higher score is prioritized when versions are equal."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         
-        # Create stories (all will have version 0 - no scripts)
+        # Create stories (all will have version 0 - no contents)
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         story3 = story_repo.insert(Story(idea_id="3", state=state))
@@ -315,26 +315,26 @@ class TestFindNextForProcessingScorePriority:
         assert result is not None
         assert result.id == story2.id  # Highest score (90/2 = 45)
     
-    def test_average_of_script_and_title_scores(
-        self, story_repo, script_repo, title_repo, review_repo
+    def test_average_of_content_and_title_scores(
+        self, story_repo, content_repo, title_repo, review_repo
     ):
-        """Test story score is average of script and title review scores."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        """Test story score is average of content and title review scores."""
+        state = "PrismQ.T.Content.From.Idea.Title"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         
-        # Story 1: title score 60, script score 40 -> avg = 50
+        # Story 1: title score 60, content score 40 -> avg = 50
         title_review1 = review_repo.insert(Review(text="Title review", score=60))
-        script_review1 = review_repo.insert(Review(text="Script review", score=40))
+        content_review1 = review_repo.insert(Review(text="Content review", score=40))
         title_repo.insert(Title(story_id=story1.id, version=0, text="title", review_id=title_review1.id))
-        script_repo.insert(Script(story_id=story1.id, version=0, text="script", review_id=script_review1.id))
+        content_repo.insert(Content(story_id=story1.id, version=0, text="content", review_id=content_review1.id))
         
-        # Story 2: title score 80, script score 80 -> avg = 80
+        # Story 2: title score 80, content score 80 -> avg = 80
         title_review2 = review_repo.insert(Review(text="Title review", score=80))
-        script_review2 = review_repo.insert(Review(text="Script review", score=80))
+        content_review2 = review_repo.insert(Review(text="Content review", score=80))
         title_repo.insert(Title(story_id=story2.id, version=0, text="title", review_id=title_review2.id))
-        script_repo.insert(Script(story_id=story2.id, version=0, text="script", review_id=script_review2.id))
+        content_repo.insert(Content(story_id=story2.id, version=0, text="content", review_id=content_review2.id))
         
         result = story_repo.find_next_for_processing(state)
         
@@ -349,7 +349,7 @@ class TestFindNextForProcessingCreatedAtPriority:
         self, story_repo
     ):
         """Test oldest story is selected when version and score are equal."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         
         # Create stories with different creation times
         now = datetime.now()
@@ -384,10 +384,10 @@ class TestFindNextForProcessingSortingOrder:
     """Tests for complete sorting order: version -> score -> created_at."""
     
     def test_full_sorting_order(
-        self, story_repo, script_repo, title_repo, review_repo
+        self, story_repo, content_repo, title_repo, review_repo
     ):
         """Test complete sorting: version ASC, score DESC, created_at ASC."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         now = datetime.now()
         
         # Story 1: version 2, score 90, older
@@ -397,7 +397,7 @@ class TestFindNextForProcessingSortingOrder:
             created_at=now - timedelta(hours=5)
         ))
         for v in range(3):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         review1 = review_repo.insert(Review(text="Review", score=90))
         title_repo.insert(Title(story_id=story1.id, version=0, text="title", review_id=review1.id))
         
@@ -408,7 +408,7 @@ class TestFindNextForProcessingSortingOrder:
             created_at=now - timedelta(hours=4)
         ))
         for v in range(2):
-            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story2.id, version=v, text="text"))
         review2 = review_repo.insert(Review(text="Review", score=50))
         title_repo.insert(Title(story_id=story2.id, version=0, text="title", review_id=review2.id))
         
@@ -420,7 +420,7 @@ class TestFindNextForProcessingSortingOrder:
             created_at=now - timedelta(hours=1)
         ))
         for v in range(2):
-            script_repo.insert(Script(story_id=story3.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story3.id, version=v, text="text"))
         review3 = review_repo.insert(Review(text="Review", score=80))
         title_repo.insert(Title(story_id=story3.id, version=0, text="title", review_id=review3.id))
         
@@ -431,21 +431,21 @@ class TestFindNextForProcessingSortingOrder:
         assert result.id == story3.id
     
     def test_version_takes_priority_over_score(
-        self, story_repo, script_repo, title_repo, review_repo
+        self, story_repo, content_repo, title_repo, review_repo
     ):
         """Test that lower version wins over higher score."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         
         # Story 1: version 3, score 100
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         for v in range(4):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         review1 = review_repo.insert(Review(text="Review", score=100))
         title_repo.insert(Title(story_id=story1.id, version=0, text="title", review_id=review1.id))
         
         # Story 2: version 0, score 10 - should win (lower version)
         story2 = story_repo.insert(Story(idea_id="2", state=state))
-        # No scripts = version 0
+        # No contents = version 0
         review2 = review_repo.insert(Review(text="Review", score=10))
         title_repo.insert(Title(story_id=story2.id, version=0, text="title", review_id=review2.id))
         
@@ -455,10 +455,10 @@ class TestFindNextForProcessingSortingOrder:
         assert result.id == story2.id  # Lower version wins
     
     def test_score_takes_priority_over_created_at(
-        self, story_repo, script_repo, title_repo, review_repo
+        self, story_repo, content_repo, title_repo, review_repo
     ):
         """Test that higher score wins over older created_at."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         now = datetime.now()
         
         # Story 1: score 30, older
@@ -492,7 +492,7 @@ class TestFindNextForProcessingEdgeCases:
         self, story_repo, title_repo
     ):
         """Test that stories without reviews have score of 0."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         
         # Story without reviews
         story1 = story_repo.insert(Story(idea_id="1", state=state))
@@ -507,7 +507,7 @@ class TestFindNextForProcessingEdgeCases:
         self, story_repo, title_repo, review_repo
     ):
         """Test that latest version's review score is used."""
-        state = "PrismQ.T.Title.From.Script"
+        state = "PrismQ.T.Title.From.Content"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
@@ -529,26 +529,26 @@ class TestFindNextForProcessingEdgeCases:
         # Story2 wins because story1's latest score (20) is lower than story2's (50)
         assert result.id == story2.id
     
-    def test_module_detection_script_keyword(self, story_repo):
-        """Test that .Script. in state triggers script version sorting."""
+    def test_module_detection_content_keyword(self, story_repo):
+        """Test that .Content. in state triggers content version sorting."""
         # This is implicitly tested by other tests, but here's an explicit check
-        state_with_script = "PrismQ.T.Script.From.Idea.Title"
-        state_without_script = "PrismQ.T.Review.Title.Readability"
+        state_with_content = "PrismQ.T.Content.From.Idea.Title"
+        state_without_content = "PrismQ.T.Review.Title.Readability"
         
-        # Verify the method recognizes script modules
-        story1 = story_repo.insert(Story(idea_id="1", state=state_with_script))
-        result1 = story_repo.find_next_for_processing(state_with_script)
+        # Verify the method recognizes content modules
+        story1 = story_repo.insert(Story(idea_id="1", state=state_with_content))
+        result1 = story_repo.find_next_for_processing(state_with_content)
         assert result1 is not None
         
-        story2 = story_repo.insert(Story(idea_id="2", state=state_without_script))
-        result2 = story_repo.find_next_for_processing(state_without_script)
+        story2 = story_repo.insert(Story(idea_id="2", state=state_without_content))
+        result2 = story_repo.find_next_for_processing(state_without_content)
         assert result2 is not None
     
-    def test_module_detection_title_from_script(self, story_repo, title_repo):
-        """Test that PrismQ.T.Title.From.Script correctly uses title version."""
-        # State pattern: PrismQ.T.Title.From.Script.Review
+    def test_module_detection_title_from_content(self, story_repo, title_repo):
+        """Test that PrismQ.T.Title.From.Content correctly uses title version."""
+        # State pattern: PrismQ.T.Title.From.Content.Review
         # This is a TITLE module (output is Title), so should sort by title version
-        state = "PrismQ.T.Title.From.Script.Review"
+        state = "PrismQ.T.Title.From.Content.Review"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
@@ -572,33 +572,33 @@ class TestFindNextForProcessingEdgeCases:
 
 
 class TestFindNextForProcessingReviewModules:
-    """Tests for Review module types (PrismQ.T.Review.Script.* and PrismQ.T.Review.Title.*)."""
+    """Tests for Review module types (PrismQ.T.Review.Content.* and PrismQ.T.Review.Title.*)."""
     
-    def test_review_script_module_uses_script_version(
-        self, story_repo, script_repo
+    def test_review_content_module_uses_content_version(
+        self, story_repo, content_repo
     ):
-        """Test PrismQ.T.Review.Script.* uses script version for sorting."""
-        state = "PrismQ.T.Review.Script.Grammar"
+        """Test PrismQ.T.Review.Content.* uses content version for sorting."""
+        state = "PrismQ.T.Review.Content.Grammar"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         story3 = story_repo.insert(Story(idea_id="3", state=state))
         
-        # Story 1 has script version 5
+        # Story 1 has content version 5
         for v in range(6):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         
-        # Story 2 has script version 2
+        # Story 2 has content version 2
         for v in range(3):
-            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story2.id, version=v, text="text"))
         
-        # Story 3 has script version 0 (no scripts = 0)
-        # No scripts added
+        # Story 3 has content version 0 (no contents = 0)
+        # No contents added
         
         result = story_repo.find_next_for_processing(state)
         
         assert result is not None
-        assert result.id == story3.id  # Lowest script version (0)
+        assert result.id == story3.id  # Lowest content version (0)
     
     def test_review_title_module_uses_title_version(
         self, story_repo, title_repo
@@ -626,72 +626,72 @@ class TestFindNextForProcessingReviewModules:
         assert result is not None
         assert result.id == story3.id  # Lowest title version (0)
     
-    def test_review_script_tone_module(self, story_repo, script_repo):
-        """Test PrismQ.T.Review.Script.Tone uses script version."""
-        state = "PrismQ.T.Review.Script.Tone"
+    def test_review_content_tone_module(self, story_repo, content_repo):
+        """Test PrismQ.T.Review.Content.Tone uses content version."""
+        state = "PrismQ.T.Review.Content.Tone"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         
-        # Story 1 has script version 3
+        # Story 1 has content version 3
         for v in range(4):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         
-        # Story 2 has script version 0
-        # No scripts added
+        # Story 2 has content version 0
+        # No contents added
         
         result = story_repo.find_next_for_processing(state)
         
         assert result is not None
-        assert result.id == story2.id  # Lowest script version (0)
+        assert result.id == story2.id  # Lowest content version (0)
     
-    def test_review_script_editing_module(self, story_repo, script_repo):
-        """Test PrismQ.T.Review.Script.Editing uses script version."""
-        state = "PrismQ.T.Review.Script.Editing"
+    def test_review_content_editing_module(self, story_repo, content_repo):
+        """Test PrismQ.T.Review.Content.Editing uses content version."""
+        state = "PrismQ.T.Review.Content.Editing"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         
-        # Story 1 has script version 1
+        # Story 1 has content version 1
         for v in range(2):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         
-        # Story 2 has script version 0
-        # No scripts added
+        # Story 2 has content version 0
+        # No contents added
         
         result = story_repo.find_next_for_processing(state)
         
         assert result is not None
-        assert result.id == story2.id  # Lowest script version (0)
+        assert result.id == story2.id  # Lowest content version (0)
 
 
 class TestFindNextForProcessingStoryModules:
     """Tests for Story module types (PrismQ.T.Story.*)."""
     
     def test_story_review_module_uses_max_of_both_versions(
-        self, story_repo, script_repo, title_repo
+        self, story_repo, content_repo, title_repo
     ):
-        """Test PrismQ.T.Story.Review uses max of script and title versions."""
+        """Test PrismQ.T.Story.Review uses max of content and title versions."""
         state = "PrismQ.T.Story.Review"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         story3 = story_repo.insert(Story(idea_id="3", state=state))
         
-        # Story 1: script v3, title v1 -> max = 3
+        # Story 1: content v3, title v1 -> max = 3
         for v in range(4):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         for v in range(2):
             title_repo.insert(Title(story_id=story1.id, version=v, text="title"))
         
-        # Story 2: script v1, title v4 -> max = 4
+        # Story 2: content v1, title v4 -> max = 4
         for v in range(2):
-            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story2.id, version=v, text="text"))
         for v in range(5):
             title_repo.insert(Title(story_id=story2.id, version=v, text="title"))
         
-        # Story 3: script v0, title v0 -> max = 0 (no content)
-        # No scripts or titles added
+        # Story 3: content v0, title v0 -> max = 0 (no content)
+        # No contents or titles added
         
         result = story_repo.find_next_for_processing(state)
         
@@ -699,23 +699,23 @@ class TestFindNextForProcessingStoryModules:
         assert result.id == story3.id  # Lowest max version (0)
     
     def test_story_polish_module_uses_max_of_both_versions(
-        self, story_repo, script_repo, title_repo
+        self, story_repo, content_repo, title_repo
     ):
-        """Test PrismQ.T.Story.Polish uses max of script and title versions."""
+        """Test PrismQ.T.Story.Polish uses max of content and title versions."""
         state = "PrismQ.T.Story.Polish"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         
-        # Story 1: script v2, title v2 -> max = 2
+        # Story 1: content v2, title v2 -> max = 2
         for v in range(3):
-            script_repo.insert(Script(story_id=story1.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story1.id, version=v, text="text"))
         for v in range(3):
             title_repo.insert(Title(story_id=story1.id, version=v, text="title"))
         
-        # Story 2: script v0, title v1 -> max = 1
+        # Story 2: content v0, title v1 -> max = 1
         for v in range(1):
-            script_repo.insert(Script(story_id=story2.id, version=v, text="text"))
+            content_repo.insert(Content(story_id=story2.id, version=v, text="text"))
         for v in range(2):
             title_repo.insert(Title(story_id=story2.id, version=v, text="title"))
         
@@ -724,22 +724,22 @@ class TestFindNextForProcessingStoryModules:
         assert result is not None
         assert result.id == story2.id  # Lowest max version (1)
     
-    def test_story_from_idea_module(self, story_repo, script_repo, title_repo):
+    def test_story_from_idea_module(self, story_repo, content_repo, title_repo):
         """Test PrismQ.T.Story.From.Idea uses max of both versions."""
         state = "PrismQ.T.Story.From.Idea"
         
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state=state))
         
-        # Story 1 has versions: script v1, title v2 -> max = 2
-        script_repo.insert(Script(story_id=story1.id, version=0, text="text"))
-        script_repo.insert(Script(story_id=story1.id, version=1, text="text"))
+        # Story 1 has versions: content v1, title v2 -> max = 2
+        content_repo.insert(Content(story_id=story1.id, version=0, text="text"))
+        content_repo.insert(Content(story_id=story1.id, version=1, text="text"))
         title_repo.insert(Title(story_id=story1.id, version=0, text="title"))
         title_repo.insert(Title(story_id=story1.id, version=1, text="title"))
         title_repo.insert(Title(story_id=story1.id, version=2, text="title"))
         
-        # Story 2 has versions: script v0, title v0 -> max = 0
-        script_repo.insert(Script(story_id=story2.id, version=0, text="text"))
+        # Story 2 has versions: content v0, title v0 -> max = 0
+        content_repo.insert(Content(story_id=story2.id, version=0, text="text"))
         title_repo.insert(Title(story_id=story2.id, version=0, text="title"))
         
         result = story_repo.find_next_for_processing(state)
@@ -751,30 +751,30 @@ class TestFindNextForProcessingStoryModules:
 class TestModuleTypeDetection:
     """Tests for _get_module_type helper method."""
     
-    def test_script_module_types(self, story_repo):
-        """Test detection of Script module types."""
-        assert story_repo._get_module_type("PrismQ.T.Script.From.Idea.Title") == "script"
-        assert story_repo._get_module_type("PrismQ.T.Script.From.Title.Review.Script") == "script"
+    def test_content_module_types(self, story_repo):
+        """Test detection of Content module types."""
+        assert story_repo._get_module_type("PrismQ.T.Content.From.Idea.Title") == "content"
+        assert story_repo._get_module_type("PrismQ.T.Content.From.Title.Review.Content") == "content"
     
     def test_title_module_types(self, story_repo):
         """Test detection of Title module types."""
         assert story_repo._get_module_type("PrismQ.T.Title.From.Idea") == "title"
-        assert story_repo._get_module_type("PrismQ.T.Title.From.Script.Review.Title") == "title"
+        assert story_repo._get_module_type("PrismQ.T.Title.From.Content.Review.Title") == "title"
     
-    def test_review_script_module_types(self, story_repo):
-        """Test detection of Review.Script module types."""
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Grammar") == "review_script"
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Tone") == "review_script"
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Content") == "review_script"
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Consistency") == "review_script"
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Editing") == "review_script"
-        assert story_repo._get_module_type("PrismQ.T.Review.Script.Readability") == "review_script"
+    def test_review_content_module_types(self, story_repo):
+        """Test detection of Review.Content module types."""
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Grammar") == "review_content"
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Tone") == "review_content"
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Content") == "review_content"
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Consistency") == "review_content"
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Editing") == "review_content"
+        assert story_repo._get_module_type("PrismQ.T.Review.Content.Readability") == "review_content"
     
     def test_review_title_module_types(self, story_repo):
         """Test detection of Review.Title module types."""
         assert story_repo._get_module_type("PrismQ.T.Review.Title.Readability") == "review_title"
-        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Script") == "review_title"
-        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Script.Idea") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Content") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Content.Idea") == "review_title"
     
     def test_story_module_types(self, story_repo):
         """Test detection of Story module types."""
@@ -794,7 +794,7 @@ class TestPreviewNextForProcessing:
     
     def test_preview_returns_none_when_no_stories(self, story_repo, capsys):
         """Test preview returns None and prints message when no stories."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         
         result = story_repo.preview_next_for_processing(state, wait_for_confirm=False)
         
@@ -805,7 +805,7 @@ class TestPreviewNextForProcessing:
     
     def test_preview_displays_story_info(self, story_repo, capsys):
         """Test preview displays story information."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         story = story_repo.insert(Story(
             idea_id="1",
             state=state
@@ -823,7 +823,7 @@ class TestPreviewNextForProcessing:
     
     def test_preview_returns_selected_story(self, story_repo):
         """Test preview returns the correctly selected story."""
-        state = "PrismQ.T.Script.From.Idea.Title"
+        state = "PrismQ.T.Content.From.Idea.Title"
         story1 = story_repo.insert(Story(idea_id="1", state=state))
         story2 = story_repo.insert(Story(idea_id="2", state="OTHER_STATE"))
         

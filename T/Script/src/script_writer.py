@@ -1,11 +1,11 @@
-"""Script Writer with AI Feedback Loop for PrismQ.
+"""Content Writer with AI Feedback Loop for PrismQ.
 
 This module defines the ScriptWriter functionality that integrates with
-the AI Script Reviewer to create an iterative optimization feedback loop.
+the AI Content Reviewer to create an iterative optimization feedback loop.
 
 The Writer takes:
 - Original text/script
-- Review report from AI Script Reviewer
+- Review report from AI Content Reviewer
 - Target audience specifications
 
 And produces:
@@ -14,7 +14,7 @@ And produces:
 - Audience-aligned improvements
 
 Workflow:
-    ScriptDraft → AI Reviewer → Review Report → AI Writer → Optimized Script
+    ScriptDraft → AI Reviewer → Review Report → AI Writer → Optimized Content
                        ↓                              ↓
                    (Feedback Loop if score < threshold)
 """
@@ -91,8 +91,8 @@ class ScriptWriter:
         Feedback Loop State:
             current_iteration: Current iteration number
             iterations_history: History of all iterations
-            original_script: Initial script text
-            current_script: Latest optimized version
+            original_content: Initial script text
+            current_content: Latest optimized version
             cumulative_improvements: All improvements applied
 
         Performance Tracking:
@@ -119,11 +119,11 @@ class ScriptWriter:
         ... )
         >>>
         >>> # Original script
-        >>> original_script = "A girl hears a voice... [145 seconds of content]"
+        >>> original_content = "A girl hears a voice... [145 seconds of content]"
         >>>
         >>> # Apply review feedback
         >>> result = writer.optimize_from_review(
-        ...     original_script=original_script,
+        ...     original_content=original_content,
         ...     review=review_report,
         ...     target_audience="Horror enthusiasts aged 18-35"
         ... )
@@ -141,8 +141,8 @@ class ScriptWriter:
     # Feedback Loop State
     current_iteration: int = 0
     iterations_history: List[FeedbackLoopIteration] = field(default_factory=list)
-    original_script: str = ""
-    current_script: str = ""
+    original_content: str = ""
+    current_content: str = ""
     cumulative_improvements: List[str] = field(default_factory=list)
 
     # Performance Tracking
@@ -157,7 +157,7 @@ class ScriptWriter:
     youtube_short_mode: bool = False
     focus_areas: List[str] = field(default_factory=list)
 
-    # Script Versioning (NEW for comparison and research)
+    # Content Versioning (NEW for comparison and research)
     script_versions: List[Dict[str, Any]] = field(default_factory=list)  # Stores version metadata
 
     # Metadata
@@ -168,7 +168,7 @@ class ScriptWriter:
 
     def optimize_from_review(
         self,
-        original_script: str,
+        original_content: str,
         review: Any,  # ScriptReview instance
         target_audience: Optional[str] = None,
     ) -> OptimizationResult:
@@ -179,7 +179,7 @@ class ScriptWriter:
         targeted optimizations to improve the script.
 
         Args:
-            original_script: Original script text
+            original_content: Original script text
             review: ScriptReview instance with evaluation and recommendations
             target_audience: Optional target audience override
 
@@ -188,12 +188,12 @@ class ScriptWriter:
         """
         # Initialize if first iteration
         if self.current_iteration == 0:
-            self.original_script = original_script
+            self.original_content = original_content
             self.initial_score = review.overall_score
             self.score_progression.append(review.overall_score)
 
         self.current_iteration += 1
-        self.current_script = original_script
+        self.current_content = original_content
         self.current_score = review.overall_score
 
         # Set optimization context
@@ -216,7 +216,7 @@ class ScriptWriter:
 
         # Apply optimizations (placeholder for actual AI implementation)
         changes_made = []
-        optimized_text = original_script
+        optimized_text = original_content
         estimated_improvement = 0
 
         # Strategy-specific optimizations
@@ -255,8 +255,8 @@ class ScriptWriter:
         self.iterations_history.append(iteration)
 
         # Store script version (NEW for comparison and research)
-        self._store_script_version(
-            script_text=optimized_text,
+        self._store_content_version(
+            content_text=optimized_text,
             iteration=self.current_iteration,
             score=estimated_new_score,
             changes=changes_made,
@@ -264,7 +264,7 @@ class ScriptWriter:
 
         # Create result
         result = OptimizationResult(
-            original_text=original_script,
+            original_text=original_content,
             optimized_text=optimized_text,
             changes_made=changes_made,
             optimization_strategy=strategy,
@@ -297,20 +297,20 @@ class ScriptWriter:
 
         return True
 
-    def _store_script_version(
-        self, script_text: str, iteration: int, score: int, changes: List[str]
+    def _store_content_version(
+        self, content_text: str, iteration: int, score: int, changes: List[str]
     ) -> None:
         """Store script version for comparison and research.
 
         Args:
-            script_text: The script text content
+            content_text: The script text content
             iteration: Iteration number
             score: Review score for this version
             changes: List of changes made
         """
         version_data = {
             "version_number": iteration,
-            "script_text": script_text,
+            "content_text": content_text,
             "length_seconds": self.target_length_seconds,
             "created_at": datetime.now().isoformat(),
             "created_by": self.writer_id,
@@ -459,8 +459,8 @@ class ScriptWriter:
             optimization_strategy=strategy,
             current_iteration=data.get("current_iteration", 0),
             iterations_history=iterations,
-            original_script=data.get("original_script", ""),
-            current_script=data.get("current_script", ""),
+            original_content=data.get("original_content", ""),
+            current_content=data.get("current_content", ""),
             cumulative_improvements=data.get("cumulative_improvements", []),
             initial_score=data.get("initial_score", 0),
             current_score=data.get("current_score", 0),

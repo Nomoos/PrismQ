@@ -5,9 +5,9 @@ using feedback from both title review (MVP-004) and script review (MVP-005).
 
 The module takes:
 - Original title (any version: v1, v2, v3, etc.)
-- Script (corresponding version)
+- Content (corresponding version)
 - Title review feedback (from ByScriptAndIdea)
-- Script review feedback (from ByTitle)
+- Content review feedback (from ByTitle)
 - Original idea (for context)
 
 And generates:
@@ -17,12 +17,12 @@ And generates:
 - Supports iterative refinement (v1→v2, v2→v3, v3→v4, etc.)
 
 Workflow Position:
-    Title vN + Script vN + Reviews → Title v(N+1) (improved)
+    Title vN + Content vN + Reviews → Title v(N+1) (improved)
 
     Examples:
-    - MVP-006: Title v1 + Script v1 + Reviews → Title v2
-    - MVP-009: Title v2 + Script v2 + Reviews → Title v3
-    - Iteration: Title v3 + Script v3 + Reviews → Title v4, v5, v6, v7, etc.
+    - MVP-006: Title v1 + Content v1 + Reviews → Title v2
+    - MVP-009: Title v2 + Content v2 + Reviews → Title v3
+    - Iteration: Title v3 + Content v3 + Reviews → Title v4, v5, v6, v7, etc.
 """
 
 import os
@@ -38,11 +38,11 @@ t_module_dir = current_file.parent.parent.parent.parent
 
 # Import review models
 review_title_path = t_module_dir / "Review" / "Title" / "ByScriptAndIdea"
-review_script_path = t_module_dir / "Review" / "Script"
+review_content_path = t_module_dir / "Review" / "Content"
 idea_model_path = t_module_dir / "Idea" / "Model" / "src"
 
 sys.path.insert(0, str(review_title_path))
-sys.path.insert(0, str(review_script_path))
+sys.path.insert(0, str(review_content_path))
 sys.path.insert(0, str(idea_model_path))
 
 from script_review import ImprovementPoint as ScriptImprovementPoint
@@ -142,7 +142,7 @@ class TitleImprover:
     def improve_title(
         self,
         original_title: str,
-        script_text: str,
+        content_text: str,
         title_review: TitleReview,
         script_review: ScriptReview,
         idea: Optional[Idea] = None,
@@ -153,7 +153,7 @@ class TitleImprover:
 
         Args:
             original_title: The original title text (v1)
-            script_text: The script text (v1)
+            content_text: The script text (v1)
             title_review: Review of title against script and idea
             script_review: Review of script against title and idea
             idea: Optional original idea for context
@@ -168,12 +168,12 @@ class TitleImprover:
         """
         if not original_title:
             raise ValueError("Original title cannot be empty")
-        if not script_text:
-            raise ValueError("Script text cannot be empty")
+        if not content_text:
+            raise ValueError("Content text cannot be empty")
         if not title_review:
             raise ValueError("Title review is required")
         if not script_review:
-            raise ValueError("Script review is required")
+            raise ValueError("Content review is required")
 
         # Create original version object
         original_version = TitleVersion(
@@ -185,7 +185,7 @@ class TitleImprover:
 
         # Extract key improvement points from both reviews
         title_improvements = self._extract_title_improvements(title_review)
-        script_insights = self._extract_script_insights(script_review)
+        script_insights = self._extract_content_insights(script_review)
 
         # Analyze what needs to change
         alignment_issues = self._analyze_alignment_issues(title_review, script_review)
@@ -193,7 +193,7 @@ class TitleImprover:
         # Generate improved title
         improved_text = self._generate_improved_title(
             original_title=original_title,
-            script_text=script_text,
+            content_text=content_text,
             title_improvements=title_improvements,
             script_insights=script_insights,
             alignment_issues=alignment_issues,
@@ -224,7 +224,7 @@ class TitleImprover:
             rationale=rationale,
             addressed_improvements=[imp["title"] for imp in title_improvements],
             script_alignment_notes=self._create_alignment_notes(
-                improved_text, script_text, alignment_issues
+                improved_text, content_text, alignment_issues
             ),
             engagement_notes=self._create_engagement_notes(
                 original_title, improved_text, title_review
@@ -263,7 +263,7 @@ class TitleImprover:
 
         return improvements
 
-    def _extract_script_insights(self, script_review: ScriptReview) -> List[Dict[str, Any]]:
+    def _extract_content_insights(self, script_review: ScriptReview) -> List[Dict[str, Any]]:
         """Extract relevant insights from script review.
 
         Args:
@@ -309,7 +309,7 @@ class TitleImprover:
             "script_alignment_score": title_review.script_alignment_score,
             "idea_alignment_score": title_review.idea_alignment_score,
             "engagement_score": title_review.engagement_score,
-            "key_script_elements": title_review.key_script_elements,
+            "key_content_elements": title_review.key_content_elements,
             "suggested_keywords": title_review.suggested_keywords,
             "needs_major_revision": title_review.needs_major_revision,
             "title_length_score": title_review.length_score,
@@ -320,7 +320,7 @@ class TitleImprover:
     def _generate_improved_title(
         self,
         original_title: str,
-        script_text: str,
+        content_text: str,
         title_improvements: List[Dict[str, Any]],
         script_insights: List[Dict[str, Any]],
         alignment_issues: Dict[str, Any],
@@ -333,7 +333,7 @@ class TitleImprover:
 
         Args:
             original_title: Original title text
-            script_text: Script text for context
+            content_text: Content text for context
             title_improvements: Improvements from title review
             script_insights: Insights from script review
             alignment_issues: Alignment analysis
@@ -357,8 +357,8 @@ class TitleImprover:
                 # Apply fixes based on category
                 if category == "script_alignment" and suggested_fix:
                     # Use suggested keyword or element
-                    improved = self._incorporate_script_elements(
-                        improved, alignment_issues["key_script_elements"]
+                    improved = self._incorporate_content_elements(
+                        improved, alignment_issues["key_content_elements"]
                     )
 
                 elif category == "engagement" and suggested_fix:
@@ -375,8 +375,8 @@ class TitleImprover:
 
         # Strategy 2: Incorporate key script elements if alignment is low
         if alignment_issues["script_alignment_score"] < 70:
-            improved = self._incorporate_script_elements(
-                improved, alignment_issues["key_script_elements"]
+            improved = self._incorporate_content_elements(
+                improved, alignment_issues["key_content_elements"]
             )
 
         # Strategy 3: Use suggested keywords if available
@@ -389,7 +389,7 @@ class TitleImprover:
 
         return improved
 
-    def _incorporate_script_elements(self, title: str, script_elements: List[str]) -> str:
+    def _incorporate_content_elements(self, title: str, script_elements: List[str]) -> str:
         """Incorporate key script elements into title.
 
         Args:
@@ -535,7 +535,7 @@ class TitleImprover:
             original_title: Original title
             improved_title: Improved title
             title_improvements: Title improvements applied
-            script_insights: Script insights considered
+            script_insights: Content insights considered
             alignment_issues: Alignment analysis
 
         Returns:
@@ -561,21 +561,21 @@ class TitleImprover:
                 f"Improved script alignment (was {alignment_issues['script_alignment_score']}%)"
             )
 
-        if alignment_issues["key_script_elements"]:
+        if alignment_issues["key_content_elements"]:
             rationale_parts.append(
-                f"Incorporated key script elements: {', '.join(alignment_issues['key_script_elements'][:2])}"
+                f"Incorporated key script elements: {', '.join(alignment_issues['key_content_elements'][:2])}"
             )
 
         return "\n".join(rationale_parts)
 
     def _create_alignment_notes(
-        self, improved_title: str, script_text: str, alignment_issues: Dict[str, Any]
+        self, improved_title: str, content_text: str, alignment_issues: Dict[str, Any]
     ) -> str:
         """Create notes on script alignment.
 
         Args:
             improved_title: The improved title
-            script_text: Script text
+            content_text: Content text
             alignment_issues: Alignment analysis
 
         Returns:
@@ -585,9 +585,9 @@ class TitleImprover:
 
         notes.append(f"New title: '{improved_title}'")
 
-        if alignment_issues["key_script_elements"]:
+        if alignment_issues["key_content_elements"]:
             notes.append(
-                f"Key elements in title: {', '.join(alignment_issues['key_script_elements'][:3])}"
+                f"Key elements in title: {', '.join(alignment_issues['key_content_elements'][:3])}"
             )
 
         notes.append(f"Previous alignment score: {alignment_issues['script_alignment_score']}%")
@@ -623,7 +623,7 @@ class TitleImprover:
 
 def improve_title_from_reviews(
     original_title: str,
-    script_text: str,
+    content_text: str,
     title_review: TitleReview,
     script_review: ScriptReview,
     idea: Optional[Idea] = None,
@@ -634,9 +634,9 @@ def improve_title_from_reviews(
 
     Args:
         original_title: Original title text (v1)
-        script_text: Script text (v1)
+        content_text: Content text (v1)
         title_review: Title review feedback
-        script_review: Script review feedback
+        script_review: Content review feedback
         idea: Optional original idea
         original_version: Version number of original (default "v1")
         new_version: Version number of new version (default "v2")
@@ -647,7 +647,7 @@ def improve_title_from_reviews(
     improver = TitleImprover()
     return improver.improve_title(
         original_title=original_title,
-        script_text=script_text,
+        content_text=content_text,
         title_review=title_review,
         script_review=script_review,
         idea=idea,

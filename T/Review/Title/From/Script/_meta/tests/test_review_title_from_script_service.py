@@ -1,7 +1,7 @@
-"""Tests for ReviewTitleFromScriptService.
+"""Tests for ReviewTitleFromContentService.
 
 This module tests the service that processes stories in the
-PrismQ.T.Review.Title.From.Script state.
+PrismQ.T.Review.Title.From.Content state.
 """
 
 import os
@@ -18,18 +18,18 @@ _repo_root = os.path.dirname(_current_dir)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.models.title import Title
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
-from T.Review.Title.From.Script.src.review_title_from_script_service import (
+from T.Review.Title.From.Content.src.review_title_from_content_service import (
     TITLE_ACCEPTANCE_THRESHOLD,
     ReviewRepository,
-    ReviewTitleFromScriptResult,
-    ReviewTitleFromScriptService,
+    ReviewTitleFromContentResult,
+    ReviewTitleFromContentService,
     create_review_table_sql,
 )
 
@@ -41,18 +41,15 @@ def db_connection():
     conn.row_factory = sqlite3.Row
 
     # Create all required tables
-    conn.executescript(
+    conn.executecontent(
         """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
+            idea_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'CREATED',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         );
         
         CREATE TABLE IF NOT EXISTS Title (
@@ -63,10 +60,11 @@ def db_connection():
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             UNIQUE(story_id, version),
-            FOREIGN KEY (story_id) REFERENCES Story(id)
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
-        CREATE TABLE IF NOT EXISTS Script (
+        CREATE TABLE IF NOT EXISTS Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
@@ -80,7 +78,7 @@ def db_connection():
     )
 
     # Create Review table
-    conn.executescript(create_review_table_sql())
+    conn.executecontent(create_review_table_sql())
 
     yield conn
     conn.close()
@@ -92,7 +90,7 @@ def repositories(db_connection):
     return {
         "story": StoryRepository(db_connection),
         "title": TitleRepository(db_connection),
-        "script": ScriptRepository(db_connection),
+        "content": ContentRepository(db_connection),
         "review": ReviewRepository(db_connection),
     }
 
@@ -100,10 +98,10 @@ def repositories(db_connection):
 @pytest.fixture
 def service(repositories):
     """Create the service instance."""
-    return ReviewTitleFromScriptService(
+    return ReviewTitleFromContentService(
         story_repo=repositories["story"],
         title_repo=repositories["title"],
-        script_repo=repositories["script"],
+        content_repo=repositories["content"],
         review_repo=repositories["review"],
     )
 
@@ -116,13 +114,13 @@ class TestReviewRepository:
         repo = ReviewRepository(db_connection)
         from Model.Database.models.review import Review
 
-        review = Review(text="Great title, well aligned with script.", score=85)
+        review = Review(text="Great title, well aligned with content.", score=85)
 
         saved = repo.insert(review)
 
         assert saved.id is not None
         assert saved.id > 0
-        assert saved.text == "Great title, well aligned with script."
+        assert saved.text == "Great title, well aligned with content."
         assert saved.score == 85
 
     def test_find_review_by_id(self, db_connection):
@@ -149,8 +147,8 @@ class TestReviewRepository:
         assert found is None
 
 
-class TestReviewTitleFromScriptService:
-    """Tests for the ReviewTitleFromScriptService class."""
+class TestReviewTitleFromContentService:
+    """Tests for the ReviewTitleFromContentService class."""
 
     def test_find_oldest_story_no_stories(self, service):
         """Test finding oldest story when none exist."""
@@ -228,20 +226,20 @@ class TestReviewTitleFromScriptService:
         assert not result.success
         assert "No title found" in result.error_message
 
-    def test_process_story_no_script(self, service, repositories):
-        """Test processing story without a script fails gracefully."""
+    def test_process_story_no_content(self, service, repositories):
+        """Test processing story without a content fails gracefully."""
         # Create story
         story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
         saved_story = repositories["story"].insert(story)
 
-        # Create title but no script
+        # Create title but no content
         title = Title(story_id=saved_story.id, version=0, text="Test Title")
         repositories["title"].insert(title)
 
         result = service.process_story(saved_story)
 
         assert not result.success
-        assert "No script found" in result.error_message
+        assert "No content found" in result.error_message
 
     def test_process_story_wrong_state(self, service, repositories):
         """Test processing story in wrong state fails."""
@@ -256,10 +254,10 @@ class TestReviewTitleFromScriptService:
     def test_process_story_accepts_title(self, repositories):
         """Test processing story that accepts title."""
         # Create service with lower threshold for accepting titles
-        service = ReviewTitleFromScriptService(
+        service = ReviewTitleFromContentService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
-            script_repo=repositories["script"],
+            content_repo=repositories["content"],
             review_repo=repositories["review"],
             acceptance_threshold=50,  # Lower threshold for test
         )
@@ -272,13 +270,13 @@ class TestReviewTitleFromScriptService:
         title = Title(story_id=saved_story.id, version=0, text="Mystery adventure story discovery")
         repositories["title"].insert(title)
 
-        # Create script with matching keywords
-        script = Script(
+        # Create content with matching keywords
+        content = Content(
             story_id=saved_story.id,
             version=0,
             text="This is a mystery story about an adventure with discovery and exploration. " * 10,
         )
-        repositories["script"].insert(script)
+        repositories["content"].insert(content)
 
         result = service.process_story(saved_story)
 
@@ -296,10 +294,10 @@ class TestReviewTitleFromScriptService:
     def test_process_story_rejects_title(self, repositories):
         """Test processing story that rejects title."""
         # Create service with very high threshold to ensure rejection
-        service = ReviewTitleFromScriptService(
+        service = ReviewTitleFromContentService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
-            script_repo=repositories["script"],
+            content_repo=repositories["content"],
             review_repo=repositories["review"],
             acceptance_threshold=100,  # Very high threshold for test
         )
@@ -312,13 +310,13 @@ class TestReviewTitleFromScriptService:
         title = Title(story_id=saved_story.id, version=0, text="Xyz abc def")
         repositories["title"].insert(title)
 
-        # Create script with different content
-        script = Script(
+        # Create content with different content
+        content = Content(
             story_id=saved_story.id,
             version=0,
             text="This is completely unrelated content about cooking and recipes.",
         )
-        repositories["script"].insert(script)
+        repositories["content"].insert(content)
 
         result = service.process_story(saved_story)
 
@@ -339,12 +337,12 @@ class TestReviewTitleFromScriptService:
         title = Title(story_id=saved_story.id, version=0, text="Test Title about Mystery")
         repositories["title"].insert(title)
 
-        script = Script(
+        content = Content(
             story_id=saved_story.id,
             version=0,
-            text="A test script about a mystery adventure story.",
+            text="A test content about a mystery adventure story.",
         )
-        repositories["script"].insert(script)
+        repositories["content"].insert(content)
 
         result = service.process_oldest_story()
 
@@ -370,12 +368,12 @@ class TestReviewTitleFromScriptService:
             title = Title(story_id=saved_story.id, version=0, text=f"Title for story {i}")
             repositories["title"].insert(title)
 
-            script = Script(
+            content = Content(
                 story_id=saved_story.id,
                 version=0,
-                text=f"Script content for story {i} about title and keywords.",
+                text=f"Content content for story {i} about title and keywords.",
             )
-            repositories["script"].insert(script)
+            repositories["content"].insert(content)
 
         results = service.process_all_stories()
 
@@ -394,8 +392,8 @@ class TestReviewTitleFromScriptService:
             title = Title(story_id=saved_story.id, version=0, text=f"Title {i}")
             repositories["title"].insert(title)
 
-            script = Script(story_id=saved_story.id, version=0, text=f"Script {i}")
-            repositories["script"].insert(script)
+            content = Content(story_id=saved_story.id, version=0, text=f"Content {i}")
+            repositories["content"].insert(content)
 
         results = service.process_all_stories(limit=2)
 
@@ -408,10 +406,10 @@ class TestStateTransitions:
     def test_acceptance_threshold_boundary(self, repositories):
         """Test state transition at acceptance threshold boundary."""
         # Create service with specific threshold
-        service = ReviewTitleFromScriptService(
+        service = ReviewTitleFromContentService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
-            script_repo=repositories["script"],
+            content_repo=repositories["content"],
             review_repo=repositories["review"],
             acceptance_threshold=70,
         )
@@ -420,16 +418,16 @@ class TestStateTransitions:
         story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
         saved_story = repositories["story"].insert(story)
 
-        # Create title and script with known matching content
+        # Create title and content with known matching content
         title = Title(
             story_id=saved_story.id, version=0, text="Adventure mystery story exploration"
         )
         repositories["title"].insert(title)
 
-        # Create script with very high keyword match
+        # Create content with very high keyword match
         matching_words = "adventure mystery story exploration discovery journey quest"
-        script = Script(story_id=saved_story.id, version=0, text=(matching_words + " ") * 20)
-        repositories["script"].insert(script)
+        content = Content(story_id=saved_story.id, version=0, text=(matching_words + " ") * 20)
+        repositories["content"].insert(content)
 
         result = service.process_story(saved_story)
 
@@ -446,12 +444,12 @@ class TestStateTransitions:
         assert updated_story.state == expected_state
 
 
-class TestReviewTitleFromScriptResult:
+class TestReviewTitleFromContentResult:
     """Tests for the result dataclass."""
 
     def test_successful_result(self):
         """Test creating a successful result."""
-        result = ReviewTitleFromScriptResult(
+        result = ReviewTitleFromContentResult(
             success=True,
             story_id=1,
             review_id=5,
@@ -469,7 +467,7 @@ class TestReviewTitleFromScriptResult:
 
     def test_failed_result(self):
         """Test creating a failed result."""
-        result = ReviewTitleFromScriptResult(success=False, error_message="No stories found")
+        result = ReviewTitleFromContentResult(success=False, error_message="No stories found")
 
         assert not result.success
         assert result.error_message == "No stories found"
@@ -494,13 +492,13 @@ class TestIntegrationWorkflow:
         title = Title(story_id=saved_story.id, version=0, text="The Haunting Mystery")
         saved_title = repositories["title"].insert(title)
 
-        # 3. Create associated script
-        script = Script(
+        # 3. Create associated content
+        content = Content(
             story_id=saved_story.id,
             version=0,
             text="This haunting mystery unfolds in an abandoned mansion where strange sounds echo through the halls.",
         )
-        saved_script = repositories["script"].insert(script)
+        saved_content = repositories["content"].insert(content)
 
         # 4. Process the story
         result = service.process_oldest_story()

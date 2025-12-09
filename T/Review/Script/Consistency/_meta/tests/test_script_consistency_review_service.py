@@ -1,10 +1,10 @@
-"""Tests for ScriptConsistencyReviewService.
+"""Tests for ContentConsistencyReviewService.
 
-Tests the workflow step PrismQ.T.Review.Script.Consistency that:
-1. Selects oldest Story with state PrismQ.T.Review.Script.Consistency
-2. Performs consistency review on script
+Tests the workflow step PrismQ.T.Review.Content.Consistency that:
+1. Selects oldest Story with state PrismQ.T.Review.Content.Consistency
+2. Performs consistency review on content
 3. Creates Review record
-4. Links Review directly to Script via review_id FK
+4. Links Review directly to Content via review_id FK
 5. Updates Story state based on review result
 """
 
@@ -15,19 +15,19 @@ from datetime import datetime, timedelta
 import pytest
 
 from Model.Database.models.review import Review
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
-from T.Review.Script.Consistency.src.script_consistency_review_service import (
+from T.Review.Content.Consistency.src.content_consistency_review_service import (
     DEFAULT_PASS_THRESHOLD,
     STATE_REVIEW_SCRIPT_CONSISTENCY,
     STATE_REVIEW_SCRIPT_CONTENT,
     STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
     ConsistencyReviewResult,
-    ScriptConsistencyReviewService,
+    ContentConsistencyReviewService,
     process_all_consistency_reviews,
     process_oldest_consistency_review,
 )
@@ -53,14 +53,16 @@ def db_connection():
 
     conn.execute(
         """
-        CREATE TABLE IF NOT EXISTS Script (
+        CREATE TABLE IF NOT EXISTS Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
             text TEXT NOT NULL,
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version)
+            UNIQUE(story_id, version),
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
     """
     )
@@ -69,13 +71,11 @@ def db_connection():
         """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
+            idea_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'CREATED',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         )
     """
     )
@@ -86,8 +86,8 @@ def db_connection():
 
 
 @pytest.fixture
-def sample_consistent_script():
-    """Script text that should pass consistency review."""
+def sample_consistent_content():
+    """Content text that should pass consistency review."""
     return """John walked into the old house at dusk.
 The building was empty, dark and quiet.
 He looked around nervously.
@@ -101,8 +101,8 @@ She smiled. "I came to help you, John."
 
 
 @pytest.fixture
-def sample_inconsistent_script():
-    """Script text that should fail consistency review due to name inconsistencies."""
+def sample_inconsistent_content():
+    """Content text that should fail consistency review due to name inconsistencies."""
     return """John walked into the old house at dusk.
 The building was empty, dark and quiet.
 He looked around nervously.
@@ -119,23 +119,23 @@ She smiled. "I never died, Johnny. That was someone else."
 """
 
 
-class TestScriptConsistencyReviewService:
-    """Tests for ScriptConsistencyReviewService."""
+class TestContentConsistencyReviewService:
+    """Tests for ContentConsistencyReviewService."""
 
     def test_count_pending_empty(self, db_connection):
         """Test count_pending when no stories exist."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
 
         assert service.count_pending() == 0
 
     def test_count_pending_with_stories(self, db_connection):
         """Test count_pending with stories in correct state."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Create stories in target state
         for i in range(3):
-            story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, script_id=i + 1))
+            story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, content_id=i + 1))
 
         # Create story in different state
         story_repo.insert(Story(state="CREATED"))
@@ -144,13 +144,13 @@ class TestScriptConsistencyReviewService:
 
     def test_get_oldest_story_empty(self, db_connection):
         """Test get_oldest_story when no stories exist."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
 
         assert service.get_oldest_story() is None
 
     def test_get_oldest_story_returns_oldest(self, db_connection):
         """Test get_oldest_story returns the oldest story."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         base_time = datetime.now()
@@ -159,13 +159,13 @@ class TestScriptConsistencyReviewService:
         story1 = story_repo.insert(
             Story(
                 state=STATE_REVIEW_SCRIPT_CONSISTENCY,
-                script_id=1,
+                content_id=1,
                 created_at=base_time - timedelta(hours=2),
             )
         )
 
         story2 = story_repo.insert(
-            Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, script_id=2, created_at=base_time)
+            Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, content_id=2, created_at=base_time)
         )
 
         oldest = service.get_oldest_story()
@@ -175,7 +175,7 @@ class TestScriptConsistencyReviewService:
 
     def test_process_oldest_story_no_stories(self, db_connection):
         """Test process_oldest_story when no stories exist."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
 
         result = service.process_oldest_story()
 
@@ -183,28 +183,28 @@ class TestScriptConsistencyReviewService:
         assert result.story_id is None
         assert "No stories found" in result.error
 
-    def test_process_oldest_story_missing_script(self, db_connection):
-        """Test process_oldest_story when story has no script_id."""
-        service = ScriptConsistencyReviewService(db_connection)
+    def test_process_oldest_story_missing_content(self, db_connection):
+        """Test process_oldest_story when story has no content_id."""
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
 
-        # Create story without script_id
-        story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, script_id=None))
+        # Create story without content_id
+        story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, content_id=None))
 
         result = service.process_oldest_story()
 
         assert result.success is False
         assert result.story_id == story.id
-        assert "no script_id" in result.error
+        assert "no content_id" in result.error
 
-    def test_process_oldest_story_script_not_found(self, db_connection):
-        """Test process_oldest_story when script doesn't exist."""
-        service = ScriptConsistencyReviewService(db_connection)
+    def test_process_oldest_story_content_not_found(self, db_connection):
+        """Test process_oldest_story when content doesn't exist."""
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
 
-        # Create story with non-existent script_id
+        # Create story with non-existent content_id
         story = story_repo.insert(
-            Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, script_id=999)  # Non-existent script
+            Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY, content_id=999)  # Non-existent content
         )
 
         result = service.process_oldest_story()
@@ -213,21 +213,21 @@ class TestScriptConsistencyReviewService:
         assert result.story_id == story.id
         assert "not found" in result.error
 
-    def test_process_oldest_story_passes(self, db_connection, sample_consistent_script):
-        """Test process_oldest_story with script that passes review."""
-        service = ScriptConsistencyReviewService(db_connection)
+    def test_process_oldest_story_passes(self, db_connection, sample_consistent_content):
+        """Test process_oldest_story with content that passes review."""
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
         review_repo = ReviewRepository(db_connection)
 
-        # Create story and script
+        # Create story and content
         story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
 
-        script = script_repo.insert(
-            Script(story_id=story.id, version=0, text=sample_consistent_script)
+        content = content_repo.insert(
+            Content(story_id=story.id, version=0, text=sample_consistent_content)
         )
 
-        story.script_id = script.id
+        story.content_id = content.id
         story_repo.update(story)
 
         # Process
@@ -235,10 +235,10 @@ class TestScriptConsistencyReviewService:
 
         assert result.success is True
         assert result.story_id == story.id
-        assert result.script_id == script.id
+        assert result.content_id == content.id
         assert result.review_id is not None
         assert result.score >= 0
-        assert result.passes is True  # Consistent script should pass
+        assert result.passes is True  # Consistent content should pass
         assert result.new_state == STATE_REVIEW_SCRIPT_CONTENT
 
         # Verify Review was created
@@ -246,29 +246,29 @@ class TestScriptConsistencyReviewService:
         assert review is not None
         assert review.score == result.score
 
-        # Verify Script has review_id FK set (Review linked directly to Script)
-        updated_script = script_repo.find_by_id(script.id)
-        assert updated_script.review_id == result.review_id
+        # Verify Content has review_id FK set (Review linked directly to Content)
+        updated_content = content_repo.find_by_id(content.id)
+        assert updated_content.review_id == result.review_id
 
         # Verify Story state was updated
         updated_story = story_repo.find_by_id(story.id)
         assert updated_story.state == STATE_REVIEW_SCRIPT_CONTENT
 
-    def test_process_oldest_story_fails(self, db_connection, sample_inconsistent_script):
-        """Test process_oldest_story with script that fails review."""
-        # Use a lower threshold to ensure pass, or create really inconsistent script
-        service = ScriptConsistencyReviewService(db_connection, pass_threshold=95)
+    def test_process_oldest_story_fails(self, db_connection, sample_inconsistent_content):
+        """Test process_oldest_story with content that fails review."""
+        # Use a lower threshold to ensure pass, or create really inconsistent content
+        service = ContentConsistencyReviewService(db_connection, pass_threshold=95)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
-        # Create story and script with inconsistencies
+        # Create story and content with inconsistencies
         story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
 
-        script = script_repo.insert(
-            Script(story_id=story.id, version=0, text=sample_inconsistent_script)
+        content = content_repo.insert(
+            Content(story_id=story.id, version=0, text=sample_inconsistent_content)
         )
 
-        story.script_id = script.id
+        story.content_id = content.id
         story_repo.update(story)
 
         # Process
@@ -276,18 +276,18 @@ class TestScriptConsistencyReviewService:
 
         assert result.success is True
         assert result.story_id == story.id
-        # The script has name inconsistencies, should fail with high threshold
+        # The content has name inconsistencies, should fail with high threshold
         assert result.new_state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 
         # Verify Story state was updated to failure state
         updated_story = story_repo.find_by_id(story.id)
         assert updated_story.state == STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 
-    def test_process_oldest_story_fifo_order(self, db_connection, sample_consistent_script):
+    def test_process_oldest_story_fifo_order(self, db_connection, sample_consistent_content):
         """Test that stories are processed in FIFO order."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
         base_time = datetime.now()
 
@@ -300,10 +300,10 @@ class TestScriptConsistencyReviewService:
                     created_at=base_time - timedelta(hours=offset),
                 )
             )
-            script = script_repo.insert(
-                Script(story_id=story.id, version=0, text=sample_consistent_script)
+            content = content_repo.insert(
+                Content(story_id=story.id, version=0, text=sample_consistent_content)
             )
-            story.script_id = script.id
+            story.content_id = content.id
             story_repo.update(story)
             stories.append(story)
 
@@ -327,19 +327,19 @@ class TestScriptConsistencyReviewService:
         assert result4.success is False
         assert result4.story_id is None
 
-    def test_process_all_pending(self, db_connection, sample_consistent_script):
+    def test_process_all_pending(self, db_connection, sample_consistent_content):
         """Test process_all_pending processes all stories."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
         # Create multiple stories
         for i in range(3):
             story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
-            script = script_repo.insert(
-                Script(story_id=story.id, version=0, text=sample_consistent_script)
+            content = content_repo.insert(
+                Content(story_id=story.id, version=0, text=sample_consistent_content)
             )
-            story.script_id = script.id
+            story.content_id = content.id
             story_repo.update(story)
 
         results = service.process_all_pending()
@@ -348,19 +348,19 @@ class TestScriptConsistencyReviewService:
         assert all(r.success for r in results)
         assert service.count_pending() == 0
 
-    def test_process_all_pending_with_limit(self, db_connection, sample_consistent_script):
+    def test_process_all_pending_with_limit(self, db_connection, sample_consistent_content):
         """Test process_all_pending with limit."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
         # Create 5 stories
         for i in range(5):
             story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
-            script = script_repo.insert(
-                Script(story_id=story.id, version=0, text=sample_consistent_script)
+            content = content_repo.insert(
+                Content(story_id=story.id, version=0, text=sample_consistent_content)
             )
-            story.script_id = script.id
+            story.content_id = content.id
             story_repo.update(story)
 
         results = service.process_all_pending(limit=2)
@@ -368,19 +368,19 @@ class TestScriptConsistencyReviewService:
         assert len(results) == 2
         assert service.count_pending() == 3
 
-    def test_get_processing_summary(self, db_connection, sample_consistent_script):
+    def test_get_processing_summary(self, db_connection, sample_consistent_content):
         """Test get_processing_summary returns correct statistics."""
-        service = ScriptConsistencyReviewService(db_connection)
+        service = ContentConsistencyReviewService(db_connection)
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
         # Create stories
         for i in range(2):
             story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
-            script = script_repo.insert(
-                Script(story_id=story.id, version=0, text=sample_consistent_script)
+            content = content_repo.insert(
+                Content(story_id=story.id, version=0, text=sample_consistent_content)
             )
-            story.script_id = script.id
+            story.content_id = content.id
             story_repo.update(story)
 
         results = service.process_all_pending()
@@ -398,17 +398,17 @@ class TestScriptConsistencyReviewService:
 class TestConvenienceFunctions:
     """Tests for convenience functions."""
 
-    def test_process_oldest_consistency_review(self, db_connection, sample_consistent_script):
+    def test_process_oldest_consistency_review(self, db_connection, sample_consistent_content):
         """Test process_oldest_consistency_review function."""
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
-        # Create story and script
+        # Create story and content
         story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
-        script = script_repo.insert(
-            Script(story_id=story.id, version=0, text=sample_consistent_script)
+        content = content_repo.insert(
+            Content(story_id=story.id, version=0, text=sample_consistent_content)
         )
-        story.script_id = script.id
+        story.content_id = content.id
         story_repo.update(story)
 
         result = process_oldest_consistency_review(db_connection)
@@ -423,18 +423,18 @@ class TestConvenienceFunctions:
         assert result.success is False
         assert result.error is not None
 
-    def test_process_all_consistency_reviews(self, db_connection, sample_consistent_script):
+    def test_process_all_consistency_reviews(self, db_connection, sample_consistent_content):
         """Test process_all_consistency_reviews function."""
         story_repo = StoryRepository(db_connection)
-        script_repo = ScriptRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
         # Create stories
         for i in range(2):
             story = story_repo.insert(Story(state=STATE_REVIEW_SCRIPT_CONSISTENCY))
-            script = script_repo.insert(
-                Script(story_id=story.id, version=0, text=sample_consistent_script)
+            content = content_repo.insert(
+                Content(story_id=story.id, version=0, text=sample_consistent_content)
             )
-            story.script_id = script.id
+            story.content_id = content.id
             story_repo.update(story)
 
         summary = process_all_consistency_reviews(db_connection)

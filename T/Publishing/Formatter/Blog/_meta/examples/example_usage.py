@@ -11,7 +11,7 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Script.Formatter.Blog import BlogFormatter, export_for_platform, format_blog
+from T.Content.Formatter.Blog import BlogFormatter, export_for_platform, format_blog
 
 
 def example_basic_usage():

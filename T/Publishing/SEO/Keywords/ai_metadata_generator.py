@@ -6,7 +6,7 @@ create high-quality, contextually-aware SEO metadata.
 
 Workflow Position:
     Stage: SEO Optimization (POST-001)
-    Input: Title + Script + Keywords → AI Generation → Output: Enhanced SEO metadata
+    Input: Title + Content + Keywords → AI Generation → Output: Enhanced SEO metadata
 
 Features:
     - GPT-based meta description generation

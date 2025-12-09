@@ -2,13 +2,15 @@
 
 **Namespace**: `PrismQ.T.Title.From.Idea`
 
-Generate initial title variants directly from the idea concept and create Story objects.
+Generate initial title variants directly from the idea concept using AI-powered title generation.
 
 ## Purpose
 
 Create the first version (v0) of title options based solely on the original idea, before any script content exists. This module:
 1. Creates 10 Story objects with FK reference to the source Idea
-2. Generates the first Title (version 0) for each Story from the Idea content
+2. Generates the first Title (version 0) for each Story from the Idea content using AI
+
+**Requirements**: This module requires AI (Ollama with Qwen3:32b model) to be available for title generation. If AI is unavailable, AIUnavailableError will be raised.
 
 ## Workflow Position
 
@@ -17,7 +19,7 @@ Create the first version (v0) of title options based solely on the original idea
 ```
 PrismQ.T.Idea.Creation
     ↓
-PrismQ.T.Title.From.Idea (v0) ← Creates Stories + Initial titles
+PrismQ.T.Title.From.Idea (v0) ← Creates Stories + Initial titles (AI-powered)
     ↓
 PrismQ.T.Script.Draft (v0)
 ```
@@ -32,19 +34,19 @@ PrismQ.T.Script.Draft (v0)
 
 ## Process
 
-1. Analyze idea concept and theme
+1. Analyze idea concept and theme using AI
 2. Create 10 Story objects, each referencing the source Idea (FK relationship)
-3. Generate 10 title variants using diverse strategies
+3. Generate 10 title variants using AI with emotional depth and SEO focus
 4. Create first Title (v0) for each Story using generated variants
-5. Update each Story's state to TITLE_V0
-6. Consider SEO and engagement factors
+5. Update each Story's state to next workflow step
+6. Titles are optimized for engagement and SEO (45-52 characters ideal)
 7. Return Stories with their Titles
 
 ## Output
 
 - 10 Story objects with:
   - FK reference to source Idea (idea_id)
-  - State: TITLE_V0
+  - State: Next workflow step
   - Timestamps (created_at, updated_at)
 
 - 10 Title objects (one per Story):
@@ -97,7 +99,7 @@ else:
 
 ```python
 import sqlite3
-from T.Title.From.Idea import StoryTitleService
+from T.Title.From.Idea import StoryTitleService, AIUnavailableError
 from T.Idea.Model.src.idea import Idea, IdeaStatus
 
 # Set up database connection
@@ -116,21 +118,22 @@ idea = Idea(
 )
 
 # Create stories with titles (persisted to database)
-# By default, skips if Idea already has Stories (skip_if_exists=True)
-result = service.create_stories_with_titles(idea)
-
-if result:
-    # Stories and Titles are now in the database
-    print(f"Created {result.count} stories with database persistence")
-else:
-    print("Idea already has stories - skipped")
+# Requires AI to be available - raises AIUnavailableError if not
+try:
+    result = service.create_stories_with_titles(idea)
+    
+    if result:
+        # Stories and Titles are now in the database
+        print(f"Created {result.count} stories with database persistence")
+    else:
+        print("Idea already has stories - skipped")
+except AIUnavailableError as e:
+    print(f"AI unavailable: {e}")
+    # Handle error - cannot generate titles without AI
 
 # Check if an Idea already has Stories
 has_stories = service.idea_has_stories(idea)
 print(f"Idea has stories: {has_stories}")
-
-# Force creation even if Idea already has Stories
-result = service.create_stories_with_titles(idea, skip_if_exists=False)
 ```
 
 ## Next Stage

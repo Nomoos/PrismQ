@@ -1,4 +1,4 @@
-"""Example usage of review_script_by_title_and_idea module.
+"""Example usage of review_content_by_title_and_idea module.
 
 This example demonstrates MVP-005: Reviewing script v1 against title v1 and idea.
 """
@@ -13,13 +13,13 @@ if str(_idea_model_path) not in sys.path:
     sys.path.insert(0, str(_idea_model_path))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Script import review_script_by_title_and_idea
+from T.Review.Content import review_content_by_title_and_idea
 
 
 def example_horror_short():
     """Example: Review a horror short script."""
     print("=" * 80)
-    print("Example 1: Horror Short Script Review")
+    print("Example 1: Horror Short Content Review")
     print("=" * 80)
 
     # Create an Idea for a horror short
@@ -40,7 +40,7 @@ def example_horror_short():
     # Title v1
     title = "The Voice That Knows Tomorrow"
 
-    # Script v1
+    # Content v1
     script = """
     Last night I heard a whisper in the darkness. It sounded exactly like my own voice,
     but I knew it couldn't be me. The voice was telling me things that hadn't happened yet.
@@ -55,12 +55,12 @@ def example_horror_short():
     """
 
     # Review the script
-    review = review_script_by_title_and_idea(
-        script_text=script, title=title, idea=idea, target_length_seconds=60
+    review = review_content_by_title_and_idea(
+        content_text=script, title=title, idea=idea, target_length_seconds=60
     )
 
     # Display results
-    print(f"\nScript ID: {review.script_id}")
+    print(f"\nScript ID: {review.content_id}")
     print(f"Title: {review.script_title}")
     print(f"Overall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")
@@ -97,7 +97,7 @@ def example_horror_short():
 def example_educational_content():
     """Example: Review an educational content script."""
     print("=" * 80)
-    print("Example 2: Educational Content Script Review")
+    print("Example 2: Educational Content Content Review")
     print("=" * 80)
 
     # Create an Idea for educational content
@@ -135,10 +135,10 @@ def example_educational_content():
     """
 
     # Review the script
-    review = review_script_by_title_and_idea(script_text=script, title=title, idea=idea)
+    review = review_content_by_title_and_idea(content_text=script, title=title, idea=idea)
 
     # Display results
-    print(f"\nScript ID: {review.script_id}")
+    print(f"\nScript ID: {review.content_id}")
     print(f"Overall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")
     print(f"Idea Alignment: {review.metadata['idea_alignment_score']}%")
@@ -163,7 +163,7 @@ def example_educational_content():
 
 
 def example_poor_alignment():
-    """Example: Script with poor alignment to title and idea."""
+    """Example: Content with poor alignment to title and idea."""
     print("=" * 80)
     print("Example 3: Poor Alignment - Pizza Recipe vs Mystery Title")
     print("=" * 80)
@@ -188,7 +188,7 @@ def example_poor_alignment():
     Finally, add your toppings and bake until the crust is golden brown.
     """
 
-    review = review_script_by_title_and_idea(script, title, idea)
+    review = review_content_by_title_and_idea(script, title, idea)
 
     print(f"\nOverall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")

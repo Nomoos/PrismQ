@@ -1,6 +1,6 @@
-"""Example usage of Script Grammar Review (MVP-014).
+"""Example usage of Content Grammar Review (MVP-014).
 
-Demonstrates how to use PrismQ.T.Review.Script.Grammar for validating
+Demonstrates how to use PrismQ.T.Review.Content.Grammar for validating
 script grammar before proceeding to Tone Review (MVP-015).
 """
 
@@ -10,15 +10,15 @@ from pathlib import Path
 # Add project root to path
 project_root = (
     Path(__file__).resolve().parents[6]
-)  # examples -> _meta -> Grammar -> Script -> Review -> T -> PrismQ
+)  # examples -> _meta -> Grammar -> Content -> Review -> T -> PrismQ
 sys.path.insert(0, str(project_root))
 
 import json
 
-from T.Review.Script.Grammar import (
+from T.Review.Content.Grammar import (
     get_grammar_feedback,
-    review_script_grammar,
-    review_script_grammar_to_json,
+    review_content_grammar,
+    review_content_grammar_to_json,
 )
 
 
@@ -34,12 +34,12 @@ A storm approaches from the distance.
 Thunder rumbles across the sky.
 The hero takes a deep breath and prepares to jump."""
 
-    print("Script:")
+    print("Content:")
     print(script)
     print("\n" + "-" * 60 + "\n")
 
     # Perform grammar review
-    review = review_script_grammar(script, script_id="hero-001", script_version="v3")
+    review = review_content_grammar(script, content_id="hero-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Passes: {'YES ✓' if review.passes else 'NO ✗'}")
@@ -47,9 +47,9 @@ The hero takes a deep breath and prepares to jump."""
     print(f"\nSummary: {review.summary}")
 
     if review.passes:
-        print("\n✓ Script is ready for Stage 15: Tone Review")
+        print("\n✓ Content is ready for Stage 15: Tone Review")
     else:
-        print("\n✗ Script needs refinement before proceeding")
+        print("\n✗ Content needs refinement before proceeding")
 
     print("\n")
 
@@ -57,7 +57,7 @@ The hero takes a deep breath and prepares to jump."""
 def example_with_errors():
     """Example showing error detection and feedback."""
     print("=" * 60)
-    print("EXAMPLE 2: Script with Grammar Errors")
+    print("EXAMPLE 2: Content with Grammar Errors")
     print("=" * 60 + "\n")
 
     script = """i recieved a mysterious message yesterday.
@@ -65,12 +65,12 @@ He were very excited about the discovery.
 The old mansion has many secrets
 We was all curious about what happened there."""
 
-    print("Script:")
+    print("Content:")
     print(script)
     print("\n" + "-" * 60 + "\n")
 
     # Perform grammar review
-    review = review_script_grammar(script, script_id="mansion-001", script_version="v3")
+    review = review_content_grammar(script, content_id="mansion-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Passes: {'YES ✓' if review.passes else 'NO ✗'}")
@@ -108,13 +108,13 @@ def example_json_output():
 He were looking for clues everywhere.
 I recieved a tip from an informant."""
 
-    print("Script:")
+    print("Content:")
     print(script)
     print("\n" + "-" * 60 + "\n")
 
     # Get JSON output
-    json_output = review_script_grammar_to_json(
-        script, script_id="detective-001", script_version="v3"
+    json_output = review_content_grammar_to_json(
+        script, content_id="detective-001", script_version="v3"
     )
 
     print("JSON Output:")
@@ -124,7 +124,7 @@ I recieved a tip from an informant."""
     data = json.loads(json_output)
     print("\n" + "-" * 60)
     print(f"\nParsed from JSON:")
-    print(f"  Script ID: {data['script_id']}")
+    print(f"  Content ID: {data['content_id']}")
     print(f"  Score: {data['overall_score']}/100")
     print(f"  Passes: {data['passes']}")
     print(f"  Issues found: {len(data['issues'])}")
@@ -135,7 +135,7 @@ I recieved a tip from an informant."""
 def example_feedback_for_refinement():
     """Example showing structured feedback for script refinement."""
     print("=" * 60)
-    print("EXAMPLE 4: Structured Feedback for Script Writer")
+    print("EXAMPLE 4: Structured Feedback for Content Writer")
     print("=" * 60 + "\n")
 
     script = """the hero enters the room cautiously.
@@ -143,19 +143,19 @@ He were carrying a flashlight.
 Strange shadows move across the walls.
 I recieved a warning about this place."""
 
-    print("Script:")
+    print("Content:")
     print(script)
     print("\n" + "-" * 60 + "\n")
 
     # Perform review
-    review = review_script_grammar(script, script_id="room-001", script_version="v3")
+    review = review_content_grammar(script, content_id="room-001", script_version="v3")
 
     # Get structured feedback
     feedback = get_grammar_feedback(review)
 
     print("FEEDBACK FOR SCRIPT WRITER")
     print("=" * 60)
-    print(f"\nScript: {feedback['script_id']} ({feedback['script_version']})")
+    print(f"\nScript: {feedback['content_id']} ({feedback['script_version']})")
     print(f"Status: {'PASS ✓' if feedback['passes'] else 'FAIL ✗'}")
     print(f"Score: {feedback['overall_score']}/{feedback['threshold']}")
     print(f"\nSummary: {feedback['summary']}")
@@ -201,15 +201,15 @@ def example_workflow_integration():
     print("EXAMPLE 5: Workflow Integration (Stage 14)")
     print("=" * 60 + "\n")
 
-    print("Simulating the workflow from Script v3 to next stage...\n")
+    print("Simulating the workflow from Content v3 to next stage...\n")
 
-    # Script v3 (after initial creation and review)
+    # Content v3 (after initial creation and review)
     script_v3 = """The old house creaks in the wind.
 Sarah approaches the front door nervously.
 She were warned not to come here.
 The door opens with a haunting sound."""
 
-    print("Script v3 (from previous stage):")
+    print("Content v3 (from previous stage):")
     print(script_v3)
     print("\n" + "-" * 60)
 
@@ -217,7 +217,7 @@ The door opens with a haunting sound."""
     print("\nStage 14: Grammar Review (MVP-014)")
     print("-" * 60)
 
-    review = review_script_grammar(script_v3, script_id="house-001", script_version="v3")
+    review = review_content_grammar(script_v3, content_id="house-001", script_version="v3")
 
     print(f"Score: {review.overall_score}/100")
     print(f"Result: {'PASS' if review.passes else 'FAIL'}")
@@ -225,7 +225,7 @@ The door opens with a haunting sound."""
     if review.passes:
         print("\n✓ WORKFLOW: Proceed to Stage 15 (Tone Review / MVP-015)")
     else:
-        print(f"\n✗ WORKFLOW: Return to Stage 11 (Script Refinement)")
+        print(f"\n✗ WORKFLOW: Return to Stage 11 (Content Refinement)")
         print(f"   Issues to fix: {len(review.issues)}")
 
         if review.critical_count > 0:
@@ -246,7 +246,7 @@ The door opens with a haunting sound."""
 
         print(script_v4)
 
-        review_v4 = review_script_grammar(script_v4, script_id="house-001", script_version="v4")
+        review_v4 = review_content_grammar(script_v4, content_id="house-001", script_version="v4")
 
         print(f"\nRe-review Score: {review_v4.overall_score}/100")
         print(f"Result: {'PASS' if review_v4.passes else 'FAIL'}")
@@ -261,7 +261,7 @@ def main():
     """Run all examples."""
     print("\n" + "=" * 60)
     print("SCRIPT GRAMMAR REVIEW EXAMPLES")
-    print("MVP-014: PrismQ.T.Review.Script.Grammar")
+    print("MVP-014: PrismQ.T.Review.Content.Grammar")
     print("=" * 60 + "\n")
 
     # Run all examples

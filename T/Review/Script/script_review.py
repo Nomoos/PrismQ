@@ -1,4 +1,4 @@
-"""Script Review model for PrismQ AI-powered script evaluation.
+"""Content Review model for PrismQ AI-powered script evaluation.
 
 This module defines the ScriptReview data model for AI-powered script evaluation
 with scoring system (0-100%) and detailed improvement recommendations for target
@@ -8,7 +8,7 @@ The ScriptReview model enables:
 - AI-driven script evaluation with numerical scoring
 - Detailed improvement points for audience optimization
 - YouTube short content optimization (< 3 minutes, variable length)
-- Feedback loop integration with Script Writer
+- Feedback loop integration with Content Writer
 
 Workflow Position:
     ScriptDraft → ScriptReview (AI Reviewer) → ScriptWriter (with feedback) → ScriptApproved
@@ -31,7 +31,7 @@ class ScriptVersion:
 
     Attributes:
         version_number: Version number (1, 2, 3, ...)
-        script_text: The actual script text content
+        content_text: The actual script text content
         length_seconds: Duration in seconds
         created_at: When this version was created
         created_by: Who/what created this version (e.g., "AI-Writer-001", "human")
@@ -41,7 +41,7 @@ class ScriptVersion:
     """
 
     version_number: int
-    script_text: str
+    content_text: str
     length_seconds: Optional[int] = None
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     created_by: str = ""
@@ -109,11 +109,11 @@ class ScriptReview:
     - YouTube short optimization guidance
     - Target audience alignment assessment
 
-    The review serves as input for the Script Writer's feedback loop,
+    The review serves as input for the Content Writer's feedback loop,
     enabling iterative optimization based on AI evaluation.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_title: Title of the reviewed script
         overall_score: Overall quality score (0-100)
         category_scores: Scores for each evaluation category
@@ -144,7 +144,7 @@ class ScriptReview:
             previous_review_id: ID of previous review (if iterative)
             improvement_trajectory: Score change over iterations
 
-        Script Versioning:
+        Content Versioning:
             script_version: Current version of the script being reviewed
             script_versions_history: List of all script versions for comparison
 
@@ -157,7 +157,7 @@ class ScriptReview:
 
     Example:
         >>> review = ScriptReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_title="The Echo - Horror Short",
         ...     overall_score=72,
         ...     target_audience="Horror enthusiasts aged 18-35",
@@ -193,7 +193,7 @@ class ScriptReview:
         ... ))
     """
 
-    script_id: str
+    content_id: str
     script_title: str
     overall_score: int  # 0-100
 
@@ -226,7 +226,7 @@ class ScriptReview:
     previous_review_id: Optional[str] = None
     improvement_trajectory: List[int] = field(default_factory=list)  # Score history
 
-    # Script Versioning (NEW for comparison and research)
+    # Content Versioning (NEW for comparison and research)
     script_version: Optional[ScriptVersion] = None
     script_versions_history: List[ScriptVersion] = field(default_factory=list)
 
@@ -319,9 +319,9 @@ class ScriptReview:
             "recommendations": self.get_high_priority_improvements()[:3],
         }
 
-    def add_script_version(
+    def add_content_version(
         self,
-        script_text: str,
+        content_text: str,
         length_seconds: Optional[int] = None,
         created_by: str = "",
         changes_from_previous: str = "",
@@ -334,7 +334,7 @@ class ScriptReview:
         - Tracking what changed between iterations
 
         Args:
-            script_text: The script text content
+            content_text: The script text content
             length_seconds: Duration in seconds
             created_by: Who/what created this version
             changes_from_previous: Description of changes
@@ -346,7 +346,7 @@ class ScriptReview:
 
         version = ScriptVersion(
             version_number=version_number,
-            script_text=script_text,
+            content_text=content_text,
             length_seconds=length_seconds or self.current_length_seconds,
             created_by=created_by or self.reviewer_id,
             changes_from_previous=changes_from_previous,
@@ -381,7 +381,7 @@ class ScriptReview:
                     "created_at": v.created_at,
                     "created_by": v.created_by,
                     "changes": v.changes_from_previous,
-                    "text_length_chars": len(v.script_text),
+                    "text_length_chars": len(v.content_text),
                 }
             )
 
@@ -485,7 +485,7 @@ class ScriptReview:
         if script_version_data:
             script_version = ScriptVersion(
                 version_number=script_version_data["version_number"],
-                script_text=script_version_data["script_text"],
+                content_text=script_version_data["content_text"],
                 length_seconds=script_version_data.get("length_seconds"),
                 created_at=script_version_data.get("created_at", datetime.now().isoformat()),
                 created_by=script_version_data.get("created_by", ""),
@@ -499,7 +499,7 @@ class ScriptReview:
             script_versions_history.append(
                 ScriptVersion(
                     version_number=sv_data["version_number"],
-                    script_text=sv_data["script_text"],
+                    content_text=sv_data["content_text"],
                     length_seconds=sv_data.get("length_seconds"),
                     created_at=sv_data.get("created_at", datetime.now().isoformat()),
                     created_by=sv_data.get("created_by", ""),
@@ -510,7 +510,7 @@ class ScriptReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_title=data["script_title"],
             overall_score=data["overall_score"],
             category_scores=category_scores,

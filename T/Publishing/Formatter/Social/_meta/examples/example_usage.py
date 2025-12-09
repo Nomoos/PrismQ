@@ -1,20 +1,20 @@
-"""Example usage of PrismQ.T.Script.Formatter.Social module.
+"""Example usage of PrismQ.T.Content.Formatter.Social module.
 
 This file demonstrates various use cases for the Social Media Formatter
 including basic usage, A/B testing, custom options, and error handling.
 
 Note: This example file is for documentation purposes and shows the expected
-      usage patterns. To run it, ensure the T.Script.Formatter.Social module
+      usage patterns. To run it, ensure the T.Content.Formatter.Social module
       is properly installed in your Python path.
 
 Usage Pattern (adjust import based on your setup):
-    from T.Script.Formatter.Social import format_twitter_thread, ...
+    from T.Content.Formatter.Social import format_twitter_thread, ...
 """
 
 # For documentation: show the correct import pattern
 # In actual usage, uncomment these imports:
 """
-from T.Script.Formatter.Social import (
+from T.Content.Formatter.Social import (
     format_twitter_thread,
     format_linkedin_post,
     format_instagram_caption,
@@ -33,7 +33,7 @@ from pathlib import Path
 
 # Mock setup for standalone execution
 try:
-    from T.Script.Formatter.Social import (
+    from T.Content.Formatter.Social import (
         FacebookFormatter,
         InstagramFormatter,
         LinkedInFormatter,
@@ -44,8 +44,8 @@ try:
         format_twitter_thread,
     )
 except ImportError:
-    print("Note: This example requires the T.Script.Formatter.Social module.")
-    print("In production, use: from T.Script.Formatter.Social import ...")
+    print("Note: This example requires the T.Content.Formatter.Social module.")
+    print("In production, use: from T.Content.Formatter.Social import ...")
     sys.exit(0)
 
 
@@ -334,14 +334,14 @@ def example_12_error_handling():
     # Test with empty script
     result_empty = format_twitter_thread(script="", content_id="error-001")
 
-    print(f"\nEmpty Script:")
+    print(f"\nEmpty Content:")
     print(f"  Success: {result_empty.success}")
     print(f"  Errors: {result_empty.errors if result_empty.errors else 'None'}")
 
     # Test with very short script
     result_short = format_linkedin_post(script="Short.", content_id="error-002")
 
-    print(f"\nVery Short Script:")
+    print(f"\nVery Short Content:")
     print(f"  Success: {result_short.success}")
     print(f"  Content Length: {len(result_short.formatted_content)}")
 

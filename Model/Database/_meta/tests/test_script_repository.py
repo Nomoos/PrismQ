@@ -1,9 +1,9 @@
-"""Tests for ScriptRepository.
+"""Tests for ContentRepository.
 
 Tests cover:
 - CRUD operations (Insert + Read only)
 - Version management (find_latest_version, find_versions, find_version)
-- Integration with Script model
+- Integration with Content model
 """
 
 import pytest
@@ -16,19 +16,19 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from Model.Database.models.script import Script
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.models.content import Content
+from Model.Database.repositories.content_repository import ContentRepository
 
 
 @pytest.fixture
 def db_connection():
-    """Create in-memory SQLite database with Script table."""
+    """Create in-memory SQLite database with Content table."""
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     
-    # Create Script table
+    # Create Content table
     conn.execute("""
-        CREATE TABLE Script (
+        CREATE TABLE Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
@@ -46,17 +46,17 @@ def db_connection():
 
 @pytest.fixture
 def repo(db_connection):
-    """Create ScriptRepository instance."""
-    return ScriptRepository(db_connection)
+    """Create ContentRepository instance."""
+    return ContentRepository(db_connection)
 
 
-class TestScriptRepositoryIntegration:
-    """Integration tests for ScriptRepository."""
+class TestContentRepositoryIntegration:
+    """Integration tests for ContentRepository."""
     
-    def test_insert_script(self, repo):
-        """Test inserting a new script."""
-        script = Script(story_id=1, version=0, text="Once upon a time...")
-        saved = repo.insert(script)
+    def test_insert_content(self, repo):
+        """Test inserting a new content."""
+        content = Content(story_id=1, version=0, text="Once upon a time...")
+        saved = repo.insert(content)
         
         assert saved.id is not None
         assert saved.id > 0
@@ -64,29 +64,29 @@ class TestScriptRepositoryIntegration:
         assert saved.version == 0
         assert saved.text == "Once upon a time..."
     
-    def test_insert_script_with_review_id(self, repo):
-        """Test inserting a script with review reference."""
-        script = Script(story_id=1, version=0, text="Content", review_id=5)
-        saved = repo.insert(script)
+    def test_insert_content_with_review_id(self, repo):
+        """Test inserting a content with review reference."""
+        content = Content(story_id=1, version=0, text="Content", review_id=5)
+        saved = repo.insert(content)
         
         assert saved.review_id == 5
     
     def test_insert_multiple_versions(self, repo):
-        """Test inserting multiple versions of a script."""
-        script_v0 = Script(story_id=1, version=0, text="Version 0")
-        script_v1 = Script(story_id=1, version=1, text="Version 1")
-        script_v2 = Script(story_id=1, version=2, text="Version 2")
+        """Test inserting multiple versions of a content."""
+        content_v0 = Content(story_id=1, version=0, text="Version 0")
+        content_v1 = Content(story_id=1, version=1, text="Version 1")
+        content_v2 = Content(story_id=1, version=2, text="Version 2")
         
-        saved_v0 = repo.insert(script_v0)
-        saved_v1 = repo.insert(script_v1)
-        saved_v2 = repo.insert(script_v2)
+        saved_v0 = repo.insert(content_v0)
+        saved_v1 = repo.insert(content_v1)
+        saved_v2 = repo.insert(content_v2)
         
         assert saved_v0.id < saved_v1.id < saved_v2.id
     
     def test_find_by_id_existing(self, repo):
-        """Test finding existing script by ID."""
-        script = Script(story_id=1, version=0, text="Test content")
-        saved = repo.insert(script)
+        """Test finding existing content by ID."""
+        content = Content(story_id=1, version=0, text="Test content")
+        saved = repo.insert(content)
         
         found = repo.find_by_id(saved.id)
         
@@ -95,41 +95,41 @@ class TestScriptRepositoryIntegration:
         assert found.text == "Test content"
     
     def test_find_by_id_not_found(self, repo):
-        """Test finding non-existent script by ID."""
+        """Test finding non-existent content by ID."""
         found = repo.find_by_id(999)
         assert found is None
     
     def test_find_all_empty(self, repo):
         """Test find_all on empty database."""
-        scripts = repo.find_all()
-        assert scripts == []
+        contents = repo.find_all()
+        assert contents == []
     
     def test_find_all_multiple(self, repo):
-        """Test find_all with multiple scripts."""
-        repo.insert(Script(story_id=1, version=0, text="Script 1"))
-        repo.insert(Script(story_id=2, version=0, text="Script 2"))
-        repo.insert(Script(story_id=1, version=1, text="Script 1 v1"))
+        """Test find_all with multiple contents."""
+        repo.insert(Content(story_id=1, version=0, text="Content 1"))
+        repo.insert(Content(story_id=2, version=0, text="Content 2"))
+        repo.insert(Content(story_id=1, version=1, text="Content 1 v1"))
         
-        scripts = repo.find_all()
+        contents = repo.find_all()
         
-        assert len(scripts) == 3
+        assert len(contents) == 3
     
     def test_exists_true(self, repo):
-        """Test exists returns True for existing script."""
-        script = Script(story_id=1, version=0, text="Test")
-        saved = repo.insert(script)
+        """Test exists returns True for existing content."""
+        content = Content(story_id=1, version=0, text="Test")
+        saved = repo.insert(content)
         
         assert repo.exists(saved.id) is True
     
     def test_exists_false(self, repo):
-        """Test exists returns False for non-existent script."""
+        """Test exists returns False for non-existent content."""
         assert repo.exists(999) is False
     
     def test_find_latest_version(self, repo):
-        """Test finding the latest version of a script."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
-        repo.insert(Script(story_id=1, version=1, text="v1"))
-        repo.insert(Script(story_id=1, version=2, text="v2"))
+        """Test finding the latest version of a content."""
+        repo.insert(Content(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=1, text="v1"))
+        repo.insert(Content(story_id=1, version=2, text="v2"))
         
         latest = repo.find_latest_version(story_id=1)
         
@@ -139,23 +139,23 @@ class TestScriptRepositoryIntegration:
     
     def test_find_latest_version_single(self, repo):
         """Test find_latest_version with only one version."""
-        repo.insert(Script(story_id=1, version=0, text="Only version"))
+        repo.insert(Content(story_id=1, version=0, text="Only version"))
         
         latest = repo.find_latest_version(story_id=1)
         
         assert latest is not None
         assert latest.version == 0
     
-    def test_find_latest_version_no_scripts(self, repo):
-        """Test find_latest_version when no scripts exist."""
+    def test_find_latest_version_no_contents(self, repo):
+        """Test find_latest_version when no contents exist."""
         latest = repo.find_latest_version(story_id=999)
         assert latest is None
     
     def test_find_versions(self, repo):
-        """Test finding all versions of a script."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
-        repo.insert(Script(story_id=1, version=1, text="v1"))
-        repo.insert(Script(story_id=1, version=2, text="v2"))
+        """Test finding all versions of a content."""
+        repo.insert(Content(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=1, text="v1"))
+        repo.insert(Content(story_id=1, version=2, text="v2"))
         
         versions = repo.find_versions(story_id=1)
         
@@ -171,9 +171,9 @@ class TestScriptRepositoryIntegration:
     
     def test_find_versions_different_stories(self, repo):
         """Test find_versions returns only versions for specified story."""
-        repo.insert(Script(story_id=1, version=0, text="Story 1"))
-        repo.insert(Script(story_id=2, version=0, text="Story 2"))
-        repo.insert(Script(story_id=1, version=1, text="Story 1 v1"))
+        repo.insert(Content(story_id=1, version=0, text="Story 1"))
+        repo.insert(Content(story_id=2, version=0, text="Story 2"))
+        repo.insert(Content(story_id=1, version=1, text="Story 1 v1"))
         
         versions_story1 = repo.find_versions(story_id=1)
         versions_story2 = repo.find_versions(story_id=2)
@@ -183,9 +183,9 @@ class TestScriptRepositoryIntegration:
     
     def test_find_version_specific(self, repo):
         """Test finding a specific version."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
-        repo.insert(Script(story_id=1, version=1, text="v1"))
-        repo.insert(Script(story_id=1, version=2, text="v2"))
+        repo.insert(Content(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=1, text="v1"))
+        repo.insert(Content(story_id=1, version=2, text="v2"))
         
         v1 = repo.find_version(story_id=1, version=1)
         
@@ -195,42 +195,42 @@ class TestScriptRepositoryIntegration:
     
     def test_find_version_not_found(self, repo):
         """Test find_version for non-existent version."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=0, text="v0"))
         
         not_found = repo.find_version(story_id=1, version=5)
         assert not_found is None
     
     def test_find_by_story_id(self, repo):
         """Test find_by_story_id alias."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
-        repo.insert(Script(story_id=1, version=1, text="v1"))
+        repo.insert(Content(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=1, text="v1"))
         
-        scripts = repo.find_by_story_id(story_id=1)
+        contents = repo.find_by_story_id(story_id=1)
         
-        assert len(scripts) == 2
+        assert len(contents) == 2
     
     def test_get_next_version_number_empty(self, repo):
-        """Test _get_next_version_number when no scripts exist."""
+        """Test _get_next_version_number when no contents exist."""
         next_version = repo._get_next_version_number(story_id=1)
         assert next_version == 0
     
     def test_get_next_version_number_existing(self, repo):
-        """Test _get_next_version_number with existing scripts."""
-        repo.insert(Script(story_id=1, version=0, text="v0"))
-        repo.insert(Script(story_id=1, version=1, text="v1"))
+        """Test _get_next_version_number with existing contents."""
+        repo.insert(Content(story_id=1, version=0, text="v0"))
+        repo.insert(Content(story_id=1, version=1, text="v1"))
         
         next_version = repo._get_next_version_number(story_id=1)
         assert next_version == 2
     
     def test_version_workflow(self, repo):
         """Test complete version workflow with create_next_version."""
-        # Create initial script
-        script_v0 = Script(story_id=1, version=0, text="Original content")
-        saved_v0 = repo.insert(script_v0)
+        # Create initial content
+        content_v0 = Content(story_id=1, version=0, text="Original content")
+        saved_v0 = repo.insert(content_v0)
         
         # Create next version using model method
-        script_v1 = saved_v0.create_next_version("Improved content", review_id=5)
-        saved_v1 = repo.insert(script_v1)
+        content_v1 = saved_v0.create_next_version("Improved content", review_id=5)
+        saved_v1 = repo.insert(content_v1)
         
         # Verify
         assert saved_v1.version == 1
@@ -243,8 +243,8 @@ class TestScriptRepositoryIntegration:
     
     def test_datetime_persistence(self, repo):
         """Test datetime is persisted and restored correctly."""
-        script = Script(story_id=1, version=0, text="Test")
-        saved = repo.insert(script)
+        content = Content(story_id=1, version=0, text="Test")
+        saved = repo.insert(content)
         
         found = repo.find_by_id(saved.id)
         
@@ -254,33 +254,33 @@ class TestScriptRepositoryIntegration:
     
     # === GET_CURRENT_SCRIPT Tests ===
     
-    def test_get_current_script(self, repo):
-        """Test get_current_script returns latest version."""
-        repo.insert(Script(story_id=1, version=0, text="Version 0"))
-        repo.insert(Script(story_id=1, version=1, text="Version 1"))
-        repo.insert(Script(story_id=1, version=2, text="Version 2"))
+    def test_get_current_content(self, repo):
+        """Test get_current_content returns latest version."""
+        repo.insert(Content(story_id=1, version=0, text="Version 0"))
+        repo.insert(Content(story_id=1, version=1, text="Version 1"))
+        repo.insert(Content(story_id=1, version=2, text="Version 2"))
         
-        current = repo.get_current_script(story_id=1)
+        current = repo.get_current_content(story_id=1)
         
         assert current is not None
         assert current.version == 2
         assert current.text == "Version 2"
     
-    def test_get_current_script_no_scripts(self, repo):
-        """Test get_current_script when no scripts exist."""
-        current = repo.get_current_script(story_id=9999)
+    def test_get_current_content_no_contents(self, repo):
+        """Test get_current_content when no contents exist."""
+        current = repo.get_current_content(story_id=9999)
         
         assert current is None
     
-    def test_get_current_script_single(self, repo):
-        """Test get_current_script with only one version."""
-        repo.insert(Script(story_id=1, version=0, text="Only Script"))
+    def test_get_current_content_single(self, repo):
+        """Test get_current_content with only one version."""
+        repo.insert(Content(story_id=1, version=0, text="Only Content"))
         
-        current = repo.get_current_script(story_id=1)
+        current = repo.get_current_content(story_id=1)
         
         assert current is not None
         assert current.version == 0
-        assert current.text == "Only Script"
+        assert current.text == "Only Content"
 
 
 if __name__ == "__main__":

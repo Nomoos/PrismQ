@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive Test Coverage Analysis Script for PrismQ.IdeaInspiration
+Comprehensive Test Coverage Analysis Content for PrismQ.IdeaInspiration
 
 This script analyzes test coverage across all modules in the repository,
 identifies gaps, and provides actionable recommendations for improvement.

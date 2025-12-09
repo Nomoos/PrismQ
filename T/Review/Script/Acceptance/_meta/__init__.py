@@ -1,1 +1,1 @@
-# Meta package for Script Acceptance module
+# Meta package for Content Acceptance module

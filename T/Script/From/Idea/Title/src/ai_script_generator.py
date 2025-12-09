@@ -1,6 +1,6 @@
-"""AI-Powered Script Generator using Qwen3:30b via Ollama.
+"""AI-Powered Content Generator using Qwen3:30b via Ollama.
 
-This module provides AI-powered script generation for the PrismQ.T.Script.From.Idea.Title
+This module provides AI-powered script generation for the PrismQ.T.Content.From.Idea.Title
 workflow using the Qwen3:30b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
@@ -11,8 +11,8 @@ Input to AI:
     - One seed variation (randomly picked from 500 predefined variations)
 
 Workflow Position:
-    Stage: PrismQ.T.Script.From.Idea.Title
-    Input: Title + Idea + Seed → AI Generation → Output: Script v1
+    Stage: PrismQ.T.Content.From.Idea.Title
+    Input: Title + Idea + Seed → AI Generation → Output: Content v1
 
 Prompts are stored as separate text files in _meta/prompts/ for easier
 maintenance and editing.
@@ -657,7 +657,7 @@ class AIScriptGenerator:
         """
         return self.available
 
-    def generate_script(
+    def generate_content(
         self,
         title: str,
         idea_text: str,
@@ -673,7 +673,7 @@ class AIScriptGenerator:
             idea_text: The idea/concept text
             target_duration_seconds: Target duration in seconds
             platform: Target platform (youtube_short, youtube_medium, tiktok, etc.)
-            tone: Script tone (engaging, mysterious, educational, dramatic)
+            tone: Content tone (engaging, mysterious, educational, dramatic)
             seed: Optional specific seed to use (if None, picks randomly from 500)
 
         Returns:
@@ -694,7 +694,7 @@ class AIScriptGenerator:
         selected_seed = seed if seed else get_random_seed()
         logger.info(f"Using seed: {selected_seed}")
 
-        prompt = self._create_script_prompt(
+        prompt = self._create_content_prompt(
             title=title,
             idea_text=idea_text,
             seed=selected_seed,
@@ -705,7 +705,7 @@ class AIScriptGenerator:
 
         try:
             response = self._call_ollama(prompt)
-            script = self._extract_script_text(response)
+            script = self._extract_content_text(response)
             logger.info(f"AI script generation successful for '{title}'")
             return script
         except Exception as e:
@@ -713,7 +713,7 @@ class AIScriptGenerator:
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-    def _create_script_prompt(
+    def _create_content_prompt(
         self, title: str, idea_text: str, seed: str, target_duration: int, platform: str, tone: str
     ) -> str:
         """Create prompt for script generation.
@@ -724,12 +724,12 @@ class AIScriptGenerator:
         - Seed (one picked from 500 variations)
 
         Args:
-            title: Script title
+            title: Content title
             idea_text: Idea/concept text
             seed: Creative direction seed
             target_duration: Target duration in seconds
             platform: Target platform
-            tone: Script tone
+            tone: Content tone
 
         Returns:
             Engineered prompt for AI
@@ -789,12 +789,12 @@ class AIScriptGenerator:
             logger.error(f"Ollama API call failed: {e}")
             raise RuntimeError(f"Failed to generate AI script: {e}")
 
-    def _extract_script_text(self, response: str) -> str:
+    def _extract_content_text(self, response: str) -> str:
         """Extract script text from AI response."""
         cleaned = response.strip()
 
         # Remove common prefixes
-        prefixes = ["SCRIPT:", "Script:", "script:", "Here is the script:", "Output:", "Narration:"]
+        prefixes = ["SCRIPT:", "Content:", "script:", "Here is the script:", "Output:", "Narration:"]
         for prefix in prefixes:
             if cleaned.lower().startswith(prefix.lower()):
                 cleaned = cleaned[len(prefix) :].strip()
@@ -808,7 +808,7 @@ class AIScriptGenerator:
         return cleaned
 
 
-def generate_script(
+def generate_content(
     title: str,
     idea_text: str,
     target_duration_seconds: int = 90,
@@ -820,11 +820,11 @@ def generate_script(
     """Convenience function to generate an AI-powered script.
 
     Args:
-        title: Script title (Titulek)
+        title: Content title (Titulek)
         idea_text: Idea/concept text
         target_duration_seconds: Target duration in seconds
         platform: Target platform
-        tone: Script tone
+        tone: Content tone
         seed: Optional specific seed (if None, picks randomly from 500)
         config: Optional AI configuration
 
@@ -835,7 +835,7 @@ def generate_script(
         RuntimeError: If AI is not available or generation fails
 
     Example:
-        >>> script = generate_script(
+        >>> script = generate_content(
         ...     title="The Mystery of the Abandoned House",
         ...     idea_text="A girl discovers a time-loop in an abandoned house...",
         ...     target_duration_seconds=90
@@ -843,7 +843,7 @@ def generate_script(
         >>> print(script)
     """
     generator = AIScriptGenerator(config=config)
-    return generator.generate_script(
+    return generator.generate_content(
         title=title,
         idea_text=idea_text,
         target_duration_seconds=target_duration_seconds,
@@ -856,7 +856,7 @@ def generate_script(
 __all__ = [
     "AIScriptGenerator",
     "AIScriptGeneratorConfig",
-    "generate_script",
+    "generate_content",
     "get_random_seed",
     "get_seed_by_index",
     "SEED_VARIATIONS",

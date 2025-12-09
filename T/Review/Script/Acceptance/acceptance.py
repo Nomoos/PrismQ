@@ -1,13 +1,13 @@
-"""Script Acceptance Gate for PrismQ MVP-013.
+"""Content Acceptance Gate for PrismQ MVP-013.
 
 This module implements the acceptance criteria check for scripts before they
 proceed to quality review stages. It verifies that the script (latest version)
 meets acceptance criteria for completeness, coherence, and alignment with title.
 
 Workflow Position:
-    Title Accepted (MVP-012) → Script Acceptance Check (MVP-013) → Quality Reviews (MVP-014+)
+    Title Accepted (MVP-012) → Content Acceptance Check (MVP-013) → Quality Reviews (MVP-014+)
 
-If NOT ACCEPTED: Loop back to MVP-010 (Script Review → Script Refinement)
+If NOT ACCEPTED: Loop back to MVP-010 (Content Review → Content Refinement)
 If ACCEPTED: Proceed to MVP-014 (Quality Reviews)
 
 The acceptance check always uses the newest/latest script version.
@@ -46,8 +46,8 @@ class ScriptAcceptanceResult:
         return asdict(self)
 
 
-def check_script_acceptance(
-    script_text: str,
+def check_content_acceptance(
+    content_text: str,
     title: str,
     script_version: Optional[str] = None,
     acceptance_threshold: int = 70,
@@ -59,12 +59,12 @@ def check_script_acceptance(
     alignment with the title.
 
     Acceptance Criteria:
-    - Completeness: Script has clear beginning, middle, and end
-    - Coherence: Script flows logically and makes sense
-    - Alignment: Script content aligns with the title promise
+    - Completeness: Content has clear beginning, middle, and end
+    - Coherence: Content flows logically and makes sense
+    - Alignment: Content content aligns with the title promise
 
     Args:
-        script_text: The script text to evaluate (latest version)
+        content_text: The script text to evaluate (latest version)
         title: The accepted title
         script_version: Optional version identifier (e.g., "v3", "v4")
         acceptance_threshold: Minimum score required for acceptance (default: 70)
@@ -81,8 +81,8 @@ def check_script_acceptance(
         - suggestions: List of suggestions (if rejected)
 
     Example:
-        >>> result = check_script_acceptance(
-        ...     script_text="A mysterious echo in an old house...",
+        >>> result = check_content_acceptance(
+        ...     content_text="A mysterious echo in an old house...",
         ...     title="The Echo Mystery",
         ...     script_version="v3"
         ... )
@@ -92,15 +92,15 @@ def check_script_acceptance(
         ...     print(f"Loop back to refinement: {result['reason']}")
     """
     # Validate inputs
-    if not script_text or not script_text.strip():
+    if not content_text or not content_text.strip():
         return ScriptAcceptanceResult(
             accepted=False,
-            reason="Script is empty or contains only whitespace",
+            reason="Content is empty or contains only whitespace",
             completeness_score=0,
             coherence_score=0,
             alignment_score=0,
             overall_score=0,
-            issues=["Script text is empty"],
+            issues=["Content text is empty"],
             suggestions=["Generate script content"],
         ).to_dict()
 
@@ -117,9 +117,9 @@ def check_script_acceptance(
         ).to_dict()
 
     # Evaluate acceptance criteria
-    completeness_score = _evaluate_completeness(script_text)
-    coherence_score = _evaluate_coherence(script_text)
-    alignment_score = _evaluate_alignment(script_text, title)
+    completeness_score = _evaluate_completeness(content_text)
+    coherence_score = _evaluate_coherence(content_text)
+    alignment_score = _evaluate_alignment(content_text, title)
 
     # Calculate overall score (weighted average)
     overall_score = int(
@@ -147,12 +147,12 @@ def check_script_acceptance(
             suggestions.append("Better align script content with title promise")
 
         reason = (
-            f"Script does not meet acceptance criteria (score: {overall_score}/{acceptance_threshold}). "
+            f"Content does not meet acceptance criteria (score: {overall_score}/{acceptance_threshold}). "
             f"Loop back to script review and refinement (MVP-010)."
         )
     else:
         reason = (
-            f"Script meets acceptance criteria (score: {overall_score}/{acceptance_threshold}). "
+            f"Content meets acceptance criteria (score: {overall_score}/{acceptance_threshold}). "
             f"Proceed to quality reviews (MVP-014)."
         )
 
@@ -168,7 +168,7 @@ def check_script_acceptance(
     ).to_dict()
 
 
-def _evaluate_completeness(script_text: str) -> int:
+def _evaluate_completeness(content_text: str) -> int:
     """Evaluate script completeness.
 
     Checks if script has:
@@ -177,14 +177,14 @@ def _evaluate_completeness(script_text: str) -> int:
     - Complete narrative arc
 
     Args:
-        script_text: The script text to evaluate
+        content_text: The script text to evaluate
 
     Returns:
         Completeness score (0-100)
     """
     score = 0
-    script_lower = script_text.lower()
-    words = script_text.split()
+    script_lower = content_text.lower()
+    words = content_text.split()
     word_count = len(words)
 
     # Base score from word count
@@ -218,7 +218,7 @@ def _evaluate_completeness(script_text: str) -> int:
     return min(score, 100)
 
 
-def _evaluate_coherence(script_text: str) -> int:
+def _evaluate_coherence(content_text: str) -> int:
     """Evaluate script coherence.
 
     Checks if script:
@@ -227,13 +227,13 @@ def _evaluate_coherence(script_text: str) -> int:
     - Maintains consistent narrative
 
     Args:
-        script_text: The script text to evaluate
+        content_text: The script text to evaluate
 
     Returns:
         Coherence score (0-100)
     """
     score = 50  # Start with baseline
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
 
     # Check for connecting words (transition indicators)
     connecting_words = [
@@ -269,12 +269,12 @@ def _evaluate_coherence(script_text: str) -> int:
         score += 10
 
     # Check for sentence structure (presence of punctuation)
-    sentences = [s.strip() for s in script_text.split(".") if s.strip()]
+    sentences = [s.strip() for s in content_text.split(".") if s.strip()]
     if len(sentences) >= 2:
         score += 10  # Multiple sentences
 
     # Check for paragraph breaks (suggests organized thought)
-    paragraphs = [p.strip() for p in script_text.split("\n") if p.strip()]
+    paragraphs = [p.strip() for p in content_text.split("\n") if p.strip()]
     if len(paragraphs) >= 2:
         score += 10  # Multiple paragraphs
 
@@ -282,7 +282,7 @@ def _evaluate_coherence(script_text: str) -> int:
     return min(score, 100)
 
 
-def _evaluate_alignment(script_text: str, title: str) -> int:
+def _evaluate_alignment(content_text: str, title: str) -> int:
     """Evaluate script-title alignment.
 
     Checks if script:
@@ -291,7 +291,7 @@ def _evaluate_alignment(script_text: str, title: str) -> int:
     - Maintains thematic consistency with title
 
     Args:
-        script_text: The script text to evaluate
+        content_text: The script text to evaluate
         title: The title to align with
 
     Returns:
@@ -299,7 +299,7 @@ def _evaluate_alignment(script_text: str, title: str) -> int:
     """
     score = 40  # Start with baseline
 
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
     title_lower = title.lower()
 
     # Extract key words from title (excluding common stopwords)

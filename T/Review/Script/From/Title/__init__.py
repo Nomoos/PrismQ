@@ -1,4 +1,4 @@
-"""PrismQ.T.Review.Script.ByTitle - Script Review Against Title and Idea
+"""PrismQ.T.Review.Content.ByTitle - Content Review Against Title and Idea
 
 AI-powered script evaluation that reviews scripts against titles and ideas.
 Provides structured feedback on alignment, flow, completeness, and gaps.
@@ -14,14 +14,14 @@ from .by_title_v2 import (
     extract_improvements_from_review,
     get_next_steps,
     is_ready_to_proceed,
-    review_script_by_title_v2,
+    review_content_by_title_v2,
 )
-from .script_review_by_title import AlignmentScore, review_script_by_title
+from .script_review_by_title import AlignmentScore, review_content_by_title
 
 __all__ = [
-    "review_script_by_title",
+    "review_content_by_title",
     "AlignmentScore",
-    "review_script_by_title_v2",
+    "review_content_by_title_v2",
     "ImprovementComparison",
     "compare_reviews",
     "extract_improvements_from_review",

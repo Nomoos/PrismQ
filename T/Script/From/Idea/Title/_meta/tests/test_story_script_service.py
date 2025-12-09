@@ -1,9 +1,9 @@
-"""Tests for Story model and StoryScriptService.
+"""Tests for Story model and StoryContentService.
 
 These tests verify:
 1. Story model functionality
 2. StoryRepository database operations
-3. StoryScriptService script generation workflow
+3. StoryContentService content generation workflow
 """
 
 import json
@@ -16,16 +16,16 @@ from pathlib import Path
 
 import pytest
 
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.models.title import Title
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
-from T.Script.From.Idea.Title.src.story_script_service import (
-    ScriptGenerationResult,
-    StoryScriptService,
+from T.Content.From.Idea.Title.src.story_content_service import (
+    ContentGenerationResult,
+    StoryContentService,
     process_all_pending_stories,
 )
 
@@ -51,22 +51,26 @@ def db_connection():
             text TEXT NOT NULL,
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version)
+            UNIQUE(story_id, version),
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
     """
     )
 
-    # Script table
+    # Content table
     conn.execute(
         """
-        CREATE TABLE IF NOT EXISTS Script (
+        CREATE TABLE IF NOT EXISTS Content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             story_id INTEGER NOT NULL,
             version INTEGER NOT NULL CHECK (version >= 0),
             text TEXT NOT NULL,
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version)
+            UNIQUE(story_id, version),
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
     """
     )
@@ -76,15 +80,11 @@ def db_connection():
         """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
+            idea_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'CREATED',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         )
     """
     )
@@ -118,7 +118,7 @@ class TestStoryModel:
         assert story.idea_json is not None
         assert story.state == "IDEA"
         assert story.title_id is None
-        assert story.script_id is None
+        assert story.content_id is None
         assert story.id is None  # Not persisted yet
 
     def test_has_idea(self):
@@ -137,32 +137,32 @@ class TestStoryModel:
         assert story_with_title.has_title() is True
         assert story_without_title.has_title() is False
 
-    def test_has_script(self):
-        """Test has_script() method."""
-        story_with_script = Story(script_id=1)
-        story_without_script = Story()
+    def test_has_content(self):
+        """Test has_content() method."""
+        story_with_content = Story(content_id=1)
+        story_without_content = Story()
 
-        assert story_with_script.has_script() is True
-        assert story_without_script.has_script() is False
+        assert story_with_content.has_content() is True
+        assert story_without_content.has_content() is False
 
-    def test_needs_script(self):
-        """Test needs_script() method."""
-        # Story that needs script (has idea and title, no script)
-        story_needs_script = Story(idea_json='{"title": "Test"}', title_id=1, script_id=None)
+    def test_needs_content(self):
+        """Test needs_content() method."""
+        # Story that needs content (has idea and title, no content)
+        story_needs_content = Story(idea_json='{"title": "Test"}', title_id=1, content_id=None)
 
-        # Story that doesn't need script (already has script)
-        story_has_script = Story(idea_json='{"title": "Test"}', title_id=1, script_id=1)
+        # Story that doesn't need content (already has content)
+        story_has_content = Story(idea_json='{"title": "Test"}', title_id=1, content_id=1)
 
-        # Story that can't have script (no idea)
+        # Story that can't have content (no idea)
         story_no_idea = Story(title_id=1)
 
-        # Story that can't have script (no title)
+        # Story that can't have content (no title)
         story_no_title = Story(idea_json='{"title": "Test"}')
 
-        assert story_needs_script.needs_script() is True
-        assert story_has_script.needs_script() is False
-        assert story_no_idea.needs_script() is False
-        assert story_no_title.needs_script() is False
+        assert story_needs_content.needs_content() is True
+        assert story_has_content.needs_content() is False
+        assert story_no_idea.needs_content() is False
+        assert story_no_title.needs_content() is False
 
     def test_to_dict_and_from_dict(self):
         """Test serialization and deserialization."""
@@ -185,13 +185,13 @@ class TestStoryModel:
         assert story.state == "IDEA"
         assert story.updated_at >= old_updated_at
 
-    def test_set_script(self):
-        """Test setting script reference."""
+    def test_set_content(self):
+        """Test setting content reference."""
         story = Story(state="TITLE")
 
-        story.set_script(5)
+        story.set_content(5)
 
-        assert story.script_id == 5
+        assert story.content_id == 5
         assert story.state == "SCRIPT"
 
 
@@ -227,8 +227,8 @@ class TestStoryRepository:
         assert found.state == "IDEA"
         assert found.idea_json == '{"title": "Updated"}'
 
-    def test_find_needing_script(self, db_connection):
-        """Test finding stories that need scripts."""
+    def test_find_needing_content(self, db_connection):
+        """Test finding stories that need contents."""
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -237,17 +237,17 @@ class TestStoryRepository:
         saved_title = title_repo.insert(title)
 
         # Create stories in different states
-        # Story that needs script
+        # Story that needs content
         story1 = story_repo.insert(
             Story(idea_json='{"title": "Test1"}', title_id=saved_title.id, state="TITLE")
         )
 
-        # Story that already has script
+        # Story that already has content
         story2 = story_repo.insert(
             Story(
                 idea_json='{"title": "Test2"}',
                 title_id=saved_title.id,
-                script_id=1,  # Has script
+                content_id=1,  # Has content
                 state="SCRIPT",
             )
         )
@@ -258,33 +258,33 @@ class TestStoryRepository:
         # Story without idea
         story4 = story_repo.insert(Story(title_id=saved_title.id, state="TITLE"))
 
-        needing = story_repo.find_needing_script()
+        needing = story_repo.find_needing_content()
 
         assert len(needing) == 1
         assert needing[0].id == story1.id
 
-    def test_count_needing_script(self, db_connection):
-        """Test counting stories that need scripts."""
+    def test_count_needing_content(self, db_connection):
+        """Test counting stories that need contents."""
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
         # Create titles
         title = title_repo.insert(Title(story_id=1, version=0, text="Title"))
 
-        # Create 3 stories that need scripts
+        # Create 3 stories that need contents
         for i in range(3):
             story_repo.insert(
                 Story(idea_json=f'{{"title": "Test{i}"}}', title_id=title.id, state="TITLE")
             )
 
-        # Create 1 story that has script
+        # Create 1 story that has content
         story_repo.insert(
             Story(
-                idea_json='{"title": "HasScript"}', title_id=title.id, script_id=1, state="SCRIPT"
+                idea_json='{"title": "HasContent"}', title_id=title.id, content_id=1, state="SCRIPT"
             )
         )
 
-        count = story_repo.count_needing_script()
+        count = story_repo.count_needing_content()
         assert count == 3
 
     def test_find_by_state_ordered_by_created(self, db_connection):
@@ -302,7 +302,7 @@ class TestStoryRepository:
         # Create story 1 (oldest)
         story1 = Story(
             idea_json='{"title": "First"}',
-            state="PrismQ.T.Script.From.Idea.Title",
+            state="PrismQ.T.Content.From.Idea.Title",
             created_at=base_time - timedelta(hours=2),
         )
         story_repo.insert(story1)
@@ -310,7 +310,7 @@ class TestStoryRepository:
         # Create story 2 (newest)
         story2 = Story(
             idea_json='{"title": "Second"}',
-            state="PrismQ.T.Script.From.Idea.Title",
+            state="PrismQ.T.Content.From.Idea.Title",
             created_at=base_time,
         )
         story_repo.insert(story2)
@@ -318,7 +318,7 @@ class TestStoryRepository:
         # Create story 3 (middle)
         story3 = Story(
             idea_json='{"title": "Third"}',
-            state="PrismQ.T.Script.From.Idea.Title",
+            state="PrismQ.T.Content.From.Idea.Title",
             created_at=base_time - timedelta(hours=1),
         )
         story_repo.insert(story3)
@@ -333,7 +333,7 @@ class TestStoryRepository:
 
         # Test ascending order (oldest first)
         stories_asc = story_repo.find_by_state_ordered_by_created(
-            "PrismQ.T.Script.From.Idea.Title", ascending=True
+            "PrismQ.T.Content.From.Idea.Title", ascending=True
         )
 
         assert len(stories_asc) == 3
@@ -343,7 +343,7 @@ class TestStoryRepository:
 
         # Test descending order (newest first)
         stories_desc = story_repo.find_by_state_ordered_by_created(
-            "PrismQ.T.Script.From.Idea.Title", ascending=False
+            "PrismQ.T.Content.From.Idea.Title", ascending=False
         )
 
         assert len(stories_desc) == 3
@@ -352,17 +352,17 @@ class TestStoryRepository:
         assert stories_desc[2].id == story1.id  # Oldest
 
 
-class TestStoryScriptService:
-    """Tests for StoryScriptService."""
+class TestStoryContentService:
+    """Tests for StoryContentService."""
 
-    def test_count_stories_needing_scripts(self, db_connection):
-        """Test counting stories needing scripts."""
-        service = StoryScriptService(db_connection)
+    def test_count_stories_needing_contents(self, db_connection):
+        """Test counting stories needing contents."""
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
         # Initially no stories
-        assert service.count_stories_needing_scripts() == 0
+        assert service.count_stories_needing_contents() == 0
 
         # Add a story with idea and title
         title = title_repo.insert(Title(story_id=1, version=0, text="Title"))
@@ -372,11 +372,11 @@ class TestStoryScriptService:
             )
         )
 
-        assert service.count_stories_needing_scripts() == 1
+        assert service.count_stories_needing_contents() == 1
 
-    def test_generate_script_for_story(self, db_connection, sample_idea):
-        """Test generating a script for a single story."""
-        service = StoryScriptService(db_connection)
+    def test_generate_content_for_story(self, db_connection, sample_idea):
+        """Test generating a content for a single story."""
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -392,36 +392,36 @@ class TestStoryScriptService:
         story.state = "TITLE"
         story_repo.update(story)
 
-        # Generate script
-        result = service.generate_script_for_story(story)
+        # Generate content
+        result = service.generate_content_for_story(story)
 
         assert result.success is True
-        assert result.script_id is not None
-        assert result.script_v1 is not None
+        assert result.content_id is not None
+        assert result.content_v1 is not None
         assert result.error is None
 
         # Verify story was updated
         updated_story = story_repo.find_by_id(story.id)
-        assert updated_story.script_id == result.script_id
+        assert updated_story.content_id == result.content_id
         assert updated_story.state == "SCRIPT"
 
-    def test_generate_script_missing_title(self, db_connection, sample_idea):
-        """Test that script generation fails when title is missing."""
-        service = StoryScriptService(db_connection)
+    def test_generate_content_missing_title(self, db_connection, sample_idea):
+        """Test that content generation fails when title is missing."""
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Create story without title
         story = story_repo.insert(Story(idea_json=json.dumps(sample_idea.to_dict()), state="IDEA"))
 
-        result = service.generate_script_for_story(story)
+        result = service.generate_content_for_story(story)
 
         assert result.success is False
         assert result.error is not None
-        assert "does not need script" in result.error
+        assert "does not need content" in result.error
 
-    def test_process_stories_needing_scripts(self, db_connection, sample_idea):
+    def test_process_stories_needing_contents(self, db_connection, sample_idea):
         """Test processing multiple stories."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -438,7 +438,7 @@ class TestStoryScriptService:
             story_repo.update(story)
 
         # Process all
-        results = service.process_stories_needing_scripts()
+        results = service.process_stories_needing_contents()
 
         assert len(results) == 3
         assert all(r.success for r in results)
@@ -452,7 +452,7 @@ class TestStoryScriptService:
 
     def test_process_with_limit(self, db_connection, sample_idea):
         """Test processing with a limit."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -467,12 +467,12 @@ class TestStoryScriptService:
             story_repo.update(story)
 
         # Process only 2
-        results = service.process_stories_needing_scripts(limit=2)
+        results = service.process_stories_needing_contents(limit=2)
 
         assert len(results) == 2
 
         # Verify only 2 were processed
-        remaining = service.count_stories_needing_scripts()
+        remaining = service.count_stories_needing_contents()
         assert remaining == 3
 
 
@@ -502,7 +502,7 @@ class TestProcessAllPendingStories:
         assert summary["success_rate"] == 1.0
 
 
-class TestStoryScriptServiceStateBased:
+class TestStoryContentServiceStateBased:
     """Tests for the state-based workflow (primary workflow).
 
     Tests the new methods:
@@ -513,7 +513,7 @@ class TestStoryScriptServiceStateBased:
 
     def test_get_oldest_story_by_state_no_stories(self, db_connection):
         """Test get_oldest_story_by_state when no stories exist."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
 
         result = service.get_oldest_story_by_state()
 
@@ -523,7 +523,7 @@ class TestStoryScriptServiceStateBased:
         """Test that get_oldest_story_by_state returns the oldest story."""
         from datetime import timedelta
 
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -572,7 +572,7 @@ class TestStoryScriptServiceStateBased:
         """Test that get_oldest_story_by_state only returns stories with correct state."""
         from datetime import timedelta
 
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         base_time = datetime.now()
@@ -601,14 +601,14 @@ class TestStoryScriptServiceStateBased:
 
 
 # =============================================================================
-# Tests for ScriptFromIdeaTitleService (PrismQ.T.Script.From.Idea.Title)
+# Tests for ContentFromIdeaTitleService (PrismQ.T.Content.From.Idea.Title)
 # =============================================================================
 
-from T.Script.From.Idea.Title.src.story_script_service import (
+from T.Content.From.Idea.Title.src.story_content_service import (
     STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
     STATE_SCRIPT_FROM_IDEA_TITLE,
-    ScriptFromIdeaTitleService,
-    StateBasedScriptResult,
+    ContentFromIdeaTitleService,
+    StateBasedContentResult,
     process_oldest_from_idea_title,
 )
 
@@ -698,7 +698,7 @@ class TestStoryRepositoryFindOldestByState:
 
     def test_count_stories_by_state(self, db_connection, sample_idea):
         """Test counting stories with the correct state."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Initially should be 0
@@ -719,7 +719,7 @@ class TestStoryRepositoryFindOldestByState:
 
     def test_process_oldest_story_no_stories(self, db_connection):
         """Test process_oldest_story returns None when no stories exist."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
 
         result = service.process_oldest_story()
 
@@ -729,7 +729,7 @@ class TestStoryRepositoryFindOldestByState:
         """Test successful processing of the oldest story."""
         from datetime import timedelta
 
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -751,20 +751,20 @@ class TestStoryRepositoryFindOldestByState:
 
         assert result is not None
         assert result.success is True
-        assert result.script_id is not None
+        assert result.content_id is not None
 
         # Verify state changed to REVIEW_TITLE_FROM_SCRIPT_IDEA
         updated_story = story_repo.find_by_id(story.id)
         assert updated_story.state == StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA
-        assert updated_story.script_id == result.script_id
+        assert updated_story.content_id == result.content_id
 
 
-class TestScriptFromIdeaTitleService:
-    """Tests for ScriptFromIdeaTitleService."""
+class TestContentFromIdeaTitleService:
+    """Tests for ContentFromIdeaTitleService."""
 
     def test_count_pending(self, db_connection, sample_idea):
         """Test counting pending stories."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -788,7 +788,7 @@ class TestScriptFromIdeaTitleService:
         """Test getting the oldest pending story."""
         from datetime import timedelta
 
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -825,7 +825,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_oldest_story_success(self, db_connection, sample_idea):
         """Test successfully processing the oldest story."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -844,18 +844,18 @@ class TestScriptFromIdeaTitleService:
 
         assert result is not None
         assert result.success is True
-        assert result.script_id is not None
-        assert result.script_v1 is not None
+        assert result.content_id is not None
+        assert result.content_v1 is not None
         assert result.error is None
 
         # Verify state changed
         updated_story = story_repo.find_by_id(story.id)
         assert updated_story.state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
-        assert updated_story.script_id == result.script_id
+        assert updated_story.content_id == result.content_id
 
     def test_process_oldest_story_missing_idea(self, db_connection):
         """Test process_oldest_story fails when story has no idea."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Create story without idea_json
@@ -870,7 +870,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_oldest_story_missing_title(self, db_connection, sample_idea):
         """Test process_oldest_story fails when story has no title."""
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Create story without title_id
@@ -889,7 +889,7 @@ class TestScriptFromIdeaTitleService:
         """Test that process_oldest_story processes stories in creation order."""
         from datetime import timedelta
 
-        service = StoryScriptService(db_connection)
+        service = StoryContentService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -932,7 +932,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_oldest_story_no_stories(self, db_connection):
         """Test processing when no stories are pending."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
 
         result = service.process_oldest_story()
 
@@ -943,7 +943,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_oldest_story_missing_title(self, db_connection, sample_idea):
         """Test processing a story without a title."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
 
         # Create a story without title_id
@@ -960,7 +960,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_oldest_story_missing_idea(self, db_connection):
         """Test processing a story without idea_json."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -979,7 +979,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_all_pending(self, db_connection, sample_idea):
         """Test processing all pending stories."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -1005,7 +1005,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_process_all_pending_with_limit(self, db_connection, sample_idea):
         """Test processing with a limit."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
@@ -1028,7 +1028,7 @@ class TestScriptFromIdeaTitleService:
 
     def test_get_processing_summary(self, db_connection, sample_idea):
         """Test getting processing summary."""
-        service = ScriptFromIdeaTitleService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
