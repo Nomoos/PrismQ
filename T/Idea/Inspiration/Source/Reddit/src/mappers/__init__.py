@@ -2,4 +2,4 @@
 
 from .reddit_mapper import RedditMapper
 
-__all__ = ['RedditMapper']
+__all__ = ["RedditMapper"]

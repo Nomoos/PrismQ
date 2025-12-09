@@ -10,15 +10,15 @@ This module applies improvements suggested by Review (Stage 21):
 """
 
 from .polish import (
+    ChangeLogEntry,
+    ChangeType,
+    ComponentType,
+    PolishConfig,
+    PriorityLevel,
     StoryPolish,
     StoryPolisher,
-    PolishConfig,
-    ChangeLogEntry,
-    ComponentType,
-    ChangeType,
-    PriorityLevel,
+    polish_story_to_json,
     polish_story_with_gpt,
-    polish_story_to_json
 )
 
 __all__ = [
@@ -27,13 +27,11 @@ __all__ = [
     "StoryPolisher",
     "PolishConfig",
     "ChangeLogEntry",
-    
     # Enums
     "ComponentType",
     "ChangeType",
     "PriorityLevel",
-    
     # Convenience functions
     "polish_story_with_gpt",
-    "polish_story_to_json"
+    "polish_story_to_json",
 ]

@@ -1,8 +1,8 @@
 """Register HackerNews task types with TaskManager API."""
 
+import logging
 import sys
 from pathlib import Path
-import logging
 
 # Add parent directories to path
 _root = Path(__file__).resolve().parent.parent.parent.parent.parent
@@ -20,13 +20,13 @@ logger = logging.getLogger(__name__)
 
 def register_hackernews_task_types():
     """Register HackerNews Stories task types with TaskManager API."""
-    
+
     try:
         client = TaskManagerClient()
     except Exception as e:
         logger.error(f"Failed to initialize TaskManager client: {e}")
         return False
-    
+
     task_types = [
         {
             "name": "PrismQ.Text.HackerNews.Story.Fetch",
@@ -39,17 +39,17 @@ def register_hackernews_task_types():
                         "type": "string",
                         "enum": ["top", "best", "new", "ask", "show", "job"],
                         "default": "top",
-                        "description": "Type of stories to fetch"
+                        "description": "Type of stories to fetch",
                     },
                     "limit": {
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 500,
                         "default": 30,
-                        "description": "Maximum number of stories to fetch"
-                    }
-                }
-            }
+                        "description": "Maximum number of stories to fetch",
+                    },
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.FrontPage",
@@ -63,10 +63,10 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 30,
                         "default": 30,
-                        "description": "Number of front page stories"
+                        "description": "Number of front page stories",
                     }
-                }
-            }
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.Best",
@@ -80,10 +80,10 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 100,
                         "default": 30,
-                        "description": "Number of best stories to fetch"
+                        "description": "Number of best stories to fetch",
                     }
-                }
-            }
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.New",
@@ -97,10 +97,10 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 100,
                         "default": 30,
-                        "description": "Number of new stories to fetch"
+                        "description": "Number of new stories to fetch",
                     }
-                }
-            }
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.Ask",
@@ -114,10 +114,10 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 100,
                         "default": 30,
-                        "description": "Number of Ask HN stories to fetch"
+                        "description": "Number of Ask HN stories to fetch",
                     }
-                }
-            }
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.Show",
@@ -131,10 +131,10 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 100,
                         "default": 30,
-                        "description": "Number of Show HN stories to fetch"
+                        "description": "Number of Show HN stories to fetch",
                     }
-                }
-            }
+                },
+            },
         },
         {
             "name": "PrismQ.Text.HackerNews.Story.Job",
@@ -148,13 +148,13 @@ def register_hackernews_task_types():
                         "minimum": 1,
                         "maximum": 100,
                         "default": 30,
-                        "description": "Number of job postings to fetch"
+                        "description": "Number of job postings to fetch",
                     }
-                }
-            }
-        }
+                },
+            },
+        },
     ]
-    
+
     success_count = 0
     for task_type in task_types:
         try:
@@ -163,7 +163,7 @@ def register_hackernews_task_types():
             success_count += 1
         except Exception as e:
             logger.error(f"❌ Failed to register {task_type['name']}: {e}")
-    
+
     logger.info(f"\nRegistered {success_count}/{len(task_types)} task types")
     return success_count == len(task_types)
 

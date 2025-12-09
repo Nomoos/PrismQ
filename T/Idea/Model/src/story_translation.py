@@ -21,15 +21,15 @@ Language Code Standard:
     Uses ISO 639-1 language codes (e.g., 'en', 'cs', 'es', 'de', 'fr')
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import Optional, Dict, Any, List
-from enum import Enum
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class TranslationStatus(Enum):
     """Status of a translation in the review workflow."""
-    
+
     DRAFT = "draft"  # Initial translation in progress
     PENDING_REVIEW = "pending_review"  # Submitted for review
     REVISION_NEEDED = "revision_needed"  # Reviewer found issues
@@ -44,10 +44,10 @@ MEANING_SCORE_THRESHOLD = 85  # Minimum score (0-100) for automatic approval
 @dataclass
 class TranslationFeedback:
     """Feedback from AI Reviewer to AI Translator.
-    
+
     Captures specific issues found during review to guide revision.
     """
-    
+
     reviewer_id: str  # AI Reviewer identifier
     iteration: int  # Which review iteration (1, 2, etc.)
     timestamp: str  # When feedback was given
@@ -60,29 +60,29 @@ class TranslationFeedback:
 @dataclass
 class StoryTranslation:
     """Translation of a story into a specific language.
-    
+
     Represents one language version of a story, linked to the original via story_id.
     All translations of the same story share the same story_id but have different
     language codes.
-    
+
     Attributes:
         story_id: ID of the original story/idea (links all translations)
         language_code: ISO 639-1 language code (e.g., 'en', 'cs', 'es')
         title: Translated title
         text: Translated story text/script
-        
+
         Translation Quality:
             status: Current workflow status
             iteration_count: Number of translation revision iterations
             max_iterations: Maximum allowed revisions (default 2)
             translator_id: AI Translator identifier
             reviewer_id: AI Reviewer identifier (if reviewed)
-            
+
         Feedback Loop:
             feedback_history: List of all feedback from reviews
             last_feedback: Most recent feedback summary
             meaning_verified: Whether meaning matches original
-            
+
         Metadata:
             translated_from: Source language code (typically original language)
             version: Translation version number
@@ -91,11 +91,11 @@ class StoryTranslation:
             approved_at: When approved by reviewer
             published_at: When published
             notes: Translation notes
-    
+
     Example:
         >>> # Original English story
         >>> original_story_id = 42
-        >>> 
+        >>>
         >>> # Czech translation
         >>> czech = StoryTranslation(
         ...     story_id=42,
@@ -106,7 +106,7 @@ class StoryTranslation:
         ...     translator_id="AI-Translator-GPT4",
         ...     status=TranslationStatus.PENDING_REVIEW
         ... )
-        >>> 
+        >>>
         >>> # Spanish translation
         >>> spanish = StoryTranslation(
         ...     story_id=42,
@@ -117,27 +117,27 @@ class StoryTranslation:
         ...     translator_id="AI-Translator-GPT4"
         ... )
     """
-    
+
     # Core Identity
     story_id: int  # Links to parent story/idea
     language_code: str  # ISO 639-1 code (en, cs, es, etc.)
-    
+
     # Content
     title: str
     text: str
-    
+
     # Translation Process
     status: TranslationStatus = TranslationStatus.DRAFT
     iteration_count: int = 0
     max_iterations: int = 2  # Limit feedback loop
     translator_id: Optional[str] = None
     reviewer_id: Optional[str] = None
-    
+
     # Feedback Loop
     feedback_history: List[Dict[str, Any]] = field(default_factory=list)
     last_feedback: str = ""
     meaning_verified: bool = False
-    
+
     # Metadata
     translated_from: str = "en"  # Source language
     version: int = 1
@@ -146,24 +146,24 @@ class StoryTranslation:
     approved_at: Optional[str] = None
     published_at: Optional[str] = None
     notes: str = ""
-    
+
     def __post_init__(self):
         """Initialize timestamps if not provided."""
         if self.created_at is None:
             self.created_at = datetime.now().isoformat()
         if self.updated_at is None:
             self.updated_at = datetime.now().isoformat()
-    
+
     def add_feedback(
         self,
         reviewer_id: str,
         issues: List[str],
         suggestions: List[str],
         meaning_score: Optional[int] = None,
-        notes: str = ""
+        notes: str = "",
     ) -> None:
         """Add feedback from AI Reviewer.
-        
+
         Args:
             reviewer_id: Identifier of the reviewer
             issues: List of specific issues found
@@ -172,7 +172,7 @@ class StoryTranslation:
             notes: Additional notes
         """
         self.iteration_count += 1
-        
+
         feedback = {
             "reviewer_id": reviewer_id,
             "iteration": self.iteration_count,
@@ -180,15 +180,15 @@ class StoryTranslation:
             "issues": issues,
             "suggestions": suggestions,
             "meaning_score": meaning_score,
-            "notes": notes
+            "notes": notes,
         }
-        
+
         self.feedback_history.append(feedback)
         self.reviewer_id = reviewer_id
-        
+
         # Update last feedback summary
         self.last_feedback = f"Iteration {self.iteration_count}: {len(issues)} issues found"
-        
+
         # Update status based on feedback
         if len(issues) == 0 and meaning_score and meaning_score >= MEANING_SCORE_THRESHOLD:
             self.status = TranslationStatus.APPROVED
@@ -196,25 +196,25 @@ class StoryTranslation:
             self.approved_at = datetime.now().isoformat()
         else:
             self.status = TranslationStatus.REVISION_NEEDED
-        
+
         self.updated_at = datetime.now().isoformat()
-    
+
     def can_request_revision(self) -> bool:
         """Check if another revision iteration is allowed.
-        
+
         Returns:
             True if iteration count is below max_iterations
         """
         return self.iteration_count < self.max_iterations
-    
+
     def submit_for_review(self) -> None:
         """Mark translation as ready for review."""
         self.status = TranslationStatus.PENDING_REVIEW
         self.updated_at = datetime.now().isoformat()
-    
+
     def approve(self, reviewer_id: str) -> None:
         """Approve translation without further revision.
-        
+
         Args:
             reviewer_id: Identifier of the reviewer
         """
@@ -223,19 +223,19 @@ class StoryTranslation:
         self.reviewer_id = reviewer_id
         self.approved_at = datetime.now().isoformat()
         self.updated_at = datetime.now().isoformat()
-    
+
     def publish(self) -> None:
         """Mark translation as published."""
         if self.status != TranslationStatus.APPROVED:
             raise ValueError("Cannot publish translation that is not approved")
-        
+
         self.status = TranslationStatus.PUBLISHED
         self.published_at = datetime.now().isoformat()
         self.updated_at = datetime.now().isoformat()
-    
+
     def update_content(self, title: str = None, text: str = None) -> None:
         """Update translation content (typically after feedback).
-        
+
         Args:
             title: New translated title (optional)
             text: New translated text (optional)
@@ -244,30 +244,30 @@ class StoryTranslation:
             self.title = title
         if text is not None:
             self.text = text
-        
+
         self.version += 1
         self.updated_at = datetime.now().isoformat()
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert StoryTranslation to dictionary representation.
-        
+
         Returns:
             Dictionary containing all fields with Enums converted to strings
         """
         data = asdict(self)
         data["status"] = self.status.value
         return data
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "StoryTranslation":
         """Create StoryTranslation from dictionary.
-        
+
         Args:
             data: Dictionary containing StoryTranslation fields
-            
+
         Returns:
             StoryTranslation instance
-            
+
         Raises:
             ValueError: If invalid status value provided
         """
@@ -279,9 +279,12 @@ class StoryTranslation:
             except ValueError as e:
                 # Log invalid status and provide helpful error
                 import logging
-                logging.warning(f"Invalid translation status '{status}', defaulting to DRAFT. Valid values: {[s.value for s in TranslationStatus]}")
+
+                logging.warning(
+                    f"Invalid translation status '{status}', defaulting to DRAFT. Valid values: {[s.value for s in TranslationStatus]}"
+                )
                 status = TranslationStatus.DRAFT
-        
+
         return cls(
             story_id=data.get("story_id"),
             language_code=data.get("language_code"),
@@ -301,9 +304,9 @@ class StoryTranslation:
             updated_at=data.get("updated_at"),
             approved_at=data.get("approved_at"),
             published_at=data.get("published_at"),
-            notes=data.get("notes", "")
+            notes=data.get("notes", ""),
         )
-    
+
     def __repr__(self) -> str:
         """String representation of StoryTranslation."""
         return (

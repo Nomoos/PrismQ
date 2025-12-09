@@ -17,21 +17,21 @@ Workflow Position: Early stage before Title generation
 
 Example:
     >>> from T.Story.From.Idea import StoryFromIdeaService, process_oldest_unreferenced_idea
-    >>> 
+    >>>
     >>> service = StoryFromIdeaService(db_connection, idea_db)
-    >>> 
+    >>>
     >>> # Process the oldest unreferenced idea (main workflow entry point)
     >>> result = service.process_oldest_unreferenced_idea()
     >>> if result:
     ...     print(f"Created {result.count} stories for idea {result.idea_id}")
-    >>> 
+    >>>
     >>> # Or use convenience function
     >>> result = process_oldest_unreferenced_idea(db_connection, idea_db)
 """
 
 from T.Story.From.Idea.src.story_from_idea_service import (
-    StoryFromIdeaService,
     StoryCreationResult,
+    StoryFromIdeaService,
     create_stories_from_idea,
     get_unreferenced_ideas,
     process_oldest_unreferenced_idea,

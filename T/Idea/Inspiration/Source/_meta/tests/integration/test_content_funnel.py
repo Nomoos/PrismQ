@@ -6,8 +6,9 @@ transformation stages: Video → Audio → Text, Audio → Text, or Text (passth
 
 import sys
 from pathlib import Path
+from typing import Any, Dict, Optional
+
 import pytest
-from typing import Optional, Dict, Any
 
 # Add paths for imports
 source_path = Path(__file__).parent.parent.parent.parent / "src"
@@ -17,15 +18,15 @@ if str(source_path) not in sys.path:
 if str(model_path) not in sys.path:
     sys.path.insert(0, str(model_path))
 
+from core.content_funnel import AudioExtractor  # Protocol, imported for type hints
+from core.content_funnel import AudioTranscriber  # Protocol, imported for type hints
+from core.content_funnel import SubtitleExtractor  # Protocol, imported for type hints
 from core.content_funnel import (  # noqa: E402
     ContentFunnel,
-    TransformationStage,
     TransformationMetadata,
-    AudioExtractor,  # Protocol, imported for type hints
-    AudioTranscriber,  # Protocol, imported for type hints
-    SubtitleExtractor,  # Protocol, imported for type hints
+    TransformationStage,
 )
-from idea_inspiration import IdeaInspiration, ContentType  # noqa: E402
+from idea_inspiration import ContentType, IdeaInspiration  # noqa: E402
 
 
 class MockAudioExtractor:
@@ -36,10 +37,7 @@ class MockAudioExtractor:
         self.call_count = 0
 
     def extract_audio(
-        self,
-        video_url: str,
-        video_id: Optional[str] = None,
-        **kwargs
+        self, video_url: str, video_id: Optional[str] = None, **kwargs
     ) -> Optional[Dict[str, Any]]:
         """Mock audio extraction."""
         self.call_count += 1
@@ -47,9 +45,9 @@ class MockAudioExtractor:
             return None
 
         return {
-            'audio_url': f"{video_url}.audio",
-            'audio_format': 'mp3',
-            'duration': 180,
+            "audio_url": f"{video_url}.audio",
+            "audio_format": "mp3",
+            "duration": 180,
         }
 
 
@@ -66,7 +64,7 @@ class MockAudioTranscriber:
         audio_url: str,
         audio_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Mock audio transcription."""
         self.call_count += 1
@@ -74,9 +72,9 @@ class MockAudioTranscriber:
             return None
 
         return {
-            'text': f"Transcribed text from {audio_url}",
-            'confidence': self.confidence,
-            'language': language or 'en',
+            "text": f"Transcribed text from {audio_url}",
+            "confidence": self.confidence,
+            "language": language or "en",
         }
 
 
@@ -92,7 +90,7 @@ class MockSubtitleExtractor:
         video_url: str,
         video_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Mock subtitle extraction."""
         self.call_count += 1
@@ -100,10 +98,10 @@ class MockSubtitleExtractor:
             return None
 
         return {
-            'text': f"Subtitle text from {video_url}",
-            'format': 'srt',
-            'language': language or 'en',
-            'confidence': 98.0,
+            "text": f"Subtitle text from {video_url}",
+            "format": "srt",
+            "language": language or "en",
+            "confidence": 98.0,
         }
 
 
@@ -126,7 +124,7 @@ class TestContentFunnel:
         funnel = ContentFunnel(
             audio_extractor=audio_extractor,
             audio_transcriber=audio_transcriber,
-            subtitle_extractor=subtitle_extractor
+            subtitle_extractor=subtitle_extractor,
         )
 
         assert funnel.audio_extractor is audio_extractor
@@ -138,9 +136,7 @@ class TestContentFunnel:
         funnel = ContentFunnel()
 
         text_idea = IdeaInspiration.from_text(
-            title="Test Article",
-            text_content="Original text content",
-            keywords=["test", "article"]
+            title="Test Article", text_content="Original text content", keywords=["test", "article"]
         )
 
         result = funnel.process(text_idea)
@@ -149,7 +145,7 @@ class TestContentFunnel:
         assert result.content == "Original text content"
         assert result.source_type == ContentType.TEXT
         # No transformations should occur
-        assert 'transformation_chain' not in result.metadata
+        assert "transformation_chain" not in result.metadata
 
     def test_video_subtitle_extraction(self):
         """Test video content with subtitle extraction."""
@@ -160,7 +156,7 @@ class TestContentFunnel:
             title="Test Video",
             description="A test video",
             source_url="https://example.com/video123",
-            source_id="video123"
+            source_id="video123",
         )
 
         result = funnel.process(video_idea, extract_subtitles=True)
@@ -170,32 +166,29 @@ class TestContentFunnel:
         # Content should contain subtitle text
         assert "Subtitle text from" in result.content
         # Metadata should track the transformation
-        assert 'transformation_chain' in result.metadata
-        assert 'subtitle_format' in result.metadata
-        assert result.metadata['subtitle_format'] == 'srt'
-        assert result.metadata['subtitle_language'] == 'en'
+        assert "transformation_chain" in result.metadata
+        assert "subtitle_format" in result.metadata
+        assert result.metadata["subtitle_format"] == "srt"
+        assert result.metadata["subtitle_language"] == "en"
 
     def test_video_audio_extraction_and_transcription(self):
         """Test video content with audio extraction and transcription."""
         audio_extractor = MockAudioExtractor()
         audio_transcriber = MockAudioTranscriber()
-        funnel = ContentFunnel(
-            audio_extractor=audio_extractor,
-            audio_transcriber=audio_transcriber
-        )
+        funnel = ContentFunnel(audio_extractor=audio_extractor, audio_transcriber=audio_transcriber)
 
         video_idea = IdeaInspiration.from_video(
             title="Test Video",
             description="A test video",
             source_url="https://example.com/video123",
-            source_id="video123"
+            source_id="video123",
         )
 
         result = funnel.process(
             video_idea,
             extract_audio=True,
             transcribe_audio=True,
-            extract_subtitles=False  # Skip subtitle extraction
+            extract_subtitles=False,  # Skip subtitle extraction
         )
 
         # Audio extraction should have been called
@@ -205,10 +198,10 @@ class TestContentFunnel:
         # Content should contain transcribed text
         assert "Transcribed text from" in result.content
         # Metadata should track both transformations
-        assert 'transformation_chain' in result.metadata
-        assert 'audio_format' in result.metadata
-        assert result.metadata['audio_format'] == 'mp3'
-        assert 'transcription_language' in result.metadata
+        assert "transformation_chain" in result.metadata
+        assert "audio_format" in result.metadata
+        assert result.metadata["audio_format"] == "mp3"
+        assert "transcription_language" in result.metadata
 
     def test_video_subtitle_preferred_over_transcription(self):
         """Test that subtitle extraction is preferred over audio transcription."""
@@ -219,20 +212,15 @@ class TestContentFunnel:
         funnel = ContentFunnel(
             audio_extractor=audio_extractor,
             audio_transcriber=audio_transcriber,
-            subtitle_extractor=subtitle_extractor
+            subtitle_extractor=subtitle_extractor,
         )
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123",
-            source_id="video123"
+            title="Test Video", source_url="https://example.com/video123", source_id="video123"
         )
 
         result = funnel.process(
-            video_idea,
-            extract_audio=True,
-            transcribe_audio=True,
-            extract_subtitles=True
+            video_idea, extract_audio=True, transcribe_audio=True, extract_subtitles=True
         )
 
         # Subtitle extraction should have been called
@@ -252,20 +240,15 @@ class TestContentFunnel:
         funnel = ContentFunnel(
             audio_extractor=audio_extractor,
             audio_transcriber=audio_transcriber,
-            subtitle_extractor=subtitle_extractor
+            subtitle_extractor=subtitle_extractor,
         )
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123",
-            source_id="video123"
+            title="Test Video", source_url="https://example.com/video123", source_id="video123"
         )
 
         result = funnel.process(
-            video_idea,
-            extract_audio=True,
-            transcribe_audio=True,
-            extract_subtitles=True
+            video_idea, extract_audio=True, transcribe_audio=True, extract_subtitles=True
         )
 
         # Both subtitle and audio extraction should have been attempted
@@ -284,7 +267,7 @@ class TestContentFunnel:
             title="Test Podcast",
             description="A test podcast episode",
             source_url="https://example.com/podcast.mp3",
-            source_id="podcast123"
+            source_id="podcast123",
         )
 
         result = funnel.process(audio_idea, transcribe_audio=True)
@@ -294,8 +277,8 @@ class TestContentFunnel:
         # Content should contain transcribed text
         assert "Transcribed text from" in result.content
         # Metadata should track the transformation
-        assert 'transformation_chain' in result.metadata
-        assert 'transcription_language' in result.metadata
+        assert "transformation_chain" in result.metadata
+        assert "transcription_language" in result.metadata
 
     def test_audio_without_transcription(self):
         """Test audio content without transcription enabled."""
@@ -303,8 +286,7 @@ class TestContentFunnel:
         funnel = ContentFunnel(audio_transcriber=audio_transcriber)
 
         audio_idea = IdeaInspiration.from_audio(
-            title="Test Podcast",
-            source_url="https://example.com/podcast.mp3"
+            title="Test Podcast", source_url="https://example.com/podcast.mp3"
         )
 
         result = funnel.process(audio_idea, transcribe_audio=False)
@@ -314,7 +296,7 @@ class TestContentFunnel:
         # Content should remain empty
         assert result.content == ""
         # No transformation chain
-        assert 'transformation_chain' not in result.metadata
+        assert "transformation_chain" not in result.metadata
 
     def test_video_with_existing_content(self):
         """Test that existing content is not overwritten."""
@@ -324,7 +306,7 @@ class TestContentFunnel:
         video_idea = IdeaInspiration.from_video(
             title="Test Video",
             subtitle_text="Existing subtitle content",
-            source_url="https://example.com/video123"
+            source_url="https://example.com/video123",
         )
 
         result = funnel.process(video_idea, extract_subtitles=True)
@@ -340,8 +322,7 @@ class TestContentFunnel:
         funnel = ContentFunnel(subtitle_extractor=subtitle_extractor)
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123"
+            title="Test Video", source_url="https://example.com/video123"
         )
 
         result = funnel.process(video_idea, extract_subtitles=True)
@@ -349,37 +330,30 @@ class TestContentFunnel:
         # Check transformation history
         history = funnel.get_transformation_history()
         assert len(history) == 1
-        assert history[0]['from_stage'] == 'video_source'
-        assert history[0]['to_stage'] == 'text_subtitled'
-        assert history[0]['method'] == 'subtitle_extraction'
-        assert history[0]['confidence'] == 98.0
+        assert history[0]["from_stage"] == "video_source"
+        assert history[0]["to_stage"] == "text_subtitled"
+        assert history[0]["method"] == "subtitle_extraction"
+        assert history[0]["confidence"] == 98.0
 
     def test_transformation_chain_format(self):
         """Test transformation chain string formatting."""
         audio_extractor = MockAudioExtractor()
         audio_transcriber = MockAudioTranscriber(confidence=92.5)
-        funnel = ContentFunnel(
-            audio_extractor=audio_extractor,
-            audio_transcriber=audio_transcriber
-        )
+        funnel = ContentFunnel(audio_extractor=audio_extractor, audio_transcriber=audio_transcriber)
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123"
+            title="Test Video", source_url="https://example.com/video123"
         )
 
         result = funnel.process(
-            video_idea,
-            extract_audio=True,
-            transcribe_audio=True,
-            extract_subtitles=False
+            video_idea, extract_audio=True, transcribe_audio=True, extract_subtitles=False
         )
 
         # Check transformation chain format
-        chain = result.metadata['transformation_chain']
-        assert 'video_source→audio_extracted' in chain
-        assert 'audio_extracted→text_transcribed' in chain
-        assert '[92.5%]' in chain
+        chain = result.metadata["transformation_chain"]
+        assert "video_source→audio_extracted" in chain
+        assert "audio_extracted→text_transcribed" in chain
+        assert "[92.5%]" in chain
 
     def test_language_parameter(self):
         """Test language parameter passing through the funnel."""
@@ -387,35 +361,27 @@ class TestContentFunnel:
         funnel = ContentFunnel(audio_transcriber=audio_transcriber)
 
         audio_idea = IdeaInspiration.from_audio(
-            title="Test Podcast",
-            source_url="https://example.com/podcast.mp3"
+            title="Test Podcast", source_url="https://example.com/podcast.mp3"
         )
 
-        result = funnel.process(audio_idea, transcribe_audio=True, language='es')
+        result = funnel.process(audio_idea, transcribe_audio=True, language="es")
 
         # Language should be stored in metadata
-        assert result.metadata['transcription_language'] == 'es'
+        assert result.metadata["transcription_language"] == "es"
 
     def test_error_handling_audio_extraction_failure(self):
         """Test graceful error handling when audio extraction fails."""
         audio_extractor = MockAudioExtractor(should_succeed=False)
         audio_transcriber = MockAudioTranscriber()
-        funnel = ContentFunnel(
-            audio_extractor=audio_extractor,
-            audio_transcriber=audio_transcriber
-        )
+        funnel = ContentFunnel(audio_extractor=audio_extractor, audio_transcriber=audio_transcriber)
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123"
+            title="Test Video", source_url="https://example.com/video123"
         )
 
         # Should not raise an exception
         result = funnel.process(
-            video_idea,
-            extract_audio=True,
-            transcribe_audio=True,
-            extract_subtitles=False
+            video_idea, extract_audio=True, transcribe_audio=True, extract_subtitles=False
         )
 
         # Content should remain empty
@@ -427,22 +393,15 @@ class TestContentFunnel:
         """Test graceful error handling when transcription fails."""
         audio_extractor = MockAudioExtractor()
         audio_transcriber = MockAudioTranscriber(should_succeed=False)
-        funnel = ContentFunnel(
-            audio_extractor=audio_extractor,
-            audio_transcriber=audio_transcriber
-        )
+        funnel = ContentFunnel(audio_extractor=audio_extractor, audio_transcriber=audio_transcriber)
 
         video_idea = IdeaInspiration.from_video(
-            title="Test Video",
-            source_url="https://example.com/video123"
+            title="Test Video", source_url="https://example.com/video123"
         )
 
         # Should not raise an exception
         result = funnel.process(
-            video_idea,
-            extract_audio=True,
-            transcribe_audio=True,
-            extract_subtitles=False
+            video_idea, extract_audio=True, transcribe_audio=True, extract_subtitles=False
         )
 
         # Audio extraction should have occurred
@@ -461,7 +420,7 @@ class TestTransformationMetadata:
             to_stage=TransformationStage.AUDIO_EXTRACTED,
             method="ffmpeg",
             confidence=95.0,
-            timestamp="2024-01-01T12:00:00Z"
+            timestamp="2024-01-01T12:00:00Z",
         )
 
         assert metadata.from_stage == TransformationStage.VIDEO_SOURCE
@@ -477,16 +436,16 @@ class TestTransformationMetadata:
             to_stage=TransformationStage.TEXT_TRANSCRIBED,
             method="whisper",
             confidence=92.5,
-            additional_info={'model': 'large-v2'}
+            additional_info={"model": "large-v2"},
         )
 
         data = metadata.to_dict()
 
-        assert data['from_stage'] == 'audio_source'
-        assert data['to_stage'] == 'text_transcribed'
-        assert data['method'] == 'whisper'
-        assert data['confidence'] == 92.5
-        assert data['additional_info']['model'] == 'large-v2'
+        assert data["from_stage"] == "audio_source"
+        assert data["to_stage"] == "text_transcribed"
+        assert data["method"] == "whisper"
+        assert data["confidence"] == 92.5
+        assert data["additional_info"]["model"] == "large-v2"
 
 
 class TestTransformationStage:
@@ -502,5 +461,5 @@ class TestTransformationStage:
         assert TransformationStage.TEXT_SOURCE.value == "text_source"
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

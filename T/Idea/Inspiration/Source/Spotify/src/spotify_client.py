@@ -1,11 +1,12 @@
 """Spotify API client for audio content integration."""
 
-from typing import List, Optional, Dict
-from datetime import datetime
-import logging
 import base64
+import logging
 import time
-from Audio.src.clients.base_client import BaseAudioClient, AudioMetadata
+from datetime import datetime
+from typing import Dict, List, Optional
+
+from Audio.src.clients.base_client import AudioMetadata, BaseAudioClient
 from Audio.src.clients.utils import sanitize_metadata
 
 logger = logging.getLogger(__name__)
@@ -117,18 +118,14 @@ class SpotifyClient(BaseAudioClient):
         """Fetch metadata for a Spotify track."""
         url = f"{self.BASE_URL}/tracks/{track_id}"
 
-        response = self._make_request(
-            method="GET", url=url, headers=self._get_headers()
-        )
+        response = self._make_request(method="GET", url=url, headers=self._get_headers())
 
         track = response.json()
 
         return AudioMetadata(
             title=track["name"],
             creator=", ".join(artist["name"] for artist in track["artists"]),
-            duration_seconds=(
-                track["duration_ms"] // 1000 if track.get("duration_ms") else None
-            ),
+            duration_seconds=(track["duration_ms"] // 1000 if track.get("duration_ms") else None),
             description=None,  # Tracks don't have descriptions
             published_at=None,  # Use album release date if available
             audio_url=track.get("preview_url"),  # 30-second preview
@@ -156,9 +153,7 @@ class SpotifyClient(BaseAudioClient):
         """Fetch metadata for a Spotify podcast episode."""
         url = f"{self.BASE_URL}/episodes/{episode_id}"
 
-        response = self._make_request(
-            method="GET", url=url, headers=self._get_headers()
-        )
+        response = self._make_request(method="GET", url=url, headers=self._get_headers())
 
         episode = response.json()
 
@@ -166,9 +161,7 @@ class SpotifyClient(BaseAudioClient):
         published_at = None
         if episode.get("release_date"):
             try:
-                published_at = datetime.fromisoformat(
-                    episode["release_date"] + "T00:00:00Z"
-                )
+                published_at = datetime.fromisoformat(episode["release_date"] + "T00:00:00Z")
             except Exception:
                 pass
 
@@ -181,9 +174,7 @@ class SpotifyClient(BaseAudioClient):
             description=episode.get("description"),
             published_at=published_at,
             audio_url=episode.get("audio_preview_url"),
-            thumbnail_url=(
-                episode["images"][0]["url"] if episode.get("images") else None
-            ),
+            thumbnail_url=(episode["images"][0]["url"] if episode.get("images") else None),
             genres=None,
             language=episode.get("language"),
             explicit=episode.get("explicit", False),
@@ -191,9 +182,7 @@ class SpotifyClient(BaseAudioClient):
             platform_id=episode["id"],
             metadata=sanitize_metadata(
                 {
-                    "show_name": (
-                        episode["show"]["name"] if episode.get("show") else None
-                    ),
+                    "show_name": (episode["show"]["name"] if episode.get("show") else None),
                     "show_id": (episode["show"]["id"] if episode.get("show") else None),
                     "external_urls": episode.get("external_urls", {}).get("spotify"),
                     "release_date": episode.get("release_date"),
@@ -232,18 +221,12 @@ class SpotifyClient(BaseAudioClient):
                 try:
                     metadata = AudioMetadata(
                         title=track["name"],
-                        creator=", ".join(
-                            artist["name"] for artist in track["artists"]
-                        ),
+                        creator=", ".join(artist["name"] for artist in track["artists"]),
                         duration_seconds=(
-                            track["duration_ms"] // 1000
-                            if track.get("duration_ms")
-                            else None
+                            track["duration_ms"] // 1000 if track.get("duration_ms") else None
                         ),
                         thumbnail_url=(
-                            track["album"]["images"][0]["url"]
-                            if track["album"]["images"]
-                            else None
+                            track["album"]["images"][0]["url"] if track["album"]["images"] else None
                         ),
                         platform="spotify",
                         platform_id=track["id"],
@@ -263,21 +246,13 @@ class SpotifyClient(BaseAudioClient):
                 try:
                     metadata = AudioMetadata(
                         title=episode["name"],
-                        creator=(
-                            episode["show"]["name"]
-                            if episode.get("show")
-                            else "Unknown"
-                        ),
+                        creator=(episode["show"]["name"] if episode.get("show") else "Unknown"),
                         duration_seconds=(
-                            episode["duration_ms"] // 1000
-                            if episode.get("duration_ms")
-                            else None
+                            episode["duration_ms"] // 1000 if episode.get("duration_ms") else None
                         ),
                         description=episode.get("description"),
                         thumbnail_url=(
-                            episode["images"][0]["url"]
-                            if episode.get("images")
-                            else None
+                            episode["images"][0]["url"] if episode.get("images") else None
                         ),
                         platform="spotify",
                         platform_id=episode["id"],

@@ -11,11 +11,7 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Script.Formatter.Blog import (
-    format_blog,
-    export_for_platform,
-    BlogFormatter
-)
+from T.Script.Formatter.Blog import BlogFormatter, export_for_platform, format_blog
 
 
 def example_basic_usage():
@@ -23,7 +19,7 @@ def example_basic_usage():
     print("=" * 70)
     print("Example 1: Basic Blog Formatting")
     print("=" * 70)
-    
+
     script = """
     This is a comprehensive story about innovation and how it shapes our world.
     
@@ -46,13 +42,11 @@ def example_basic_usage():
     Those who are willing to take risks. Innovation is not just about technology.
     It's about human creativity and determination.
     """
-    
+
     result = format_blog(
-        script=script,
-        title="Innovation: Shaping Our Future",
-        content_id="blog-001"
+        script=script, title="Innovation: Shaping Our Future", content_id="blog-001"
     )
-    
+
     if result.success:
         print("\n✅ Formatting successful!")
         print(f"\nMetadata:")
@@ -66,7 +60,7 @@ def example_basic_usage():
         print(f"{result.formatted_content[:500]}...")
     else:
         print(f"\n❌ Errors: {result.errors}")
-    
+
     print("\n")
 
 
@@ -75,7 +69,7 @@ def example_platform_specific():
     print("=" * 70)
     print("Example 2: Platform-Specific Exports")
     print("=" * 70)
-    
+
     script = """
     Machine learning is transforming the world of technology. From self-driving cars
     to personalized recommendations, ML algorithms are everywhere. But what exactly
@@ -92,22 +86,22 @@ def example_platform_specific():
     It's not just a tool for tech companies. It's becoming essential across all
     industries, from healthcare to finance to entertainment.
     """
-    
+
     platforms = ["medium", "wordpress", "ghost"]
-    
+
     for platform in platforms:
         print(f"\n--- {platform.upper()} Export ---")
-        
+
         format_type = "html" if platform == "wordpress" else "markdown"
-        
+
         result = export_for_platform(
             script=script,
             title="Understanding Machine Learning",
             content_id=f"ml-{platform}",
             platform=platform,
-            format_type=format_type
+            format_type=format_type,
         )
-        
+
         if result.success:
             print(f"✅ {platform.capitalize()} export successful")
             print(f"   Format: {result.format_type}")
@@ -116,7 +110,7 @@ def example_platform_specific():
             print(f"   {result.formatted_content[:200]}...")
         else:
             print(f"❌ Errors: {result.errors}")
-    
+
     print("\n")
 
 
@@ -125,7 +119,7 @@ def example_with_cta():
     print("=" * 70)
     print("Example 3: Blog with Call-to-Action")
     print("=" * 70)
-    
+
     script = """
     Content marketing is essential for business growth. It helps build trust,
     establish authority, and drive conversions. But creating effective content
@@ -145,17 +139,17 @@ def example_with_cta():
     build an audience and see results. But with patience and persistence,
     the rewards are substantial.
     """
-    
+
     cta_text = "📧 Subscribe to our newsletter for weekly marketing tips and strategies!"
-    
+
     result = format_blog(
         script=script,
         title="The Ultimate Guide to Content Marketing",
         content_id="cta-example",
         cta_text=cta_text,
-        platform="medium"
+        platform="medium",
     )
-    
+
     if result.success:
         print("\n✅ Formatting with CTA successful!")
         print(f"\nCTA text: {cta_text}")
@@ -165,7 +159,7 @@ def example_with_cta():
         print(result.formatted_content)
     else:
         print(f"\n❌ Errors: {result.errors}")
-    
+
     print("\n")
 
 
@@ -174,7 +168,7 @@ def example_html_format():
     print("=" * 70)
     print("Example 4: HTML Output Format")
     print("=" * 70)
-    
+
     script = """
     Web design has evolved dramatically over the years. From simple text-based
     pages to rich, interactive experiences, the web has come a long way.
@@ -185,14 +179,14 @@ def example_html_format():
     The future of web design includes AI-powered personalization, voice interfaces,
     and augmented reality experiences. Staying current with these trends is essential.
     """
-    
+
     result = format_blog(
         script=script,
         title="The Evolution of Web Design",
         content_id="html-example",
-        format_type="html"
+        format_type="html",
     )
-    
+
     if result.success:
         print("\n✅ HTML formatting successful!")
         print(f"\nFormat: {result.format_type}")
@@ -204,7 +198,7 @@ def example_html_format():
         print(result.formatted_content[:400])
     else:
         print(f"\n❌ Errors: {result.errors}")
-    
+
     print("\n")
 
 
@@ -213,21 +207,19 @@ def example_metadata_analysis():
     print("=" * 70)
     print("Example 5: Metadata Analysis")
     print("=" * 70)
-    
+
     # Create scripts of different lengths
     scripts = {
         "short": "Innovation. " * 50,  # ~50 words
         "medium": "Innovation drives progress. " * 100,  # ~300 words
-        "long": "Innovation is the key to success. " * 300  # ~1800 words
+        "long": "Innovation is the key to success. " * 300,  # ~1800 words
     }
-    
+
     for length, script in scripts.items():
         result = format_blog(
-            script=script,
-            title=f"{length.capitalize()} Article",
-            content_id=f"meta-{length}"
+            script=script, title=f"{length.capitalize()} Article", content_id=f"meta-{length}"
         )
-        
+
         if result.success:
             print(f"\n{length.upper()} Article:")
             print(f"  Word count: {result.metadata.word_count}")
@@ -235,7 +227,7 @@ def example_metadata_analysis():
             print(f"  Reading time: {result.metadata.reading_time}")
             print(f"  Paragraphs: {result.metadata.paragraph_count}")
             print(f"  Headings: {result.metadata.heading_count}")
-    
+
     print("\n")
 
 
@@ -246,14 +238,14 @@ def main():
     print("  BLOG FORMATTER - EXAMPLE USAGE")
     print("*" * 70)
     print("\n")
-    
+
     # Run examples
     example_basic_usage()
     example_platform_specific()
     example_with_cta()
     example_html_format()
     example_metadata_analysis()
-    
+
     print("=" * 70)
     print("All examples completed!")
     print("=" * 70)

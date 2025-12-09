@@ -8,4 +8,4 @@ Available Formatters:
     - Social: Social media format optimizer for Twitter/X, LinkedIn, Instagram, Facebook
 """
 
-__all__ = ['Blog', 'Social']
+__all__ = ["Blog", "Social"]

@@ -2,14 +2,14 @@
 
 from .config import Config
 from .database import Database
+from .idea_processor import ContentType, IdeaInspiration, IdeaProcessor
 from .metrics import UniversalMetrics
-from .idea_processor import IdeaProcessor, IdeaInspiration, ContentType
 
 __all__ = [
-    'Config',
-    'Database',
-    'UniversalMetrics',
-    'IdeaProcessor',
-    'IdeaInspiration',
-    'ContentType',
+    "Config",
+    "Database",
+    "UniversalMetrics",
+    "IdeaProcessor",
+    "IdeaInspiration",
+    "ContentType",
 ]

@@ -9,11 +9,12 @@ maintenance and editing.
 """
 
 import json
-import requests
-from pathlib import Path
-from typing import List, Dict, Any, Optional, Literal
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +28,13 @@ _PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
 def _load_prompt(filename: str) -> str:
     """Load a prompt from the prompts directory.
-    
+
     Args:
         filename: Name of the prompt file (e.g., 'idea_from_title.txt')
-        
+
     Returns:
         The prompt text content
-        
+
     Raises:
         FileNotFoundError: If the prompt file doesn't exist
     """
@@ -44,7 +45,7 @@ def _load_prompt(filename: str) -> str:
 @dataclass
 class AIConfig:
     """Configuration for AI model and generation.
-    
+
     Attributes:
         model: Name of the Ollama model to use
         api_base: Base URL for Ollama API
@@ -52,6 +53,7 @@ class AIConfig:
         max_tokens: Maximum tokens to generate
         timeout: Request timeout in seconds
     """
+
     model: str = "llama3.1:70b-q4_K_M"  # Default: Best for RTX 5090
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
@@ -61,28 +63,28 @@ class AIConfig:
 
 class AIIdeaGenerator:
     """Generate Ideas using local AI models via Ollama.
-    
+
     This class handles communication with local LLM models through the
     Ollama API to generate rich, detailed Ideas with comprehensive
     narrative structure.
     """
-    
+
     # Minimum length for generated idea text in characters
     MIN_IDEA_TEXT_LENGTH = 100
 
     def __init__(self, config: Optional[AIConfig] = None):
         """Initialize AI generator with configuration.
-        
+
         Args:
             config: Optional AI configuration
         """
         self.config = config or AIConfig()
         self.available = self._check_ollama_availability()
         self._custom_prompt_template: Optional[str] = None
-    
+
     def set_prompt_template(self, template: str) -> None:
         """Set a custom prompt template for AI generation.
-        
+
         The template can use the following placeholders:
         - {num_ideas}: Number of ideas to generate
         - {input}: The title or description input
@@ -90,19 +92,19 @@ class AIIdeaGenerator:
         - {formats}: Target formats
         - {genre}: Content genre
         - {length}: Target length
-        
+
         Args:
             template: Custom prompt template string
         """
         self._custom_prompt_template = template
         logger.info("Custom prompt template set for AI generation")
-    
+
     def get_prompt_template(self, for_description: bool = False) -> str:
         """Get the current prompt template.
-        
+
         Args:
             for_description: If True, return template for description-based generation
-            
+
         Returns:
             The current prompt template (custom or default from file)
         """
@@ -110,23 +112,20 @@ class AIIdeaGenerator:
             return self._custom_prompt_template
         filename = "idea_from_description.txt" if for_description else "idea_from_title.txt"
         return _load_prompt(filename)
-    
+
     def _check_ollama_availability(self) -> bool:
         """Check if Ollama is available and running.
-        
+
         Returns:
             True if Ollama is available, False otherwise
         """
         try:
-            response = requests.get(
-                f"{self.config.api_base}/api/tags",
-                timeout=5
-            )
+            response = requests.get(f"{self.config.api_base}/api/tags", timeout=5)
             return response.status_code == 200
         except Exception as e:
             logger.warning(f"Ollama not available: {e}")
             return False
-    
+
     def generate_ideas_from_title(
         self,
         title: str,
@@ -134,10 +133,10 @@ class AIIdeaGenerator:
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[str] = None,
-        length_target: Optional[str] = None
+        length_target: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Generate multiple idea variations from a title using AI.
-        
+
         Args:
             title: Base title to generate ideas from
             num_ideas: Number of idea variations to generate
@@ -145,26 +144,26 @@ class AIIdeaGenerator:
             target_formats: Target formats for content
             genre: Content genre
             length_target: Target content length
-            
+
         Returns:
             List of dictionaries containing idea data
         """
         if not self.available:
             logger.warning("Ollama not available, returning empty list")
             return []
-        
+
         prompt = self._create_title_prompt(
             title=title,
             num_ideas=num_ideas,
             target_platforms=target_platforms,
             target_formats=target_formats,
             genre=genre,
-            length_target=length_target
+            length_target=length_target,
         )
-        
+
         response_text = self._call_ollama(prompt)
         return self._parse_ideas_response(response_text, num_ideas)
-    
+
     def generate_ideas_from_description(
         self,
         description: str,
@@ -172,10 +171,10 @@ class AIIdeaGenerator:
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[str] = None,
-        length_target: Optional[str] = None
+        length_target: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Generate multiple ideas from a description using AI.
-        
+
         Args:
             description: Description to generate ideas from
             num_ideas: Number of ideas to generate
@@ -183,26 +182,26 @@ class AIIdeaGenerator:
             target_formats: Target formats for content
             genre: Content genre
             length_target: Target content length
-            
+
         Returns:
             List of dictionaries containing idea data
         """
         if not self.available:
             logger.warning("Ollama not available, returning empty list")
             return []
-        
+
         prompt = self._create_description_prompt(
             description=description,
             num_ideas=num_ideas,
             target_platforms=target_platforms,
             target_formats=target_formats,
             genre=genre,
-            length_target=length_target
+            length_target=length_target,
         )
-        
+
         response_text = self._call_ollama(prompt)
         return self._parse_ideas_response(response_text, num_ideas)
-    
+
     def _create_title_prompt(
         self,
         title: str,
@@ -210,12 +209,12 @@ class AIIdeaGenerator:
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[str] = None,
-        length_target: Optional[str] = None
+        length_target: Optional[str] = None,
     ) -> str:
         """Create a prompt for generating ideas from a title.
-        
+
         Uses the configured prompt template with variable substitution.
-        
+
         Args:
             title: Base title
             num_ideas: Number of ideas to generate
@@ -223,7 +222,7 @@ class AIIdeaGenerator:
             target_formats: Target formats
             genre: Content genre
             length_target: Target length
-            
+
         Returns:
             Formatted prompt string
         """
@@ -231,18 +230,18 @@ class AIIdeaGenerator:
         formats_str = ", ".join(target_formats) if target_formats else "text, video"
         genre_str = genre if genre else "general"
         length_str = length_target if length_target else "variable"
-        
+
         template = self.get_prompt_template(for_description=False)
-        
+
         return template.format(
             num_ideas=num_ideas,
             input=title,
             platforms=platforms_str,
             formats=formats_str,
             genre=genre_str,
-            length=length_str
+            length=length_str,
         )
-    
+
     def _create_description_prompt(
         self,
         description: str,
@@ -250,12 +249,12 @@ class AIIdeaGenerator:
         target_platforms: Optional[List[str]] = None,
         target_formats: Optional[List[str]] = None,
         genre: Optional[str] = None,
-        length_target: Optional[str] = None
+        length_target: Optional[str] = None,
     ) -> str:
         """Create a prompt for generating ideas from a description.
-        
+
         Uses the configured prompt template with variable substitution.
-        
+
         Args:
             description: Base description
             num_ideas: Number of ideas to generate
@@ -263,7 +262,7 @@ class AIIdeaGenerator:
             target_formats: Target formats
             genre: Content genre
             length_target: Target length
-            
+
         Returns:
             Formatted prompt string
         """
@@ -271,27 +270,27 @@ class AIIdeaGenerator:
         formats_str = ", ".join(target_formats) if target_formats else "text, video"
         genre_str = genre if genre else "general"
         length_str = length_target if length_target else "variable"
-        
+
         template = self.get_prompt_template(for_description=True)
-        
+
         return template.format(
             num_ideas=num_ideas,
             input=description,
             platforms=platforms_str,
             formats=formats_str,
             genre=genre_str,
-            length=length_str
+            length=length_str,
         )
-    
+
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate content.
-        
+
         Args:
             prompt: Prompt to send to the model
-            
+
         Returns:
             Generated text response
-            
+
         Raises:
             RuntimeError: If API call fails
         """
@@ -304,174 +303,172 @@ class AIIdeaGenerator:
                     "stream": False,
                     "options": {
                         "temperature": self.config.temperature,
-                        "num_predict": self.config.max_tokens
-                    }
+                        "num_predict": self.config.max_tokens,
+                    },
                 },
-                timeout=self.config.timeout
+                timeout=self.config.timeout,
             )
-            
+
             response.raise_for_status()
             result = response.json()
             return result.get("response", "")
-            
+
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama API call failed: {e}")
             raise RuntimeError(f"Failed to generate ideas: {e}")
-    
+
     def _parse_ideas_response(
-        self,
-        response_text: str,
-        expected_count: int
+        self, response_text: str, expected_count: int
     ) -> List[Dict[str, Any]]:
         """Parse AI response into idea dictionaries.
-        
+
         Args:
             response_text: Raw response from AI
             expected_count: Expected number of ideas
-            
+
         Returns:
             List of parsed idea dictionaries
         """
         try:
             # Try to extract JSON from response
             # Sometimes models add explanatory text before/after JSON
-            start_idx = response_text.find('[')
-            end_idx = response_text.rfind(']')
-            
+            start_idx = response_text.find("[")
+            end_idx = response_text.rfind("]")
+
             if start_idx >= 0 and end_idx > start_idx:
-                json_text = response_text[start_idx:end_idx + 1]
+                json_text = response_text[start_idx : end_idx + 1]
                 ideas = json.loads(json_text)
-                
+
                 if isinstance(ideas, list):
                     # Validate and clean each idea
                     validated_ideas = []
                     for idea in ideas[:expected_count]:
-                        if isinstance(idea, dict) and 'title' in idea:
+                        if isinstance(idea, dict) and "title" in idea:
                             validated_ideas.append(self._validate_idea_dict(idea))
-                    
+
                     return validated_ideas
-            
+
             logger.warning("Failed to parse JSON from AI response")
             return []
-            
+
         except json.JSONDecodeError as e:
             logger.error(f"JSON parsing failed: {e}")
             return []
-    
+
     def _validate_idea_dict(self, idea: Dict[str, Any]) -> Dict[str, Any]:
         """Validate and ensure all required fields exist in idea dict.
-        
+
         Args:
             idea: Raw idea dictionary
-            
+
         Returns:
             Validated idea dictionary with all fields
         """
         # Ensure all required fields exist
         required_fields = {
-            'title': '',
-            'concept': '',
-            'premise': '',
-            'logline': '',
-            'hook': '',
-            'synopsis': '',
-            'skeleton': '',
-            'outline': '',
-            'keywords': [],
-            'themes': [],
-            'idea_text': ''
+            "title": "",
+            "concept": "",
+            "premise": "",
+            "logline": "",
+            "hook": "",
+            "synopsis": "",
+            "skeleton": "",
+            "outline": "",
+            "keywords": [],
+            "themes": [],
+            "idea_text": "",
         }
-        
+
         for field, default in required_fields.items():
             if field not in idea:
                 idea[field] = default
-            elif field in ['keywords', 'themes'] and not isinstance(idea[field], list):
+            elif field in ["keywords", "themes"] and not isinstance(idea[field], list):
                 idea[field] = [idea[field]] if idea[field] else []
-        
+
         # Ensure idea_text meets minimum length requirement
-        idea_text = idea.get('idea_text', '')
+        idea_text = idea.get("idea_text", "")
         if len(idea_text) < self.MIN_IDEA_TEXT_LENGTH:
-            idea['idea_text'] = self._generate_idea_text(idea)
-        
+            idea["idea_text"] = self._generate_idea_text(idea)
+
         return idea
-    
+
     def _generate_idea_text(self, idea: Dict[str, Any]) -> str:
         """Generate idea_text field from other fields when missing or too short.
-        
+
         Combines hook, premise, concept, and other fields to create a rich
         description that meets the minimum length requirement.
-        
+
         Args:
             idea: The idea dictionary
-            
+
         Returns:
             Generated idea_text of at least MIN_IDEA_TEXT_LENGTH characters
         """
         parts = []
-        
+
         # Start with hook if available
-        hook = idea.get('hook', '')
+        hook = idea.get("hook", "")
         if hook and len(hook) > 3:
             parts.append(hook)
-        
+
         # Add premise
-        premise = idea.get('premise', '')
+        premise = idea.get("premise", "")
         if premise and len(premise) > 3:
             parts.append(premise)
-        
+
         # Add concept if still short
-        text = ' '.join(parts)
+        text = " ".join(parts)
         if len(text) < self.MIN_IDEA_TEXT_LENGTH:
-            concept = idea.get('concept', '')
+            concept = idea.get("concept", "")
             if concept and len(concept) > 3:
                 parts.append(concept)
-        
+
         # Add logline if still short
-        text = ' '.join(parts)
+        text = " ".join(parts)
         if len(text) < self.MIN_IDEA_TEXT_LENGTH:
-            logline = idea.get('logline', '')
+            logline = idea.get("logline", "")
             if logline and len(logline) > 3:
                 parts.append(logline)
-        
+
         # Add themes if still short
-        text = ' '.join(parts)
+        text = " ".join(parts)
         if len(text) < self.MIN_IDEA_TEXT_LENGTH:
-            themes = idea.get('themes', [])
+            themes = idea.get("themes", [])
             if themes:
                 parts.append(f"Themes: {', '.join(str(t) for t in themes)}")
-        
+
         # Add keywords if still short
-        text = ' '.join(parts)
+        text = " ".join(parts)
         if len(text) < self.MIN_IDEA_TEXT_LENGTH:
-            keywords = idea.get('keywords', [])
+            keywords = idea.get("keywords", [])
             if keywords:
                 parts.append(f"Keywords: {', '.join(str(k) for k in keywords)}")
-        
+
         # Combine all parts
-        text = ' '.join(parts)
-        
+        text = " ".join(parts)
+
         # If still too short, add title and synopsis excerpt
-        title = idea.get('title', '')
+        title = idea.get("title", "")
         if len(text) < self.MIN_IDEA_TEXT_LENGTH and title:
             text = f"About: {title}. {text}" if text else f"About: {title}"
-        
-        synopsis = idea.get('synopsis', '')
+
+        synopsis = idea.get("synopsis", "")
         if len(text) < self.MIN_IDEA_TEXT_LENGTH and synopsis:
             # Add excerpt of synopsis
-            excerpt = synopsis[:200].rsplit(' ', 1)[0] if len(synopsis) > 200 else synopsis
+            excerpt = synopsis[:200].rsplit(" ", 1)[0] if len(synopsis) > 200 else synopsis
             text = f"{text} {excerpt}" if text else excerpt
-        
+
         # Add skeleton if still short
-        skeleton = idea.get('skeleton', '')
+        skeleton = idea.get("skeleton", "")
         if len(text) < self.MIN_IDEA_TEXT_LENGTH and skeleton:
             excerpt = skeleton[:150] if len(skeleton) > 150 else skeleton
             text = f"{text} Structure: {excerpt}" if text else f"Structure: {excerpt}"
-        
+
         # Final fallback: pad with contextual description
         if len(text) < self.MIN_IDEA_TEXT_LENGTH:
             padding = f" This idea explores creative possibilities for engaging content targeting various platforms and formats."
             text = text + padding if text else padding.strip()
-        
+
         return text
 
 

@@ -11,23 +11,24 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Story.Review import (
-    review_story_with_gpt,
-    review_story_to_json,
-    get_expert_feedback,
-    ReviewDecision
-)
 import json
+
+from T.Story.Review import (
+    ReviewDecision,
+    get_expert_feedback,
+    review_story_to_json,
+    review_story_with_gpt,
+)
 
 
 def example_basic_review():
     """Example: Basic expert review of a story."""
-    print("="*70)
+    print("=" * 70)
     print("Example 1: Basic Expert Review")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     title = "The Midnight Visitor: A Choice That Echoes"
-    
+
     script = """Have you ever wondered if your choices really matter?
     
 At exactly midnight, Emma receives a visitor.
@@ -51,16 +52,16 @@ It's about living with the ones you make.
 Future Emma fades with a smile.
 "You'll be okay. We always are."
 """
-    
+
     audience_context = {
         "demographic": "US female 14-29",
         "platform": "YouTube shorts",
         "style": "thought-provoking sci-fi",
-        "duration": "60 seconds"
+        "duration": "60 seconds",
     }
-    
+
     original_idea = "A sci-fi story about meeting your future self and learning about choices"
-    
+
     # Perform expert review
     review = review_story_with_gpt(
         title=title,
@@ -69,9 +70,9 @@ Future Emma fades with a smile.
         original_idea=original_idea,
         story_id="example-001",
         story_version="v3",
-        publish_threshold=95
+        publish_threshold=95,
     )
-    
+
     # Display results
     print(f"Title: {title}\n")
     print(f"Story ID: {review.story_id}")
@@ -81,7 +82,7 @@ Future Emma fades with a smile.
     print(f"Confidence: {review.overall_assessment.confidence}%")
     print(f"Ready for Publishing: {review.overall_assessment.ready_for_publishing}")
     print(f"Decision: {review.decision.value.upper()}")
-    
+
     print(f"\n{'='*70}")
     print("Assessment Breakdown:")
     print(f"{'='*70}")
@@ -93,13 +94,15 @@ Future Emma fades with a smile.
     print(f"  - {review.professional_quality.feedback}")
     print(f"\nPlatform Optimization: {review.platform_optimization.score}/100")
     print(f"  - {review.platform_optimization.feedback}")
-    
+
     if review.improvement_suggestions:
         print(f"\n{'='*70}")
         print(f"Improvement Suggestions ({len(review.improvement_suggestions)}):")
         print(f"{'='*70}")
         for i, suggestion in enumerate(review.improvement_suggestions, 1):
-            print(f"\n{i}. [{suggestion.priority.value.upper()}] {suggestion.component.value.upper()}")
+            print(
+                f"\n{i}. [{suggestion.priority.value.upper()}] {suggestion.component.value.upper()}"
+            )
             print(f"   {suggestion.suggestion}")
             print(f"   Impact: {suggestion.impact}")
             print(f"   Effort: {suggestion.estimated_effort.value}")
@@ -107,12 +110,12 @@ Future Emma fades with a smile.
 
 def example_workflow_integration():
     """Example: Using expert review in the workflow."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 2: Workflow Integration")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     title = "The Last Library: Where Stories Never Die"
-    
+
     script = """In a world where books are illegal, one library remains.
     
 Maya is the last librarian.
@@ -140,13 +143,13 @@ To memorize them.
 
 The stories live on.
 """
-    
+
     audience_context = {
         "demographic": "US female 14-29",
         "platform": "YouTube shorts",
-        "style": "dystopian drama"
+        "style": "dystopian drama",
     }
-    
+
     # Perform review
     review = review_story_with_gpt(
         title=title,
@@ -154,104 +157,104 @@ The stories live on.
         audience_context=audience_context,
         story_id="workflow-001",
         story_version="v4",
-        publish_threshold=95
+        publish_threshold=95,
     )
-    
+
     # Get workflow feedback
     feedback = get_expert_feedback(review)
-    
+
     print(f"Story: {feedback['story_id']}")
     print(f"Quality Score: {feedback['quality_score']}/100")
     print(f"Decision: {feedback['decision'].upper()}")
     print(f"\nNext Action: {feedback['next_action']}")
-    
+
     # Handle workflow decision
-    if feedback['decision'] == 'publish':
+    if feedback["decision"] == "publish":
         print("\n✅ Story is ready for publishing!")
         print("   Proceeding to Stage 23: Publishing.Finalization")
     else:
         print("\n⚠️  Story needs expert polish")
         print("   Proceeding to Stage 22: Story.Polish")
         print("   Proceeding to Stage 22: Story.ExpertPolish")
-        
-        if feedback['high_priority_suggestions']:
+
+        if feedback["high_priority_suggestions"]:
             print("\n   High Priority Improvements:")
-            for suggestion in feedback['high_priority_suggestions']:
+            for suggestion in feedback["high_priority_suggestions"]:
                 print(f"   - [{suggestion['component'].upper()}] {suggestion['suggestion']}")
-        
-        if feedback['small_effort_suggestions']:
+
+        if feedback["small_effort_suggestions"]:
             print("\n   Quick Wins (Small Effort):")
-            for suggestion in feedback['small_effort_suggestions']:
+            for suggestion in feedback["small_effort_suggestions"]:
                 print(f"   - {suggestion['suggestion']}")
 
 
 def example_json_output():
     """Example: Getting JSON output for API integration."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 3: JSON Output for API Integration")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     title = "The Algorithm Knows: But Should You Listen?"
     script = "A short story about AI and human intuition."
-    
+
     # Get JSON output
     json_result = review_story_to_json(
         title=title,
         script=script,
         audience_context={"platform": "YouTube"},
         story_id="json-001",
-        story_version="v2"
+        story_version="v2",
     )
-    
+
     print("JSON Output:")
     print(json_result)
-    
+
     # Parse and use
     result_dict = json.loads(json_result)
     print(f"\n\nParsed Results:")
     print(f"Story ID: {result_dict['story_id']}")
     print(f"Decision: {result_dict['decision']}")
-    
-    if 'overall_assessment' in result_dict:
+
+    if "overall_assessment" in result_dict:
         print(f"Quality Score: {result_dict['overall_assessment']['quality_score']}")
 
 
 def example_filtering_suggestions():
     """Example: Filtering and prioritizing improvement suggestions."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 4: Filtering Improvement Suggestions")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     review = review_story_with_gpt(
         title="Test Story",
         script="Short test script",
         audience_context={},
         story_id="filter-001",
-        publish_threshold=98  # High threshold to trigger suggestions
+        publish_threshold=98,  # High threshold to trigger suggestions
     )
-    
+
     print(f"Total Suggestions: {len(review.improvement_suggestions)}")
-    
+
     # Get high-priority suggestions
     high_priority = review.get_high_priority_suggestions()
     print(f"\nHigh Priority Suggestions: {len(high_priority)}")
     for suggestion in high_priority:
         print(f"  - [{suggestion.component.value}] {suggestion.suggestion}")
-    
+
     # Get small effort suggestions (quick wins)
     small_effort = review.get_small_effort_suggestions()
     print(f"\nSmall Effort Suggestions (Quick Wins): {len(small_effort)}")
     for suggestion in small_effort:
         print(f"  - {suggestion.suggestion}")
-    
+
     # Get suggestions by component
     from T.Story.Review import ComponentType
-    
+
     title_suggestions = review.get_suggestions_by_component(ComponentType.TITLE)
     print(f"\nTitle Improvements: {len(title_suggestions)}")
     for suggestion in title_suggestions:
         print(f"  - {suggestion.suggestion}")
-    
+
     script_suggestions = review.get_suggestions_by_component(ComponentType.SCRIPT)
     print(f"\nScript Improvements: {len(script_suggestions)}")
     for suggestion in script_suggestions:
@@ -260,25 +263,25 @@ def example_filtering_suggestions():
 
 def example_custom_threshold():
     """Example: Using custom publish threshold."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 5: Custom Publish Threshold")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     title = "Mystery of the Missing Memories"
     script = "A psychological thriller about selective amnesia."
-    
+
     # Try with different thresholds
     thresholds = [90, 95, 98]
-    
+
     for threshold in thresholds:
         review = review_story_with_gpt(
             title=title,
             script=script,
             audience_context={"platform": "YouTube"},
             story_id=f"threshold-{threshold}",
-            publish_threshold=threshold
+            publish_threshold=threshold,
         )
-        
+
         print(f"\nThreshold: {threshold}")
         print(f"Quality Score: {review.overall_assessment.quality_score}")
         print(f"Decision: {review.decision.value}")
@@ -286,17 +289,17 @@ def example_custom_threshold():
 
 
 if __name__ == "__main__":
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PrismQ.T.Story.Review - Usage Examples")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     # Run examples
     example_basic_review()
     example_workflow_integration()
     example_json_output()
     example_filtering_suggestions()
     example_custom_threshold()
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("Examples completed successfully!")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")

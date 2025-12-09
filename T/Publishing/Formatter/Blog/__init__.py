@@ -12,36 +12,33 @@ Public API:
 """
 
 from .blog_formatter import (
-    BlogFormatter,
     BlogFormattedContent,
+    BlogFormatter,
     BlogMetadata,
-    format_blog
+    format_blog,
 )
-
 from .platform_adapters import (
-    PlatformAdapterFactory,
-    MediumAdapter,
-    WordPressAdapter,
     GhostAdapter,
-    export_for_platform
+    MediumAdapter,
+    PlatformAdapterFactory,
+    WordPressAdapter,
+    export_for_platform,
 )
 
 __all__ = [
     # Main formatter
-    'BlogFormatter',
-    'format_blog',
-    
+    "BlogFormatter",
+    "format_blog",
     # Platform adapters
-    'PlatformAdapterFactory',
-    'MediumAdapter',
-    'WordPressAdapter',
-    'GhostAdapter',
-    'export_for_platform',
-    
+    "PlatformAdapterFactory",
+    "MediumAdapter",
+    "WordPressAdapter",
+    "GhostAdapter",
+    "export_for_platform",
     # Data classes
-    'BlogFormattedContent',
-    'BlogMetadata',
+    "BlogFormattedContent",
+    "BlogMetadata",
 ]
 
-__version__ = '1.0.0'
-__author__ = 'Worker12 (Content Specialist)'
+__version__ = "1.0.0"
+__author__ = "Worker12 (Content Specialist)"

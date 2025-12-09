@@ -17,15 +17,15 @@ Workflow Position:
     Script v3+ (Grammar Passed) → ToneReview (AI Reviewer) → Script Refinement (if fails) → Stage 16
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Optional, Any
-from enum import Enum
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class ToneIssueType(Enum):
     """Types of tone issues that can be detected."""
-    
+
     EMOTIONAL_INTENSITY = "emotional_intensity"  # Intensity mismatch
     STYLE_ALIGNMENT = "style_alignment"  # Style inconsistency
     VOICE_CONSISTENCY = "voice_consistency"  # Voice/POV issues
@@ -37,7 +37,7 @@ class ToneIssueType(Enum):
 
 class ToneSeverity(Enum):
     """Severity levels for tone issues."""
-    
+
     CRITICAL = "critical"  # Must be fixed
     HIGH = "high"  # Should be fixed
     MEDIUM = "medium"  # Recommended to fix
@@ -47,7 +47,7 @@ class ToneSeverity(Enum):
 @dataclass
 class ToneIssue:
     """Individual tone issue found in the script."""
-    
+
     issue_type: ToneIssueType
     severity: ToneSeverity
     line_number: int
@@ -60,7 +60,7 @@ class ToneIssue:
 @dataclass
 class ToneReview:
     """AI-powered tone review with style and voice consistency validation.
-    
+
     ToneReview provides comprehensive tone and style validation with:
     - Overall tone appropriateness score (0-100%)
     - Categorized issue detection
@@ -68,45 +68,45 @@ class ToneReview:
     - Suggested improvements with explanations
     - Severity-based prioritization
     - Pass/fail determination for workflow progression
-    
+
     The review serves as a quality gate - script must pass both grammar review
     (Stage 14) and tone review before proceeding to next stage (Stage 16).
     If it fails, script returns to refinement (Stage 11) with tone feedback.
-    
+
     Attributes:
         script_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall tone appropriateness score (0-100)
         pass_threshold: Minimum score required to pass (default 80)
         passes: Whether review passes (score >= threshold)
-        
+
         Tone Metrics:
             emotional_intensity_score: Emotional intensity appropriateness (0-100)
             style_alignment_score: Style consistency score (0-100)
             voice_consistency_score: Voice/POV consistency (0-100)
             audience_fit_score: Audience appropriateness (0-100)
-        
+
         Issue Tracking:
             issues: List of all detected tone issues
             critical_count: Number of critical issues
             high_count: Number of high severity issues
             medium_count: Number of medium severity issues
             low_count: Number of low severity issues
-            
+
         Review Metadata:
             reviewer_id: AI reviewer identifier
             reviewed_at: Timestamp of review
             confidence_score: AI confidence in review (0-100)
             target_tone: Expected tone style (e.g., "dark", "suspense")
             target_audience: Target audience description
-            
+
         Feedback:
             summary: Overall assessment summary
             primary_concerns: Main issues to address
             strengths: What works well
             recommendations: Specific improvements
             notes: Additional reviewer notes
-    
+
     Example:
         >>> review = ToneReview(
         ...     script_id="script-001",
@@ -128,33 +128,35 @@ class ToneReview:
         ... else:
         ...     print("Return to Stage 11: Script Refinement")
     """
-    
+
     script_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
-    pass_threshold: int = 80  # Minimum score to pass (lower than Grammar's 85 due to subjective nature)
+    pass_threshold: int = (
+        80  # Minimum score to pass (lower than Grammar's 85 due to subjective nature)
+    )
     passes: bool = True  # Whether review passes
-    
+
     # Tone Metrics
     emotional_intensity_score: int = 0  # 0-100
     style_alignment_score: int = 0  # 0-100
     voice_consistency_score: int = 0  # 0-100
     audience_fit_score: int = 0  # 0-100
-    
+
     # Issue Tracking
     issues: List[ToneIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
     low_count: int = 0
-    
+
     # Review Metadata
     reviewer_id: str = "AI-ToneReviewer-001"
     reviewed_at: Optional[str] = None
     confidence_score: int = 85  # 0-100
     target_tone: str = ""  # Expected tone (e.g., "dark suspense")
     target_audience: str = ""  # Target audience description
-    
+
     # Feedback
     summary: str = ""
     primary_concerns: List[str] = field(default_factory=list)
@@ -162,23 +164,23 @@ class ToneReview:
     recommendations: List[str] = field(default_factory=list)
     notes: str = ""
     metadata: Dict[str, str] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Initialize timestamps and computed fields."""
         if self.reviewed_at is None:
             self.reviewed_at = datetime.now().isoformat()
-        
+
         # Calculate pass/fail status
         self._recalculate_pass_status()
-    
+
     def add_issue(self, issue: ToneIssue) -> None:
         """Add a tone issue to the review.
-        
+
         Args:
             issue: ToneIssue to add
         """
         self.issues.append(issue)
-        
+
         # Update severity counts
         if issue.severity == ToneSeverity.CRITICAL:
             self.critical_count += 1
@@ -188,10 +190,10 @@ class ToneReview:
             self.medium_count += 1
         elif issue.severity == ToneSeverity.LOW:
             self.low_count += 1
-        
+
         # Recalculate pass status
         self._recalculate_pass_status()
-    
+
     def _recalculate_pass_status(self) -> None:
         """Recalculate pass/fail status based on issues."""
         # Fail if any critical issues
@@ -199,77 +201,77 @@ class ToneReview:
             self.passes = False
         else:
             self.passes = self.overall_score >= self.pass_threshold
-    
+
     def get_issues_by_severity(self, severity: ToneSeverity) -> List[ToneIssue]:
         """Get all issues of a specific severity.
-        
+
         Args:
             severity: The severity level to filter by
-            
+
         Returns:
             List of issues with the specified severity
         """
         return [issue for issue in self.issues if issue.severity == severity]
-    
+
     def get_issues_by_type(self, issue_type: ToneIssueType) -> List[ToneIssue]:
         """Get all issues of a specific type.
-        
+
         Args:
             issue_type: The issue type to filter by
-            
+
         Returns:
             List of issues with the specified type
         """
         return [issue for issue in self.issues if issue.issue_type == issue_type]
-    
+
     def get_critical_issues(self) -> List[ToneIssue]:
         """Get all critical issues that must be fixed.
-        
+
         Returns:
             List of critical severity issues
         """
         return self.get_issues_by_severity(ToneSeverity.CRITICAL)
-    
+
     def get_high_priority_issues(self) -> List[ToneIssue]:
         """Get all high priority issues.
-        
+
         Returns:
             List of critical and high severity issues
         """
         critical = self.get_issues_by_severity(ToneSeverity.CRITICAL)
         high = self.get_issues_by_severity(ToneSeverity.HIGH)
         return critical + high
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert ToneReview to dictionary representation.
-        
+
         Returns:
             Dictionary containing all fields with Enums converted to strings
         """
         data = asdict(self)
-        
+
         # Convert issues
         data["issues"] = [
             {
                 **asdict(issue),
                 "issue_type": issue.issue_type.value,
-                "severity": issue.severity.value
+                "severity": issue.severity.value,
             }
             for issue in self.issues
         ]
-        
+
         return data
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ToneReview":
         """Create ToneReview from dictionary.
-        
+
         Args:
             data: Dictionary containing ToneReview fields
-            
+
         Returns:
             ToneReview instance
-            
+
         Note:
             Explicit parameter passing ensures type safety and clear data mapping,
             following the same pattern as GrammarReview for consistency.
@@ -279,16 +281,18 @@ class ToneReview:
         for issue_data in data.get("issues", []):
             issue_type = ToneIssueType(issue_data["issue_type"])
             severity = ToneSeverity(issue_data["severity"])
-            issues.append(ToneIssue(
-                issue_type=issue_type,
-                severity=severity,
-                line_number=issue_data["line_number"],
-                text=issue_data["text"],
-                suggestion=issue_data["suggestion"],
-                explanation=issue_data["explanation"],
-                confidence=issue_data.get("confidence", 85)
-            ))
-        
+            issues.append(
+                ToneIssue(
+                    issue_type=issue_type,
+                    severity=severity,
+                    line_number=issue_data["line_number"],
+                    text=issue_data["text"],
+                    suggestion=issue_data["suggestion"],
+                    explanation=issue_data["explanation"],
+                    confidence=issue_data.get("confidence", 85),
+                )
+            )
+
         return cls(
             script_id=data["script_id"],
             script_version=data.get("script_version", "v3"),
@@ -314,9 +318,9 @@ class ToneReview:
             strengths=data.get("strengths", []),
             recommendations=data.get("recommendations", []),
             notes=data.get("notes", ""),
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
-    
+
     def __repr__(self) -> str:
         """String representation of ToneReview."""
         return (

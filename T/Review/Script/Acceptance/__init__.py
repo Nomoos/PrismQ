@@ -16,13 +16,13 @@ Always uses the newest/latest script version.
 
 Example Usage:
     >>> from PrismQ.T.Review.Script.Acceptance import check_script_acceptance
-    >>> 
+    >>>
     >>> result = check_script_acceptance(
     ...     script_text="In the old house, mysterious echoes reveal secrets...",
     ...     title="The Echo Mystery",
     ...     script_version="v3"
     ... )
-    >>> 
+    >>>
     >>> if result["accepted"]:
     ...     print("Proceed to quality reviews")
     ... else:
@@ -30,12 +30,6 @@ Example Usage:
     ...     print(f"Issues: {result['issues']}")
 """
 
-from .acceptance import (
-    check_script_acceptance,
-    ScriptAcceptanceResult
-)
+from .acceptance import ScriptAcceptanceResult, check_script_acceptance
 
-__all__ = [
-    "check_script_acceptance",
-    "ScriptAcceptanceResult"
-]
+__all__ = ["check_script_acceptance", "ScriptAcceptanceResult"]

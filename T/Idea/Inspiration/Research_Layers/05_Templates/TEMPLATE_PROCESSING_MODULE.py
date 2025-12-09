@@ -20,10 +20,11 @@ Principles:
 - Returns enriched IdeaInspiration (immutable pattern)
 """
 
-from typing import Optional, Dict, Any
+import logging
+from typing import Any, Dict, Optional
+
 from Model import IdeaInspiration
 from src import Config
-import logging
 
 
 class {ModuleName}Processor:
@@ -221,6 +222,7 @@ class {ModuleName}Processor:
 # Alternative: Protocol-based approach for more flexibility
 
 from typing import Protocol
+
 
 class IdeaProcessor(Protocol):
     """Protocol defining the interface for idea processors.

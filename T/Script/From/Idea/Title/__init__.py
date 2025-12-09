@@ -21,32 +21,32 @@ Key Features:
 Usage:
     # Generate a single script (primary state-based workflow)
     from T.Script.From.Idea.Title import StoryScriptService
-    
+
     service = StoryScriptService(connection)
     result = service.process_oldest_story()
     if result and result.success:
         print(f"Generated script {result.script_id}")
-    
+
     # Generate script directly
     from T.Script.From.Idea.Title import ScriptGenerator
-    
+
     generator = ScriptGenerator()
     script = generator.generate_script_v1(idea=my_idea, title="My Title")
 """
 
 from .src.script_generator import (
+    PlatformTarget,
     ScriptGenerator,
     ScriptGeneratorConfig,
-    ScriptV1,
     ScriptSection,
     ScriptStructure,
-    PlatformTarget,
-    ScriptTone
+    ScriptTone,
+    ScriptV1,
 )
 from .src.story_script_service import (
-    StoryScriptService,
     ScriptGenerationResult,
-    process_all_pending_stories
+    StoryScriptService,
+    process_all_pending_stories,
 )
 
 __version__ = "0.2.0"
@@ -62,5 +62,5 @@ __all__ = [
     # Story Script Service
     "StoryScriptService",
     "ScriptGenerationResult",
-    "process_all_pending_stories"
+    "process_all_pending_stories",
 ]

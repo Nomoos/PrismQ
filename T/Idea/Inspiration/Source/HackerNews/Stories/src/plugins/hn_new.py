@@ -1,42 +1,44 @@
 """HackerNews New Stories plugin for scraping newest posts."""
 
-import requests
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
-from . import SourcePlugin, IdeaInspiration
+
+import requests
+
+from . import IdeaInspiration, SourcePlugin
 
 
 class HNNewPlugin(SourcePlugin):
     """Plugin for scraping new stories from HackerNews.
-    
+
     Uses HackerNews official Firebase API.
     Follows Open/Closed Principle (OCP) - open for extension, closed for modification.
     """
-    
+
     def __init__(self, config):
         """Initialize HackerNews new stories plugin.
-        
+
         Args:
             config: Configuration object with HN API settings
         """
         super().__init__(config)
         self.api_base_url = config.hn_api_base_url
         self.timeout = config.hn_request_timeout
-    
+
     def get_source_name(self) -> str:
         """Get the name of this source.
-        
+
         Returns:
             Source name
         """
         return "hackernews_new"
-    
+
     def _fetch_item(self, item_id: int) -> Optional[Dict[str, Any]]:
         """Fetch a single item from HackerNews API.
-        
+
         Args:
             item_id: HackerNews item ID
-            
+
         Returns:
             Item data dictionary or None if request fails
         """
@@ -48,95 +50,95 @@ class HNNewPlugin(SourcePlugin):
         except requests.RequestException as e:
             print(f"  ✗ Failed to fetch item {item_id}: {e}")
             return None
-    
+
     def _item_to_idea(self, item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Convert HackerNews item to idea format.
-        
+
         Args:
             item: HackerNews item data
-            
+
         Returns:
             Idea dictionary or None if item is invalid
         """
-        if not item or item.get('deleted') or item.get('dead'):
+        if not item or item.get("deleted") or item.get("dead"):
             return None
-        
-        item_id = item.get('id')
-        title = item.get('title', '')
-        text = item.get('text', '')
-        url = item.get('url', '')
-        item_type = item.get('type', 'story')
-        score = item.get('score', 0)
-        descendants = item.get('descendants', 0)
-        by = item.get('by', '')
-        time = item.get('time', 0)
-        
+
+        item_id = item.get("id")
+        title = item.get("title", "")
+        text = item.get("text", "")
+        url = item.get("url", "")
+        item_type = item.get("type", "story")
+        score = item.get("score", 0)
+        descendants = item.get("descendants", 0)
+        by = item.get("by", "")
+        time = item.get("time", 0)
+
         # Build tags
-        tags = [item_type, 'new']
-        
+        tags = [item_type, "new"]
+
         # Extract domain from URL if present
         if url:
             try:
                 domain = urlparse(url).netloc
                 if domain:
                     # Remove www. prefix
-                    domain = domain.replace('www.', '')
+                    domain = domain.replace("www.", "")
                     tags.append(domain)
             except Exception:
                 pass
-        
+
         # Add type-specific tags
-        if title.lower().startswith('ask hn'):
-            tags.append('Ask HN')
-        elif title.lower().startswith('show hn'):
-            tags.append('Show HN')
-        elif title.lower().startswith('tell hn'):
-            tags.append('Tell HN')
-        
+        if title.lower().startswith("ask hn"):
+            tags.append("Ask HN")
+        elif title.lower().startswith("show hn"):
+            tags.append("Show HN")
+        elif title.lower().startswith("tell hn"):
+            tags.append("Tell HN")
+
         return {
-            'source_id': str(item_id),
-            'title': title,
-            'description': text if text else '',
-            'tags': self.format_tags(tags),
-            'metrics': item  # Store full item data for metrics calculation
+            "source_id": str(item_id),
+            "title": title,
+            "description": text if text else "",
+            "tags": self.format_tags(tags),
+            "metrics": item,  # Store full item data for metrics calculation
         }
-    
+
     def scrape(self, limit: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape new stories from HackerNews.
-        
+
         Args:
             limit: Maximum number of stories to scrape (uses config if not provided)
-            
+
         Returns:
             List of idea dictionaries
         """
         return self.scrape_newstories(limit=limit)
-    
+
     def scrape_newstories(self, limit: Optional[int] = None) -> List[IdeaInspiration]:
         """Scrape new stories from HackerNews.
-        
+
         Args:
             limit: Maximum number of stories to scrape (uses config if not provided)
-            
+
         Returns:
             List of IdeaInspiration objects
         """
         ideas = []
-        
+
         if limit is None:
             limit = self.config.hn_new_max_posts
-        
+
         print(f"Scraping {limit} new stories from HackerNews...")
-        
+
         try:
             # Get new story IDs
             url = f"{self.api_base_url}/newstories.json"
             response = requests.get(url, timeout=self.timeout)
             response.raise_for_status()
             story_ids = response.json()[:limit]
-            
+
             print(f"Found {len(story_ids)} story IDs")
-            
+
             # Fetch each story
             for item_id in story_ids:
                 item = self._fetch_item(item_id)
@@ -145,46 +147,46 @@ class HNNewPlugin(SourcePlugin):
                     if idea:
                         idea = self._transform_story_to_idea(idea)
                         ideas.append(idea)
-                        score = item.get('score', 0) if item.get('score') else 0
+                        score = item.get("score", 0) if item.get("score") else 0
                         print(f"  ✓ {item.get('title', '')[:60]}... (score: {score})")
-            
+
             print(f"\nSuccessfully scraped {len(ideas)} new stories")
-            
+
         except requests.RequestException as e:
             print(f"Error fetching new stories: {e}")
-        
+
         return ideas
-    
+
     def _transform_story_to_idea(self, story_data: Dict[str, Any]) -> IdeaInspiration:
         """Transform HackerNews story data to IdeaInspiration object.
-        
+
         Args:
             story_data: Story data dictionary
-            
+
         Returns:
             IdeaInspiration object
         """
-        title = story_data.get('title', 'Untitled')
-        description = story_data.get('description', '')
-        tags = story_data.get('tags', [])
-        
+        title = story_data.get("title", "Untitled")
+        description = story_data.get("description", "")
+        tags = story_data.get("tags", [])
+
         # Extract metrics from the full item data and move to metadata as strings
-        metrics = story_data.get('metrics', {})
-        
+        metrics = story_data.get("metrics", {})
+
         metadata = {
-            'story_id': story_data.get('source_id', ''),
-            'score': str(metrics.get('score', 0)),
-            'descendants': str(metrics.get('descendants', 0)),
-            'by': str(metrics.get('by', '')),
-            'time': str(metrics.get('time', '')),
-            'type': str(metrics.get('type', 'story')),
-            'source': 'hackernews_new',
+            "story_id": story_data.get("source_id", ""),
+            "score": str(metrics.get("score", 0)),
+            "descendants": str(metrics.get("descendants", 0)),
+            "by": str(metrics.get("by", "")),
+            "time": str(metrics.get("time", "")),
+            "type": str(metrics.get("type", "story")),
+            "source": "hackernews_new",
         }
-        
+
         # Add URL if present
-        if metrics.get('url'):
-            metadata['story_url'] = str(metrics['url'])
-        
+        if metrics.get("url"):
+            metadata["story_url"] = str(metrics["url"])
+
         # Create IdeaInspiration using from_text factory method
         idea = IdeaInspiration.from_text(
             title=title,
@@ -192,11 +194,11 @@ class HNNewPlugin(SourcePlugin):
             text_content=description,
             keywords=tags,
             metadata=metadata,
-            source_id=story_data.get('source_id', ''),
+            source_id=story_data.get("source_id", ""),
             source_url=f"https://news.ycombinator.com/item?id={story_data.get('source_id', '')}",
             source_platform="hackernews",
-            source_created_by=str(metrics.get('by', '')),
-            source_created_at=str(metrics.get('time', ''))
+            source_created_by=str(metrics.get("by", "")),
+            source_created_at=str(metrics.get("time", "")),
         )
-        
+
         return idea

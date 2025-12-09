@@ -5,15 +5,15 @@ including success/failure statistics, timing data, and detailed error informatio
 """
 
 import json
-from dataclasses import dataclass, asdict
-from typing import List, Dict, Any, Optional
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
 class BatchItemReport:
     """Report for a single item in a batch.
-    
+
     Attributes:
         idea_id: ID of the processed idea
         status: Processing status ('success' | 'failed')
@@ -22,6 +22,7 @@ class BatchItemReport:
         error: Error message if failed
         result_summary: Brief summary of result
     """
+
     idea_id: str
     status: str
     processing_time: float
@@ -33,7 +34,7 @@ class BatchItemReport:
 @dataclass
 class BatchReport:
     """Comprehensive batch processing report.
-    
+
     Attributes:
         batch_id: Unique batch identifier
         total_items: Total number of items in batch
@@ -47,6 +48,7 @@ class BatchReport:
         failures: List of failed item details
         config: Batch configuration used
     """
+
     batch_id: str
     total_items: int
     processed_items: int
@@ -62,57 +64,56 @@ class BatchReport:
 
 class ReportGenerator:
     """Generator for batch processing reports."""
-    
+
     def __init__(self):
         """Initialize report generator."""
         pass
-    
+
     def generate_report(
         self,
         batch_id: str,
         results: List[Dict[str, Any]],
         started_at: datetime,
         completed_at: datetime,
-        config: Dict[str, Any]
+        config: Dict[str, Any],
     ) -> BatchReport:
         """Generate a comprehensive batch report.
-        
+
         Args:
             batch_id: Unique batch identifier
             results: List of batch processing results
             started_at: Batch start time
             completed_at: Batch completion time
             config: Batch configuration
-            
+
         Returns:
             BatchReport instance
         """
         total_items = len(results)
-        success_count = sum(1 for r in results if r.get('status') == 'success')
+        success_count = sum(1 for r in results if r.get("status") == "success")
         failure_count = total_items - success_count
-        
+
         total_duration = (completed_at - started_at).total_seconds()
-        
+
         # Calculate average processing time
         processing_times = [
-            r.get('duration', 0.0) for r in results 
-            if r.get('duration') is not None
+            r.get("duration", 0.0) for r in results if r.get("duration") is not None
         ]
         avg_processing_time = (
-            sum(processing_times) / len(processing_times) 
-            if processing_times else 0.0
+            sum(processing_times) / len(processing_times) if processing_times else 0.0
         )
-        
+
         # Extract failure details
         failures = [
             {
-                'idea_id': r.get('idea_id', 'unknown'),
-                'error': r.get('error', 'Unknown error'),
-                'attempts': r.get('attempts', 0)
+                "idea_id": r.get("idea_id", "unknown"),
+                "error": r.get("error", "Unknown error"),
+                "attempts": r.get("attempts", 0),
             }
-            for r in results if r.get('status') == 'failed'
+            for r in results
+            if r.get("status") == "failed"
         ]
-        
+
         return BatchReport(
             batch_id=batch_id,
             total_items=total_items,
@@ -124,9 +125,9 @@ class ReportGenerator:
             started_at=started_at.isoformat(),
             completed_at=completed_at.isoformat(),
             failures=failures,
-            config=config
+            config=config,
         )
-    
+
     def generate_item_report(
         self,
         idea_id: str,
@@ -134,10 +135,10 @@ class ReportGenerator:
         processing_time: float,
         attempts: int,
         error: Optional[str] = None,
-        result_summary: Optional[str] = None
+        result_summary: Optional[str] = None,
     ) -> BatchItemReport:
         """Generate a report for a single batch item.
-        
+
         Args:
             idea_id: ID of the processed idea
             status: Processing status
@@ -145,7 +146,7 @@ class ReportGenerator:
             attempts: Number of attempts
             error: Optional error message
             result_summary: Optional result summary
-            
+
         Returns:
             BatchItemReport instance
         """
@@ -155,56 +156,56 @@ class ReportGenerator:
             processing_time=processing_time,
             attempts=attempts,
             error=error,
-            result_summary=result_summary
+            result_summary=result_summary,
         )
-    
+
     def to_json(self, report: BatchReport) -> str:
         """Convert batch report to JSON string.
-        
+
         Args:
             report: BatchReport instance
-            
+
         Returns:
             JSON string representation
         """
         return json.dumps(asdict(report), indent=2)
-    
+
     def to_csv(self, report: BatchReport) -> str:
         """Convert batch report to CSV format.
-        
+
         Args:
             report: BatchReport instance
-            
+
         Returns:
             CSV string representation
         """
         lines = []
-        
+
         # Header
-        lines.append("Batch ID,Total Items,Success Count,Failure Count,Total Duration (s),Avg Processing Time (s)")
-        
+        lines.append(
+            "Batch ID,Total Items,Success Count,Failure Count,Total Duration (s),Avg Processing Time (s)"
+        )
+
         # Summary row
         lines.append(
             f"{report.batch_id},{report.total_items},{report.success_count},"
             f"{report.failure_count},{report.total_duration:.2f},"
             f"{report.avg_processing_time:.2f}"
         )
-        
+
         # Failures section
         if report.failures:
             lines.append("")
             lines.append("Failed Items")
             lines.append("Idea ID,Error,Attempts")
             for failure in report.failures:
-                lines.append(
-                    f"{failure['idea_id']},\"{failure['error']}\",{failure['attempts']}"
-                )
-        
+                lines.append(f"{failure['idea_id']},\"{failure['error']}\",{failure['attempts']}")
+
         return "\n".join(lines)
-    
+
     def print_summary(self, report: BatchReport) -> None:
         """Print a human-readable summary of the batch report.
-        
+
         Args:
             report: BatchReport instance
         """
@@ -219,14 +220,14 @@ class ReportGenerator:
         print(f"Avg Processing Time:   {report.avg_processing_time:.2f}s")
         print(f"Started:               {report.started_at}")
         print(f"Completed:             {report.completed_at}")
-        
+
         if report.failures:
             print(f"\nFailed Items ({len(report.failures)}):")
             for i, failure in enumerate(report.failures[:5], 1):  # Show first 5
                 print(f"  {i}. {failure['idea_id']}: {failure['error']}")
             if len(report.failures) > 5:
                 print(f"  ... and {len(report.failures) - 5} more")
-        
+
         print(f"{'='*60}\n")
 
 

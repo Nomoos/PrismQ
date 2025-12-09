@@ -14,28 +14,28 @@ content transformation orchestration.
 """
 
 import sys
-from pathlib import Path
-from typing import Optional, Dict, Any, Protocol, List
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Protocol
 
 # Add Model path to sys.path to import IdeaInspiration
 model_path = Path(__file__).parent.parent.parent.parent / "Model" / "src"
 if str(model_path) not in sys.path:
     sys.path.insert(0, str(model_path))
 
-from idea_inspiration import IdeaInspiration, ContentType  # noqa: E402
+from idea_inspiration import ContentType, IdeaInspiration  # noqa: E402
 
 
 class TransformationStage(Enum):
     """Stages in the content funnel transformation pipeline."""
 
-    VIDEO_SOURCE = "video_source"          # Original video content
-    AUDIO_EXTRACTED = "audio_extracted"    # Audio extracted from video
-    AUDIO_SOURCE = "audio_source"          # Original audio content
+    VIDEO_SOURCE = "video_source"  # Original video content
+    AUDIO_EXTRACTED = "audio_extracted"  # Audio extracted from video
+    AUDIO_SOURCE = "audio_source"  # Original audio content
     TEXT_TRANSCRIBED = "text_transcribed"  # Text from audio transcription
-    TEXT_SUBTITLED = "text_subtitled"      # Text from video subtitles/captions
-    TEXT_SOURCE = "text_source"            # Original text content
+    TEXT_SUBTITLED = "text_subtitled"  # Text from video subtitles/captions
+    TEXT_SOURCE = "text_source"  # Original text content
 
 
 @dataclass
@@ -64,12 +64,12 @@ class TransformationMetadata:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
-            'from_stage': self.from_stage.value,
-            'to_stage': self.to_stage.value,
-            'method': self.method,
-            'confidence': self.confidence,
-            'timestamp': self.timestamp,
-            'additional_info': self.additional_info or {}
+            "from_stage": self.from_stage.value,
+            "to_stage": self.to_stage.value,
+            "method": self.method,
+            "confidence": self.confidence,
+            "timestamp": self.timestamp,
+            "additional_info": self.additional_info or {},
         }
 
 
@@ -81,10 +81,7 @@ class AudioExtractor(Protocol):
     """
 
     def extract_audio(
-        self,
-        video_url: str,
-        video_id: Optional[str] = None,
-        **kwargs
+        self, video_url: str, video_id: Optional[str] = None, **kwargs
     ) -> Optional[Dict[str, Any]]:
         """Extract audio from video.
 
@@ -112,7 +109,7 @@ class AudioTranscriber(Protocol):
         audio_url: str,
         audio_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Transcribe audio to text.
 
@@ -141,7 +138,7 @@ class SubtitleExtractor(Protocol):
         video_url: str,
         video_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Extract subtitles from video.
 
@@ -193,7 +190,7 @@ class ContentFunnel:
         self,
         audio_extractor: Optional[AudioExtractor] = None,
         audio_transcriber: Optional[AudioTranscriber] = None,
-        subtitle_extractor: Optional[SubtitleExtractor] = None
+        subtitle_extractor: Optional[SubtitleExtractor] = None,
     ):
         """Initialize ContentFunnel with optional extractors/transcribers.
 
@@ -213,7 +210,7 @@ class ContentFunnel:
         extract_audio: bool = False,
         transcribe_audio: bool = False,
         extract_subtitles: bool = True,
-        language: Optional[str] = None
+        language: Optional[str] = None,
     ) -> IdeaInspiration:
         """Process an IdeaInspiration through the content funnel.
 
@@ -247,14 +244,10 @@ class ContentFunnel:
                 extract_audio=extract_audio,
                 transcribe_audio=transcribe_audio,
                 extract_subtitles=extract_subtitles,
-                language=language
+                language=language,
             )
         elif idea.source_type == ContentType.AUDIO:
-            return self._process_audio(
-                idea,
-                transcribe_audio=transcribe_audio,
-                language=language
-            )
+            return self._process_audio(idea, transcribe_audio=transcribe_audio, language=language)
         else:  # TEXT or UNKNOWN
             # Text is already at the final stage
             return idea
@@ -265,7 +258,7 @@ class ContentFunnel:
         extract_audio: bool,
         transcribe_audio: bool,
         extract_subtitles: bool,
-        language: Optional[str]
+        language: Optional[str],
     ) -> IdeaInspiration:
         """Process video content through the funnel.
 
@@ -286,19 +279,19 @@ class ContentFunnel:
         # Try subtitle extraction first (faster and more accurate)
         if extract_subtitles and self.subtitle_extractor and not idea.content:
             subtitle_data = self._extract_subtitles_from_video(idea, language)
-            if subtitle_data and subtitle_data.get('text'):
-                idea.content = subtitle_data['text']
+            if subtitle_data and subtitle_data.get("text"):
+                idea.content = subtitle_data["text"]
                 self._record_transformation(
                     TransformationStage.VIDEO_SOURCE,
                     TransformationStage.TEXT_SUBTITLED,
                     "subtitle_extraction",
-                    confidence=subtitle_data.get('confidence')
+                    confidence=subtitle_data.get("confidence"),
                 )
                 # Store subtitle metadata
-                if 'format' in subtitle_data:
-                    idea.metadata['subtitle_format'] = subtitle_data['format']
-                if 'language' in subtitle_data:
-                    idea.metadata['subtitle_language'] = subtitle_data['language']
+                if "format" in subtitle_data:
+                    idea.metadata["subtitle_format"] = subtitle_data["format"]
+                if "language" in subtitle_data:
+                    idea.metadata["subtitle_language"] = subtitle_data["language"]
 
         # Fallback to audio extraction and transcription if needed
         if not idea.content and transcribe_audio:
@@ -308,45 +301,40 @@ class ContentFunnel:
                     self._record_transformation(
                         TransformationStage.VIDEO_SOURCE,
                         TransformationStage.AUDIO_EXTRACTED,
-                        "audio_extraction"
+                        "audio_extraction",
                     )
                     # Store audio metadata
-                    if 'audio_format' in audio_data:
-                        idea.metadata['audio_format'] = audio_data['audio_format']
-                    if 'duration' in audio_data:
-                        idea.metadata['audio_duration'] = str(audio_data['duration'])
+                    if "audio_format" in audio_data:
+                        idea.metadata["audio_format"] = audio_data["audio_format"]
+                    if "duration" in audio_data:
+                        idea.metadata["audio_duration"] = str(audio_data["duration"])
 
                     # Now transcribe the extracted audio
-                    if self.audio_transcriber and audio_data.get('audio_url'):
+                    if self.audio_transcriber and audio_data.get("audio_url"):
                         transcription_data = self._transcribe_audio(
-                            audio_data['audio_url'],
-                            idea.source_id,
-                            language
+                            audio_data["audio_url"], idea.source_id, language
                         )
-                        if transcription_data and transcription_data.get('text'):
-                            idea.content = transcription_data['text']
+                        if transcription_data and transcription_data.get("text"):
+                            idea.content = transcription_data["text"]
                             self._record_transformation(
                                 TransformationStage.AUDIO_EXTRACTED,
                                 TransformationStage.TEXT_TRANSCRIBED,
                                 "audio_transcription",
-                                confidence=transcription_data.get('confidence')
+                                confidence=transcription_data.get("confidence"),
                             )
                             # Store transcription metadata
-                            if 'language' in transcription_data:
-                                lang = transcription_data['language']
-                                idea.metadata['transcription_language'] = lang
+                            if "language" in transcription_data:
+                                lang = transcription_data["language"]
+                                idea.metadata["transcription_language"] = lang
 
         # Store transformation history in metadata
         if self._transformation_history:
-            idea.metadata['transformation_chain'] = self._format_transformation_chain()
+            idea.metadata["transformation_chain"] = self._format_transformation_chain()
 
         return idea
 
     def _process_audio(
-        self,
-        idea: IdeaInspiration,
-        transcribe_audio: bool,
-        language: Optional[str]
+        self, idea: IdeaInspiration, transcribe_audio: bool, language: Optional[str]
     ) -> IdeaInspiration:
         """Process audio content through the funnel.
 
@@ -363,32 +351,27 @@ class ContentFunnel:
         if transcribe_audio and self.audio_transcriber and not idea.content:
             if idea.source_url:
                 transcription_data = self._transcribe_audio(
-                    idea.source_url,
-                    idea.source_id,
-                    language
+                    idea.source_url, idea.source_id, language
                 )
-                if transcription_data and transcription_data.get('text'):
-                    idea.content = transcription_data['text']
+                if transcription_data and transcription_data.get("text"):
+                    idea.content = transcription_data["text"]
                     self._record_transformation(
                         TransformationStage.AUDIO_SOURCE,
                         TransformationStage.TEXT_TRANSCRIBED,
                         "audio_transcription",
-                        confidence=transcription_data.get('confidence')
+                        confidence=transcription_data.get("confidence"),
                     )
                     # Store transcription metadata
-                    if 'language' in transcription_data:
-                        idea.metadata['transcription_language'] = transcription_data['language']
+                    if "language" in transcription_data:
+                        idea.metadata["transcription_language"] = transcription_data["language"]
 
         # Store transformation history in metadata
         if self._transformation_history:
-            idea.metadata['transformation_chain'] = self._format_transformation_chain()
+            idea.metadata["transformation_chain"] = self._format_transformation_chain()
 
         return idea
 
-    def _extract_audio_from_video(
-        self,
-        idea: IdeaInspiration
-    ) -> Optional[Dict[str, Any]]:
+    def _extract_audio_from_video(self, idea: IdeaInspiration) -> Optional[Dict[str, Any]]:
         """Extract audio from video content.
 
         Args:
@@ -402,8 +385,7 @@ class ContentFunnel:
 
         try:
             return self.audio_extractor.extract_audio(
-                video_url=idea.source_url,
-                video_id=idea.source_id
+                video_url=idea.source_url, video_id=idea.source_id
             )
         except Exception as e:
             # Log error but don't raise - allow processing to continue
@@ -411,10 +393,7 @@ class ContentFunnel:
             return None
 
     def _transcribe_audio(
-        self,
-        audio_url: str,
-        audio_id: Optional[str],
-        language: Optional[str]
+        self, audio_url: str, audio_id: Optional[str], language: Optional[str]
     ) -> Optional[Dict[str, Any]]:
         """Transcribe audio to text.
 
@@ -431,9 +410,7 @@ class ContentFunnel:
 
         try:
             return self.audio_transcriber.transcribe_audio(
-                audio_url=audio_url,
-                audio_id=audio_id,
-                language=language
+                audio_url=audio_url, audio_id=audio_id, language=language
             )
         except Exception as e:
             # Log error but don't raise - allow processing to continue
@@ -441,9 +418,7 @@ class ContentFunnel:
             return None
 
     def _extract_subtitles_from_video(
-        self,
-        idea: IdeaInspiration,
-        language: Optional[str]
+        self, idea: IdeaInspiration, language: Optional[str]
     ) -> Optional[Dict[str, Any]]:
         """Extract subtitles from video content.
 
@@ -459,9 +434,7 @@ class ContentFunnel:
 
         try:
             return self.subtitle_extractor.extract_subtitles(
-                video_url=idea.source_url,
-                video_id=idea.source_id,
-                language=language
+                video_url=idea.source_url, video_id=idea.source_id, language=language
             )
         except Exception as e:
             # Log error but don't raise - allow processing to continue
@@ -473,7 +446,7 @@ class ContentFunnel:
         from_stage: TransformationStage,
         to_stage: TransformationStage,
         method: str,
-        confidence: Optional[float] = None
+        confidence: Optional[float] = None,
     ) -> None:
         """Record a transformation in the history.
 
@@ -490,7 +463,7 @@ class ContentFunnel:
             to_stage=to_stage,
             method=method,
             confidence=confidence,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
         self._transformation_history.append(metadata)
 

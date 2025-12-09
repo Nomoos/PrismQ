@@ -12,23 +12,24 @@ Workflow Position:
     IdeaInspiration → Idea → Script → Proofreading → Publishing
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Optional, Any
-from enum import Enum
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
-
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 # Translation constants
-CZECH_TRANSLATION_NOTE = "\n\n[Poznámka: Pro produkční překlad použijte StoryTranslation model s AI překladačem]"
+CZECH_TRANSLATION_NOTE = (
+    "\n\n[Poznámka: Pro produkční překlad použijte StoryTranslation model s AI překladačem]"
+)
 
 
 class IdeaStatus(Enum):
     """Status of an Idea in the content workflow.
-    
+
     This enum represents the complete workflow stages from initial inspiration
     to final publication and archival. Each state represents a distinct phase
     in the content creation pipeline.
-    
+
     Progressive Multi-Format Workflow:
         IdeaInspiration → Idea → Outline → Skeleton → Title
           ↓
@@ -49,74 +50,74 @@ class IdeaStatus(Enum):
         PublishPlanning → PublishedVideo → AnalyticsReviewVideo
           ↓
         Archived
-    
+
     Note: Content follows progressive enrichment:
     - Text: Published text serves as source for voiceover recording
     - Audio: Published audio serves as foundation for video scene planning
     - Video: Combines published audio with visual elements
     - Can stop at any stage (text-only, audio-only, or full video)
     """
-    
+
     # Legacy states (kept for backward compatibility)
     DRAFT = "draft"
     VALIDATED = "validated"
     APPROVED = "approved"
     IN_PRODUCTION = "in_production"
-    
+
     # Idea Development Phase
     IDEA = "idea"
     OUTLINE = "outline"
     SKELETON = "skeleton"
     TITLE = "title"
-    
+
     # Script Development Phase
     SCRIPT = "script"
     SCRIPT_DRAFT = "script_draft"
     SCRIPT_REVIEW = "script_review"
     SCRIPT_APPROVED = "script_approved"
-    
+
     # Text Publication (First Format - Source for Audio)
     TEXT_PUBLISHING = "text_publishing"
     TEXT_PUBLISHED = "text_published"
     TEXT_ANALYTICS = "text_analytics"
-    
+
     # Voiceover Production Phase (Uses Published Text)
     VOICEOVER = "voiceover"
     VOICEOVER_REVIEW = "voiceover_review"
     VOICEOVER_APPROVED = "voiceover_approved"
-    
+
     # Audio Publication (Second Format - Source for Video)
     AUDIO_PUBLISHING = "audio_publishing"
     AUDIO_PUBLISHED = "audio_published"
     AUDIO_ANALYTICS = "audio_analytics"
-    
+
     # Visual Production Phase (Uses Published Audio)
     SCENE_PLANNING = "scene_planning"
     KEYFRAME_PLANNING = "keyframe_planning"
     KEYFRAME_GENERATION = "keyframe_generation"
-    
+
     # Video Assembly Phase
     VIDEO_ASSEMBLY = "video_assembly"
     VIDEO_REVIEW = "video_review"
     VIDEO_FINALIZED = "video_finalized"
-    
+
     # Video Publication (Third Format)
     VIDEO_PUBLISH_PLANNING = "video_publish_planning"
     VIDEO_PUBLISHED = "video_published"
     VIDEO_ANALYTICS = "video_analytics"
-    
+
     # Legacy Publication States (for backward compatibility)
     PUBLISH_PLANNING = "publish_planning"
     PUBLISHED = "published"
     ANALYTICS_REVIEW = "analytics_review"
-    
+
     # Final State
     ARCHIVED = "archived"
 
 
 class ContentGenre(Enum):
     """Genre classification for content."""
-    
+
     TRUE_CRIME = "true_crime"
     MYSTERY = "mystery"
     HORROR = "horror"
@@ -132,24 +133,24 @@ class ContentGenre(Enum):
 @dataclass
 class Idea:
     """Core data model for distilled content ideas.
-    
-    Idea represents a refined concept that can be created independently or derived 
-    from one or more IdeaInspiration instances. It captures the essence of a creative 
+
+    Idea represents a refined concept that can be created independently or derived
+    from one or more IdeaInspiration instances. It captures the essence of a creative
     concept with comprehensive storytelling elements and execution strategy.
-    
-    Note: Ideas can exist without IdeaInspiration sources - they can be created 
+
+    Note: Ideas can exist without IdeaInspiration sources - they can be created
     directly with manual input.
-    
+
     Attributes:
         title: Clear, compelling title for the idea
         concept: Core concept or hook that defines the idea
-        
+
         Story Foundation (Základy příběhu):
             idea: Basic story spark - word, sentence, scene, or feeling (Nápad)
             premise: Short 1-3 sentence explanation of what story is about (Premisa)
             logline: One-sentence dramatic version creating WOW effect
             hook: First sentence/moment that draws readers in (Háček)
-        
+
         Story Structure (Struktura příběhu):
             synopsis: Short summary (1-3 paragraphs) for quick understanding
             story_premise: Core story premise providing AI context for generation
@@ -157,7 +158,7 @@ class Idea:
             outline: Detailed plan with scenes, emotions, tension building (Osnova)
             beat_sheet: Breakdown into small story beats/moments (Taktová mapa)
             scenes: Scene breakdown - basic building blocks (Scény)
-        
+
         Narrative Elements (Narativní prvky):
             pov: Point of view - who tells the story (Úhel pohledu)
             emotional_arc: Character's emotional journey from start to end (Emoční oblouk)
@@ -166,7 +167,7 @@ class Idea:
             climax: Most intense moment (Vrchol příběhu)
             ending: Conclusion content (Závěr)
             ending_type: Type of ending (open/shock/emotional)
-        
+
         Content Properties:
             purpose: What problem does this solve or what value does it provide
             emotional_quality: The emotional tone and impact (e.g., "suspenseful", "inspiring")
@@ -182,7 +183,7 @@ class Idea:
             setting_notes: Setting, world-building, and environmental details
             tone_guidance: Detailed guidance on tone, mood, and atmosphere
             length_target: Target length specification (e.g., "2000 words", "15 minutes")
-        
+
         Metadata:
             potential_scores: Potential performance across contexts (platform, region, demographic)
             inspiration_ids: List of IdeaInspiration IDs that contributed to this Idea
@@ -193,12 +194,12 @@ class Idea:
             created_at: Timestamp of creation
             updated_at: Timestamp of last update
             created_by: Creator identifier (human or AI agent)
-    
+
     Note on Universal Generation:
         Ideas are designed for universal content generation. Each idea can be released
         simultaneously as text, audio, and video across multiple platforms. The target_formats
         and target_platforms fields support this multi-format, multi-platform approach.
-    
+
     Example:
         >>> # Short horror story with complete narrative structure
         >>> idea = Idea(
@@ -228,7 +229,7 @@ class Idea:
         ...     length_target="60 seconds video / 500 words text",
         ...     tone_guidance="Start mysterious, build to terrifying, end with shocking twist"
         ... )
-        >>> 
+        >>>
         >>> # Educational content example
         >>> educational = Idea(
         ...     title="How Quantum Computers Actually Work",
@@ -248,16 +249,16 @@ class Idea:
         ...     length_target="8-10 minutes"
         ... )
     """
-    
+
     title: str
     concept: str
-    
+
     # Story Foundation (Základy příběhu)
     idea: str = ""  # Basic spark: word, sentence, scene, feeling (Nápad)
     premise: str = ""  # Short 1-3 sentence explanation (Premisa)
     logline: str = ""  # One-sentence dramatic version for WOW effect
     hook: str = ""  # First sentence/moment that draws readers in (Háček)
-    
+
     # Story Structure (Struktura příběhu)
     synopsis: str = ""  # Short summary (1-3 paragraphs)
     story_premise: str = ""  # Story premise for AI context (legacy field)
@@ -265,7 +266,7 @@ class Idea:
     outline: str = ""  # Detailed plan with scenes, emotions, tension (Osnova)
     beat_sheet: str = ""  # Small story beats/moments (Taktová mapa)
     scenes: str = ""  # Scene breakdown (Scény)
-    
+
     # Narrative Elements (Narativní prvky)
     pov: str = ""  # Point of view: first person/third person (Úhel pohledu)
     emotional_arc: str = ""  # Character's emotional journey (Emoční oblouk)
@@ -274,7 +275,7 @@ class Idea:
     climax: str = ""  # Most intense moment (Vrchol příběhu)
     ending: str = ""  # Conclusion type and content (Závěr)
     ending_type: str = ""  # open/shock/emotional ending
-    
+
     # Content Properties
     purpose: str = ""
     emotional_quality: str = ""
@@ -290,10 +291,10 @@ class Idea:
     setting_notes: str = ""
     tone_guidance: str = ""
     length_target: str = ""
-    
+
     # Multi-Language Support
     original_language: str = "en"  # ISO 639-1 code for original language
-    
+
     potential_scores: Dict[str, int] = field(default_factory=dict)
     inspiration_ids: List[str] = field(default_factory=list)
     metadata: Dict[str, str] = field(default_factory=dict)
@@ -303,17 +304,17 @@ class Idea:
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     created_by: Optional[str] = None
-    
+
     def __post_init__(self):
         """Initialize timestamps if not provided."""
         if self.created_at is None:
             self.created_at = datetime.now().isoformat()
         if self.updated_at is None:
             self.updated_at = datetime.now().isoformat()
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert Idea to dictionary representation.
-        
+
         Returns:
             Dictionary containing all fields with Enums converted to strings
         """
@@ -321,14 +322,14 @@ class Idea:
         data["genre"] = self.genre.value
         data["status"] = self.status.value
         return data
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Idea":
         """Create Idea from dictionary.
-        
+
         Args:
             data: Dictionary containing Idea fields
-            
+
         Returns:
             Idea instance
         """
@@ -339,14 +340,14 @@ class Idea:
                 genre = ContentGenre(genre)
             except ValueError:
                 genre = ContentGenre.OTHER
-        
+
         status = data.get("status", "draft")
         if isinstance(status, str):
             try:
                 status = IdeaStatus(status)
             except ValueError:
                 status = IdeaStatus.DRAFT
-        
+
         return cls(
             title=data.get("title", ""),
             concept=data.get("concept", ""),
@@ -392,7 +393,7 @@ class Idea:
             updated_at=data.get("updated_at"),
             created_by=data.get("created_by"),
         )
-    
+
     @classmethod
     def from_inspirations(
         cls,
@@ -420,11 +421,11 @@ class Idea:
         created_by: Optional[str] = None,
     ) -> "Idea":
         """Create Idea from one or more IdeaInspiration instances.
-        
+
         This factory method demonstrates the fusion/distillation process where
         multiple IdeaInspiration instances are combined into a single cohesive
         Idea concept.
-        
+
         Args:
             inspirations: List of IdeaInspiration instances to blend
             title: Title for the new Idea
@@ -448,47 +449,47 @@ class Idea:
             outline: Structured outline or content structure
             skeleton: Basic framework or skeleton of the content
             created_by: Creator identifier
-            
+
         Returns:
             Idea instance with linked inspiration IDs
         """
         # Extract inspiration IDs (assuming they have source_id or id attribute)
         inspiration_ids = []
         for insp in inspirations:
-            if hasattr(insp, 'source_id') and insp.source_id:
+            if hasattr(insp, "source_id") and insp.source_id:
                 inspiration_ids.append(insp.source_id)
-            elif hasattr(insp, 'id'):
+            elif hasattr(insp, "id"):
                 inspiration_ids.append(str(insp.id))
-        
+
         # Aggregate keywords from inspirations if not provided
         if keywords is None:
             keywords = []
             for insp in inspirations:
-                if hasattr(insp, 'keywords') and insp.keywords:
+                if hasattr(insp, "keywords") and insp.keywords:
                     keywords.extend(insp.keywords)
             # Remove duplicates while preserving order
             keywords = list(dict.fromkeys(keywords))
-        
+
         # Aggregate themes from inspirations if not provided
         if themes is None:
             themes = []
             for insp in inspirations:
-                if hasattr(insp, 'themes') and insp.themes:
+                if hasattr(insp, "themes") and insp.themes:
                     themes.extend(insp.themes)
             # Remove duplicates while preserving order
             themes = list(dict.fromkeys(themes))
-        
+
         # Aggregate potential scores from inspirations if available
         potential_scores = {}
         for insp in inspirations:
-            if hasattr(insp, 'contextual_category_scores'):
+            if hasattr(insp, "contextual_category_scores"):
                 for key, value in insp.contextual_category_scores.items():
                     if key in potential_scores:
                         # Average the scores if multiple inspirations have the same context
                         potential_scores[key] = (potential_scores[key] + value) // 2
                     else:
                         potential_scores[key] = value
-        
+
         return cls(
             title=title,
             concept=concept,
@@ -514,13 +515,13 @@ class Idea:
             inspiration_ids=inspiration_ids,
             created_by=created_by,
         )
-    
+
     def create_new_version(self, **updates) -> "Idea":
         """Create a new version of this Idea with updates.
-        
+
         Args:
             **updates: Keyword arguments for fields to update
-            
+
         Returns:
             New Idea instance with incremented version
         """
@@ -529,92 +530,92 @@ class Idea:
         data["updated_at"] = datetime.now().isoformat()
         data.update(updates)
         return Idea.from_dict(data)
-    
+
     def generate_summary(self, max_length: int = 500) -> str:
         """Generate a concise summary of the Idea.
-        
+
         Creates a summary that captures the essence of the Idea using key fields
         like title, concept, premise, and synopsis. Useful for quick overview,
         sharing, or translation.
-        
+
         Args:
             max_length: Maximum length of summary in characters (default 500)
-            
+
         Returns:
             Concise summary of the Idea
-            
+
         Example:
-            >>> idea = Idea(title="The Echo", concept="Time travel horror", 
+            >>> idea = Idea(title="The Echo", concept="Time travel horror",
             ...             premise="A girl hears her future self warning her")
             >>> summary = idea.generate_summary(max_length=200)
         """
         # Build summary from available fields in order of priority
         summary_parts = []
-        
+
         # Always include title and concept
         summary_parts.append(f"Title: {self.title}")
         summary_parts.append(f"Concept: {self.concept}")
-        
+
         # Add premise if available and not too long
         if self.premise:
             summary_parts.append(f"Premise: {self.premise}")
-        
+
         # Add logline if available (usually concise)
         if self.logline:
             summary_parts.append(f"Logline: {self.logline}")
-        
+
         # Add synopsis if available and we have space
         if self.synopsis:
             summary_parts.append(f"Synopsis: {self.synopsis}")
-        
+
         # Add genre and target info
         summary_parts.append(f"Genre: {self.genre.value}")
-        
+
         if self.target_platforms:
             platforms = ", ".join(self.target_platforms[:3])  # Limit to first 3
             summary_parts.append(f"Platforms: {platforms}")
-        
+
         if self.target_formats:
             formats = ", ".join(self.target_formats)
             summary_parts.append(f"Formats: {formats}")
-        
+
         # Join and truncate if necessary
         summary = "\n".join(summary_parts)
-        
+
         if len(summary) > max_length:
             # Truncate to max_length, breaking at last complete sentence/line
             # Ensure we don't exceed max_length even if no newline is found
             truncated = summary[:max_length]
-            last_newline = truncated.rfind('\n')
+            last_newline = truncated.rfind("\n")
             if last_newline > 0:
                 summary = truncated[:last_newline]
             else:
                 summary = truncated
-            
-            if not summary.endswith('.'):
+
+            if not summary.endswith("."):
                 summary += "..."
-        
+
         return summary
-    
+
     def translate_summary_to_czech(self, summary: Optional[str] = None) -> str:
         """Translate summary to Czech language.
-        
+
         Translates the Idea summary to Czech (CS) language. This is a placeholder
         implementation that would integrate with translation services in production.
-        
+
         Args:
             summary: Optional pre-generated summary to translate. If not provided,
                     generates summary first using generate_summary()
-            
+
         Returns:
             Czech translation of the summary
-            
+
         Note:
             In production, this would integrate with:
             - StoryTranslation model for full translation workflow
             - AI translation services (OpenAI, DeepL, etc.)
             - Translation feedback loop for quality assurance
-            
+
         Example:
             >>> idea = Idea(title="The Echo", concept="Time travel horror")
             >>> czech_summary = idea.translate_summary_to_czech()
@@ -622,7 +623,7 @@ class Idea:
         # Get or generate summary
         if summary is None:
             summary = self.generate_summary()
-        
+
         # Simple translation mapping for demonstration
         # In production, this would use AI translation services
         translation_map = {
@@ -646,17 +647,17 @@ class Idea:
             "technology": "technologie",
             "other": "jiné",
         }
-        
+
         # Apply translations
         czech_summary = summary
         for english, czech in translation_map.items():
             czech_summary = czech_summary.replace(english, czech)
-        
+
         # Add note about translation method
         czech_summary += CZECH_TRANSLATION_NOTE
-        
+
         return czech_summary
-    
+
     def __repr__(self) -> str:
         """String representation of Idea."""
         return (

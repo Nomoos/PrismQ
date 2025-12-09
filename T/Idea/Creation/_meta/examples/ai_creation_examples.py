@@ -5,16 +5,17 @@ This example demonstrates how to use the IdeaCreator to generate Ideas
 using local AI models optimized for RTX 5090 and other high-end GPUs.
 """
 
-import sys
 import os
+import sys
 
 # Add parent directories to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../Model/src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../Model'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../Model/src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../Model"))
 
-from creation import IdeaCreator, CreationConfig
 from ai_generator import AIConfig
+from creation import CreationConfig, IdeaCreator
+
 from idea import ContentGenre
 
 
@@ -23,12 +24,12 @@ def example_default_usage():
     print("=" * 80)
     print("Example 1: Default Usage (10 ideas with AI)")
     print("=" * 80)
-    
+
     creator = IdeaCreator()
-    
+
     # Default: creates 10 ideas from a title
     ideas = creator.create_from_title("The Future of Artificial Intelligence")
-    
+
     print(f"\nCreated {len(ideas)} ideas:")
     for i, idea in enumerate(ideas, 1):
         print(f"\n{i}. {idea.title}")
@@ -41,15 +42,12 @@ def example_custom_number():
     print("\n" + "=" * 80)
     print("Example 2: Custom Number of Ideas")
     print("=" * 80)
-    
+
     creator = IdeaCreator()
-    
+
     # Create 5 ideas instead of default 10
-    ideas = creator.create_from_title(
-        "Quantum Computing Explained",
-        num_ideas=5
-    )
-    
+    ideas = creator.create_from_title("Quantum Computing Explained", num_ideas=5)
+
     print(f"\nCreated {len(ideas)} ideas with custom count")
 
 
@@ -58,9 +56,9 @@ def example_with_targeting():
     print("\n" + "=" * 80)
     print("Example 3: Platform and Format Targeting")
     print("=" * 80)
-    
+
     creator = IdeaCreator()
-    
+
     # Create ideas targeted for specific platforms and formats
     ideas = creator.create_from_title(
         "Social Media Trends 2024",
@@ -68,9 +66,9 @@ def example_with_targeting():
         target_platforms=["youtube", "tiktok", "instagram"],
         target_formats=["video", "short-form"],
         genre=ContentGenre.ENTERTAINMENT,
-        length_target="60 seconds"
+        length_target="60 seconds",
     )
-    
+
     print(f"\nCreated {len(ideas)} ideas for social media platforms")
     print(f"Target platforms: {ideas[0].target_platforms}")
     print(f"Target formats: {ideas[0].target_formats}")
@@ -82,22 +80,22 @@ def example_from_description():
     print("\n" + "=" * 80)
     print("Example 4: Creating Ideas from Description")
     print("=" * 80)
-    
+
     creator = IdeaCreator()
-    
+
     description = """
     Explore the ethical implications of AI in healthcare, focusing on 
     privacy concerns, bias in algorithms, and the balance between 
     innovation and patient safety.
     """
-    
+
     ideas = creator.create_from_description(
         description,
         num_ideas=10,
         genre=ContentGenre.EDUCATIONAL,
-        target_platforms=["medium", "youtube", "linkedin"]
+        target_platforms=["medium", "youtube", "linkedin"],
     )
-    
+
     print(f"\nCreated {len(ideas)} ideas from description:")
     for i, idea in enumerate(ideas[:3], 1):  # Show first 3
         print(f"\n{i}. {idea.title}")
@@ -109,22 +107,22 @@ def example_rtx_5090_optimized():
     print("\n" + "=" * 80)
     print("Example 5: RTX 5090 Optimized Configuration")
     print("=" * 80)
-    
+
     # Configure for best quality using RTX 5090 recommended models
     config = CreationConfig(
         use_ai=True,
         ai_model="llama3.1:70b-q4_K_M",  # Best for RTX 5090
         ai_temperature=0.8,
-        default_num_ideas=10
+        default_num_ideas=10,
     )
-    
+
     creator = IdeaCreator(config)
-    
+
     ideas = creator.create_from_title("The Ethics of AI Development")
-    
+
     print(f"\nUsing model: {config.ai_model}")
     print(f"Created {len(ideas)} high-quality ideas")
-    
+
     if ideas:
         print(f"\nFirst idea:")
         print(f"Title: {ideas[0].title}")
@@ -137,21 +135,13 @@ def example_alternative_models():
     print("\n" + "=" * 80)
     print("Example 6: Alternative AI Models")
     print("=" * 80)
-    
+
     # Qwen 2.5 - Excellent for creative writing
-    config_qwen = CreationConfig(
-        use_ai=True,
-        ai_model="qwen2.5:72b-q4_K_M",
-        ai_temperature=0.9
-    )
-    
+    config_qwen = CreationConfig(use_ai=True, ai_model="qwen2.5:72b-q4_K_M", ai_temperature=0.9)
+
     # Command-R - Great for structured output
-    config_command = CreationConfig(
-        use_ai=True,
-        ai_model="command-r:35b",
-        ai_temperature=0.7
-    )
-    
+    config_command = CreationConfig(use_ai=True, ai_model="command-r:35b", ai_temperature=0.7)
+
     print("\nAvailable model configurations:")
     print(f"1. Llama 3.1 70B: llama3.1:70b-q4_K_M (Default, best overall)")
     print(f"2. Qwen 2.5 72B: qwen2.5:72b-q4_K_M (Creative writing)")
@@ -164,16 +154,13 @@ def example_no_ai_fallback():
     print("\n" + "=" * 80)
     print("Example 7: Fallback Mode (No AI)")
     print("=" * 80)
-    
+
     # Explicitly disable AI to use fallback generation
     config = CreationConfig(use_ai=False)
     creator = IdeaCreator(config)
-    
-    ideas = creator.create_from_title(
-        "Machine Learning Basics",
-        num_ideas=5
-    )
-    
+
+    ideas = creator.create_from_title("Machine Learning Basics", num_ideas=5)
+
     print(f"\nCreated {len(ideas)} ideas using fallback generation (no AI)")
     print("Note: Fallback uses placeholder generation for testing/development")
 
@@ -183,21 +170,17 @@ def example_batch_creation():
     print("\n" + "=" * 80)
     print("Example 8: Batch Creation for Multiple Topics")
     print("=" * 80)
-    
+
     creator = IdeaCreator()
-    
-    topics = [
-        "AI in Education",
-        "Sustainable Technology",
-        "Future of Work"
-    ]
-    
+
+    topics = ["AI in Education", "Sustainable Technology", "Future of Work"]
+
     all_ideas = []
     for topic in topics:
         ideas = creator.create_from_title(topic, num_ideas=3)
         all_ideas.extend(ideas)
         print(f"\nCreated {len(ideas)} ideas for: {topic}")
-    
+
     print(f"\nTotal ideas created: {len(all_ideas)}")
 
 
@@ -207,7 +190,7 @@ def main():
     print("AI-Powered Idea Creation Examples")
     print("Optimized for RTX 5090 with Ollama")
     print("=" * 80)
-    
+
     examples = [
         example_default_usage,
         example_custom_number,
@@ -216,15 +199,15 @@ def main():
         example_rtx_5090_optimized,
         example_alternative_models,
         example_no_ai_fallback,
-        example_batch_creation
+        example_batch_creation,
     ]
-    
+
     for example in examples:
         try:
             example()
         except Exception as e:
             print(f"\nExample failed: {e}")
-    
+
     print("\n" + "=" * 80)
     print("Examples completed!")
     print("=" * 80)

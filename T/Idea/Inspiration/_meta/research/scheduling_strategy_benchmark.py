@@ -11,22 +11,22 @@ NOTE: This script is currently a framework/scaffold. It will be fully functional
 once Issue #327 (Queue Scheduling Strategies) is completed by Worker 04.
 """
 
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, field
-from enum import Enum
-import time
 import statistics
+import time
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # Import fairness metrics
 from fairness_metrics import (
+    analyze_starvation_risk,
+    calculate_expected_weighted_random_probability,
     calculate_gini_coefficient,
     calculate_jains_fairness_index,
-    calculate_wait_time_statistics,
-    analyze_starvation_risk,
     calculate_probability_distribution,
-    calculate_expected_weighted_random_probability,
+    calculate_wait_time_statistics,
     compare_distributions,
 )
 
@@ -34,39 +34,42 @@ from fairness_metrics import (
 class SchedulingStrategy(str, Enum):
     """
     Task queue scheduling strategies.
-    
+
     NOTE: These will be implemented in Issue #327 by Worker 04.
     This enum defines the interface for benchmarking.
     """
-    FIFO = "fifo"               # First-In-First-Out
-    LIFO = "lifo"               # Last-In-First-Out
-    PRIORITY = "priority"       # Priority-based (lower number first)
+
+    FIFO = "fifo"  # First-In-First-Out
+    LIFO = "lifo"  # Last-In-First-Out
+    PRIORITY = "priority"  # Priority-based (lower number first)
     WEIGHTED_RANDOM = "weighted_random"  # Probabilistic with priority weights
 
 
 @dataclass
 class BenchmarkConfig:
     """Configuration for benchmark tests."""
-    
+
     # Test parameters
     num_tasks: int = 10000
-    priority_distribution: Dict[int, float] = field(default_factory=lambda: {
-        1: 0.1,    # 10% high priority
-        10: 0.3,   # 30% medium-high
-        50: 0.4,   # 40% medium
-        100: 0.2,  # 20% low priority
-    })
-    
+    priority_distribution: Dict[int, float] = field(
+        default_factory=lambda: {
+            1: 0.1,  # 10% high priority
+            10: 0.3,  # 30% medium-high
+            50: 0.4,  # 40% medium
+            100: 0.2,  # 20% low priority
+        }
+    )
+
     # Starvation threshold
     starvation_threshold_seconds: float = 300.0
-    
+
     # Performance targets
     target_claim_latency_ms: float = 10.0
     target_throughput_per_min: float = 500.0
-    
+
     # Test database
     db_path: str = "test_benchmark.db"
-    
+
     # Output
     results_dir: str = "benchmark_results"
     report_path: str = "SCHEDULING_STRATEGY_COMPARISON.md"
@@ -75,33 +78,33 @@ class BenchmarkConfig:
 @dataclass
 class BenchmarkResult:
     """Results from a single benchmark run."""
-    
+
     strategy: SchedulingStrategy
     timestamp: datetime = field(default_factory=datetime.now)
-    
+
     # Performance metrics
     total_tasks: int = 0
     duration_seconds: float = 0.0
     throughput_per_min: float = 0.0
-    
+
     # Latency metrics (milliseconds)
     claim_latencies: List[float] = field(default_factory=list)
     mean_latency_ms: float = 0.0
     p50_latency_ms: float = 0.0
     p95_latency_ms: float = 0.0
     p99_latency_ms: float = 0.0
-    
+
     # Wait time metrics (seconds)
     wait_times: List[float] = field(default_factory=list)
     wait_times_by_priority: Dict[int, List[float]] = field(default_factory=dict)
-    
+
     # Fairness metrics
     gini_coefficient: float = 0.0
     jains_fairness_index: float = 0.0
-    
+
     # Starvation analysis
     starvation_stats: Dict[int, Dict[str, float]] = field(default_factory=dict)
-    
+
     # Selection distribution (for probability analysis)
     selections_by_priority: Dict[int, int] = field(default_factory=dict)
     actual_probability: Dict[int, float] = field(default_factory=dict)
@@ -112,42 +115,42 @@ class BenchmarkResult:
 class StrategyBenchmark:
     """
     Benchmark framework for scheduling strategies.
-    
+
     This class provides the structure for benchmarking. The actual strategy
     implementations will come from Issue #327.
     """
-    
+
     def __init__(self, config: BenchmarkConfig):
         """
         Initialize benchmark framework.
-        
+
         Args:
             config: Benchmark configuration
         """
         self.config = config
         self.results: Dict[SchedulingStrategy, BenchmarkResult] = {}
-        
+
         # Create results directory
         Path(config.results_dir).mkdir(parents=True, exist_ok=True)
-    
+
     def benchmark_strategy(self, strategy: SchedulingStrategy) -> BenchmarkResult:
         """
         Benchmark a single scheduling strategy.
-        
+
         NOTE: This is a placeholder. Full implementation depends on #327.
-        
+
         Args:
             strategy: Strategy to benchmark
-            
+
         Returns:
             BenchmarkResult with performance and fairness metrics
         """
         print(f"\n{'='*60}")
         print(f"Benchmarking {strategy.value.upper()} strategy")
         print(f"{'='*60}")
-        
+
         result = BenchmarkResult(strategy=strategy)
-        
+
         # TODO: Implement once #327 is complete
         # This will:
         # 1. Set up queue with strategy
@@ -155,16 +158,16 @@ class StrategyBenchmark:
         # 3. Claim and process tasks
         # 4. Measure latencies and wait times
         # 5. Calculate fairness metrics
-        
+
         print(f"⚠️  Waiting for Issue #327 to be completed")
         print(f"    Strategy implementation needed: {strategy.value}")
-        
+
         return result
-    
+
     def benchmark_all_strategies(self) -> Dict[SchedulingStrategy, BenchmarkResult]:
         """
         Benchmark all scheduling strategies.
-        
+
         Returns:
             Dict mapping strategy to benchmark results
         """
@@ -174,45 +177,43 @@ class StrategyBenchmark:
         print(f"  Tasks: {self.config.num_tasks}")
         print(f"  Priority distribution: {self.config.priority_distribution}")
         print(f"  Starvation threshold: {self.config.starvation_threshold_seconds}s")
-        
+
         for strategy in SchedulingStrategy:
             result = self.benchmark_strategy(strategy)
             self.results[strategy] = result
-        
+
         return self.results
-    
+
     def measure_fairness(self, strategy: SchedulingStrategy) -> Dict[str, float]:
         """
         Measure fairness metrics for a strategy.
-        
+
         NOTE: Placeholder - full implementation depends on #327.
-        
+
         Args:
             strategy: Strategy to analyze
-            
+
         Returns:
             Dict with fairness metrics
         """
         # TODO: Implement once we have actual wait time data from #327
         return {
-            'gini_coefficient': 0.0,
-            'jains_fairness_index': 0.0,
+            "gini_coefficient": 0.0,
+            "jains_fairness_index": 0.0,
         }
-    
+
     def test_starvation(
-        self,
-        strategy: SchedulingStrategy,
-        continuous_high_priority: bool = True
+        self, strategy: SchedulingStrategy, continuous_high_priority: bool = True
     ) -> Dict[str, Any]:
         """
         Test starvation scenarios for a strategy.
-        
+
         NOTE: Placeholder - full implementation depends on #327.
-        
+
         Args:
             strategy: Strategy to test
             continuous_high_priority: Whether to continuously add high priority tasks
-            
+
         Returns:
             Dict with starvation test results
         """
@@ -222,22 +223,22 @@ class StrategyBenchmark:
         # 2. Continuously add high priority tasks (if enabled)
         # 3. Measure how long low priority tasks wait
         # 4. Determine if/when starvation occurs
-        
+
         return {
-            'max_wait_low_priority': 0.0,
-            'pct_starved': 0.0,
-            'starvation_detected': False,
+            "max_wait_low_priority": 0.0,
+            "pct_starved": 0.0,
+            "starvation_detected": False,
         }
-    
+
     def analyze_probability_distribution(self, strategy: SchedulingStrategy) -> Dict[str, Any]:
         """
         Analyze probability distribution for weighted random strategy.
-        
+
         NOTE: Placeholder - full implementation depends on #327.
-        
+
         Args:
             strategy: Strategy to analyze (primarily for WEIGHTED_RANDOM)
-            
+
         Returns:
             Dict with probability analysis
         """
@@ -247,43 +248,43 @@ class StrategyBenchmark:
         # 2. Count selections by priority
         # 3. Calculate actual vs expected probabilities
         # 4. Measure deviation
-        
+
         return {
-            'actual_distribution': {},
-            'expected_distribution': {},
-            'max_deviation_pct': 0.0,
+            "actual_distribution": {},
+            "expected_distribution": {},
+            "max_deviation_pct": 0.0,
         }
-    
+
     def generate_comparison_report(self, output_path: Optional[str] = None) -> str:
         """
         Generate markdown comparison report.
-        
+
         Args:
             output_path: Optional path to save report (uses config default if None)
-            
+
         Returns:
             Path to generated report
         """
         if output_path is None:
             output_path = self.config.report_path
-        
+
         report_content = self._build_report_content()
-        
-        with open(output_path, 'w') as f:
+
+        with open(output_path, "w") as f:
             f.write(report_content)
-        
+
         print(f"\n✅ Report generated: {output_path}")
         return output_path
-    
+
     def _build_report_content(self) -> str:
         """Build the markdown report content."""
-        
+
         # Get current status
         if not self.results:
             status = "⚠️ **Status**: Benchmarks not yet run (waiting for Issue #327)"
         else:
             status = "✅ **Status**: Benchmarks completed"
-        
+
         report = f"""# Scheduling Strategy Comparison Report
 
 {status}
@@ -482,31 +483,31 @@ TBD
 **Worker**: Worker 09 - Research Engineer  
 **Issue**: #338
 """
-        
+
         return report
 
 
 def main():
     """Main entry point for benchmark suite."""
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("Scheduling Strategy Benchmark Framework")
     print("Issue #338: Research Scheduling Strategy Performance")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Create configuration
     config = BenchmarkConfig()
-    
+
     # Initialize benchmark
     benchmark = StrategyBenchmark(config)
-    
+
     # Generate initial report template
     print("\n📝 Generating initial report template...")
     benchmark.generate_comparison_report()
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("✅ Framework initialized successfully")
-    print("="*60)
+    print("=" * 60)
     print("\n⚠️  Note: Full benchmarking depends on Issue #327")
     print("   Once scheduling strategies are implemented, run:")
     print("   >>> benchmark.benchmark_all_strategies()")
