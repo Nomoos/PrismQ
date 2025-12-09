@@ -84,6 +84,17 @@ class AITitleConfig:
     max_tokens: int = 2000
     timeout: int = 60
     num_variants: int = 10
+    
+    # Temperature variation for diversity (min, increment per variant)
+    temperature_base: float = 0.7
+    temperature_increment: float = 0.02
+    
+    # Title length scoring thresholds (in characters)
+    ideal_length_min: int = 45
+    ideal_length_max: int = 52
+    good_length_min: int = 40
+    good_length_max: int = 55
+    acceptable_length_max: int = 60
 
 
 class AITitleGenerator:
@@ -196,11 +207,11 @@ class AITitleGenerator:
         variants = []
         try:
             for i in range(n_variants):
-                # Build prompt for this iteration
+                # Build prompt for this iteration (num_variants not used by new prompt)
                 prompt = self._create_prompt(idea, n_variants)
                 
-                # Vary temperature slightly for diversity (0.7 to 0.9)
-                temp_variation = 0.7 + (i * 0.02)
+                # Vary temperature for diversity using config values
+                temp_variation = self.config.temperature_base + (i * self.config.temperature_increment)
                 response_text = self._call_ollama(prompt, temperature=temp_variation)
                 variant = self._parse_single_title_response(response_text, idea)
                 if variant:
@@ -326,17 +337,19 @@ class AITitleGenerator:
             style = self._infer_title_style(title_text)
             
             # Calculate a score based on title characteristics
-            # Prefer titles close to 45-52 characters as per prompt requirements
+            # Prefer titles in the ideal length range per prompt requirements
             length = len(title_text)
             score = 0.85  # Base score
-            if 45 <= length <= 52:
-                score = 0.95  # Ideal length
-            elif 40 <= length <= 55:
-                score = 0.90  # Good length
-            elif length < 40:
+            
+            # Use config thresholds for scoring
+            if self.config.ideal_length_min <= length <= self.config.ideal_length_max:
+                score = 0.95  # Ideal length (45-52 chars)
+            elif self.config.good_length_min <= length <= self.config.good_length_max:
+                score = 0.90  # Good length (40-55 chars)
+            elif length < self.config.good_length_min:
                 score = 0.80  # A bit short
-            elif length <= 60:
-                score = 0.82  # A bit long
+            elif length <= self.config.acceptable_length_max:
+                score = 0.82  # A bit long but acceptable (56-60 chars)
             else:
                 score = 0.75  # Too long
             
