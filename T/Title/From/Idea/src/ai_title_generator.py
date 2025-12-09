@@ -81,7 +81,7 @@ class AITitleConfig:
 
     model: str = "qwen3:32b"  # Qwen3:30b for RTX 5090
     api_base: str = "http://localhost:11434"
-    temperature: float = 0.7  # Default base temperature (not used with randomization)
+    temperature: float = 0.7  # Fallback temperature (when not using randomization)
     max_tokens: int = 2000
     timeout: int = 60
     num_variants: int = 10
@@ -308,7 +308,6 @@ class AITitleGenerator:
         template = self.get_prompt_template()
 
         return template.format(
-            num_variants=num_variants,
             title=title,
             concept=concept,
             genre=genre,
