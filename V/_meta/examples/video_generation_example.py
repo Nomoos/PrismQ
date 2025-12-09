@@ -11,12 +11,13 @@ The principle: Video = Keyframes + Scene Descriptions + Subtitles
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class TransitionType(Enum):
     """Types of transitions between scenes."""
+
     CUT = "cut"
     FADE = "fade"
     DISSOLVE = "dissolve"
@@ -27,6 +28,7 @@ class TransitionType(Enum):
 
 class CameraMovement(Enum):
     """Types of camera movements within a scene."""
+
     STATIC = "static"
     ZOOM_IN = "zoom_in"
     ZOOM_OUT = "zoom_out"
@@ -39,13 +41,13 @@ class CameraMovement(Enum):
 @dataclass
 class Keyframe:
     """Represents a single keyframe (visual foundation).
-    
+
     Keyframes are the core images that define:
     - Visual atmosphere
     - Shot transitions
     - Cinematic pacing
     - Emotional tone
-    
+
     Attributes:
         id: Unique keyframe identifier
         image_prompt: Text prompt describing the visual
@@ -55,6 +57,7 @@ class Keyframe:
         duration: How long this keyframe is displayed (seconds)
         source: Origin of keyframe (e.g., "ai_generated", "stock", "custom")
     """
+
     id: str
     image_prompt: str
     style: str
@@ -62,22 +65,24 @@ class Keyframe:
     timestamp: float
     duration: float
     source: str = "ai_generated"
-    
+
     def __str__(self):
-        return f"Keyframe({self.id}, {self.timestamp}s-{self.timestamp + self.duration}s, {self.mood})"
+        return (
+            f"Keyframe({self.id}, {self.timestamp}s-{self.timestamp + self.duration}s, {self.mood})"
+        )
 
 
 @dataclass
 class SceneDescription:
     """Represents a scene with visual and narrative elements.
-    
+
     Scenes define:
     - When keyframes appear
     - Which visuals pair with narration
     - Camera movements
     - Transitions between shots
     - Emotional arc reinforcement
-    
+
     Attributes:
         id: Unique scene identifier
         start_time: Scene start timestamp (seconds)
@@ -89,6 +94,7 @@ class SceneDescription:
         transition_out: Transition when leaving scene
         visual_notes: Additional visual direction notes
     """
+
     id: str
     start_time: float
     end_time: float
@@ -98,12 +104,12 @@ class SceneDescription:
     transition_in: TransitionType
     transition_out: TransitionType
     visual_notes: str = ""
-    
+
     @property
     def duration(self) -> float:
         """Calculate scene duration in seconds."""
         return self.end_time - self.start_time
-    
+
     def __str__(self):
         return f"Scene({self.id}, {self.start_time}s-{self.end_time}s, keyframe={self.keyframe_id})"
 
@@ -111,14 +117,14 @@ class SceneDescription:
 @dataclass
 class SubtitleSegment:
     """Represents a word-level subtitle segment.
-    
+
     Subtitles provide the final, most precise timing layer:
     - Exact timestamp alignment
     - Fast cut sync
     - Beat matching
     - Micro transitions
     - Dramatic pauses visualization
-    
+
     Attributes:
         text: The word or phrase to display
         start_time: When to show (seconds)
@@ -126,17 +132,18 @@ class SubtitleSegment:
         position: Screen position (e.g., "bottom", "center")
         style: Subtitle style (e.g., "default", "bold", "animated")
     """
+
     text: str
     start_time: float
     end_time: float
     position: str = "bottom"
     style: str = "default"
-    
+
     @property
     def duration(self) -> float:
         """Calculate subtitle duration in seconds."""
         return self.end_time - self.start_time
-    
+
     def __str__(self):
         return f"Subtitle('{self.text}', {self.start_time}s-{self.end_time}s)"
 
@@ -144,12 +151,12 @@ class SubtitleSegment:
 @dataclass
 class VideoComposition:
     """Complete video composition with all three layers.
-    
+
     This represents the final video assembly combining:
     1. Visual Layer (Keyframes)
     2. Structural Layer (Scene Descriptions)
     3. Timing Layer (Subtitles)
-    
+
     Attributes:
         title: Video title
         duration: Total video duration (seconds)
@@ -158,45 +165,50 @@ class VideoComposition:
         subtitles: List of subtitle segments (precise timing)
         metadata: Additional video metadata
     """
+
     title: str
     duration: float
     keyframes: List[Keyframe]
     scenes: List[SceneDescription]
     subtitles: List[SubtitleSegment]
     metadata: Dict[str, Any]
-    
+
     def validate(self) -> List[str]:
         """Validate the video composition for consistency.
-        
+
         Returns:
             List of validation errors (empty if valid)
         """
         errors = []
-        
+
         # Check that scenes reference valid keyframes
         keyframe_ids = {kf.id for kf in self.keyframes}
         for scene in self.scenes:
             if scene.keyframe_id not in keyframe_ids:
-                errors.append(f"Scene {scene.id} references non-existent keyframe {scene.keyframe_id}")
-        
+                errors.append(
+                    f"Scene {scene.id} references non-existent keyframe {scene.keyframe_id}"
+                )
+
         # Check that scenes don't overlap
         for i, scene in enumerate(self.scenes[:-1]):
             next_scene = self.scenes[i + 1]
             if scene.end_time > next_scene.start_time:
                 errors.append(f"Scene {scene.id} overlaps with {next_scene.id}")
-        
+
         # Check that all content fits within video duration
         if self.scenes and self.scenes[-1].end_time > self.duration:
-            errors.append(f"Last scene extends beyond video duration ({self.scenes[-1].end_time} > {self.duration})")
-        
+            errors.append(
+                f"Last scene extends beyond video duration ({self.scenes[-1].end_time} > {self.duration})"
+            )
+
         return errors
-    
+
     def get_scene_at(self, timestamp: float) -> Optional[SceneDescription]:
         """Get the scene playing at a specific timestamp.
-        
+
         Args:
             timestamp: Time in seconds
-            
+
         Returns:
             Scene at that timestamp, or None if no scene
         """
@@ -204,35 +216,34 @@ class VideoComposition:
             if scene.start_time <= timestamp < scene.end_time:
                 return scene
         return None
-    
+
     def get_subtitles_at(self, timestamp: float) -> List[SubtitleSegment]:
         """Get all subtitles visible at a specific timestamp.
-        
+
         Args:
             timestamp: Time in seconds
-            
+
         Returns:
             List of subtitles visible at that timestamp
         """
-        return [
-            sub for sub in self.subtitles
-            if sub.start_time <= timestamp < sub.end_time
-        ]
-    
+        return [sub for sub in self.subtitles if sub.start_time <= timestamp < sub.end_time]
+
     def __str__(self):
-        return (f"VideoComposition('{self.title}', {self.duration}s, "
-                f"{len(self.keyframes)} keyframes, {len(self.scenes)} scenes, "
-                f"{len(self.subtitles)} subtitles)")
+        return (
+            f"VideoComposition('{self.title}', {self.duration}s, "
+            f"{len(self.keyframes)} keyframes, {len(self.scenes)} scenes, "
+            f"{len(self.subtitles)} subtitles)"
+        )
 
 
 def create_example_video() -> VideoComposition:
     """Create an example video composition demonstrating the three-layer approach.
-    
+
     This example creates a 60-second video about "The Future of AI" with:
     - 5 keyframes defining visual moments
     - 5 scenes with narration and camera movements
     - Word-level subtitles for precise timing
-    
+
     Returns:
         A complete VideoComposition ready for rendering
     """
@@ -246,7 +257,7 @@ def create_example_video() -> VideoComposition:
             mood="hopeful",
             timestamp=0.0,
             duration=12.0,
-            source="ai_generated"
+            source="ai_generated",
         ),
         Keyframe(
             id="kf_002",
@@ -255,7 +266,7 @@ def create_example_video() -> VideoComposition:
             mood="intriguing",
             timestamp=12.0,
             duration=10.0,
-            source="ai_generated"
+            source="ai_generated",
         ),
         Keyframe(
             id="kf_003",
@@ -264,7 +275,7 @@ def create_example_video() -> VideoComposition:
             mood="collaborative",
             timestamp=22.0,
             duration=15.0,
-            source="ai_generated"
+            source="ai_generated",
         ),
         Keyframe(
             id="kf_004",
@@ -273,7 +284,7 @@ def create_example_video() -> VideoComposition:
             mood="mysterious",
             timestamp=37.0,
             duration=11.0,
-            source="ai_generated"
+            source="ai_generated",
         ),
         Keyframe(
             id="kf_005",
@@ -282,10 +293,10 @@ def create_example_video() -> VideoComposition:
             mood="inspiring",
             timestamp=48.0,
             duration=12.0,
-            source="ai_generated"
+            source="ai_generated",
         ),
     ]
-    
+
     # LAYER 2: STRUCTURAL LAYER (Scene Descriptions)
     # Define how keyframes appear, transitions, and camera movements
     scenes = [
@@ -298,7 +309,7 @@ def create_example_video() -> VideoComposition:
             camera_movement=CameraMovement.ZOOM_IN,
             transition_in=TransitionType.FADE,
             transition_out=TransitionType.DISSOLVE,
-            visual_notes="Slow zoom into cityscape, establishing the future setting"
+            visual_notes="Slow zoom into cityscape, establishing the future setting",
         ),
         SceneDescription(
             id="scene_002",
@@ -309,7 +320,7 @@ def create_example_video() -> VideoComposition:
             camera_movement=CameraMovement.STATIC,
             transition_in=TransitionType.DISSOLVE,
             transition_out=TransitionType.CUT,
-            visual_notes="Hold on neural network, let viewer absorb the complexity"
+            visual_notes="Hold on neural network, let viewer absorb the complexity",
         ),
         SceneDescription(
             id="scene_003",
@@ -320,7 +331,7 @@ def create_example_video() -> VideoComposition:
             camera_movement=CameraMovement.PAN_RIGHT,
             transition_in=TransitionType.CUT,
             transition_out=TransitionType.FADE,
-            visual_notes="Pan to reveal person interacting with AI, showing partnership"
+            visual_notes="Pan to reveal person interacting with AI, showing partnership",
         ),
         SceneDescription(
             id="scene_004",
@@ -331,7 +342,7 @@ def create_example_video() -> VideoComposition:
             camera_movement=CameraMovement.ZOOM_OUT,
             transition_in=TransitionType.FADE,
             transition_out=TransitionType.DISSOLVE,
-            visual_notes="Zoom out to show scale of data processing"
+            visual_notes="Zoom out to show scale of data processing",
         ),
         SceneDescription(
             id="scene_005",
@@ -342,10 +353,10 @@ def create_example_video() -> VideoComposition:
             camera_movement=CameraMovement.STATIC,
             transition_in=TransitionType.DISSOLVE,
             transition_out=TransitionType.FADE,
-            visual_notes="Final inspirational message, hold on unified vision"
+            visual_notes="Final inspirational message, hold on unified vision",
         ),
     ]
-    
+
     # LAYER 3: TIMING LAYER (Subtitles)
     # Word-level timing for precise synchronization
     # Note: In production, these would be automatically generated from audio analysis
@@ -358,14 +369,12 @@ def create_example_video() -> VideoComposition:
         SubtitleSegment("transforms", 2.8, 3.6, "bottom", "default"),
         SubtitleSegment("everything", 3.6, 4.4, "bottom", "default"),
         SubtitleSegment("we know.", 4.4, 5.2, "bottom", "default"),
-        
         # Scene 2 subtitles
         SubtitleSegment("At its core,", 12.0, 13.0, "bottom", "default"),
         SubtitleSegment("AI is about", 13.0, 14.0, "bottom", "default"),
         SubtitleSegment("connections,", 14.0, 15.0, "bottom", "default"),
         SubtitleSegment("patterns,", 15.0, 16.0, "bottom", "default"),
         SubtitleSegment("and learning.", 16.0, 17.5, "bottom", "default"),
-        
         # Scene 3 subtitles
         SubtitleSegment("But the real", 22.0, 23.0, "bottom", "default"),
         SubtitleSegment("magic happens", 23.0, 24.2, "bottom", "default"),
@@ -376,7 +385,6 @@ def create_example_video() -> VideoComposition:
         SubtitleSegment("possibilities", 28.0, 29.2, "bottom", "default"),
         SubtitleSegment("we never", 29.2, 30.0, "bottom", "default"),
         SubtitleSegment("imagined.", 30.0, 31.2, "bottom", "default"),
-        
         # Scene 4 subtitles
         SubtitleSegment("The flow", 37.0, 37.8, "bottom", "default"),
         SubtitleSegment("of information", 37.8, 39.0, "bottom", "default"),
@@ -384,7 +392,6 @@ def create_example_video() -> VideoComposition:
         SubtitleSegment("opening", 40.2, 41.0, "bottom", "default"),
         SubtitleSegment("new frontiers", 41.0, 42.2, "bottom", "default"),
         SubtitleSegment("of understanding.", 42.2, 43.8, "bottom", "default"),
-        
         # Scene 5 subtitles
         SubtitleSegment("Together,", 48.0, 49.0, "bottom", "default"),
         SubtitleSegment("we're not just", 49.0, 50.2, "bottom", "default"),
@@ -394,7 +401,7 @@ def create_example_video() -> VideoComposition:
         SubtitleSegment("the future", 53.4, 54.4, "bottom", "default"),
         SubtitleSegment("of humanity.", 54.4, 55.8, "bottom", "default"),
     ]
-    
+
     # Combine all layers into complete composition
     video = VideoComposition(
         title="The Future of AI",
@@ -409,10 +416,10 @@ def create_example_video() -> VideoComposition:
             "genre": "educational",
             "target_audience": "tech_enthusiasts",
             "framerate": 30,
-            "resolution": "1080x1920"
-        }
+            "resolution": "1080x1920",
+        },
     )
-    
+
     return video
 
 
@@ -422,12 +429,12 @@ def demonstrate_video_layers():
     print("VIDEO GENERATION: THREE-LAYER APPROACH")
     print("=" * 80)
     print("\nPrinciple: Video = Keyframes + Scene Descriptions + Subtitles\n")
-    
+
     # Create example video
     video = create_example_video()
-    
+
     print(f"Created: {video}\n")
-    
+
     # Validate composition
     errors = video.validate()
     if errors:
@@ -436,7 +443,7 @@ def demonstrate_video_layers():
             print(f"   - {error}")
     else:
         print("✅ Video composition is valid\n")
-    
+
     # Display Layer 1: Keyframes
     print("-" * 80)
     print("LAYER 1: VISUAL LAYER (Keyframes)")
@@ -447,7 +454,7 @@ def demonstrate_video_layers():
         print(f"    Prompt: {kf.image_prompt}")
         print(f"    Style: {kf.style} | Mood: {kf.mood}")
         print()
-    
+
     # Display Layer 2: Scene Descriptions
     print("-" * 80)
     print("LAYER 2: STRUCTURAL LAYER (Scene Descriptions)")
@@ -455,12 +462,12 @@ def demonstrate_video_layers():
     print("These define timing, transitions, and camera movements.\n")
     for scene in video.scenes:
         print(f"  {scene}")
-        print(f"    Narration: \"{scene.narration}\"")
+        print(f'    Narration: "{scene.narration}"')
         print(f"    Camera: {scene.camera_movement.value}")
         print(f"    Transitions: {scene.transition_in.value} → {scene.transition_out.value}")
         print(f"    Notes: {scene.visual_notes}")
         print()
-    
+
     # Display Layer 3: Subtitles (sample)
     print("-" * 80)
     print("LAYER 3: TIMING LAYER (Subtitles)")
@@ -471,18 +478,18 @@ def demonstrate_video_layers():
     for sub in video.subtitles[:10]:
         print(f"    {sub}")
     print()
-    
+
     # Demonstrate querying at specific timestamps
     print("-" * 80)
     print("TIMESTAMP QUERY EXAMPLE")
     print("-" * 80)
     print("What's happening at different moments in the video?\n")
-    
+
     test_timestamps = [5.0, 15.0, 30.0, 45.0, 55.0]
     for ts in test_timestamps:
         scene = video.get_scene_at(ts)
         subs = video.get_subtitles_at(ts)
-        
+
         print(f"  At {ts}s:")
         if scene:
             print(f"    Scene: {scene.id} (keyframe: {scene.keyframe_id})")
@@ -491,12 +498,13 @@ def demonstrate_video_layers():
             subtitle_texts = " | ".join([s.text for s in subs])
             print(f"    Subtitles: {subtitle_texts}")
         print()
-    
+
     # Print rendering instructions
     print("-" * 80)
     print("RENDERING WORKFLOW")
     print("-" * 80)
-    print("""
+    print(
+        """
 To render this video, follow these steps:
 
 1. Generate/Acquire Keyframes
@@ -521,8 +529,9 @@ To render this video, follow these steps:
    - Add platform-specific elements (CTAs, end screens)
 
 Tools: FFmpeg, DaVinci Resolve, Premiere Pro, or custom video pipeline
-""")
-    
+"""
+    )
+
     print("=" * 80)
     print("Example completed successfully!")
     print("=" * 80)
@@ -533,7 +542,8 @@ def demonstrate_layering_principle():
     print("\n" + "=" * 80)
     print("WHY THIS LAYER ORDER?")
     print("=" * 80)
-    print("""
+    print(
+        """
 The three-layer approach follows a specific dependency chain:
 
 1. KEYFRAMES FIRST (Visual Foundation)
@@ -559,7 +569,8 @@ This order ensures:
 - No rework needed when adding layers
 - Maximum flexibility in production
 - Clean separation of concerns
-""")
+"""
+    )
     print("=" * 80)
 
 
@@ -569,13 +580,13 @@ def main():
     print("PRISMQ VIDEO GENERATION - REFERENCE EXAMPLE")
     print("=" * 80)
     print("\nReference: https://youtube.com/shorts/NMMAZGYy_Eg?si=hRULhkvt0nmqKwH4\n")
-    
+
     # Demonstrate the three-layer approach
     demonstrate_video_layers()
-    
+
     # Explain the layering principle
     demonstrate_layering_principle()
-    
+
     print("\n✅ Example completed! You now understand the three-layer video approach.\n")
 
 

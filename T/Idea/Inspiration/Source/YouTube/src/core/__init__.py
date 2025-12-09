@@ -4,12 +4,11 @@ This module provides core functionality including configuration management,
 database operations, metrics calculation, and idea processing.
 """
 
+from . import db_utils, logging_config
 from .config import Config
 from .database import Database
-from .metrics import UniversalMetrics
 from .idea_processor import IdeaProcessor
-from . import db_utils
-from . import logging_config
+from .metrics import UniversalMetrics
 
 __all__ = [
     "Config",

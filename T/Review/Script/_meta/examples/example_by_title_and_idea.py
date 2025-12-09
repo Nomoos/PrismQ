@@ -12,8 +12,8 @@ _idea_model_path = _repo_root / "T" / "Idea" / "Model"
 if str(_idea_model_path) not in sys.path:
     sys.path.insert(0, str(_idea_model_path))
 
+from src.idea import ContentGenre, Idea
 from T.Review.Script import review_script_by_title_and_idea
-from src.idea import Idea, ContentGenre
 
 
 def example_horror_short():
@@ -21,25 +21,25 @@ def example_horror_short():
     print("=" * 80)
     print("Example 1: Horror Short Script Review")
     print("=" * 80)
-    
+
     # Create an Idea for a horror short
     idea = Idea(
         title="The Echo",
         concept="A girl hears her own future voice warning her",
         premise="A teenage girl starts hearing a voice that sounds identical to her own, "
-                "giving her warnings about the future. When the warnings come true, "
-                "she realizes the voice is her future self trying to prevent her death.",
+        "giving her warnings about the future. When the warnings come true, "
+        "she realizes the voice is her future self trying to prevent her death.",
         logline="A girl discovers she can hear her own future thoughts—and they're telling her to run.",
         hook="Last night I woke up... but my body kept sleeping.",
         genre=ContentGenre.HORROR,
         target_platforms=["youtube", "tiktok"],
         target_formats=["video", "audio"],
-        length_target="60 seconds video"
+        length_target="60 seconds video",
     )
-    
+
     # Title v1
     title = "The Voice That Knows Tomorrow"
-    
+
     # Script v1
     script = """
     Last night I heard a whisper in the darkness. It sounded exactly like my own voice,
@@ -53,15 +53,12 @@ def example_horror_short():
     But when I looked in the mirror, I saw myself... but it wasn't me. It was my future self,
     trying to warn my past self. And I realized - I'm already too late.
     """
-    
+
     # Review the script
     review = review_script_by_title_and_idea(
-        script_text=script,
-        title=title,
-        idea=idea,
-        target_length_seconds=60
+        script_text=script, title=title, idea=idea, target_length_seconds=60
     )
-    
+
     # Display results
     print(f"\nScript ID: {review.script_id}")
     print(f"Title: {review.script_title}")
@@ -72,28 +69,28 @@ def example_horror_short():
     print(f"Current Length: {review.current_length_seconds}s")
     print(f"Is YouTube Short: {review.is_youtube_short}")
     print(f"Needs Major Revision: {review.needs_major_revision}")
-    
+
     print(f"\nStrengths ({len(review.strengths)}):")
     for strength in review.strengths[:3]:
         print(f"  - {strength}")
-    
+
     print(f"\nCategory Scores:")
     for cat_score in review.category_scores:
         print(f"  - {cat_score.category.value}: {cat_score.score}%")
-    
+
     print(f"\nTop Improvement Points ({len(review.improvement_points)} total):")
     for point in review.improvement_points[:3]:
         print(f"  - [{point.priority}] {point.title}")
         print(f"    Impact: +{point.impact_score}%")
         print(f"    {point.description}")
-    
+
     print(f"\nQuick Wins:")
     for win in review.quick_wins:
         print(f"  - {win}")
-    
+
     if review.primary_concern:
         print(f"\nPrimary Concern: {review.primary_concern}")
-    
+
     print()
 
 
@@ -102,23 +99,23 @@ def example_educational_content():
     print("=" * 80)
     print("Example 2: Educational Content Script Review")
     print("=" * 80)
-    
+
     # Create an Idea for educational content
     idea = Idea(
         title="How Quantum Computers Work",
         concept="Explaining quantum computing through everyday analogies",
         premise="Quantum computers process information fundamentally differently than regular computers. "
-                "This explainer uses everyday analogies to make the complex simple.",
+        "This explainer uses everyday analogies to make the complex simple.",
         logline="Your computer checks one path at a time; quantum computers check all paths at once.",
         hook="What if your GPS could explore every possible route simultaneously?",
         genre=ContentGenre.EDUCATIONAL,
         target_platforms=["youtube", "medium"],
         target_formats=["video", "text"],
-        length_target="3-5 minutes"
+        length_target="3-5 minutes",
     )
-    
+
     title = "Quantum Computing Explained Simply"
-    
+
     script = """
     What if your GPS could explore every possible route simultaneously? That's essentially
     what quantum computers do with information.
@@ -136,26 +133,22 @@ def example_educational_content():
     complex systems. They're not faster at everything, but for specific tasks, they're
     revolutionary.
     """
-    
+
     # Review the script
-    review = review_script_by_title_and_idea(
-        script_text=script,
-        title=title,
-        idea=idea
-    )
-    
+    review = review_script_by_title_and_idea(script_text=script, title=title, idea=idea)
+
     # Display results
     print(f"\nScript ID: {review.script_id}")
     print(f"Overall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")
     print(f"Idea Alignment: {review.metadata['idea_alignment_score']}%")
-    
+
     print(f"\nCategory Scores:")
     for cat_score in review.category_scores:
         print(f"  - {cat_score.category.value}: {cat_score.score}%")
         if cat_score.reasoning:
             print(f"    {cat_score.reasoning}")
-    
+
     print(f"\nHigh-Priority Improvements:")
     high_priority = review.get_high_priority_improvements()
     if high_priority:
@@ -165,7 +158,7 @@ def example_educational_content():
                 print(f"    Fix: {point.suggested_fix}")
     else:
         print("  No high-priority improvements needed!")
-    
+
     print()
 
 
@@ -174,16 +167,16 @@ def example_poor_alignment():
     print("=" * 80)
     print("Example 3: Poor Alignment - Pizza Recipe vs Mystery Title")
     print("=" * 80)
-    
+
     idea = Idea(
         title="The Mystery of the Lost City",
         concept="Archaeologists discover an ancient civilization",
         premise="A team finds ruins that challenge everything we know about history",
-        genre=ContentGenre.MYSTERY
+        genre=ContentGenre.MYSTERY,
     )
-    
+
     title = "Uncovering the Lost Civilization"
-    
+
     # Completely unrelated script
     script = """
     The best pizza recipes require three key ingredients: quality flour, fresh yeast,
@@ -194,16 +187,16 @@ def example_poor_alignment():
     stretch it gently to avoid tearing. Add your sauce sparingly - too much will make it soggy.
     Finally, add your toppings and bake until the crust is golden brown.
     """
-    
+
     review = review_script_by_title_and_idea(script, title, idea)
-    
+
     print(f"\nOverall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")
     print(f"Idea Alignment: {review.metadata['idea_alignment_score']}%")
     print(f"Needs Major Revision: {review.needs_major_revision}")
-    
+
     print(f"\nPrimary Concern: {review.primary_concern}")
-    
+
     print(f"\nCritical Issues:")
     for point in review.improvement_points:
         if point.priority == "high":
@@ -211,7 +204,7 @@ def example_poor_alignment():
             print(f"    {point.description}")
             if point.specific_example:
                 print(f"    Example: {point.specific_example}")
-    
+
     print()
 
 
@@ -220,7 +213,7 @@ def main():
     example_horror_short()
     example_educational_content()
     example_poor_alignment()
-    
+
     print("=" * 80)
     print("Examples completed!")
     print("=" * 80)

@@ -1,20 +1,22 @@
 """Tests for Idea model."""
 
-import pytest
 from datetime import datetime
-from src.idea import Idea, IdeaStatus, ContentGenre
+
+import pytest
+
+from src.idea import ContentGenre, Idea, IdeaStatus
 
 
 class TestIdeaBasic:
     """Test basic Idea functionality."""
-    
+
     def test_create_basic_idea(self):
         """Test creating a basic Idea instance."""
         idea = Idea(
             title="Test Idea",
             concept="Test concept for validation",
         )
-        
+
         assert idea.title == "Test Idea"
         assert idea.concept == "Test concept for validation"
         assert idea.synopsis == ""
@@ -44,20 +46,14 @@ class TestIdeaBasic:
         assert idea.created_at is not None
         assert idea.updated_at is not None
         assert idea.created_by is None
-    
+
     def test_create_with_all_fields(self):
         """Test creating Idea with all fields for universal content generation."""
-        target_demographics = {
-            "age_range": "18-35",
-            "interests": "technology,science"
-        }
-        potential_scores = {
-            "platform:youtube": 85,
-            "region:us": 90
-        }
+        target_demographics = {"age_range": "18-35", "interests": "technology,science"}
+        potential_scores = {"platform:youtube": 85, "region:us": 90}
         inspiration_ids = ["insp-1", "insp-2"]
         metadata = {"key": "value"}
-        
+
         idea = Idea(
             title="Complete Idea",
             concept="Full concept",
@@ -85,9 +81,9 @@ class TestIdeaBasic:
             version=2,
             status=IdeaStatus.VALIDATED,
             notes="Test notes",
-            created_by="test-user"
+            created_by="test-user",
         )
-        
+
         assert idea.title == "Complete Idea"
         assert idea.concept == "Full concept"
         assert idea.synopsis == "A short synopsis"
@@ -110,7 +106,7 @@ class TestIdeaBasic:
         assert idea.status == IdeaStatus.VALIDATED
         assert idea.notes == "Test notes"
         assert idea.created_by == "test-user"
-    
+
     def test_create_idea_without_inspirations(self):
         """Test creating an Idea without IdeaInspiration sources."""
         idea = Idea(
@@ -118,9 +114,9 @@ class TestIdeaBasic:
             concept="Manually created without sources",
             keywords=["manual", "standalone"],
             outline="Custom outline",
-            skeleton="Custom skeleton"
+            skeleton="Custom skeleton",
         )
-        
+
         assert idea.title == "Manual Idea"
         assert idea.concept == "Manually created without sources"
         assert idea.keywords == ["manual", "standalone"]
@@ -128,24 +124,21 @@ class TestIdeaBasic:
         assert idea.skeleton == "Custom skeleton"
         assert idea.inspiration_ids == []  # No inspirations
         assert idea.status == IdeaStatus.DRAFT
-    
+
     def test_timestamps_auto_generated(self):
         """Test that timestamps are automatically generated."""
-        idea = Idea(
-            title="Timestamp Test",
-            concept="Testing auto timestamps"
-        )
-        
+        idea = Idea(title="Timestamp Test", concept="Testing auto timestamps")
+
         assert idea.created_at is not None
         assert idea.updated_at is not None
-        
+
         # Verify ISO format
         try:
             datetime.fromisoformat(idea.created_at)
             datetime.fromisoformat(idea.updated_at)
         except ValueError:
             pytest.fail("Timestamps should be in ISO format")
-    
+
     def test_ai_generation_fields(self):
         """Test AI generation support fields."""
         idea = Idea(
@@ -157,10 +150,12 @@ class TestIdeaBasic:
             character_notes="Protagonist: Tech detective with dark past. Antagonist: AI mastermind",
             setting_notes="Near-future cyberpunk city, underground hacker networks",
             tone_guidance="Start mysterious, build tension, maintain hope, end with twist",
-            length_target="Feature length, 90-120 minutes"
+            length_target="Feature length, 90-120 minutes",
         )
-        
-        assert idea.synopsis == "A short version of the story in 2-3 paragraphs for quick AI context"
+
+        assert (
+            idea.synopsis == "A short version of the story in 2-3 paragraphs for quick AI context"
+        )
         assert idea.story_premise == "Deep story premise providing AI with narrative foundation"
         assert len(idea.themes) == 3
         assert "redemption" in idea.themes
@@ -172,7 +167,7 @@ class TestIdeaBasic:
 
 class TestIdeaSerialization:
     """Test serialization and deserialization."""
-    
+
     def test_to_dict(self):
         """Test converting Idea to dictionary."""
         idea = Idea(
@@ -182,11 +177,11 @@ class TestIdeaSerialization:
             target_formats=["video", "text"],
             genre=ContentGenre.DOCUMENTARY,
             status=IdeaStatus.DRAFT,
-            inspiration_ids=["insp-1", "insp-2"]
+            inspiration_ids=["insp-1", "insp-2"],
         )
-        
+
         data = idea.to_dict()
-        
+
         assert isinstance(data, dict)
         assert data["title"] == "Test Idea"
         assert data["concept"] == "Test concept"
@@ -196,7 +191,7 @@ class TestIdeaSerialization:
         assert data["status"] == "draft"  # Converted to string
         assert data["inspiration_ids"] == ["insp-1", "insp-2"]
         assert data["version"] == 1
-    
+
     def test_from_dict(self):
         """Test creating Idea from dictionary."""
         data = {
@@ -208,11 +203,11 @@ class TestIdeaSerialization:
             "genre": "entertainment",
             "status": "validated",
             "inspiration_ids": ["id-1"],
-            "version": 3
+            "version": 3,
         }
-        
+
         idea = Idea.from_dict(data)
-        
+
         assert idea.title == "Dict Idea"
         assert idea.concept == "From dictionary"
         assert idea.purpose == "Testing"
@@ -222,7 +217,7 @@ class TestIdeaSerialization:
         assert idea.status == IdeaStatus.VALIDATED
         assert idea.inspiration_ids == ["id-1"]
         assert idea.version == 3
-    
+
     def test_from_dict_with_invalid_enum(self):
         """Test from_dict handles invalid enum values gracefully."""
         data = {
@@ -231,17 +226,17 @@ class TestIdeaSerialization:
             "target_platforms": ["invalid_platform"],
             "target_formats": ["text"],
             "genre": "invalid_genre",
-            "status": "invalid_status"
+            "status": "invalid_status",
         }
-        
+
         idea = Idea.from_dict(data)
-        
+
         # Should fall back to defaults for enums
         assert idea.target_platforms == ["invalid_platform"]  # Lists are kept as-is
         assert idea.target_formats == ["text"]
         assert idea.genre == ContentGenre.OTHER
         assert idea.status == IdeaStatus.DRAFT
-    
+
     def test_roundtrip_serialization(self):
         """Test that to_dict -> from_dict preserves data."""
         original = Idea(
@@ -265,13 +260,13 @@ class TestIdeaSerialization:
             version=5,
             status=IdeaStatus.APPROVED,
             notes="Test notes",
-            created_by="tester"
+            created_by="tester",
         )
-        
+
         # Roundtrip
         data = original.to_dict()
         restored = Idea.from_dict(data)
-        
+
         # Compare key fields
         assert restored.title == original.title
         assert restored.concept == original.concept
@@ -297,21 +292,22 @@ class TestIdeaSerialization:
 
 class TestIdeaFromInspirations:
     """Test creating Ideas from IdeaInspiration instances."""
-    
+
     def test_from_inspirations_basic(self):
         """Test basic creation from inspirations."""
+
         # Mock IdeaInspiration objects
         class MockInspiration:
             def __init__(self, source_id):
                 self.source_id = source_id
                 self.contextual_category_scores = {}
-        
+
         inspirations = [
             MockInspiration("insp-1"),
             MockInspiration("insp-2"),
-            MockInspiration("insp-3")
+            MockInspiration("insp-3"),
         ]
-        
+
         idea = Idea.from_inspirations(
             inspirations=inspirations,
             title="Fused Idea",
@@ -319,9 +315,9 @@ class TestIdeaFromInspirations:
             purpose="Test fusion",
             target_platforms=["youtube", "tiktok"],
             target_formats=["video"],
-            genre=ContentGenre.DOCUMENTARY
+            genre=ContentGenre.DOCUMENTARY,
         )
-        
+
         assert idea.title == "Fused Idea"
         assert idea.concept == "Combined from multiple sources"
         assert idea.purpose == "Test fusion"
@@ -332,53 +328,51 @@ class TestIdeaFromInspirations:
         assert "insp-1" in idea.inspiration_ids
         assert "insp-2" in idea.inspiration_ids
         assert "insp-3" in idea.inspiration_ids
-    
+
     def test_from_inspirations_with_scores(self):
         """Test that potential scores are aggregated from inspirations."""
+
         class MockInspiration:
             def __init__(self, source_id, scores):
                 self.source_id = source_id
                 self.contextual_category_scores = scores
                 self.keywords = []
-        
+
         inspirations = [
             MockInspiration("insp-1", {"region:us": 80, "age:18-24": 70}),
             MockInspiration("insp-2", {"region:us": 90, "age:25-34": 85}),
-            MockInspiration("insp-3", {"region:uk": 75})
+            MockInspiration("insp-3", {"region:uk": 75}),
         ]
-        
+
         idea = Idea.from_inspirations(
-            inspirations=inspirations,
-            title="Scored Idea",
-            concept="With aggregated scores"
+            inspirations=inspirations, title="Scored Idea", concept="With aggregated scores"
         )
-        
+
         # Should aggregate scores
         assert len(idea.potential_scores) > 0
         assert "region:us" in idea.potential_scores
         # US should be averaged: (80 + 90) / 2 = 85
         assert idea.potential_scores["region:us"] == 85
-    
+
     def test_from_inspirations_with_keywords(self):
         """Test that keywords are aggregated from inspirations."""
+
         class MockInspiration:
             def __init__(self, source_id, keywords):
                 self.source_id = source_id
                 self.keywords = keywords
                 self.contextual_category_scores = {}
-        
+
         inspirations = [
             MockInspiration("insp-1", ["mystery", "crime", "investigation"]),
             MockInspiration("insp-2", ["crime", "thriller", "suspense"]),
-            MockInspiration("insp-3", ["mystery", "detective"])
+            MockInspiration("insp-3", ["mystery", "detective"]),
         ]
-        
+
         idea = Idea.from_inspirations(
-            inspirations=inspirations,
-            title="Keyword Test",
-            concept="Testing keyword aggregation"
+            inspirations=inspirations, title="Keyword Test", concept="Testing keyword aggregation"
         )
-        
+
         # Should aggregate and deduplicate keywords
         assert "mystery" in idea.keywords
         assert "crime" in idea.keywords
@@ -389,80 +383,77 @@ class TestIdeaFromInspirations:
         # No duplicates
         assert idea.keywords.count("mystery") == 1
         assert idea.keywords.count("crime") == 1
-    
+
     def test_from_inspirations_with_created_by(self):
         """Test from_inspirations with creator tracking."""
+
         class MockInspiration:
             def __init__(self, source_id):
                 self.source_id = source_id
                 self.contextual_category_scores = {}
-        
+
         inspirations = [MockInspiration("insp-1")]
-        
+
         idea = Idea.from_inspirations(
             inspirations=inspirations,
             title="Tracked Idea",
             concept="With creator",
-            created_by="AI-Agent-007"
+            created_by="AI-Agent-007",
         )
-        
+
         assert idea.created_by == "AI-Agent-007"
 
 
 class TestIdeaVersioning:
     """Test version management functionality."""
-    
+
     def test_create_new_version(self):
         """Test creating a new version of an idea."""
         original = Idea(
-            title="Original",
-            concept="Original concept",
-            version=1,
-            status=IdeaStatus.DRAFT
+            title="Original", concept="Original concept", version=1, status=IdeaStatus.DRAFT
         )
-        
+
         updated = original.create_new_version(
-            concept="Updated concept",
-            status=IdeaStatus.VALIDATED
+            concept="Updated concept", status=IdeaStatus.VALIDATED
         )
-        
+
         assert updated.title == "Original"  # Unchanged
         assert updated.concept == "Updated concept"  # Updated
         assert updated.version == 2  # Incremented
         assert updated.status == IdeaStatus.VALIDATED  # Updated
         assert original.version == 1  # Original unchanged
-    
+
     def test_version_increments(self):
         """Test that versions increment correctly."""
         idea = Idea(title="Test", concept="Test", version=5)
-        
+
         v6 = idea.create_new_version()
         v7 = v6.create_new_version()
         v8 = v7.create_new_version()
-        
+
         assert idea.version == 5
         assert v6.version == 6
         assert v7.version == 7
         assert v8.version == 8
-    
+
     def test_updated_at_changes(self):
         """Test that updated_at timestamp changes with new version."""
         import time
-        
+
         original = Idea(title="Test", concept="Test")
         original_timestamp = original.updated_at
-        
+
         # Small delay to ensure different timestamp
         time.sleep(0.01)
-        
+
         updated = original.create_new_version(concept="Updated")
-        
+
         assert updated.updated_at != original_timestamp
 
 
 class TestIdeaEnums:
     """Test enum functionality."""
-    
+
     def test_idea_status_values(self):
         """Test IdeaStatus enum values."""
         assert IdeaStatus.DRAFT.value == "draft"
@@ -470,7 +461,7 @@ class TestIdeaEnums:
         assert IdeaStatus.APPROVED.value == "approved"
         assert IdeaStatus.IN_PRODUCTION.value == "in_production"
         assert IdeaStatus.ARCHIVED.value == "archived"
-    
+
     def test_content_genre_values(self):
         """Test ContentGenre enum values."""
         assert ContentGenre.TRUE_CRIME.value == "true_crime"
@@ -483,7 +474,7 @@ class TestIdeaEnums:
 
 class TestIdeaRepresentation:
     """Test string representation."""
-    
+
     def test_repr(self):
         """Test __repr__ method."""
         idea = Idea(
@@ -491,11 +482,11 @@ class TestIdeaRepresentation:
             concept="Test",
             version=3,
             status=IdeaStatus.VALIDATED,
-            inspiration_ids=["a", "b", "c"]
+            inspiration_ids=["a", "b", "c"],
         )
-        
+
         repr_str = repr(idea)
-        
+
         assert "Idea(" in repr_str
         assert "version=3" in repr_str
         assert "status=validated" in repr_str

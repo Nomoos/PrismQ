@@ -9,7 +9,7 @@ Run this example:
 
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 # Add paths for imports
 source_path = Path(__file__).parent.parent.parent / "src"
@@ -19,14 +19,19 @@ if str(source_path) not in sys.path:
 if str(model_path) not in sys.path:
     sys.path.insert(0, str(model_path))
 
+from core.content_funnel import (
+    AudioExtractor,  # Protocol, used for type hints in docstrings
+)
+from core.content_funnel import (
+    AudioTranscriber,  # Protocol, used for type hints in docstrings
+)
+from core.content_funnel import (
+    SubtitleExtractor,  # Protocol, used for type hints in docstrings
+)
 from core.content_funnel import (  # noqa: E402
     ContentFunnel,
-    AudioExtractor,  # Protocol, used for type hints in docstrings
-    AudioTranscriber,  # Protocol, used for type hints in docstrings
-    SubtitleExtractor  # Protocol, used for type hints in docstrings
 )
-from idea_inspiration import IdeaInspiration, ContentType  # noqa: E402, F401
-
+from idea_inspiration import ContentType, IdeaInspiration  # noqa: E402, F401
 
 # Example implementation of extractors/transcribers
 # In real usage, these would use actual tools like ffmpeg, Whisper, youtube-dl, etc.
@@ -36,10 +41,7 @@ class ExampleAudioExtractor:
     """Example audio extractor (would use ffmpeg in production)."""
 
     def extract_audio(
-        self,
-        video_url: str,
-        video_id: Optional[str] = None,
-        **kwargs
+        self, video_url: str, video_id: Optional[str] = None, **kwargs
     ) -> Optional[Dict[str, Any]]:
         """Extract audio from video."""
         print(f"  [AudioExtractor] Extracting audio from: {video_url}")
@@ -48,9 +50,9 @@ class ExampleAudioExtractor:
         # ffmpeg -i {video_url} -vn -acodec mp3 {output_path}
 
         return {
-            'audio_url': f"/tmp/{video_id or 'audio'}.mp3",
-            'audio_format': 'mp3',
-            'duration': 180,
+            "audio_url": f"/tmp/{video_id or 'audio'}.mp3",
+            "audio_format": "mp3",
+            "duration": 180,
         }
 
 
@@ -62,7 +64,7 @@ class ExampleAudioTranscriber:
         audio_url: str,
         audio_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Transcribe audio to text."""
         print(f"  [AudioTranscriber] Transcribing: {audio_url}")
@@ -73,11 +75,11 @@ class ExampleAudioTranscriber:
         # result = model.transcribe(audio_url, language=language)
 
         return {
-            'text': f"[Transcribed content from {audio_url}]\n\n"
-                   "This is an example transcription. In production, this would contain "
-                   "the actual transcribed text from the audio using a tool like OpenAI Whisper.",
-            'confidence': 92.5,
-            'language': language or 'en',
+            "text": f"[Transcribed content from {audio_url}]\n\n"
+            "This is an example transcription. In production, this would contain "
+            "the actual transcribed text from the audio using a tool like OpenAI Whisper.",
+            "confidence": 92.5,
+            "language": language or "en",
         }
 
 
@@ -89,7 +91,7 @@ class ExampleSubtitleExtractor:
         video_url: str,
         video_id: Optional[str] = None,
         language: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[Dict[str, Any]]:
         """Extract subtitles from video."""
         print(f"  [SubtitleExtractor] Extracting subtitles from: {video_url}")
@@ -98,20 +100,20 @@ class ExampleSubtitleExtractor:
         # youtube_dl.extract_info(video_url, {'writesubtitles': True})
 
         return {
-            'text': f"[Subtitle content from {video_url}]\n\n"
-                   "This is an example subtitle text. In production, this would contain "
-                   "the actual subtitle/caption text extracted from the video.",
-            'format': 'srt',
-            'language': language or 'en',
-            'confidence': 98.0,
+            "text": f"[Subtitle content from {video_url}]\n\n"
+            "This is an example subtitle text. In production, this would contain "
+            "the actual subtitle/caption text extracted from the video.",
+            "format": "srt",
+            "language": language or "en",
+            "confidence": 98.0,
         }
 
 
 def example_video_with_subtitles():
     """Example 1: Process video content with subtitle extraction."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 1: Video → Text (via Subtitles)")
-    print("="*80)
+    print("=" * 80)
 
     # Create a video IdeaInspiration
     video_idea = IdeaInspiration.from_video(
@@ -120,7 +122,7 @@ def example_video_with_subtitles():
         source_url="https://youtube.com/watch?v=abc123",
         source_id="abc123",
         source_platform="youtube",
-        keywords=["python", "machine learning", "tutorial"]
+        keywords=["python", "machine learning", "tutorial"],
     )
 
     print(f"\nOriginal Video Idea:")
@@ -145,9 +147,9 @@ def example_video_with_subtitles():
 
 def example_video_with_audio_transcription():
     """Example 2: Process video content with audio extraction and transcription."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 2: Video → Audio → Text (via Transcription)")
-    print("="*80)
+    print("=" * 80)
 
     # Create a video IdeaInspiration
     video_idea = IdeaInspiration.from_video(
@@ -155,7 +157,7 @@ def example_video_with_audio_transcription():
         description="Interview with a tech entrepreneur",
         source_url="https://example.com/interview.mp4",
         source_id="interview123",
-        source_platform="custom"
+        source_platform="custom",
     )
 
     print(f"\nOriginal Video Idea:")
@@ -165,8 +167,7 @@ def example_video_with_audio_transcription():
 
     # Create funnel with audio extractor and transcriber
     funnel = ContentFunnel(
-        audio_extractor=ExampleAudioExtractor(),
-        audio_transcriber=ExampleAudioTranscriber()
+        audio_extractor=ExampleAudioExtractor(), audio_transcriber=ExampleAudioTranscriber()
     )
 
     print(f"\nProcessing through funnel...")
@@ -174,7 +175,7 @@ def example_video_with_audio_transcription():
         video_idea,
         extract_audio=True,
         transcribe_audio=True,
-        extract_subtitles=False  # No subtitle extraction
+        extract_subtitles=False,  # No subtitle extraction
     )
 
     print(f"\nEnriched Video Idea:")
@@ -189,15 +190,15 @@ def example_video_with_audio_transcription():
     for trans in funnel.get_transformation_history():
         print(f"  {trans['from_stage']} → {trans['to_stage']}")
         print(f"    Method: {trans['method']}")
-        if trans['confidence']:
+        if trans["confidence"]:
             print(f"    Confidence: {trans['confidence']}%")
 
 
 def example_audio_transcription():
     """Example 3: Process audio content with transcription."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 3: Audio → Text (via Transcription)")
-    print("="*80)
+    print("=" * 80)
 
     # Create an audio IdeaInspiration
     audio_idea = IdeaInspiration.from_audio(
@@ -206,7 +207,7 @@ def example_audio_transcription():
         source_url="https://example.com/podcast.mp3",
         source_id="podcast456",
         source_platform="spotify",
-        keywords=["tech", "news", "podcast"]
+        keywords=["tech", "news", "podcast"],
     )
 
     print(f"\nOriginal Audio Idea:")
@@ -219,7 +220,7 @@ def example_audio_transcription():
     funnel = ContentFunnel(audio_transcriber=ExampleAudioTranscriber())
 
     print(f"\nProcessing through funnel...")
-    enriched = funnel.process(audio_idea, transcribe_audio=True, language='en')
+    enriched = funnel.process(audio_idea, transcribe_audio=True, language="en")
 
     print(f"\nEnriched Audio Idea:")
     print(f"  Title: {enriched.title}")
@@ -230,16 +231,16 @@ def example_audio_transcription():
 
 def example_text_passthrough():
     """Example 4: Process text content (passthrough)."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 4: Text Content (Passthrough)")
-    print("="*80)
+    print("=" * 80)
 
     # Create a text IdeaInspiration
     text_idea = IdeaInspiration.from_text(
         title="Best Python Libraries for 2024",
         description="Comprehensive guide to Python libraries",
         text_content="Python continues to be one of the most popular programming languages...",
-        keywords=["python", "libraries", "guide"]
+        keywords=["python", "libraries", "guide"],
     )
 
     print(f"\nOriginal Text Idea:")
@@ -256,22 +257,24 @@ def example_text_passthrough():
     print(f"\nEnriched Text Idea:")
     print(f"  Title: {enriched.title}")
     print(f"  Content: {enriched.content[:50]}...")
-    print(f"  Transformation Chain: {enriched.metadata.get('transformation_chain', '(none - text is final form)')}")
+    print(
+        f"  Transformation Chain: {enriched.metadata.get('transformation_chain', '(none - text is final form)')}"
+    )
     print(f"\n  Note: Text content passes through unchanged - it's already at the final stage.")
 
 
 def example_video_with_fallback():
     """Example 5: Video with subtitle extraction fallback to transcription."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 5: Video with Fallback (Subtitles → Transcription)")
-    print("="*80)
+    print("=" * 80)
 
     # Create a video IdeaInspiration
     video_idea = IdeaInspiration.from_video(
         title="Conference Talk",
         description="Keynote presentation",
         source_url="https://example.com/talk.mp4",
-        source_id="talk789"
+        source_id="talk789",
     )
 
     print(f"\nOriginal Video Idea:")
@@ -282,7 +285,7 @@ def example_video_with_fallback():
     funnel = ContentFunnel(
         audio_extractor=ExampleAudioExtractor(),
         audio_transcriber=ExampleAudioTranscriber(),
-        subtitle_extractor=ExampleSubtitleExtractor()
+        subtitle_extractor=ExampleSubtitleExtractor(),
     )
 
     print(f"\nProcessing through funnel (trying subtitles first)...")
@@ -290,7 +293,7 @@ def example_video_with_fallback():
         video_idea,
         extract_audio=True,
         transcribe_audio=True,
-        extract_subtitles=True  # Will try subtitles first
+        extract_subtitles=True,  # Will try subtitles first
     )
 
     print(f"\nEnriched Video Idea:")
@@ -302,10 +305,10 @@ def example_video_with_fallback():
 
 def main():
     """Run all examples."""
-    print("\n" + "#"*80)
+    print("\n" + "#" * 80)
     print("# ContentFunnel Usage Examples")
     print("# Demonstrating Video → Audio → Text transformation pipeline")
-    print("#"*80)
+    print("#" * 80)
 
     example_video_with_subtitles()
     example_video_with_audio_transcription()
@@ -313,9 +316,9 @@ def main():
     example_text_passthrough()
     example_video_with_fallback()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("All examples completed!")
-    print("="*80)
+    print("=" * 80)
     print("\nKey Takeaways:")
     print("  1. ContentFunnel provides a unified interface for content transformation")
     print("  2. Video content can be processed via subtitles or audio transcription")

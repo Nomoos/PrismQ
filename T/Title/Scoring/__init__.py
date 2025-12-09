@@ -13,51 +13,29 @@ Key Features:
 Workflow Position: Post-MVP Enhancement (Sprint 4)
 """
 
-from .test_manager import (
-    ABTest,
-    TitleVariant,
-    ABTestManager,
-    TestStatus
-)
-
-from .statistics import (
-    calculate_significance,
-    VariantMetrics,
-    SignificanceResult
-)
-
-from .variant_router import (
-    assign_variant,
-    VariantRouter
-)
-
-from .report_generator import (
-    generate_report,
-    TestReport,
-    ReportGenerator
-)
+from .report_generator import ReportGenerator, TestReport, generate_report
+from .statistics import SignificanceResult, VariantMetrics, calculate_significance
+from .test_manager import ABTest, ABTestManager, TestStatus, TitleVariant
+from .variant_router import VariantRouter, assign_variant
 
 __all__ = [
     # Test Management
-    'ABTest',
-    'TitleVariant',
-    'ABTestManager',
-    'TestStatus',
-    
+    "ABTest",
+    "TitleVariant",
+    "ABTestManager",
+    "TestStatus",
     # Statistics
-    'calculate_significance',
-    'VariantMetrics',
-    'SignificanceResult',
-    
+    "calculate_significance",
+    "VariantMetrics",
+    "SignificanceResult",
     # Variant Routing
-    'assign_variant',
-    'VariantRouter',
-    
+    "assign_variant",
+    "VariantRouter",
     # Reporting
-    'generate_report',
-    'TestReport',
-    'ReportGenerator',
+    "generate_report",
+    "TestReport",
+    "ReportGenerator",
 ]
 
-__version__ = '1.0.0'
-__author__ = 'PrismQ Team - Worker17'
+__version__ = "1.0.0"
+__author__ = "PrismQ Team - Worker17"

@@ -25,42 +25,40 @@ Options:
 Examples:
     # Run worker with default settings
     python scripts/run_worker.py
-    
+
     # Run worker with custom ID and policy
     python scripts/run_worker.py --worker-id reddit-worker-001 --claiming-policy LIFO
-    
+
     # Run worker for limited iterations
     python scripts/run_worker.py --max-iterations 100
-    
+
     # Run worker with custom .env file
     python scripts/run_worker.py --env-file .env.production
 """
 
-import sys
-import os
 import logging
-import click
-from pathlib import Path
-from dotenv import load_dotenv
+import os
 import socket
+import sys
 import uuid
+from pathlib import Path
+
+import click
+from dotenv import load_dotenv
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from workers.factory import worker_factory
 from core.config import Config
+from workers.factory import worker_factory
 
 
 def setup_logging():
     """Setup logging configuration."""
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler('reddit_worker.log')
-        ]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(), logging.FileHandler("reddit_worker.log")],
     )
 
 
@@ -73,63 +71,51 @@ def generate_worker_id() -> str:
 
 @click.command()
 @click.option(
-    '--worker-id',
-    default=None,
-    help='Unique worker identifier (default: auto-generated)'
+    "--worker-id", default=None, help="Unique worker identifier (default: auto-generated)"
 )
 @click.option(
-    '--worker-type',
-    default='reddit_subreddit',
-    type=click.Choice(['reddit_subreddit']),
-    help='Worker type to create (default: reddit_subreddit)'
+    "--worker-type",
+    default="reddit_subreddit",
+    type=click.Choice(["reddit_subreddit"]),
+    help="Worker type to create (default: reddit_subreddit)",
 )
 @click.option(
-    '--claiming-policy',
-    default='FIFO',
-    type=click.Choice(['FIFO', 'LIFO', 'PRIORITY']),
-    help='Task claiming policy (default: FIFO)'
+    "--claiming-policy",
+    default="FIFO",
+    type=click.Choice(["FIFO", "LIFO", "PRIORITY"]),
+    help="Task claiming policy (default: FIFO)",
 )
 @click.option(
-    '--poll-interval',
-    default=5,
-    type=int,
-    help='Seconds between task polls (default: 5)'
+    "--poll-interval", default=5, type=int, help="Seconds between task polls (default: 5)"
 )
 @click.option(
-    '--max-iterations',
-    default=0,
-    type=int,
-    help='Max iterations (0 = unlimited, default: 0)'
+    "--max-iterations", default=0, type=int, help="Max iterations (0 = unlimited, default: 0)"
 )
-@click.option(
-    '--env-file',
-    default='.env',
-    help='Path to .env file (default: .env)'
-)
+@click.option("--env-file", default=".env", help="Path to .env file (default: .env)")
 def main(worker_id, worker_type, claiming_policy, poll_interval, max_iterations, env_file):
     """Launch Reddit Posts Worker using TaskManager API pattern."""
-    
+
     # Setup logging
     setup_logging()
     logger = logging.getLogger(__name__)
-    
+
     # Load environment variables
     if os.path.exists(env_file):
         load_dotenv(env_file)
         logger.info(f"Loaded environment from {env_file}")
     else:
         logger.warning(f"Environment file {env_file} not found, using system environment")
-    
+
     # Generate worker ID if not provided
     if not worker_id:
         worker_id = generate_worker_id()
         logger.info(f"Generated worker ID: {worker_id}")
-    
+
     try:
         # Initialize configuration
         logger.info("Initializing configuration...")
         config = Config(interactive=False)
-        
+
         # Create worker instance using factory
         logger.info(f"Creating worker (type: {worker_type})...")
         worker = worker_factory.create(
@@ -137,9 +123,9 @@ def main(worker_id, worker_type, claiming_policy, poll_interval, max_iterations,
             worker_id=worker_id,
             config=config,
             claiming_policy=claiming_policy,
-            poll_interval=poll_interval
+            poll_interval=poll_interval,
         )
-        
+
         # Log worker information
         logger.info("=" * 80)
         logger.info("Reddit Posts Worker Started (TaskManager API Pattern)")
@@ -152,7 +138,7 @@ def main(worker_id, worker_type, claiming_policy, poll_interval, max_iterations,
         logger.info(f"IdeaInspiration DB: {config.database_path}")
         logger.info("Task Queue: TaskManager API (external)")
         logger.info("=" * 80)
-        
+
         # Run worker
         if max_iterations > 0:
             logger.info(f"Starting worker (will process up to {max_iterations} tasks)...")
@@ -160,9 +146,9 @@ def main(worker_id, worker_type, claiming_policy, poll_interval, max_iterations,
         else:
             logger.info("Starting worker (unlimited iterations, press Ctrl+C to stop)...")
             worker.run()
-        
+
         logger.info("Worker completed successfully")
-        
+
     except KeyboardInterrupt:
         logger.info("Worker stopped by user (Ctrl+C)")
         sys.exit(0)
@@ -171,5 +157,5 @@ def main(worker_id, worker_type, claiming_policy, poll_interval, max_iterations,
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,7 +1,6 @@
 """Blend variant templates - combinations of themes."""
 
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 # Theme blends - new themes combined with each other
 VARIANT_BUTTERFLIES_ANXIETY = {
@@ -13,7 +12,7 @@ VARIANT_BUTTERFLIES_ANXIETY = {
         "the_conflict": "How they fight each other",
         "the_moment": "When both hit at once",
         "the_choice": "What wins - approach or avoid?",
-        "the_lesson": "What this combination taught"
+        "the_lesson": "What this combination taught",
     },
     "example": {
         "the_attraction": "Wanting to talk to them so badly",
@@ -21,8 +20,8 @@ VARIANT_BUTTERFLIES_ANXIETY = {
         "the_conflict": "Heart says go, brain says DANGER",
         "the_moment": "They looked at me and I forgot how words work",
         "the_choice": "Smiled instead of ran. Small victory.",
-        "the_lesson": "Attraction and anxiety can coexist"
-    }
+        "the_lesson": "Attraction and anxiety can coexist",
+    },
 }
 
 VARIANT_BODY_COMPARISON = {
@@ -34,7 +33,7 @@ VARIANT_BODY_COMPARISON = {
         "the_feeling": "How it affects body image",
         "the_reality": "What filters and editing hide",
         "the_shift": "Moments of perspective",
-        "the_practice": "Working on both body image and comparison"
+        "the_practice": "Working on both body image and comparison",
     },
     "example": {
         "the_comparison": "Bodies that don't look like mine",
@@ -42,8 +41,8 @@ VARIANT_BODY_COMPARISON = {
         "the_feeling": "Never enough. Always wrong.",
         "the_reality": "Angles, filters, editing, best moments",
         "the_shift": "Realizing I'm comparing reality to fantasy",
-        "the_practice": "Muting accounts that make me feel bad about my body"
-    }
+        "the_practice": "Muting accounts that make me feel bad about my body",
+    },
 }
 
 VARIANT_ONLINE_FITTING = {
@@ -55,7 +54,7 @@ VARIANT_ONLINE_FITTING = {
         "what_changed": "How online belonging helps",
         "the_contrast": "Online vs. IRL fitting in",
         "the_bridge": "How online affects offline",
-        "the_truth": "What this taught about belonging"
+        "the_truth": "What this taught about belonging",
     },
     "example": {
         "irl_struggle": "School where no one gets me",
@@ -63,8 +62,8 @@ VARIANT_ONLINE_FITTING = {
         "what_changed": "Proof that my kind of people exist",
         "the_contrast": "IRL: performance. Online: me.",
         "the_bridge": "Online confidence slowly leaking into real life",
-        "the_truth": "Belonging doesn't require geography"
-    }
+        "the_truth": "Belonging doesn't require geography",
+    },
 }
 
 VARIANT_FUTURE_COMPARISON = {
@@ -76,7 +75,7 @@ VARIANT_FUTURE_COMPARISON = {
         "the_spiral": "How comparison makes anxiety worse",
         "the_reality": "What comparison hides about others' fears",
         "the_break": "Moments of clarity",
-        "the_now": "Focusing on present instead of comparing futures"
+        "the_now": "Focusing on present instead of comparing futures",
     },
     "example": {
         "the_fear": "Everyone has a plan and I don't",
@@ -84,8 +83,8 @@ VARIANT_FUTURE_COMPARISON = {
         "the_spiral": "They know. I don't. I'm behind.",
         "the_reality": "They're scared too. They just perform better.",
         "the_break": "Hearing someone 'together' admit they're terrified",
-        "the_now": "Today's decision, not tomorrow's whole life"
-    }
+        "the_now": "Today's decision, not tomorrow's whole life",
+    },
 }
 
 VARIANT_BODY_BUTTERFLIES = {
@@ -97,7 +96,7 @@ VARIANT_BODY_BUTTERFLIES = {
         "the_question": "Whether they'd like the real body",
         "the_hiding": "What gets hidden because of body image",
         "the_conflict": "Wanting to be seen but fearing it",
-        "the_work": "Separating attraction from body image"
+        "the_work": "Separating attraction from body image",
     },
     "example": {
         "the_attraction": "Wanting them to notice me",
@@ -105,8 +104,8 @@ VARIANT_BODY_BUTTERFLIES = {
         "the_question": "Would they still like me in person?",
         "the_hiding": "Strategic angles. Careful clothes.",
         "the_conflict": "Want connection. Fear being seen.",
-        "the_work": "Learning that attraction isn't conditional on perfect bodies"
-    }
+        "the_work": "Learning that attraction isn't conditional on perfect bodies",
+    },
 }
 
 VARIANT_ONLINE_FUTURE = {
@@ -118,7 +117,7 @@ VARIANT_ONLINE_FUTURE = {
         "why_online": "Why it's easier to share online",
         "what_they_get": "What they understand",
         "the_support": "How they help",
-        "the_value": "What this online support means"
+        "the_value": "What this online support means",
     },
     "example": {
         "the_fear": "What if I make the wrong choice?",
@@ -126,8 +125,8 @@ VARIANT_ONLINE_FUTURE = {
         "why_online": "No judgment from people who know my 'real' life",
         "what_they_get": "They're scared too. We share the fear.",
         "the_support": "Just knowing someone else is also lost",
-        "the_value": "Not alone in the uncertainty"
-    }
+        "the_value": "Not alone in the uncertainty",
+    },
 }
 
 VARIANT_FITTING_COMPARISON = {
@@ -139,7 +138,7 @@ VARIANT_FITTING_COMPARISON = {
         "the_spiral": "How comparison makes fitting in harder",
         "the_performance": "What you perform to try to fit",
         "the_exhaustion": "The cost of trying",
-        "the_question": "Is fitting in worth it?"
+        "the_question": "Is fitting in worth it?",
     },
     "example": {
         "the_not_fitting": "Every social situation",
@@ -147,8 +146,8 @@ VARIANT_FITTING_COMPARISON = {
         "the_spiral": "They belong. I don't. It's obvious.",
         "the_performance": "Laughing at jokes I don't get",
         "the_exhaustion": "Being fake is a full-time job",
-        "the_question": "What if I found places where I don't have to try?"
-    }
+        "the_question": "What if I found places where I don't have to try?",
+    },
 }
 
 # Cross blends - new themes with older templates
@@ -161,7 +160,7 @@ VARIANT_CONFESSION_BODY = {
         "who_you_tell": "Who receives this confession",
         "the_vulnerability": "How scary this is to admit",
         "their_response": "What they say/do",
-        "what_changes": "After confessing"
+        "what_changes": "After confessing",
     },
     "example": {
         "the_confession": "I've never felt comfortable in my own skin",
@@ -169,8 +168,8 @@ VARIANT_CONFESSION_BODY = {
         "who_you_tell": "Someone who feels safe",
         "the_vulnerability": "Admitting weakness feels dangerous",
         "their_response": "'Me too' - the most healing words",
-        "what_changes": "Lighter. Less alone in the struggle."
-    }
+        "what_changes": "Lighter. Less alone in the struggle.",
+    },
 }
 
 VARIANT_UNSENT_FUTURE = {
@@ -182,7 +181,7 @@ VARIANT_UNSENT_FUTURE = {
         "the_fear": "The future fear it contained",
         "why_not_sent": "What stopped you",
         "what_you_sent": "The safer version (or nothing)",
-        "where_the_fear_lives": "What happens to unsaid fears"
+        "where_the_fear_lives": "What happens to unsaid fears",
     },
     "example": {
         "the_unsent": "'I have no idea what I'm doing and I'm terrified'",
@@ -190,8 +189,8 @@ VARIANT_UNSENT_FUTURE = {
         "the_fear": "Being the only one without a plan",
         "why_not_sent": "Don't want to be the only mess",
         "what_you_sent": "'Yeah I'm figuring it out'",
-        "where_the_fear_lives": "Inside, growing"
-    }
+        "where_the_fear_lives": "Inside, growing",
+    },
 }
 
 VARIANT_MIRROR_BODY = {
@@ -203,7 +202,7 @@ VARIANT_MIRROR_BODY = {
         "the_usual": "Normal mirror reaction",
         "this_time": "What was different this time",
         "the_shift": "A new way of seeing",
-        "the_ongoing": "How mirror relationship is changing"
+        "the_ongoing": "How mirror relationship is changing",
     },
     "example": {
         "the_mirror": "Same body as always",
@@ -211,8 +210,8 @@ VARIANT_MIRROR_BODY = {
         "the_usual": "Finding every flaw, making plans to fix",
         "this_time": "Just... looked. Without attacking.",
         "the_shift": "What if this body is just... mine?",
-        "the_ongoing": "Some days war, some days truce"
-    }
+        "the_ongoing": "Some days war, some days truce",
+    },
 }
 
 VARIANT_GROWING_ONLINE = {
@@ -224,7 +223,7 @@ VARIANT_GROWING_ONLINE = {
         "the_contrast": "Why one is thriving while other fades",
         "the_guilt": "Feeling bad about online being more real",
         "the_question": "Which friendship is more valid?",
-        "the_truth": "What you've decided about connection"
+        "the_truth": "What you've decided about connection",
     },
     "example": {
         "the_irl": "Best friend since elementary. Strangers now.",
@@ -232,8 +231,8 @@ VARIANT_GROWING_ONLINE = {
         "the_contrast": "IRL: small talk. Online: real talk.",
         "the_guilt": "Should IRL friends matter more?",
         "the_question": "Is proximity the measure of friendship?",
-        "the_truth": "Connection is connection. Medium doesn't matter."
-    }
+        "the_truth": "Connection is connection. Medium doesn't matter.",
+    },
 }
 
 VARIANT_QUIET_BODY = {
@@ -245,7 +244,7 @@ VARIANT_QUIET_BODY = {
         "what_it_felt_like": "The feeling of defying expectations",
         "who_noticed": "Did anyone see the rebellion?",
         "what_it_meant": "Why this small act mattered",
-        "the_bigger_fight": "What you're really fighting for"
+        "the_bigger_fight": "What you're really fighting for",
     },
     "example": {
         "the_expectation": "Hide. Cover. Apologize for existing.",
@@ -253,8 +252,8 @@ VARIANT_QUIET_BODY = {
         "what_it_felt_like": "Terrifying and alive",
         "who_noticed": "Maybe no one. Maybe everyone.",
         "what_it_meant": "My body is not the enemy",
-        "the_bigger_fight": "The right to exist without shrinking"
-    }
+        "the_bigger_fight": "The right to exist without shrinking",
+    },
 }
 
 VARIANT_CHOSEN_ONLINE = {
@@ -266,7 +265,7 @@ VARIANT_CHOSEN_ONLINE = {
         "what_makes_them_family": "Why they count as family",
         "never_met": "The in-person situation",
         "the_realness": "Whether it's 'real' family",
-        "what_it_means": "What this online family provides"
+        "what_it_means": "What this online family provides",
     },
     "example": {
         "who_they_are": "Group chat that's been going for years",
@@ -274,8 +273,8 @@ VARIANT_CHOSEN_ONLINE = {
         "what_makes_them_family": "Show up when it matters. Always.",
         "never_met": "Most of them, never seen their faces",
         "the_realness": "As real as any family I have",
-        "what_it_means": "Chosen across distance is still chosen"
-    }
+        "what_it_means": "Chosen across distance is still chosen",
+    },
 }
 
 VARIANT_PERMISSION_BODY = {
@@ -287,7 +286,7 @@ VARIANT_PERMISSION_BODY = {
         "the_realization": "That you could give it yourself",
         "the_moment": "When you gave yourself permission",
         "what_it_felt_like": "The feeling of body permission",
-        "what_changed": "Life after giving yourself this"
+        "what_changed": "Life after giving yourself this",
     },
     "example": {
         "the_permission": "To exist in this body. As it is.",
@@ -295,8 +294,8 @@ VARIANT_PERMISSION_BODY = {
         "the_realization": "They'll never give permission. Have to take it.",
         "the_moment": "Decided my body deserves to be here",
         "what_it_felt_like": "Revolutionary and ordinary at once",
-        "what_changed": "Started living instead of waiting to deserve living"
-    }
+        "what_changed": "Started living instead of waiting to deserve living",
+    },
 }
 
 VARIANT_SMALL_COMPARISON = {
@@ -308,7 +307,7 @@ VARIANT_SMALL_COMPARISON = {
         "why_it_hit": "What made it actually significant",
         "the_spiral": "Where the comparison led",
         "the_break": "Breaking out of the spiral",
-        "the_lesson": "What small comparisons taught"
+        "the_lesson": "What small comparisons taught",
     },
     "example": {
         "the_small_thing": "Their Instagram got more likes",
@@ -316,8 +315,8 @@ VARIANT_SMALL_COMPARISON = {
         "why_it_hit": "Proof of something I feared about myself",
         "the_spiral": "They're better. More liked. More everything.",
         "the_break": "Remembering numbers aren't worth",
-        "the_lesson": "Small comparisons reveal big fears"
-    }
+        "the_lesson": "Small comparisons reveal big fears",
+    },
 }
 
 VARIANT_IDENTITY_FITTING = {
@@ -329,7 +328,7 @@ VARIANT_IDENTITY_FITTING = {
         "the_conflict": "Where identity and fitting in clash",
         "the_cost": "What dimming yourself costs",
         "the_choice": "What you've chosen",
-        "the_power": "Strength in choosing authenticity"
+        "the_power": "Strength in choosing authenticity",
     },
     "example": {
         "the_identity": "All the 'weird' parts of me",
@@ -337,8 +336,8 @@ VARIANT_IDENTITY_FITTING = {
         "the_conflict": "Can't be both real and fitting in",
         "the_cost": "Performed belonging feels hollow",
         "the_choice": "Finding spaces where real fits",
-        "the_power": "Authenticity as the ultimate belonging"
-    }
+        "the_power": "Authenticity as the ultimate belonging",
+    },
 }
 
 VARIANT_LEARNED_BODY = {
@@ -350,7 +349,7 @@ VARIANT_LEARNED_BODY = {
         "how_it_stuck": "How the lesson shaped you",
         "the_truth": "Whether the lesson was true",
         "the_unlearning": "What you're trying to undo",
-        "the_new_story": "The body story you're writing now"
+        "the_new_story": "The body story you're writing now",
     },
     "example": {
         "the_lesson": "Bodies like mine are wrong",
@@ -358,8 +357,8 @@ VARIANT_LEARNED_BODY = {
         "how_it_stuck": "Believed it was fact, not opinion",
         "the_truth": "It was never true. Just repeated.",
         "the_unlearning": "Catching old thoughts, questioning them",
-        "the_new_story": "This body is trying its best. So am I."
-    }
+        "the_new_story": "This body is trying its best. So am I.",
+    },
 }
 
 VARIANT_SAFE_ONLINE = {
@@ -371,7 +370,7 @@ VARIANT_SAFE_ONLINE = {
         "what_you_share": "What you can be with them",
         "the_paradox": "Stranger who knows you best",
         "what_others_say": "Skepticism about online safety",
-        "why_it_works": "What makes online safety real"
+        "why_it_works": "What makes online safety real",
     },
     "example": {
         "who_they_are": "Someone I've never met, know completely",
@@ -379,8 +378,8 @@ VARIANT_SAFE_ONLINE = {
         "what_you_share": "The version of me that's 'too much' for IRL",
         "the_paradox": "They've never seen my face but know my soul",
         "what_others_say": "'That's not a real friendship'",
-        "why_it_works": "No performance required. Just truth."
-    }
+        "why_it_works": "No performance required. Just truth.",
+    },
 }
 
 VARIANT_REWRITING_BODY = {
@@ -392,7 +391,7 @@ VARIANT_REWRITING_BODY = {
         "the_chapter": "The moment that defined this story",
         "the_new_story": "What you want to believe instead",
         "the_evidence": "What supports the new story",
-        "the_work": "How the rewriting is going"
+        "the_work": "How the rewriting is going",
     },
     "example": {
         "the_old_story": "'My body is wrong and needs fixing'",
@@ -400,8 +399,8 @@ VARIANT_REWRITING_BODY = {
         "the_chapter": "The first time someone laughed at me in a swimsuit",
         "the_new_story": "My body is trying its best. So am I.",
         "the_evidence": "It healed when I was sick. It carries me through hard days. It's trying.",
-        "the_work": "Some days the old story wins. But less often now."
-    }
+        "the_work": "Some days the old story wins. But less often now.",
+    },
 }
 
 

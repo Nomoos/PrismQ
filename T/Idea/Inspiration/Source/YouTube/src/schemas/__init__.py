@@ -3,10 +3,10 @@
 This module provides data models for YouTube-specific data structures.
 """
 
-from .youtube_video import YouTubeVideo, YouTubeChannel, YouTubeSearchResult
+from .youtube_video import YouTubeChannel, YouTubeSearchResult, YouTubeVideo
 
 __all__ = [
-    'YouTubeVideo',
-    'YouTubeChannel',
-    'YouTubeSearchResult',
+    "YouTubeVideo",
+    "YouTubeChannel",
+    "YouTubeSearchResult",
 ]

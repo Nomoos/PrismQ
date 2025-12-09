@@ -12,12 +12,14 @@ Architecture:
 # Import main components
 from .base_worker import BaseWorker
 
+
 # Lazy import of RedditSubredditWorker to avoid import errors when
 # IdeaInspiration model is not available (e.g., during testing)
 def __getattr__(name):
     """Lazy import for RedditSubredditWorker."""
     if name == "RedditSubredditWorker":
         from .reddit_subreddit_worker import RedditSubredditWorker
+
         return RedditSubredditWorker
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

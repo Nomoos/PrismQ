@@ -16,16 +16,15 @@ The service:
 """
 
 from .content_review import (
-    ContentReview,
     ContentIssue,
     ContentIssueType,
-    ContentSeverity
+    ContentReview,
+    ContentSeverity,
 )
-
 from .script_content_review import (
-    ScriptContentReviewer,
     ContentReviewResult,
-    review_oldest_story_content
+    ScriptContentReviewer,
+    review_oldest_story_content,
 )
 
 __all__ = [

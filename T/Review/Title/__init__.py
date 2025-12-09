@@ -6,12 +6,13 @@ AI-powered title evaluation modules.
 # Import v1 review (ByScriptAndIdea - located at From.Script.Idea)
 try:
     from .From.Script.Idea import (
-        review_title_by_script_and_idea,
+        TitleCategoryScore,
+        TitleImprovementPoint,
         TitleReview,
         TitleReviewCategory,
-        TitleImprovementPoint,
-        TitleCategoryScore
+        review_title_by_script_and_idea,
     )
+
     _has_v1 = True
 except ImportError:
     _has_v1 = False
@@ -19,11 +20,12 @@ except ImportError:
 # Import v2 review (ByScript - located at From.Script)
 try:
     from .From.Script import (
-        review_title_by_script_v2,
+        ImprovementComparison,
         compare_reviews,
         get_improvement_summary,
-        ImprovementComparison
+        review_title_by_script_v2,
     )
+
     _has_v2 = True
 except ImportError:
     _has_v2 = False
@@ -31,18 +33,22 @@ except ImportError:
 __all__ = []
 
 if _has_v1:
-    __all__.extend([
-        "review_title_by_script_and_idea",
-        "TitleReview",
-        "TitleReviewCategory",
-        "TitleImprovementPoint",
-        "TitleCategoryScore"
-    ])
+    __all__.extend(
+        [
+            "review_title_by_script_and_idea",
+            "TitleReview",
+            "TitleReviewCategory",
+            "TitleImprovementPoint",
+            "TitleCategoryScore",
+        ]
+    )
 
 if _has_v2:
-    __all__.extend([
-        "review_title_by_script_v2",
-        "compare_reviews",
-        "get_improvement_summary",
-        "ImprovementComparison"
-    ])
+    __all__.extend(
+        [
+            "review_title_by_script_v2",
+            "compare_reviews",
+            "get_improvement_summary",
+            "ImprovementComparison",
+        ]
+    )

@@ -24,15 +24,16 @@ Example Usage:
 """
 
 from enum import Enum
-from typing import Dict, List, Set, Optional
+from typing import Dict, List, Optional
 
 
 class StateCategory(Enum):
     """Categories for grouping workflow states.
-    
+
     Allows for logical organization and filtering of states.
     New categories can be added without modifying existing code.
     """
+
     CREATION = "creation"
     GENERATION = "generation"
     REVIEW = "review"
@@ -46,42 +47,42 @@ _STATE_PREFIX = "PrismQ.T"
 
 class StoryState(str, Enum):
     """Workflow state enum for Story entities.
-    
+
     This enum provides type-safe state values that match the StateNames constants.
     Using str as base class allows direct comparison with string state values.
-    
+
     States follow the PrismQ.T naming convention:
         PrismQ.T.<Output>.From.<Input> - for generation states
         PrismQ.T.<Action>.<Target> - for other states
-    
+
     Example:
         >>> from Model.State.constants.state_names import StoryState
         >>> story.state = StoryState.TITLE_FROM_IDEA.value
         >>> story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
     """
-    
+
     # Initial state when Story is created
     CREATED = "CREATED"
-    
+
     # Stage 1: Initial Creation
     IDEA_CREATION = f"{_STATE_PREFIX}.Idea.Creation"
-    
+
     # Stage 2-3: Initial Content Generation
     TITLE_FROM_IDEA = f"{_STATE_PREFIX}.Title.From.Idea"
     SCRIPT_FROM_IDEA_TITLE = f"{_STATE_PREFIX}.Script.From.Idea.Title"
-    
+
     # Stages 4-6: Initial Review Cycle
     REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{_STATE_PREFIX}.Review.Title.From.Script.Idea"
     REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{_STATE_PREFIX}.Review.Script.From.Title.Idea"
     REVIEW_TITLE_FROM_SCRIPT = f"{_STATE_PREFIX}.Review.Title.From.Script"
-    
+
     # Stages 7-9: Refinement and Re-review
     TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Title.From.Title.Review.Script"
     SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Script.From.Script.Review.Title"
     SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Script.From.Title.Review.Script"
     REVIEW_SCRIPT_FROM_TITLE = f"{_STATE_PREFIX}.Review.Script.From.Title"
     TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Title.From.Script.Review.Title"
-    
+
     # Stages 10-16: Quality Review States
     REVIEW_SCRIPT_GRAMMAR = f"{_STATE_PREFIX}.Review.Script.Grammar"
     REVIEW_SCRIPT_TONE = f"{_STATE_PREFIX}.Review.Script.Tone"
@@ -90,14 +91,14 @@ class StoryState(str, Enum):
     REVIEW_SCRIPT_EDITING = f"{_STATE_PREFIX}.Review.Script.Editing"
     REVIEW_TITLE_READABILITY = f"{_STATE_PREFIX}.Review.Title.Readability"
     REVIEW_SCRIPT_READABILITY = f"{_STATE_PREFIX}.Review.Script.Readability"
-    
+
     # Stages 17-18: Expert Review Loop
     STORY_REVIEW = f"{_STATE_PREFIX}.Story.Review"
     STORY_POLISH = f"{_STATE_PREFIX}.Story.Polish"
-    
+
     # Terminal State
     PUBLISHING = f"{_STATE_PREFIX}.Publishing"
-    
+
     # Legacy states (kept for backward compatibility)
     TITLE_V0 = f"{_STATE_PREFIX}.Title.V0"
     SCRIPT_V0 = f"{_STATE_PREFIX}.Script.V0"
@@ -105,41 +106,41 @@ class StoryState(str, Enum):
 
 class StateNames:
     """State name constants for the PrismQ.T workflow.
-    
+
     All state names follow the naming convention:
         PrismQ.T.<Output>.From.<Input> - for generation states
         PrismQ.T.<Action>.<Target> - for other states
-    
+
     This class is designed to be extensible:
         - New states can be added as class attributes
         - The registry automatically includes all state constants
         - Helper methods allow querying states by category or pattern
-    
+
     Attributes:
         STATE_PREFIX: The common prefix for all state names
     """
-    
+
     # Common prefix for all states
     STATE_PREFIX = "PrismQ.T"
-    
+
     # =========================================================================
     # Stage 1: Initial Creation
     # =========================================================================
     IDEA_CREATION = f"{STATE_PREFIX}.Idea.Creation"
-    
+
     # =========================================================================
     # Stage 2-3: Initial Content Generation
     # =========================================================================
     TITLE_FROM_IDEA = f"{STATE_PREFIX}.Title.From.Idea"
     SCRIPT_FROM_IDEA_TITLE = f"{STATE_PREFIX}.Script.From.Idea.Title"
-    
+
     # =========================================================================
     # Stages 4-6: Initial Review Cycle
     # =========================================================================
     REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{STATE_PREFIX}.Review.Title.From.Script.Idea"
     REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{STATE_PREFIX}.Review.Script.From.Title.Idea"
     REVIEW_TITLE_FROM_SCRIPT = f"{STATE_PREFIX}.Review.Title.From.Script"
-    
+
     # =========================================================================
     # Stages 7-9: Refinement and Re-review
     # =========================================================================
@@ -149,7 +150,7 @@ class StateNames:
     REVIEW_SCRIPT_FROM_TITLE = f"{STATE_PREFIX}.Review.Script.From.Title"
     TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Title.From.Script.Review.Title"
     SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
-    
+
     # =========================================================================
     # Stages 10-16: Quality Review States
     # =========================================================================
@@ -160,18 +161,18 @@ class StateNames:
     REVIEW_SCRIPT_EDITING = f"{STATE_PREFIX}.Review.Script.Editing"
     REVIEW_TITLE_READABILITY = f"{STATE_PREFIX}.Review.Title.Readability"
     REVIEW_SCRIPT_READABILITY = f"{STATE_PREFIX}.Review.Script.Readability"
-    
+
     # =========================================================================
     # Stages 17-18: Expert Review Loop
     # =========================================================================
     STORY_REVIEW = f"{STATE_PREFIX}.Story.Review"
     STORY_POLISH = f"{STATE_PREFIX}.Story.Polish"
-    
+
     # =========================================================================
     # Terminal State
     # =========================================================================
     PUBLISHING = f"{STATE_PREFIX}.Publishing"
-    
+
     # =========================================================================
     # State Category Mappings (for extensible categorization)
     # =========================================================================
@@ -208,14 +209,14 @@ class StateNames:
             PUBLISHING,
         ],
     }
-    
+
     @classmethod
     def get_all_states(cls) -> List[str]:
         """Get all defined state names.
-        
+
         Returns:
             List of all state name strings.
-            
+
         Example:
             >>> states = StateNames.get_all_states()
             >>> 'PrismQ.T.Idea.Creation' in states
@@ -223,41 +224,43 @@ class StateNames:
         """
         states = []
         for attr_name in dir(cls):
-            if (not attr_name.startswith('_') and 
-                attr_name.isupper() and 
-                attr_name != 'STATE_PREFIX' and
-                isinstance(getattr(cls, attr_name), str) and
-                getattr(cls, attr_name).startswith(cls.STATE_PREFIX)):
+            if (
+                not attr_name.startswith("_")
+                and attr_name.isupper()
+                and attr_name != "STATE_PREFIX"
+                and isinstance(getattr(cls, attr_name), str)
+                and getattr(cls, attr_name).startswith(cls.STATE_PREFIX)
+            ):
                 states.append(getattr(cls, attr_name))
         return states
-    
+
     @classmethod
     def get_states_by_category(cls, category: StateCategory) -> List[str]:
         """Get all states belonging to a specific category.
-        
+
         Args:
             category: The StateCategory to filter by.
-            
+
         Returns:
             List of state names in the specified category.
-            
+
         Example:
             >>> review_states = StateNames.get_states_by_category(StateCategory.REVIEW)
             >>> 'PrismQ.T.Review.Script.Grammar' in review_states
             True
         """
         return cls._CATEGORY_MAPPINGS.get(category, [])
-    
+
     @classmethod
     def get_state_category(cls, state_name: str) -> Optional[StateCategory]:
         """Get the category of a specific state.
-        
+
         Args:
             state_name: The full state name string.
-            
+
         Returns:
             The StateCategory or None if not found.
-            
+
         Example:
             >>> StateNames.get_state_category('PrismQ.T.Idea.Creation')
             <StateCategory.CREATION: 'creation'>
@@ -266,17 +269,17 @@ class StateNames:
             if state_name in states:
                 return category
         return None
-    
+
     @classmethod
     def is_valid_state(cls, state_name: str) -> bool:
         """Check if a state name is a valid defined state.
-        
+
         Args:
             state_name: The state name to validate.
-            
+
         Returns:
             True if the state is defined, False otherwise.
-            
+
         Example:
             >>> StateNames.is_valid_state('PrismQ.T.Idea.Creation')
             True
@@ -284,36 +287,36 @@ class StateNames:
             False
         """
         return state_name in cls.get_all_states()
-    
+
     @classmethod
     def get_review_states(cls) -> List[str]:
         """Get all review-related states.
-        
+
         Convenience method for getting all states in the REVIEW category.
-        
+
         Returns:
             List of review state names.
         """
         return cls.get_states_by_category(StateCategory.REVIEW)
-    
+
     @classmethod
     def get_generation_states(cls) -> List[str]:
         """Get all content generation states.
-        
+
         Convenience method for getting all states in the GENERATION category.
-        
+
         Returns:
             List of generation state names.
         """
         return cls.get_states_by_category(StateCategory.GENERATION)
-    
+
     @classmethod
     def get_quality_review_states(cls) -> List[str]:
         """Get all quality review states (stages 10-16).
-        
+
         These are the local AI review states for grammar, tone, content,
         consistency, editing, and readability.
-        
+
         Returns:
             List of quality review state names.
         """
@@ -326,52 +329,52 @@ class StateNames:
             cls.REVIEW_TITLE_READABILITY,
             cls.REVIEW_SCRIPT_READABILITY,
         ]
-    
+
     @classmethod
     def count_states(cls) -> int:
         """Get the total count of defined states.
-        
+
         Returns:
             Total number of state constants.
         """
         return len(cls.get_all_states())
-    
+
     @classmethod
     def parse_state_name(cls, state_name: str) -> Dict[str, str]:
         """Parse a state name into its components.
-        
+
         Args:
             state_name: The full state name string.
-            
+
         Returns:
             Dictionary with parsed components:
                 - prefix: The PrismQ.T prefix
                 - output: The output/target of the state
                 - action: Optional action (e.g., 'From', 'By')
                 - input: Optional input/source
-                
+
         Example:
             >>> StateNames.parse_state_name('PrismQ.T.Title.From.Idea')
             {'prefix': 'PrismQ.T', 'output': 'Title', 'action': 'From', 'input': 'Idea'}
         """
         if not state_name.startswith(cls.STATE_PREFIX):
             raise ValueError(f"Invalid state name: {state_name}")
-        
-        parts = state_name.split('.')
+
+        parts = state_name.split(".")
         # Validate minimum parts (PrismQ.T needs at least 2 parts)
         if len(parts) < 2:
             raise ValueError(f"Invalid state name: {state_name}")
-        
+
         result = {
-            'prefix': f"{parts[0]}.{parts[1]}",
-            'output': parts[2] if len(parts) > 2 else '',
+            "prefix": f"{parts[0]}.{parts[1]}",
+            "output": parts[2] if len(parts) > 2 else "",
         }
-        
+
         if len(parts) > 3:
             # Parse action and input parts
-            result['action'] = parts[3]
-            result['input'] = '.'.join(parts[4:]) if len(parts) > 4 else ''
-        
+            result["action"] = parts[3]
+            result["input"] = ".".join(parts[4:]) if len(parts) > 4 else ""
+
         return result
 
 
@@ -380,5 +383,19 @@ INITIAL_STATES = [StateNames.IDEA_CREATION]
 TERMINAL_STATES = [StateNames.PUBLISHING]
 EXPERT_REVIEW_STATES = [StateNames.STORY_REVIEW, StateNames.STORY_POLISH]
 
-# Re-export TransitionValidator for convenience
-from Model.State.validators.transition_validator import TransitionValidator
+# Re-export TransitionValidator for convenience (imported at end to avoid circular import)
+# This is intentionally placed here to break the circular dependency
+# between Model.state and Model.State.validators.transition_validator
+from Model.State.validators.transition_validator import (  # noqa: E402
+    TransitionValidator,
+)
+
+__all__ = [
+    "StateCategory",
+    "StoryState",
+    "StateNames",
+    "TransitionValidator",
+    "INITIAL_STATES",
+    "TERMINAL_STATES",
+    "EXPERT_REVIEW_STATES",
+]

@@ -10,17 +10,16 @@ This module serves as a quality gate in the workflow:
 """
 
 from .editing_review import (
-    EditingReview,
     EditingIssue,
     EditingIssueType,
-    EditingSeverity
+    EditingReview,
+    EditingSeverity,
 )
-
 from .script_editing_review import (
     ScriptEditingChecker,
+    get_editing_feedback,
     review_script_editing,
     review_script_editing_to_json,
-    get_editing_feedback
 )
 
 __all__ = [
@@ -33,5 +32,5 @@ __all__ = [
     "ScriptEditingChecker",
     "review_script_editing",
     "review_script_editing_to_json",
-    "get_editing_feedback"
+    "get_editing_feedback",
 ]

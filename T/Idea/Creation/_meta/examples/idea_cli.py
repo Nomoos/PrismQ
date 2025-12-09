@@ -8,21 +8,22 @@ Usage:
     python idea_cli.py --from-title "Short Title" --model qwen2.5:72b-q4_K_M
 """
 
-import sys
-import os
 import argparse
+import os
+import sys
 
 # Add parent directories to path for imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
-src_dir = os.path.join(current_dir, '../../src')
-model_dir = os.path.join(current_dir, '../../../Model/src')
-model_base = os.path.join(current_dir, '../../../Model')
+src_dir = os.path.join(current_dir, "../../src")
+model_dir = os.path.join(current_dir, "../../../Model/src")
+model_base = os.path.join(current_dir, "../../../Model")
 
 sys.path.insert(0, src_dir)
 sys.path.insert(0, model_dir)
 sys.path.insert(0, model_base)
 
-from creation import IdeaCreator, CreationConfig
+from creation import CreationConfig, IdeaCreator
+
 from idea import ContentGenre
 
 
@@ -32,7 +33,7 @@ def print_idea(idea, index=1, verbose=False):
     print(f"Idea {index}: {idea.title}")
     print(f"{'='*80}")
     print(f"\nConcept: {idea.concept}")
-    
+
     if verbose:
         if idea.premise:
             print(f"\nPremise: {idea.premise}")
@@ -46,7 +47,7 @@ def print_idea(idea, index=1, verbose=False):
             print(f"\nSkeleton:\n{idea.skeleton}")
         if idea.outline:
             print(f"\nOutline:\n{idea.outline}")
-    
+
     if idea.keywords:
         print(f"\nKeywords: {', '.join(idea.keywords[:10])}")
     if idea.themes:
@@ -67,85 +68,56 @@ Examples:
   %(prog)s --from-title "Quantum Computing" --num-ideas 5
   %(prog)s "AI Story Ideas" --verbose --model qwen2.5:72b-q4_K_M
   %(prog)s "Social Media" --no-ai --num-ideas 3
-        """
+        """,
     )
-    
+
+    parser.add_argument("input", nargs="?", help="Topic or description to generate ideas from")
     parser.add_argument(
-        'input',
-        nargs='?',
-        help='Topic or description to generate ideas from'
-    )
-    parser.add_argument(
-        '--from-title',
-        action='store_true',
-        help='Treat input as a title (default behavior)'
+        "--from-title", action="store_true", help="Treat input as a title (default behavior)"
     )
     parser.add_argument(
-        '--from-description',
-        action='store_true',
-        help='Treat input as a detailed description'
+        "--from-description", action="store_true", help="Treat input as a detailed description"
+    )
+    parser.add_argument("--num-ideas", type=int, help="Number of ideas to generate (default: 10)")
+    parser.add_argument(
+        "--model",
+        default="llama3.1:70b-q4_K_M",
+        help="AI model to use (default: llama3.1:70b-q4_K_M)",
     )
     parser.add_argument(
-        '--num-ideas',
-        type=int,
-        help='Number of ideas to generate (default: 10)'
-    )
-    parser.add_argument(
-        '--model',
-        default='llama3.1:70b-q4_K_M',
-        help='AI model to use (default: llama3.1:70b-q4_K_M)'
-    )
-    parser.add_argument(
-        '--temperature',
+        "--temperature",
         type=float,
         default=0.8,
-        help='AI temperature for creativity (0.0-2.0, default: 0.8)'
+        help="AI temperature for creativity (0.0-2.0, default: 0.8)",
     )
     parser.add_argument(
-        '--no-ai',
-        action='store_true',
-        help='Disable AI and use fallback generation'
+        "--no-ai", action="store_true", help="Disable AI and use fallback generation"
     )
+    parser.add_argument("--genre", choices=[g.value for g in ContentGenre], help="Content genre")
+    parser.add_argument("--platforms", nargs="+", help="Target platforms (e.g., youtube tiktok)")
+    parser.add_argument("--formats", nargs="+", help="Target formats (e.g., video audio text)")
     parser.add_argument(
-        '--genre',
-        choices=[g.value for g in ContentGenre],
-        help='Content genre'
+        "--verbose", "-v", action="store_true", help="Show detailed idea information"
     )
-    parser.add_argument(
-        '--platforms',
-        nargs='+',
-        help='Target platforms (e.g., youtube tiktok)'
-    )
-    parser.add_argument(
-        '--formats',
-        nargs='+',
-        help='Target formats (e.g., video audio text)'
-    )
-    parser.add_argument(
-        '--verbose',
-        '-v',
-        action='store_true',
-        help='Show detailed idea information'
-    )
-    
+
     args = parser.parse_args()
-    
+
     # Validate input
     if not args.input:
         parser.print_help()
         sys.exit(1)
-    
+
     # Create configuration
     config = CreationConfig(
         use_ai=not args.no_ai,
         ai_model=args.model,
         ai_temperature=args.temperature,
-        default_num_ideas=args.num_ideas or 10
+        default_num_ideas=args.num_ideas or 10,
     )
-    
+
     # Create IdeaCreator
     creator = IdeaCreator(config)
-    
+
     # Print configuration
     print(f"\n{'='*80}")
     print("AI-Powered Idea Generation")
@@ -157,12 +129,12 @@ Examples:
     if not args.no_ai:
         print(f"Model: {args.model}")
         print(f"Temperature: {args.temperature}")
-    
+
     # Parse genre
     genre = None
     if args.genre:
         genre = ContentGenre(args.genre)
-    
+
     # Generate ideas
     try:
         if args.from_description:
@@ -171,7 +143,7 @@ Examples:
                 num_ideas=args.num_ideas,
                 target_platforms=args.platforms,
                 target_formats=args.formats,
-                genre=genre
+                genre=genre,
             )
         else:
             ideas = creator.create_from_title(
@@ -179,21 +151,21 @@ Examples:
                 num_ideas=args.num_ideas,
                 target_platforms=args.platforms,
                 target_formats=args.formats,
-                genre=genre
+                genre=genre,
             )
-        
+
         # Print results
         print(f"\n{'='*80}")
         print(f"Generated {len(ideas)} Ideas")
         print(f"{'='*80}")
-        
+
         for i, idea in enumerate(ideas, 1):
             print_idea(idea, i, args.verbose)
-        
+
         print(f"\n{'='*80}")
         print("Generation Complete!")
         print(f"{'='*80}")
-        
+
     except Exception as e:
         print(f"\nError generating ideas: {e}", file=sys.stderr)
         sys.exit(1)

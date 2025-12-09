@@ -15,13 +15,13 @@ Modes:
     Preview: Creates scripts for testing without saving (extensive logging)
 """
 
-import sys
-import os
 import json
 import logging
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 # Setup paths - Now in T/Script/From/Idea/Title/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -40,14 +40,15 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
 # Import script generator
 try:
     from script_generator import (
+        PlatformTarget,
         ScriptGenerator,
         ScriptGeneratorConfig,
-        ScriptV1,
         ScriptSection,
         ScriptStructure,
-        PlatformTarget,
         ScriptTone,
+        ScriptV1,
     )
+
     SCRIPT_GENERATOR_AVAILABLE = True
 except ImportError as e:
     SCRIPT_GENERATOR_AVAILABLE = False
@@ -55,7 +56,8 @@ except ImportError as e:
 
 # Try to import Idea model
 try:
-    from idea import Idea, ContentGenre
+    from idea import ContentGenre, Idea
+
     IDEA_MODEL_AVAILABLE = True
 except ImportError:
     IDEA_MODEL_AVAILABLE = False
@@ -63,6 +65,7 @@ except ImportError:
 # Try to import database
 try:
     from Model.Database.repositories.script_repository import ScriptRepository
+
     DB_AVAILABLE = True
 except ImportError:
     DB_AVAILABLE = False
@@ -72,18 +75,20 @@ except ImportError:
 # ANSI Colors for Terminal Output
 # =============================================================================
 
+
 class Colors:
     """ANSI color codes for terminal styling."""
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    CYAN = '\033[96m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    GRAY = '\033[90m'
-    END = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+
+    HEADER = "\033[95m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    GRAY = "\033[90m"
+    END = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 
 def print_header(text: str) -> None:
@@ -131,93 +136,94 @@ def print_debug(text: str, logger: Optional[logging.Logger] = None) -> None:
 # Input Parsing
 # =============================================================================
 
+
 def parse_input(text: str, logger: Optional[logging.Logger] = None) -> tuple:
     """Parse input text and extract idea and title.
-    
+
     Handles:
     - JSON with idea and title fields
     - Plain text (treated as title, concept generated)
-    
+
     Args:
         text: Input text (any format)
         logger: Optional logger for debug output
-        
+
     Returns:
         Tuple of (Idea, title_text) or (None, None) if parsing fails
     """
     text = text.strip()
-    
+
     if logger:
         logger.info(f"Parsing input text ({len(text)} chars)")
-    
+
     # Try to parse as JSON
-    if text.startswith('{'):
+    if text.startswith("{"):
         try:
             data = json.loads(text)
             if logger:
                 logger.info(f"Detected JSON input with {len(data)} fields")
-            
+
             # Extract title
-            title_text = data.get('title') or data.get('story_title') or 'Untitled Story'
-            
+            title_text = data.get("title") or data.get("story_title") or "Untitled Story"
+
             # Create Idea from JSON data
-            idea_title = data.get('idea_title') or title_text
-            concept = data.get('concept') or data.get('description') or title_text
-            
+            idea_title = data.get("idea_title") or title_text
+            concept = data.get("concept") or data.get("description") or title_text
+
             # Try to parse genre
             genre = ContentGenre.OTHER
-            genre_str = data.get('genre', '').lower()
+            genre_str = data.get("genre", "").lower()
             if genre_str:
                 genre_map = {
-                    'horror': ContentGenre.HORROR,
-                    'educational': ContentGenre.EDUCATIONAL,
-                    'entertainment': ContentGenre.ENTERTAINMENT,
-                    'mystery': ContentGenre.MYSTERY,
-                    'drama': ContentGenre.DRAMA,
-                    'sci-fi': ContentGenre.SCI_FI,
-                    'science fiction': ContentGenre.SCI_FI,
-                    'fantasy': ContentGenre.FANTASY,
-                    'romance': ContentGenre.ROMANCE,
-                    'thriller': ContentGenre.THRILLER,
-                    'comedy': ContentGenre.COMEDY,
+                    "horror": ContentGenre.HORROR,
+                    "educational": ContentGenre.EDUCATIONAL,
+                    "entertainment": ContentGenre.ENTERTAINMENT,
+                    "mystery": ContentGenre.MYSTERY,
+                    "drama": ContentGenre.DRAMA,
+                    "sci-fi": ContentGenre.SCI_FI,
+                    "science fiction": ContentGenre.SCI_FI,
+                    "fantasy": ContentGenre.FANTASY,
+                    "romance": ContentGenre.ROMANCE,
+                    "thriller": ContentGenre.THRILLER,
+                    "comedy": ContentGenre.COMEDY,
                 }
                 genre = genre_map.get(genre_str, ContentGenre.OTHER)
-            
+
             idea = Idea(
                 title=idea_title,
                 concept=concept,
                 genre=genre,
-                themes=data.get('themes', []),
-                keywords=data.get('keywords', []),
-                hook=data.get('hook', ''),
-                premise=data.get('premise', ''),
-                synopsis=data.get('synopsis', ''),
+                themes=data.get("themes", []),
+                keywords=data.get("keywords", []),
+                hook=data.get("hook", ""),
+                premise=data.get("premise", ""),
+                synopsis=data.get("synopsis", ""),
             )
-            
+
             if logger:
                 logger.info(f"Created Idea: '{idea_title}' with title: '{title_text}'")
-            
+
             return idea, title_text
-            
+
         except json.JSONDecodeError as e:
             if logger:
                 logger.warning(f"JSON parse failed: {e}")
-    
+
     # Plain text handling - treat as title
     if logger:
         logger.info("Processing as plain text")
-    
+
     title_text = text[:100] if len(text) <= 100 else text[:97] + "..."
-    
+
     idea = Idea(
         title=title_text,
         concept=text if len(text) > 50 else f"Story about: {text}",
         genre=ContentGenre.OTHER,
     )
-    
+
     if logger:
         logger.info(f"Created Idea from plain text: '{idea.title}'")
-    
+
     return idea, title_text
 
 
@@ -225,9 +231,10 @@ def parse_input(text: str, logger: Optional[logging.Logger] = None) -> tuple:
 # Interactive Mode
 # =============================================================================
 
+
 def run_interactive_mode(preview: bool = False, debug: bool = False):
     """Run the interactive script generation mode.
-    
+
     Args:
         preview: If True, don't save to database (preview/test mode)
         debug: If True, enable extensive debug logging
@@ -237,38 +244,38 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     if debug or preview:
         log_filename = f"script_from_idea_title_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         log_path = SCRIPT_DIR / log_filename
-        
+
         logging.basicConfig(
             level=logging.DEBUG if debug else logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
+            format="%(asctime)s - %(levelname)s - %(message)s",
             handlers=[
                 logging.FileHandler(log_path),
-                logging.StreamHandler() if debug else logging.NullHandler()
-            ]
+                logging.StreamHandler() if debug else logging.NullHandler(),
+            ],
         )
-        logger = logging.getLogger('PrismQ.Script.From.Idea.Title')
+        logger = logging.getLogger("PrismQ.Script.From.Idea.Title")
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
-    
+
     # Print header
     mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
     print_header(f"PrismQ Script From Idea+Title - {mode_text}")
-    
+
     # Check module availability
     if not SCRIPT_GENERATOR_AVAILABLE:
         print_error(f"Script generator module not available: {IMPORT_ERROR}")
         if logger:
             logger.error(f"Module import failed: {IMPORT_ERROR}")
         return 1
-    
+
     if not IDEA_MODEL_AVAILABLE:
         print_error("Idea model not available")
         return 1
-    
+
     print_success("Script generator module loaded")
     if logger:
         logger.info("Script generator module loaded successfully")
-    
+
     if preview:
         print_warning("Preview mode - scripts will NOT be saved to database")
         print_info("This mode is for testing and tuning. Check logs for details.")
@@ -278,35 +285,35 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         else:
             print_warning("Database module not available - will run in preview mode")
             preview = True
-    
+
     # Show available options
     print_section("Script Generation Options")
     print("  Structure: hook_deliver_cta, three_act, problem_solution, story")
     print("  Tone: engaging, mysterious, educational, dramatic, conversational")
     print("  Platform: youtube_short, youtube_medium, youtube_long, tiktok, instagram_reel")
-    
+
     # Interactive loop
     print_section("Enter Input")
     print("Enter idea+title (as JSON or plain text for title).")
     print('Example JSON: {"title": "Story Title", "concept": "Story concept", "genre": "horror"}')
     print("Press Enter to submit, or type 'quit' to exit.\n")
-    
+
     while True:
         print(f"{Colors.CYAN}>>> {Colors.END}", end="")
-        
+
         try:
             line = input().strip()
-            if line.lower() == 'quit':
+            if line.lower() == "quit":
                 print_info("Exiting...")
                 if logger:
                     logger.info("User requested exit")
                 return 0
-            
+
             if not line:
                 continue
-            
+
             input_text = line
-            
+
         except EOFError:
             print_info("Exiting...")
             return 0
@@ -314,52 +321,54 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print("\n")
             print_info("Interrupted. Type 'quit' to exit.")
             continue
-        
+
         if logger:
             logger.info(f"Received input: {len(input_text)} chars")
-        
+
         # Parse input
         print_section("Processing Input")
         idea, title = parse_input(input_text, logger)
-        
+
         if not idea or not title:
             print_error("Could not parse input")
             continue
-        
+
         print(f"  Idea Title: {Colors.BOLD}{idea.title}{Colors.END}")
         print(f"  Script Title: {Colors.BOLD}{title}{Colors.END}")
         if idea.concept:
-            concept_preview = idea.concept[:100] + '...' if len(idea.concept) > 100 else idea.concept
+            concept_preview = (
+                idea.concept[:100] + "..." if len(idea.concept) > 100 else idea.concept
+            )
             print(f"  Concept: {concept_preview}")
         print(f"  Genre: {idea.genre.value if hasattr(idea.genre, 'value') else idea.genre}")
-        
+
         # Generate script
         print_section("Generating Script")
-        
+
         try:
             config = ScriptGeneratorConfig(
                 platform_target=PlatformTarget.YOUTUBE_MEDIUM,
                 target_duration_seconds=90,
                 structure_type=ScriptStructure.HOOK_DELIVER_CTA,
                 include_cta=True,
-                tone=ScriptTone.ENGAGING
+                tone=ScriptTone.ENGAGING,
             )
             generator = ScriptGenerator(config)
             print_info("Generating script with HOOK_DELIVER_CTA structure...")
             if logger:
                 logger.info("Generating script")
-            
+
             script = generator.generate_script_v1(idea, title)
-                
+
         except Exception as e:
             print_error(f"Error generating script: {e}")
             if logger:
                 logger.exception("Script generation failed")
             continue
-        
+
         # Display results
         print_section(f"Generated Script")
-        
+
         print(f"\n{Colors.GREEN}{'─' * 60}{Colors.END}")
         print(f"{Colors.GREEN}{Colors.BOLD}  Script: {script.title}{Colors.END}")
         print(f"{Colors.GREEN}{'─' * 60}{Colors.END}")
@@ -368,28 +377,38 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print(f"  Platform: {script.platform_target.value}")
         print(f"  Duration: {script.total_duration_seconds}s")
         print(f"  Sections: {len(script.sections)}")
-        
+
         for section in script.sections:
-            print(f"\n  {Colors.CYAN}[{section.section_type.upper()}]{Colors.END} ({section.estimated_duration_seconds}s)")
+            print(
+                f"\n  {Colors.CYAN}[{section.section_type.upper()}]{Colors.END} ({section.estimated_duration_seconds}s)"
+            )
             print(f"    Purpose: {section.purpose}")
             # Show first 200 chars of content
-            content_preview = section.content[:200] + '...' if len(section.content) > 200 else section.content
+            content_preview = (
+                section.content[:200] + "..." if len(section.content) > 200 else section.content
+            )
             print(f"    Content: {content_preview}")
-        
+
         if logger:
             logger.info(f"Script generated: {script.script_id}")
-            logger.debug(f"Script data: {json.dumps(script.to_dict(), indent=2, ensure_ascii=False)}")
-        
+            logger.debug(
+                f"Script data: {json.dumps(script.to_dict(), indent=2, ensure_ascii=False)}"
+            )
+
         # Save to database (if not preview mode)
         if not preview and DB_AVAILABLE:
             print_section("Database Operations")
-            save_choice = input(f"{Colors.CYAN}Save to database? (y/n) [y]: {Colors.END}").strip().lower()
-            if save_choice != 'n':
+            save_choice = (
+                input(f"{Colors.CYAN}Save to database? (y/n) [y]: {Colors.END}").strip().lower()
+            )
+            if save_choice != "n":
                 print_info("Saving to database...")
                 if logger:
                     logger.info("Saving script to database")
                 # TODO: Implement actual DB save
-                print_warning("Database save not yet implemented - script was created but not persisted")
+                print_warning(
+                    "Database save not yet implemented - script was created but not persisted"
+                )
             else:
                 print_info("Skipped database save")
                 if logger:
@@ -399,21 +418,25 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_info("Script created - NOT saved to database")
             if logger:
                 logger.info("Preview mode: script created but not saved")
-        
+
         # Output as JSON option
-        json_choice = input(f"\n{Colors.CYAN}Output as JSON? (y/n) [n]: {Colors.END}").strip().lower()
-        if json_choice == 'y':
+        json_choice = (
+            input(f"\n{Colors.CYAN}Output as JSON? (y/n) [n]: {Colors.END}").strip().lower()
+        )
+        if json_choice == "y":
             print_section("JSON Output")
             print(json.dumps(script.to_dict(), indent=2, ensure_ascii=False))
             if logger:
                 logger.info("User requested JSON output")
-        
+
         # Output full script text
-        full_text_choice = input(f"\n{Colors.CYAN}Show full script text? (y/n) [n]: {Colors.END}").strip().lower()
-        if full_text_choice == 'y':
+        full_text_choice = (
+            input(f"\n{Colors.CYAN}Show full script text? (y/n) [n]: {Colors.END}").strip().lower()
+        )
+        if full_text_choice == "y":
             print_section("Full Script Text")
             print(script.full_text)
-        
+
         print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
         print("Enter new input or type 'quit' to exit.\n")
 
@@ -421,27 +444,29 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 def main():
     """Main entry point."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(
-        description='Interactive Script Generation from Idea+Title for PrismQ',
+        description="Interactive Script Generation from Idea+Title for PrismQ",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python script_from_idea_title_interactive.py                    # Interactive mode with DB save
   python script_from_idea_title_interactive.py --preview          # Preview mode (no DB save)
   python script_from_idea_title_interactive.py --preview --debug  # Debug mode with extensive logging
-        """
+        """,
     )
-    
-    parser.add_argument('--preview', '-p', action='store_true',
-                       help='Preview mode - do not save to database')
-    parser.add_argument('--debug', '-d', action='store_true',
-                       help='Enable debug logging (extensive output)')
-    
+
+    parser.add_argument(
+        "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
+    )
+    parser.add_argument(
+        "--debug", "-d", action="store_true", help="Enable debug logging (extensive output)"
+    )
+
     args = parser.parse_args()
-    
+
     return run_interactive_mode(preview=args.preview, debug=args.debug)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

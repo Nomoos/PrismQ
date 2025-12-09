@@ -1,7 +1,6 @@
 """Base variant templates - foundational structural templates."""
 
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 VARIANT_EMOTION_FIRST = {
     "name": "Emotion-First Hook",
@@ -12,7 +11,7 @@ VARIANT_EMOTION_FIRST = {
         "target_audience": "Who this content is for",
         "unusual_angle": "A unique perspective or approach",
         "ending_style": "How the content ends",
-        "content_constraints": {"length": "Content length", "safety": "Safety considerations"}
+        "content_constraints": {"length": "Content length", "safety": "Safety considerations"},
     },
     "example": {
         "main_emotion": "curiosity",
@@ -20,8 +19,8 @@ VARIANT_EMOTION_FIRST = {
         "target_audience": "History enthusiasts aged 25-45",
         "unusual_angle": "from an insider's perspective",
         "ending_style": "twist",
-        "content_constraints": {"length": "5-10 minutes", "safety": "Review for sensitive content"}
-    }
+        "content_constraints": {"length": "5-10 minutes", "safety": "Review for sensitive content"},
+    },
 }
 
 VARIANT_MYSTERY = {
@@ -34,17 +33,20 @@ VARIANT_MYSTERY = {
         "title_direction": {"type": "Title framing type", "suggestion": "Suggested title"},
         "tone_notes": "Overall tone",
         "style_notes": "Presentation style",
-        "sensitivities": "Boundaries and considerations to respect"
+        "sensitivities": "Boundaries and considerations to respect",
     },
     "example": {
         "central_mystery": "What really happened in the abandoned facility?",
         "emotional_hook": "Everyone thinks they know the story, but the truth reveals something deeply human.",
         "key_hook_scene": "The moment the door opens and silence falls.",
-        "title_direction": {"type": "question", "suggestion": "What Really Happened at Building 7?"},
+        "title_direction": {
+            "type": "question",
+            "suggestion": "What Really Happened at Building 7?",
+        },
         "tone_notes": "suspenseful",
         "style_notes": "investigative",
-        "sensitivities": ["Avoid sensationalism", "Respect privacy", "Fact-check claims"]
-    }
+        "sensitivities": ["Avoid sensationalism", "Respect privacy", "Fact-check claims"],
+    },
 }
 
 VARIANT_SKELETON = {
@@ -59,7 +61,7 @@ VARIANT_SKELETON = {
         "platform": "Ideal platform for this content",
         "target_audience": "Who this content is for",
         "title_keywords": "Keywords for title generation",
-        "title_images": "Visual concepts for thumbnails/covers"
+        "title_images": "Visual concepts for thumbnails/covers",
     },
     "example": {
         "opening_hook": "Nobody expected what would happen next...",
@@ -70,8 +72,8 @@ VARIANT_SKELETON = {
         "platform": "youtube",
         "target_audience": "Young adults 18-34",
         "title_keywords": ["unexpected", "truth", "revealed"],
-        "title_images": ["dramatic reveal", "contrast"]
-    }
+        "title_images": ["dramatic reveal", "contrast"],
+    },
 }
 
 VARIANT_SHORTFORM = {
@@ -82,15 +84,15 @@ VARIANT_SHORTFORM = {
         "core_tension": "The central conflict or question",
         "emotional_payload": "What feeling to deliver",
         "visual_anchor": "Key visual or moment",
-        "call_to_action": "What viewers should do/feel after"
+        "call_to_action": "What viewers should do/feel after",
     },
     "example": {
         "hook_line": "POV: You just discovered something that changes everything",
         "core_tension": "The gap between expectation and reality",
         "emotional_payload": "surprised realization",
         "visual_anchor": "The moment of discovery",
-        "call_to_action": "Share if this resonates"
-    }
+        "call_to_action": "Share if this resonates",
+    },
 }
 
 VARIANT_NICHE_BLEND = {
@@ -101,15 +103,15 @@ VARIANT_NICHE_BLEND = {
         "secondary_niche": "Complementary category for blend",
         "blend_concept": "How the two connect",
         "unique_angle": "What makes this combination fresh",
-        "audience_overlap": "Who would care about both niches"
+        "audience_overlap": "Who would care about both niches",
     },
     "example": {
         "primary_niche": "Personal development",
         "secondary_niche": "Gaming culture",
         "blend_concept": "Life lessons from video game mechanics",
         "unique_angle": "Using game design principles for real-world goals",
-        "audience_overlap": "Gamers interested in self-improvement"
-    }
+        "audience_overlap": "Gamers interested in self-improvement",
+    },
 }
 
 VARIANT_MINIMAL = {
@@ -118,13 +120,13 @@ VARIANT_MINIMAL = {
     "fields": {
         "one_line_hook": "The entire concept in one sentence",
         "emotional_core": "The feeling at the heart of it",
-        "format_suggestion": "Best format for this idea"
+        "format_suggestion": "Best format for this idea",
     },
     "example": {
         "one_line_hook": "What if everything you believed was just one perspective?",
         "emotional_core": "curiosity mixed with uncertainty",
-        "format_suggestion": "contemplative essay or video"
-    }
+        "format_suggestion": "contemplative essay or video",
+    },
 }
 
 VARIANT_4POINT = {
@@ -134,14 +136,14 @@ VARIANT_4POINT = {
         "problem": "The issue or question being addressed",
         "insight": "The key revelation or perspective",
         "proof": "Evidence or story that supports the insight",
-        "action": "What the audience can do with this"
+        "action": "What the audience can do with this",
     },
     "example": {
         "problem": "People feel disconnected despite being more connected than ever",
         "insight": "Quality of connection matters more than quantity",
         "proof": "Studies show deep conversations improve wellbeing more than many shallow ones",
-        "action": "Try having one meaningful conversation today"
-    }
+        "action": "Try having one meaningful conversation today",
+    },
 }
 
 VARIANT_HOOK_FRAME = {
@@ -151,14 +153,14 @@ VARIANT_HOOK_FRAME = {
         "primary_hook": "The main attention-grabber",
         "supporting_context": "What makes the hook meaningful",
         "payoff_promise": "What the audience will gain",
-        "emotional_journey": "The feeling arc from start to finish"
+        "emotional_journey": "The feeling arc from start to finish",
     },
     "example": {
         "primary_hook": "I found out something that nobody was supposed to know",
         "supporting_context": "It changed how I see everything",
         "payoff_promise": "You'll see it differently too",
-        "emotional_journey": "curiosity → tension → revelation → reflection"
-    }
+        "emotional_journey": "curiosity → tension → revelation → reflection",
+    },
 }
 
 VARIANT_SHORTFORM2 = {
@@ -169,15 +171,15 @@ VARIANT_SHORTFORM2 = {
         "quick_setup": "Fast context establishment",
         "twist_or_reveal": "The surprise element",
         "emotional_land": "Where viewers emotionally end up",
-        "shareability_factor": "Why someone would share this"
+        "shareability_factor": "Why someone would share this",
     },
     "example": {
         "scroll_stopper": "Wait for it...",
         "quick_setup": "Everyone told me this wouldn't work",
         "twist_or_reveal": "But then THIS happened",
         "emotional_land": "inspired determination",
-        "shareability_factor": "Relatable underdog story"
-    }
+        "shareability_factor": "Relatable underdog story",
+    },
 }
 
 VARIANT_GENRE = {
@@ -188,15 +190,15 @@ VARIANT_GENRE = {
         "genre_conventions": "Expected elements of the genre",
         "subversion": "How expectations are played with",
         "emotional_target": "The feeling genre fans expect",
-        "visual_style": "Visual language of the genre"
+        "visual_style": "Visual language of the genre",
     },
     "example": {
         "genre": "mystery thriller",
         "genre_conventions": "clues, red herrings, revelation",
         "subversion": "The mystery is internal, not external",
         "emotional_target": "suspense leading to understanding",
-        "visual_style": "moody, detailed, revelatory"
-    }
+        "visual_style": "moody, detailed, revelatory",
+    },
 }
 
 VARIANT_SCENE_SEED = {
@@ -208,7 +210,7 @@ VARIANT_SCENE_SEED = {
         "emotional_undercurrent": "The feeling beneath the surface",
         "implied_before": "What happened before this moment",
         "implied_after": "Where this could lead",
-        "character_in_scene": "Who we're following"
+        "character_in_scene": "Who we're following",
     },
     "example": {
         "scene_description": "Someone finds an old photo they've never seen before",
@@ -216,8 +218,8 @@ VARIANT_SCENE_SEED = {
         "emotional_undercurrent": "Curiosity mixed with unease",
         "implied_before": "A history not fully shared",
         "implied_after": "Questions that will change relationships",
-        "character_in_scene": "Someone discovering family secrets"
-    }
+        "character_in_scene": "Someone discovering family secrets",
+    },
 }
 
 
