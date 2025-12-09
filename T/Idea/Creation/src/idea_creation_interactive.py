@@ -426,9 +426,43 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logger.info(
                     f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection"
                 )
-            variants = create_ideas_from_input(
-                title, count=DEFAULT_IDEA_COUNT, description=description
+            
+            # Import functions we need for progress feedback
+            from idea_variants import (
+                IdeaGenerator, 
+                FlavorSelector,
             )
+            
+            # Create generator and selector instances
+            generator = IdeaGenerator()
+            selector = FlavorSelector()
+            
+            # Select flavors upfront
+            selected_flavors = selector.select_multiple(DEFAULT_IDEA_COUNT)
+            
+            # Generate variants one at a time with progress feedback
+            for i, flavor_name in enumerate(selected_flavors):
+                try:
+                    # Show progress
+                    print_info(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Generating with flavor: {flavor_name}...")
+                    
+                    # Generate the variant
+                    idea = generator.generate_from_flavor(
+                        title=title,
+                        flavor_name=flavor_name,
+                        description=description,
+                        variation_index=i,
+                    )
+                    variants.append(idea)
+                    
+                    if logger:
+                        logger.info(f"Generated variant {i+1}/{DEFAULT_IDEA_COUNT} with flavor: {flavor_name}")
+                
+                except Exception as e:
+                    print_warning(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Failed with flavor {flavor_name}: {e}")
+                    if logger:
+                        logger.warning(f"Failed to generate variant {i+1} with flavor {flavor_name}: {e}")
+                    continue
 
         except Exception as e:
             print_error(f"Error creating variants: {e}")
