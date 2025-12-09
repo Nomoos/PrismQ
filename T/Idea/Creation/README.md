@@ -10,7 +10,7 @@ Transform minimal input (title or description) into multiple, fully-formed Ideas
 
 ## Key Features
 
-- **AI-Powered Generation**: Uses local LLMs (Llama 3.1 70B, Qwen 2.5, etc.) via Ollama
+- **AI-Powered Generation**: Uses local LLMs (Qwen 3.30b default, optimized for idea refinement) via Ollama
 - **Custom Prompt Templates**: NEW! Flexible templating system with multiple placeholder formats
 - **Default 10 Ideas**: Generates 10 high-quality ideas by default (Path 2: Manual Creation)
 - **RTX 5090 Optimized**: Configured for best models on high-end GPUs
@@ -39,16 +39,16 @@ print(f"Created {len(ideas)} ideas")  # Output: Created 10 ideas
 ### Prerequisites
 
 1. **Install Ollama**: https://ollama.com/
-2. **Pull a model**: `ollama pull llama3.1:70b-q4_K_M`
+2. **Pull the model**: `ollama pull qwen2.5:32b`
 3. **Start server**: `ollama serve`
 
-### Recommended Models for RTX 5090
+### Recommended Models
 
 | Model | VRAM | Best For |
 |-------|------|----------|
-| `llama3.1:70b-q4_K_M` | 22GB | All-around best (default) |
-| `qwen2.5:72b-q4_K_M` | 23GB | Creative writing |
-| `command-r:35b` | 18GB | Structured output |
+| `qwen2.5:32b` | ~20GB | Qwen 3.30b - idea refinement (default) |
+| `qwen2.5:72b-q4_K_M` | 23GB | Creative writing (larger) |
+| `llama3.1:70b-q4_K_M` | 22GB | All-around alternative |
 
 ## Workflow Position
 
@@ -192,7 +192,7 @@ class CreationConfig:
     
     # AI settings
     use_ai: bool = True                        # Enable AI generation
-    ai_model: str = "llama3.1:70b-q4_K_M"     # Model name
+    ai_model: str = "qwen2.5:32b"             # Model name (Qwen 3.30b default)
     ai_temperature: float = 0.8                # Creativity (0.0-2.0)
     default_num_ideas: int = 10                # Default: 10 ideas
 ```
@@ -247,7 +247,7 @@ WARNING: Ollama not available, using fallback
 
 ### Model Not Found
 ```bash
-ollama pull llama3.1:70b-q4_K_M
+ollama pull qwen2.5:32b
 ```
 
 ### Out of Memory
