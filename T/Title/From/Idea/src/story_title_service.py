@@ -513,11 +513,9 @@ class StoryTitleService:
         # Persist Title
         title = self._title_repo.insert(title)
 
-        # Update Story's title_id reference
-        story.title_id = title.id
-
         # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
         # The workflow is: TITLE_FROM_IDEA -> SCRIPT_FROM_IDEA_TITLE
+        # Title already references Story via story_id FK
         story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
         self._story_repo.update(story)
 
@@ -679,10 +677,8 @@ class StoryTitleService:
                 # Assign a temporary ID for in-memory usage
                 title.id = i + 1
 
-            # Update Story's title_id reference
-            story.title_id = title.id
-
             # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
+            # Title already references Story via story_id FK
             story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
             if self._story_repo:
                 self._story_repo.update(story)

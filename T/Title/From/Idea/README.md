@@ -135,7 +135,6 @@ except AIUnavailableError as e:
 has_stories = service.idea_has_stories(idea)
 print(f"Idea has stories: {has_stories}")
 ```
-```
 
 ## Next Stage
 
