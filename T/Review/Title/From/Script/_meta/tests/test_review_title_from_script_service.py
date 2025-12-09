@@ -60,7 +60,8 @@ def db_connection():
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             UNIQUE(story_id, version),
-            FOREIGN KEY (story_id) REFERENCES Story(id)
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
         CREATE TABLE IF NOT EXISTS Script (
