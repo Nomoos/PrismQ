@@ -183,6 +183,32 @@ class AITitleGenerator:
             return self._custom_prompt_template
         return _load_prompt("title_generation.txt")
 
+    def _read_multiline_input(self) -> str:
+        """Read multi-line input from user until double newline or EOF.
+        
+        Continues reading lines until the user enters two consecutive empty lines
+        or reaches EOF (Ctrl+D on Unix, Ctrl+Z on Windows).
+        
+        Returns:
+            The combined input text with newlines preserved
+        """
+        lines = []
+        empty_line_count = 0
+        while True:
+            try:
+                line = input()
+                if not line:
+                    empty_line_count += 1
+                    if empty_line_count >= 2:
+                        break
+                else:
+                    empty_line_count = 0
+                    lines.append(line)
+            except EOFError:
+                break
+        
+        return "\n".join(lines).strip()
+
     def generate_from_idea(
         self, idea: Idea, num_variants: Optional[int] = None
     ) -> List[TitleVariant]:
@@ -221,7 +247,7 @@ class AITitleGenerator:
         # Build prompt once (it's the same for all calls with the new single-title format)
         prompt = self._create_prompt(idea, n_variants)
         
-        # Log the prompt template for debugging/preview purposes
+        # Log the prompt for debugging (when logger is configured)
         logger.info(f"Generated prompt for {n_variants} title variants")
         logger.info(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
         
@@ -315,27 +341,11 @@ class AITitleGenerator:
             print("-" * 80)
             print("\nInstructions:")
             print("1. Copy the prompt above")
-            print("2. Run it in your AI tool (e.g., Ollama CLI: ollama run " + self.config.model + ")")
+            print(f"2. Run it in your AI tool (e.g., Ollama CLI: ollama run {self.config.model})")
             print("3. Paste the AI response below")
             print("\nEnter AI response (press Enter twice when done):")
             
-            # Read multi-line input until double newline or EOF
-            lines = []
-            empty_line_count = 0
-            while True:
-                try:
-                    line = input()
-                    if not line:
-                        empty_line_count += 1
-                        if empty_line_count >= 2:
-                            break
-                    else:
-                        empty_line_count = 0
-                        lines.append(line)
-                except EOFError:
-                    break
-            
-            response_text = "\n".join(lines).strip()
+            response_text = self._read_multiline_input()
             logger.info(f"Manual mode: Received {len(response_text)} characters of response")
             return response_text
         
