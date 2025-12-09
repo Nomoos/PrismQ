@@ -32,27 +32,21 @@ The central entity in PrismQ that ties together Ideas, Titles, Scripts, and Revi
 ```sql
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idea_json TEXT NULL,
-    title_id INTEGER NULL,
-    script_id INTEGER NULL,
+    idea_id INTEGER NULL,
     state TEXT NOT NULL DEFAULT 'CREATED',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (title_id) REFERENCES Title(id),
-    FOREIGN KEY (script_id) REFERENCES Script(id)
+    FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
 
 -- Performance indexes
 CREATE INDEX idx_story_state ON Story(state);
-CREATE INDEX idx_story_title_id ON Story(title_id);
-CREATE INDEX idx_story_script_id ON Story(script_id);
+CREATE INDEX idx_story_idea_id ON Story(idea_id);
 ```
 
 **Fields:**
 - `id`: Primary key (auto-generated)
-- `idea_json`: Serialized Idea data (JSON string)
-- `title_id`: FK to latest Title version (optional)
-- `script_id`: FK to latest Script version (optional)
+- `idea_id`: FK to Idea table (references source idea)
 - `state`: Current workflow state (module-based state name)
 - `created_at`: Creation timestamp
 - `updated_at`: Last state change timestamp
