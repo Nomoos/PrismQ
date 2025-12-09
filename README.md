@@ -39,7 +39,8 @@ Each module has its own **_meta/** directory:
 1. **[Setup Environment](./src/README.md)** - Configure your environment
 2. **[Explore T Module](./T/README.md)** - Start with text generation
 3. **[Review Workflow](./_meta/WORKFLOW.md)** - Understand the workflow
-4. **[Use Client](./Client/README.md)** - Manage tasks via web interface
+4. **[Run Scripts](./_meta/scripts/NEXT_STEPS.md)** - Execute the production pipeline
+5. **[Use Client](./Client/README.md)** - Manage tasks via web interface
 
 ## 📄 License
 
