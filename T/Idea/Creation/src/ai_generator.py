@@ -136,7 +136,7 @@ class AIConfig:
         timeout: Request timeout in seconds
     """
 
-    model: str = "qwen2.5:32b"  # Default: Qwen 3.30b - optimized for idea refinement
+    model: str = "qwen3:32b"  # Default: Best for RTX 5090
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
     max_tokens: int = 2000

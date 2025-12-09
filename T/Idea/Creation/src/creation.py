@@ -39,7 +39,7 @@ class CreationConfig:
         variation_degree: How different generated ideas should be (low/medium/high)
         include_all_fields: Whether to generate all narrative fields
         use_ai: Whether to use AI for generation (requires Ollama)
-        ai_model: AI model to use (e.g., "llama3.1:70b-q4_K_M")
+        ai_model: AI model to use (e.g., "qwen3:30b")
         ai_temperature: Temperature for AI generation (0.0-2.0)
         default_num_ideas: Default number of ideas to generate
         prompt_template: Custom prompt template for AI generation (optional)
@@ -52,7 +52,7 @@ class CreationConfig:
     variation_degree: Literal["low", "medium", "high"] = "medium"
     include_all_fields: bool = True
     use_ai: bool = True  # Enable AI by default
-    ai_model: str = "llama3.1:70b-q4_K_M"  # Best for RTX 5090
+    ai_model: str = "qwen3:30b"  # Best for RTX 5090
     ai_temperature: float = 0.8
     default_num_ideas: int = 10  # Default to 10 ideas as per requirements
     prompt_template: Optional[str] = None  # Custom prompt template

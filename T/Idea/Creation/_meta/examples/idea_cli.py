@@ -81,8 +81,8 @@ Examples:
     parser.add_argument("--num-ideas", type=int, help="Number of ideas to generate (default: 10)")
     parser.add_argument(
         "--model",
-        default="qwen2.5:32b",
-        help="AI model to use (default: qwen2.5:32b - Qwen 3.30b)",
+        default="qwen3:32b",
+        help="AI model to use (default: qwen3:32b)",
     )
     parser.add_argument(
         "--temperature",

@@ -1,4 +1,4 @@
-"""Tests for AI Script Generator (Qwen2.5-14B-Instruct).
+"""Tests for AI Script Generator (Qwen3:30b).
 
 These tests verify:
 1. AIScriptGeneratorConfig default values
@@ -109,9 +109,9 @@ class TestAIScriptGeneratorConfig:
     """Tests for AIScriptGeneratorConfig."""
 
     def test_default_model_is_qwen(self):
-        """Test that default model is Qwen2.5-14B-Instruct."""
+        """Test that default model is Qwen3:30b."""
         config = AIScriptGeneratorConfig()
-        assert config.model == "qwen2.5:14b-instruct"
+        assert config.model == "qwen3:30b"
 
     def test_default_api_base(self):
         """Test default API base URL."""
@@ -135,7 +135,7 @@ class TestAIScriptGenerator:
     def test_initialization_with_default_config(self):
         """Test initialization with default config."""
         generator = AIScriptGenerator()
-        assert generator.config.model == "qwen2.5:14b-instruct"
+        assert generator.config.model == "qwen3:30b"
 
     def test_is_available_returns_bool(self):
         """Test that is_available returns boolean."""
@@ -240,9 +240,9 @@ class TestScriptGeneratorAIIntegration:
         assert hasattr(config, "ai_timeout")
 
     def test_default_ai_model_is_qwen(self):
-        """Test that default AI model is Qwen2.5-14B-Instruct."""
+        """Test that default AI model is Qwen3:30b."""
         config = ScriptGeneratorConfig()
-        assert config.ai_model == "qwen2.5:14b-instruct"
+        assert config.ai_model == "qwen3:30b"
 
     def test_generator_has_is_ai_available_method(self):
         """Test that ScriptGenerator has is_ai_available method."""

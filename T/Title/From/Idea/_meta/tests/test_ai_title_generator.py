@@ -1,7 +1,7 @@
 """Tests for AI Title Generation module.
 
 This module tests the AITitleGenerator functionality which uses
-local LLM models (Qwen2.5-14B-Instruct) via Ollama to generate titles.
+local LLM models (Qwen3:30b) via Ollama to generate titles.
 """
 
 import os
@@ -40,7 +40,7 @@ class TestAITitleConfig:
         """Test default configuration values."""
         config = AITitleConfig()
 
-        assert config.model == "qwen2.5:14b-instruct"
+        assert config.model == "qwen3:30b"
         assert config.api_base == "http://localhost:11434"
         assert config.temperature == 0.8
         assert config.max_tokens == 2000
