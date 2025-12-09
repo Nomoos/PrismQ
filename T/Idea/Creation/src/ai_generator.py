@@ -94,7 +94,6 @@ def apply_template(template: str, **kwargs) -> str:
     # Use a safe approach that only substitutes available keys
     try:
         # Build a dict with only the placeholders that exist in the template
-        import re
         # Find all {variable} patterns
         placeholders = re.findall(r'\{(\w+)\}', result)
         safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
