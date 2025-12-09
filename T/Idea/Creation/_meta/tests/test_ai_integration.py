@@ -1,8 +1,8 @@
 """Test AI integration in idea_variants module.
 
 This test verifies that:
-1. AI generation is attempted when Ollama is available
-2. Template fallback works when Ollama is unavailable
+1. AI generation is required and errors are raised when Ollama is unavailable
+2. AI generation works correctly when Ollama is available
 3. Generated content is meaningful and not template-like
 """
 
@@ -40,25 +40,25 @@ class TestAIIntegration:
             assert generator.ai_generator is not None
             assert generator.use_ai is True
     
-    def test_fallback_when_ollama_unavailable(self):
-        """Test that template generation is used when Ollama is unavailable."""
-        # Create generator without AI (simulating unavailable Ollama)
+    def test_error_when_ollama_unavailable(self):
+        """Test that RuntimeError is raised when Ollama is unavailable."""
+        # Mock the AI generator to simulate Ollama being unavailable
+        with patch('idea_variants.AIIdeaGenerator') as mock_ai_gen_class:
+            mock_ai_instance = Mock()
+            mock_ai_instance.available = False
+            mock_ai_gen_class.return_value = mock_ai_instance
+            
+            # Should raise RuntimeError when AI is requested but unavailable
+            with pytest.raises(RuntimeError, match="Ollama is not available"):
+                IdeaGenerator(use_ai=True)
+    
+    def test_no_error_when_ai_disabled(self):
+        """Test that no error is raised when AI is explicitly disabled."""
+        # Create generator without AI
         generator = IdeaGenerator(use_ai=False)
         
         assert generator.ai_generator is None
-        
-        # Generate an idea - should use template fallback
-        idea = generator.generate_from_flavor(
-            title="Test Title",
-            flavor_name="Emotion-First Hook",
-            description="Test description"
-        )
-        
-        assert idea is not None
-        assert 'hook' in idea
-        assert 'core_concept' in idea
-        # Template generation should include the title in some way
-        assert 'Test' in idea['hook'] or 'test' in idea['hook'].lower()
+        assert generator.use_ai is False
     
     def test_ai_content_generation_with_mock(self):
         """Test AI content generation with mocked AI generator."""
@@ -125,42 +125,32 @@ class TestAIIntegration:
                             f"Template phrase '{phrase}' found in {field_name}: {field_value}"
                         )
     
-    def test_create_ideas_from_input_with_ai(self):
-        """Test the convenience function with AI generation."""
-        # Since we can't run Ollama in test environment, we test the function signature
-        # and verify it doesn't crash
-        ideas = create_ideas_from_input("Test Title", count=2)
-        
-        assert isinstance(ideas, list)
-        assert len(ideas) <= 2  # May be less if AI fails
-        
-        if ideas:
-            idea = ideas[0]
-            assert 'flavor_name' in idea
-            assert 'hook' in idea
-            assert 'core_concept' in idea
+    def test_create_ideas_from_input_requires_ai(self):
+        """Test that create_ideas_from_input requires AI to be available."""
+        # Mock AI as unavailable
+        with patch('idea_variants.AIIdeaGenerator') as mock_ai_gen_class:
+            mock_ai_instance = Mock()
+            mock_ai_instance.available = False
+            mock_ai_gen_class.return_value = mock_ai_instance
+            
+            # Should raise RuntimeError when AI is not available
+            with pytest.raises(RuntimeError, match="Ollama is not available"):
+                create_ideas_from_input("Test Title", count=2)
 
 
-class TestTemplateQuality:
-    """Tests for template fallback quality."""
+class TestErrorHandling:
+    """Tests for error handling when AI is unavailable."""
     
-    def test_template_fallback_includes_topic(self):
-        """Test that template fallback includes the actual topic."""
+    def test_generation_fails_without_ai(self):
+        """Test that idea generation fails when AI is disabled."""
         generator = IdeaGenerator(use_ai=False)
         
-        idea = generator.generate_from_flavor(
-            title="Acadia Night Hikers",
-            flavor_name="Mystery/Curiosity Gap"
-        )
-        
-        # Template should reference the actual topic
-        all_content = ' '.join([
-            idea.get('hook', ''),
-            idea.get('core_concept', ''),
-            idea.get('emotional_core', '')
-        ])
-        
-        assert 'Acadia' in all_content or 'acadia' in all_content.lower()
+        # Should raise RuntimeError when trying to generate without AI
+        with pytest.raises(RuntimeError, match="AI generator not available"):
+            generator.generate_from_flavor(
+                title="Test Title",
+                flavor_name="Emotion-First Hook"
+            )
 
 
 if __name__ == '__main__':

@@ -14,15 +14,15 @@ This template text appeared even when Ollama was running, indicating the AI gene
 
 ## Solution
 
-Integrated AI generation into the `idea_variants.py` module to use Ollama for generating rich, narrative content instead of templates.
+Integrated AI generation into the `idea_variants.py` module to use Ollama for generating rich, narrative content. **AI generation is now required** - the system will raise an error if Ollama is not available.
 
 ### Changes Made
 
 1. **AI Generator Integration** (`idea_variants.py`)
    - Added `AIIdeaGenerator` import and integration
    - Modified `IdeaGenerator.__init__()` to initialize AI generator when available
-   - Added `use_ai` parameter to control AI generation
-   - Maintains backward compatibility with fallback to templates
+   - **Raises `RuntimeError` if AI is requested but Ollama is not available**
+   - Removed template fallback - AI is now required
 
 2. **Custom Field Generation Prompt** (`field_generation.txt`)
    - Created a specialized prompt for generating field-specific content
@@ -30,9 +30,10 @@ Integrated AI generation into the `idea_variants.py` module to use Ollama for ge
    - Avoids phrases like "relates to" or "for this topic"
 
 3. **Updated Generation Methods**
-   - `_generate_focused_content()`: Uses AI first, falls back to templates
-   - `_generate_field_content()`: Uses AI first, falls back to templates
-   - Added logging for AI attempts and fallbacks
+   - `_generate_focused_content()`: Requires AI, raises error if unavailable
+   - `_generate_field_content()`: Requires AI, raises error if unavailable
+   - `_try_ai_generation()`: Returns content or raises `RuntimeError`
+   - Added comprehensive error messages with setup instructions
 
 ### Architecture
 
@@ -41,23 +42,23 @@ Input Title → IdeaGenerator
               ↓
     ┌─────────┴─────────┐
     ↓                   ↓
-AI Available?      Template Fallback
-    ↓                   ↓
-AIIdeaGenerator    Template strings
-    ↓                   ↓
-field_generation.txt   "How X relates to Y"
-    ↓                   ↓
-Rich AI content    Template content
+AI Available?      Error (RuntimeError)
+    ↓
+AIIdeaGenerator
+    ↓
+field_generation.txt
+    ↓
+Rich AI content
 ```
 
 ## Usage
 
-### With AI Generation (Ollama Running)
+### Normal Usage (Ollama Running)
 
 ```python
 from idea_variants import create_ideas_from_input
 
-# AI will be used automatically if Ollama is running
+# Requires Ollama to be running
 ideas = create_ideas_from_input("Acadia Night Hikers", count=10)
 
 for idea in ideas:
@@ -67,22 +68,39 @@ for idea in ideas:
     #  leading to a treasure hunt through Acadia's moonlit trails."
 ```
 
-### Without AI (Fallback Mode)
+### Without Ollama (Will Raise Error)
 
 ```python
 from idea_variants import IdeaGenerator
 
-# Explicitly disable AI
-generator = IdeaGenerator(use_ai=False)
-idea = generator.generate_from_flavor("My Title", "Emotion-First Hook")
+# This will raise RuntimeError if Ollama is not available
+try:
+    gen = IdeaGenerator(use_ai=True)  # Default
+    idea = gen.generate_from_flavor("My Title", "Emotion-First Hook")
+except RuntimeError as e:
+    print(f"Error: {e}")
+    # Output: "AI generation requested but Ollama is not available. 
+    #          Please ensure Ollama is installed and running..."
+```
 
-# Output: Template-based content (fallback behavior)
-# "My title: the attention-grabbing opening or central question"
+### Disabling AI (For Testing Only)
+
+```python
+from idea_variants import IdeaGenerator
+
+# Explicitly disable AI - but generation will fail
+gen = IdeaGenerator(use_ai=False)
+
+try:
+    idea = gen.generate_from_flavor("My Title", "Emotion-First Hook")
+except RuntimeError as e:
+    print(f"Error: {e}")
+    # Output: "AI generator not available. Cannot generate ideas without AI..."
 ```
 
 ## Setup Instructions
 
-To enable AI generation, ensure Ollama is installed and running:
+**AI generation is required.** To use this system, you must install and run Ollama:
 
 1. **Install Ollama**
    ```bash
@@ -115,22 +133,15 @@ python T/Idea/Creation/_meta/examples/demo_ai_generation.py
 ```
 
 This will:
-- Show generated ideas with current configuration
-- Indicate whether AI or template generation is being used
-- Provide setup instructions if Ollama is not detected
+- Attempt to generate ideas with current configuration
+- Show clear error if Ollama is not detected
+- Provide setup instructions
 
 ### Run Tests
 
 ```bash
-# Basic functionality tests
-python -c "
-import sys
-sys.path.insert(0, 'T/Idea/Creation/src')
-from idea_variants import create_ideas_from_input
-
-ideas = create_ideas_from_input('Test', count=2)
-print(f'Generated {len(ideas)} ideas')
-"
+# Run test suite (uses mocked AI)
+python T/Idea/Creation/_meta/tests/test_ai_integration.py
 ```
 
 ## Expected Behavior
@@ -142,17 +153,18 @@ print(f'Generated {len(ideas)} ideas')
 - Logging shows: "AI generated content for..."
 
 ### Without Ollama
-- Falls back to template generation
-- Contains template phrases (old behavior)
-- Logging shows: "Ollama not available. Falling back to template generation."
+- **Raises `RuntimeError` immediately**
+- Error message includes setup instructions
+- No idea generation occurs
 
 ## Verification
 
 To verify AI generation is working:
 
-1. Check the generated content for narrative quality
-2. Look for template phrases (shouldn't exist with AI)
-3. Check logs for AI generation messages
+1. Ensure Ollama is running: `curl http://localhost:11434/api/tags`
+2. Run idea generation
+3. Check that no errors are raised
+4. Verify output contains narrative content (not template phrases)
 
 Example of AI-generated content:
 ```
@@ -165,40 +177,49 @@ Core Concept: "A coming-of-age adventure where nighttime hikes become
                in the darkness."
 ```
 
-Example of template-based content (fallback):
-```
-Hook: "Acadia night hikers: the attention-grabbing opening or central question"
-Core Concept: "The main idea or premise in 1-2 sentences for Acadia night hikers"
-```
-
 ## Files Modified
 
-- `T/Idea/Creation/src/idea_variants.py` - Core integration
+- `T/Idea/Creation/src/idea_variants.py` - Core integration, removed fallback
 - `T/Idea/Creation/_meta/prompts/field_generation.txt` - New prompt (created)
-- `T/Idea/Creation/_meta/tests/test_ai_integration.py` - Test suite (created)
-- `T/Idea/Creation/_meta/examples/demo_ai_generation.py` - Demo script (created)
+- `T/Idea/Creation/_meta/tests/test_ai_integration.py` - Updated tests
+- `T/Idea/Creation/AI_INTEGRATION_README.md` - Updated documentation
 
-## Backward Compatibility
+## Error Messages
 
-The changes maintain full backward compatibility:
-- Existing code continues to work without modifications
-- Template generation remains as fallback
-- No breaking changes to the API
-- Default behavior: Try AI first, fall back to templates if unavailable
+### When Ollama is not installed/running:
+```
+RuntimeError: AI generation requested but Ollama is not available. 
+Please ensure Ollama is installed and running. 
+Install from https://ollama.com/ and start with 'ollama serve'.
+```
+
+### When AI is disabled but generation is attempted:
+```
+RuntimeError: AI generator not available. Cannot generate ideas without AI. 
+Please ensure Ollama is installed and running.
+```
+
+### When AI generates insufficient content:
+```
+RuntimeError: AI generated insufficient content for 'hook'. 
+Generated: 15 characters, minimum required: 20.
+```
 
 ## Troubleshooting
 
-### "Ollama not available" message
+### "Ollama is not available" error
 - Check if Ollama is running: `curl http://localhost:11434/api/tags`
 - Start Ollama: `ollama serve`
 - Verify model is installed: `ollama list`
+- If no models, install one: `ollama pull qwen3:32b`
 
-### Template-like content even with Ollama running
-- Check Ollama logs for errors
-- Verify the model can generate content: `ollama run qwen3:32b "test"`
-- Check if firewall is blocking port 11434
-
-### "AI generated content too short"
+### "AI generated insufficient content" error
 - The AI model might need a better prompt
 - Try a different model (e.g., qwen2.5:72b)
 - Check model temperature setting in AIConfig
+- Verify the model is functioning: `ollama run qwen3:32b "test"`
+
+### Firewall blocking port 11434
+- Check firewall settings
+- Ensure localhost connections are allowed
+- Try accessing `http://localhost:11434/api/tags` in a browser

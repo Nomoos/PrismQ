@@ -2,13 +2,13 @@
 Demonstration of AI-powered idea generation.
 
 This script demonstrates how the idea generation system works:
-1. With Ollama available: Generates rich, AI-powered content for each field
-2. Without Ollama: Falls back to template generation
+- Requires Ollama to be running - will raise an error if not available
+- Generates rich, AI-powered content for each field
 
-To run with AI generation:
+To run this script:
 1. Install Ollama: https://ollama.com/
-2. Start Ollama: ollama serve
-3. Pull a model: ollama pull qwen3:32b
+2. Pull a model: ollama pull qwen3:32b
+3. Start Ollama: ollama serve
 4. Run this script
 
 Expected output WITH Ollama:
@@ -17,8 +17,7 @@ Expected output WITH Ollama:
 - Content is specific to the input and flavor
 
 Expected output WITHOUT Ollama:
-- Falls back to template-based generation
-- Contains template phrases (this is the old behavior that was being fixed)
+- RuntimeError with clear instructions to install and start Ollama
 """
 
 import sys
@@ -31,71 +30,56 @@ from idea_variants import create_ideas_from_input
 
 
 def demonstrate_idea_generation():
-    """Demonstrate idea generation with and without AI."""
+    """Demonstrate idea generation with AI."""
     
     print("=" * 80)
-    print("PrismQ Idea Generation - AI Integration Demonstration")
+    print("PrismQ Idea Generation - AI Required Demonstration")
     print("=" * 80)
     
     title = "Acadia Night Hikers"
     
     print(f"\nInput: {title}")
-    print(f"Generating 2 idea variants...\n")
+    print(f"Attempting to generate 2 idea variants...\n")
     
-    # Generate ideas (will use AI if Ollama is running, templates otherwise)
-    ideas = create_ideas_from_input(title, count=2)
-    
-    if not ideas:
-        print("⚠ No ideas generated. Please check if Ollama is running.")
-        return
-    
-    print(f"Generated {len(ideas)} ideas:\n")
-    
-    for i, idea in enumerate(ideas, 1):
-        print(f"\n{'─' * 70}")
-        print(f"Variant {i}: {idea.get('variant_name', 'Unknown')}")
-        print(f"{'─' * 70}")
+    try:
+        # Generate ideas - requires Ollama to be running
+        ideas = create_ideas_from_input(title, count=2)
         
-        # Show each field
-        fields = ['hook', 'core_concept', 'emotional_core', 'audience_connection', 
-                  'key_elements', 'tone_style']
+        print(f"Generated {len(ideas)} ideas:\n")
         
-        for field in fields:
-            if field in idea:
-                value = idea[field]
-                field_name = field.replace('_', ' ').title()
-                print(f"\n{field_name}:")
-                print(f"  {value}")
-        
-        # Check for template phrases (indicates fallback)
-        template_indicators = [
-            "How", "relates to", "the attention-grabbing opening",
-            "the main idea or premise in 1-2 sentences"
-        ]
-        
-        has_template_text = any(
-            indicator.lower() in str(idea.get(field, '')).lower()
-            for field in fields
-            for indicator in template_indicators
-        )
-        
-        if has_template_text:
-            print("\n⚠ Note: Template-based generation detected (Ollama not available)")
-        else:
+        for i, idea in enumerate(ideas, 1):
+            print(f"\n{'─' * 70}")
+            print(f"Variant {i}: {idea.get('variant_name', 'Unknown')}")
+            print(f"{'─' * 70}")
+            
+            # Show each field
+            fields = ['hook', 'core_concept', 'emotional_core', 'audience_connection', 
+                      'key_elements', 'tone_style']
+            
+            for field in fields:
+                if field in idea:
+                    value = idea[field]
+                    field_name = field.replace('_', ' ').title()
+                    print(f"\n{field_name}:")
+                    print(f"  {value}")
+            
             print("\n✓ AI-generated content (rich, narrative descriptions)")
-    
-    print(f"\n{'=' * 80}")
-    print("Demonstration complete!")
-    print("=" * 80)
-    
-    print("\nInterpretation:")
-    print("- If you see template phrases like 'How X relates to Y', Ollama is not running")
-    print("- If you see rich narrative content, AI generation is working correctly")
-    print("\nTo enable AI generation:")
-    print("1. Install Ollama: https://ollama.com/")
-    print("2. Start Ollama server: ollama serve")
-    print("3. Pull a model: ollama pull qwen3:32b")
-    print("4. Run this script again")
+        
+        print(f"\n{'=' * 80}")
+        print("Success! AI generation is working correctly.")
+        print("=" * 80)
+        
+    except RuntimeError as e:
+        print(f"\n{'=' * 80}")
+        print("ERROR: AI Generation Failed")
+        print("=" * 80)
+        print(f"\n{e}\n")
+        print("Setup Instructions:")
+        print("1. Install Ollama: https://ollama.com/")
+        print("2. Pull a model: ollama pull qwen3:32b")
+        print("3. Start Ollama server: ollama serve")
+        print("4. Run this script again")
+        print(f"\n{'=' * 80}")
 
 
 if __name__ == '__main__':

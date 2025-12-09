@@ -43,6 +43,9 @@ class IdeaGenerator:
                           If None, uses global loader.
             use_ai: Whether to use AI generation (default: True)
             ai_config: Optional AIConfig instance for AI generation
+            
+        Raises:
+            RuntimeError: If use_ai is True but Ollama is not available
         """
         self.loader = flavor_loader or get_flavor_loader()
         self.loader.ensure_loaded()
@@ -56,8 +59,13 @@ class IdeaGenerator:
             if self.ai_generator.available:
                 logger.info(f"AI generation enabled with model: {config.model}")
             else:
-                logger.warning("AI generation requested but Ollama not available. Falling back to template generation.")
-                self.ai_generator = None
+                error_msg = (
+                    "AI generation requested but Ollama is not available. "
+                    "Please ensure Ollama is installed and running. "
+                    "Install from https://ollama.com/ and start with 'ollama serve'."
+                )
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
     
     def generate_from_flavor(
         self,
@@ -191,8 +199,8 @@ class IdeaGenerator:
         description: str,
         field_desc: str,
         flavor_name: str,
-    ) -> Optional[str]:
-        """Try to generate content using AI.
+    ) -> str:
+        """Generate content using AI.
         
         Args:
             title: Input title
@@ -201,36 +209,41 @@ class IdeaGenerator:
             flavor_name: Flavor name
             
         Returns:
-            Generated content if successful, None otherwise
+            Generated content from AI
+            
+        Raises:
+            RuntimeError: If AI generator is not available or generation fails
         """
         if not self.ai_generator:
-            return None
-        
-        try:
-            # Create input text
-            input_text = title
-            if description:
-                input_text = f"{title}: {description}"
-            
-            # Use custom field generation prompt
-            generated = self.ai_generator.generate_with_custom_prompt(
-                input_text=input_text,
-                prompt_template_name="field_generation",
-                flavor=flavor_name,
-                field_description=field_desc,
-                use_random_flavor=False
+            raise RuntimeError(
+                "AI generator not available. Cannot generate ideas without AI. "
+                "Please ensure Ollama is installed and running."
             )
-            
-            # Validate content length
-            if generated and len(generated) > self.MIN_AI_CONTENT_LENGTH:
-                logger.debug(f"AI generated content for '{field_desc}': {generated[:80]}...")
-                return generated.strip()
-            else:
-                logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
-                return None
-        except Exception as e:
-            logger.warning(f"AI generation failed for '{field_desc}': {e}, falling back to template")
-            return None
+        
+        # Create input text
+        input_text = title
+        if description:
+            input_text = f"{title}: {description}"
+        
+        # Use custom field generation prompt
+        generated = self.ai_generator.generate_with_custom_prompt(
+            input_text=input_text,
+            prompt_template_name="field_generation",
+            flavor=flavor_name,
+            field_description=field_desc,
+            use_random_flavor=False
+        )
+        
+        # Validate content length
+        if not generated or len(generated) <= self.MIN_AI_CONTENT_LENGTH:
+            raise RuntimeError(
+                f"AI generated insufficient content for '{field_desc}'. "
+                f"Generated: {len(generated) if generated else 0} characters, "
+                f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
+            )
+        
+        logger.debug(f"AI generated content for '{field_desc}': {generated[:80]}...")
+        return generated.strip()
     
     def _generate_focused_content(
         self,
@@ -242,26 +255,13 @@ class IdeaGenerator:
     ) -> str:
         """Generate detailed content for the focus field.
         
-        Uses AI generation if available, falls back to templates otherwise.
+        Uses AI generation (required).
+        
+        Raises:
+            RuntimeError: If AI generation fails
         """
-        # Try AI generation first
-        ai_content = self._try_ai_generation(title, description, field_desc, flavor_name)
-        if ai_content:
-            return ai_content
-        
-        # Fallback to template generation
-        topic = self._humanize_topic(title)
-        flavor_lower = flavor_name.lower()
-        
-        templates = [
-            f"{topic} - {field_desc}",
-            f"Exploring {topic} through {flavor_lower}",
-            f"{field_desc} centered on {topic}",
-            f"A story about {topic} that emphasizes {field_desc.lower()}",
-        ]
-        
-        rng = random.Random(seed)
-        return rng.choice(templates)
+        # AI generation is required, no fallback
+        return self._try_ai_generation(title, description, field_desc, flavor_name)
     
     def _generate_field_content(
         self,
@@ -273,24 +273,13 @@ class IdeaGenerator:
     ) -> str:
         """Generate standard content for a field.
         
-        Uses AI generation if available, falls back to templates otherwise.
+        Uses AI generation (required).
+        
+        Raises:
+            RuntimeError: If AI generation fails
         """
-        # Try AI generation first
-        ai_content = self._try_ai_generation(title, description, field_desc, flavor_name)
-        if ai_content:
-            return ai_content
-        
-        # Fallback to template generation
-        topic = self._humanize_topic(title)
-        
-        templates = [
-            f"{field_desc} for {topic}",
-            f"{topic}: {field_desc.lower()}",
-            f"How {topic} relates to {field_desc.lower()}",
-        ]
-        
-        rng = random.Random(seed)
-        return rng.choice(templates)
+        # AI generation is required, no fallback
+        return self._try_ai_generation(title, description, field_desc, flavor_name)
 
 
 # =============================================================================
