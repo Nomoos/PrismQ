@@ -93,6 +93,8 @@ def apply_template(template: str, **kwargs) -> str:
         result = result.replace('INSERT_TEXT_HERE', str(input_value))
         result = result.replace('INSERT TEXT HERE', str(input_value))
         result = result.replace('[INSERT TEXT HERE]', str(input_value))
+        result = result.replace('[INPUT]', str(input_value))  # Simpler placeholder
+        result = result.replace('[TEXT]', str(input_value))   # Alternative placeholder
     
     # Handle [FLAVOR] and similar bracket notation
     if 'flavor' in kwargs:

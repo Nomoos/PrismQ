@@ -15,4 +15,4 @@ The output must present only the improved idea.
 The output must avoid broad generalities.
 The output must contain exactly 5 sentences.
 
-SOURCE_IDEA: [INSERT TEXT HERE]
+SOURCE_IDEA: [INPUT]

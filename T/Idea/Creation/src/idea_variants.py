@@ -73,6 +73,7 @@ class IdeaGenerator:
         flavor_name: str,
         description: str = "",
         variation_index: int = 0,
+        second_flavor_chance: float = 0.2,
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
         
@@ -81,6 +82,7 @@ class IdeaGenerator:
             flavor_name: Name of the flavor to use
             description: Optional description
             variation_index: Variation number for uniqueness
+            second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
             
         Returns:
             Dictionary with generated idea content
@@ -91,6 +93,10 @@ class IdeaGenerator:
         flavor = self.loader.get_flavor(flavor_name)
         default_fields = self.loader.get_default_fields()
         seed = self._generate_seed(title, description, variation_index)
+        
+        # Determine if we should add a second flavor (small chance)
+        rng = random.Random(seed)
+        use_second_flavor = rng.random() < second_flavor_chance
         
         # Build idea dictionary
         idea = {
@@ -103,8 +109,21 @@ class IdeaGenerator:
             'keywords': flavor.get('keywords', []),
         }
         
+        # If using second flavor, select one and update variant name
+        second_flavor_name = None
+        if use_second_flavor:
+            # Get all available flavors
+            all_flavors = self.loader.list_flavor_names()
+            # Remove the first flavor from the list to avoid duplicates
+            available_flavors = [f for f in all_flavors if f != flavor_name]
+            if available_flavors:
+                second_flavor_name = rng.choice(available_flavors)
+                # Update variant name to show both flavors
+                idea['variant_name'] = f"{flavor_name} + {second_flavor_name}"
+                idea['flavor_name'] = idea['variant_name']
+                logger.info(f"Using dual flavor: {idea['variant_name']}")
+        
         # Generate complete refined idea using idea_improvement prompt
-        # This generates 5 sentences that we'll distribute across fields
         if not self.ai_generator:
             raise RuntimeError(
                 "AI generator not available. Cannot generate ideas without AI. "
@@ -116,11 +135,16 @@ class IdeaGenerator:
         if description:
             input_text = f"{title}: {description}"
         
+        # Combine flavors for the prompt
+        flavor_text = flavor_name
+        if second_flavor_name:
+            flavor_text = f"{flavor_name} and {second_flavor_name}"
+        
         # Use idea_improvement prompt to generate complete refined idea
         generated_idea = self.ai_generator.generate_with_custom_prompt(
             input_text=input_text,
             prompt_template_name="idea_improvement",
-            flavor=flavor_name,
+            flavor=flavor_text,
             use_random_flavor=False
         )
         
@@ -132,18 +156,13 @@ class IdeaGenerator:
                 f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
             )
         
-        # Parse the 5-sentence output into fields
-        # Split by periods and clean up
-        sentences = [s.strip() + '.' for s in generated_idea.split('.') if s.strip()]
-        
-        # Map sentences to fields
-        field_names = list(default_fields.keys())
-        for i, field_name in enumerate(field_names):
-            if i < len(sentences):
-                idea[field_name] = sentences[i]
-            else:
-                # If we have fewer sentences than fields, use the last sentence
-                idea[field_name] = sentences[-1] if sentences else generated_idea
+        # Store the complete generated idea as a single paragraph in the hook field
+        # Other fields remain empty since output is one continuous paragraph, not parsed
+        idea['hook'] = generated_idea
+        # Leave other fields empty
+        for field_name in default_fields.keys():
+            if field_name != 'hook':
+                idea[field_name] = ""
         
         # Add metadata
         idea['generated_at'] = datetime.now().isoformat()
@@ -407,10 +426,10 @@ class IdeaFormatter:
         """
         lines = []
         
-        # Add core content fields
+        # Add core content fields (skip empty fields)
         for field in ['hook', 'core_concept', 'emotional_core', 'audience_connection', 
                       'key_elements', 'tone_style']:
-            if field in idea:
+            if field in idea and idea[field]:
                 lines.append(f"  {idea[field]}")
         
         return '\n'.join(lines)
