@@ -45,6 +45,8 @@ try:
         get_flavor,
         list_flavors,
         get_flavor_count,
+        IdeaGenerator,
+        FlavorSelector,
     )
     # Backward compatibility
     get_template = get_flavor
@@ -426,12 +428,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logger.info(
                     f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection"
                 )
-            
-            # Import functions we need for progress feedback
-            from idea_variants import (
-                IdeaGenerator, 
-                FlavorSelector,
-            )
             
             # Create generator and selector instances
             generator = IdeaGenerator()
