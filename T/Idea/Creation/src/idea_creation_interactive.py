@@ -40,15 +40,15 @@ sys.path.insert(0, str(REPO_ROOT))  # Add repo root for src module import
 try:
     from idea_variants import (
         DEFAULT_IDEA_COUNT,
-        VARIANT_TEMPLATES,
-        create_all_variants,
-        create_idea_variant,
         create_ideas_from_input,
-        create_multiple_of_same_variant,
         format_idea_as_text,
-        get_template,
-        list_templates,
+        get_flavor,
+        list_flavors,
+        get_flavor_count,
     )
+    # Backward compatibility
+    get_template = get_flavor
+    list_templates = list_flavors
 
     VARIANTS_AVAILABLE = True
 except ImportError as e:
