@@ -16,29 +16,29 @@ The Story creation workflow:
 4. Returns Stories and Titles ready for next workflow stage
 """
 
+from .src.story_title_service import (
+    StoryTitleResult,
+    StoryTitleService,
+    create_stories_from_idea,
+)
 from .src.title_generator import (
+    TitleConfig,
     TitleGenerator,
     TitleVariant,
-    TitleConfig,
-    generate_titles_from_idea
-)
-from .src.story_title_service import (
-    StoryTitleService,
-    StoryTitleResult,
-    create_stories_from_idea
+    generate_titles_from_idea,
 )
 
 __all__ = [
     # Title generation
-    'TitleGenerator',
-    'TitleVariant',
-    'TitleConfig',
-    'generate_titles_from_idea',
+    "TitleGenerator",
+    "TitleVariant",
+    "TitleConfig",
+    "generate_titles_from_idea",
     # Story + Title creation
-    'StoryTitleService',
-    'StoryTitleResult',
-    'create_stories_from_idea',
+    "StoryTitleService",
+    "StoryTitleResult",
+    "create_stories_from_idea",
 ]
 
-__version__ = '1.0.0'
-__author__ = 'PrismQ Team'
+__version__ = "1.0.0"
+__author__ = "PrismQ Team"

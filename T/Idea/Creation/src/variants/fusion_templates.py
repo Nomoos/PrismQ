@@ -1,7 +1,6 @@
 """Fusion variant templates - combinations of story seed templates."""
 
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 VARIANT_CONFESSION_MYSTERY = {
     "name": "Confession + Mystery Fusion",
@@ -12,7 +11,7 @@ VARIANT_CONFESSION_MYSTERY = {
         "the_clues": "What hints at the truth",
         "the_reveal": "How confession and mystery connect",
         "emotional_core": "The feeling underneath",
-        "resolution": "How understanding comes"
+        "resolution": "How understanding comes",
     },
     "example": {
         "the_secret": "Something I've kept hidden even from myself",
@@ -20,8 +19,8 @@ VARIANT_CONFESSION_MYSTERY = {
         "the_clues": "Small patterns I couldn't explain",
         "the_reveal": "The confession IS the solution to the mystery",
         "emotional_core": "Fear of self-knowledge",
-        "resolution": "Naming the thing finally makes sense of everything"
-    }
+        "resolution": "Naming the thing finally makes sense of everything",
+    },
 }
 
 VARIANT_OVERHEARD_TRANSFORMATION = {
@@ -33,7 +32,7 @@ VARIANT_OVERHEARD_TRANSFORMATION = {
         "the_shift": "The immediate impact",
         "the_process": "How transformation unfolded",
         "after": "Who you became",
-        "the_gift": "What the accidental hearing gave you"
+        "the_gift": "What the accidental hearing gave you",
     },
     "example": {
         "what_was_heard": "Something that shattered an illusion",
@@ -41,8 +40,8 @@ VARIANT_OVERHEARD_TRANSFORMATION = {
         "the_shift": "World tilting on its axis",
         "the_process": "Grieving the old understanding",
         "after": "Someone who sees more clearly",
-        "the_gift": "Painful truth over comfortable lies"
-    }
+        "the_gift": "Painful truth over comfortable lies",
+    },
 }
 
 VARIANT_UNSENT_REBELLION = {
@@ -54,7 +53,7 @@ VARIANT_UNSENT_REBELLION = {
         "why_not_sending_was_rebellion": "The act of restraint as defiance",
         "what_silence_communicated": "What not-saying said",
         "the_power": "Strength in withheld words",
-        "the_resolution": "Where the unsent lives now"
+        "the_resolution": "Where the unsent lives now",
     },
     "example": {
         "the_unsent": "The response they expected me to send",
@@ -62,8 +61,8 @@ VARIANT_UNSENT_REBELLION = {
         "why_not_sending_was_rebellion": "Refused to perform expected emotions",
         "what_silence_communicated": "I'm done explaining myself",
         "the_power": "They waited for words that never came",
-        "the_resolution": "Learned that sometimes silence is the answer"
-    }
+        "the_resolution": "Learned that sometimes silence is the answer",
+    },
 }
 
 VARIANT_MIRROR_INHERITANCE = {
@@ -75,7 +74,7 @@ VARIANT_MIRROR_INHERITANCE = {
         "whose_ghost": "Who you saw in yourself",
         "the_feeling": "Emotion of seeing the pattern",
         "the_choice": "What to do with the recognition",
-        "the_work": "Breaking or honoring the inheritance"
+        "the_work": "Breaking or honoring the inheritance",
     },
     "example": {
         "what_the_mirror_showed": "An expression. A posture. A way of being.",
@@ -83,8 +82,8 @@ VARIANT_MIRROR_INHERITANCE = {
         "whose_ghost": "Parent. Grandparent. The line before me.",
         "the_feeling": "Horror mixed with compassion",
         "the_choice": "This is where the pattern changes",
-        "the_work": "Honoring the survival while choosing differently"
-    }
+        "the_work": "Honoring the survival while choosing differently",
+    },
 }
 
 VARIANT_CHOSEN_GROWING = {
@@ -96,7 +95,7 @@ VARIANT_CHOSEN_GROWING = {
         "the_drift": "How distance crept in",
         "the_grief": "Losing what you chose",
         "the_difference": "How it differs from blood family distance",
-        "the_truth": "What chosen family distance teaches"
+        "the_truth": "What chosen family distance teaches",
     },
     "example": {
         "the_chosen_bond": "Friends who became everything",
@@ -104,8 +103,8 @@ VARIANT_CHOSEN_GROWING = {
         "the_drift": "We grew in different directions",
         "the_grief": "Hurts more because we chose this",
         "the_difference": "Can't blame circumstance, just change",
-        "the_truth": "Even chosen connections need choosing again and again"
-    }
+        "the_truth": "Even chosen connections need choosing again and again",
+    },
 }
 
 VARIANT_PARALLEL_PERMISSION = {
@@ -117,7 +116,7 @@ VARIANT_PARALLEL_PERMISSION = {
         "what_held_you_back": "Why you didn't give yourself that permission",
         "the_comparison": "How their life might be different",
         "the_lesson": "What their choice teaches you",
-        "the_now": "Permission you're considering giving yourself"
+        "the_now": "Permission you're considering giving yourself",
     },
     "example": {
         "the_parallel_self": "Me, but if I'd said yes instead of no",
@@ -125,8 +124,8 @@ VARIANT_PARALLEL_PERMISSION = {
         "what_held_you_back": "Fear dressed as practicality",
         "the_comparison": "Maybe happier. Maybe not. But definitely different.",
         "the_lesson": "Permission was always mine to give",
-        "the_now": "Wondering what I'm still waiting for permission for"
-    }
+        "the_now": "Wondering what I'm still waiting for permission for",
+    },
 }
 
 

@@ -14,7 +14,7 @@ Video Metadata:
 Story Summary:
     An 11-year-old autistic girl named Mera has been training with a bo staff
     (hand-carved by her late grandfather) for 3 years, practicing 5+ hours daily.
-    When a 13-year-old bully named Vanessa violently attacks Mera's best friend 
+    When a 13-year-old bully named Vanessa violently attacks Mera's best friend
     Theo (who has ADHD), then stalks him and eventually breaks into Mera's home
     with a knife, Mera uses her training to defend them both. The story ends
     with Mera being cleared of any wrongdoing (self-defense in defense of another).
@@ -43,7 +43,7 @@ Content Potential:
 
 Note on Subtitle Text:
     The SUBTITLE_TEXT variable contains the raw auto-generated subtitles from YouTube.
-    Some transcription errors exist in the original (e.g., "Merror"/"Mirror" instead of 
+    Some transcription errors exist in the original (e.g., "Merror"/"Mirror" instead of
     "Mera", "neurode divergent" instead of "neurodivergent"). These are preserved
     to maintain authenticity to the source material. For production use, consider
     cleaning the transcript or using manual captions if available.
@@ -51,23 +51,23 @@ Note on Subtitle Text:
 
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 # Add paths for imports
 # Path: Video/_meta/examples -> Video -> YouTube -> Source -> Inspiration -> Idea -> Model/src
-model_path = Path(__file__).resolve().parents[6] / 'Model' / 'src'
+model_path = Path(__file__).resolve().parents[6] / "Model" / "src"
 if str(model_path) not in sys.path:
     sys.path.insert(0, str(model_path))
 
 # Try to import the Idea model, fallback to minimal definition if not available
 try:
-    from idea import Idea, ContentGenre, IdeaStatus
+    from idea import ContentGenre, Idea, IdeaStatus
 except ImportError:
     # Minimal fallback for standalone execution
-    from enum import Enum
     from dataclasses import dataclass, field
     from datetime import datetime
-    
+    from enum import Enum
+
     class ContentGenre(Enum):
         TRUE_CRIME = "true_crime"
         MYSTERY = "mystery"
@@ -79,12 +79,12 @@ except ImportError:
         LIFESTYLE = "lifestyle"
         TECHNOLOGY = "technology"
         OTHER = "other"
-    
+
     class IdeaStatus(Enum):
         DRAFT = "draft"
         VALIDATED = "validated"
         APPROVED = "approved"
-    
+
     @dataclass
     class Idea:
         title: str
@@ -133,62 +133,74 @@ SUBTITLE_TEXT = """When did you realize your neurode divergent child was actuall
 
 # IdeaInspiration data extracted from the video
 IDEA_INSPIRATION_DATA: Dict[str, Any] = {
-    'title': "When that acting challenge suddenly feels a little too real",
-    'description': (
+    "title": "When that acting challenge suddenly feels a little too real",
+    "description": (
         "A parent shares the story of their 11-year-old autistic daughter Mera, "
         "who used 3 years of dedicated bo staff training to defend her best friend "
         "Theo (who has ADHD) from a violent bully who broke into their home with a knife."
     ),
-    'content': SUBTITLE_TEXT,
-    'keywords': [
-        'autism', 'ADHD', 'neurodivergent', 'self-defense', 'friendship',
-        'bo staff', 'martial arts', 'bullying', 'empowerment', 'dedication',
-        'training', 'protection', 'legacy', 'grandparent', 'child hero'
+    "content": SUBTITLE_TEXT,
+    "keywords": [
+        "autism",
+        "ADHD",
+        "neurodivergent",
+        "self-defense",
+        "friendship",
+        "bo staff",
+        "martial arts",
+        "bullying",
+        "empowerment",
+        "dedication",
+        "training",
+        "protection",
+        "legacy",
+        "grandparent",
+        "child hero",
     ],
-    'source_type': 'video',
-    'metadata': {
-        'views': '2217',
-        'likes': '97',
-        'posted_ago': '8 hours',
-        'platform': 'youtube',
-        'subtitles_available': 'true',
-        'content_type': 'story_narration',
-        'language': 'en',
-        'duration_estimate': '3-4 minutes',
-        'engagement_rate': '4.38%',  # likes/views * 100
+    "source_type": "video",
+    "metadata": {
+        "views": "2217",
+        "likes": "97",
+        "posted_ago": "8 hours",
+        "platform": "youtube",
+        "subtitles_available": "true",
+        "content_type": "story_narration",
+        "language": "en",
+        "duration_estimate": "3-4 minutes",
+        "engagement_rate": "4.38%",  # likes/views * 100
     },
-    'source_id': None,  # Video ID not provided in original problem
-    'source_url': None,  # URL not provided in original problem
-    'source_created_by': None,  # Channel name not provided
-    'source_created_at': None,  # Exact date not provided
-    'score': 85,  # High score based on engagement and content quality
-    'category': 'inspirational_story',
-    'subcategory_relevance': {
-        'family_content': 90,
-        'neurodivergent_community': 95,
-        'self_defense': 85,
-        'anti_bullying': 92,
-        'empowerment': 88,
+    "source_id": None,  # Video ID not provided in original problem
+    "source_url": None,  # URL not provided in original problem
+    "source_created_by": None,  # Channel name not provided
+    "source_created_at": None,  # Exact date not provided
+    "score": 85,  # High score based on engagement and content quality
+    "category": "inspirational_story",
+    "subcategory_relevance": {
+        "family_content": 90,
+        "neurodivergent_community": 95,
+        "self_defense": 85,
+        "anti_bullying": 92,
+        "empowerment": 88,
     },
-    'contextual_category_scores': {
-        'region:us': 90,
-        'region:uk': 85,
-        'age:15-24': 88,
-        'age:25-34': 92,
-        'age:35-44': 90,  # Parent demographic
-        'platform:youtube': 90,
-        'platform:tiktok': 85,
-        'platform:instagram': 80,
+    "contextual_category_scores": {
+        "region:us": 90,
+        "region:uk": 85,
+        "age:15-24": 88,
+        "age:25-34": 92,
+        "age:35-44": 90,  # Parent demographic
+        "platform:youtube": 90,
+        "platform:tiktok": 85,
+        "platform:instagram": 80,
     },
 }
 
 
 def create_idea_from_video() -> Idea:
     """Create a structured Idea from this video analysis.
-    
+
     This demonstrates how the IdeaInspiration would be transformed
     into the Idea model for content production in PrismQ.
-    
+
     Returns:
         Idea instance ready for content production
     """
@@ -199,7 +211,6 @@ def create_idea_from_video() -> Idea:
             "with her late grandfather's hand-carved bo staff to defend her neurodivergent "
             "best friend from a violent home invader."
         ),
-        
         # Story Foundation
         idea="Autistic girl defends friend with grandfather's legacy",
         premise=(
@@ -213,7 +224,6 @@ def create_idea_from_video() -> Idea:
             "her only friend from the bully who broke into their home with a knife."
         ),
         hook="Teachers kept telling me to redirect her into something more normal. Thank God I never listened.",
-        
         # Story Structure
         skeleton=(
             "1. Meet Mera: autistic girl with grandfather's staff, trains 5 hrs daily\n"
@@ -233,7 +243,6 @@ def create_idea_from_video() -> Idea:
             "- Climax: 3 years of training vs knife-wielding bully\n"
             "- Resolution: Detective confirms self-defense, Mera is clear"
         ),
-        
         # Narrative Elements
         pov="first person - parent narrator (creates warmth and authenticity)",
         emotional_arc="concern → hope → fear → pride → relief → vindication",
@@ -242,33 +251,38 @@ def create_idea_from_video() -> Idea:
         climax="Mera faces Vanessa alone, staff vs knife",
         ending="Detective tells Mera she's not in trouble - complete vindication",
         ending_type="emotional/triumphant",
-        
         # Content Properties
         purpose="Inspire neurodivergent families and challenge assumptions about 'obsessive' interests",
         emotional_quality="inspiring, protective, triumphant, validating",
         target_audience="Parents of neurodivergent children, neurodivergent community, self-defense advocates",
         target_demographics={
-            'age_range': '15-45',
-            'interests': 'parenting,neurodivergent,self_defense,martial_arts',
-            'regions': 'US,UK,CA,AU'
+            "age_range": "15-45",
+            "interests": "parenting,neurodivergent,self_defense,martial_arts",
+            "regions": "US,UK,CA,AU",
         },
-        target_platforms=['youtube', 'tiktok', 'instagram', 'podcast'],
-        target_formats=['video', 'audio', 'text'],
+        target_platforms=["youtube", "tiktok", "instagram", "podcast"],
+        target_formats=["video", "audio", "text"],
         genre=ContentGenre.ENTERTAINMENT,  # Could also be DOCUMENTARY
         style="narrative storytelling with emotional hooks",
         keywords=[
-            'autism empowerment', 'ADHD friendship', 'self-defense',
-            'bo staff', 'martial arts', 'bullying prevention',
-            'neurodivergent strength', 'grandparent legacy', 'child hero'
+            "autism empowerment",
+            "ADHD friendship",
+            "self-defense",
+            "bo staff",
+            "martial arts",
+            "bullying prevention",
+            "neurodivergent strength",
+            "grandparent legacy",
+            "child hero",
         ],
         themes=[
-            'neurodivergent empowerment',
-            'friendship loyalty',
-            'dedicated practice',
-            'legacy and memory',
-            'standing up for others',
-            'challenging assumptions',
-            'when obsession becomes skill'
+            "neurodivergent empowerment",
+            "friendship loyalty",
+            "dedicated practice",
+            "legacy and memory",
+            "standing up for others",
+            "challenging assumptions",
+            "when obsession becomes skill",
         ],
         character_notes=(
             "Mera (11, autistic): Dedicated, focused, loyal, calm under pressure. "
@@ -291,23 +305,22 @@ def create_idea_from_video() -> Idea:
             "End on emotional note: vindication of both Mera and parent's choices."
         ),
         length_target="3-4 minute video / 2,500 words text / 5-minute podcast segment",
-        
         # Metadata
         potential_scores={
-            'platform:youtube': 90,
-            'platform:tiktok': 85,
-            'region:us': 90,
-            'age:25-34': 92,
-            'demographic:parent': 95,
+            "platform:youtube": 90,
+            "platform:tiktok": 85,
+            "region:us": 90,
+            "age:25-34": 92,
+            "demographic:parent": 95,
         },
         inspiration_ids=[],  # Would link to stored IdeaInspiration ID
         metadata={
-            'original_source': 'youtube_video',
-            'content_type': 'story_narration',
-            'viral_potential': 'high',
-            'controversy_risk': 'low',
-            'educational_value': 'medium',
-            'emotional_impact': 'high',
+            "original_source": "youtube_video",
+            "content_type": "story_narration",
+            "viral_potential": "high",
+            "controversy_risk": "low",
+            "educational_value": "medium",
+            "emotional_impact": "high",
         },
         status=IdeaStatus.DRAFT,
         notes=(
@@ -325,7 +338,7 @@ def main():
     print("=" * 70)
     print("YouTube Video Analysis: Mera's Bo Staff Defense")
     print("=" * 70)
-    
+
     print("\n📹 ORIGINAL VIDEO METADATA:")
     print("-" * 40)
     print(f"Title: {IDEA_INSPIRATION_DATA['title']}")
@@ -333,18 +346,18 @@ def main():
     print(f"Likes: {IDEA_INSPIRATION_DATA['metadata']['likes']}")
     print(f"Engagement: {IDEA_INSPIRATION_DATA['metadata']['engagement_rate']}")
     print(f"Score: {IDEA_INSPIRATION_DATA['score']}/100")
-    
+
     print("\n🏷️ KEYWORDS:")
     print("-" * 40)
-    for kw in IDEA_INSPIRATION_DATA['keywords'][:10]:
+    for kw in IDEA_INSPIRATION_DATA["keywords"][:10]:
         print(f"  • {kw}")
-    
+
     print("\n📊 SUBCATEGORY RELEVANCE:")
     print("-" * 40)
-    for cat, score in IDEA_INSPIRATION_DATA['subcategory_relevance'].items():
+    for cat, score in IDEA_INSPIRATION_DATA["subcategory_relevance"].items():
         bar = "█" * (score // 10) + "░" * (10 - score // 10)
         print(f"  {cat}: {bar} {score}%")
-    
+
     print("\n💡 CREATED IDEA:")
     print("-" * 40)
     idea = create_idea_from_video()
@@ -353,13 +366,13 @@ def main():
     print(f"Genre: {idea.genre.value}")
     print(f"Platforms: {', '.join(idea.target_platforms)}")
     print(f"Status: {idea.status.value}")
-    
+
     print("\n📝 STORY ELEMENTS:")
     print("-" * 40)
     print(f"Hook: {idea.hook}")
     print(f"Logline: {idea.logline}")
     print(f"Emotional Arc: {idea.emotional_arc}")
-    
+
     print("\n" + "=" * 70)
     print("Analysis complete! Ready for content production pipeline.")
     print("=" * 70)

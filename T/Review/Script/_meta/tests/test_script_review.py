@@ -1,27 +1,25 @@
 """Tests for ScriptReview model."""
 
-import pytest
 from datetime import datetime
+
+import pytest
+
 from T.Review.Script import (
-    ScriptReview,
-    ReviewCategory,
+    CategoryScore,
     ContentLength,
     ImprovementPoint,
-    CategoryScore
+    ReviewCategory,
+    ScriptReview,
 )
 
 
 class TestScriptReviewBasic:
     """Test basic ScriptReview functionality."""
-    
+
     def test_create_basic_review(self):
         """Test creating a basic ScriptReview instance."""
-        review = ScriptReview(
-            script_id="script-001",
-            script_title="Test Script",
-            overall_score=75
-        )
-        
+        review = ScriptReview(script_id="script-001", script_title="Test Script", overall_score=75)
+
         assert review.script_id == "script-001"
         assert review.script_title == "Test Script"
         assert review.overall_score == 75
@@ -49,7 +47,7 @@ class TestScriptReviewBasic:
         assert review.quick_wins == []
         assert review.notes == ""
         assert review.metadata == {}
-    
+
     def test_create_youtube_short_review(self):
         """Test creating a review for YouTube short."""
         review = ScriptReview(
@@ -65,9 +63,9 @@ class TestScriptReviewBasic:
             hook_strength_score=95,
             retention_score=68,
             viral_potential_score=78,
-            needs_major_revision=False
+            needs_major_revision=False,
         )
-        
+
         assert review.script_id == "short-001"
         assert review.script_title == "Horror Short"
         assert review.overall_score == 72
@@ -85,7 +83,7 @@ class TestScriptReviewBasic:
 
 class TestCategoryScore:
     """Test CategoryScore functionality."""
-    
+
     def test_create_category_score(self):
         """Test creating CategoryScore."""
         score = CategoryScore(
@@ -93,9 +91,9 @@ class TestCategoryScore:
             score=85,
             reasoning="Strong hook, weak middle",
             strengths=["Great opening", "Emotional impact"],
-            weaknesses=["Mid-section drag", "Predictable"]
+            weaknesses=["Mid-section drag", "Predictable"],
         )
-        
+
         assert score.category == ReviewCategory.ENGAGEMENT
         assert score.score == 85
         assert score.reasoning == "Strong hook, weak middle"
@@ -105,7 +103,7 @@ class TestCategoryScore:
 
 class TestImprovementPoint:
     """Test ImprovementPoint functionality."""
-    
+
     def test_create_improvement_point(self):
         """Test creating ImprovementPoint."""
         point = ImprovementPoint(
@@ -115,9 +113,9 @@ class TestImprovementPoint:
             priority="high",
             impact_score=25,
             specific_example="Investigation sequence too long",
-            suggested_fix="Focus on 2-3 key moments"
+            suggested_fix="Focus on 2-3 key moments",
         )
-        
+
         assert point.category == ReviewCategory.PACING
         assert point.title == "Reduce middle section"
         assert point.description == "Cut 30-40 seconds"
@@ -129,88 +127,84 @@ class TestImprovementPoint:
 
 class TestScriptReviewMethods:
     """Test ScriptReview methods."""
-    
+
     def test_get_category_score(self):
         """Test getting score for specific category."""
-        review = ScriptReview(
-            script_id="script-001",
-            script_title="Test",
-            overall_score=75
-        )
-        
+        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+
         # Add category scores
-        review.category_scores.append(CategoryScore(
-            category=ReviewCategory.ENGAGEMENT,
-            score=80,
-            reasoning="Good"
-        ))
-        review.category_scores.append(CategoryScore(
-            category=ReviewCategory.PACING,
-            score=70,
-            reasoning="Needs work"
-        ))
-        
+        review.category_scores.append(
+            CategoryScore(category=ReviewCategory.ENGAGEMENT, score=80, reasoning="Good")
+        )
+        review.category_scores.append(
+            CategoryScore(category=ReviewCategory.PACING, score=70, reasoning="Needs work")
+        )
+
         # Get specific category
         engagement = review.get_category_score(ReviewCategory.ENGAGEMENT)
         assert engagement is not None
         assert engagement.score == 80
-        
+
         pacing = review.get_category_score(ReviewCategory.PACING)
         assert pacing is not None
         assert pacing.score == 70
-        
+
         # Non-existent category
         clarity = review.get_category_score(ReviewCategory.CLARITY)
         assert clarity is None
-    
+
     def test_get_high_priority_improvements(self):
         """Test getting high-priority improvements."""
-        review = ScriptReview(
-            script_id="script-001",
-            script_title="Test",
-            overall_score=75
-        )
-        
+        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+
         # Add improvements with different priorities
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.PACING,
-            title="High priority 1",
-            description="Important",
-            priority="high",
-            impact_score=25
-        ))
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.CLARITY,
-            title="Medium priority",
-            description="Moderate",
-            priority="medium",
-            impact_score=15
-        ))
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.STRUCTURE,
-            title="High priority 2",
-            description="Critical",
-            priority="high",
-            impact_score=30
-        ))
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.IMPACT,
-            title="Low priority",
-            description="Nice to have",
-            priority="low",
-            impact_score=5
-        ))
-        
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.PACING,
+                title="High priority 1",
+                description="Important",
+                priority="high",
+                impact_score=25,
+            )
+        )
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.CLARITY,
+                title="Medium priority",
+                description="Moderate",
+                priority="medium",
+                impact_score=15,
+            )
+        )
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.STRUCTURE,
+                title="High priority 2",
+                description="Critical",
+                priority="high",
+                impact_score=30,
+            )
+        )
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.IMPACT,
+                title="Low priority",
+                description="Nice to have",
+                priority="low",
+                impact_score=5,
+            )
+        )
+
         # Get high-priority only
         high_priority = review.get_high_priority_improvements()
-        
+
         assert len(high_priority) == 2
         # Should be sorted by impact score (descending)
         assert high_priority[0].title == "High priority 2"
         assert high_priority[0].impact_score == 30
         assert high_priority[1].title == "High priority 1"
         assert high_priority[1].impact_score == 25
-    
+
     def test_get_youtube_short_readiness(self):
         """Test YouTube short readiness calculation."""
         review = ScriptReview(
@@ -222,11 +216,11 @@ class TestScriptReviewMethods:
             current_length_seconds=55,
             hook_strength_score=85,
             retention_score=75,
-            viral_potential_score=70
+            viral_potential_score=70,
         )
-        
+
         readiness = review.get_youtube_short_readiness()
-        
+
         assert "ready" in readiness
         assert "readiness_score" in readiness
         assert "length_compliant" in readiness
@@ -235,25 +229,25 @@ class TestScriptReviewMethods:
         assert readiness["hook_strength"] == 85
         assert readiness["retention_score"] == 75
         assert readiness["viral_potential"] == 70
-    
+
     def test_youtube_short_readiness_not_configured(self):
         """Test readiness when not configured for YouTube shorts."""
         review = ScriptReview(
             script_id="script-001",
             script_title="Regular Script",
             overall_score=75,
-            is_youtube_short=False
+            is_youtube_short=False,
         )
-        
+
         readiness = review.get_youtube_short_readiness()
-        
+
         assert readiness["ready"] is False
         assert "Not configured" in readiness["reason"]
 
 
 class TestScriptReviewSerialization:
     """Test serialization and deserialization."""
-    
+
     def test_to_dict(self):
         """Test converting ScriptReview to dictionary."""
         review = ScriptReview(
@@ -261,42 +255,42 @@ class TestScriptReviewSerialization:
             script_title="Test",
             overall_score=75,
             target_length=ContentLength.YOUTUBE_SHORT,
-            is_youtube_short=True
+            is_youtube_short=True,
         )
-        
+
         # Add category score
-        review.category_scores.append(CategoryScore(
-            category=ReviewCategory.ENGAGEMENT,
-            score=80,
-            reasoning="Good"
-        ))
-        
+        review.category_scores.append(
+            CategoryScore(category=ReviewCategory.ENGAGEMENT, score=80, reasoning="Good")
+        )
+
         # Add improvement point
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.PACING,
-            title="Fix pacing",
-            description="Improve timing",
-            priority="high",
-            impact_score=20
-        ))
-        
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.PACING,
+                title="Fix pacing",
+                description="Improve timing",
+                priority="high",
+                impact_score=20,
+            )
+        )
+
         data = review.to_dict()
-        
+
         assert isinstance(data, dict)
         assert data["script_id"] == "script-001"
         assert data["script_title"] == "Test"
         assert data["overall_score"] == 75
         assert data["target_length"] == "youtube_short"  # Enum to string
         assert data["is_youtube_short"] is True
-        
+
         # Check category scores converted
         assert len(data["category_scores"]) == 1
         assert data["category_scores"][0]["category"] == "engagement"
-        
+
         # Check improvement points converted
         assert len(data["improvement_points"]) == 1
         assert data["improvement_points"][0]["category"] == "pacing"
-    
+
     def test_from_dict(self):
         """Test creating ScriptReview from dictionary."""
         data = {
@@ -311,7 +305,7 @@ class TestScriptReviewSerialization:
                     "score": 80,
                     "reasoning": "Good",
                     "strengths": ["Hook"],
-                    "weaknesses": ["Middle"]
+                    "weaknesses": ["Middle"],
                 }
             ],
             "improvement_points": [
@@ -322,29 +316,29 @@ class TestScriptReviewSerialization:
                     "priority": "high",
                     "impact_score": 20,
                     "specific_example": "Example",
-                    "suggested_fix": "Fix"
+                    "suggested_fix": "Fix",
                 }
-            ]
+            ],
         }
-        
+
         review = ScriptReview.from_dict(data)
-        
+
         assert review.script_id == "script-001"
         assert review.script_title == "Test"
         assert review.overall_score == 75
         assert review.target_length == ContentLength.YOUTUBE_SHORT_EXTENDED
         assert review.is_youtube_short is True
-        
+
         # Check category scores
         assert len(review.category_scores) == 1
         assert review.category_scores[0].category == ReviewCategory.ENGAGEMENT
         assert review.category_scores[0].score == 80
-        
+
         # Check improvement points
         assert len(review.improvement_points) == 1
         assert review.improvement_points[0].category == ReviewCategory.PACING
         assert review.improvement_points[0].impact_score == 20
-    
+
     def test_roundtrip_serialization(self):
         """Test that to_dict -> from_dict preserves data."""
         original = ScriptReview(
@@ -370,13 +364,13 @@ class TestScriptReviewSerialization:
             strengths=["Strong hook"],
             primary_concern="Pacing",
             quick_wins=["Cut intro"],
-            notes="Test notes"
+            notes="Test notes",
         )
-        
+
         # Roundtrip
         data = original.to_dict()
         restored = ScriptReview.from_dict(data)
-        
+
         # Compare fields
         assert restored.script_id == original.script_id
         assert restored.script_title == original.script_title
@@ -405,26 +399,25 @@ class TestScriptReviewSerialization:
 
 class TestScriptReviewRepresentation:
     """Test string representation."""
-    
+
     def test_repr(self):
         """Test __repr__ method."""
         review = ScriptReview(
-            script_id="script-001",
-            script_title="Test Script",
-            overall_score=75,
-            iteration_number=2
+            script_id="script-001", script_title="Test Script", overall_score=75, iteration_number=2
         )
-        
-        review.improvement_points.append(ImprovementPoint(
-            category=ReviewCategory.PACING,
-            title="Test",
-            description="Test",
-            priority="high",
-            impact_score=20
-        ))
-        
+
+        review.improvement_points.append(
+            ImprovementPoint(
+                category=ReviewCategory.PACING,
+                title="Test",
+                description="Test",
+                priority="high",
+                impact_score=20,
+            )
+        )
+
         repr_str = repr(review)
-        
+
         assert "ScriptReview(" in repr_str
         assert "script='Test Script'" in repr_str
         assert "score=75%" in repr_str

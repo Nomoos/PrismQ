@@ -15,7 +15,7 @@ For business logic models with validation and workflow methods, use:
 
 try:
     from .review import Review
-    from .story_review import StoryReview, ReviewType
+    from .story_review import ReviewType, StoryReview
 except ImportError:
     # Allow importing when not installed as package
     pass

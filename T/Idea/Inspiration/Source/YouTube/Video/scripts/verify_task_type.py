@@ -23,29 +23,25 @@ def verify_task_type_registration():
     print("=" * 70)
     print("YouTube Video Task Type Verification")
     print("=" * 70)
-    
+
     # Get supported task types
     supported_types = worker_factory.get_supported_types()
-    
+
     print("\nRegistered task types:")
     for task_type in supported_types:
         print(f"  ✓ {task_type}")
-    
+
     # Verify youtube_video_scrape is present
     print("\nVerifying youtube_video_scrape:")
-    if 'youtube_video_scrape' in supported_types:
+    if "youtube_video_scrape" in supported_types:
         print("  ✅ youtube_video_scrape is registered")
     else:
         print("  ❌ youtube_video_scrape is NOT registered")
         return False
-    
+
     # Verify all three expected types are present
-    expected_types = [
-        'youtube_video_single',
-        'youtube_video_search',
-        'youtube_video_scrape'
-    ]
-    
+    expected_types = ["youtube_video_single", "youtube_video_search", "youtube_video_scrape"]
+
     print("\nVerifying all expected task types:")
     all_present = True
     for task_type in expected_types:
@@ -54,7 +50,7 @@ def verify_task_type_registration():
         else:
             print(f"  ❌ {task_type} MISSING")
             all_present = False
-    
+
     if all_present:
         print("\n✅ All task types verified successfully!")
         print("\nTask Type Details:")
@@ -72,7 +68,7 @@ def main():
     try:
         success = verify_task_type_registration()
         print("\n" + "=" * 70)
-        
+
         if success:
             print("Verification PASSED")
             print("=" * 70)
@@ -81,10 +77,11 @@ def main():
             print("Verification FAILED")
             print("=" * 70)
             sys.exit(1)
-            
+
     except Exception as e:
         print(f"\n❌ Error during verification: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

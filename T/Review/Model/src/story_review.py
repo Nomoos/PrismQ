@@ -16,6 +16,7 @@ from typing import Optional
 
 class ReviewType(str, Enum):
     """Types of Story reviews."""
+
     GRAMMAR = "grammar"
     TONE = "tone"
     CONTENT = "content"
@@ -26,10 +27,10 @@ class ReviewType(str, Enum):
 @dataclass
 class StoryReview:
     """Linking table model for Story reviews.
-    
+
     Allows many-to-many relationship between Story and Review,
     with additional metadata (version, review_type).
-    
+
     Attributes:
         id: Primary key (auto-generated)
         story_id: FK to Story
@@ -37,11 +38,11 @@ class StoryReview:
         version: Story version being reviewed (>= 0, UINT simulation)
         review_type: Type of review (grammar, tone, content, etc.)
         created_at: Timestamp of creation
-    
+
     Note:
         UNIQUE(story_id, version, review_type) prevents duplicate
         reviews of the same type for the same version.
-    
+
     Example:
         >>> story_review = StoryReview(
         ...     story_id=1,
@@ -50,23 +51,23 @@ class StoryReview:
         ...     review_type=ReviewType.GRAMMAR
         ... )
     """
-    
+
     story_id: int
     review_id: int
     version: int
     review_type: ReviewType
     id: Optional[int] = None
     created_at: datetime = field(default_factory=datetime.now)
-    
+
     def __post_init__(self):
         """Validate version is non-negative (UINT simulation)."""
         if self.version < 0:
             raise ValueError(f"Version must be >= 0, got {self.version}")
-        
+
         # Convert string to enum if needed
         if isinstance(self.review_type, str):
             self.review_type = ReviewType(self.review_type)
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for database storage."""
         return {
@@ -74,21 +75,25 @@ class StoryReview:
             "story_id": self.story_id,
             "review_id": self.review_id,
             "version": self.version,
-            "review_type": self.review_type.value if isinstance(self.review_type, ReviewType) else self.review_type,
+            "review_type": (
+                self.review_type.value
+                if isinstance(self.review_type, ReviewType)
+                else self.review_type
+            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> "StoryReview":
         """Create StoryReview from dictionary."""
         created_at = data.get("created_at")
         if isinstance(created_at, str):
             created_at = datetime.fromisoformat(created_at)
-        
+
         review_type = data["review_type"]
         if isinstance(review_type, str):
             review_type = ReviewType(review_type)
-        
+
         return cls(
             id=data.get("id"),
             story_id=data["story_id"],

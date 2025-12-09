@@ -10,7 +10,7 @@ for creative content generation in the workflow:
 
 Example:
     >>> from idea import Idea, ContentGenre
-    >>> 
+    >>>
     >>> idea = Idea(
     ...     title="The Digital Phantom Mystery",
     ...     concept="An investigation into unsolved internet mysteries",
@@ -21,9 +21,9 @@ Example:
 """
 
 from src.idea import (
+    ContentGenre,
     Idea,
     IdeaStatus,
-    ContentGenre,
 )
 
 __all__ = [

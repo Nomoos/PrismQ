@@ -16,7 +16,7 @@ Workflow position:
 
 Example:
     >>> from T.Review.Model import Review
-    >>> 
+    >>>
     >>> review = Review(
     ...     text="Great title! Clear and engaging.",
     ...     score=85
@@ -25,7 +25,7 @@ Example:
 
 try:
     from .src.review import Review
-    from .src.story_review import StoryReview, ReviewType
+    from .src.story_review import ReviewType, StoryReview
 except ImportError:
     # Allow importing when not installed as package
     pass

@@ -7,13 +7,9 @@ Stage 24 (MVP-024): Report Generation
 """
 
 from .report_generation import (
-    ReportGenerator,
     PublishingReport,
-    generate_publishing_report
+    ReportGenerator,
+    generate_publishing_report,
 )
 
-__all__ = [
-    "ReportGenerator",
-    "PublishingReport",
-    "generate_publishing_report"
-]
+__all__ = ["ReportGenerator", "PublishingReport", "generate_publishing_report"]

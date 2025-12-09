@@ -4,15 +4,15 @@ AI-powered title evaluation for v2+ iterations with improvement tracking.
 """
 
 from .by_script_v2 import (
-    review_title_by_script_v2,
+    ImprovementComparison,
     compare_reviews,
     get_improvement_summary,
-    ImprovementComparison
+    review_title_by_script_v2,
 )
 
 __all__ = [
     "review_title_by_script_v2",
     "compare_reviews",
     "get_improvement_summary",
-    "ImprovementComparison"
+    "ImprovementComparison",
 ]

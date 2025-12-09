@@ -19,7 +19,7 @@ Usage:
         process_review_script_tone,
         ReviewResult
     )
-    
+
     # Using database connection
     result = process_review_script_tone(conn)
     if result:
@@ -34,12 +34,11 @@ from datetime import datetime
 from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.story import Story
 from Model.Database.models.script import Script
-from Model.Database.repositories.story_repository import StoryRepository
+from Model.Database.models.story import Story
 from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
-
 
 # Score threshold for accepting a script review
 ACCEPTANCE_THRESHOLD = 75
@@ -53,7 +52,7 @@ STATE_REVIEW_SCRIPT_EDITING = StateNames.REVIEW_SCRIPT_EDITING
 @dataclass
 class ReviewResult:
     """Result of the review script tone process.
-    
+
     Attributes:
         story: The Story that was reviewed
         script: The Script that was reviewed
@@ -61,6 +60,7 @@ class ReviewResult:
         new_state: The new state the story was transitioned to
         accepted: Whether the script was accepted
     """
+
     story: Story
     script: Script
     review: Review
@@ -69,19 +69,18 @@ class ReviewResult:
 
 
 def get_story_with_lowest_script_version(
-    connection: sqlite3.Connection,
-    story_repository: StoryRepository
+    connection: sqlite3.Connection, story_repository: StoryRepository
 ) -> Optional[Story]:
     """Get the Story with the lowest current script version for review.
-    
+
     Selects from Stories with state 'PrismQ.T.Review.Script.Tone',
     picking the one whose Script has the lowest current version number.
     Current version = highest version number across same story_id.
-    
+
     Args:
         connection: SQLite database connection
         story_repository: Repository for Story database operations
-        
+
     Returns:
         Story with lowest current script version, or None if none found
     """
@@ -97,44 +96,44 @@ def get_story_with_lowest_script_version(
         ORDER BY MAX(sc.version) ASC
         LIMIT 1
         """,
-        (STATE_REVIEW_SCRIPT_TONE,)
+        (STATE_REVIEW_SCRIPT_TONE,),
     )
-    
+
     row = cursor.fetchone()
     if row is None:
         return None
-    
+
     story_id = row["story_id"] if isinstance(row, sqlite3.Row) else row[0]
     return story_repository.find_by_id(story_id)
 
 
 def determine_next_state(accepted: bool) -> str:
     """Determine the next state based on review outcome.
-    
+
     Args:
         accepted: Whether the script was accepted
-        
+
     Returns:
         The next state name
     """
     if not accepted:
         # Script not accepted - send back for rewrite
         return STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-    
+
     # Script accepted - proceed to editing review
     return STATE_REVIEW_SCRIPT_EDITING
 
 
 def create_review(score: int, text: str) -> Review:
     """Create a Review model instance.
-    
+
     Args:
         score: Review score (0-100)
         text: Review text content
-        
+
     Returns:
         Review instance
-        
+
     Raises:
         ValueError: If score is not in valid range (0-100)
         TypeError: If score is not an integer
@@ -144,37 +143,30 @@ def create_review(score: int, text: str) -> Review:
         raise TypeError("score must be an integer value")
     if score < 0 or score > 100:
         raise ValueError(f"score must be between 0 and 100, got {score}")
-    
-    return Review(
-        text=text,
-        score=score,
-        created_at=datetime.now()
-    )
+
+    return Review(text=text, score=score, created_at=datetime.now())
 
 
-def evaluate_tone(
-    script_text: str,
-    target_tone: str = ""
-) -> Tuple[int, str]:
+def evaluate_tone(script_text: str, target_tone: str = "") -> Tuple[int, str]:
     """Evaluate a script's tone and style consistency.
-    
+
     This is a simple evaluation that checks basic tone aspects.
     In production, this could be replaced with AI-powered review.
-    
+
     Args:
         script_text: The script content to review
         target_tone: Optional target tone description (e.g., "dark", "suspense")
-        
+
     Returns:
         Tuple of (score, review_text)
     """
     # Base score
     score = 70
     review_points = []
-    
+
     # Word count analysis
     word_count = len(script_text.split())
-    
+
     if word_count < 50:
         score -= 15
         review_points.append("Script is too short for meaningful tone assessment.")
@@ -184,16 +176,35 @@ def evaluate_tone(
     else:
         score += 5
         review_points.append("Script has adequate length for tone assessment.")
-    
+
     script_lower = script_text.lower()
-    
+
     # Check for tone-related keywords (emotional intensity)
-    positive_tone_words = {"happy", "joy", "excited", "wonderful", "amazing", "great", "love", "beautiful"}
-    negative_tone_words = {"sad", "dark", "fear", "horror", "terrible", "awful", "hate", "ugly", "scary"}
-    
+    positive_tone_words = {
+        "happy",
+        "joy",
+        "excited",
+        "wonderful",
+        "amazing",
+        "great",
+        "love",
+        "beautiful",
+    }
+    negative_tone_words = {
+        "sad",
+        "dark",
+        "fear",
+        "horror",
+        "terrible",
+        "awful",
+        "hate",
+        "ugly",
+        "scary",
+    }
+
     positive_count = sum(1 for word in positive_tone_words if word in script_lower)
     negative_count = sum(1 for word in negative_tone_words if word in script_lower)
-    
+
     # Check for tone consistency
     if positive_count > 2 and negative_count < 2:
         review_points.append("Script maintains consistent positive tone.")
@@ -207,7 +218,7 @@ def evaluate_tone(
     else:
         review_points.append("Mixed tone detected - consider making tone more consistent.")
         score -= 5
-    
+
     # Check for target tone alignment if specified
     if target_tone:
         target_lower = target_tone.lower()
@@ -225,48 +236,62 @@ def evaluate_tone(
             else:
                 score -= 10
                 review_points.append(f"Tone doesn't align well with target tone '{target_tone}'.")
-    
+
     # Check for voice consistency (POV indicators) - use word boundaries for better matching
     # Pad with spaces for boundary detection
     padded_text = f" {script_lower} "
-    first_person = padded_text.count(" i ") + padded_text.count(" i'm ") + padded_text.count(" my ") + padded_text.count(" me ")
-    second_person = padded_text.count(" you ") + padded_text.count(" your ") + padded_text.count(" yours ")
-    third_person = padded_text.count(" he ") + padded_text.count(" she ") + padded_text.count(" they ") + padded_text.count(" his ") + padded_text.count(" her ") + padded_text.count(" their ")
-    
+    first_person = (
+        padded_text.count(" i ")
+        + padded_text.count(" i'm ")
+        + padded_text.count(" my ")
+        + padded_text.count(" me ")
+    )
+    second_person = (
+        padded_text.count(" you ") + padded_text.count(" your ") + padded_text.count(" yours ")
+    )
+    third_person = (
+        padded_text.count(" he ")
+        + padded_text.count(" she ")
+        + padded_text.count(" they ")
+        + padded_text.count(" his ")
+        + padded_text.count(" her ")
+        + padded_text.count(" their ")
+    )
+
     pov_counts = [first_person, second_person, third_person]
     dominant_pov = max(pov_counts)
     other_povs = sum(c for c in pov_counts if c != dominant_pov and c > 0)
-    
+
     if dominant_pov > 0 and other_povs < dominant_pov * 0.3:
         score += 5
         review_points.append("Consistent voice/POV throughout the script.")
     elif dominant_pov > 0 and other_povs > dominant_pov * 0.5:
         score -= 5
         review_points.append("POV shifts detected - consider maintaining consistent voice.")
-    
+
     # Ensure score is in valid range
     score = max(0, min(100, score))
-    
+
     # Build review text
     prefix = "Tone review: "
     review_text = prefix + " ".join(review_points)
-    
+
     return score, review_text
 
 
 def save_review(connection: sqlite3.Connection, review: Review) -> Review:
     """Save a Review to the database.
-    
+
     Args:
         connection: SQLite database connection
         review: Review instance to save
-        
+
     Returns:
         Review with id populated
     """
     cursor = connection.execute(
         "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
-        (review.text, review.score, review.created_at.isoformat())
+        (review.text, review.score, review.created_at.isoformat()),
     )
     connection.commit()
     review.id = cursor.lastrowid
@@ -275,32 +300,26 @@ def save_review(connection: sqlite3.Connection, review: Review) -> Review:
 
 def update_script_review_id(connection: sqlite3.Connection, script_id: int, review_id: int) -> None:
     """Update a Script's review_id to link it to a Review.
-    
+
     This updates the existing script's review_id without creating a new version,
     since adding a review reference doesn't change the script content.
-    
+
     Args:
         connection: SQLite database connection
         script_id: ID of the Script to update
         review_id: ID of the Review to link to
     """
-    connection.execute(
-        "UPDATE Script SET review_id = ? WHERE id = ?",
-        (review_id, script_id)
-    )
+    connection.execute("UPDATE Script SET review_id = ? WHERE id = ?", (review_id, script_id))
     connection.commit()
 
 
-def get_script_for_story(
-    script_repository: ScriptRepository,
-    story: Story
-) -> Optional[Script]:
+def get_script_for_story(script_repository: ScriptRepository, story: Story) -> Optional[Script]:
     """Get the current Script for a Story.
-    
+
     Args:
         script_repository: Repository for Script database operations
         story: The Story to get Script for
-        
+
     Returns:
         The Script if found, None otherwise
     """
@@ -313,10 +332,10 @@ def get_script_for_story(
 def process_review_script_tone(
     connection: sqlite3.Connection,
     script_text: Optional[str] = None,
-    target_tone: Optional[str] = None
+    target_tone: Optional[str] = None,
 ) -> Optional[ReviewResult]:
     """Process the script tone review workflow stage.
-    
+
     This function:
     1. Finds the Story with lowest current script version in state 'PrismQ.T.Review.Script.Tone'
     2. Gets the Script associated with the Story (latest version)
@@ -324,30 +343,30 @@ def process_review_script_tone(
     4. Creates a Review record and saves it to database
     5. Links the Review to the Script via Script.review_id FK
     6. Updates the Story state based on review outcome
-    
+
     Args:
         connection: SQLite database connection
         script_text: Optional script text override (for testing)
         target_tone: Optional target tone description (for testing)
-        
+
     Returns:
         ReviewResult if a story was processed, None if no stories found
     """
     # Set up row factory for proper dict-like access
     connection.row_factory = sqlite3.Row
-    
+
     story_repository = StoryRepository(connection)
     script_repository = ScriptRepository(connection)
-    
+
     # Get story with lowest current script version in review state
     story = get_story_with_lowest_script_version(connection, story_repository)
-    
+
     if story is None:
         return None
-    
+
     # Get the script for this story
     script = get_script_for_story(script_repository, story)
-    
+
     # Get script text from the Script entity, or use override if provided (for testing)
     if script_text is not None:
         actual_script_text = script_text
@@ -355,22 +374,21 @@ def process_review_script_tone(
         actual_script_text = script.text
     else:
         actual_script_text = "Sample script content for tone review"
-    
+
     actual_target_tone = target_tone or ""
-    
+
     # Evaluate the script tone
     score, review_text = evaluate_tone(
-        script_text=actual_script_text,
-        target_tone=actual_target_tone
+        script_text=actual_script_text, target_tone=actual_target_tone
     )
-    
+
     # Create and save review to database
     review = create_review(score=score, text=review_text)
     review = save_review(connection, review)
-    
+
     # Determine if accepted
     accepted = score >= ACCEPTANCE_THRESHOLD
-    
+
     # Link Review to Script by updating the script's review_id
     if script is not None:
         # Update existing script's review_id directly (no need to create new version)
@@ -380,56 +398,45 @@ def process_review_script_tone(
     else:
         # If no script exists, create one with the review reference
         reviewed_script = Script(
-            story_id=story.id,
-            version=0,
-            text=actual_script_text,
-            review_id=review.id
+            story_id=story.id, version=0, text=actual_script_text, review_id=review.id
         )
         reviewed_script = script_repository.insert(reviewed_script)
         story.script_id = reviewed_script.id
-    
+
     # Determine next state
     new_state = determine_next_state(accepted=accepted)
-    
+
     # Update story state
     story.update_state(new_state)
     story_repository.update(story)
-    
+
     return ReviewResult(
-        story=story,
-        script=reviewed_script,
-        review=review,
-        new_state=new_state,
-        accepted=accepted
+        story=story, script=reviewed_script, review=review, new_state=new_state, accepted=accepted
     )
 
 
 def process_all_pending_reviews(
-    connection: sqlite3.Connection,
-    target_tone: Optional[str] = None
+    connection: sqlite3.Connection, target_tone: Optional[str] = None
 ) -> list:
     """Process all pending script tone reviews.
-    
+
     Args:
         connection: SQLite database connection
         target_tone: Optional target tone description
-        
+
     Returns:
         List of ReviewResult for all processed stories
     """
     results = []
-    
+
     while True:
-        result = process_review_script_tone(
-            connection=connection,
-            target_tone=target_tone
-        )
-        
+        result = process_review_script_tone(connection=connection, target_tone=target_tone)
+
         if result is None:
             break
-            
+
         results.append(result)
-    
+
     return results
 
 

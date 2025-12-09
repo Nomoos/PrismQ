@@ -1,5 +1,5 @@
 """Idea Fusion module initialization."""
 
-from .fusion import IdeaFusion, FusionConfig, FusionStrategy
+from .fusion import FusionConfig, FusionStrategy, IdeaFusion
 
 __all__ = ["IdeaFusion", "FusionConfig", "FusionStrategy"]

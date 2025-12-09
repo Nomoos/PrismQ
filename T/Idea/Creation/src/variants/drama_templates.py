@@ -1,7 +1,6 @@
 """Drama-focused variant templates - Reddit-style and personal drama."""
 
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 VARIANT_FAMILY_DRAMA = {
     "name": "Family Drama Seed",
@@ -12,7 +11,7 @@ VARIANT_FAMILY_DRAMA = {
         "conflict_core": "What the conflict is really about",
         "emotional_weight": "The feeling beneath the surface",
         "twist_potential": "Where this could go unexpectedly",
-        "resolution_direction": "How understanding might come"
+        "resolution_direction": "How understanding might come",
     },
     "example": {
         "hook_line": "I just found out why my parents treated my sibling differently",
@@ -20,8 +19,8 @@ VARIANT_FAMILY_DRAMA = {
         "conflict_core": "Love expressed through control vs. freedom",
         "emotional_weight": "Betrayal mixed with understanding",
         "twist_potential": "The 'favorite' also suffered",
-        "resolution_direction": "Seeing parents as flawed humans"
-    }
+        "resolution_direction": "Seeing parents as flawed humans",
+    },
 }
 
 VARIANT_SOCIAL_HOME = {
@@ -32,15 +31,15 @@ VARIANT_SOCIAL_HOME = {
         "family_reaction": "How family responded",
         "misunderstanding": "What was misread",
         "aftermath": "How things changed",
-        "lesson": "What was learned about online/offline"
+        "lesson": "What was learned about online/offline",
     },
     "example": {
         "digital_trigger": "A screenshot taken out of context",
         "family_reaction": "Assumptions before questions",
         "misunderstanding": "Tone lost in text",
         "aftermath": "New rules about digital communication",
-        "lesson": "Context matters everywhere"
-    }
+        "lesson": "Context matters everywhere",
+    },
 }
 
 VARIANT_REALISTIC_MYSTERY = {
@@ -52,7 +51,7 @@ VARIANT_REALISTIC_MYSTERY = {
         "red_herrings": "Misleading possibilities",
         "real_answer": "The grounded explanation",
         "human_element": "What it reveals about people",
-        "satisfaction": "Why the resolution feels right"
+        "satisfaction": "Why the resolution feels right",
     },
     "example": {
         "mystery_setup": "Things keep going missing from shared spaces",
@@ -60,8 +59,8 @@ VARIANT_REALISTIC_MYSTERY = {
         "red_herrings": "Obvious suspects who aren't responsible",
         "real_answer": "Misunderstanding about shared property",
         "human_element": "Communication gaps cause most mysteries",
-        "satisfaction": "Understanding replaces suspicion"
-    }
+        "satisfaction": "Understanding replaces suspicion",
+    },
 }
 
 VARIANT_SCHOOL_FAMILY = {
@@ -73,7 +72,7 @@ VARIANT_SCHOOL_FAMILY = {
         "student_perspective": "How the student sees it",
         "tension_point": "Where conflict peaks",
         "bridge_building": "How understanding develops",
-        "new_normal": "Where things land after"
+        "new_normal": "Where things land after",
     },
     "example": {
         "crossover_trigger": "A school issue that required parent contact",
@@ -81,8 +80,8 @@ VARIANT_SCHOOL_FAMILY = {
         "student_perspective": "Feeling caught between two worlds",
         "tension_point": "When assumptions clashed with reality",
         "bridge_building": "Honest conversation finally happening",
-        "new_normal": "Better communication going forward"
-    }
+        "new_normal": "Better communication going forward",
+    },
 }
 
 VARIANT_PERSONAL_VOICE = {
@@ -94,7 +93,7 @@ VARIANT_PERSONAL_VOICE = {
         "core_experience": "What's being shared",
         "emotional_honesty": "The raw truth underneath",
         "universal_thread": "What makes it relatable",
-        "closing_thought": "Where the reflection lands"
+        "closing_thought": "Where the reflection lands",
     },
     "example": {
         "voice_tone": "Honest and slightly self-deprecating",
@@ -102,8 +101,8 @@ VARIANT_PERSONAL_VOICE = {
         "core_experience": "A moment that changed perspective",
         "emotional_honesty": "The feelings that are hard to admit",
         "universal_thread": "Everyone has moments like this",
-        "closing_thought": "What I understand now that I didn't then"
-    }
+        "closing_thought": "What I understand now that I didn't then",
+    },
 }
 
 

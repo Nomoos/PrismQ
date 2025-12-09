@@ -10,30 +10,30 @@ Design Pattern: Template Method Pattern with Progressive Enrichment
 - Platform-specific workers: Add platform operations
 """
 
-from .content_funnel import (
-    ContentFunnel,
-    TransformationStage,
-    TransformationMetadata,
-    AudioExtractor,
-    AudioTranscriber,
-    SubtitleExtractor,
-)
+from .base_source_worker import BaseSourceWorker
 
 # Worker hierarchy - Progressive Enrichment Pattern
 from .base_worker import BaseWorker, Task, TaskResult
-from .base_source_worker import BaseSourceWorker
+from .content_funnel import (
+    AudioExtractor,
+    AudioTranscriber,
+    ContentFunnel,
+    SubtitleExtractor,
+    TransformationMetadata,
+    TransformationStage,
+)
 
 __all__ = [
     # Content Funnel
-    'ContentFunnel',
-    'TransformationStage',
-    'TransformationMetadata',
-    'AudioExtractor',
-    'AudioTranscriber',
-    'SubtitleExtractor',
+    "ContentFunnel",
+    "TransformationStage",
+    "TransformationMetadata",
+    "AudioExtractor",
+    "AudioTranscriber",
+    "SubtitleExtractor",
     # Worker Hierarchy
-    'BaseWorker',
-    'Task',
-    'TaskResult',
-    'BaseSourceWorker',
+    "BaseWorker",
+    "Task",
+    "TaskResult",
+    "BaseSourceWorker",
 ]

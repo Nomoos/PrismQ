@@ -12,9 +12,10 @@ Usage:
     python scripts/register_task_types.py
 """
 
+import logging
 import sys
 from pathlib import Path
-import logging
+
 """Register Reddit task types with TaskManager API."""
 
 import sys
@@ -37,8 +38,9 @@ except ImportError:
     print("ERROR: TaskManager client not available")
     print("Make sure TaskManager module is installed and accessible")
     sys.exit(1)
-from TaskManager import TaskManagerClient
 import logging
+
+from TaskManager import TaskManagerClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

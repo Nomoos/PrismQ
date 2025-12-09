@@ -16,17 +16,12 @@ for cleaner imports: `from PrismQ.T.Script import ScriptWriter`
 
 # Export ScriptWriter from src for convenient imports
 from .src import (
-    ScriptWriter,
-    OptimizationStrategy,
+    FeedbackLoopIteration,
     OptimizationResult,
-    FeedbackLoopIteration
+    OptimizationStrategy,
+    ScriptWriter,
 )
 
-__all__ = [
-    "ScriptWriter",
-    "OptimizationStrategy",
-    "OptimizationResult",
-    "FeedbackLoopIteration"
-]
+__all__ = ["ScriptWriter", "OptimizationStrategy", "OptimizationResult", "FeedbackLoopIteration"]
 
 __version__ = "1.0.0"

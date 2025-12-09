@@ -12,9 +12,10 @@ Run this script to see examples of:
 4. Custom worker configuration
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load environment
@@ -28,7 +29,8 @@ print()
 # Example 1: Simple Worker Creation
 print("Example 1: Create a simple worker")
 print("-" * 80)
-print("""
+print(
+    """
 from src.workers.factory import worker_factory
 from src.core.config import Config
 from src.core.database import Database
@@ -48,13 +50,15 @@ worker = worker_factory.create(
 
 # Run for 10 iterations
 worker.run(poll_interval=5, max_iterations=10)
-""")
+"""
+)
 print()
 
 # Example 2: Search Worker
 print("Example 2: Create a search worker")
 print("-" * 80)
-print("""
+print(
+    """
 # Create worker for search tasks
 worker = worker_factory.create(
     task_type='youtube_video_search',
@@ -66,13 +70,15 @@ worker = worker_factory.create(
 
 # Run continuously
 worker.run(poll_interval=5)
-""")
+"""
+)
 print()
 
 # Example 3: Multiple Workers
 print("Example 3: Run multiple workers in parallel")
 print("-" * 80)
-print("""
+print(
+    """
 import threading
 
 def run_worker(worker_id, task_type):
@@ -99,14 +105,16 @@ for i in range(3):
 # Wait for all to complete
 for thread in threads:
     thread.join()
-""")
+"""
+)
 print()
 
 # Summary
 print("=" * 80)
 print("Summary of Worker Usage Patterns")
 print("=" * 80)
-print("""
+print(
+    """
 1. Single Worker: Best for small-scale scraping (<100 videos/hour)
 2. Multiple Workers: Scale horizontally for higher throughput
 3. Custom Config: Adjust settings per worker for specific needs
@@ -117,5 +125,6 @@ Next Steps:
 - Review scripts/run_worker.py for production usage
 - See DEPLOYMENT_GUIDE.md for deployment instructions
 - Check _meta/docs/YOUTUBE_VIDEO_WORKER.md for complete guide
-""")
+"""
+)
 print("=" * 80)

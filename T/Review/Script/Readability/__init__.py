@@ -10,14 +10,14 @@ This module serves as the final script quality gate in the workflow:
 """
 
 from .script_readability_review import (
-    ReadabilityReview,
     ReadabilityIssue,
     ReadabilityIssueType,
+    ReadabilityReview,
     ReadabilitySeverity,
     ScriptReadabilityChecker,
+    get_readability_feedback,
     review_script_readability,
     review_script_readability_to_json,
-    get_readability_feedback
 )
 
 __all__ = [
@@ -28,5 +28,5 @@ __all__ = [
     "ScriptReadabilityChecker",
     "review_script_readability",
     "review_script_readability_to_json",
-    "get_readability_feedback"
+    "get_readability_feedback",
 ]

@@ -15,14 +15,14 @@ Service Module (in src/):
 """
 
 from T.Review.Script.Consistency.consistency_review import (
-    ConsistencyReview,
     ConsistencyIssue,
     ConsistencyIssueType,
+    ConsistencyReview,
     ConsistencySeverity,
     ScriptConsistencyChecker,
+    get_consistency_feedback,
     review_script_consistency,
     review_script_consistency_to_json,
-    get_consistency_feedback
 )
 
 __all__ = [

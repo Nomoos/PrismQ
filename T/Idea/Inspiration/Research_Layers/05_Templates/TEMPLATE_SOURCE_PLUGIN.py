@@ -16,9 +16,11 @@ Example:
 """
 
 from typing import List, Optional
+
+from Source.{MediaType}.src.plugins import {MediaType}Plugin  # e.g., VideoPlugin
+
 from Model import IdeaInspiration
 from src import Config
-from Source.{MediaType}.src.plugins import {MediaType}Plugin  # e.g., VideoPlugin
 
 
 class {Platform}{Endpoint}Plugin({MediaType}Plugin):
