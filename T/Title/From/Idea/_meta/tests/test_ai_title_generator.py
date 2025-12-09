@@ -1,7 +1,7 @@
 """Tests for AI Title Generation module.
 
-This module tests the AITitleGenerator functionality which uses
-local LLM models (Qwen3:30b) via Ollama to generate titles.
+This module tests the refactored AITitleGenerator functionality which uses
+local LLM models (Qwen3:32b) via Ollama to generate titles.
 """
 
 import os
@@ -23,29 +23,29 @@ sys.path.insert(0, str(_idea_model_path))
 sys.path.insert(0, str(_src_path))
 
 from ai_title_generator import (
-    AITitleConfig,
     AITitleGenerator,
+    TitleGeneratorConfig,
     AIUnavailableError,
-    generate_ai_titles_from_idea,
+    generate_titles_from_idea,
 )
-from title_generator import TitleVariant
+from title_variant import TitleVariant
+from ollama_client import OllamaClient, OllamaConfig
+from title_scorer import TitleScorer, ScoringConfig
+from prompt_loader import PromptLoader
 
 from idea import ContentGenre, Idea, IdeaStatus
 
 
-class TestAITitleConfig:
-    """Tests for AITitleConfig dataclass."""
+class TestTitleGeneratorConfig:
+    """Tests for TitleGeneratorConfig dataclass."""
 
     def test_default_config(self):
         """Test default configuration values."""
-        config = AITitleConfig()
+        config = TitleGeneratorConfig()
 
-        assert config.model == "qwen3:32b"
-        assert config.api_base == "http://localhost:11434"
-        assert config.temperature == 0.8
-        assert config.max_tokens == 2000
-        assert config.timeout == 60
         assert config.num_variants == 10
+        assert config.temperature_min == 0.6
+        assert config.temperature_max == 0.8
 
     def test_custom_config(self):
         """Test custom configuration."""
