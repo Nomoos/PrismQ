@@ -311,6 +311,10 @@ class AIIdeaGenerator:
             ...     prompt_template="Improve this: {input}"
             ... )
         """
+        # Validate template parameters first (before availability check)
+        if not prompt_template_name and not prompt_template:
+            raise ValueError("Must provide either prompt_template_name or prompt_template")
+        
         if not self.available:
             logger.warning("Ollama not available, returning empty string")
             return ""
@@ -320,11 +324,9 @@ class AIIdeaGenerator:
             template_file = f"{prompt_template_name}.txt"
             template = _load_prompt(template_file)
             logger.info(f"Loaded prompt template: {prompt_template_name}")
-        elif prompt_template:
+        else:
             template = prompt_template
             logger.info("Using provided prompt template string")
-        else:
-            raise ValueError("Must provide either prompt_template_name or prompt_template")
         
         # Apply template with input text and any additional kwargs
         kwargs['input'] = input_text
