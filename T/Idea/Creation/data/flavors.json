@@ -1,0 +1,272 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Flavor definitions for PrismQ Idea Creation system",
+    "last_updated": "2025-12-09",
+    "total_flavors": 39
+  },
+  "default_fields": {
+    "hook": "The attention-grabbing opening or central question",
+    "core_concept": "The main idea or premise in 1-2 sentences",
+    "emotional_core": "The emotional heart of the story",
+    "audience_connection": "Why this resonates with the target audience",
+    "key_elements": "3-5 key story elements or beats",
+    "tone_style": "Overall tone and style approach"
+  },
+  "flavors": {
+    "Emotion-First Hook": {
+      "description": "Emotion as the primary driver",
+      "keywords": ["emotional", "hook", "feeling"],
+      "focus": "emotional_core",
+      "weight": 70
+    },
+    "Mystery/Curiosity Gap": {
+      "description": "Central mystery or unanswered question",
+      "keywords": ["mystery", "curiosity", "question"],
+      "focus": "hook",
+      "weight": 68
+    },
+    "Story Skeleton": {
+      "description": "Complete story structure framework",
+      "keywords": ["structure", "framework", "narrative"],
+      "focus": "key_elements",
+      "weight": 60
+    },
+    "Short-Form Viral": {
+      "description": "Optimized for short-form viral platforms",
+      "keywords": ["viral", "short", "engaging"],
+      "focus": "hook",
+      "weight": 65
+    },
+    "Niche-Blend": {
+      "description": "Combines multiple niches",
+      "keywords": ["blend", "niche", "unique"],
+      "focus": "core_concept",
+      "weight": 55
+    },
+    "Soft Supernatural + Friendship": {
+      "description": "Gentle supernatural with friendship and emotional growth",
+      "keywords": ["supernatural", "friendship", "wonder"],
+      "focus": "emotional_core",
+      "weight": 70
+    },
+    "Light Mystery + Adventure": {
+      "description": "Puzzles and adventure without dark themes",
+      "keywords": ["mystery", "adventure", "light"],
+      "focus": "key_elements",
+      "weight": 68
+    },
+    "Sci-Fi + School Realism": {
+      "description": "Near-future tech meets real school life",
+      "keywords": ["scifi", "school", "identity"],
+      "focus": "core_concept",
+      "weight": 60
+    },
+    "Emotional Drama + Growth": {
+      "description": "Character-driven feelings and transformation",
+      "keywords": ["emotional", "drama", "growth"],
+      "focus": "emotional_core",
+      "weight": 90
+    },
+    "Identity + Empowerment": {
+      "description": "Finding voice and embracing difference",
+      "keywords": ["identity", "empowerment", "voice"],
+      "focus": "emotional_core",
+      "weight": 85
+    },
+    "Confession Story Seed": {
+      "description": "First-person confession revealing hidden truth",
+      "keywords": ["confession", "vulnerable", "honest"],
+      "focus": "emotional_core",
+      "weight": 88
+    },
+    "Before/After Transformation Seed": {
+      "description": "Pivotal moment that changed everything",
+      "keywords": ["transformation", "change", "moment"],
+      "focus": "key_elements",
+      "weight": 75
+    },
+    "Overheard Truth Seed": {
+      "description": "Accidentally hearing something not meant for them",
+      "keywords": ["overheard", "secret", "discovery"],
+      "focus": "hook",
+      "weight": 75
+    },
+    "Mirror Moment Seed": {
+      "description": "Self-recognition or confrontation with self-image",
+      "keywords": ["mirror", "self", "realization"],
+      "focus": "emotional_core",
+      "weight": 85
+    },
+    "Chosen Family Seed": {
+      "description": "Finding belonging outside blood ties",
+      "keywords": ["family", "chosen", "belonging"],
+      "focus": "emotional_core",
+      "weight": 83
+    },
+    "Growing Apart Seed": {
+      "description": "Recognizing a connection is changing or fading",
+      "keywords": ["relationship", "change", "grief"],
+      "focus": "emotional_core",
+      "weight": 83
+    },
+    "First Butterflies Seed": {
+      "description": "First crush and attraction experiences",
+      "keywords": ["crush", "butterflies", "attraction"],
+      "focus": "emotional_core",
+      "weight": 85
+    },
+    "Body Acceptance Seed": {
+      "description": "Journey toward body acceptance and self-love",
+      "keywords": ["body", "acceptance", "self-love"],
+      "focus": "emotional_core",
+      "weight": 85
+    },
+    "Fitting In Seed": {
+      "description": "Navigating social belonging and acceptance",
+      "keywords": ["fitting", "belonging", "social"],
+      "focus": "audience_connection",
+      "weight": 80
+    },
+    "Online Connection Seed": {
+      "description": "Digital life and online relationships",
+      "keywords": ["online", "digital", "connection"],
+      "focus": "audience_connection",
+      "weight": 80
+    },
+    "Future Anxiety Seed": {
+      "description": "Fears and uncertainty about the future",
+      "keywords": ["future", "anxiety", "uncertainty"],
+      "focus": "emotional_core",
+      "weight": 78
+    },
+    "Comparison Trap Seed": {
+      "description": "Struggles with social comparison",
+      "keywords": ["comparison", "social", "self-worth"],
+      "focus": "emotional_core",
+      "weight": 78
+    },
+    "Youth Adventure Quest": {
+      "description": "Adventure-focused coming-of-age for ages 10-22",
+      "keywords": ["adventure", "growth", "discovery"],
+      "focus": "key_elements",
+      "weight": 85,
+      "audience": "10-22 years"
+    },
+    "Teen Identity Journey": {
+      "description": "Identity exploration for ages 10-22",
+      "keywords": ["identity", "self-discovery", "transformation"],
+      "focus": "emotional_core",
+      "weight": 90,
+      "audience": "10-22 years"
+    },
+    "Modern Woman's Voice": {
+      "description": "Contemporary women's experiences",
+      "keywords": ["identity", "empowerment", "authentic"],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "US women"
+    },
+    "Women's Real Talk": {
+      "description": "Honest stories about real-life challenges",
+      "keywords": ["honest", "relational", "vulnerable"],
+      "focus": "emotional_core",
+      "weight": 80,
+      "audience": "US women"
+    },
+    "Maine Youth Stories": {
+      "description": "Regional stories for Maine youth",
+      "keywords": ["regional", "community", "nature"],
+      "focus": "audience_connection",
+      "weight": 75,
+      "audience": "Maine residents 10-25"
+    },
+    "Teen Girl Confessional": {
+      "description": "First-person confessional for girls 13-16",
+      "keywords": ["confession", "emotional", "authentic"],
+      "focus": "emotional_core",
+      "weight": 95,
+      "audience": "US women 13-16"
+    },
+    "Young Woman's Moment": {
+      "description": "Snapshot moments of teenage girlhood",
+      "keywords": ["moment", "growth", "relational"],
+      "focus": "emotional_core",
+      "weight": 95,
+      "audience": "US women 13-16"
+    },
+    "Teen Girl Drama": {
+      "description": "Relatable dramatic stories for teen girls",
+      "keywords": ["drama", "relational", "friendship"],
+      "focus": "emotional_core",
+      "weight": 92,
+      "audience": "teen girls"
+    },
+    "Girl Squad Chronicles": {
+      "description": "Friendship and group dynamics",
+      "keywords": ["friendship", "group", "loyalty"],
+      "focus": "audience_connection",
+      "weight": 88,
+      "audience": "teen girls"
+    },
+    "Confession + Teen Identity": {
+      "description": "Confessional moments with identity exploration",
+      "keywords": ["confession", "identity", "transformation"],
+      "focus": "emotional_core",
+      "weight": 100,
+      "audience": "13-17 young women US/Canada"
+    },
+    "Body Acceptance + Real Talk": {
+      "description": "Body image with honest emotional depth",
+      "keywords": ["body", "honest", "transformation"],
+      "focus": "emotional_core",
+      "weight": 98,
+      "audience": "13-17 young women US/Canada"
+    },
+    "Friend Drama + Girl Squad": {
+      "description": "Friendship dynamics with group complexity",
+      "keywords": ["friendship", "drama", "loyalty"],
+      "focus": "emotional_core",
+      "weight": 96,
+      "audience": "13-17 young women US/Canada"
+    },
+    "Online Connection + Teen Voice": {
+      "description": "Digital life meets authentic teen expression",
+      "keywords": ["online", "authentic", "identity"],
+      "focus": "audience_connection",
+      "weight": 94,
+      "audience": "13-17 young women US/Canada"
+    },
+    "Mirror Moment + Identity Power": {
+      "description": "Self-recognition leading to empowerment",
+      "keywords": ["mirror", "identity", "empowerment"],
+      "focus": "emotional_core",
+      "weight": 97,
+      "audience": "13-17 young women US/Canada"
+    },
+    "Teen Girl Heart": {
+      "description": "Emotional core stories for 13-17 young women",
+      "keywords": ["emotional", "authentic", "relational"],
+      "focus": "emotional_core",
+      "weight": 100,
+      "audience": "13-17 young women US/Canada",
+      "score": 10.0
+    },
+    "Young Woman's Truth": {
+      "description": "Honest first-person narratives",
+      "keywords": ["honest", "confession", "vulnerable"],
+      "focus": "emotional_core",
+      "weight": 100,
+      "audience": "13-17 young women US/Canada",
+      "score": 9.8
+    },
+    "Teen Moment Magic": {
+      "description": "Small moments with big meaning",
+      "keywords": ["moment", "meaning", "growth"],
+      "focus": "emotional_core",
+      "weight": 98,
+      "audience": "13-17 young women US/Canada",
+      "score": 9.5
+    }
+  }
+}

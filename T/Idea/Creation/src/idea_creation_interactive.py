@@ -40,15 +40,15 @@ sys.path.insert(0, str(REPO_ROOT))  # Add repo root for src module import
 try:
     from idea_variants import (
         DEFAULT_IDEA_COUNT,
-        VARIANT_TEMPLATES,
-        create_all_variants,
-        create_idea_variant,
         create_ideas_from_input,
-        create_multiple_of_same_variant,
         format_idea_as_text,
-        get_template,
-        list_templates,
+        get_flavor,
+        list_flavors,
+        get_flavor_count,
     )
+    # Backward compatibility
+    get_template = get_flavor
+    list_templates = list_flavors
 
     VARIANTS_AVAILABLE = True
 except ImportError as e:
@@ -334,15 +334,39 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_warning("Database module not available - will run in preview mode")
             preview = True
 
-    # Show available templates
-    print_section("Available Variant Templates")
-    templates = list_templates()
-    for i, name in enumerate(templates, 1):
-        template = get_template(name)
-        print(f"  {i:2}. {Colors.BOLD}{name:15}{Colors.END} - {template['name']}")
-
-    if logger:
-        logger.info(f"Available templates: {templates}")
+    # Show available flavors (not variant templates)
+    # Flavors are now the primary interface - variants are implementation details
+    print_section("Available Flavors")
+    
+    # Import flavor functions
+    try:
+        from flavors import list_flavor_categories, get_flavor_count
+        
+        total_flavors = get_flavor_count()
+        print(f"  Total available flavors: {Colors.BOLD}{total_flavors}{Colors.END}")
+        print(f"  Flavors are automatically selected using weighted random selection")
+        print(f"  optimized for the primary audience (13-17 young women in US/Canada)")
+        
+        categories = list_flavor_categories()
+        print(f"\n  Sample flavor categories:")
+        for cat_name in list(categories.keys())[:5]:
+            flavors_in_cat = categories[cat_name]
+            print(f"    • {Colors.CYAN}{cat_name}{Colors.END}: {len(flavors_in_cat)} flavors")
+        
+        if logger:
+            logger.info(f"Available flavors: {total_flavors}")
+            logger.info(f"Flavor categories: {list(categories.keys())}")
+    except ImportError:
+        # Fallback to showing templates if flavors not available
+        print_warning("Flavor module not available, showing variant templates")
+        templates = list_templates()
+        for i, name in enumerate(templates[:10], 1):
+            template = get_template(name)
+            print(f"  {i:2}. {Colors.BOLD}{name:15}{Colors.END} - {template['name']}")
+        print(f"  ... and {len(templates) - 10} more")
+        
+        if logger:
+            logger.info(f"Available templates: {len(templates)}")
 
     # Interactive loop
     print_section("Enter Text Input")
