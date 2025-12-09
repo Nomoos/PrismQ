@@ -115,7 +115,7 @@ class TestLoadPrompt(unittest.TestCase):
         self.assertIsInstance(content, str)
         self.assertGreater(len(content), 0)
         # Should contain the task description
-        self.assertIn("Analyze", content)
+        self.assertIn("rewrite", content)
         self.assertIn("{input}", content)
     
     def test_load_nonexistent_prompt_raises(self):

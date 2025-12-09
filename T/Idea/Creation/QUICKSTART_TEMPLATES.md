@@ -28,26 +28,41 @@ print(result)
 Located at: `T/Idea/Creation/_meta/prompts/idea_improvement.txt`
 
 ```
-Task:
-Analyze the following text and identify its core weaknesses in concept, logic, 
-worldbuilding, clarity, or thematic intention. Use these weaknesses to redesign 
-the idea into a stronger, clearer, more compelling version.
+You will rewrite the provided text into a stronger core idea. Your task is to restate 
+the underlying conceptual intention with sharper logic, clearer thematic focus, and 
+more coherent framing. You must stay within the scope of the original text, but when 
+the text is minimal, fragmentary, or ambiguous, you must infer a plausible conceptual 
+intention and refine it. You must never state that the text is insufficient; always 
+produce a refined idea based on whatever is given. You may use light atmospheric or 
+descriptive language, but only in service of clarifying tone or emotional context, 
+not to add new content.
 
-Rules:
+Output exactly 5 sentences that express the improved idea. The output may include 
+subtle mood or texture, but must remain grounded in the conceptual structure of the 
+idea. Do not add new events, scenes, world elements, characters, lore, or emotional 
+beats that are not in the source. Keep the language controlled, purposeful, and 
+focused on articulating the central thought.
 
-Do not summarize the text.
-Do not review pacing or structure.
-Do not describe the audience.
-Do not explain your reasoning.
-Do not output critique.
-Do not output lists, sections, or commentary.
+Do not analyze, critique, summarize, or reference the original text. Do not mention 
+that you are rewriting. Do not explain your reasoning. Produce only the final refined 
+idea as a standalone conceptual statement.
 
-Output only the final improved idea as a short, self-contained concept.
+Reinforcement:
+Always generate a refined idea, even from minimal input.
+The output may include light atmosphere but must remain conceptual.
+The output must refine, not expand.
+The output must not summarize or comment on the source.
+The output must present only the improved idea.
+The output must contain exactly 5 sentences.
 
-Now analyze this text and produce the improved idea:
-
-{input}
+SOURCE_IDEA: {input}
 ```
+
+## Example Usage
+
+**Input:** `"Acadia Night Hikers"`
+
+**Output (from AI):** The template will generate exactly 5 sentences that refine this minimal input into a stronger conceptual idea, inferring the underlying intention and expressing it with clearer thematic focus.
 
 ## Creating Your Own Templates
 
