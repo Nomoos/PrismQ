@@ -190,13 +190,19 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
 
-        # Build prompt from idea
+        # Build prompt from idea (once, since each call generates one title)
         prompt = self._create_prompt(idea, n_variants)
 
-        # Call Ollama
+        # Call Ollama multiple times to generate n_variants titles
+        # The new prompt generates one title per call
+        variants = []
         try:
-            response_text = self._call_ollama(prompt)
-            variants = self._parse_response(response_text, idea, n_variants)
+            for i in range(n_variants):
+                response_text = self._call_ollama(prompt)
+                variant = self._parse_single_title_response(response_text, idea, i)
+                if variant:
+                    variants.append(variant)
+            
             return variants
         except Exception as e:
             error_msg = f"AI title generation failed: {e}"
@@ -279,6 +285,95 @@ class AITitleGenerator:
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama API call failed: {e}")
             raise RuntimeError(f"Failed to generate titles: {e}")
+
+    def _parse_single_title_response(
+        self, response_text: str, idea: Idea, variant_index: int
+    ) -> Optional[TitleVariant]:
+        """Parse AI response for single title output (plain text).
+
+        This method handles the new prompt format that outputs only the title text,
+        not a JSON structure.
+
+        Args:
+            response_text: Raw response from AI (should be just the title)
+            idea: Original idea (for extracting keywords)
+            variant_index: Index of this variant (for scoring variation)
+
+        Returns:
+            TitleVariant instance or None if parsing fails
+        """
+        try:
+            # The new prompt outputs only the title text, so just clean and use it
+            title_text = response_text.strip()
+            
+            # Basic validation
+            if not title_text:
+                logger.warning("AI returned empty title text")
+                return None
+            
+            # Extract keywords from the idea for the variant
+            keywords = []
+            if hasattr(idea, "keywords") and idea.keywords:
+                keywords = idea.keywords[:3]
+            
+            # Determine a style based on title characteristics
+            style = self._infer_title_style(title_text)
+            
+            # Calculate a score based on title characteristics
+            # Prefer titles close to 45-52 characters as per prompt requirements
+            length = len(title_text)
+            score = 0.85  # Base score
+            if 45 <= length <= 52:
+                score = 0.95  # Ideal length
+            elif 40 <= length <= 55:
+                score = 0.90  # Good length
+            elif length < 40:
+                score = 0.80  # A bit short
+            elif length <= 60:
+                score = 0.82  # A bit long
+            else:
+                score = 0.75  # Too long
+            
+            # Add slight variation for diversity (to avoid identical scores)
+            score -= variant_index * 0.01
+            score = max(0.70, min(1.0, score))  # Clamp between 0.70 and 1.0
+            
+            return TitleVariant(
+                text=title_text,
+                style=style,
+                length=length,
+                keywords=keywords,
+                score=score
+            )
+        except Exception as e:
+            logger.error(f"Failed to parse single title response: {e}")
+            return None
+
+    def _infer_title_style(self, title_text: str) -> str:
+        """Infer the style of a title based on its text.
+
+        Args:
+            title_text: The title text
+
+        Returns:
+            Style string
+        """
+        title_lower = title_text.lower()
+        
+        # Check for question
+        if "?" in title_text or title_lower.startswith(("what", "why", "how", "when", "where", "who")):
+            return "question"
+        
+        # Check for how-to
+        if title_lower.startswith("how to"):
+            return "how-to"
+        
+        # Check for listicle (numbers)
+        if any(char.isdigit() for char in title_text[:10]):
+            return "listicle"
+        
+        # Default to direct style
+        return "direct"
 
     def _parse_response(
         self, response_text: str, idea: Idea, expected_count: int
