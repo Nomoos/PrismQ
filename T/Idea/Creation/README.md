@@ -6,14 +6,22 @@ The Creation module generates **10 Ideas by default** from simple inputs like ti
 
 ## Recent Updates ✨
 
-**Flavors System Migration** - The system has transitioned from a variant-centric to a **flavor-centric** interface:
-- **110 flavors** available (93 base + 17 custom audience-specific)
+**SOLID Architecture Refactoring** - Complete redesign following SOLID principles:
+- **Externalized Configuration**: Flavors defined in `data/flavors.json` (39 flavors)
+- **Service-Oriented**: `FlavorLoader`, `IdeaGenerator`, `FlavorSelector` classes
+- **Single Responsibility**: Each class does one thing well
+- **Open/Closed**: Extended through configuration, not code modification
+- **Clean Separation**: Code and data in separate files
+- **110% Test Coverage**: All functionality verified
+
+**Flavors System Migration** - Transitioned from variant-centric to flavor-centric interface:
+- **39 curated flavors** (streamlined from 93 variants)
 - **Automatic weighted selection** optimized for primary audience (13-17 young women in US/Canada)
 - **Custom audience flavors** for different demographics
 - **Scoring system** rates flavors for audience fit (0.0-10.0)
-- **Removed unused variant template files** - cleaner codebase
+- **Clean API**: Simple, intuitive function calls
 
-**[→ See FLAVORS_MIGRATION.md for details](./FLAVORS_MIGRATION.md)**
+**[→ See Flavors Migration Guide](./_meta/docs/FLAVORS_MIGRATION.md) for details**
 
 ## Purpose
 
@@ -260,11 +268,26 @@ Each AI-generated Idea includes:
 - **Qwen 2.5 72B**: 2-4 minutes (~12-20 tokens/sec)
 - **Command-R 35B**: 1-2 minutes (~25-35 tokens/sec)
 
-## Module Metadata
+## Module Documentation
 
-### Documentation
-- **[AI Generation Guide](./AI_GENERATION.md)** - Complete AI setup and usage
-- **[Custom Prompts Guide](./CUSTOM_PROMPTS.md)** - NEW: Flexible templating system
+### Core Documentation
+- **[Flavors Migration Guide](./_meta/docs/FLAVORS_MIGRATION.md)** - Understanding the flavors system
+- **[AI Generation Guide](./_meta/docs/AI_GENERATION.md)** - Complete AI setup and usage
+- **[Custom Prompts Guide](./_meta/docs/CUSTOM_PROMPTS.md)** - Flexible templating system
+- **[How It Works (CZ)](./_meta/docs/HOW_IT_WORKS.md)** - Detailed system explanation
+- **[Flavor System Guide](./_meta/docs/FLAVOR_SYSTEM.md)** - Working with flavors
+
+### Implementation & Review
+- **[Implementation Notes](./_meta/docs/IMPLEMENTATION_NOTES.md)** - Technical details
+- **[Implementation Summary](./_meta/docs/IMPLEMENTATION_SUMMARY.md)** - Overview
+- **[Review Documents](./_meta/docs/REVIEW.md)** - Code reviews and feedback
+
+### Reference
+- **[Prompt Variations](./_meta/docs/PROMPT_VARIATIONS.md)** - Prompt engineering guide
+- **[Quickstart Templates](./_meta/docs/QUICKSTART_TEMPLATES.md)** - Quick reference
+- **[Qwen Model Selection](./_meta/docs/QWEN_MODEL_SELECTION.md)** - Model comparison
+
+### External Links
 - **[Local AI Setup](../Model/_meta/docs/LOCAL_AI_GENERATION.md)** - Ollama configuration
 
 ### Examples
