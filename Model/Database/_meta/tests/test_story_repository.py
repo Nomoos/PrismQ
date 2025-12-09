@@ -50,7 +50,7 @@ def db_connection():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
             score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
     """)
     
