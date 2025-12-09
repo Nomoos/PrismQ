@@ -47,7 +47,7 @@ All critical documentation is in place, consistent, and properly linked. Minor e
   - All submodules documented (Idea, Script, Title, Review, Publishing)
   - Sequential workflow position explained
   - Navigation links working
-  - Additional workflow documentation in `TITLE_SCRIPT_WORKFLOW.md`
+  - Additional workflow documentation in `T/_meta/docs/TITLE_SCRIPT_WORKFLOW.md`
 - **Quality**: High - well-structured with clear module hierarchy
 
 #### A - Audio Generation Pipeline ✅

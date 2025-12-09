@@ -9,7 +9,7 @@
 
 ## 📋 Overview
 
-This directory contains the complete planning package for implementing Story Generation workflow (Stages 21-22 from WORKFLOW_DETAILED.md). The package includes a master plan, sample atomic issues demonstrating the approach, and supporting documentation.
+This directory contains the complete planning package for implementing Story Generation workflow (Stages 21-22 from T/_meta/docs/WORKFLOW_DETAILED.md). The package includes a master plan, sample atomic issues demonstrating the approach, and supporting documentation.
 
 ---
 
@@ -498,7 +498,7 @@ All issues demonstrate adherence to SOLID principles:
 ## 📚 References
 
 ### Workflow Documentation
-- [T/WORKFLOW_DETAILED.md](../../../T/WORKFLOW_DETAILED.md) - Complete workflow (Stages 1-23)
+- [T/_meta/docs/WORKFLOW_DETAILED.md](../../../T/_meta/docs/WORKFLOW_DETAILED.md) - Complete workflow (Stages 1-23)
 - [T/Story/README.md](../../../T/Story/README.md) - Story module overview
 - [T/Story/ExpertReview/README.md](../../../T/Story/ExpertReview/README.md) - ExpertReview docs
 - [T/Story/Polish/README.md](../../../T/Story/Polish/README.md) - Polish docs

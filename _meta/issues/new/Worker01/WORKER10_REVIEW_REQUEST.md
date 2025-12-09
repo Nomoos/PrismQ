@@ -9,7 +9,7 @@
 
 ## Summary
 
-Worker01 has created a comprehensive implementation plan for Story Generation workflow (Stages 21-22) based on WORKFLOW_DETAILED.md. This includes:
+Worker01 has created a comprehensive implementation plan for Story Generation workflow (Stages 21-22) based on T/_meta/docs/WORKFLOW_DETAILED.md. This includes:
 
 1. **Master Plan**: `STORY_GENERATION_PLAN.md` - Complete overview of 20 atomic issues across 5 phases
 2. **Sample Issues**: 3 detailed atomic issues demonstrating the approach:
@@ -261,7 +261,7 @@ Benefit: [Potential improvement]
 ## References
 
 ### Key Documents
-- [WORKFLOW_DETAILED.md](../../T/WORKFLOW_DETAILED.md) - Source of truth for workflow
+- [T/_meta/docs/WORKFLOW_DETAILED.md](../../../T/_meta/docs/WORKFLOW_DETAILED.md) - Source of truth for workflow
 - [STORY_GENERATION_PLAN.md](./STORY_GENERATION_PLAN.md) - Master implementation plan
 - [T/Story/README.md](../../T/Story/README.md) - Story module overview
 

@@ -18,7 +18,7 @@ Individual archive files have been merged and removed:
 New implementation planning package merged:
 - **STORY_GENERATION_PLAN.md**: Master plan with 20 atomic issues (STORY-001 to STORY-020)
 - **Worker01/** directory: Complete planning documentation (83KB across 6 files)
-- Implements Stages 21-22 (Story.ExpertReview + Story.Polish) from WORKFLOW_DETAILED.md
+- Implements Stages 21-22 (Story.ExpertReview + Story.Polish) from T/_meta/docs/WORKFLOW_DETAILED.md
 
 ### Previous Documentation Updates
 ✅ Replaced PARALLEL_RUN_NEXT_FULL.md with actual POST-001 to POST-048 roadmap  
