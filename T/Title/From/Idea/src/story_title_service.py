@@ -513,10 +513,10 @@ class StoryTitleService:
         # Persist Title
         title = self._title_repo.insert(title)
 
-        # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
-        # The workflow is: TITLE_FROM_IDEA -> SCRIPT_FROM_IDEA_TITLE
+        # Update Story state to CONTENT_FROM_IDEA_TITLE (next workflow step)
+        # The workflow is: TITLE_FROM_IDEA -> CONTENT_FROM_IDEA_TITLE
         # Title already references Story via story_id FK
-        story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
+        story.transition_to(StoryState.CONTENT_FROM_IDEA_TITLE)
         self._story_repo.update(story)
 
         return title
@@ -527,7 +527,7 @@ class StoryTitleService:
         This method:
         1. Finds all Stories with state TITLE_FROM_IDEA and no Title references
         2. Generates Title (v0) for each Story
-        3. Updates each Story's state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
+        3. Updates each Story's state to CONTENT_FROM_IDEA_TITLE (next workflow step)
 
         Args:
             idea_db: Optional SimpleIdeaDatabase to fetch Idea content.
@@ -677,9 +677,9 @@ class StoryTitleService:
                 # Assign a temporary ID for in-memory usage
                 title.id = i + 1
 
-            # Update Story state to SCRIPT_FROM_IDEA_TITLE (next workflow step)
+            # Update Story state to CONTENT_FROM_IDEA_TITLE (next workflow step)
             # Title already references Story via story_id FK
-            story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
+            story.transition_to(StoryState.CONTENT_FROM_IDEA_TITLE)
             if self._story_repo:
                 self._story_repo.update(story)
 
