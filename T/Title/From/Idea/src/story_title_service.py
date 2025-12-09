@@ -132,26 +132,32 @@ class StoryTitleService:
     This service implements the PrismQ.T.Title.From.Idea workflow stage,
     which finds Stories with state TITLE_FROM_IDEA (ready for title generation)
     that don't have Title references yet, and generates Title (version 0) for each.
+    
+    Title generation is AI-only using Ollama with Qwen3:32b model. If AI is
+    unavailable, AIUnavailableError will be raised.
 
     The service requires a database connection to:
     1. Find Stories with correct state and no titles
     2. Persist generated Titles
-    3. Update Story state to TITLE_V0
+    3. Update Story state to next workflow step
 
     Attributes:
         _conn: SQLite database connection
         _story_repo: Story repository
         _title_repo: Title repository
-        _title_generator: TitleGenerator for creating title variants
+        _ai_title_generator: AITitleGenerator for creating title variants (required)
 
     Example:
         >>> conn = sqlite3.connect("prismq.db")
         >>> conn.row_factory = sqlite3.Row
         >>> service = StoryTitleService(conn)
         >>>
-        >>> # Process all stories without titles
-        >>> result = service.process_stories_without_titles()
-        >>> print(f"Created {len(result.titles)} titles")
+        >>> # Process all stories without titles (requires AI)
+        >>> try:
+        ...     result = service.process_stories_without_titles()
+        ...     print(f"Created {len(result.titles)} titles")
+        ... except AIUnavailableError as e:
+        ...     print(f"AI unavailable: {e}")
     """
 
     NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
@@ -172,8 +178,10 @@ class StoryTitleService:
                 Required for new workflow (process_stories_without_titles).
                 Optional for backward compatibility (create_stories_with_titles).
             title_config: Optional configuration for title generation.
-            use_ai: Whether to use AI (Qwen2.5-14B-Instruct) for title generation.
-                Defaults to True. Falls back to template-based if AI unavailable.
+                Note: Title generation always uses AI. This parameter is kept
+                for backward compatibility but is not used.
+            use_ai: Whether to use AI for title generation.
+                Defaults to True. Must be True as AI is always required.
             auto_create_schema: If True (default), automatically creates database
                 tables on initialization. Set to False if schema is managed
                 externally via SchemaManager or migration tools.
@@ -182,17 +190,19 @@ class StoryTitleService:
             For production environments with proper schema management, set
             auto_create_schema=False and use SchemaManager.initialize_schema()
             during application bootstrapping instead.
+            
+            Title generation is AI-only. If AI is unavailable, AIUnavailableError
+            will be raised when attempting to generate titles.
         """
         self._conn = connection
         self._story_repo = StoryRepository(connection) if connection else None
         self._title_repo = TitleRepository(connection) if connection else None
-        self._title_generator = TitleGenerator(title_config)
 
         # Optionally ensure required tables exist (for convenience in development/testing)
         if connection and auto_create_schema:
             self.ensure_tables_exist()
 
-        # Initialize AI title generator if requested and available
+        # Initialize AI title generator (required for title generation)
         self._use_ai = use_ai
         self._ai_title_generator = None
         if use_ai and AI_TITLE_AVAILABLE:
@@ -636,10 +646,9 @@ class StoryTitleService:
         if skip_if_exists and self.idea_has_stories(idea, effective_idea_id):
             return None
 
-        # Generate title variants using existing TitleGenerator
-        title_variants = self._title_generator.generate_from_idea(
-            idea, num_variants=self.NUM_STORIES
-        )
+        # Generate title variants using AI (required - no fallback)
+        # Will raise AIUnavailableError if AI is not available
+        title_variants = self.generate_title_variants(idea, num_variants=self.NUM_STORIES)
 
         # Create Stories and Titles
         stories: List[Story] = []
@@ -746,27 +755,32 @@ def create_stories_from_idea(
     DEPRECATED: Use Story.From.Idea module to create stories first,
     then use process_stories_without_titles() to generate titles.
     This function is kept for backward compatibility.
+    
+    Requires AI (Ollama with Qwen3:32b) to be available for title generation.
 
     Args:
         idea: The source Idea object.
         connection: Optional SQLite connection for persistence.
         idea_id: Optional explicit idea identifier.
-        title_config: Optional configuration for title generation.
+        title_config: Optional configuration for title generation (not used).
         skip_if_exists: If True (default), returns None if the Idea
             already has Stories in the database.
 
     Returns:
         StoryTitleResult containing created Stories and Titles,
         or None if skip_if_exists=True and Idea already has Stories.
+        
+    Raises:
+        AIUnavailableError: If AI title generation is not available.
 
     Example:
         >>> idea = Idea(title="AI Future", concept="Exploring AI trends")
-        >>> result = create_stories_from_idea(idea)
-        >>> if result:
-        ...     print(f"Created {result.count} stories")
-        ... else:
-        ...     print("Idea already has stories")
-        Created 10 stories
+        >>> try:
+        ...     result = create_stories_from_idea(idea)
+        ...     if result:
+        ...         print(f"Created {result.count} stories")
+        ... except AIUnavailableError:
+        ...     print("AI unavailable - cannot generate titles")
     """
     service = StoryTitleService(connection, title_config)
     return service.create_stories_with_titles(idea, idea_id, skip_if_exists)
@@ -780,14 +794,19 @@ def process_stories_without_titles(
     This is the main entry point for the PrismQ.T.Title.From.Idea module.
     It finds Stories with state TITLE_FROM_IDEA that don't have Title
     references yet, and generates the first Title (v0) for each.
+    
+    Requires AI (Ollama with Qwen3:32b) to be available for title generation.
 
     Args:
         connection: SQLite connection for persistence.
         idea_db: Optional SimpleIdeaDatabase for fetching Idea content.
-        title_config: Optional configuration for title generation.
+        title_config: Optional configuration for title generation (not used).
 
     Returns:
         StoryTitleResult containing processed Stories and created Titles.
+        
+    Raises:
+        AIUnavailableError: If AI title generation is not available.
 
     Example:
         >>> conn = sqlite3.connect("prismq.db")
