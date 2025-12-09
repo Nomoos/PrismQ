@@ -290,6 +290,7 @@ class AIIdeaGenerator:
         prompt_template_name: Optional[str] = None,
         prompt_template: Optional[str] = None,
         flavor: Optional[str] = None,
+        use_random_flavor: bool = True,
         **kwargs,
     ) -> str:
         """Generate text using a custom prompt template.
@@ -308,7 +309,10 @@ class AIIdeaGenerator:
             input_text: The input text to process
             prompt_template_name: Name of prompt template file (without .txt)
             prompt_template: Template string directly (if not using a file)
-            flavor: Optional thematic flavor for refinement (e.g., "Mystery + Unease")
+            flavor: Optional thematic flavor for refinement (e.g., "Mystery + Unease").
+                   If None and use_random_flavor=True, a weighted random flavor is selected.
+            use_random_flavor: If True and flavor is None, uses weighted random flavor selection.
+                              If False and flavor is None, no flavor is applied.
             **kwargs: Additional variables for template substitution
             
         Returns:
@@ -319,16 +323,22 @@ class AIIdeaGenerator:
             
         Examples:
             >>> gen = AIIdeaGenerator()
-            >>> # Using a template file with flavor
+            >>> # Using a template file with specific flavor
             >>> result = gen.generate_with_custom_prompt(
             ...     "The Vanishing Tide",
             ...     prompt_template_name="idea_improvement",
             ...     flavor="Mystery + Unease"
             ... )
-            >>> # Using a template string
+            >>> # Using weighted random flavor (default)
+            >>> result = gen.generate_with_custom_prompt(
+            ...     "Acadia Night Hikers",
+            ...     prompt_template_name="idea_improvement"
+            ... )  # Automatically selects weighted random flavor
+            >>> # No flavor
             >>> result = gen.generate_with_custom_prompt(
             ...     "My story",
-            ...     prompt_template="Improve this: {input}"
+            ...     prompt_template="Improve this: {input}",
+            ...     use_random_flavor=False
             ... )
         """
         # Validate template parameters first (before availability check)
@@ -350,9 +360,17 @@ class AIIdeaGenerator:
         
         # Apply template with input text, flavor, and any additional kwargs
         kwargs['input'] = input_text
+        
+        # Handle flavor selection
         if flavor:
             kwargs['flavor'] = flavor
-            logger.info(f"Using flavor: {flavor}")
+            logger.info(f"Using specified flavor: {flavor}")
+        elif use_random_flavor and '[FLAVOR]' in template:
+            # Import here to avoid circular dependency
+            from flavors import pick_weighted_flavor
+            selected_flavor = pick_weighted_flavor()
+            kwargs['flavor'] = selected_flavor
+            logger.info(f"Using weighted random flavor: {selected_flavor}")
         
         prompt = apply_template(template, **kwargs)
         

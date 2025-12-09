@@ -7,13 +7,14 @@ from the variant templates and represent abstract directions for tone and emphas
 
 from typing import Dict, List, Optional
 import sys
+import random
 from pathlib import Path
 
 # Add path for variant templates import
 _SCRIPT_DIR = Path(__file__).parent
 sys.path.insert(0, str(_SCRIPT_DIR))
 
-from idea_variants import list_templates, get_template
+from idea_variants import list_templates, get_template, VARIANT_WEIGHTS
 
 
 # =============================================================================
@@ -270,4 +271,114 @@ def get_flavor_count() -> int:
         Number of flavors
     """
     return len(_ALL_FLAVORS)
+
+
+# =============================================================================
+# WEIGHTED FLAVOR SELECTION
+# =============================================================================
+
+def _generate_flavor_weights() -> Dict[str, int]:
+    """Generate flavor weights based on variant weights.
+    
+    Maps each flavor (variant name) to its weight from VARIANT_WEIGHTS.
+    Flavors inherit the weights of their corresponding variants.
+    
+    Returns:
+        Dictionary mapping flavor names to weights
+    """
+    flavor_weights = {}
+    
+    for flavor_name, info in _ALL_FLAVORS.items():
+        variant_key = info['variant_key']
+        # Get weight from VARIANT_WEIGHTS, default to 50 if not found
+        weight = VARIANT_WEIGHTS.get(variant_key, 50)
+        flavor_weights[flavor_name] = weight
+    
+    return flavor_weights
+
+
+# Generate flavor weights from variant weights
+_FLAVOR_WEIGHTS = _generate_flavor_weights()
+
+
+def get_flavor_weights() -> Dict[str, int]:
+    """Get the flavor weight mappings.
+    
+    Returns:
+        Dictionary mapping flavor names to their weights
+    """
+    return _FLAVOR_WEIGHTS.copy()
+
+
+def pick_weighted_flavor(seed: Optional[int] = None) -> str:
+    """Pick a flavor using weighted random selection.
+    
+    Weights are inherited from variant template weights, which are tuned for
+    the primary audience (US girls 13-15) with higher weights for
+    emotion-focused, identity-focused, and mobile-friendly themes.
+    
+    Args:
+        seed: Optional seed for reproducible selection. If None, uses random.
+        
+    Returns:
+        Selected flavor name
+        
+    Examples:
+        >>> flavor = pick_weighted_flavor()
+        >>> # Likely to get high-weight flavors like "Emotional Drama + Growth"
+        
+        >>> flavor = pick_weighted_flavor(seed=12345)
+        >>> # Reproducible selection with seed
+    """
+    if seed is not None:
+        rng = random.Random(seed)
+    else:
+        rng = random.Random()
+    
+    # Build weighted list
+    flavors = list(_FLAVOR_WEIGHTS.keys())
+    weights = [_FLAVOR_WEIGHTS[f] for f in flavors]
+    
+    # Use random.choices with weights
+    selected = rng.choices(flavors, weights=weights, k=1)[0]
+    return selected
+
+
+def get_default_or_random_flavor(flavor: Optional[str] = None, use_weighted: bool = True, seed: Optional[int] = None) -> str:
+    """Get a flavor - use provided, or select default/random.
+    
+    This is the main function for flavor selection in the system.
+    
+    Args:
+        flavor: Optional flavor name. If provided, returns this.
+        use_weighted: If True, uses weighted random selection. If False, uses simple default.
+        seed: Optional seed for reproducible weighted selection.
+        
+    Returns:
+        Flavor name to use
+        
+    Examples:
+        >>> # Use provided flavor
+        >>> get_default_or_random_flavor("Mystery + Unease")
+        'Mystery + Unease'
+        
+        >>> # Use weighted random (default behavior)
+        >>> get_default_or_random_flavor()
+        # Returns weighted random flavor, e.g., "Emotional Drama + Growth"
+        
+        >>> # Use simple default
+        >>> get_default_or_random_flavor(use_weighted=False)
+        'Emotional Drama + Growth'
+    """
+    if flavor:
+        # Use provided flavor if specified
+        return flavor
+    
+    if use_weighted:
+        # Use weighted random selection (default)
+        return pick_weighted_flavor(seed=seed)
+    else:
+        # Use simple default
+        return get_default_flavor()
+
 

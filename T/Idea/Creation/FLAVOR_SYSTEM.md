@@ -119,7 +119,7 @@ rather than a cue for descriptive or narrative writing...
 
 ```python
 from ai_generator import AIIdeaGenerator
-from flavors import list_flavors, search_flavors_by_keyword
+from flavors import list_flavors, search_flavors_by_keyword, pick_weighted_flavor
 
 # Browse all flavors
 all_flavors = list_flavors()  # Returns all 93
@@ -130,12 +130,47 @@ emotional_flavors = search_flavors_by_keyword("emotional")
 
 # Use with AI
 generator = AIIdeaGenerator()
+
+# Method 1: Use weighted random flavor (DEFAULT - recommended)
+result = generator.generate_with_custom_prompt(
+    input_text="Your idea here",
+    prompt_template_name="idea_improvement"
+)
+# Automatically selects a weighted random flavor
+# High-weight flavors (100) are more likely: "Emotional Drama + Growth", "Identity + Empowerment", etc.
+
+# Method 2: Specify a particular flavor
 result = generator.generate_with_custom_prompt(
     input_text="Your idea here",
     prompt_template_name="idea_improvement",
-    flavor="Mystery + Unease"  # Any of 93 flavors
+    flavor="Mystery + Unease"  # Explicit flavor selection
+)
+
+# Method 3: Pick a random flavor yourself
+selected_flavor = pick_weighted_flavor()
+result = generator.generate_with_custom_prompt(
+    input_text="Your idea here",
+    prompt_template_name="idea_improvement",
+    flavor=selected_flavor
 )
 ```
+
+### Weighted Selection
+
+Flavors use **weighted random selection** by default:
+
+- Each flavor inherits the weight from its corresponding variant template
+- Weights range from 25 to 100
+- **Ultra-primary flavors (weight 100)**: 31 flavors optimized for US girls 15-18
+  - Examples: "Emotional Drama + Growth", "Identity + Empowerment", "Body Acceptance Seed"
+- **Very high flavors (weight 92-98)**: Strong teen appeal
+  - Examples: "Magical Realism + Aesthetic", "School + Family Collision"
+- **High flavors (weight 70-88)**: Good appeal across ages
+  - Examples: "Light Mystery + Adventure", "Soft Supernatural + Friendship"
+- **Moderate flavors (weight 45-65)**: Broader appeal
+- **Lower weights (25-40)**: More specialized or structured themes
+
+This ensures the most relevant and engaging flavors are selected more frequently while maintaining variety.
 
 ## Complete Flavor List
 

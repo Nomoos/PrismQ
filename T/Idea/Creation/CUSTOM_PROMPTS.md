@@ -50,20 +50,37 @@ emotional_flavors = search_flavors_by_keyword("emotional")
 
 ### Using Flavors with Templates
 
-The `idea_improvement.txt` template now supports the `[FLAVOR]` placeholder:
+The `idea_improvement.txt` template now supports the `[FLAVOR]` placeholder with **weighted random selection**:
 
 ```python
 from ai_generator import AIIdeaGenerator
 
 generator = AIIdeaGenerator()
 
-# Refine with a specific thematic flavor
+# Method 1: Use weighted random flavor (DEFAULT - no flavor parameter needed)
+result = generator.generate_with_custom_prompt(
+    input_text="Acadia Night Hikers",
+    prompt_template_name="idea_improvement"
+)
+# Automatically selects a weighted random flavor like "Emotional Drama + Growth"
+# Higher-weighted flavors (weight 100) are more likely to be selected
+
+# Method 2: Specify a particular flavor
 result = generator.generate_with_custom_prompt(
     input_text="Acadia Night Hikers",
     prompt_template_name="idea_improvement",
-    flavor="Mystery + Unease"  # Guides the conceptual orientation
+    flavor="Mystery + Unease"  # Explicit flavor
+)
+
+# Method 3: Disable flavor selection
+result = generator.generate_with_custom_prompt(
+    input_text="Acadia Night Hikers",
+    prompt_template_name="idea_improvement",
+    use_random_flavor=False  # No flavor applied
 )
 ```
+
+**Flavor Weights**: Each flavor inherits the weight from its variant template. Ultra-primary flavors (weight 100) like "Emotional Drama + Growth", "Identity + Empowerment", and "Body Acceptance Seed" are most likely to be selected, tuned for the primary audience (US girls 13-15).
 
 Different flavors produce different conceptual emphases while maintaining the core idea.
 
