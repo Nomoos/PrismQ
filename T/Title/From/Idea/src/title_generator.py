@@ -50,8 +50,8 @@ class TitleConfig:
     include_keywords: bool = True
 
 
-# Import TitleVariant from the new modular structure
-from title_variant import TitleVariant
+# Import TitleVariant from the new modular structure using relative import
+from .title_variant import TitleVariant
 
 
 class TitleGenerator:

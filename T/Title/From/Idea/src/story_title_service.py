@@ -64,9 +64,9 @@ src_dir = current_file.parent
 if str(src_dir) not in sys.path:
     sys.path.insert(0, str(src_dir))
 
-# Import title generation components from refactored modules
-from title_variant import TitleVariant
-from ai_title_generator import (
+# Import title generation components from refactored modules using relative imports
+from .title_variant import TitleVariant
+from .ai_title_generator import (
     AITitleGenerator,
     TitleGeneratorConfig,
     AIUnavailableError as _AIUnavailableError,

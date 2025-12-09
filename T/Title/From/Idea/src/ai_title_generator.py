@@ -21,10 +21,11 @@ sys.path.insert(0, str(model_path))
 
 from idea import Idea
 
-from ollama_client import OllamaClient, OllamaConfig
-from prompt_loader import PromptLoader
-from title_scorer import TitleScorer, ScoringConfig
-from title_variant import TitleVariant
+# Import refactored components using relative imports for package consistency
+from .ollama_client import OllamaClient, OllamaConfig
+from .prompt_loader import PromptLoader
+from .title_scorer import TitleScorer, ScoringConfig
+from .title_variant import TitleVariant
 
 logger = logging.getLogger(__name__)
 
