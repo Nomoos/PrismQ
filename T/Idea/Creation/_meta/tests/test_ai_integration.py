@@ -21,6 +21,12 @@ from ai_generator import AIIdeaGenerator, AIConfig
 class TestAIIntegration:
     """Tests for AI integration in idea generation."""
     
+    # Test data constants
+    MOCK_AI_CONTENT = (
+        "Sarah discovers an ancient map hidden in her grandmother's attic, leading to a treasure hunt through Acadia's moonlit trails. "
+        "The journey becomes a test of courage as mysterious lights guide her deeper into the forest."
+    )
+    
     def test_ai_generator_initialization_when_available(self):
         """Test that AI generator is initialized when Ollama is available."""
         # Mock the AI generator to simulate Ollama being available
@@ -91,11 +97,8 @@ class TestAIIntegration:
             mock_ai_instance = Mock()
             mock_ai_instance.available = True
             
-            # Mock realistic AI content
-            mock_ai_instance.generate_with_custom_prompt = lambda input_text, **kwargs: (
-                "Sarah discovers an ancient map hidden in her grandmother's attic, leading to a treasure hunt through Acadia's moonlit trails. "
-                "The journey becomes a test of courage as mysterious lights guide her deeper into the forest."
-            )
+            # Use test data constant for realistic AI content
+            mock_ai_instance.generate_with_custom_prompt = lambda **kwargs: self.MOCK_AI_CONTENT
             
             mock_ai_gen_class.return_value = mock_ai_instance
             

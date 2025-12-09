@@ -32,6 +32,9 @@ class IdeaGenerator:
     Single Responsibility: Generate idea content from input and flavor.
     """
     
+    # Minimum length for AI-generated content to be considered valid
+    MIN_AI_CONTENT_LENGTH = 20
+    
     def __init__(self, flavor_loader=None, use_ai=True, ai_config=None):
         """Initialize idea generator.
         
@@ -182,6 +185,53 @@ class IdeaGenerator:
             topic = topic[0].upper() + topic[1:]
         return topic if topic else "this topic"
     
+    def _try_ai_generation(
+        self,
+        title: str,
+        description: str,
+        field_desc: str,
+        flavor_name: str,
+    ) -> Optional[str]:
+        """Try to generate content using AI.
+        
+        Args:
+            title: Input title
+            description: Optional description
+            field_desc: Field description for the prompt
+            flavor_name: Flavor name
+            
+        Returns:
+            Generated content if successful, None otherwise
+        """
+        if not self.ai_generator:
+            return None
+        
+        try:
+            # Create input text
+            input_text = title
+            if description:
+                input_text = f"{title}: {description}"
+            
+            # Use custom field generation prompt
+            generated = self.ai_generator.generate_with_custom_prompt(
+                input_text=input_text,
+                prompt_template_name="field_generation",
+                flavor=flavor_name,
+                field_description=field_desc,
+                use_random_flavor=False
+            )
+            
+            # Validate content length
+            if generated and len(generated) > self.MIN_AI_CONTENT_LENGTH:
+                logger.debug(f"AI generated content for '{field_desc}': {generated[:80]}...")
+                return generated.strip()
+            else:
+                logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
+                return None
+        except Exception as e:
+            logger.warning(f"AI generation failed for '{field_desc}': {e}, falling back to template")
+            return None
+    
     def _generate_focused_content(
         self,
         title: str,
@@ -195,30 +245,9 @@ class IdeaGenerator:
         Uses AI generation if available, falls back to templates otherwise.
         """
         # Try AI generation first
-        if self.ai_generator:
-            try:
-                # Create input text
-                input_text = title
-                if description:
-                    input_text = f"{title}: {description}"
-                
-                # Use custom field generation prompt
-                generated = self.ai_generator.generate_with_custom_prompt(
-                    input_text=input_text,
-                    prompt_template_name="field_generation",
-                    flavor=flavor_name,
-                    field_description=field_desc,
-                    use_random_flavor=False
-                )
-                
-                # If AI generated meaningful content, use it
-                if generated and len(generated) > 20:
-                    logger.debug(f"AI generated focused content for '{field_desc}': {generated[:80]}...")
-                    return generated.strip()
-                else:
-                    logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
-            except Exception as e:
-                logger.warning(f"AI generation failed for focused content '{field_desc}': {e}, falling back to template")
+        ai_content = self._try_ai_generation(title, description, field_desc, flavor_name)
+        if ai_content:
+            return ai_content
         
         # Fallback to template generation
         topic = self._humanize_topic(title)
@@ -247,30 +276,9 @@ class IdeaGenerator:
         Uses AI generation if available, falls back to templates otherwise.
         """
         # Try AI generation first
-        if self.ai_generator:
-            try:
-                # Create input text
-                input_text = title
-                if description:
-                    input_text = f"{title}: {description}"
-                
-                # Use custom field generation prompt
-                generated = self.ai_generator.generate_with_custom_prompt(
-                    input_text=input_text,
-                    prompt_template_name="field_generation",
-                    flavor=flavor_name,
-                    field_description=field_desc,
-                    use_random_flavor=False
-                )
-                
-                # If AI generated meaningful content, use it
-                if generated and len(generated) > 20:
-                    logger.debug(f"AI generated field content for '{field_desc}': {generated[:80]}...")
-                    return generated.strip()
-                else:
-                    logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
-            except Exception as e:
-                logger.warning(f"AI generation failed for field content '{field_desc}': {e}, falling back to template")
+        ai_content = self._try_ai_generation(title, description, field_desc, flavor_name)
+        if ai_content:
+            return ai_content
         
         # Fallback to template generation
         topic = self._humanize_topic(title)
