@@ -58,7 +58,7 @@ class StoryState(str, Enum):
     Example:
         >>> from Model.State.constants.state_names import StoryState
         >>> story.state = StoryState.TITLE_FROM_IDEA.value
-        >>> story.transition_to(StoryState.CONTENT_FROM_IDEA_TITLE)
+        >>> story.transition_to(StoryState.SCRIPT_FROM_IDEA_TITLE)
     """
 
     # Initial state when Story is created
@@ -69,28 +69,28 @@ class StoryState(str, Enum):
 
     # Stage 2-3: Initial Content Generation
     TITLE_FROM_IDEA = f"{_STATE_PREFIX}.Title.From.Idea"
-    CONTENT_FROM_IDEA_TITLE = f"{_STATE_PREFIX}.Content.From.Idea.Title"
+    SCRIPT_FROM_IDEA_TITLE = f"{_STATE_PREFIX}.Script.From.Idea.Title"
 
     # Stages 4-6: Initial Review Cycle
-    REVIEW_TITLE_FROM_CONTENT_IDEA = f"{_STATE_PREFIX}.Review.Title.From.Content.Idea"
-    REVIEW_CONTENT_FROM_TITLE_IDEA = f"{_STATE_PREFIX}.Review.Content.From.Title.Idea"
-    REVIEW_TITLE_FROM_CONTENT = f"{_STATE_PREFIX}.Review.Title.From.Content"
+    REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{_STATE_PREFIX}.Review.Title.From.Script.Idea"
+    REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{_STATE_PREFIX}.Review.Script.From.Title.Idea"
+    REVIEW_TITLE_FROM_SCRIPT = f"{_STATE_PREFIX}.Review.Title.From.Script"
 
     # Stages 7-9: Refinement and Re-review
-    TITLE_FROM_TITLE_REVIEW_CONTENT = f"{_STATE_PREFIX}.Title.From.Title.Review.Content"
-    CONTENT_FROM_CONTENT_REVIEW_TITLE = f"{_STATE_PREFIX}.Content.From.Content.Review.Title"
-    CONTENT_FROM_TITLE_REVIEW_CONTENT = f"{_STATE_PREFIX}.Content.From.Title.Review.Content"
-    REVIEW_CONTENT_FROM_TITLE = f"{_STATE_PREFIX}.Review.Content.From.Title"
-    TITLE_FROM_CONTENT_REVIEW_TITLE = f"{_STATE_PREFIX}.Title.From.Content.Review.Title"
+    TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Title.From.Title.Review.Script"
+    SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Script.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{_STATE_PREFIX}.Script.From.Title.Review.Script"
+    REVIEW_SCRIPT_FROM_TITLE = f"{_STATE_PREFIX}.Review.Script.From.Title"
+    TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{_STATE_PREFIX}.Title.From.Script.Review.Title"
 
     # Stages 10-16: Quality Review States
-    REVIEW_CONTENT_GRAMMAR = f"{_STATE_PREFIX}.Review.Content.Grammar"
-    REVIEW_CONTENT_TONE = f"{_STATE_PREFIX}.Review.Content.Tone"
-    REVIEW_CONTENT_CONTENT = f"{_STATE_PREFIX}.Review.Content.Content"
-    REVIEW_CONTENT_CONSISTENCY = f"{_STATE_PREFIX}.Review.Content.Consistency"
-    REVIEW_CONTENT_EDITING = f"{_STATE_PREFIX}.Review.Content.Editing"
+    REVIEW_SCRIPT_GRAMMAR = f"{_STATE_PREFIX}.Review.Script.Grammar"
+    REVIEW_SCRIPT_TONE = f"{_STATE_PREFIX}.Review.Script.Tone"
+    REVIEW_SCRIPT_CONTENT = f"{_STATE_PREFIX}.Review.Script.Content"
+    REVIEW_SCRIPT_CONSISTENCY = f"{_STATE_PREFIX}.Review.Script.Consistency"
+    REVIEW_SCRIPT_EDITING = f"{_STATE_PREFIX}.Review.Script.Editing"
     REVIEW_TITLE_READABILITY = f"{_STATE_PREFIX}.Review.Title.Readability"
-    REVIEW_CONTENT_READABILITY = f"{_STATE_PREFIX}.Review.Content.Readability"
+    REVIEW_SCRIPT_READABILITY = f"{_STATE_PREFIX}.Review.Script.Readability"
 
     # Stages 17-18: Expert Review Loop
     STORY_REVIEW = f"{_STATE_PREFIX}.Story.Review"
@@ -101,7 +101,7 @@ class StoryState(str, Enum):
 
     # Legacy states (kept for backward compatibility)
     TITLE_V0 = f"{_STATE_PREFIX}.Title.V0"
-    CONTENT_V0 = f"{_STATE_PREFIX}.Content.V0"
+    SCRIPT_V0 = f"{_STATE_PREFIX}.Script.V0"
 
 
 class StateNames:
@@ -132,35 +132,35 @@ class StateNames:
     # Stage 2-3: Initial Content Generation
     # =========================================================================
     TITLE_FROM_IDEA = f"{STATE_PREFIX}.Title.From.Idea"
-    CONTENT_FROM_IDEA_TITLE = f"{STATE_PREFIX}.Content.From.Idea.Title"
+    SCRIPT_FROM_IDEA_TITLE = f"{STATE_PREFIX}.Script.From.Idea.Title"
 
     # =========================================================================
     # Stages 4-6: Initial Review Cycle
     # =========================================================================
-    REVIEW_TITLE_FROM_CONTENT_IDEA = f"{STATE_PREFIX}.Review.Title.From.Content.Idea"
-    REVIEW_CONTENT_FROM_TITLE_IDEA = f"{STATE_PREFIX}.Review.Content.From.Title.Idea"
-    REVIEW_TITLE_FROM_CONTENT = f"{STATE_PREFIX}.Review.Title.From.Content"
+    REVIEW_TITLE_FROM_SCRIPT_IDEA = f"{STATE_PREFIX}.Review.Title.From.Script.Idea"
+    REVIEW_SCRIPT_FROM_TITLE_IDEA = f"{STATE_PREFIX}.Review.Script.From.Title.Idea"
+    REVIEW_TITLE_FROM_SCRIPT = f"{STATE_PREFIX}.Review.Title.From.Script"
 
     # =========================================================================
     # Stages 7-9: Refinement and Re-review
     # =========================================================================
-    TITLE_FROM_TITLE_REVIEW_CONTENT = f"{STATE_PREFIX}.Title.From.Title.Review.Content"
-    CONTENT_FROM_CONTENT_REVIEW_TITLE = f"{STATE_PREFIX}.Content.From.Content.Review.Title"
-    CONTENT_FROM_TITLE_REVIEW_CONTENT = f"{STATE_PREFIX}.Content.From.Title.Review.Content"
-    REVIEW_CONTENT_FROM_TITLE = f"{STATE_PREFIX}.Review.Content.From.Title"
-    TITLE_FROM_CONTENT_REVIEW_TITLE = f"{STATE_PREFIX}.Title.From.Content.Review.Title"
-    CONTENT_FROM_TITLE_REVIEW_CONTENT = f"{STATE_PREFIX}.Content.From.Title.Review.Content"
+    TITLE_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Title.From.Title.Review.Script"
+    SCRIPT_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Script.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
+    REVIEW_SCRIPT_FROM_TITLE = f"{STATE_PREFIX}.Review.Script.From.Title"
+    TITLE_FROM_SCRIPT_REVIEW_TITLE = f"{STATE_PREFIX}.Title.From.Script.Review.Title"
+    SCRIPT_FROM_TITLE_REVIEW_SCRIPT = f"{STATE_PREFIX}.Script.From.Title.Review.Script"
 
     # =========================================================================
     # Stages 10-16: Quality Review States
     # =========================================================================
-    REVIEW_CONTENT_GRAMMAR = f"{STATE_PREFIX}.Review.Content.Grammar"
-    REVIEW_CONTENT_TONE = f"{STATE_PREFIX}.Review.Content.Tone"
-    REVIEW_CONTENT_CONTENT = f"{STATE_PREFIX}.Review.Content.Content"
-    REVIEW_CONTENT_CONSISTENCY = f"{STATE_PREFIX}.Review.Content.Consistency"
-    REVIEW_CONTENT_EDITING = f"{STATE_PREFIX}.Review.Content.Editing"
+    REVIEW_SCRIPT_GRAMMAR = f"{STATE_PREFIX}.Review.Script.Grammar"
+    REVIEW_SCRIPT_TONE = f"{STATE_PREFIX}.Review.Script.Tone"
+    REVIEW_SCRIPT_CONTENT = f"{STATE_PREFIX}.Review.Script.Content"
+    REVIEW_SCRIPT_CONSISTENCY = f"{STATE_PREFIX}.Review.Script.Consistency"
+    REVIEW_SCRIPT_EDITING = f"{STATE_PREFIX}.Review.Script.Editing"
     REVIEW_TITLE_READABILITY = f"{STATE_PREFIX}.Review.Title.Readability"
-    REVIEW_CONTENT_READABILITY = f"{STATE_PREFIX}.Review.Content.Readability"
+    REVIEW_SCRIPT_READABILITY = f"{STATE_PREFIX}.Review.Script.Readability"
 
     # =========================================================================
     # Stages 17-18: Expert Review Loop
@@ -182,24 +182,24 @@ class StateNames:
         ],
         StateCategory.GENERATION: [
             TITLE_FROM_IDEA,
-            CONTENT_FROM_IDEA_TITLE,
-            TITLE_FROM_TITLE_REVIEW_CONTENT,
-            CONTENT_FROM_CONTENT_REVIEW_TITLE,
-            CONTENT_FROM_TITLE_REVIEW_CONTENT,
-            TITLE_FROM_CONTENT_REVIEW_TITLE,
+            SCRIPT_FROM_IDEA_TITLE,
+            TITLE_FROM_TITLE_REVIEW_SCRIPT,
+            SCRIPT_FROM_SCRIPT_REVIEW_TITLE,
+            SCRIPT_FROM_TITLE_REVIEW_SCRIPT,
+            TITLE_FROM_SCRIPT_REVIEW_TITLE,
         ],
         StateCategory.REVIEW: [
-            REVIEW_TITLE_FROM_CONTENT_IDEA,
-            REVIEW_CONTENT_FROM_TITLE_IDEA,
-            REVIEW_TITLE_FROM_CONTENT,
-            REVIEW_CONTENT_FROM_TITLE,
-            REVIEW_CONTENT_GRAMMAR,
-            REVIEW_CONTENT_TONE,
-            REVIEW_CONTENT_CONTENT,
-            REVIEW_CONTENT_CONSISTENCY,
-            REVIEW_CONTENT_EDITING,
+            REVIEW_TITLE_FROM_SCRIPT_IDEA,
+            REVIEW_SCRIPT_FROM_TITLE_IDEA,
+            REVIEW_TITLE_FROM_SCRIPT,
+            REVIEW_SCRIPT_FROM_TITLE,
+            REVIEW_SCRIPT_GRAMMAR,
+            REVIEW_SCRIPT_TONE,
+            REVIEW_SCRIPT_CONTENT,
+            REVIEW_SCRIPT_CONSISTENCY,
+            REVIEW_SCRIPT_EDITING,
             REVIEW_TITLE_READABILITY,
-            REVIEW_CONTENT_READABILITY,
+            REVIEW_SCRIPT_READABILITY,
             STORY_REVIEW,
         ],
         StateCategory.REFINEMENT: [
@@ -246,7 +246,7 @@ class StateNames:
 
         Example:
             >>> review_states = StateNames.get_states_by_category(StateCategory.REVIEW)
-            >>> 'PrismQ.T.Review.Content.Grammar' in review_states
+            >>> 'PrismQ.T.Review.Script.Grammar' in review_states
             True
         """
         return cls._CATEGORY_MAPPINGS.get(category, [])
@@ -321,13 +321,13 @@ class StateNames:
             List of quality review state names.
         """
         return [
-            cls.REVIEW_CONTENT_GRAMMAR,
-            cls.REVIEW_CONTENT_TONE,
-            cls.REVIEW_CONTENT_CONTENT,
-            cls.REVIEW_CONTENT_CONSISTENCY,
-            cls.REVIEW_CONTENT_EDITING,
+            cls.REVIEW_SCRIPT_GRAMMAR,
+            cls.REVIEW_SCRIPT_TONE,
+            cls.REVIEW_SCRIPT_CONTENT,
+            cls.REVIEW_SCRIPT_CONSISTENCY,
+            cls.REVIEW_SCRIPT_EDITING,
             cls.REVIEW_TITLE_READABILITY,
-            cls.REVIEW_CONTENT_READABILITY,
+            cls.REVIEW_SCRIPT_READABILITY,
         ]
 
     @classmethod
