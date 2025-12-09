@@ -111,7 +111,7 @@ def example_rtx_5090_optimized():
     # Configure for best quality using RTX 5090 recommended models
     config = CreationConfig(
         use_ai=True,
-        ai_model="llama3.1:70b-q4_K_M",  # Best for RTX 5090
+        ai_model="qwen3:30b",  # Best for RTX 5090
         ai_temperature=0.8,
         default_num_ideas=10,
     )
@@ -136,15 +136,15 @@ def example_alternative_models():
     print("Example 6: Alternative AI Models")
     print("=" * 80)
 
-    # Qwen 2.5 - Excellent for creative writing
-    config_qwen = CreationConfig(use_ai=True, ai_model="qwen2.5:72b-q4_K_M", ai_temperature=0.9)
+    # Qwen 3.30b - Excellent for creative writing and balance
+    config_qwen = CreationConfig(use_ai=True, ai_model="qwen3:30b", ai_temperature=0.9)
 
     # Command-R - Great for structured output
     config_command = CreationConfig(use_ai=True, ai_model="command-r:35b", ai_temperature=0.7)
 
     print("\nAvailable model configurations:")
-    print(f"1. Llama 3.1 70B: llama3.1:70b-q4_K_M (Default, best overall)")
-    print(f"2. Qwen 2.5 72B: qwen2.5:72b-q4_K_M (Creative writing)")
+    print(f"1. Qwen 3:30B: qwen3:30b (Default, best overall)")
+    print(f"2. Qwen 2.5 72B: qwen2.5:72b-q4_K_M (Creative writing, higher resource)")
     print(f"3. Command-R 35B: command-r:35b (Structured output)")
     print(f"4. Mixtral 8x7B: mixtral:8x7b-q4_K_M (Balanced performance)")
 
@@ -214,7 +214,7 @@ def main():
     print("\nNote: If Ollama is not running, all examples will use fallback generation.")
     print("To use AI generation:")
     print("1. Install Ollama: https://ollama.com/")
-    print("2. Pull a model: ollama pull llama3.1:70b-q4_K_M")
+    print("2. Pull a model: ollama pull qwen3:30b")
     print("3. Run the server: ollama serve")
     print("4. Run these examples again")
 

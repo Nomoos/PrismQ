@@ -2,7 +2,7 @@
 
 This module implements the script generation logic using local AI models:
 - Takes Idea object and Title v1 as input
-- Generates structured script with intro, body, and conclusion using Qwen2.5-14B-Instruct
+- Generates structured script with intro, body, and conclusion using Qwen3:30b
 - Optimizes for platform requirements (YouTube shorts < 180s)
 - Maintains coherence with title promises and idea intent
 - ALL generation goes through local AI models via Ollama
@@ -169,7 +169,7 @@ class ScriptGeneratorConfig:
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
         tone: Script tone (engaging, mysterious, educational, etc.)
-        ai_model: AI model to use for generation (default: Qwen2.5-14B-Instruct)
+        ai_model: AI model to use for generation (default: Qwen3:30b)
         ai_api_base: Base URL for Ollama API
         ai_temperature: AI generation temperature (0.0-2.0)
         ai_timeout: AI request timeout in seconds
@@ -182,7 +182,7 @@ class ScriptGeneratorConfig:
     include_cta: bool = True
     tone: ScriptTone = ScriptTone.ENGAGING
     # AI generation settings (required - all generation uses AI)
-    ai_model: str = "qwen2.5:14b-instruct"
+    ai_model: str = "qwen3:30b"
     ai_api_base: str = "http://localhost:11434"
     ai_temperature: float = 0.7
     ai_timeout: int = 120
@@ -191,7 +191,7 @@ class ScriptGeneratorConfig:
 class ScriptGenerator:
     """Generate script drafts (v1) from ideas and titles using local AI models.
 
-    This class uses Qwen2.5-14B-Instruct via Ollama for all script generation.
+    This class uses Qwen3:30b via Ollama for all script generation.
     AI availability is required - an error is raised if AI is not available.
     """
 
