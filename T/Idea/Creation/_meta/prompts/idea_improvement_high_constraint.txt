@@ -1,0 +1,3 @@
+Rewrite the source idea into a disciplined conceptual statement shaped by [FLAVOR]. Each sentence must introduce one specific conceptual function: a premise, a mechanism, an adaptive pressure, a thematic transformation, and a concluding implication. Avoid all sensory, metaphorical, emotional, or scenic language. Output exactly 5 sentences as the final idea, without commentary or reference to rewriting.
+
+SOURCE_IDEA: {input}

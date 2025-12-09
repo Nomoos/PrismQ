@@ -1,0 +1,3 @@
+Rewrite the source idea into a clearer, more focused concept. Infer what the idea is fundamentally trying to explore and restate it with stronger thematic clarity shaped by [FLAVOR]. Emphasize the central tension or contrast embedded in the idea, expressed conceptually rather than descriptively. Output exactly 5 sentences forming a single refined idea. Do not summarize, analyze, or reference the original text; only present the final concept.
+
+SOURCE_IDEA: {input}

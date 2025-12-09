@@ -78,7 +78,7 @@ class AITitleConfig:
         num_variants: Number of title variants to generate (3-10)
     """
 
-    model: str = "qwen3:30b"  # Qwen3:30b for RTX 5090
+    model: str = "qwen3:32b"  # Qwen3:30b for RTX 5090
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
     max_tokens: int = 2000

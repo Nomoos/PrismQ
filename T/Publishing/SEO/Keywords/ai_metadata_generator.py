@@ -72,7 +72,7 @@ class AIConfig:
     """Configuration for AI-powered metadata generation.
 
     Attributes:
-        model: Name of the Ollama model to use (default: qwen3:30b)
+        model: Name of the Ollama model to use (default: qwen3:32b)
         api_base: Base URL for Ollama API
         temperature: Sampling temperature (0.0-2.0, lower = more focused)
         max_tokens: Maximum tokens to generate
@@ -80,7 +80,7 @@ class AIConfig:
         enable_ai: Whether to use AI generation (raises error if False or unavailable)
     """
 
-    model: str = "qwen3:30b"  # Default local AI model - excellent balance of quality and speed
+    model: str = "qwen3:32b"  # Default local AI model - excellent balance of quality and speed
     api_base: str = "http://localhost:11434"
     temperature: float = 0.3  # Lower temp for more consistent SEO output
     max_tokens: int = 500

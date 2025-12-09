@@ -10,7 +10,8 @@ Transform minimal input (title or description) into multiple, fully-formed Ideas
 
 ## Key Features
 
-- **AI-Powered Generation**: Uses local LLMs (Llama 3.1 70B, Qwen 2.5, etc.) via Ollama
+- **AI-Powered Generation**: Uses local LLMs (Qwen 3.30b default, optimized for idea refinement) via Ollama
+- **Custom Prompt Templates**: NEW! Flexible templating system with multiple placeholder formats
 - **Default 10 Ideas**: Generates 10 high-quality ideas by default (Path 2: Manual Creation)
 - **RTX 5090 Optimized**: Configured for best models on high-end GPUs
 - **Intelligent Fallback**: Automatically falls back when AI unavailable
@@ -38,16 +39,16 @@ print(f"Created {len(ideas)} ideas")  # Output: Created 10 ideas
 ### Prerequisites
 
 1. **Install Ollama**: https://ollama.com/
-2. **Pull a model**: `ollama pull llama3.1:70b-q4_K_M`
+2. **Pull the model**: `ollama pull qwen3:32b`
 3. **Start server**: `ollama serve`
 
-### Recommended Models for RTX 5090
+### Recommended Models
 
 | Model | VRAM | Best For |
 |-------|------|----------|
-| `llama3.1:70b-q4_K_M` | 22GB | All-around best (default) |
-| `qwen2.5:72b-q4_K_M` | 23GB | Creative writing |
-| `command-r:35b` | 18GB | Structured output |
+| `qwen3:32b` | ~20GB | Qwen 3 32B - idea refinement (default) |
+| `qwen2.5:72b-q4_K_M` | 23GB | Creative writing (larger) |
+| `llama3.1:70b-q4_K_M` | 22GB | All-around alternative |
 
 ## Workflow Position
 
@@ -131,7 +132,40 @@ creator = IdeaCreator(config)
 ideas = creator.create_from_title("Creative Story Ideas")
 ```
 
-### Example 6: Fallback Mode (No AI)
+### Example 6: Custom Prompt Templates (New!)
+
+The module now supports flexible custom prompt templates for advanced AI usage:
+
+```python
+from PrismQ.T.Idea.Creation.src.ai_generator import AIIdeaGenerator
+
+# Initialize AI generator
+generator = AIIdeaGenerator()
+
+# Use a pre-made template by name
+result = generator.generate_with_custom_prompt(
+    input_text="The Vanishing Tide",
+    prompt_template_name="idea_improvement"
+)
+
+# Or use an inline template
+custom_template = """
+Task: Improve this story concept.
+
+Concept: {input}
+
+Output an enhanced version with stronger hooks and clearer themes.
+"""
+
+result = generator.generate_with_custom_prompt(
+    input_text="My story idea",
+    prompt_template=custom_template
+)
+```
+
+**See [CUSTOM_PROMPTS.md](./CUSTOM_PROMPTS.md) for complete guide**
+
+### Example 7: Fallback Mode (No AI)
 
 ```python
 # Disable AI to use placeholder generation
@@ -158,7 +192,7 @@ class CreationConfig:
     
     # AI settings
     use_ai: bool = True                        # Enable AI generation
-    ai_model: str = "llama3.1:70b-q4_K_M"     # Model name
+    ai_model: str = "qwen3:32b"               # Model name (Qwen 3 32B default)
     ai_temperature: float = 0.8                # Creativity (0.0-2.0)
     default_num_ideas: int = 10                # Default: 10 ideas
 ```
@@ -189,14 +223,17 @@ Each AI-generated Idea includes:
 
 ### Documentation
 - **[AI Generation Guide](./AI_GENERATION.md)** - Complete AI setup and usage
+- **[Custom Prompts Guide](./CUSTOM_PROMPTS.md)** - NEW: Flexible templating system
 - **[Local AI Setup](../Model/_meta/docs/LOCAL_AI_GENERATION.md)** - Ollama configuration
 
 ### Examples
 - **[AI Examples](../_meta/examples/ai_creation_examples.py)** - Complete code examples
+- **[Custom Prompt Examples](./_meta/examples/custom_prompt_example.py)** - NEW: Templating examples
 - **[Usage Examples](./_meta/examples/)** - Additional examples
 
 ### Tests
 - **[Test Suite](./_meta/tests/test_creation.py)** - 40 tests including AI tests
+- **[Custom Prompt Tests](./_meta/tests/test_custom_prompts.py)** - NEW: 22 templating tests
 
 ## Troubleshooting
 
@@ -210,7 +247,7 @@ WARNING: Ollama not available, using fallback
 
 ### Model Not Found
 ```bash
-ollama pull llama3.1:70b-q4_K_M
+ollama pull qwen3:32b
 ```
 
 ### Out of Memory

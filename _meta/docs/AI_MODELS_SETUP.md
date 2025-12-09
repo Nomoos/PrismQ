@@ -23,7 +23,7 @@ PrismQ uses local LLM models through Ollama for AI-powered content generation an
 
 ```bash
 # Quick start - Pull the primary model
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 ```
 
 ## Prerequisites
@@ -61,7 +61,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 In your terminal, run:
 
 ```bash
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 ```
 
 This will download approximately 19GB of model weights. The download time depends on your internet connection speed.
@@ -71,7 +71,7 @@ This will download approximately 19GB of model weights. The download time depend
 After the download finishes, verify the installation:
 
 ```bash
-ollama run qwen3:30b
+ollama run qwen3:32b
 ```
 
 You'll drop into an interactive prompt. Try something like:
@@ -88,7 +88,7 @@ If it responds with quality output, Qwen 3:30B is correctly installed.
 |-------|------|---------------|----------|
 | `qwen3:8b` | ~5GB | 8GB | Lighter weight, faster inference |
 | `qwen3:14b` | ~9GB | 16GB | Good balance for mid-range GPUs |
-| **`qwen3:30b`** | **~19GB** | **24GB+** | **🏆 PRIMARY - Best quality for RTX 5090** |
+| **`qwen3:32b`** | **~19GB** | **24GB+** | **🏆 PRIMARY - Best quality for RTX 5090** |
 | `qwen3:72b` | ~45GB | 48GB+ | Premium quality, requires multi-GPU or quantization |
 
 ### Alternative: Qwen 2.5 Models (Legacy)
@@ -99,7 +99,7 @@ For systems that cannot run Qwen 3, Qwen 2.5 variants are available:
 |-------|------|---------------|----------|
 | `qwen2.5:7b` | ~4.5GB | 8GB | Lighter weight, faster inference |
 | `qwen2.5:14b` | ~9GB | 16GB | Good balance of quality and speed |
-| `qwen2.5:32b` | ~20GB | 24GB+ | High quality alternative |
+| `qwen3:32b` | ~20GB | 24GB+ | High quality alternative |
 
 ```bash
 # Legacy fallback
@@ -138,7 +138,7 @@ For users with an NVIDIA RTX 5090 (32GB VRAM), you have access to the most power
 
 ```bash
 # Install primary model
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 ```
 
 ### Recommended Models for RTX 5090
@@ -209,7 +209,7 @@ ollama pull llama3.3:70b-q4_K_M
 ollama pull llama3.3:70b-q5_K_S
 
 # Pro Qwen2.5 32B (vejde se celý bez kvantizace)
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 ```
 
 > **Poznámka ke Q6_K:** I když Q6_K nabízí ~98.5% kvality, vyžaduje ~54GB VRAM pro 70B model. Na RTX 5090 (32GB) by musel použít CPU offloading, což dramaticky zpomalí inference. Pro vaši sestavu doporučuji Q4_K_M - ztráta kvality je minimální (~5%) a rychlost bude výrazně lepší.
@@ -234,7 +234,7 @@ ollama pull qwen2.5:32b
 from T.Publishing.SEO.Keywords import AIConfig
 
 # Primary model for all tasks
-PRIMARY_MODEL = "qwen3:30b"
+PRIMARY_MODEL = "qwen3:32b"
 
 # Idea Generation - creative, diverse
 idea_config = AIConfig(
@@ -319,7 +319,7 @@ Na základě interního testování PrismQ s anglickými příběhy pro US/CA pu
 
 | Model | Test příběh | Skóre | Struktura | Dialog | Postavy | Napětí | Konzistence | Čitelnost | Poznámka |
 |-------|-------------|-------|-----------|--------|---------|--------|-------------|-----------|----------|
-| **qwen2.5:32b (EN)** | The Lighthouse Keeper's Secret | **7.8/10** | 8 | 9 | 6.5 | 8 | 7 | 7.5 | 7 | 🏆 Překvapivě čisté, soudržné, čtivé — mnohem lepší než CZ |
+| **qwen3:32b (EN)** | The Lighthouse Keeper's Secret | **7.8/10** | 8 | 9 | 6.5 | 8 | 7 | 7.5 | 7 | 🏆 Překvapivě čisté, soudržné, čtivé — mnohem lepší než CZ |
 | **mistral-nemo:12b (EN)** | The Whispering Grove | **7.5/10** | 8 | 9 | 6 | 7.5 | 6 | 7 | 6 | Angličtina výrazně zvedá kvalitu, dobré YA-fantasy |
 
 > **Klíčové zjištění:** Anglická verze výrazně převyšuje českou u obou modelů. Pro US/CA publikum doporučujeme vždy generovat v angličtině.
@@ -335,7 +335,7 @@ Na základě testů doporučujeme pro **americké/kanadské teen publikum**:
 
 ```bash
 # Primární model pro EN YA content
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 
 # Sekundární/rychlejší model
 ollama pull mistral-nemo:12b
@@ -392,7 +392,7 @@ ollama pull nous-hermes2:yi-34b-q4_K_M
 
 **2. Qwen2.5:32b** - Univerzální vysoká kvalita
 ```bash
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 ```
 - Nejlepší balance kvality a rychlosti
 - Výborná angličtina, emotivní próza
@@ -434,7 +434,7 @@ reddit_config = AIConfig(
 
 # Teen Drama / Family Drama
 drama_config = AIConfig(
-    model="qwen2.5:32b",
+    model="qwen3:32b",
     temperature=0.75,
     max_tokens=4000,
     enable_ai=True
@@ -458,7 +458,7 @@ teen_stories_config = AIConfig(
 ollama pull nous-hermes2:yi-34b-q4_K_M
 
 # 2. Univerzální vysoká kvalita
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 
 # 3. Pro edgier teen content
 ollama pull dolphin2.6:yi-34b-q4_K_M
@@ -537,7 +537,7 @@ ollama pull yi:34b-chat-q4_K_M
 ollama pull nous-hermes2-mixtral:8x7b-q4_K_M
 
 # 4. Univerzální záloha
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 ```
 
 #### Konfigurace pro tvorbu příběhů
@@ -718,7 +718,7 @@ from T.Publishing.SEO.Keywords import AIConfig
 class MovingWindowGenerator:
     """Moving Window generator pro dlouhé příběhy."""
     
-    def __init__(self, model: str = "qwen2.5:32b"):
+    def __init__(self, model: str = "qwen3:32b"):
         self.config = AIConfig(
             model=model,
             api_base="http://localhost:11434",
@@ -761,7 +761,7 @@ Now continue the story:
 '''
 
 # Použití:
-generator = MovingWindowGenerator("qwen2.5:32b")
+generator = MovingWindowGenerator("qwen3:32b")
 generator.set_story_bible("""
 Characters: Clara (28, melancholic), Evelyn (ghost, mysterious)
 Setting: Willow Creek, haunted Victorian house
@@ -852,7 +852,7 @@ class PrismQMovingWindowScript:
     
     def __init__(
         self, 
-        model: str = "qwen2.5:32b",
+        model: str = "qwen3:32b",
         window_size: int = 1200,  # tokens
         block_words: int = 400    # target words per block
     ):
@@ -1067,7 +1067,7 @@ def script_from_idea_title_moving_window(idea: dict, title: str) -> str:
         script = script_from_idea_title_moving_window(idea, title)
     """
     generator = PrismQMovingWindowScript(
-        model="qwen2.5:32b",
+        model="qwen3:32b",
         window_size=1200,
         block_words=400
     )
@@ -1142,7 +1142,7 @@ For RTX 5090 with 32GB VRAM, we recommend:
 
 ```bash
 # Best quality for story writing
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 
 # Alternative for SEO and metadata
 ollama pull llama3.1:70b-q4_K_M
@@ -1155,7 +1155,7 @@ from T.Publishing.SEO.Keywords import AIConfig
 
 # High-quality story generation config
 story_config = AIConfig(
-    model="qwen2.5:32b",
+    model="qwen3:32b",
     api_base="http://localhost:11434",
     temperature=0.7,  # Higher for creative writing
     max_tokens=2000,
@@ -1230,7 +1230,7 @@ class PrismQModelManager:
 
 # Použití na začátku workflow
 manager = PrismQModelManager.get_instance()
-manager.ensure_model_loaded("qwen3:30b")  # Primary local model
+manager.ensure_model_loaded("qwen3:32b")  # Primary local model
 
 # Všechny následující dotazy použijí již načtený model
 ```
@@ -1239,8 +1239,8 @@ manager.ensure_model_loaded("qwen3:30b")  # Primary local model
 
 | Fáze | Model | Důvod |
 |------|-------|-------|
-| **Idea → Title → Script → Review** | `qwen3:30b` | 🏆 Jeden model pro celý workflow, bez přepínání |
-| **SEO Metadata** (volitelně) | `qwen3:30b` | Konzistentní výstupy |
+| **Idea → Title → Script → Review** | `qwen3:32b` | 🏆 Jeden model pro celý workflow, bez přepínání |
+| **SEO Metadata** (volitelně) | `qwen3:32b` | Konzistentní výstupy |
 
 > **Tip:** Pro maximální efektivitu používejte jeden model (Qwen 3:30B) pro celý běh. Přepínání mezi modely vyžaduje uvolnění a načtení ~20-40GB dat, což trvá 10-30 sekund.
 
@@ -1250,7 +1250,7 @@ Pro váš konkrétní hardware (AMD Ryzen 9 9900X3D + RTX 5090 32GB):
 
 | Parametr | Doporučená hodnota | Důvod |
 |----------|-------------------|-------|
-| **Model** | `qwen3:30b` | 🏆 Primary local model, plně využije RTX 5090 |
+| **Model** | `qwen3:32b` | 🏆 Primary local model, plně využije RTX 5090 |
 | **VRAM Usage** | ~19GB | Dostatek prostoru pro context |
 | **Context Length** | 8192-32768 | Využije 3D V-Cache pro KV cache |
 | **Batch Size** | 1 | Standardní pro generování |
@@ -1306,7 +1306,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 After the download finishes, verify the installation:
 
 ```bash
-ollama run qwen3:30b
+ollama run qwen3:32b
 ```
 
 You'll enter an interactive prompt. Try a test query:
@@ -1335,7 +1335,7 @@ import ollama
 prompt = "Write the first 500 words of a psychological horror story told in first person."
 
 response = ollama.chat(
-    model="qwen3:30b",  # Primary local AI model
+    model="qwen3:32b",  # Primary local AI model
     messages=[
         {"role": "user", "content": prompt}
     ]
@@ -1363,7 +1363,7 @@ from T.Publishing.SEO.Keywords import process_content_seo, AIConfig
 
 # Configure to use Qwen 3:30B (primary local model)
 config = AIConfig(
-    model="qwen3:30b",
+    model="qwen3:32b",
     api_base="http://localhost:11434",
     temperature=0.3,
     enable_ai=True
@@ -1949,7 +1949,7 @@ Now analyze the following story:
 """
     
     response = ollama.chat(
-        model="qwen3:30b",  # Qwen 3:30B for local review
+        model="qwen3:32b",  # Qwen 3:30B for local review
         messages=[
             {"role": "user", "content": REVIEW_PROMPT + story_text}
         ]
@@ -1966,7 +1966,7 @@ Now analyze the following story:
         "review": review_text,
         "score": score,
         "ready_for_polish": score >= 75,
-        "model": "qwen3:30b"
+        "model": "qwen3:32b"
     }
 ```
 
@@ -2002,10 +2002,10 @@ Loop back to LOCAL REVIEW
 
 ```bash
 # Pull Qwen 3:30B model
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 
 # Or with specific quantization for RTX 5090 (32GB VRAM)
-ollama pull qwen3:30b-q4_K_M
+ollama pull qwen3:32b-q4_K_M
 
 # Set keep-alive for efficient batch processing
 export OLLAMA_KEEP_ALIVE=60m

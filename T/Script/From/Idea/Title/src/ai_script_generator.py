@@ -609,7 +609,7 @@ class AIScriptGeneratorConfig:
         timeout: Request timeout in seconds
     """
 
-    model: str = "qwen3:30b"
+    model: str = "qwen3:32b"
     api_base: str = "http://localhost:11434"
     temperature: float = 0.7  # Moderate creativity for engaging scripts
     max_tokens: int = 2000

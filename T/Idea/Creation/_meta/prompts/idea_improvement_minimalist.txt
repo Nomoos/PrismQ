@@ -1,0 +1,3 @@
+Rewrite the text into a precise, distilled core idea shaped conceptually by [FLAVOR]. Use tight, economical phrasing and avoid abstraction not inherent in the idea. Output exactly 5 sentences that present the refined idea directly and clearly without atmospherics, imagery, or narrative framing. Output only the idea as a standalone conceptual statement.
+
+SOURCE_IDEA: {input}

@@ -10,6 +10,7 @@ maintenance and editing.
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
@@ -42,6 +43,87 @@ def _load_prompt(filename: str) -> str:
     return prompt_path.read_text(encoding="utf-8")
 
 
+def list_available_prompts() -> List[str]:
+    """List all available prompt templates in the prompts directory.
+    
+    Returns:
+        List of prompt template names (without .txt extension)
+    """
+    if not _PROMPTS_DIR.exists():
+        return []
+    
+    prompts = []
+    for prompt_file in _PROMPTS_DIR.glob("*.txt"):
+        prompts.append(prompt_file.stem)
+    
+    return sorted(prompts)
+
+
+def apply_template(template: str, **kwargs) -> str:
+    """Apply variable substitution to a template string.
+    
+    Supports multiple placeholder formats:
+    - {variable} - Standard Python format strings
+    - [VARIABLE] - Bracket notation (e.g., [FLAVOR], [INSERT TEXT HERE])
+    - INSERTTEXTHERE or INSERT_TEXT_HERE - Custom placeholder formats
+    
+    Args:
+        template: The template string with placeholders
+        **kwargs: Variable values to substitute
+        
+    Returns:
+        Template with variables substituted
+        
+    Examples:
+        >>> apply_template("Hello {name}!", name="World")
+        'Hello World!'
+        >>> apply_template("Text: INSERTTEXTHERE", input="My text")
+        'Text: My text'
+        >>> apply_template("Flavor: [FLAVOR]", flavor="Mystery")
+        'Flavor: Mystery'
+    """
+    # First handle custom placeholder formats
+    result = template
+    
+    # Handle INSERTTEXTHERE and similar custom formats
+    if 'input' in kwargs:
+        input_value = kwargs['input']
+        # Replace various custom placeholder formats
+        result = result.replace('INSERTTEXTHERE', str(input_value))
+        result = result.replace('INSERT_TEXT_HERE', str(input_value))
+        result = result.replace('INSERT TEXT HERE', str(input_value))
+        result = result.replace('[INSERT TEXT HERE]', str(input_value))
+    
+    # Handle [FLAVOR] and similar bracket notation
+    if 'flavor' in kwargs:
+        flavor_value = kwargs['flavor']
+        result = result.replace('[FLAVOR]', str(flavor_value))
+    
+    # Handle generic [VARIABLE] bracket notation
+    bracket_placeholders = re.findall(r'\[(\w+(?:\s+\w+)*)\]', result)
+    for placeholder in bracket_placeholders:
+        # Try to find matching key (case-insensitive)
+        key = placeholder.lower().replace(' ', '_')
+        if key in kwargs:
+            result = result.replace(f'[{placeholder}]', str(kwargs[key]))
+    
+    # Then apply standard Python format string substitution
+    # Use a safe approach that only substitutes available keys
+    try:
+        # Build a dict with only the placeholders that exist in the template
+        # Find all {variable} patterns
+        placeholders = re.findall(r'\{(\w+)\}', result)
+        safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
+        
+        # Apply standard format substitution
+        if safe_kwargs:
+            result = result.format(**safe_kwargs)
+    except (KeyError, ValueError) as e:
+        logger.warning(f"Template substitution warning: {e}")
+    
+    return result
+
+
 @dataclass
 class AIConfig:
     """Configuration for AI model and generation.
@@ -54,7 +136,7 @@ class AIConfig:
         timeout: Request timeout in seconds
     """
 
-    model: str = "qwen3:30b"  # Default: Best for RTX 5090
+    model: str = "qwen3:32b"  # Default: Best for RTX 5090
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
     max_tokens: int = 2000
@@ -202,6 +284,102 @@ class AIIdeaGenerator:
         response_text = self._call_ollama(prompt)
         return self._parse_ideas_response(response_text, num_ideas)
 
+    def generate_with_custom_prompt(
+        self,
+        input_text: str,
+        prompt_template_name: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+        flavor: Optional[str] = None,
+        use_random_flavor: bool = True,
+        **kwargs,
+    ) -> str:
+        """Generate text using a custom prompt template.
+        
+        This method provides maximum flexibility for using custom prompts
+        with the AI. You can either:
+        1. Provide a prompt template name (loads from _meta/prompts/)
+        2. Provide a prompt template string directly
+        
+        The template supports multiple placeholder formats:
+        - {input} or {variable} - Standard Python format strings
+        - [FLAVOR] - Thematic flavor for idea refinement
+        - INSERTTEXTHERE - Custom placeholder format
+        
+        Args:
+            input_text: The input text to process
+            prompt_template_name: Name of prompt template file (without .txt)
+            prompt_template: Template string directly (if not using a file)
+            flavor: Optional thematic flavor for refinement (e.g., "Mystery + Unease").
+                   If None and use_random_flavor=True, a weighted random flavor is selected.
+            use_random_flavor: If True and flavor is None, uses weighted random flavor selection.
+                              If False and flavor is None, no flavor is applied.
+            **kwargs: Additional variables for template substitution
+            
+        Returns:
+            Generated text from the AI
+            
+        Raises:
+            ValueError: If neither template name nor template provided
+            
+        Examples:
+            >>> gen = AIIdeaGenerator()
+            >>> # Using a template file with specific flavor
+            >>> result = gen.generate_with_custom_prompt(
+            ...     "The Vanishing Tide",
+            ...     prompt_template_name="idea_improvement",
+            ...     flavor="Mystery + Unease"
+            ... )
+            >>> # Using weighted random flavor (default)
+            >>> result = gen.generate_with_custom_prompt(
+            ...     "Acadia Night Hikers",
+            ...     prompt_template_name="idea_improvement"
+            ... )  # Automatically selects weighted random flavor
+            >>> # No flavor
+            >>> result = gen.generate_with_custom_prompt(
+            ...     "My story",
+            ...     prompt_template="Improve this: {input}",
+            ...     use_random_flavor=False
+            ... )
+        """
+        # Validate template parameters first (before availability check)
+        if not prompt_template_name and not prompt_template:
+            raise ValueError("Must provide either prompt_template_name or prompt_template")
+        
+        if not self.available:
+            logger.warning("Ollama not available, returning empty string")
+            return ""
+        
+        # Load or use provided template
+        if prompt_template_name:
+            template_file = f"{prompt_template_name}.txt"
+            template = _load_prompt(template_file)
+            logger.info(f"Loaded prompt template: {prompt_template_name}")
+        else:
+            template = prompt_template
+            logger.info("Using provided prompt template string")
+        
+        # Apply template with input text, flavor, and any additional kwargs
+        kwargs['input'] = input_text
+        
+        # Handle flavor selection
+        if flavor:
+            kwargs['flavor'] = flavor
+            logger.info(f"Using specified flavor: {flavor}")
+        elif use_random_flavor and '[FLAVOR]' in template:
+            # Import here to avoid circular dependency
+            from flavors import pick_weighted_flavor
+            selected_flavor = pick_weighted_flavor()
+            kwargs['flavor'] = selected_flavor
+            logger.info(f"Using weighted random flavor: {selected_flavor}")
+        
+        prompt = apply_template(template, **kwargs)
+        
+        logger.debug(f"Generated prompt: {prompt[:200]}...")
+        
+        # Call AI and return raw response
+        response_text = self._call_ollama(prompt)
+        return response_text.strip()
+
     def _create_title_prompt(
         self,
         title: str,
@@ -233,7 +411,8 @@ class AIIdeaGenerator:
 
         template = self.get_prompt_template(for_description=False)
 
-        return template.format(
+        return apply_template(
+            template,
             num_ideas=num_ideas,
             input=title,
             platforms=platforms_str,
@@ -273,7 +452,8 @@ class AIIdeaGenerator:
 
         template = self.get_prompt_template(for_description=True)
 
-        return template.format(
+        return apply_template(
+            template,
             num_ideas=num_ideas,
             input=description,
             platforms=platforms_str,

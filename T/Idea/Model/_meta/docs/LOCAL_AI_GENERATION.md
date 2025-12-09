@@ -260,7 +260,7 @@ generation_params = {
 | **Educational Content** | command-r:35b | 18GB | Fast | ★★★★☆ | Structured output |
 | **Technical/Code** | deepseek-coder:33b | 17GB | Fast | ★★★★★ | Best for tutorials |
 | **Fast Iteration** | llama3.2:8b | 8GB | Very Fast | ★★★☆☆ | Draft generation |
-| **Multi-language** | qwen2.5:32b-q4_K_M | 16GB | Fast | ★★★★☆ | Best for non-English |
+| **Multi-language** | qwen3:32b-q4_K_M | 16GB | Fast | ★★★★☆ | Best for non-English |
 
 ### Troubleshooting RTX 5090
 
