@@ -1,0 +1,3 @@
+Rewrite the source idea as a conceptual exploration of internal change, aligned with the thematic flavor [FLAVOR]. Identify the idea's implicit psychological or developmental trajectory and render it as a structured conceptual statement without describing scenes or emotions. Output exactly 5 sentences. Output only the refined idea.
+
+SOURCE_IDEA: {input}

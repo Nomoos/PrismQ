@@ -1,0 +1,3 @@
+Rewrite the provided source idea with clearer internal logic, thematic cohesion, and interpretive depth aligned with [FLAVOR]. Frame the idea as a conceptual investigation rather than a narrative premise. Output exactly 5 sentences presenting a refined theoretical-style idea without imagery or emotional scene-setting. Output only the final refined idea.
+
+SOURCE_IDEA: {input}
