@@ -60,7 +60,9 @@ def db_connection():
             text TEXT NOT NULL,
             review_id INTEGER NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(story_id, version)
+            UNIQUE(story_id, version),
+            FOREIGN KEY (story_id) REFERENCES Story(id),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
     """
     )
