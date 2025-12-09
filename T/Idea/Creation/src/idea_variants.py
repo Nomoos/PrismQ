@@ -14,8 +14,12 @@ import random
 import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import logging
 
 from flavor_loader import get_flavor_loader
+from ai_generator import AIIdeaGenerator, AIConfig
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -28,15 +32,29 @@ class IdeaGenerator:
     Single Responsibility: Generate idea content from input and flavor.
     """
     
-    def __init__(self, flavor_loader=None):
+    def __init__(self, flavor_loader=None, use_ai=True, ai_config=None):
         """Initialize idea generator.
         
         Args:
             flavor_loader: Optional FlavorLoader instance.
                           If None, uses global loader.
+            use_ai: Whether to use AI generation (default: True)
+            ai_config: Optional AIConfig instance for AI generation
         """
         self.loader = flavor_loader or get_flavor_loader()
         self.loader.ensure_loaded()
+        
+        # Initialize AI generator if requested
+        self.ai_generator = None
+        self.use_ai = use_ai
+        if use_ai:
+            config = ai_config or AIConfig()
+            self.ai_generator = AIIdeaGenerator(config)
+            if self.ai_generator.available:
+                logger.info(f"AI generation enabled with model: {config.model}")
+            else:
+                logger.warning("AI generation requested but Ollama not available. Falling back to template generation.")
+                self.ai_generator = None
     
     def generate_from_flavor(
         self,
@@ -75,6 +93,7 @@ class IdeaGenerator:
         }
         
         # Generate content for each field
+        # AI will be used automatically if available via the helper methods
         focus_field = flavor.get('focus', 'core_concept')
         
         for field_name, field_desc in default_fields.items():
@@ -171,7 +190,37 @@ class IdeaGenerator:
         flavor_name: str,
         seed: int,
     ) -> str:
-        """Generate detailed content for the focus field."""
+        """Generate detailed content for the focus field.
+        
+        Uses AI generation if available, falls back to templates otherwise.
+        """
+        # Try AI generation first
+        if self.ai_generator:
+            try:
+                # Create input text
+                input_text = title
+                if description:
+                    input_text = f"{title}: {description}"
+                
+                # Use custom field generation prompt
+                generated = self.ai_generator.generate_with_custom_prompt(
+                    input_text=input_text,
+                    prompt_template_name="field_generation",
+                    flavor=flavor_name,
+                    field_description=field_desc,
+                    use_random_flavor=False
+                )
+                
+                # If AI generated meaningful content, use it
+                if generated and len(generated) > 20:
+                    logger.debug(f"AI generated focused content for '{field_desc}': {generated[:80]}...")
+                    return generated.strip()
+                else:
+                    logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
+            except Exception as e:
+                logger.warning(f"AI generation failed for focused content '{field_desc}': {e}, falling back to template")
+        
+        # Fallback to template generation
         topic = self._humanize_topic(title)
         flavor_lower = flavor_name.lower()
         
@@ -193,7 +242,37 @@ class IdeaGenerator:
         flavor_name: str,
         seed: int,
     ) -> str:
-        """Generate standard content for a field."""
+        """Generate standard content for a field.
+        
+        Uses AI generation if available, falls back to templates otherwise.
+        """
+        # Try AI generation first
+        if self.ai_generator:
+            try:
+                # Create input text
+                input_text = title
+                if description:
+                    input_text = f"{title}: {description}"
+                
+                # Use custom field generation prompt
+                generated = self.ai_generator.generate_with_custom_prompt(
+                    input_text=input_text,
+                    prompt_template_name="field_generation",
+                    flavor=flavor_name,
+                    field_description=field_desc,
+                    use_random_flavor=False
+                )
+                
+                # If AI generated meaningful content, use it
+                if generated and len(generated) > 20:
+                    logger.debug(f"AI generated field content for '{field_desc}': {generated[:80]}...")
+                    return generated.strip()
+                else:
+                    logger.warning(f"AI generated content too short for '{field_desc}', falling back to template")
+            except Exception as e:
+                logger.warning(f"AI generation failed for field content '{field_desc}': {e}, falling back to template")
+        
+        # Fallback to template generation
         topic = self._humanize_topic(title)
         
         templates = [

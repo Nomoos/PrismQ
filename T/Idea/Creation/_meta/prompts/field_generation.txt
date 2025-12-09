@@ -1,0 +1,15 @@
+You will generate compelling content for a story idea field. Your task is to create engaging, specific content that brings the idea to life.
+
+INPUT: {input}
+FLAVOR: {flavor}
+FIELD: {field_description}
+
+Generate 1-3 sentences of rich, specific content for this field that:
+- Captures the essence of the input through the lens of the flavor
+- Addresses what the field is asking for
+- Is concrete and specific, not generic or template-like
+- Feels like actual story content, not placeholder text
+
+Do not use phrases like "relates to" or "for this topic". Write as if you're pitching an actual story idea.
+
+Output only the field content, no explanations or preamble.
