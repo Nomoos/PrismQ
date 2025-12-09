@@ -190,16 +190,19 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
 
-        # Build prompt from idea (once, since each call generates one title)
-        prompt = self._create_prompt(idea, n_variants)
-
         # Call Ollama multiple times to generate n_variants titles
         # The new prompt generates one title per call
+        # Each call uses slightly different temperature for diversity
         variants = []
         try:
             for i in range(n_variants):
-                response_text = self._call_ollama(prompt)
-                variant = self._parse_single_title_response(response_text, idea, i)
+                # Build prompt for this iteration
+                prompt = self._create_prompt(idea, n_variants)
+                
+                # Vary temperature slightly for diversity (0.7 to 0.9)
+                temp_variation = 0.7 + (i * 0.02)
+                response_text = self._call_ollama(prompt, temperature=temp_variation)
+                variant = self._parse_single_title_response(response_text, idea)
                 if variant:
                     variants.append(variant)
             
@@ -251,11 +254,12 @@ class AITitleGenerator:
             themes=themes_str,
         )
 
-    def _call_ollama(self, prompt: str) -> str:
+    def _call_ollama(self, prompt: str, temperature: Optional[float] = None) -> str:
         """Call Ollama API to generate titles.
 
         Args:
             prompt: Prompt to send to the model
+            temperature: Optional temperature override for this call
 
         Returns:
             Generated text response
@@ -264,6 +268,9 @@ class AITitleGenerator:
             RuntimeError: If API call fails
         """
         try:
+            # Use provided temperature or fall back to config
+            temp = temperature if temperature is not None else self.config.temperature
+            
             response = requests.post(
                 f"{self.config.api_base}/api/generate",
                 json={
@@ -271,7 +278,7 @@ class AITitleGenerator:
                     "prompt": prompt,
                     "stream": False,
                     "options": {
-                        "temperature": self.config.temperature,
+                        "temperature": temp,
                         "num_predict": self.config.max_tokens,
                     },
                 },
@@ -287,7 +294,7 @@ class AITitleGenerator:
             raise RuntimeError(f"Failed to generate titles: {e}")
 
     def _parse_single_title_response(
-        self, response_text: str, idea: Idea, variant_index: int
+        self, response_text: str, idea: Idea
     ) -> Optional[TitleVariant]:
         """Parse AI response for single title output (plain text).
 
@@ -297,7 +304,6 @@ class AITitleGenerator:
         Args:
             response_text: Raw response from AI (should be just the title)
             idea: Original idea (for extracting keywords)
-            variant_index: Index of this variant (for scoring variation)
 
         Returns:
             TitleVariant instance or None if parsing fails
@@ -333,10 +339,6 @@ class AITitleGenerator:
                 score = 0.82  # A bit long
             else:
                 score = 0.75  # Too long
-            
-            # Add slight variation for diversity (to avoid identical scores)
-            score -= variant_index * 0.01
-            score = max(0.70, min(1.0, score))  # Clamp between 0.70 and 1.0
             
             return TitleVariant(
                 text=title_text,
