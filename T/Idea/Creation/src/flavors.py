@@ -1,8 +1,8 @@
 """Flavor definitions for idea refinement templates.
 
 This module provides thematic flavor options that can be used to guide
-the conceptual refinement of ideas. Flavors are automatically generated
-from the variant templates and represent abstract directions for tone and emphasis.
+the conceptual refinement of ideas. Flavors define thematic directions
+for story development and are used throughout the system.
 """
 
 from typing import Dict, List, Optional
@@ -10,289 +10,70 @@ import sys
 import random
 from pathlib import Path
 
-# Add path for variant templates import
+# Add path for imports
 _SCRIPT_DIR = Path(__file__).parent
 sys.path.insert(0, str(_SCRIPT_DIR))
 
-from idea_variants import list_templates, get_template, VARIANT_WEIGHTS
+from idea_variants import (
+    FLAVOR_DEFINITIONS,
+    FLAVOR_WEIGHTS,
+    DEFAULT_FLAVOR_WEIGHT,
+    list_flavors as _list_flavors,
+    get_flavor as _get_flavor,
+)
 
 
 # =============================================================================
-# FLAVOR GENERATION FROM VARIANT TEMPLATES
+# FLAVOR ACCESS FUNCTIONS
 # =============================================================================
 
-def _generate_flavors_from_variants() -> Dict[str, Dict]:
-    """Generate flavor definitions from all variant templates.
-    
-    This function analyzes all variant templates and creates corresponding
-    flavor definitions that capture their thematic essence.
+def _generate_flavors_from_definitions() -> Dict[str, Dict]:
+    """Get flavors from the new flavor-based system.
     
     Returns:
         Dictionary mapping flavor names to their definitions
     """
     flavors = {}
-    templates = list_templates()
     
-    for template_key in templates:
-        template = get_template(template_key)
-        variant_name = template.get('name', template_key)
-        desc = template.get('description', '')
-        
-        # Create flavor from variant
-        flavor_name = variant_name
-        
-        # Extract thematic keywords from description
-        desc_lower = desc.lower()
-        keywords = []
-        
-        if any(word in desc_lower for word in ['emotion', 'feeling', 'heart']):
-            keywords.append('emotional')
-        if any(word in desc_lower for word in ['mystery', 'puzzle', 'secret']):
-            keywords.append('mystery')
-        if any(word in desc_lower for word in ['tension', 'conflict', 'struggle']):
-            keywords.append('tension')
-        if any(word in desc_lower for word in ['transform', 'growth', 'change']):
-            keywords.append('transformation')
-        if any(word in desc_lower for word in ['identity', 'power', 'voice']):
-            keywords.append('identity')
-        if any(word in desc_lower for word in ['romantic', 'love', 'attraction']):
-            keywords.append('romantic')
-        if any(word in desc_lower for word in ['moral', 'ethical', 'choice']):
-            keywords.append('moral')
-        if any(word in desc_lower for word in ['friend', 'relationship', 'connect']):
-            keywords.append('relational')
-        if any(word in desc_lower for word in ['dark', 'shadow', 'unease']):
-            keywords.append('dark')
-        if any(word in desc_lower for word in ['hope', 'optimis', 'resilience']):
-            keywords.append('hopeful')
-        
-        # Build flavor definition
+    for flavor_name, flavor_def in FLAVOR_DEFINITIONS.items():
         flavors[flavor_name] = {
-            'description': desc,
-            'variant_key': template_key,
-            'keywords': keywords,
-            'template_name': variant_name,
+            'description': flavor_def.get('description', ''),
+            'variant_key': flavor_name.lower().replace(' ', '_').replace('/', '_').replace('+', 'plus'),
+            'keywords': flavor_def.get('keywords', []),
+            'template_name': flavor_name,
+            'audience': flavor_def.get('audience', ''),
+            'weight': FLAVOR_WEIGHTS.get(flavor_name, DEFAULT_FLAVOR_WEIGHT),
         }
+        
+        if 'score' in flavor_def:
+            flavors[flavor_name]['score'] = flavor_def['score']
     
     return flavors
 
 
-# Generate flavors from all variants
-_ALL_FLAVORS = _generate_flavors_from_variants()
-
-
-# =============================================================================
-# CUSTOM AUDIENCE-SPECIFIC FLAVORS
-# =============================================================================
-
-# Custom flavors for specific target audiences
-# These are manually curated combinations optimized for different demographics
-
-CUSTOM_AUDIENCE_FLAVORS = {
-    # Audience: 10-22 years (broad young audience)
-    'Youth Adventure Quest': {
-        'description': 'Adventure-focused stories with coming-of-age elements for ages 10-22',
-        'variant_key': 'custom_youth_adventure',
-        'keywords': ['adventure', 'growth', 'discovery', 'friendship', 'challenge'],
-        'template_name': 'Youth Adventure Quest',
-        'audience': '10-22 years',
-        'weight': 85,
-    },
-    'Teen Identity Journey': {
-        'description': 'Identity exploration and self-discovery for ages 10-22',
-        'variant_key': 'custom_teen_identity',
-        'keywords': ['identity', 'transformation', 'empowerment', 'self-discovery'],
-        'template_name': 'Teen Identity Journey',
-        'audience': '10-22 years',
-        'weight': 90,
-    },
-    
-    # Audience: US women (broad women audience)
-    'Modern Woman\'s Voice': {
-        'description': 'Contemporary stories centering women\'s experiences and perspectives',
-        'variant_key': 'custom_us_woman_voice',
-        'keywords': ['identity', 'empowerment', 'emotional', 'relational', 'authentic'],
-        'template_name': 'Modern Woman\'s Voice',
-        'audience': 'US women',
-        'weight': 85,
-    },
-    'Women\'s Real Talk': {
-        'description': 'Honest, relatable stories about real-life challenges for women',
-        'variant_key': 'custom_women_real_talk',
-        'keywords': ['emotional', 'relational', 'honest', 'vulnerable', 'authentic'],
-        'template_name': 'Women\'s Real Talk',
-        'audience': 'US women',
-        'weight': 80,
-    },
-    
-    # Audience: Maine residents aged 10-25
-    'Maine Youth Stories': {
-        'description': 'Regional stories with local flavor for Maine youth aged 10-25',
-        'variant_key': 'custom_maine_youth',
-        'keywords': ['regional', 'community', 'nature', 'identity', 'belonging'],
-        'template_name': 'Maine Youth Stories',
-        'audience': 'Maine residents 10-25',
-        'weight': 75,
-    },
-    
-    # Audience: US women aged 13-16
-    'Teen Girl Confessional': {
-        'description': 'First-person confessional stories for US girls aged 13-16',
-        'variant_key': 'custom_teen_girl_confessional',
-        'keywords': ['emotional', 'confession', 'identity', 'relational', 'authentic'],
-        'template_name': 'Teen Girl Confessional',
-        'audience': 'US women 13-16',
-        'weight': 95,
-    },
-    'Young Woman\'s Moment': {
-        'description': 'Snapshot moments of teenage girlhood for ages 13-16',
-        'variant_key': 'custom_young_woman_moment',
-        'keywords': ['emotional', 'moment', 'growth', 'relational', 'authentic'],
-        'template_name': 'Young Woman\'s Moment',
-        'audience': 'US women 13-16',
-        'weight': 95,
-    },
-    
-    # Audience: teen girls (general)
-    'Teen Girl Drama': {
-        'description': 'Relatable dramatic stories for teen girls',
-        'variant_key': 'custom_teen_girl_drama',
-        'keywords': ['emotional', 'drama', 'relational', 'friendship', 'identity'],
-        'template_name': 'Teen Girl Drama',
-        'audience': 'teen girls',
-        'weight': 92,
-    },
-    'Girl Squad Chronicles': {
-        'description': 'Friendship and group dynamic stories for teen girls',
-        'variant_key': 'custom_girl_squad',
-        'keywords': ['friendship', 'relational', 'group', 'loyalty', 'drama'],
-        'template_name': 'Girl Squad Chronicles',
-        'audience': 'teen girls',
-        'weight': 88,
-    },
-}
-
-# Mixed/blended custom flavors (combinations of existing + custom)
-MIXED_CUSTOM_FLAVORS = {
-    'Confession + Teen Identity': {
-        'description': 'Confessional moments mixed with identity exploration',
-        'variant_key': 'mixed_confession_identity',
-        'keywords': ['confession', 'identity', 'emotional', 'transformation'],
-        'template_name': 'Confession + Teen Identity',
-        'base_flavors': ['Confession Story Seed', 'Teen Identity Journey'],
-        'audience': '13-17 young women US/Canada',
-        'weight': 100,
-    },
-    'Body Acceptance + Real Talk': {
-        'description': 'Body image stories with honest emotional depth',
-        'variant_key': 'mixed_body_real_talk',
-        'keywords': ['body', 'emotional', 'honest', 'transformation', 'acceptance'],
-        'template_name': 'Body Acceptance + Real Talk',
-        'base_flavors': ['Body Acceptance Seed', 'Women\'s Real Talk'],
-        'audience': '13-17 young women US/Canada',
-        'weight': 98,
-    },
-    'Friend Drama + Girl Squad': {
-        'description': 'Friendship dynamics with group complexity',
-        'variant_key': 'mixed_friend_squad',
-        'keywords': ['friendship', 'relational', 'drama', 'group', 'loyalty'],
-        'template_name': 'Friend Drama + Girl Squad',
-        'base_flavors': ['Growing Apart Seed', 'Girl Squad Chronicles'],
-        'audience': '13-17 young women US/Canada',
-        'weight': 96,
-    },
-    'Online Connection + Teen Voice': {
-        'description': 'Digital life meets authentic teen expression',
-        'variant_key': 'mixed_online_teen_voice',
-        'keywords': ['online', 'digital', 'authentic', 'connection', 'identity'],
-        'template_name': 'Online Connection + Teen Voice',
-        'base_flavors': ['Online Connection Seed', 'Modern Woman\'s Voice'],
-        'audience': '13-17 young women US/Canada',
-        'weight': 94,
-    },
-    'Mirror Moment + Identity Power': {
-        'description': 'Self-recognition leading to empowerment',
-        'variant_key': 'mixed_mirror_identity',
-        'keywords': ['mirror', 'identity', 'empowerment', 'transformation', 'realization'],
-        'template_name': 'Mirror Moment + Identity Power',
-        'base_flavors': ['Mirror Moment Seed', 'Identity + Empowerment'],
-        'audience': '13-17 young women US/Canada',
-        'weight': 97,
-    },
-}
-
-# Primary audience optimized flavors (best for 13-17 young women in US/Canada)
-PRIMARY_AUDIENCE_FLAVORS = {
-    'Teen Girl Heart': {
-        'description': 'Emotional core stories optimized for 13-17 young women',
-        'variant_key': 'primary_teen_heart',
-        'keywords': ['emotional', 'authentic', 'relational', 'growth', 'vulnerability'],
-        'template_name': 'Teen Girl Heart',
-        'audience': '13-17 young women US/Canada',
-        'weight': 100,
-        'score': 10.0,  # Perfect score for primary audience
-    },
-    'Young Woman\'s Truth': {
-        'description': 'Honest first-person narratives for 13-17 young women',
-        'variant_key': 'primary_young_truth',
-        'keywords': ['honest', 'confession', 'emotional', 'authentic', 'vulnerable'],
-        'template_name': 'Young Woman\'s Truth',
-        'audience': '13-17 young women US/Canada',
-        'weight': 100,
-        'score': 9.8,
-    },
-    'Teen Moment Magic': {
-        'description': 'Small moments with big meaning for 13-17 young women',
-        'variant_key': 'primary_teen_moment',
-        'keywords': ['moment', 'meaning', 'emotional', 'realization', 'growth'],
-        'template_name': 'Teen Moment Magic',
-        'audience': '13-17 young women US/Canada',
-        'weight': 98,
-        'score': 9.5,
-    },
-}
-
-# Merge custom flavors into main flavor dict
-_ALL_FLAVORS.update(CUSTOM_AUDIENCE_FLAVORS)
-_ALL_FLAVORS.update(MIXED_CUSTOM_FLAVORS)
-_ALL_FLAVORS.update(PRIMARY_AUDIENCE_FLAVORS)
+# Generate flavors from the new system
+_ALL_FLAVORS = _generate_flavors_from_definitions()
 
 # Create organized flavor categories
 FLAVOR_CATEGORIES = {
-    'Emotional & Dramatic': [
+    'Emotional & Core': [
         'Emotion-First Hook',
         'Emotional Drama + Growth',
-        'Personal Drama (First-Person Voice)',
         'Confession Story Seed',
-        'Real Family Drama Seed',
-        'Safe Person Seed',
-        'Holding Space Seed',
+        'Teen Girl Heart',
+        'Young Woman\'s Truth',
+        'Teen Moment Magic',
     ],
     'Mystery & Discovery': [
         'Mystery/Curiosity Gap',
         'Light Mystery + Adventure',
-        'Mystery with Emotional Hook',
         'Overheard Truth Seed',
-        'What They Don\'t Know Seed',
-        'Confession + Mystery Fusion',
-    ],
-    'Psychological & Internal': [
-        'Psychological Tension',
-        'Introspective Transformation',
-        'Mirror Moment Seed',
-        'Before/After Transformation Seed',
-        'The Version of Me Seed',
-        'Quiet Rebellion Seed',
-        'Body Acceptance Seed',
-        'Fitting In Seed',
     ],
     'Identity & Growth': [
         'Identity + Empowerment',
-        'Heritage Discovery Story Seed',
-        'Emotional Inheritance Seed',
-        'Permission To Seed',
-        'Learned Young Seed',
-        'Rewriting the Story Seed',
+        'Teen Identity Journey',
+        'Mirror Moment Seed',
+        'Before/After Transformation Seed',
     ],
     'Relationship & Connection': [
         'Soft Supernatural + Friendship',
@@ -300,52 +81,20 @@ FLAVOR_CATEGORIES = {
         'Growing Apart Seed',
         'First Butterflies Seed',
         'Online Connection Seed',
-        'Safe Person Seed',
     ],
-    'Tension & Conflict': [
-        'Competitive + Rivals to Allies',
-        'School + Family Collision',
-        'Social + Home Drama',
-        'Unsent Message Seed',
-        'Almost Said Seed',
-    ],
-    'Adventure & Challenge': [
-        'Survival Challenge (Safe)',
-        'Urban Social Quest',
-        'Light Mystery + Adventure',
-        'Sci-Fi + School Realism',
-    ],
-    'Transformation & Change': [
-        'Before/After Transformation Seed',
-        'Overheard + Transformation Fusion',
-        'Parallel Lives Seed',
-        'Last Time Seed',
-    ],
-    'Existential & Meaning': [
-        'Existential Conflict',
+    'Teen Life & Challenges': [
+        'Body Acceptance Seed',
+        'Fitting In Seed',
         'Future Anxiety Seed',
         'Comparison Trap Seed',
-        'Emotional Inheritance Seed',
-    ],
-    'Romance & Attraction': [
-        'Romantic Tension',
-        'First Butterflies Seed',
-        'First Butterflies + Fitting In Blend',
-        'Body Acceptance + First Butterflies Blend',
-    ],
-    'Moral & Ethical': [
-        'Moral Dilemma',
-        'Sci-Fi + School Realism',
-        'Quiet Rebellion Seed',
-        'AI as Companion (Safe)',
     ],
     'Creative & Aesthetic': [
-        'Magical Realism + Aesthetic',
-        'Niche-Blend',
-        'Genre Focus',
         'Story Skeleton',
+        'Short-Form Viral',
+        'Niche-Blend',
+        'Sci-Fi + School Realism',
     ],
-    'Custom Audience-Specific': [
+    'Audience-Specific': [
         'Youth Adventure Quest',
         'Teen Identity Journey',
         'Modern Woman\'s Voice',
@@ -362,11 +111,6 @@ FLAVOR_CATEGORIES = {
         'Friend Drama + Girl Squad',
         'Online Connection + Teen Voice',
         'Mirror Moment + Identity Power',
-    ],
-    'Primary Audience Optimized (13-17 US/Canada)': [
-        'Teen Girl Heart',
-        'Young Woman\'s Truth',
-        'Teen Moment Magic',
     ],
 }
 
@@ -622,11 +366,7 @@ def get_flavor_count() -> int:
 # =============================================================================
 
 def _generate_flavor_weights() -> Dict[str, int]:
-    """Generate flavor weights based on variant weights.
-    
-    Maps each flavor (variant name) to its weight from VARIANT_WEIGHTS.
-    Flavors inherit the weights of their corresponding variants.
-    Custom audience-specific flavors have their own weights defined inline.
+    """Get flavor weights from the flavor definitions.
     
     Returns:
         Dictionary mapping flavor names to weights
@@ -634,19 +374,14 @@ def _generate_flavor_weights() -> Dict[str, int]:
     flavor_weights = {}
     
     for flavor_name, info in _ALL_FLAVORS.items():
-        variant_key = info['variant_key']
-        # Check if weight is defined in the flavor info (custom flavors)
-        if 'weight' in info:
-            weight = info['weight']
-        else:
-            # Get weight from VARIANT_WEIGHTS, default to 50 if not found
-            weight = VARIANT_WEIGHTS.get(variant_key, 50)
+        # Weights are already set in the flavor info
+        weight = info.get('weight', DEFAULT_FLAVOR_WEIGHT)
         flavor_weights[flavor_name] = weight
     
     return flavor_weights
 
 
-# Generate flavor weights from variant weights
+# Generate flavor weights
 _FLAVOR_WEIGHTS = _generate_flavor_weights()
 
 
