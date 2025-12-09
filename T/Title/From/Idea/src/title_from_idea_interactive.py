@@ -660,20 +660,9 @@ def run_state_workflow_mode(
             if len(sibling_titles) > 5:
                 print(f"    ... and {len(sibling_titles) - 5} more")
 
-        # Get Idea from story.idea_json first, then fall back to fetching from Idea database
+        # Fetch Idea from Idea database using story.idea_id
         idea = None
-        if story.idea_json:
-            try:
-                idea_data = json.loads(story.idea_json)
-                if IDEA_MODEL_AVAILABLE:
-                    idea = Idea.from_dict(idea_data)
-                    print_info(f"Using embedded idea_json data")
-            except (json.JSONDecodeError, Exception) as e:
-                if logger:
-                    logger.warning(f"Failed to parse idea_json: {e}")
-
-        # If no idea_json, fetch from Idea database using story.idea_id
-        if idea is None and story.idea_id is not None:
+        if story.idea_id is not None:
             try:
                 idea_id = int(story.idea_id)
                 idea_dict = idea_db.get_idea(idea_id)
