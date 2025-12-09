@@ -1,7 +1,7 @@
 """AI-powered Title Generation using local LLMs via Ollama.
 
 This module provides AI generation capabilities for creating title variants
-from Ideas using local LLM models (Qwen2.5-14B-Instruct) through Ollama API.
+from Ideas using local LLM models (Qwen3:30b) through Ollama API.
 Optimized for RTX 5090 and other high-end GPUs.
 
 Prompts are stored as separate text files in _meta/prompts/ for easier
@@ -78,7 +78,7 @@ class AITitleConfig:
         num_variants: Number of title variants to generate (3-10)
     """
 
-    model: str = "qwen2.5:14b-instruct"  # Qwen2.5-14B-Instruct for RTX 5090
+    model: str = "qwen3:30b"  # Qwen3:30b for RTX 5090
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
     max_tokens: int = 2000
@@ -89,7 +89,7 @@ class AITitleConfig:
 class AITitleGenerator:
     """Generate title variants using local AI models via Ollama.
 
-    This class handles communication with local LLM models (Qwen2.5-14B-Instruct)
+    This class handles communication with local LLM models (Qwen3:30b)
     through the Ollama API to generate creative, engaging title variants.
     Falls back to template-based generation if Ollama is unavailable.
     """

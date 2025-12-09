@@ -67,7 +67,7 @@ def get_default_db_path() -> str:
 
 # Module constants
 DEFAULT_COUNT = 10
-DEFAULT_MODEL = "llama3.1:70b-q4_K_M"
+DEFAULT_MODEL = "qwen3:30b"
 DEFAULT_TEMPERATURE = 0.8
 MAX_COUNT = 100
 MIN_COUNT = 1
@@ -520,8 +520,8 @@ Examples:
 
     parser.add_argument(
         "--model",
-        default="llama3.1:70b-q4_K_M",
-        help="AI model to use (default: llama3.1:70b-q4_K_M)",
+        default="qwen3:30b",
+        help="AI model to use (default: qwen3:30b)",
     )
 
     parser.add_argument(

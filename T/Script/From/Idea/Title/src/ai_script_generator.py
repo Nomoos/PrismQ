@@ -1,7 +1,7 @@
-"""AI-Powered Script Generator using Qwen2.5-14B-Instruct via Ollama.
+"""AI-Powered Script Generator using Qwen3:30b via Ollama.
 
 This module provides AI-powered script generation for the PrismQ.T.Script.From.Idea.Title
-workflow using the Qwen2.5-14B-Instruct model.
+workflow using the Qwen3:30b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
 
@@ -602,14 +602,14 @@ class AIScriptGeneratorConfig:
     All generation uses local AI models via Ollama.
 
     Attributes:
-        model: Name of the Ollama model to use (default: Qwen2.5-14B-Instruct)
+        model: Name of the Ollama model to use (default: Qwen3:30b)
         api_base: Base URL for Ollama API
         temperature: Sampling temperature (0.0-2.0, lower = more focused)
         max_tokens: Maximum tokens to generate
         timeout: Request timeout in seconds
     """
 
-    model: str = "qwen2.5:14b-instruct"
+    model: str = "qwen3:30b"
     api_base: str = "http://localhost:11434"
     temperature: float = 0.7  # Moderate creativity for engaging scripts
     max_tokens: int = 2000
@@ -617,7 +617,7 @@ class AIScriptGeneratorConfig:
 
 
 class AIScriptGenerator:
-    """Generate scripts using AI with Qwen2.5-14B-Instruct.
+    """Generate scripts using AI with Qwen3:30b.
 
     All generation goes through local AI models.
 

@@ -1,6 +1,6 @@
 """Script generation from idea and title using AI.
 
-This module provides AI-powered script generation using Qwen2.5-14B-Instruct.
+This module provides AI-powered script generation using Qwen3:30b.
 ALL generation goes through local AI models via Ollama.
 
 Input to AI:
@@ -53,7 +53,7 @@ __all__ = [
     "ScriptSection",
     "ScriptStructure",
     "PlatformTarget",
-    # AI Script Generator (Qwen2.5-14B-Instruct)
+    # AI Script Generator (Qwen3:30b)
     "AIScriptGenerator",
     "AIScriptGeneratorConfig",
     "generate_script",
