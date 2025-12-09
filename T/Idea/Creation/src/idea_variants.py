@@ -14,8 +14,12 @@ import random
 import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import logging
 
 from flavor_loader import get_flavor_loader
+from ai_generator import AIIdeaGenerator, AIConfig
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -28,15 +32,40 @@ class IdeaGenerator:
     Single Responsibility: Generate idea content from input and flavor.
     """
     
-    def __init__(self, flavor_loader=None):
+    # Minimum length for AI-generated content to be considered valid
+    MIN_AI_CONTENT_LENGTH = 20
+    
+    def __init__(self, flavor_loader=None, use_ai=True, ai_config=None):
         """Initialize idea generator.
         
         Args:
             flavor_loader: Optional FlavorLoader instance.
                           If None, uses global loader.
+            use_ai: Whether to use AI generation (default: True)
+            ai_config: Optional AIConfig instance for AI generation
+            
+        Raises:
+            RuntimeError: If use_ai is True but Ollama is not available
         """
         self.loader = flavor_loader or get_flavor_loader()
         self.loader.ensure_loaded()
+        
+        # Initialize AI generator if requested
+        self.ai_generator = None
+        self.use_ai = use_ai
+        if use_ai:
+            config = ai_config or AIConfig()
+            self.ai_generator = AIIdeaGenerator(config)
+            if self.ai_generator.available:
+                logger.info(f"AI generation enabled with model: {config.model}")
+            else:
+                error_msg = (
+                    "AI generation requested but Ollama is not available. "
+                    "Please ensure Ollama is installed and running. "
+                    "Install from https://ollama.com/ and start with 'ollama serve'."
+                )
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
     
     def generate_from_flavor(
         self,
@@ -44,6 +73,7 @@ class IdeaGenerator:
         flavor_name: str,
         description: str = "",
         variation_index: int = 0,
+        second_flavor_chance: float = 0.2,
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
         
@@ -52,6 +82,7 @@ class IdeaGenerator:
             flavor_name: Name of the flavor to use
             description: Optional description
             variation_index: Variation number for uniqueness
+            second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
             
         Returns:
             Dictionary with generated idea content
@@ -62,6 +93,10 @@ class IdeaGenerator:
         flavor = self.loader.get_flavor(flavor_name)
         default_fields = self.loader.get_default_fields()
         seed = self._generate_seed(title, description, variation_index)
+        
+        # Determine if we should add a second flavor (small chance)
+        rng = random.Random(seed)
+        use_second_flavor = rng.random() < second_flavor_chance
         
         # Build idea dictionary
         idea = {
@@ -74,20 +109,60 @@ class IdeaGenerator:
             'keywords': flavor.get('keywords', []),
         }
         
-        # Generate content for each field
-        focus_field = flavor.get('focus', 'core_concept')
+        # If using second flavor, select one and update variant name
+        second_flavor_name = None
+        if use_second_flavor:
+            # Get all available flavors
+            all_flavors = self.loader.list_flavor_names()
+            # Remove the first flavor from the list to avoid duplicates
+            available_flavors = [f for f in all_flavors if f != flavor_name]
+            if available_flavors:
+                second_flavor_name = rng.choice(available_flavors)
+                # Update variant name to show both flavors
+                idea['variant_name'] = f"{flavor_name} + {second_flavor_name}"
+                idea['flavor_name'] = idea['variant_name']
+                logger.info(f"Using dual flavor: {idea['variant_name']}")
         
-        for field_name, field_desc in default_fields.items():
-            if field_name == focus_field:
-                # Make the focus field more detailed
-                idea[field_name] = self._generate_focused_content(
-                    title, description, field_desc, flavor_name, seed
-                )
-            else:
-                # Generate standard content
-                idea[field_name] = self._generate_field_content(
-                    title, description, field_desc, flavor_name, seed
-                )
+        # Generate complete refined idea using idea_improvement prompt
+        if not self.ai_generator:
+            raise RuntimeError(
+                "AI generator not available. Cannot generate ideas without AI. "
+                "Please ensure Ollama is installed and running."
+            )
+        
+        # Create input text
+        input_text = title
+        if description:
+            input_text = f"{title}: {description}"
+        
+        # Combine flavors for the prompt
+        flavor_text = flavor_name
+        if second_flavor_name:
+            flavor_text = f"{flavor_name} and {second_flavor_name}"
+        
+        # Use idea_improvement prompt to generate complete refined idea
+        generated_idea = self.ai_generator.generate_with_custom_prompt(
+            input_text=input_text,
+            prompt_template_name="idea_improvement",
+            flavor=flavor_text,
+            use_random_flavor=False
+        )
+        
+        # Validate content
+        if not generated_idea or len(generated_idea) <= self.MIN_AI_CONTENT_LENGTH:
+            raise RuntimeError(
+                f"AI generated insufficient content. "
+                f"Generated: {len(generated_idea) if generated_idea else 0} characters, "
+                f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
+            )
+        
+        # Store the complete generated idea as a single paragraph in the hook field
+        # Other fields remain empty since output is one continuous paragraph, not parsed
+        idea['hook'] = generated_idea
+        # Leave other fields empty
+        for field_name in default_fields.keys():
+            if field_name != 'hook':
+                idea[field_name] = ""
         
         # Add metadata
         idea['generated_at'] = datetime.now().isoformat()
@@ -163,6 +238,58 @@ class IdeaGenerator:
             topic = topic[0].upper() + topic[1:]
         return topic if topic else "this topic"
     
+    def _try_ai_generation(
+        self,
+        title: str,
+        description: str,
+        field_desc: str,
+        flavor_name: str,
+    ) -> str:
+        """Generate content using AI.
+        
+        Args:
+            title: Input title
+            description: Optional description
+            field_desc: Field description for the prompt
+            flavor_name: Flavor name
+            
+        Returns:
+            Generated content from AI
+            
+        Raises:
+            RuntimeError: If AI generator is not available or generation fails
+        """
+        if not self.ai_generator:
+            raise RuntimeError(
+                "AI generator not available. Cannot generate ideas without AI. "
+                "Please ensure Ollama is installed and running."
+            )
+        
+        # Create input text
+        input_text = title
+        if description:
+            input_text = f"{title}: {description}"
+        
+        # Use custom field generation prompt
+        generated = self.ai_generator.generate_with_custom_prompt(
+            input_text=input_text,
+            prompt_template_name="field_generation",
+            flavor=flavor_name,
+            field_description=field_desc,
+            use_random_flavor=False
+        )
+        
+        # Validate content length
+        if not generated or len(generated) <= self.MIN_AI_CONTENT_LENGTH:
+            raise RuntimeError(
+                f"AI generated insufficient content for '{field_desc}'. "
+                f"Generated: {len(generated) if generated else 0} characters, "
+                f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
+            )
+        
+        logger.debug(f"AI generated content for '{field_desc}': {generated[:80]}...")
+        return generated.strip()
+    
     def _generate_focused_content(
         self,
         title: str,
@@ -171,19 +298,15 @@ class IdeaGenerator:
         flavor_name: str,
         seed: int,
     ) -> str:
-        """Generate detailed content for the focus field."""
-        topic = self._humanize_topic(title)
-        flavor_lower = flavor_name.lower()
+        """Generate detailed content for the focus field.
         
-        templates = [
-            f"{topic} - {field_desc}",
-            f"Exploring {topic} through {flavor_lower}",
-            f"{field_desc} centered on {topic}",
-            f"A story about {topic} that emphasizes {field_desc.lower()}",
-        ]
+        Uses AI generation (required).
         
-        rng = random.Random(seed)
-        return rng.choice(templates)
+        Raises:
+            RuntimeError: If AI generation fails
+        """
+        # AI generation is required, no fallback
+        return self._try_ai_generation(title, description, field_desc, flavor_name)
     
     def _generate_field_content(
         self,
@@ -193,17 +316,15 @@ class IdeaGenerator:
         flavor_name: str,
         seed: int,
     ) -> str:
-        """Generate standard content for a field."""
-        topic = self._humanize_topic(title)
+        """Generate standard content for a field.
         
-        templates = [
-            f"{field_desc} for {topic}",
-            f"{topic}: {field_desc.lower()}",
-            f"How {topic} relates to {field_desc.lower()}",
-        ]
+        Uses AI generation (required).
         
-        rng = random.Random(seed)
-        return rng.choice(templates)
+        Raises:
+            RuntimeError: If AI generation fails
+        """
+        # AI generation is required, no fallback
+        return self._try_ai_generation(title, description, field_desc, flavor_name)
 
 
 # =============================================================================
@@ -305,10 +426,10 @@ class IdeaFormatter:
         """
         lines = []
         
-        # Add core content fields
+        # Add core content fields (skip empty fields)
         for field in ['hook', 'core_concept', 'emotional_core', 'audience_connection', 
                       'key_elements', 'tone_style']:
-            if field in idea:
+            if field in idea and idea[field]:
                 lines.append(f"  {idea[field]}")
         
         return '\n'.join(lines)
