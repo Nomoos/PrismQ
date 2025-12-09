@@ -122,8 +122,8 @@ class TestStoryPolish:
             story_id="story_001",
             original_title="Original Title",
             polished_title="Polished Title",
-            original_script="Original script text",
-            polished_script="Polished script text",
+            original_content="Original script text",
+            polished_content="Polished script text",
             original_quality_score=92,
             expected_quality_score=96,
             quality_delta=4,
@@ -143,8 +143,8 @@ class TestStoryPolish:
             story_id="story_002",
             original_title="Test",
             polished_title="Test Polish",
-            original_script="Script",
-            polished_script="Polished Script",
+            original_content="Content",
+            polished_content="Polished Content",
         )
 
         data = polish.to_dict()
@@ -160,8 +160,8 @@ class TestStoryPolish:
             story_id="story_003",
             original_title="JSON Test",
             polished_title="JSON Test Polish",
-            original_script="Script",
-            polished_script="Script Polish",
+            original_content="Content",
+            polished_content="Content Polish",
         )
 
         json_str = polish.to_json()
@@ -177,8 +177,8 @@ class TestStoryPolish:
             "story_id": "story_004",
             "original_title": "Original",
             "polished_title": "Polished",
-            "original_script": "Script",
-            "polished_script": "Polish Script",
+            "original_content": "Content",
+            "polished_content": "Polish Content",
             "change_log": [],
             "quality_delta": 5,
         }
@@ -258,7 +258,7 @@ class TestStoryPolisher:
         assert len(changes) == 1
         assert changes[0].change_type == ChangeType.CAPITALIZATION
 
-    def test_polish_script_opening_enhancement(self):
+    def test_polish_content_opening_enhancement(self):
         """Test polishing script with opening enhancement."""
         polisher = StoryPolisher()
 
@@ -270,8 +270,8 @@ class TestStoryPolisher:
             }
         ]
 
-        original_script = "Every night at midnight, she returns..."
-        polished, changes = polisher._polish_script(original_script, suggestions, None, None)
+        original_content = "Every night at midnight, she returns..."
+        polished, changes = polisher._polish_content(original_content, suggestions, None, None)
 
         assert "We've all driven past" in polished
         assert len(changes) == 1
@@ -313,7 +313,7 @@ class TestStoryPolisher:
         polish = polisher.polish_story(
             story_id="story_test_001",
             current_title="The House That Remembers: and Hunts",
-            current_script="Every night at midnight, she returns...",
+            current_content="Every night at midnight, she returns...",
             expert_review_data=review_data,
             iteration_number=1,
         )
@@ -330,7 +330,7 @@ class TestStoryPolisher:
         assert "And Hunts" in polish.polished_title
 
         # Check script improvement
-        assert "We've all driven past" in polish.polished_script
+        assert "We've all driven past" in polish.polished_content
 
     def test_polish_story_no_applicable_suggestions(self):
         """Test polishing when no suggestions meet priority threshold."""
@@ -347,14 +347,14 @@ class TestStoryPolisher:
         polish = polisher.polish_story(
             story_id="story_test_002",
             current_title="Perfect Title",
-            current_script="Perfect script text",
+            current_content="Perfect script text",
             expert_review_data=review_data,
         )
 
         # Should have no changes since low priority doesn't meet HIGH threshold
         assert len(polish.change_log) == 0
         assert polish.polished_title == polish.original_title
-        assert polish.polished_script == polish.original_script
+        assert polish.polished_content == polish.original_content
 
 
 @pytest.mark.integration
@@ -376,7 +376,7 @@ class TestStoryPolisherIntegration:
         polish1 = polisher.polish_story(
             story_id="story_iter_001",
             current_title="Title: and Subtitle",
-            current_script="Script text",
+            current_content="Content text",
             expert_review_data=review_data,
             iteration_number=1,
         )
@@ -388,7 +388,7 @@ class TestStoryPolisherIntegration:
         polish2 = polisher.polish_story(
             story_id="story_iter_001",
             current_title=polish1.polished_title,
-            current_script=polish1.polished_script,
+            current_content=polish1.polished_content,
             expert_review_data=review_data,
             iteration_number=2,
         )
@@ -410,7 +410,7 @@ class TestStoryPolisherIntegration:
         polish = polisher.polish_story(
             story_id="story_json_001",
             current_title="Test Title",
-            current_script="Test script",
+            current_content="Test script",
             expert_review_data=review_data,
         )
 
@@ -439,7 +439,7 @@ def test_convenience_function_polish_story_with_gpt():
     polish = polish_story_with_gpt(
         story_id="test_conv_001",
         current_title="Test Title",
-        current_script="Test Script",
+        current_content="Test Content",
         expert_review_data=review_data,
     )
 
@@ -454,8 +454,8 @@ def test_convenience_function_polish_story_to_json():
         story_id="story_json",
         original_title="Title",
         polished_title="Polished",
-        original_script="Script",
-        polished_script="Polished Script",
+        original_content="Content",
+        polished_content="Polished Content",
     )
 
     json_str = polish_story_to_json(polish)

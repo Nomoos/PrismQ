@@ -1,1 +1,1 @@
-"""Metadata for T.Script.Formatter.Blog module."""
+"""Metadata for T.Content.Formatter.Blog module."""

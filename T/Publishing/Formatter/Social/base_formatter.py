@@ -81,7 +81,7 @@ class BaseSocialFormatter:
         """Extract key points from script.
 
         Args:
-            script: Script content
+            script: Content content
             max_points: Maximum number of key points to extract
 
         Returns:
@@ -124,7 +124,7 @@ class BaseSocialFormatter:
         """Generate an engaging hook from script content.
 
         Args:
-            script: Script content
+            script: Content content
             hook_type: Type of hook (question, statement, stat)
 
         Returns:
@@ -158,7 +158,7 @@ class BaseSocialFormatter:
         """Extract main message from script.
 
         Args:
-            script: Script content
+            script: Content content
             max_length: Maximum length of message
 
         Returns:
@@ -189,7 +189,7 @@ class BaseSocialFormatter:
         """Extract relevant hashtags from script.
 
         Args:
-            script: Script content
+            script: Content content
             min_hashtags: Minimum number of hashtags
             max_hashtags: Maximum number of hashtags
 

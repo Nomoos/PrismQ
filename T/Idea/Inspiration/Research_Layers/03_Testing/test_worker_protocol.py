@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WorkerHost Protocol Test Script
+WorkerHost Protocol Test Content
 
 This script demonstrates and tests the WorkerHost protocol:
 1. Sends JSON task to worker via stdin
@@ -9,7 +9,7 @@ This script demonstrates and tests the WorkerHost protocol:
 4. Reports exit codes
 
 Usage:
-    python test_worker_protocol.py [worker_script.py]
+    python test_worker_protocol.py [worker_content.py]
 
 Example:
     python test_worker_protocol.py example_worker.py
@@ -26,8 +26,8 @@ from typing import Any, Dict, Tuple
 class ProtocolTester:
     """Test harness for WorkerHost protocol compliance"""
 
-    def __init__(self, worker_script: Path):
-        self.worker_script = worker_script
+    def __init__(self, worker_content: Path):
+        self.worker_content = worker_content
         self.test_results = []
 
     def run_test(self, test_name: str, task: Dict[str, Any], expected_success: bool = True) -> bool:
@@ -52,9 +52,9 @@ class ProtocolTester:
         print(json.dumps(task, indent=2))
 
         # Run worker process
-        print(f"\nExecuting worker: {self.worker_script}")
+        print(f"\nExecuting worker: {self.worker_content}")
         result = subprocess.run(
-            [sys.executable, str(self.worker_script)],
+            [sys.executable, str(self.worker_content)],
             input=task_json,
             capture_output=True,
             text=True,
@@ -136,7 +136,7 @@ class ProtocolTester:
         print("\n" + "=" * 80)
         print("WORKERHOST PROTOCOL TEST SUITE")
         print("=" * 80)
-        print(f"Worker Script: {self.worker_script}")
+        print(f"Worker Content: {self.worker_content}")
         print(f"Python: {sys.executable}")
         print("=" * 80)
 
@@ -206,19 +206,19 @@ class ProtocolTester:
 def main():
     """Main entry point"""
     if len(sys.argv) < 2:
-        print("Usage: python test_worker_protocol.py [worker_script.py]")
+        print("Usage: python test_worker_protocol.py [worker_content.py]")
         print("\nExample:")
         print("  python test_worker_protocol.py example_worker.py")
         sys.exit(1)
 
-    worker_script = Path(sys.argv[1])
+    worker_content = Path(sys.argv[1])
 
-    if not worker_script.exists():
-        print(f"Error: Worker script not found: {worker_script}")
+    if not worker_content.exists():
+        print(f"Error: Worker script not found: {worker_content}")
         sys.exit(1)
 
     # Run tests
-    tester = ProtocolTester(worker_script)
+    tester = ProtocolTester(worker_content)
     tester.run_all_tests()
 
 

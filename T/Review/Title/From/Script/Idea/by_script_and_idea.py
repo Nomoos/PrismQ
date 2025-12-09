@@ -11,7 +11,7 @@ The reviewer provides:
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Idea + Title v1 + Script v1 → ByScriptAndIdea Review → TitleReview Feedback → Title v2
+    Idea + Title v1 + Content v1 → ByScriptAndIdea Review → TitleReview Feedback → Title v2
 """
 
 import re
@@ -28,7 +28,7 @@ from .title_review import (
 # Use TYPE_CHECKING to avoid runtime import issues
 if TYPE_CHECKING:
     from T.Idea.Model.src.idea import Idea
-    from T.Script.FromIdeaAndTitle.src.script_generator import ScriptV1
+    from T.Content.FromIdeaAndTitle.src.script_generator import ScriptV1
 else:
     # At runtime, we'll accept any object with the right attributes
     Idea = Any
@@ -110,7 +110,7 @@ SEO_PATTERNS = {
     "action": r"\b(guide|tips|ways|methods|steps|secrets)\b",
 }
 
-# Script analysis constants
+# Content analysis constants
 SCRIPT_INTRO_PERCENTAGE = 0.2  # First 20% of script considered as introduction
 DEFAULT_SCRIPT_SUMMARY_LENGTH = 200  # Characters for auto-generated summary
 
@@ -153,25 +153,25 @@ def extract_keywords(text: str, max_keywords: int = 10) -> List[str]:
     return [word for word, _ in sorted_words[:max_keywords]]
 
 
-def analyze_title_script_alignment(
-    title_text: str, script_text: str, script_summary: Optional[str] = None
+def analyze_title_content_alignment(
+    title_text: str, content_text: str, script_summary: Optional[str] = None
 ) -> AlignmentAnalysis:
     """Analyze how well title aligns with script content.
 
     Args:
         title_text: The title to analyze
-        script_text: The script content
+        content_text: The script content
         script_summary: Optional summary of script
 
     Returns:
         AlignmentAnalysis with scores and feedback
     """
     title_lower = title_text.lower()
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
 
     # Extract keywords from title and script
     title_keywords = extract_keywords(title_text, max_keywords=5)
-    script_keywords = extract_keywords(script_text, max_keywords=20)
+    script_keywords = extract_keywords(content_text, max_keywords=20)
 
     # Find matching keywords
     matches = []
@@ -387,7 +387,7 @@ def generate_improvement_points(
 
     Args:
         title_text: The title being reviewed
-        script_alignment: Script alignment analysis
+        script_alignment: Content alignment analysis
         idea_alignment: Idea alignment analysis
         engagement_data: Engagement metrics
         seo_data: SEO metrics
@@ -397,7 +397,7 @@ def generate_improvement_points(
     """
     improvements = []
 
-    # Script alignment improvements
+    # Content alignment improvements
     if script_alignment.score < 75:
         if script_alignment.mismatches:
             improvements.append(
@@ -495,12 +495,12 @@ def generate_improvement_points(
     return improvements
 
 
-def review_title_by_script_and_idea(
+def review_title_by_content_and_idea(
     title_text: str,
-    script_text: str,
+    content_text: str,
     idea_summary: str,
     title_id: Optional[str] = None,
-    script_id: Optional[str] = None,
+    content_id: Optional[str] = None,
     idea_id: Optional[str] = None,
     script_summary: Optional[str] = None,
     idea_intent: Optional[str] = None,
@@ -521,12 +521,12 @@ def review_title_by_script_and_idea(
 
     Args:
         title_text: The title text to review
-        script_text: The full script text
+        content_text: The full script text
         idea_summary: Summary of the core idea
         title_id: Optional identifier for the title
-        script_id: Optional identifier for the script
+        content_id: Optional identifier for the script
         idea_id: Optional identifier for the idea
-        script_summary: Optional summary of script (if not provided, extracted from script_text)
+        script_summary: Optional summary of script (if not provided, extracted from content_text)
         idea_intent: Optional intent/purpose of the idea
         target_audience: Optional target audience description
         title_version: Version of title being reviewed (default: "v1")
@@ -537,37 +537,37 @@ def review_title_by_script_and_idea(
         TitleReview object with comprehensive scores, feedback, and improvement points
 
     Example:
-        >>> review = review_title_by_script_and_idea(
+        >>> review = review_title_by_content_and_idea(
         ...     title_text="The Echo - A Haunting Discovery",
-        ...     script_text="In the abandoned house, echoes reveal dark secrets...",
+        ...     content_text="In the abandoned house, echoes reveal dark secrets...",
         ...     idea_summary="Horror story about mysterious echoes",
         ...     idea_intent="Create suspense through auditory elements"
         ... )
         >>> print(f"Overall score: {review.overall_score}%")
-        >>> print(f"Script alignment: {review.script_alignment_score}%")
+        >>> print(f"Content alignment: {review.script_alignment_score}%")
     """
     # Generate IDs if not provided (using absolute value to ensure positive IDs)
     title_id = title_id or f"title-{abs(hash(title_text)) % 10000:04d}"
-    script_id = script_id or f"script-{abs(hash(script_text)) % 10000:04d}"
+    content_id = content_id or f"script-{abs(hash(content_text)) % 10000:04d}"
     idea_id = idea_id or f"idea-{abs(hash(idea_summary)) % 10000:04d}"
 
     # Extract script summary if not provided
     if not script_summary:
         # Use first DEFAULT_SCRIPT_SUMMARY_LENGTH characters as summary
-        if len(script_text) > DEFAULT_SCRIPT_SUMMARY_LENGTH:
-            script_summary = script_text[:DEFAULT_SCRIPT_SUMMARY_LENGTH] + "..."
+        if len(content_text) > DEFAULT_SCRIPT_SUMMARY_LENGTH:
+            script_summary = content_text[:DEFAULT_SCRIPT_SUMMARY_LENGTH] + "..."
         else:
-            script_summary = script_text
+            script_summary = content_text
 
     # Analyze alignments
-    script_alignment = analyze_title_script_alignment(title_text, script_text, script_summary)
+    script_alignment = analyze_title_content_alignment(title_text, content_text, script_summary)
     idea_alignment = analyze_title_idea_alignment(title_text, idea_summary, idea_intent)
 
     # Analyze engagement
     engagement_data = analyze_engagement(title_text)
 
     # Analyze SEO
-    script_keywords = extract_keywords(script_text, max_keywords=20)
+    script_keywords = extract_keywords(content_text, max_keywords=20)
     seo_data = analyze_seo(title_text, script_keywords)
 
     # Calculate overall score (weighted average)
@@ -670,13 +670,13 @@ def review_title_by_script_and_idea(
         overall_score=overall_score,
         category_scores=category_scores,
         improvement_points=improvement_points,
-        # Script context
-        script_id=script_id,
+        # Content context
+        content_id=content_id,
         script_title=title_text,  # Often the title is used as script title
         script_summary=script_summary,
         script_version=script_version,
         script_alignment_score=script_alignment.score,
-        key_script_elements=script_alignment.key_elements,
+        key_content_elements=script_alignment.key_elements,
         # Idea context
         idea_id=idea_id,
         idea_summary=idea_summary,

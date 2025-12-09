@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Manual Verification Script for youtube_video_scrape Task Type
+Manual Verification Content for youtube_video_scrape Task Type
 
 This script verifies that the youtube_video_scrape task type is properly
 registered and can be instantiated.

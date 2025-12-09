@@ -254,12 +254,12 @@ class TestEdgeCases:
 
     def test_very_long_content(self):
         """Test with very long content."""
-        long_script = " ".join(
+        long_content = " ".join(
             ["Python programming is great for web development and data science."] * 100
         )
 
         result = process_taxonomy(
-            title="Python Programming Guide", script=long_script, keywords=["python", "programming"]
+            title="Python Programming Guide", script=long_content, keywords=["python", "programming"]
         )
 
         assert len(result["tags"]) > 0

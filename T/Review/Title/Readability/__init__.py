@@ -12,12 +12,12 @@ Workflow Position:
     Story (state=PrismQ.T.Review.Title.Readability) → Review → State Transition
 
 Selection Logic:
-    Selects the Story that has the Script with the lowest current version number
+    Selects the Story that has the Content with the lowest current version number
     (where "current version" is the highest version for a given story_id).
     This ensures stories with less refined scripts are processed first.
 
 State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Script.From.Title.Review.Script' (refinement)
+- If review doesn't accept title → 'PrismQ.T.Content.From.Title.Review.Content' (refinement)
 - If review accepts title → 'PrismQ.T.Story.Review' (next stage)
 
 Output:

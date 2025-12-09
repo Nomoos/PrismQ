@@ -6,7 +6,7 @@ This module provides the Idea data model which represents distilled/fused
 concepts derived from IdeaInspiration instances. Ideas serve as the foundation
 for creative content generation in the workflow:
 
-    IdeaInspiration → Idea → Script → Proofreading → Publishing
+    IdeaInspiration → Idea → Content → Proofreading → Publishing
 
 Example:
     >>> from idea import Idea, ContentGenre

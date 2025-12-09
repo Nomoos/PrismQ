@@ -12,8 +12,8 @@ sys.path.insert(0, str(test_dir / "../../src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model/src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model"))
 sys.path.insert(0, str(test_dir / "../../../../Review/Title/ByScriptAndIdea"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Script/ByTitle"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Script"))
+sys.path.insert(0, str(test_dir / "../../../../Review/Content/ByTitle"))
+sys.path.insert(0, str(test_dir / "../../../../Review/Content"))
 
 from script_review import (
     CategoryScore,
@@ -114,7 +114,7 @@ class TestTitleImprover:
 
         # Sample data
         self.original_title = "The Mystery House"
-        self.script_text = """
+        self.content_text = """
         In the abandoned Victorian house on Elm Street, strange echoes fill the air.
         Every night, Sarah hears voices repeating her words moments after she speaks.
         The haunting sound grows stronger, revealing dark secrets buried in the walls.
@@ -129,8 +129,8 @@ class TestTitleImprover:
             script_alignment_score=60,
             idea_alignment_score=70,
             engagement_score=75,
-            script_id="script-001",
-            key_script_elements=["echo", "Victorian", "haunting", "secrets"],
+            content_id="script-001",
+            key_content_elements=["echo", "Victorian", "haunting", "secrets"],
             suggested_keywords=["echo", "haunting"],
             current_length_chars=len(self.original_title),
             optimal_length_chars=60,
@@ -158,7 +158,7 @@ class TestTitleImprover:
 
         # Create sample script review
         self.script_review = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title=self.original_title,
             overall_score=72,
             target_audience="Horror enthusiasts",
@@ -172,7 +172,7 @@ class TestTitleImprover:
             ImprovementPoint(
                 category=ReviewCategory.ENGAGEMENT,
                 title="Opening hook",
-                description="Script has strong echo element that title should reflect",
+                description="Content has strong echo element that title should reflect",
                 priority="high",
                 impact_score=80,
                 suggested_fix="Emphasize the echo mystery",
@@ -183,7 +183,7 @@ class TestTitleImprover:
         """Test basic title improvement."""
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
         )
@@ -204,7 +204,7 @@ class TestTitleImprover:
 
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
             idea=idea,
@@ -217,7 +217,7 @@ class TestTitleImprover:
         """Test improvement with custom version numbers."""
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
             original_version_number="v2",
@@ -227,11 +227,11 @@ class TestTitleImprover:
         assert result.original_version.version_number == "v2"
         assert result.new_version.version_number == "v3"
 
-    def test_improve_title_incorporates_script_elements(self):
+    def test_improve_title_incorporates_content_elements(self):
         """Test that improvement incorporates key script elements."""
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
         )
@@ -247,7 +247,7 @@ class TestTitleImprover:
         """Test that addressed improvements are tracked."""
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
         )
@@ -262,7 +262,7 @@ class TestTitleImprover:
         """Test that version history is maintained."""
         result = self.improver.improve_title(
             original_title=self.original_title,
-            script_text=self.script_text,
+            content_text=self.content_text,
             title_review=self.title_review,
             script_review=self.script_review,
         )
@@ -276,7 +276,7 @@ class TestTitleImprover:
         with pytest.raises(ValueError):
             self.improver.improve_title(
                 original_title="",
-                script_text=self.script_text,
+                content_text=self.content_text,
                 title_review=self.title_review,
                 script_review=self.script_review,
             )
@@ -284,7 +284,7 @@ class TestTitleImprover:
         with pytest.raises(ValueError):
             self.improver.improve_title(
                 original_title=self.original_title,
-                script_text="",
+                content_text="",
                 title_review=self.title_review,
                 script_review=self.script_review,
             )
@@ -292,7 +292,7 @@ class TestTitleImprover:
         with pytest.raises(ValueError):
             self.improver.improve_title(
                 original_title=self.original_title,
-                script_text=self.script_text,
+                content_text=self.content_text,
                 title_review=None,
                 script_review=self.script_review,
             )
@@ -341,15 +341,15 @@ class TestTitleImprovementStrategies:
         assert improvements[1]["priority"] == "medium"
         assert improvements[2]["priority"] == "low"
 
-    def test_extract_script_insights(self):
+    def test_extract_content_insights(self):
         """Test extracting relevant insights from script review."""
-        review = ScriptReview(script_id="test", script_title="Test", overall_score=75)
+        review = ScriptReview(content_id="test", script_title="Test", overall_score=75)
 
         review.improvement_points = [
             ImprovementPoint(
                 category=ReviewCategory.ENGAGEMENT,
                 title="Title promise",
-                description="Script mentions title expectations",
+                description="Content mentions title expectations",
                 priority="high",
                 impact_score=80,
             ),
@@ -362,18 +362,18 @@ class TestTitleImprovementStrategies:
             ),
         ]
 
-        insights = self.improver._extract_script_insights(review)
+        insights = self.improver._extract_content_insights(review)
 
         # Should only extract title-relevant insights
         if insights:
             assert any("title" in ins["description"].lower() for ins in insights)
 
-    def test_incorporate_script_elements(self):
+    def test_incorporate_content_elements(self):
         """Test incorporating script elements into title."""
         title = "The House"
         elements = ["mystery", "echo", "Victorian"]
 
-        result = self.improver._incorporate_script_elements(title, elements)
+        result = self.improver._incorporate_content_elements(title, elements)
 
         # Should have added an element
         assert len(result) > len(title)
@@ -413,14 +413,14 @@ class TestConvenienceFunction:
             title_text=title,
             overall_score=70,
             script_alignment_score=65,
-            key_script_elements=["mystery", "secrets"],
+            key_content_elements=["mystery", "secrets"],
         )
 
-        script_review = ScriptReview(script_id="test", script_title=title, overall_score=75)
+        script_review = ScriptReview(content_id="test", script_title=title, overall_score=75)
 
         result = improve_title_from_reviews(
             original_title=title,
-            script_text=script,
+            content_text=script,
             title_review=title_review,
             script_review=script_review,
         )
@@ -446,7 +446,7 @@ class TestAcceptanceCriteria:
             title_text=title,
             overall_score=65,
             script_alignment_score=60,
-            key_script_elements=["mysteries", "dangerous", "old house"],
+            key_content_elements=["mysteries", "dangerous", "old house"],
         )
         title_review.improvement_points = [
             TitleImprovementPoint(
@@ -458,7 +458,7 @@ class TestAcceptanceCriteria:
             )
         ]
 
-        script_review = ScriptReview(script_id="ac-test-1", script_title=title, overall_score=70)
+        script_review = ScriptReview(content_id="ac-test-1", script_title=title, overall_score=70)
         script_review.improvement_points = [
             ImprovementPoint(
                 category=ReviewCategory.ENGAGEMENT,
@@ -471,7 +471,7 @@ class TestAcceptanceCriteria:
 
         result = improver.improve_title(
             original_title=title,
-            script_text=script,
+            content_text=script,
             title_review=title_review,
             script_review=script_review,
         )
@@ -494,11 +494,11 @@ class TestAcceptanceCriteria:
             title_id="ac-test-2", title_text=title_v1, overall_score=70, script_alignment_score=65
         )
 
-        script_review = ScriptReview(script_id="ac-test-2", script_title=title_v1, overall_score=72)
+        script_review = ScriptReview(content_id="ac-test-2", script_title=title_v1, overall_score=72)
 
         result = improver.improve_title(
             original_title=title_v1,
-            script_text=script_v1,
+            content_text=script_v1,
             title_review=title_review,
             script_review=script_review,
             original_version_number="v1",
@@ -522,14 +522,14 @@ class TestAcceptanceCriteria:
             overall_score=70,
             script_alignment_score=50,  # Poor alignment
             engagement_score=85,  # Good engagement
-            key_script_elements=["scientific", "discoveries"],
+            key_content_elements=["scientific", "discoveries"],
         )
 
-        script_review = ScriptReview(script_id="ac-test-3", script_title=title, overall_score=75)
+        script_review = ScriptReview(content_id="ac-test-3", script_title=title, overall_score=75)
 
         result = improver.improve_title(
             original_title=title,
-            script_text=script,
+            content_text=script,
             title_review=title_review,
             script_review=script_review,
         )
@@ -544,15 +544,15 @@ class TestAcceptanceCriteria:
         improver = TitleImprover()
 
         title_v1 = "Original Title"
-        script = "Script content here."
+        script = "Content content here."
 
         title_review = TitleReview(title_id="ac-test-4", title_text=title_v1, overall_score=70)
 
-        script_review = ScriptReview(script_id="ac-test-4", script_title=title_v1, overall_score=72)
+        script_review = ScriptReview(content_id="ac-test-4", script_title=title_v1, overall_score=72)
 
         result = improver.improve_title(
             original_title=title_v1,
-            script_text=script,
+            content_text=script,
             title_review=title_review,
             script_review=script_review,
         )
@@ -577,7 +577,7 @@ class TestAcceptanceCriteria:
             title_text=title,
             overall_score=60,
             script_alignment_score=55,
-            key_script_elements=["space", "exploration", "alien"],
+            key_content_elements=["space", "exploration", "alien"],
         )
         title_review.improvement_points = [
             TitleImprovementPoint(
@@ -589,11 +589,11 @@ class TestAcceptanceCriteria:
             )
         ]
 
-        script_review = ScriptReview(script_id="ac-test-5", script_title=title, overall_score=75)
+        script_review = ScriptReview(content_id="ac-test-5", script_title=title, overall_score=75)
 
         result = improver.improve_title(
             original_title=title,
-            script_text=script,
+            content_text=script,
             title_review=title_review,
             script_review=script_review,
         )

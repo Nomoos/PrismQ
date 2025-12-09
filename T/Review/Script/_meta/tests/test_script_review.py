@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from T.Review.Script import (
+from T.Review.Content import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
@@ -18,10 +18,10 @@ class TestScriptReviewBasic:
 
     def test_create_basic_review(self):
         """Test creating a basic ScriptReview instance."""
-        review = ScriptReview(script_id="script-001", script_title="Test Script", overall_score=75)
+        review = ScriptReview(content_id="script-001", script_title="Test Content", overall_score=75)
 
-        assert review.script_id == "script-001"
-        assert review.script_title == "Test Script"
+        assert review.content_id == "script-001"
+        assert review.script_title == "Test Content"
         assert review.overall_score == 75
         assert review.category_scores == []
         assert review.improvement_points == []
@@ -51,7 +51,7 @@ class TestScriptReviewBasic:
     def test_create_youtube_short_review(self):
         """Test creating a review for YouTube short."""
         review = ScriptReview(
-            script_id="short-001",
+            content_id="short-001",
             script_title="Horror Short",
             overall_score=72,
             target_audience="Horror fans 18-35",
@@ -66,7 +66,7 @@ class TestScriptReviewBasic:
             needs_major_revision=False,
         )
 
-        assert review.script_id == "short-001"
+        assert review.content_id == "short-001"
         assert review.script_title == "Horror Short"
         assert review.overall_score == 72
         assert review.target_audience == "Horror fans 18-35"
@@ -130,7 +130,7 @@ class TestScriptReviewMethods:
 
     def test_get_category_score(self):
         """Test getting score for specific category."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=75)
 
         # Add category scores
         review.category_scores.append(
@@ -155,7 +155,7 @@ class TestScriptReviewMethods:
 
     def test_get_high_priority_improvements(self):
         """Test getting high-priority improvements."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=75)
 
         # Add improvements with different priorities
         review.improvement_points.append(
@@ -208,7 +208,7 @@ class TestScriptReviewMethods:
     def test_get_youtube_short_readiness(self):
         """Test YouTube short readiness calculation."""
         review = ScriptReview(
-            script_id="short-001",
+            content_id="short-001",
             script_title="Test Short",
             overall_score=75,
             is_youtube_short=True,
@@ -233,8 +233,8 @@ class TestScriptReviewMethods:
     def test_youtube_short_readiness_not_configured(self):
         """Test readiness when not configured for YouTube shorts."""
         review = ScriptReview(
-            script_id="script-001",
-            script_title="Regular Script",
+            content_id="script-001",
+            script_title="Regular Content",
             overall_score=75,
             is_youtube_short=False,
         )
@@ -251,7 +251,7 @@ class TestScriptReviewSerialization:
     def test_to_dict(self):
         """Test converting ScriptReview to dictionary."""
         review = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title="Test",
             overall_score=75,
             target_length=ContentLength.YOUTUBE_SHORT,
@@ -277,7 +277,7 @@ class TestScriptReviewSerialization:
         data = review.to_dict()
 
         assert isinstance(data, dict)
-        assert data["script_id"] == "script-001"
+        assert data["content_id"] == "script-001"
         assert data["script_title"] == "Test"
         assert data["overall_score"] == 75
         assert data["target_length"] == "youtube_short"  # Enum to string
@@ -294,7 +294,7 @@ class TestScriptReviewSerialization:
     def test_from_dict(self):
         """Test creating ScriptReview from dictionary."""
         data = {
-            "script_id": "script-001",
+            "content_id": "script-001",
             "script_title": "Test",
             "overall_score": 75,
             "target_length": "youtube_short_extended",
@@ -323,7 +323,7 @@ class TestScriptReviewSerialization:
 
         review = ScriptReview.from_dict(data)
 
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_title == "Test"
         assert review.overall_score == 75
         assert review.target_length == ContentLength.YOUTUBE_SHORT_EXTENDED
@@ -342,8 +342,8 @@ class TestScriptReviewSerialization:
     def test_roundtrip_serialization(self):
         """Test that to_dict -> from_dict preserves data."""
         original = ScriptReview(
-            script_id="script-001",
-            script_title="Test Script",
+            content_id="script-001",
+            script_title="Test Content",
             overall_score=80,
             target_audience="Test audience",
             audience_alignment_score=85,
@@ -372,7 +372,7 @@ class TestScriptReviewSerialization:
         restored = ScriptReview.from_dict(data)
 
         # Compare fields
-        assert restored.script_id == original.script_id
+        assert restored.content_id == original.content_id
         assert restored.script_title == original.script_title
         assert restored.overall_score == original.overall_score
         assert restored.target_audience == original.target_audience
@@ -403,7 +403,7 @@ class TestScriptReviewRepresentation:
     def test_repr(self):
         """Test __repr__ method."""
         review = ScriptReview(
-            script_id="script-001", script_title="Test Script", overall_score=75, iteration_number=2
+            content_id="script-001", script_title="Test Content", overall_score=75, iteration_number=2
         )
 
         review.improvement_points.append(
@@ -419,7 +419,7 @@ class TestScriptReviewRepresentation:
         repr_str = repr(review)
 
         assert "ScriptReview(" in repr_str
-        assert "script='Test Script'" in repr_str
+        assert "script='Test Content'" in repr_str
         assert "score=75%" in repr_str
         assert "iteration=2" in repr_str
         assert "improvements=1" in repr_str

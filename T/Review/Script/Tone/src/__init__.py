@@ -1,1 +1,1 @@
-"""PrismQ.T.Review.Script.Tone src module."""
+"""PrismQ.T.Review.Content.Tone src module."""

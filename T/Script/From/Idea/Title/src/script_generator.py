@@ -1,4 +1,4 @@
-"""Script Generator for creating v1 scripts from ideas and titles.
+"""Content Generator for creating v1 scripts from ideas and titles.
 
 This module implements the script generation logic using local AI models:
 - Takes Idea object and Title v1 as input
@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
-# Path: T/Script/From/Idea/Title/src/script_generator.py
+# Path: T/Content/From/Idea/Title/src/script_generator.py
 # Up 6 levels to T/, then into Idea/Model/src
 parent_dir = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
@@ -42,7 +42,7 @@ def _get_ai_generator_module():
     global _ai_generator_module
     if _ai_generator_module is None:
         try:
-            from . import ai_script_generator as _ai_generator_module
+            from . import ai_content_generator as _ai_generator_module
         except ImportError:
             logger.warning("AI script generator module not available")
             _ai_generator_module = False
@@ -50,7 +50,7 @@ def _get_ai_generator_module():
 
 
 class ScriptStructure(Enum):
-    """Script structure types."""
+    """Content structure types."""
 
     THREE_ACT = "three_act"  # Introduction, Development, Conclusion
     HOOK_DELIVER_CTA = "hook_deliver_cta"  # Hook, Deliver, Call-to-Action
@@ -70,7 +70,7 @@ class PlatformTarget(Enum):
 
 
 class ScriptTone(Enum):
-    """Script tone options."""
+    """Content tone options."""
 
     ENGAGING = "engaging"
     MYSTERIOUS = "mysterious"
@@ -95,7 +95,7 @@ class ScriptV1:
     """Initial script draft (version 1).
 
     Attributes:
-        script_id: Unique identifier for this script
+        content_id: Unique identifier for this script
         idea_id: Reference to source Idea
         title: The title (v1) this script was generated from
         full_text: Complete script text
@@ -109,7 +109,7 @@ class ScriptV1:
         notes: Additional notes or context
     """
 
-    script_id: str
+    content_id: str
     idea_id: str
     title: str
     full_text: str
@@ -132,7 +132,7 @@ class ScriptV1:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
-            "script_id": self.script_id,
+            "content_id": self.content_id,
             "idea_id": self.idea_id,
             "title": self.title,
             "full_text": self.full_text,
@@ -165,10 +165,10 @@ class ScriptGeneratorConfig:
     Attributes:
         platform_target: Target platform for optimization
         target_duration_seconds: Target script duration
-        structure_type: Script structure to use
+        structure_type: Content structure to use
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
-        tone: Script tone (engaging, mysterious, educational, etc.)
+        tone: Content tone (engaging, mysterious, educational, etc.)
         ai_model: AI model to use for generation (default: Qwen3:30b)
         ai_api_base: Base URL for Ollama API
         ai_temperature: AI generation temperature (0.0-2.0)
@@ -247,8 +247,8 @@ class ScriptGenerator:
         """
         return self._ai_available
 
-    def generate_script_v1(
-        self, idea: "Idea", title: str, script_id: Optional[str] = None, **kwargs
+    def generate_content_v1(
+        self, idea: "Idea", title: str, content_id: Optional[str] = None, **kwargs
     ) -> ScriptV1:
         """Generate initial script (v1) from idea and title using AI.
 
@@ -258,7 +258,7 @@ class ScriptGenerator:
         Args:
             idea: Source Idea object
             title: Title variant (v1) to use
-            script_id: Optional script ID (generated if not provided)
+            content_id: Optional script ID (generated if not provided)
             **kwargs: Additional configuration overrides
 
         Returns:
@@ -286,8 +286,8 @@ class ScriptGenerator:
             raise RuntimeError(error_msg)
 
         # Generate script ID if not provided
-        if not script_id:
-            script_id = self._generate_script_id(idea, title)
+        if not content_id:
+            content_id = self._generate_content_id(idea, title)
 
         logger.info(f"Generating script with AI for '{title}'")
         full_text, sections = self._generate_with_ai(idea, title, config)
@@ -307,7 +307,7 @@ class ScriptGenerator:
 
         # Create ScriptV1 object
         script = ScriptV1(
-            script_id=script_id,
+            content_id=content_id,
             idea_id=getattr(idea, "id", "unknown"),
             title=title,
             full_text=full_text,
@@ -339,7 +339,7 @@ class ScriptGenerator:
 
         Args:
             idea: Source Idea object
-            title: Script title
+            title: Content title
             config: Generation configuration
 
         Returns:
@@ -378,7 +378,7 @@ class ScriptGenerator:
             tone = config.tone.value if hasattr(config.tone, "value") else str(config.tone)
 
             # Generate full script using AI (title + idea_text + random seed)
-            full_text = self._ai_generator.generate_script(
+            full_text = self._ai_generator.generate_content(
                 title=title,
                 idea_text=idea_text,
                 target_duration_seconds=config.target_duration_seconds,
@@ -484,7 +484,7 @@ class ScriptGenerator:
         )
         return config
 
-    def _generate_script_id(self, idea: "Idea", title: str) -> str:
+    def _generate_content_id(self, idea: "Idea", title: str) -> str:
         """Generate a unique script ID."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         idea_id = getattr(idea, "id", "unknown")

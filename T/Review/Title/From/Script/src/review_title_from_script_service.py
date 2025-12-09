@@ -1,15 +1,15 @@
-"""PrismQ.T.Review.Title.From.Script Service Module.
+"""PrismQ.T.Review.Title.From.Content Service Module.
 
 This module provides the service to process stories in the
-PrismQ.T.Review.Title.From.Script state by:
+PrismQ.T.Review.Title.From.Content state by:
 1. Selecting the oldest Story in this state
 2. Reviewing the title against the script
 3. Creating a Review record with text and score
 4. Updating the Story state based on review result
 
 State Transitions:
-    - If review accepts title (score >= threshold) -> PrismQ.T.Review.Script.From.Title
-    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Script.Review.Title
+    - If review accepts title (score >= threshold) -> PrismQ.T.Review.Content.From.Title
+    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Content.Review.Title
 """
 
 import os
@@ -21,7 +21,7 @@ from typing import List, Optional, Tuple
 
 # Setup paths for imports
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_module_root = os.path.dirname(_current_dir)  # T/Review/Title/From/Script
+_module_root = os.path.dirname(_current_dir)  # T/Review/Title/From/Content
 _t_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_module_root))))  # T
 _repo_root = os.path.dirname(_t_root)
 
@@ -31,19 +31,19 @@ if _t_root not in sys.path:
     sys.path.insert(0, _t_root)
 
 from Model.Database.models.review import Review
-from Model.Database.models.script import Script
+from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.models.title import Title
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
 
 # Try to import the review function
 try:
-    from T.Review.Title.From.Script.by_script_v2 import (
+    from T.Review.Title.From.Content.by_content_v2 import (
         SCORE_THRESHOLD_HIGH,
-        review_title_by_script_v2,
+        review_title_by_content_v2,
     )
 
     REVIEW_AVAILABLE = True
@@ -132,10 +132,10 @@ class ReviewRepository:
 
 
 class ReviewTitleFromScriptService:
-    """Service for processing stories in the PrismQ.T.Review.Title.From.Script state.
+    """Service for processing stories in the PrismQ.T.Review.Title.From.Content state.
 
     This service implements the workflow logic for reviewing titles against scripts:
-    1. Finds the oldest story in the Review.Title.From.Script state
+    1. Finds the oldest story in the Review.Title.From.Content state
     2. Loads the associated title and script
     3. Performs title review analysis
     4. Creates a Review record
@@ -144,7 +144,7 @@ class ReviewTitleFromScriptService:
     Attributes:
         story_repo: Repository for Story operations
         title_repo: Repository for Title operations
-        script_repo: Repository for Script operations
+        content_repo: Repository for Content operations
         review_repo: Repository for Review operations
     """
 
@@ -157,7 +157,7 @@ class ReviewTitleFromScriptService:
         self,
         story_repo: StoryRepository,
         title_repo: TitleRepository,
-        script_repo: ScriptRepository,
+        content_repo: ContentRepository,
         review_repo: ReviewRepository,
         acceptance_threshold: int = TITLE_ACCEPTANCE_THRESHOLD,
     ):
@@ -166,18 +166,18 @@ class ReviewTitleFromScriptService:
         Args:
             story_repo: Repository for Story operations
             title_repo: Repository for Title operations
-            script_repo: Repository for Script operations
+            content_repo: Repository for Content operations
             review_repo: Repository for Review operations
             acceptance_threshold: Score threshold for accepting titles (default: 70)
         """
         self.story_repo = story_repo
         self.title_repo = title_repo
-        self.script_repo = script_repo
+        self.content_repo = content_repo
         self.review_repo = review_repo
         self.acceptance_threshold = acceptance_threshold
 
     def find_oldest_story_to_process(self) -> Optional[Story]:
-        """Find the oldest story in the Review.Title.From.Script state.
+        """Find the oldest story in the Review.Title.From.Content state.
 
         Returns:
             Oldest Story in the current state, or None if none found
@@ -188,30 +188,30 @@ class ReviewTitleFromScriptService:
         return stories[0] if stories else None
 
     def count_stories_to_process(self) -> int:
-        """Count stories in the Review.Title.From.Script state.
+        """Count stories in the Review.Title.From.Content state.
 
         Returns:
             Number of stories waiting to be processed
         """
         return self.story_repo.count_by_state(self.CURRENT_STATE)
 
-    def _generate_review(self, title: Title, script: Script) -> Tuple[str, int]:
+    def _generate_review(self, title: Title, script: Content) -> Tuple[str, int]:
         """Generate review text and score for a title against a script.
 
         Args:
             title: The Title to review
-            script: The Script to review against
+            script: The Content to review against
 
         Returns:
             Tuple of (review_text, review_score)
         """
         if REVIEW_AVAILABLE:
             # Use the full review module
-            review_result = review_title_by_script_v2(
+            review_result = review_title_by_content_v2(
                 title_text=title.text,
-                script_text=script.text,
+                content_text=script.text,
                 title_id=str(title.id),
-                script_id=str(script.id),
+                content_id=str(script.id),
                 title_version=f"v{title.version}",
                 script_version=f"v{script.version}",
             )
@@ -244,7 +244,7 @@ class ReviewTitleFromScriptService:
 
         # Add specific feedback
         if review_result.script_alignment_score:
-            parts.append(f"Script alignment: {review_result.script_alignment_score}%")
+            parts.append(f"Content alignment: {review_result.script_alignment_score}%")
 
         if review_result.engagement_score:
             parts.append(f"Engagement score: {review_result.engagement_score}%")
@@ -259,19 +259,19 @@ class ReviewTitleFromScriptService:
 
         return " ".join(parts)
 
-    def _simple_review(self, title_text: str, script_text: str) -> Tuple[str, int]:
+    def _simple_review(self, title_text: str, content_text: str) -> Tuple[str, int]:
         """Simple fallback review when full module is not available.
 
         Args:
             title_text: Title text to review
-            script_text: Script text to review against
+            content_text: Content text to review against
 
         Returns:
             Tuple of (review_text, review_score)
         """
         # Simple keyword matching
         title_lower = title_text.lower()
-        script_lower = script_text.lower()
+        script_lower = content_text.lower()
 
         # Extract simple keywords from title
         title_words = set(word for word in title_lower.split() if len(word) > 3 and word.isalpha())
@@ -329,7 +329,7 @@ class ReviewTitleFromScriptService:
             )
 
         # Get the latest script for the story
-        script = self.script_repo.find_latest_version(story.id)
+        script = self.content_repo.find_latest_version(story.id)
         if not script:
             return ReviewTitleFromScriptResult(
                 success=False, story_id=story.id, error_message="No script found for story"
@@ -367,7 +367,7 @@ class ReviewTitleFromScriptService:
         )
 
     def process_oldest_story(self) -> ReviewTitleFromScriptResult:
-        """Process the oldest story in the Review.Title.From.Script state.
+        """Process the oldest story in the Review.Title.From.Content state.
 
         Returns:
             ReviewTitleFromScriptResult with processing outcome
@@ -381,7 +381,7 @@ class ReviewTitleFromScriptService:
         return self.process_story(story)
 
     def process_all_stories(self, limit: Optional[int] = None) -> List[ReviewTitleFromScriptResult]:
-        """Process all stories in the Review.Title.From.Script state.
+        """Process all stories in the Review.Title.From.Content state.
 
         Args:
             limit: Optional maximum number of stories to process

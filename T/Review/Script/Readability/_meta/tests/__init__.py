@@ -1,1 +1,1 @@
-"""Tests for Script Readability Review module."""
+"""Tests for Content Readability Review module."""

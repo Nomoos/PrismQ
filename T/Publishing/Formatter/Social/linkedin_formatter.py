@@ -1,4 +1,4 @@
-"""LinkedIn post formatter for PrismQ.T.Script.Formatter.Social.
+"""LinkedIn post formatter for PrismQ.T.Content.Formatter.Social.
 
 This module transforms scripts into LinkedIn post format with professional
 structure, hook optimization, and hashtag management.
@@ -41,7 +41,7 @@ class LinkedInFormatter(BaseSocialFormatter):
         """Format script into LinkedIn post.
 
         Args:
-            script: Script content to format
+            script: Content content to format
             content_id: Unique identifier for content
             hook_type: Type of hook (question, statement, stat)
             add_hashtags: Whether to add hashtags
@@ -123,7 +123,7 @@ class LinkedInFormatter(BaseSocialFormatter):
         LinkedIn hook must be compelling in first 140 characters.
 
         Args:
-            script: Script content
+            script: Content content
             hook_type: Type of hook
 
         Returns:
@@ -151,7 +151,7 @@ class LinkedInFormatter(BaseSocialFormatter):
         """Structure main content for LinkedIn.
 
         Args:
-            script: Script content
+            script: Content content
 
         Returns:
             Structured content with paragraphs
@@ -285,7 +285,7 @@ def format_linkedin_post(
     """Convenience function to format script as LinkedIn post.
 
     Args:
-        script: Script content to format
+        script: Content content to format
         content_id: Unique identifier for content
         hook_type: Type of hook (question, statement, stat)
         add_hashtags: Whether to add hashtags

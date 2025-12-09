@@ -1,4 +1,4 @@
-"""Example: Script Versioning for Comparison and Research
+"""Example: Content Versioning for Comparison and Research
 
 This example demonstrates how to use script versioning to:
 - Store each iteration's script text
@@ -12,14 +12,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
-from T.Review.Script import (
+from T.Review.Content import (
     ContentLength,
     ImprovementPoint,
     ReviewCategory,
     ScriptReview,
     ScriptVersion,
 )
-from T.Script import ScriptWriter
+from T.Content import ScriptWriter
 
 
 def example_version_tracking():
@@ -50,14 +50,14 @@ def example_version_tracking():
     [Length: ~145 seconds]
     """
 
-    print("\n📝 VERSION 1: Original Script")
+    print("\n📝 VERSION 1: Original Content")
     print("─" * 80)
     print(f"Length: 145 seconds")
     print(f"Content preview: {script_v1[:100]}...")
 
     # Create review for V1
     review_v1 = ScriptReview(
-        script_id="script-echo-001",
+        content_id="script-echo-001",
         script_title="The Echo",
         overall_score=68,
         is_youtube_short=True,
@@ -67,8 +67,8 @@ def example_version_tracking():
     )
 
     # Store V1 in review
-    review_v1.add_script_version(
-        script_text=script_v1,
+    review_v1.add_content_version(
+        content_text=script_v1,
         length_seconds=145,
         created_by="Human-Writer",
         changes_from_previous="Initial version",
@@ -115,7 +115,7 @@ def example_version_tracking():
 
     # Create review for V2
     review_v2 = ScriptReview(
-        script_id="script-echo-001",
+        content_id="script-echo-001",
         script_title="The Echo",
         overall_score=80,
         is_youtube_short=True,
@@ -125,8 +125,8 @@ def example_version_tracking():
     )
 
     # Store V2
-    review_v2.add_script_version(
-        script_text=script_v2,
+    review_v2.add_content_version(
+        content_text=script_v2,
         length_seconds=105,
         created_by="AI-Writer-001",
         changes_from_previous="Reduced investigation sequence, stronger opening",
@@ -158,7 +158,7 @@ def example_version_tracking():
 
     # Store V3
     review_v3 = ScriptReview(
-        script_id="script-echo-001",
+        content_id="script-echo-001",
         script_title="The Echo",
         overall_score=88,
         is_youtube_short=True,
@@ -167,8 +167,8 @@ def example_version_tracking():
         optimal_length_seconds=75,
     )
 
-    review_v3.add_script_version(
-        script_text=script_v3,
+    review_v3.add_content_version(
+        content_text=script_v3,
         length_seconds=75,
         created_by="AI-Writer-001",
         changes_from_previous="Ultra-compressed for YouTube shorts, removed all padding",

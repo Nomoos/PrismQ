@@ -8,9 +8,9 @@ Models:
 - StoryReview: Linking table for Story reviews with review types
 
 For business logic models with validation and workflow methods, use:
-- T.Review.Script.Consistency for ConsistencyReview
-- T.Review.Script.Content for ContentReview
-- T.Review.Script.Editing for EditingReview
+- T.Review.Content.Consistency for ConsistencyReview
+- T.Review.Content.Content for ContentReview
+- T.Review.Content.Editing for EditingReview
 """
 
 try:

@@ -1,6 +1,6 @@
-"""Script Grammar Review - AI-powered grammar validation for scripts.
+"""Content Grammar Review - AI-powered grammar validation for scripts.
 
-This module implements PrismQ.T.Review.Script.Grammar for Stage 14 (MVP-014).
+This module implements PrismQ.T.Review.Content.Grammar for Stage 14 (MVP-014).
 Provides comprehensive grammar, punctuation, spelling, syntax, and tense checking
 for script content with line-by-line error detection and JSON output.
 
@@ -10,7 +10,7 @@ with detailed feedback.
 
 Workflow Position:
     Stage 14 (MVP-014): Grammar Review
-    Script v3+ → Grammar Review → [PASS: Stage 15] or [FAIL: Script Refinement]
+    Content v3+ → Grammar Review → [PASS: Stage 15] or [FAIL: Content Refinement]
 """
 
 import json
@@ -138,25 +138,25 @@ class ScriptGrammarChecker:
             ],
         }
 
-    def review_script(
-        self, script_text: str, script_id: str = "script-001", script_version: str = "v3"
+    def review_content(
+        self, content_text: str, content_id: str = "script-001", script_version: str = "v3"
     ) -> GrammarReview:
         """Review a script for grammar, punctuation, spelling, syntax, and tense.
 
         Args:
-            script_text: The script text to review
-            script_id: Identifier for the script
+            content_text: The script text to review
+            content_id: Identifier for the script
             script_version: Version of the script (v3, v4, etc.)
 
         Returns:
             GrammarReview object with all detected issues
         """
         review = GrammarReview(
-            script_id=script_id, script_version=script_version, pass_threshold=self.pass_threshold
+            content_id=content_id, script_version=script_version, pass_threshold=self.pass_threshold
         )
 
         # Split script into lines for line-by-line analysis
-        lines = script_text.split("\n")
+        lines = content_text.split("\n")
 
         # Check each line
         for line_num, line in enumerate(lines, start=1):
@@ -176,7 +176,7 @@ class ScriptGrammarChecker:
             self._check_capitalization(line, line_num, review)
 
         # Check overall tense consistency
-        self._check_tense_consistency(script_text, lines, review)
+        self._check_tense_consistency(content_text, lines, review)
 
         # Calculate overall score based on issues
         review.overall_score = self._calculate_score(review)
@@ -306,7 +306,7 @@ class ScriptGrammarChecker:
             review.add_issue(issue)
 
     def _check_tense_consistency(
-        self, script_text: str, lines: List[str], review: GrammarReview
+        self, content_text: str, lines: List[str], review: GrammarReview
     ) -> None:
         """Check for tense consistency throughout the script."""
         # Count tense markers
@@ -314,10 +314,10 @@ class ScriptGrammarChecker:
         present_count = 0
 
         for pattern in self.tense_patterns["past"]:
-            past_count += len(re.findall(pattern, script_text, re.IGNORECASE))
+            past_count += len(re.findall(pattern, content_text, re.IGNORECASE))
 
         for pattern in self.tense_patterns["present"]:
-            present_count += len(re.findall(pattern, script_text, re.IGNORECASE))
+            present_count += len(re.findall(pattern, content_text, re.IGNORECASE))
 
         # Determine primary tense
         if past_count > present_count * 2:
@@ -348,7 +348,7 @@ class ScriptGrammarChecker:
                             line_number=line_num,
                             text=line.strip(),
                             suggestion=f"Consider using {primary_tense} tense consistently",
-                            explanation=f"Script primarily uses {primary_tense} tense, but this line uses {tense_name} tense",
+                            explanation=f"Content primarily uses {primary_tense} tense, but this line uses {tense_name} tense",
                             confidence=60,
                         )
                         review.add_issue(issue)
@@ -384,17 +384,17 @@ class ScriptGrammarChecker:
         total_issues = len(review.issues)
 
         if total_issues == 0:
-            review.summary = "Excellent! No grammar issues detected. Script is technically correct."
+            review.summary = "Excellent! No grammar issues detected. Content is technically correct."
             review.passes = True
             return
 
         # Generate summary
         if review.passes:
             review.summary = (
-                f"Script passes grammar review with {total_issues} minor issue(s) detected."
+                f"Content passes grammar review with {total_issues} minor issue(s) detected."
             )
         else:
-            review.summary = f"Script requires revision. {total_issues} grammar issue(s) detected, including {review.critical_count} critical error(s)."
+            review.summary = f"Content requires revision. {total_issues} grammar issue(s) detected, including {review.critical_count} critical error(s)."
 
         # Identify primary concerns
         if review.critical_count > 0:
@@ -421,17 +421,17 @@ class ScriptGrammarChecker:
             review.quick_fixes.append(f"Fix {capitalization_count} capitalization error(s)")
 
 
-def review_script_grammar(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_grammar(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> GrammarReview:
     """Convenience function to review script grammar.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -440,27 +440,27 @@ def review_script_grammar(
 
     Example:
         >>> script = "I was walking down the street. He were running fast."
-        >>> review = review_script_grammar(script)
+        >>> review = review_content_grammar(script)
         >>> print(f"Score: {review.overall_score}")
         >>> print(f"Passes: {review.passes}")
         >>> for issue in review.issues:
         ...     print(f"Line {issue.line_number}: {issue.explanation}")
     """
     checker = ScriptGrammarChecker(pass_threshold=pass_threshold)
-    return checker.review_script(script_text, script_id, script_version)
+    return checker.review_content(content_text, content_id, script_version)
 
 
-def review_script_grammar_to_json(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_grammar_to_json(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> str:
     """Review script grammar and return results as JSON string.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -469,13 +469,13 @@ def review_script_grammar_to_json(
 
     Example:
         >>> script = "I was walking. He were running."
-        >>> json_result = review_script_grammar_to_json(script)
+        >>> json_result = review_content_grammar_to_json(script)
         >>> import json
         >>> result = json.loads(json_result)
         >>> print(result['overall_score'])
         >>> print(result['passes'])
     """
-    review = review_script_grammar(script_text, script_id, script_version, pass_threshold)
+    review = review_content_grammar(content_text, content_id, script_version, pass_threshold)
     return json.dumps(review.to_dict(), indent=2)
 
 
@@ -489,15 +489,15 @@ def get_grammar_feedback(review: GrammarReview) -> Dict[str, Any]:
         Dictionary with structured feedback for script writers
 
     Example:
-        >>> review = review_script_grammar(script_text)
+        >>> review = review_content_grammar(content_text)
         >>> feedback = get_grammar_feedback(review)
         >>> if not feedback['passes']:
-        ...     print("Script needs revision:")
+        ...     print("Content needs revision:")
         ...     for issue in feedback['critical_issues']:
         ...         print(f"  Line {issue['line']}: {issue['explanation']}")
     """
     return {
-        "script_id": review.script_id,
+        "content_id": review.content_id,
         "script_version": review.script_version,
         "passes": review.passes,
         "overall_score": review.overall_score,
@@ -529,25 +529,25 @@ def get_grammar_feedback(review: GrammarReview) -> Dict[str, Any]:
         "next_action": (
             "Proceed to Stage 15 (Tone Review)"
             if review.passes
-            else "Return to Script Refinement (Stage 11)"
+            else "Return to Content Refinement (Stage 11)"
         ),
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    test_script = """I was walking down the street when I saw him.
+    test_content = """I was walking down the street when I saw him.
 He were running very fast toward the old building.
 The sun was setting, and shadows grow longer.
 I recieved a message on my phone.
 it was important but I couldn't read it clearly"""
 
-    print("=== Script Grammar Review ===\n")
-    print("Script:")
-    print(test_script)
+    print("=== Content Grammar Review ===\n")
+    print("Content:")
+    print(test_content)
     print("\n" + "=" * 50 + "\n")
 
-    review = review_script_grammar(test_script, script_id="test-001", script_version="v3")
+    review = review_content_grammar(test_content, content_id="test-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Passes: {'YES' if review.passes else 'NO'}")
@@ -566,4 +566,4 @@ it was important but I couldn't read it clearly"""
 
     print("\n" + "=" * 50)
     print("\nJSON Output:")
-    print(review_script_grammar_to_json(test_script, script_id="test-001"))
+    print(review_content_grammar_to_json(test_content, content_id="test-001"))

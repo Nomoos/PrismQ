@@ -114,17 +114,17 @@ class TestAssessmentComponents:
     def test_story_coherence(self):
         """Test StoryCoherence class."""
         coherence = StoryCoherence(
-            score=92, feedback="Excellent coherence", title_script_alignment=AlignmentLevel.PERFECT
+            score=92, feedback="Excellent coherence", title_content_alignment=AlignmentLevel.PERFECT
         )
 
         assert coherence.score == 92
         assert coherence.feedback == "Excellent coherence"
-        assert coherence.title_script_alignment == AlignmentLevel.PERFECT
+        assert coherence.title_content_alignment == AlignmentLevel.PERFECT
 
         # Test to_dict
         data = coherence.to_dict()
         assert data["score"] == 92
-        assert data["title_script_alignment"] == "perfect"
+        assert data["title_content_alignment"] == "perfect"
 
     def test_audience_fit(self):
         """Test AudienceFit class."""
@@ -320,7 +320,7 @@ class TestExpertReviewMethods:
             ImprovementSuggestion(
                 component=ComponentType.SCRIPT,
                 priority=Priority.MEDIUM,
-                suggestion="Script fix",
+                suggestion="Content fix",
                 impact="Good",
                 estimated_effort=EffortLevel.SMALL,
             ),

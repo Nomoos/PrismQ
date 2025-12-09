@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Script.ByTitle v2 module.
+"""Example usage of PrismQ.T.Review.Content.ByTitle v2 module.
 
 This example demonstrates how to use the v2 review functionality to:
 1. Review script v2 against title v3
@@ -20,23 +20,23 @@ sys.path.insert(0, str(_repo_root))
 sys.path.insert(0, str(_idea_model))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Script.ByTitle.by_title_v2 import (
+from T.Review.Content.ByTitle.by_title_v2 import (
     compare_reviews,
     extract_improvements_from_review,
     get_next_steps,
     is_ready_to_proceed,
-    review_script_by_title_v2,
+    review_content_by_title_v2,
 )
 
 # Now we can import
-from T.Review.Script.ByTitle.script_review_by_title import review_script_by_title
+from T.Review.Content.ByTitle.script_review_by_title import review_content_by_title
 
 
 def main():
     """Demonstrate v2 review workflow."""
 
     print("=" * 80)
-    print("PrismQ.T.Review.Script.ByTitle v2 - Example Usage")
+    print("PrismQ.T.Review.Content.ByTitle v2 - Example Usage")
     print("=" * 80)
     print()
 
@@ -66,13 +66,13 @@ def main():
     At first, I thought it was just static.
     """
     print(f"Title v1: {title_v1}")
-    print(f"Script v1 (excerpt): {script_v1[:100]}...")
+    print(f"Content v1 (excerpt): {script_v1[:100]}...")
     print()
 
     # Step 3: Review v1
     print("Step 3: Review script v1 against title v1")
     print("-" * 80)
-    v1_review = review_script_by_title(script_v1, title_v1, idea)
+    v1_review = review_content_by_title(script_v1, title_v1, idea)
     print(f"V1 Overall Score: {v1_review.overall_score}%")
     print(f"V1 Title Alignment: {v1_review.metadata['title_alignment_score']}%")
     print(f"V1 Idea Alignment: {v1_review.metadata['idea_alignment_score']}%")
@@ -97,14 +97,14 @@ def main():
     Now I understand - the echo isn't just a warning. It's a curse.
     """
     print(f"Title v3: {title_v3}")
-    print(f"Script v2: Expanded with more detail and emotional depth")
+    print(f"Content v2: Expanded with more detail and emotional depth")
     print()
 
     # Step 5: Review v2
     print("Step 5: Review script v2 against title v3 (with comparison)")
     print("-" * 80)
-    v2_review = review_script_by_title_v2(
-        script_text=script_v2,
+    v2_review = review_content_by_title_v2(
+        content_text=script_v2,
         title=title_v3,
         idea=idea,
         script_version="v2",
@@ -191,18 +191,18 @@ def main():
     )
 
     if score_change > 0:
-        print(f"✓ Script improved by {score_change}%")
+        print(f"✓ Content improved by {score_change}%")
     elif score_change < 0:
-        print(f"✗ Script regressed by {abs(score_change)}%")
+        print(f"✗ Content regressed by {abs(score_change)}%")
     else:
-        print("= Script quality maintained")
+        print("= Content quality maintained")
 
     if v2_review.overall_score >= 80:
-        print("✓ Script ready for acceptance check")
+        print("✓ Content ready for acceptance check")
     elif v2_review.overall_score >= 60:
-        print("⚠ Script needs minor improvements")
+        print("⚠ Content needs minor improvements")
     else:
-        print("✗ Script needs major revision")
+        print("✗ Content needs major revision")
 
     print()
     print("=" * 80)

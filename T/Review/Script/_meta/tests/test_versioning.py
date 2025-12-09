@@ -2,51 +2,51 @@
 
 import pytest
 
-from T.Review.Script import ContentLength, ScriptReview, ScriptVersion
-from T.Script import ScriptWriter
+from T.Review.Content import ContentLength, ScriptReview, ScriptVersion
+from T.Content import ScriptWriter
 
 
 class TestScriptVersioning:
     """Test script versioning for comparison and research."""
 
-    def test_add_script_version_to_review(self):
+    def test_add_content_version_to_review(self):
         """Test adding script version to review."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=75)
 
         # Add first version
-        version1 = review.add_script_version(
-            script_text="Original script text...",
+        version1 = review.add_content_version(
+            content_text="Original script text...",
             length_seconds=120,
             created_by="AI-Writer-001",
             changes_from_previous="Initial version",
         )
 
         assert version1.version_number == 1
-        assert version1.script_text == "Original script text..."
+        assert version1.content_text == "Original script text..."
         assert version1.length_seconds == 120
         assert version1.review_score == 75
         assert len(review.script_versions_history) == 1
         assert review.script_version == version1
 
-    def test_multiple_script_versions(self):
+    def test_multiple_content_versions(self):
         """Test adding multiple script versions."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=70)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=70)
 
         # Add versions
-        v1 = review.add_script_version(
-            script_text="Version 1 text...", length_seconds=145, changes_from_previous="Initial"
+        v1 = review.add_content_version(
+            content_text="Version 1 text...", length_seconds=145, changes_from_previous="Initial"
         )
 
         review.overall_score = 80
-        v2 = review.add_script_version(
-            script_text="Version 2 text improved...",
+        v2 = review.add_content_version(
+            content_text="Version 2 text improved...",
             length_seconds=120,
             changes_from_previous="Reduced length by 25s, improved pacing",
         )
 
         review.overall_score = 88
-        v3 = review.add_script_version(
-            script_text="Version 3 text optimized...",
+        v3 = review.add_content_version(
+            content_text="Version 3 text optimized...",
             length_seconds=90,
             changes_from_previous="Further optimization for YouTube shorts",
         )
@@ -59,7 +59,7 @@ class TestScriptVersioning:
 
     def test_get_version_comparison(self):
         """Test getting version comparison data."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=65)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=65)
 
         # Need at least 2 versions
         comparison = review.get_version_comparison()
@@ -67,9 +67,9 @@ class TestScriptVersioning:
         assert "Need at least 2 versions" in comparison["message"]
 
         # Add versions
-        review.add_script_version("V1", 145, changes_from_previous="Initial")
+        review.add_content_version("V1", 145, changes_from_previous="Initial")
         review.overall_score = 80
-        review.add_script_version("V2", 90, changes_from_previous="Optimized")
+        review.add_content_version("V2", 90, changes_from_previous="Optimized")
 
         comparison = review.get_version_comparison()
         assert comparison["comparison_available"] is True
@@ -84,7 +84,7 @@ class TestScriptVersioning:
 
         original = "Original script..."
         review = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title="Test",
             overall_score=70,
             current_length_seconds=120,
@@ -97,18 +97,18 @@ class TestScriptVersioning:
         # Check version was stored
         assert len(writer.script_versions) == 1
         assert writer.script_versions[0]["version_number"] == 1
-        assert writer.script_versions[0]["script_text"] == result.optimized_text
+        assert writer.script_versions[0]["content_text"] == result.optimized_text
         assert writer.script_versions[0]["score"] > 0
 
     def test_writer_version_comparison(self):
         """Test writer version comparison."""
-        from T.Review.Script import ImprovementPoint, ReviewCategory
+        from T.Review.Content import ImprovementPoint, ReviewCategory
 
         writer = ScriptWriter(target_score_threshold=85)
 
         # First iteration
         review1 = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title="Test",
             overall_score=65,
             current_length_seconds=145,
@@ -124,11 +124,11 @@ class TestScriptVersioning:
             )
         )
 
-        result1 = writer.optimize_from_review("Script v1...", review1)
+        result1 = writer.optimize_from_review("Content v1...", review1)
 
         # Second iteration
         review2 = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title="Test",
             overall_score=80,
             current_length_seconds=120,
@@ -149,10 +149,10 @@ class TestScriptVersioning:
 
     def test_version_serialization(self):
         """Test that versions are serialized correctly."""
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=75)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=75)
 
-        review.add_script_version(
-            "Script text v1",
+        review.add_content_version(
+            "Content text v1",
             length_seconds=120,
             created_by="AI-Writer-001",
             changes_from_previous="Initial",
@@ -164,6 +164,6 @@ class TestScriptVersioning:
 
         assert len(restored.script_versions_history) == 1
         assert restored.script_versions_history[0].version_number == 1
-        assert restored.script_versions_history[0].script_text == "Script text v1"
+        assert restored.script_versions_history[0].content_text == "Content text v1"
         assert restored.script_version is not None
         assert restored.script_version.version_number == 1

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Reddit Posts Worker Launcher Script - TaskManager API Pattern
+Reddit Posts Worker Launcher Content - TaskManager API Pattern
 
 This script launches a Reddit Posts Worker that uses pure TaskManager API.
 No local SQLite queue is used - all task management is via external API.

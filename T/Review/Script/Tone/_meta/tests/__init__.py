@@ -1,1 +1,1 @@
-"""Tests for T.Review.Script.Tone module."""
+"""Tests for T.Review.Content.Tone module."""

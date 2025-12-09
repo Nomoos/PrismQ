@@ -9,7 +9,7 @@ sys.path.insert(0, str(project_root))
 
 import pytest
 
-from T.Script.Formatter.Blog import (
+from T.Content.Formatter.Blog import (
     BlogFormattedContent,
     BlogFormatter,
     BlogMetadata,
@@ -19,7 +19,7 @@ from T.Script.Formatter.Blog import (
 
 
 @pytest.fixture
-def sample_short_script():
+def sample_short_content():
     """Sample short script for testing."""
     return """This is a story about innovation. Innovation changes the world. 
     We see it everywhere. From technology to art. From science to culture. 
@@ -28,7 +28,7 @@ def sample_short_script():
 
 
 @pytest.fixture
-def sample_medium_script():
+def sample_medium_content():
     """Sample medium-length script for testing."""
     return """This is a comprehensive story about innovation and how it shapes our world.
     
@@ -55,7 +55,7 @@ def sample_medium_script():
 
 
 @pytest.fixture
-def sample_long_script():
+def sample_long_content():
     """Sample long script for testing (2000+ words)."""
     return (
         """Innovation: The Engine of Human Progress
@@ -155,12 +155,12 @@ class TestBlogFormatter:
         assert formatter is not None
         assert formatter.READING_SPEED_WPM == 225
 
-    def test_format_short_blog(self, sample_short_script):
+    def test_format_short_blog(self, sample_short_content):
         """Test formatting a short blog post."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_short_script, title="Innovation Story", content_id="test-001"
+            script=sample_short_content, title="Innovation Story", content_id="test-001"
         )
 
         assert result.success is True
@@ -169,12 +169,12 @@ class TestBlogFormatter:
         assert "# Innovation Story" in result.formatted_content
         assert result.metadata.word_count > 0
 
-    def test_format_medium_blog(self, sample_medium_script):
+    def test_format_medium_blog(self, sample_medium_content):
         """Test formatting a medium-length blog post."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="Innovation and Progress",
             content_id="test-002",
             format_type="markdown",
@@ -186,12 +186,12 @@ class TestBlogFormatter:
         assert result.metadata.reading_time is not None
         assert "min read" in result.metadata.reading_time
 
-    def test_format_with_html(self, sample_medium_script):
+    def test_format_with_html(self, sample_medium_content):
         """Test formatting as HTML."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="HTML Test",
             content_id="test-003",
             format_type="html",
@@ -203,14 +203,14 @@ class TestBlogFormatter:
         assert "<p>" in result.formatted_content
         assert "</p>" in result.formatted_content
 
-    def test_format_with_cta(self, sample_medium_script):
+    def test_format_with_cta(self, sample_medium_content):
         """Test formatting with CTA sections."""
         formatter = BlogFormatter()
 
         cta_text = "Subscribe to our newsletter for more insights!"
 
         result = formatter.format_blog(
-            script=sample_medium_script, title="CTA Test", content_id="test-004", cta_text=cta_text
+            script=sample_medium_content, title="CTA Test", content_id="test-004", cta_text=cta_text
         )
 
         assert result.success is True
@@ -226,34 +226,34 @@ class TestBlogFormatter:
         assert formatter._calculate_reading_time(675) == "3 min read"
         assert formatter._calculate_reading_time(1125) == "5 min read"
 
-    def test_excerpt_generation(self, sample_medium_script):
+    def test_excerpt_generation(self, sample_medium_content):
         """Test excerpt generation."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_medium_script, title="Excerpt Test", content_id="test-005"
+            script=sample_medium_content, title="Excerpt Test", content_id="test-005"
         )
 
         assert len(result.metadata.excerpt) > 0
         assert len(result.metadata.excerpt) <= 200
 
-    def test_paragraph_formatting(self, sample_medium_script):
+    def test_paragraph_formatting(self, sample_medium_content):
         """Test paragraph formatting with sentence limits."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_medium_script, title="Paragraph Test", content_id="test-006"
+            script=sample_medium_content, title="Paragraph Test", content_id="test-006"
         )
 
         # Check that content is formatted with proper paragraphs
         assert result.metadata.paragraph_count > 0
 
-    def test_heading_hierarchy(self, sample_medium_script):
+    def test_heading_hierarchy(self, sample_medium_content):
         """Test heading hierarchy (H1, H2, H3)."""
         formatter = BlogFormatter()
 
         result = formatter.format_blog(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="Heading Test",
             content_id="test-007",
             format_type="markdown",
@@ -269,10 +269,10 @@ class TestBlogFormatter:
 class TestPlatformSpecific:
     """Test platform-specific formatting."""
 
-    def test_medium_format(self, sample_medium_script):
+    def test_medium_format(self, sample_medium_content):
         """Test Medium-specific formatting."""
         result = export_for_platform(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="Medium Test",
             content_id="test-101",
             platform="medium",
@@ -286,10 +286,10 @@ class TestPlatformSpecific:
             "Import this to Medium" in result.formatted_content or "---" in result.formatted_content
         )
 
-    def test_wordpress_format(self, sample_medium_script):
+    def test_wordpress_format(self, sample_medium_content):
         """Test WordPress-specific formatting."""
         result = export_for_platform(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="WordPress Test",
             content_id="test-102",
             platform="wordpress",
@@ -301,10 +301,10 @@ class TestPlatformSpecific:
         # Check for WordPress-specific elements
         assert "WordPress" in result.formatted_content or "wp:" in result.formatted_content
 
-    def test_ghost_format(self, sample_medium_script):
+    def test_ghost_format(self, sample_medium_content):
         """Test Ghost-specific formatting."""
         result = export_for_platform(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="Ghost Test",
             content_id="test-103",
             platform="ghost",
@@ -316,10 +316,10 @@ class TestPlatformSpecific:
         # Check for Ghost-specific elements (frontmatter)
         assert "---" in result.formatted_content or "title:" in result.formatted_content
 
-    def test_generic_format(self, sample_medium_script):
+    def test_generic_format(self, sample_medium_content):
         """Test generic platform formatting."""
         result = export_for_platform(
-            script=sample_medium_script,
+            script=sample_medium_content,
             title="Generic Test",
             content_id="test-104",
             platform="generic",
@@ -333,10 +333,10 @@ class TestPlatformSpecific:
 class TestConvenienceFunction:
     """Test convenience function."""
 
-    def test_format_blog_function(self, sample_short_script):
+    def test_format_blog_function(self, sample_short_content):
         """Test format_blog convenience function."""
         result = format_blog(
-            script=sample_short_script, title="Function Test", content_id="test-201"
+            script=sample_short_content, title="Function Test", content_id="test-201"
         )
 
         assert result.success is True
@@ -347,7 +347,7 @@ class TestConvenienceFunction:
 class TestEdgeCases:
     """Test edge cases and error handling."""
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test formatting empty script."""
         formatter = BlogFormatter()
 
@@ -356,7 +356,7 @@ class TestEdgeCases:
         # Should handle gracefully
         assert result.content_id == "test-301"
 
-    def test_very_short_script(self):
+    def test_very_short_content(self):
         """Test with very short script."""
         formatter = BlogFormatter()
 
@@ -399,7 +399,7 @@ class TestEdgeCases:
 class TestScriptLengthVariations:
     """Test with various script lengths as per acceptance criteria."""
 
-    def test_500_word_script(self):
+    def test_500_word_content(self):
         """Test with ~500 word script."""
         script = " ".join(["word"] * 500)
 
@@ -413,7 +413,7 @@ class TestScriptLengthVariations:
             or "3 min read" in result.metadata.reading_time
         )
 
-    def test_1000_word_script(self):
+    def test_1000_word_content(self):
         """Test with ~1000 word script."""
         script = " ".join(["word"] * 1000)
 
@@ -427,7 +427,7 @@ class TestScriptLengthVariations:
             or "5 min read" in result.metadata.reading_time
         )
 
-    def test_2000_word_script(self):
+    def test_2000_word_content(self):
         """Test with ~2000 word script."""
         script = " ".join(["word"] * 2000)
 

@@ -377,9 +377,9 @@ class TestVariantSceneSeed:
         """Test template has scene_hook field."""
         assert "scene_hook" in VARIANT_SCENE_SEED["fields"]
 
-    def test_has_script_length_field(self):
-        """Test template has target_script_length field."""
-        assert "target_script_length" in VARIANT_SCENE_SEED["fields"]
+    def test_has_content_length_field(self):
+        """Test template has target_content_length field."""
+        assert "target_content_length" in VARIANT_SCENE_SEED["fields"]
 
 
 class TestAllTemplatesConsistency:

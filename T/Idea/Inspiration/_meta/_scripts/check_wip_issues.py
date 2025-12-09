@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to check the state of issues in the wip directory.
+Content to check the state of issues in the wip directory.
 
 This script:
 1. Scans all issue files in _meta/issues/wip/

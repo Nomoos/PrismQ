@@ -5,14 +5,14 @@ It evaluates how well a refined script (v2) aligns with its refined title (v3)
 and tracks improvements from v1.
 
 The v2 reviewer provides:
-- Script-title alignment assessment for v2+ versions
+- Content-title alignment assessment for v2+ versions
 - Comparison with v1 review results
 - Improvement trajectory tracking
 - Enhanced feedback for further refinement
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Script v2 + Title v3 + v1 Review → ByTitle v2 Review → ScriptReview Feedback → Script v3
+    Content v2 + Title v3 + v1 Review → ByTitle v2 Review → ScriptReview Feedback → Content v3
 """
 
 import os
@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from T.Review.Script.ByTitle.script_review_by_title import (
+from T.Review.Content.ByTitle.script_review_by_title import (
     AlignmentScore,
     _analyze_idea_alignment,
     _analyze_title_alignment,
@@ -31,13 +31,13 @@ from T.Review.Script.ByTitle.script_review_by_title import (
     _calculate_overall_score,
     _create_category_scores,
     _determine_target_length,
-    _estimate_script_length,
+    _estimate_content_length,
     _generate_improvement_points,
     _identify_primary_concern,
     _identify_quick_wins,
-    review_script_by_title,
+    review_content_by_title,
 )
-from T.Review.Script.script_review import (
+from T.Review.Content.script_review import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
@@ -207,11 +207,11 @@ def _generate_category_feedback(category: str, delta: int) -> str:
         return f"{category.capitalize()} significantly worse - review needed"
 
 
-def review_script_by_title_v2(
-    script_text: str,
+def review_content_by_title_v2(
+    content_text: str,
     title: str,
     idea: Idea,
-    script_id: Optional[str] = None,
+    content_id: Optional[str] = None,
     script_version: str = "v2",
     title_version: str = "v3",
     target_length_seconds: Optional[int] = None,
@@ -224,16 +224,16 @@ def review_script_by_title_v2(
     refined title (v3+) and tracks improvements from previous versions.
 
     The v2 review focuses on:
-    - Script-title alignment for refined versions
+    - Content-title alignment for refined versions
     - Improvement tracking from v1 to v2
     - Identification of regressions
     - Enhanced feedback for further refinement
 
     Args:
-        script_text: The script text to review (v2 or later)
+        content_text: The script text to review (v2 or later)
         title: The title text (v3 or later - latest version)
         idea: The Idea model object containing the core concept
-        script_id: Optional identifier for the script
+        content_id: Optional identifier for the script
         script_version: Version of script being reviewed (default "v2")
         title_version: Version of title being reviewed (default "v3")
         target_length_seconds: Optional target duration in seconds
@@ -251,11 +251,11 @@ def review_script_by_title_v2(
         ...     genre=ContentGenre.HORROR
         ... )
         >>> # First review (v1)
-        >>> v1_review = review_script_by_title(script_v1, title_v1, idea)
+        >>> v1_review = review_content_by_title(script_v1, title_v1, idea)
         >>>
         >>> # Second review (v2 script against v3 title)
-        >>> v2_review = review_script_by_title_v2(
-        ...     script_text=script_v2,
+        >>> v2_review = review_content_by_title_v2(
+        ...     content_text=script_v2,
         ...     title=title_v3,
         ...     idea=idea,
         ...     previous_review=v1_review
@@ -264,15 +264,15 @@ def review_script_by_title_v2(
     """
 
     # Generate script ID if not provided
-    if script_id is None:
-        script_id = f"script-{idea.title.lower().replace(' ', '-')}-{script_version}"
+    if content_id is None:
+        content_id = f"script-{idea.title.lower().replace(' ', '-')}-{script_version}"
 
     # Perform base review using existing logic
-    base_review = review_script_by_title(
-        script_text=script_text,
+    base_review = review_content_by_title(
+        content_text=content_text,
         title=title,
         idea=idea,
-        script_id=script_id,
+        content_id=content_id,
         target_length_seconds=target_length_seconds,
         reviewer_id=reviewer_id,
     )
@@ -375,7 +375,7 @@ def get_next_steps(review: ScriptReview) -> List[str]:
     steps = []
 
     if is_ready_to_proceed(review):
-        steps.append("Script meets quality standards - proceed to acceptance check")
+        steps.append("Content meets quality standards - proceed to acceptance check")
     else:
         if review.needs_major_revision:
             steps.append("Major revision required - address all high-priority issues")

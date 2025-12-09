@@ -1,10 +1,10 @@
-"""Review Script From Title src module.
+"""Review Content From Title src module.
 
 This module provides script review functionality for the
-PrismQ.T.Review.Script.From.Title workflow stage.
+PrismQ.T.Review.Content.From.Title workflow stage.
 """
 
-from .review_script_from_title import (
+from .review_content_from_title import (
     ACCEPTANCE_THRESHOLD,
     STATE_REVIEW_SCRIPT_FROM_TITLE,
     STATE_REVIEW_SCRIPT_GRAMMAR,
@@ -12,20 +12,20 @@ from .review_script_from_title import (
     ReviewResult,
     create_review,
     determine_next_state,
-    evaluate_script,
+    evaluate_content,
     get_oldest_story_for_review,
     process_all_pending_reviews,
-    process_review_script_from_title,
+    process_review_content_from_title,
 )
 
 __all__ = [
     "ReviewResult",
-    "process_review_script_from_title",
+    "process_review_content_from_title",
     "process_all_pending_reviews",
     "get_oldest_story_for_review",
     "determine_next_state",
     "create_review",
-    "evaluate_script",
+    "evaluate_content",
     "ACCEPTANCE_THRESHOLD",
     "STATE_REVIEW_SCRIPT_FROM_TITLE",
     "STATE_REVIEW_TITLE_FROM_SCRIPT",

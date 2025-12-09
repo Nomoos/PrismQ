@@ -1,10 +1,10 @@
-"""Script Improvement module for generating improved script versions.
+"""Content Improvement module for generating improved script versions.
 
 This module implements script improvement using feedback from reviews.
 It takes original script, title, and reviews to generate improved versions.
 
 Workflow Position:
-    Script vN + Title vN + Reviews → Script v(N+1) (improved)
+    Content vN + Title vN + Reviews → Content v(N+1) (improved)
 """
 
 import os
@@ -19,8 +19,8 @@ current_file = Path(__file__)
 t_module_dir = current_file.parent.parent.parent.parent.parent.parent  # T
 
 # Import review models
-sys.path.insert(0, str(t_module_dir / "Review" / "Script"))
-sys.path.insert(0, str(t_module_dir / "Review" / "Title" / "From" / "Script" / "Idea"))
+sys.path.insert(0, str(t_module_dir / "Review" / "Content"))
+sys.path.insert(0, str(t_module_dir / "Review" / "Title" / "From" / "Content" / "Idea"))
 sys.path.insert(0, str(t_module_dir / "Idea" / "Model" / "src"))
 
 try:
@@ -96,9 +96,9 @@ class ScriptImprover:
         """Initialize ScriptImprover."""
         pass
 
-    def improve_script(
+    def improve_content(
         self,
-        original_script: str,
+        original_content: str,
         title_text: str,
         script_review: "ScriptReview",
         title_review: Optional["TitleReview"] = None,
@@ -108,7 +108,7 @@ class ScriptImprover:
         """Generate improved script based on review feedback.
 
         Args:
-            original_script: The original script text
+            original_content: The original script text
             title_text: The title text
             script_review: Review of script
             title_review: Optional title review
@@ -118,17 +118,17 @@ class ScriptImprover:
         Returns:
             ImprovedScript with new version and improvement details
         """
-        if not original_script:
+        if not original_content:
             raise ValueError("Original script cannot be empty")
         if not title_text:
             raise ValueError("Title text cannot be empty")
         if not script_review:
-            raise ValueError("Script review is required")
+            raise ValueError("Content review is required")
 
         # Create original version object
         original_version = ScriptVersion(
             version_number=original_version_number,
-            text=original_script,
+            text=original_content,
             review_score=script_review.overall_score,
             notes="Original script version",
         )
@@ -137,8 +137,8 @@ class ScriptImprover:
         improvements = self._extract_improvements(script_review)
 
         # Generate improved script
-        improved_text = self._generate_improved_script(
-            original_script=original_script,
+        improved_text = self._generate_improved_content(
+            original_content=original_content,
             title_text=title_text,
             improvements=improvements,
             script_review=script_review,
@@ -146,8 +146,8 @@ class ScriptImprover:
 
         # Create rationale
         rationale = self._create_rationale(
-            original_script=original_script,
-            improved_script=improved_text,
+            original_content=original_content,
+            improved_content=improved_text,
             improvements=improvements,
         )
 
@@ -198,9 +198,9 @@ class ScriptImprover:
 
         return improvements
 
-    def _generate_improved_script(
+    def _generate_improved_content(
         self,
-        original_script: str,
+        original_content: str,
         title_text: str,
         improvements: List[Dict[str, Any]],
         script_review: "ScriptReview",
@@ -211,7 +211,7 @@ class ScriptImprover:
         In production, this would use AI to rewrite sections.
         For MVP, we apply rule-based improvements.
         """
-        improved = original_script
+        improved = original_content
 
         # Strategy 1: Address high-priority improvements
         high_priority = [imp for imp in improvements if imp["priority"] == "high"]
@@ -290,15 +290,15 @@ class ScriptImprover:
         return script.strip()
 
     def _create_rationale(
-        self, original_script: str, improved_script: str, improvements: List[Dict[str, Any]]
+        self, original_content: str, improved_content: str, improvements: List[Dict[str, Any]]
     ) -> str:
         """Create explanation of changes made."""
         rationale_parts = []
 
-        original_len = len(original_script)
-        improved_len = len(improved_script)
+        original_len = len(original_content)
+        improved_len = len(improved_content)
 
-        rationale_parts.append(f"Script length: {original_len} → {improved_len} characters")
+        rationale_parts.append(f"Content length: {original_len} → {improved_len} characters")
 
         if improvements:
             high_priority = [imp for imp in improvements if imp["priority"] == "high"]
@@ -341,8 +341,8 @@ class ScriptImprover:
         return "\n".join(notes)
 
 
-def improve_script_from_reviews(
-    original_script: str,
+def improve_content_from_reviews(
+    original_content: str,
     title_text: str,
     script_review: "ScriptReview",
     title_review: Optional["TitleReview"] = None,
@@ -352,9 +352,9 @@ def improve_script_from_reviews(
     """Convenience function to improve script from reviews.
 
     Args:
-        original_script: Original script text
+        original_content: Original script text
         title_text: Title text
-        script_review: Script review feedback
+        script_review: Content review feedback
         title_review: Optional title review
         original_version: Version number of original
         new_version: Version number of new version
@@ -363,8 +363,8 @@ def improve_script_from_reviews(
         ImprovedScript with new version and details
     """
     improver = ScriptImprover()
-    return improver.improve_script(
-        original_script=original_script,
+    return improver.improve_content(
+        original_content=original_content,
         title_text=title_text,
         script_review=script_review,
         title_review=title_review,

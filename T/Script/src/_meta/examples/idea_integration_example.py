@@ -1,6 +1,6 @@
 """Example: Integration with Idea Model
 
-Shows how the AI Script Review and Writer feedback loop integrates
+Shows how the AI Content Review and Writer feedback loop integrates
 with the existing PrismQ Idea workflow.
 """
 
@@ -13,17 +13,17 @@ sys.path.insert(
 )
 
 from src.idea import ContentGenre, Idea, IdeaStatus
-from T.Review.Script import (
+from T.Review.Content import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
     ReviewCategory,
     ScriptReview,
 )
-from T.Script import OptimizationStrategy, ScriptWriter
+from T.Content import OptimizationStrategy, ScriptWriter
 
 
-def example_idea_to_script_workflow():
+def example_idea_to_content_workflow():
     """Demonstrate complete workflow from Idea to approved script."""
     print("=" * 80)
     print("PRISMQ IDEA → SCRIPT WORKFLOW WITH AI FEEDBACK LOOP")
@@ -58,10 +58,10 @@ def example_idea_to_script_workflow():
     print(f"  Status: {idea.status.value}")
 
     # 2. Create initial script draft
-    print("\n📝 STEP 2: Create Initial Script Draft")
+    print("\n📝 STEP 2: Create Initial Content Draft")
     print("─" * 80)
 
-    initial_script = """
+    initial_content = """
     A girl wakes up at 3 AM to a voice calling her name. 
     
     The voice sounds exactly like her own. She investigates her apartment,
@@ -92,7 +92,7 @@ def example_idea_to_script_workflow():
     print("─" * 80)
 
     review = ScriptReview(
-        script_id=f"script-{idea.title}",
+        content_id=f"script-{idea.title}",
         script_title=idea.title,
         overall_score=68,
         target_audience="Horror enthusiasts aged 18-35",
@@ -167,7 +167,7 @@ def example_idea_to_script_workflow():
     )
 
     result = writer.optimize_from_review(
-        original_script=initial_script,
+        original_content=initial_content,
         review=review,
         target_audience="Horror fans 18-35 on TikTok/YouTube Shorts",
     )
@@ -204,13 +204,13 @@ def example_idea_to_script_workflow():
         ↓
     Outline/Skeleton → ({IdeaStatus.OUTLINE.value})
         ↓
-    Script Draft → ({IdeaStatus.SCRIPT_DRAFT.value})
+    Content Draft → ({IdeaStatus.SCRIPT_DRAFT.value})
         ↓
     AI Review → ({IdeaStatus.SCRIPT_REVIEW.value})
         ↓
     AI Writer Optimization
         ↓
-    Script Approved → ({IdeaStatus.SCRIPT_APPROVED.value}) ← YOU ARE HERE
+    Content Approved → ({IdeaStatus.SCRIPT_APPROVED.value}) ← YOU ARE HERE
         ↓
     Text Publishing → ({IdeaStatus.TEXT_PUBLISHING.value})
         ↓
@@ -227,7 +227,7 @@ def example_idea_to_script_workflow():
 
 def main():
     """Run the example."""
-    idea, review, writer = example_idea_to_script_workflow()
+    idea, review, writer = example_idea_to_content_workflow()
 
     print("\n💡 NEXT STEPS:")
     print("  1. Publish as text content (blog, Medium, LinkedIn)")

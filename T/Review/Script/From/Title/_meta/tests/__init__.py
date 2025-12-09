@@ -1,1 +1,1 @@
-"""Tests for PrismQ.T.Review.Script.ByTitle module."""
+"""Tests for PrismQ.T.Review.Content.ByTitle module."""

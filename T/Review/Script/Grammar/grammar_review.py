@@ -13,7 +13,7 @@ The GrammarReview model enables:
 
 Workflow Position:
     Stage 14 (MVP-014): Grammar Review
-    Script v3+ → GrammarReview (AI Reviewer) → Script Refinement (if fails) → Stage 15
+    Content v3+ → GrammarReview (AI Reviewer) → Content Refinement (if fails) → Stage 15
 """
 
 from dataclasses import asdict, dataclass, field
@@ -73,7 +73,7 @@ class GrammarReview:
     to refinement (Stage 11) with grammar feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall grammar correctness score (0-100)
         pass_threshold: Minimum score required to pass (default 85)
@@ -99,7 +99,7 @@ class GrammarReview:
 
     Example:
         >>> review = GrammarReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=92
         ... )
@@ -114,10 +114,10 @@ class GrammarReview:
         >>> if review.passes:
         ...     print("Ready for Stage 15: Tone Review")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 85  # Minimum score to pass
@@ -267,7 +267,7 @@ class GrammarReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 85),
@@ -290,7 +290,7 @@ class GrammarReview:
     def __repr__(self) -> str:
         """String representation of GrammarReview."""
         return (
-            f"GrammarReview(script={self.script_id}, "
+            f"GrammarReview(script={self.content_id}, "
             f"version={self.script_version}, "
             f"score={self.overall_score}%, "
             f"passes={'YES' if self.passes else 'NO'}, "

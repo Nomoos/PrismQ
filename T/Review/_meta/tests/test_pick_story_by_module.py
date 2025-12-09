@@ -53,36 +53,36 @@ class TestPickStoryByModule:
     def test_returns_none_when_no_stories(self, db_connection):
         """Test that None is returned when no stories exist."""
         story = pick_story_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert story is None
 
     def test_returns_none_when_no_stories_in_state(self, db_connection, story_repository):
         """Test that None is returned when no stories match the module state."""
         # Create a story in a different state
-        story = Story(state="PrismQ.T.Review.Script.Tone")
+        story = Story(state="PrismQ.T.Review.Content.Tone")
         story_repository.insert(story)
 
         # Try to pick a story for a different module
         result = pick_story_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert result is None
 
     def test_returns_story_matching_module_state(self, db_connection, story_repository):
         """Test that a story matching the module state is returned."""
         # Create a story in the target state
-        story = Story(state="PrismQ.T.Review.Script.Readability")
+        story = Story(state="PrismQ.T.Review.Content.Readability")
         saved = story_repository.insert(story)
 
         # Pick the story
         result = pick_story_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
 
         assert result is not None
         assert result.id == saved.id
-        assert result.state == "PrismQ.T.Review.Script.Readability"
+        assert result.state == "PrismQ.T.Review.Content.Readability"
 
     def test_returns_oldest_story_when_multiple(self, db_connection, story_repository):
         """Test that the oldest story is returned when multiple match."""
@@ -90,19 +90,19 @@ class TestPickStoryByModule:
 
         # Create older story first
         older_story = Story(
-            state="PrismQ.T.Review.Script.Readability", created_at=base_time - timedelta(hours=2)
+            state="PrismQ.T.Review.Content.Readability", created_at=base_time - timedelta(hours=2)
         )
         saved_older = story_repository.insert(older_story)
 
         # Create newer story
         newer_story = Story(
-            state="PrismQ.T.Review.Script.Readability", created_at=base_time - timedelta(hours=1)
+            state="PrismQ.T.Review.Content.Readability", created_at=base_time - timedelta(hours=1)
         )
         story_repository.insert(newer_story)
 
         # Pick should return the older story
         result = pick_story_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
 
         assert result is not None
@@ -111,28 +111,28 @@ class TestPickStoryByModule:
     def test_accepts_custom_repository(self, db_connection, story_repository):
         """Test that a custom repository can be provided."""
         # Create a story
-        story = Story(state="PrismQ.T.Review.Script.Tone")
+        story = Story(state="PrismQ.T.Review.Content.Tone")
         story_repository.insert(story)
 
         # Pick using custom repository
         result = pick_story_by_module(
             connection=db_connection,
-            module_name="PrismQ.T.Review.Script.Tone",
+            module_name="PrismQ.T.Review.Content.Tone",
             story_repository=story_repository,
         )
 
         assert result is not None
-        assert result.state == "PrismQ.T.Review.Script.Tone"
+        assert result.state == "PrismQ.T.Review.Content.Tone"
 
     def test_works_with_various_module_names(self, db_connection, story_repository):
         """Test picking stories for various module names."""
         module_names = [
-            "PrismQ.T.Review.Script.Grammar",
-            "PrismQ.T.Review.Script.Tone",
-            "PrismQ.T.Review.Script.Content",
-            "PrismQ.T.Review.Script.Consistency",
-            "PrismQ.T.Review.Script.Editing",
-            "PrismQ.T.Review.Script.Readability",
+            "PrismQ.T.Review.Content.Grammar",
+            "PrismQ.T.Review.Content.Tone",
+            "PrismQ.T.Review.Content.Content",
+            "PrismQ.T.Review.Content.Consistency",
+            "PrismQ.T.Review.Content.Editing",
+            "PrismQ.T.Review.Content.Readability",
         ]
 
         # Create a story for each module state
@@ -153,18 +153,18 @@ class TestCountStoriesByModule:
     def test_returns_zero_when_no_stories(self, db_connection):
         """Test that 0 is returned when no stories exist."""
         count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert count == 0
 
     def test_returns_zero_when_no_stories_in_state(self, db_connection, story_repository):
         """Test that 0 is returned when no stories match the module state."""
         # Create a story in a different state
-        story = Story(state="PrismQ.T.Review.Script.Tone")
+        story = Story(state="PrismQ.T.Review.Content.Tone")
         story_repository.insert(story)
 
         count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert count == 0
 
@@ -172,36 +172,36 @@ class TestCountStoriesByModule:
         """Test that stories are counted correctly."""
         # Create multiple stories in the target state
         for i in range(5):
-            story = Story(state="PrismQ.T.Review.Script.Editing")
+            story = Story(state="PrismQ.T.Review.Content.Editing")
             story_repository.insert(story)
 
         count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Editing"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Editing"
         )
         assert count == 5
 
     def test_counts_only_matching_state(self, db_connection, story_repository):
         """Test that only stories with matching state are counted."""
         # Create stories in different states
-        for state in ["PrismQ.T.Review.Script.Tone", "PrismQ.T.Review.Script.Editing"]:
+        for state in ["PrismQ.T.Review.Content.Tone", "PrismQ.T.Review.Content.Editing"]:
             for i in range(3):
                 story = Story(state=state)
                 story_repository.insert(story)
 
         # Count for one specific state
         count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Tone"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Tone"
         )
         assert count == 3
 
     def test_accepts_custom_repository(self, db_connection, story_repository):
         """Test that a custom repository can be provided."""
-        story = Story(state="PrismQ.T.Review.Script.Grammar")
+        story = Story(state="PrismQ.T.Review.Content.Grammar")
         story_repository.insert(story)
 
         count = count_stories_by_module(
             connection=db_connection,
-            module_name="PrismQ.T.Review.Script.Grammar",
+            module_name="PrismQ.T.Review.Content.Grammar",
             story_repository=story_repository,
         )
         assert count == 1
@@ -214,12 +214,12 @@ class TestIntegration:
         """Test a typical pick-and-process workflow."""
         # Create stories to process
         for i in range(3):
-            story = Story(state="PrismQ.T.Review.Script.Readability")
+            story = Story(state="PrismQ.T.Review.Content.Readability")
             story_repository.insert(story)
 
         # Verify initial count
         initial_count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert initial_count == 3
 
@@ -227,7 +227,7 @@ class TestIntegration:
         processed = []
         while True:
             story = pick_story_by_module(
-                connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+                connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
             )
             if story is None:
                 break
@@ -241,6 +241,6 @@ class TestIntegration:
 
         # Verify no more stories in original state
         final_count = count_stories_by_module(
-            connection=db_connection, module_name="PrismQ.T.Review.Script.Readability"
+            connection=db_connection, module_name="PrismQ.T.Review.Content.Readability"
         )
         assert final_count == 0

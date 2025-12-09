@@ -1,6 +1,6 @@
-"""Example usage of Script Acceptance Gate (MVP-013).
+"""Example usage of Content Acceptance Gate (MVP-013).
 
-This example demonstrates how to use the check_script_acceptance function
+This example demonstrates how to use the check_content_acceptance function
 to evaluate whether a script is ready to proceed to quality reviews.
 """
 
@@ -12,19 +12,19 @@ project_root = Path(__file__).resolve().parents[6]
 sys.path.insert(0, str(project_root))
 
 # Import from the module
-from T.Review.Script.Acceptance.acceptance import check_script_acceptance
+from T.Review.Content.Acceptance.acceptance import check_content_acceptance
 
 
 def main():
     """Demonstrate script acceptance checking."""
 
     print("=" * 70)
-    print("Script Acceptance Gate (MVP-013) - Example Usage")
+    print("Content Acceptance Gate (MVP-013) - Example Usage")
     print("=" * 70)
     print()
 
     # Example 1: Well-formed script (ACCEPTED)
-    print("Example 1: High-Quality Script")
+    print("Example 1: High-Quality Content")
     print("-" * 70)
 
     script_v3 = """
@@ -39,10 +39,10 @@ def main():
 
     title = "The Echo Mystery"
 
-    result = check_script_acceptance(script_text=script_v3, title=title, script_version="v3")
+    result = check_content_acceptance(content_text=script_v3, title=title, script_version="v3")
 
     print(f"Title: {title}")
-    print(f"Script Version: v3")
+    print(f"Content Version: v3")
     print()
     print(f"Accepted: {result['accepted']}")
     print(f"Overall Score: {result['overall_score']}/100")
@@ -56,7 +56,7 @@ def main():
     if result["accepted"]:
         print("✓ ACCEPTED - Proceed to MVP-014 (Quality Reviews)")
     else:
-        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Script Review)")
+        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Content Review)")
         print()
         print("Issues:")
         for issue in result["issues"]:
@@ -70,18 +70,18 @@ def main():
     print()
 
     # Example 2: Incomplete script (NOT ACCEPTED)
-    print("Example 2: Incomplete Script")
+    print("Example 2: Incomplete Content")
     print("-" * 70)
 
     script_incomplete = "Just a short fragment without proper structure"
     title_incomplete = "The Great Story"
 
-    result2 = check_script_acceptance(
-        script_text=script_incomplete, title=title_incomplete, script_version="v3"
+    result2 = check_content_acceptance(
+        content_text=script_incomplete, title=title_incomplete, script_version="v3"
     )
 
     print(f"Title: {title_incomplete}")
-    print(f"Script Version: v3")
+    print(f"Content Version: v3")
     print()
     print(f"Accepted: {result2['accepted']}")
     print(f"Overall Score: {result2['overall_score']}/100")
@@ -95,7 +95,7 @@ def main():
     if result2["accepted"]:
         print("✓ ACCEPTED - Proceed to MVP-014 (Quality Reviews)")
     else:
-        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Script Review)")
+        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Content Review)")
         print()
         print("Issues:")
         for issue in result2["issues"]:
@@ -109,7 +109,7 @@ def main():
     print()
 
     # Example 3: Misaligned script (NOT ACCEPTED)
-    print("Example 3: Misaligned Script")
+    print("Example 3: Misaligned Content")
     print("-" * 70)
 
     script_misaligned = """
@@ -122,12 +122,12 @@ def main():
 
     title_misaligned = "The Haunted Mansion Mystery"
 
-    result3 = check_script_acceptance(
-        script_text=script_misaligned, title=title_misaligned, script_version="v4"
+    result3 = check_content_acceptance(
+        content_text=script_misaligned, title=title_misaligned, script_version="v4"
     )
 
     print(f"Title: {title_misaligned}")
-    print(f"Script Version: v4")
+    print(f"Content Version: v4")
     print()
     print(f"Accepted: {result3['accepted']}")
     print(f"Overall Score: {result3['overall_score']}/100")
@@ -141,7 +141,7 @@ def main():
     if result3["accepted"]:
         print("✓ ACCEPTED - Proceed to MVP-014 (Quality Reviews)")
     else:
-        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Script Review)")
+        print("✗ NOT ACCEPTED - Loop back to MVP-010 (Content Review)")
         print()
         print("Issues:")
         for issue in result3["issues"]:

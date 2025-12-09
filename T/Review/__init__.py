@@ -25,7 +25,7 @@ Example:
     >>> # Pick a story for processing by module name
     >>> story = pick_story_by_module(
     ...     connection=conn,
-    ...     module_name="PrismQ.T.Review.Script.Readability"
+    ...     module_name="PrismQ.T.Review.Content.Readability"
     ... )
 """
 
@@ -74,19 +74,19 @@ def pick_story_by_module(
     FIFO order (oldest first by created_at).
 
     The module name directly corresponds to the Story state. For example:
-    - module_name="PrismQ.T.Review.Script.Readability" picks Stories
-      with state="PrismQ.T.Review.Script.Readability"
+    - module_name="PrismQ.T.Review.Content.Readability" picks Stories
+      with state="PrismQ.T.Review.Content.Readability"
 
     Args:
         connection: SQLite database connection
         module_name: The module name which equals the Story state to match.
             Examples:
-            - "PrismQ.T.Review.Script.Readability"
-            - "PrismQ.T.Review.Script.Tone"
-            - "PrismQ.T.Review.Script.Editing"
-            - "PrismQ.T.Review.Script.Content"
-            - "PrismQ.T.Review.Script.Grammar"
-            - "PrismQ.T.Review.Script.Consistency"
+            - "PrismQ.T.Review.Content.Readability"
+            - "PrismQ.T.Review.Content.Tone"
+            - "PrismQ.T.Review.Content.Editing"
+            - "PrismQ.T.Review.Content.Content"
+            - "PrismQ.T.Review.Content.Grammar"
+            - "PrismQ.T.Review.Content.Consistency"
         story_repository: Optional StoryRepository instance. If not provided,
             one will be created using the connection.
 
@@ -104,7 +104,7 @@ def pick_story_by_module(
         >>> # Pick oldest story ready for readability review
         >>> story = pick_story_by_module(
         ...     connection=conn,
-        ...     module_name="PrismQ.T.Review.Script.Readability"
+        ...     module_name="PrismQ.T.Review.Content.Readability"
         ... )
         >>> if story:
         ...     print(f"Processing story {story.id}")
@@ -114,7 +114,7 @@ def pick_story_by_module(
         >>> repo = StoryRepository(conn)
         >>> story = pick_story_by_module(
         ...     connection=conn,
-        ...     module_name="PrismQ.T.Review.Script.Tone",
+        ...     module_name="PrismQ.T.Review.Content.Tone",
         ...     story_repository=repo
         ... )
     """
@@ -152,7 +152,7 @@ def count_stories_by_module(
         >>>
         >>> count = count_stories_by_module(
         ...     connection=conn,
-        ...     module_name="PrismQ.T.Review.Script.Readability"
+        ...     module_name="PrismQ.T.Review.Content.Readability"
         ... )
         >>> print(f"{count} stories waiting for readability review")
     """

@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Script.ByTitle module.
+"""Example usage of PrismQ.T.Review.Content.ByTitle module.
 
 This example demonstrates how to review scripts against titles and ideas
 to get structured feedback with JSON output.
@@ -19,13 +19,13 @@ sys.path.insert(0, str(_idea_model))
 from src.idea import ContentGenre, Idea
 
 # Now we can import
-from T.Review.Script.ByTitle.script_review_by_title import review_script_by_title
+from T.Review.Content.ByTitle.script_review_by_title import review_content_by_title
 
 
 def example_basic_review():
     """Basic script review example."""
     print("=" * 60)
-    print("EXAMPLE 1: Basic Script Review")
+    print("EXAMPLE 1: Basic Content Review")
     print("=" * 60)
 
     # Create an idea
@@ -57,8 +57,8 @@ def example_basic_review():
     """
 
     # Review the script
-    review = review_script_by_title(
-        script_text=script, title=title, idea=idea, target_length_seconds=90
+    review = review_content_by_title(
+        content_text=script, title=title, idea=idea, target_length_seconds=90
     )
 
     # Display results
@@ -96,7 +96,7 @@ def example_gap_identification():
         length_target="60 seconds",
     )
 
-    # Script that doesn't deliver on the title's promise of "5 secrets"
+    # Content that doesn't deliver on the title's promise of "5 secrets"
     title = "5 Secrets to Perfect Memory"
     script = """
     Want better memory? Here's a tip: get more sleep.
@@ -105,7 +105,7 @@ def example_gap_identification():
     """
 
     # Review
-    review = review_script_by_title(script, title, idea, target_length_seconds=60)
+    review = review_content_by_title(script, title, idea, target_length_seconds=60)
 
     print(f"\nScript: {review.script_title}")
     print(f"Overall Score: {review.overall_score}%")
@@ -141,7 +141,7 @@ def example_json_output():
     """
 
     # Review
-    review = review_script_by_title(script, title, idea)
+    review = review_content_by_title(script, title, idea)
 
     # Convert to JSON
     review_dict = review.to_dict()
@@ -150,7 +150,7 @@ def example_json_output():
     print(
         json.dumps(
             {
-                "script_id": review_dict["script_id"],
+                "content_id": review_dict["content_id"],
                 "script_title": review_dict["script_title"],
                 "overall_score": review_dict["overall_score"],
                 "needs_major_revision": review_dict["needs_major_revision"],
@@ -196,7 +196,7 @@ def example_category_scores():
     """
 
     # Review
-    review = review_script_by_title(script, title, idea)
+    review = review_content_by_title(script, title, idea)
 
     print(f"\nScript: {review.script_title}")
     print(f"Overall Score: {review.overall_score}%")
@@ -235,7 +235,7 @@ def example_iterative_improvement():
     """
 
     print("\n--- ITERATION 1 ---")
-    review_v1 = review_script_by_title(script_v1, title, idea)
+    review_v1 = review_content_by_title(script_v1, title, idea)
     print(f"Score: {review_v1.overall_score}%")
     print(f"Needs Major Revision: {review_v1.needs_major_revision}")
     print("\nTop Improvement:")
@@ -257,7 +257,7 @@ def example_iterative_improvement():
     """
 
     print("\n--- ITERATION 2 ---")
-    review_v2 = review_script_by_title(script_v2, title, idea)
+    review_v2 = review_content_by_title(script_v2, title, idea)
     print(f"Score: {review_v2.overall_score}%")
     print(f"Needs Major Revision: {review_v2.needs_major_revision}")
     print(f"Improvement: +{review_v2.overall_score - review_v1.overall_score}%")
@@ -269,7 +269,7 @@ def main():
     """Run all examples."""
     print("\n")
     print("*" * 60)
-    print("PrismQ.T.Review.Script.ByTitle - Usage Examples")
+    print("PrismQ.T.Review.Content.ByTitle - Usage Examples")
     print("*" * 60)
     print("\n")
 

@@ -1,1 +1,1 @@
-# Test package for Script Acceptance module
+# Test package for Content Acceptance module

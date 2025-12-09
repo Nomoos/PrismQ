@@ -1,4 +1,4 @@
-"""PrismQ.T.Script.Formatter.Social - Social Media Format Optimizer.
+"""PrismQ.T.Content.Formatter.Social - Social Media Format Optimizer.
 
 This module transforms scripts into social media-optimized formats for
 various platforms including Twitter/X, LinkedIn, Instagram, and Facebook.

@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Script.Consistency module.
+"""Example usage of PrismQ.T.Review.Content.Consistency module.
 
 This example demonstrates how to use the Consistency Review module to check
 scripts for character name consistency, timeline issues, location tracking,
@@ -11,14 +11,14 @@ from pathlib import Path
 # Add project root to path
 project_root = (
     Path(__file__).resolve().parents[6]
-)  # examples -> _meta -> Consistency -> Script -> Review -> T -> PrismQ
+)  # examples -> _meta -> Consistency -> Content -> Review -> T -> PrismQ
 sys.path.insert(0, str(project_root))
 
-from T.Review.Script.Consistency import (
+from T.Review.Content.Consistency import (
     ScriptConsistencyChecker,
     get_consistency_feedback,
-    review_script_consistency,
-    review_script_consistency_to_json,
+    review_content_consistency,
+    review_content_consistency_to_json,
 )
 
 
@@ -38,12 +38,12 @@ After an hour, Sarah closed the book and left the library."""
     print(script)
 
     # Review the script
-    review = review_script_consistency(script, "example-001", "v3")
+    review = review_content_consistency(script, "example-001", "v3")
 
     print(f"\n{'='*70}")
     print("Review Results:")
     print(f"{'='*70}")
-    print(f"Script ID: {review.script_id}")
+    print(f"Content ID: {review.content_id}")
     print(f"Version: {review.script_version}")
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Character Score: {review.character_score}/100")
@@ -89,7 +89,7 @@ Johnny opened it carefully."""
     print(script)
 
     # Review the script
-    review = review_script_consistency(script, "example-002", "v3")
+    review = review_content_consistency(script, "example-002", "v3")
 
     print(f"\n{'='*70}")
     print("Review Results:")
@@ -128,7 +128,7 @@ Bob agreed with the idea."""
     print(script)
 
     # Get JSON output
-    json_result = review_script_consistency_to_json(script, "example-003", "v3")
+    json_result = review_content_consistency_to_json(script, "example-003", "v3")
 
     print(f"\n{'='*70}")
     print("JSON Output (first 500 characters):")
@@ -153,13 +153,13 @@ Emma watched the birds flying."""
     print(script)
 
     # Review and get feedback
-    review = review_script_consistency(script, "example-004", "v3")
+    review = review_content_consistency(script, "example-004", "v3")
     feedback = get_consistency_feedback(review)
 
     print(f"\n{'='*70}")
     print("Structured Feedback:")
     print(f"{'='*70}")
-    print(f"Script ID: {feedback['script_id']}")
+    print(f"Content ID: {feedback['content_id']}")
     print(f"Version: {feedback['script_version']}")
     print(f"Overall Score: {feedback['overall_score']}/100")
     print(f"Passes: {'YES ✓' if feedback['passes'] else 'NO ✗'}")
@@ -194,7 +194,7 @@ Smith found a crucial clue hidden under the desk."""
 
     # Create checker with custom threshold
     checker = ScriptConsistencyChecker(pass_threshold=85)
-    review = checker.review_script(script, "example-005", "v3")
+    review = checker.review_content(script, "example-005", "v3")
 
     print(f"\n{'='*70}")
     print("Review Results (Pass Threshold: 85):")
@@ -224,10 +224,10 @@ Michael prepared the final report."""
 
     print("\nScript:")
     print(script)
-    print("\nWorkflow: Script v3+ → Consistency Review → Decision")
+    print("\nWorkflow: Content v3+ → Consistency Review → Decision")
 
     # Review the script
-    review = review_script_consistency(script, "workflow-001", "v3", pass_threshold=80)
+    review = review_content_consistency(script, "workflow-001", "v3", pass_threshold=80)
 
     print(f"\n{'='*70}")
     print("Consistency Review Decision:")
@@ -238,7 +238,7 @@ Michael prepared the final report."""
     if review.passes:
         print("\n✓ PASS: Proceed to Stage 18 (Editing Review / MVP-018)")
     else:
-        print("\n✗ FAIL: Return to Stage 11 (Script Refinement) with feedback")
+        print("\n✗ FAIL: Return to Stage 11 (Content Refinement) with feedback")
 
         if review.critical_count > 0:
             print(f"\n  → {review.critical_count} critical issue(s) must be fixed")
@@ -255,9 +255,9 @@ Michael prepared the final report."""
 
 if __name__ == "__main__":
     print("\n" + "=" * 70)
-    print("PrismQ Script Consistency Review - Example Usage")
+    print("PrismQ Content Consistency Review - Example Usage")
     print("=" * 70)
-    print("\nModule: T.Review.Script.Consistency")
+    print("\nModule: T.Review.Content.Consistency")
     print("Stage: 17 (MVP-017)")
     print("Purpose: Check character names, timeline, locations, contradictions")
     print()

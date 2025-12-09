@@ -1,1 +1,1 @@
-"""Test initialization for Script Editing Review tests."""
+"""Test initialization for Content Editing Review tests."""

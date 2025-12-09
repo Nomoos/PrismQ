@@ -4,14 +4,14 @@ from datetime import datetime
 
 import pytest
 
-from T.Review.Script import (
+from T.Review.Content import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
     ReviewCategory,
     ScriptReview,
 )
-from T.Script import (
+from T.Content import (
     FeedbackLoopIteration,
     OptimizationResult,
     OptimizationStrategy,
@@ -32,8 +32,8 @@ class TestScriptWriterBasic:
         assert writer.optimization_strategy == OptimizationStrategy.COMPREHENSIVE
         assert writer.current_iteration == 0
         assert writer.iterations_history == []
-        assert writer.original_script == ""
-        assert writer.current_script == ""
+        assert writer.original_content == ""
+        assert writer.current_content == ""
         assert writer.cumulative_improvements == []
         assert writer.initial_score == 0
         assert writer.current_score == 0
@@ -66,11 +66,11 @@ class TestOptimizationFromReview:
         """Test basic optimization from review."""
         writer = ScriptWriter()
 
-        original_script = "Test script content that needs optimization."
+        original_content = "Test script content that needs optimization."
 
         # Create review
         review = ScriptReview(
-            script_id="script-001",
+            content_id="script-001",
             script_title="Test",
             overall_score=70,
             target_audience="Test audience",
@@ -91,10 +91,10 @@ class TestOptimizationFromReview:
         )
 
         # Optimize
-        result = writer.optimize_from_review(original_script=original_script, review=review)
+        result = writer.optimize_from_review(original_content=original_content, review=review)
 
         assert isinstance(result, OptimizationResult)
-        assert result.original_text == original_script
+        assert result.original_text == original_content
         assert len(result.changes_made) > 0
         assert result.estimated_score_improvement >= 0
         assert writer.current_iteration == 1
@@ -106,10 +106,10 @@ class TestOptimizationFromReview:
         """Test optimization for YouTube short."""
         writer = ScriptWriter(optimization_strategy=OptimizationStrategy.YOUTUBE_SHORT)
 
-        original_script = "Long script that needs shortening..."
+        original_content = "Long script that needs shortening..."
 
         review = ScriptReview(
-            script_id="short-001",
+            content_id="short-001",
             script_title="Short",
             overall_score=65,
             is_youtube_short=True,
@@ -121,7 +121,7 @@ class TestOptimizationFromReview:
         )
 
         result = writer.optimize_from_review(
-            original_script=original_script, review=review, target_audience="Young adults"
+            original_content=original_content, review=review, target_audience="Young adults"
         )
 
         assert writer.youtube_short_mode is True
@@ -133,13 +133,13 @@ class TestOptimizationFromReview:
         """Test optimization when major revision needed."""
         writer = ScriptWriter()
 
-        original_script = "Script with major issues."
+        original_content = "Content with major issues."
 
         review = ScriptReview(
-            script_id="script-001", script_title="Test", overall_score=50, needs_major_revision=True
+            content_id="script-001", script_title="Test", overall_score=50, needs_major_revision=True
         )
 
-        result = writer.optimize_from_review(original_script=original_script, review=review)
+        result = writer.optimize_from_review(original_content=original_content, review=review)
 
         # Should indicate major revision
         assert any("major" in change.lower() for change in result.changes_made)
@@ -229,7 +229,7 @@ class TestStrategyDetermination:
         writer = ScriptWriter()
 
         review = ScriptReview(
-            script_id="short-001",
+            content_id="short-001",
             script_title="Test",
             overall_score=70,
             is_youtube_short=True,
@@ -245,7 +245,7 @@ class TestStrategyDetermination:
         """Test strategy for engagement issues."""
         writer = ScriptWriter()
 
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=70)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=70)
 
         # Add weak engagement score
         review.category_scores.append(
@@ -260,7 +260,7 @@ class TestStrategyDetermination:
         """Test strategy for pacing issues."""
         writer = ScriptWriter()
 
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=70)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=70)
 
         review.category_scores.append(
             CategoryScore(category=ReviewCategory.PACING, score=55, reasoning="Too slow")
@@ -274,7 +274,7 @@ class TestStrategyDetermination:
         """Test fallback to comprehensive strategy."""
         writer = ScriptWriter()
 
-        review = ScriptReview(script_id="script-001", script_title="Test", overall_score=70)
+        review = ScriptReview(content_id="script-001", script_title="Test", overall_score=70)
 
         strategy = writer._determine_strategy(review)
 
@@ -293,8 +293,8 @@ class TestScriptWriterSerialization:
         )
 
         writer.current_iteration = 2
-        writer.original_script = "Original"
-        writer.current_script = "Current"
+        writer.original_content = "Original"
+        writer.current_content = "Current"
 
         data = writer.to_dict()
 
@@ -303,8 +303,8 @@ class TestScriptWriterSerialization:
         assert data["target_score_threshold"] == 85
         assert data["optimization_strategy"] == "youtube_short"
         assert data["current_iteration"] == 2
-        assert data["original_script"] == "Original"
-        assert data["current_script"] == "Current"
+        assert data["original_content"] == "Original"
+        assert data["current_content"] == "Current"
 
     def test_from_dict(self):
         """Test creating ScriptWriter from dictionary."""
@@ -314,8 +314,8 @@ class TestScriptWriterSerialization:
             "max_iterations": 5,
             "optimization_strategy": "youtube_short",
             "current_iteration": 2,
-            "original_script": "Original",
-            "current_script": "Current",
+            "original_content": "Original",
+            "current_content": "Current",
             "cumulative_improvements": ["Fix 1", "Fix 2"],
             "initial_score": 65,
             "current_score": 78,
@@ -339,8 +339,8 @@ class TestScriptWriterSerialization:
         assert writer.max_iterations == 5
         assert writer.optimization_strategy == OptimizationStrategy.YOUTUBE_SHORT
         assert writer.current_iteration == 2
-        assert writer.original_script == "Original"
-        assert writer.current_script == "Current"
+        assert writer.original_content == "Original"
+        assert writer.current_content == "Current"
         assert len(writer.cumulative_improvements) == 2
         assert writer.initial_score == 65
         assert writer.current_score == 78
@@ -357,8 +357,8 @@ class TestScriptWriterSerialization:
         )
 
         original.current_iteration = 2
-        original.original_script = "Original text"
-        original.current_script = "Current text"
+        original.original_content = "Original text"
+        original.current_content = "Current text"
         original.cumulative_improvements = ["Improvement 1", "Improvement 2"]
         original.initial_score = 65
         original.current_score = 78
@@ -379,8 +379,8 @@ class TestScriptWriterSerialization:
         assert restored.max_iterations == original.max_iterations
         assert restored.optimization_strategy == original.optimization_strategy
         assert restored.current_iteration == original.current_iteration
-        assert restored.original_script == original.original_script
-        assert restored.current_script == original.current_script
+        assert restored.original_content == original.original_content
+        assert restored.current_content == original.current_content
         assert restored.cumulative_improvements == original.cumulative_improvements
         assert restored.initial_score == original.initial_score
         assert restored.current_score == original.current_score

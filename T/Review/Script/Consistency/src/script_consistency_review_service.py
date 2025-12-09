@@ -1,18 +1,18 @@
-"""Script Consistency Review Service - Process stories for consistency review.
+"""Content Consistency Review Service - Process stories for consistency review.
 
-This module implements PrismQ.T.Review.Script.Consistency workflow step.
+This module implements PrismQ.T.Review.Content.Consistency workflow step.
 It:
-1. Selects the oldest Story where state is PrismQ.T.Review.Script.Consistency
+1. Selects the oldest Story where state is PrismQ.T.Review.Content.Consistency
 2. Performs consistency review on the script content
 3. Creates a Review record with text and score
-4. Links the Review directly to Script via review_id FK
+4. Links the Review directly to Content via review_id FK
 5. Updates Story state based on review result:
-   - If NOT accepted: PrismQ.T.Script.From.Title.Review.Script
-   - If accepted: PrismQ.T.Review.Script.Content
+   - If NOT accepted: PrismQ.T.Content.From.Title.Review.Content
+   - If accepted: PrismQ.T.Review.Content.Content
 
 Usage:
     >>> import sqlite3
-    >>> from T.Review.Script.Consistency.src.script_consistency_review_service import (
+    >>> from T.Review.Content.Consistency.src.script_consistency_review_service import (
     ...     ScriptConsistencyReviewService,
     ...     process_oldest_consistency_review
     ... )
@@ -36,12 +36,12 @@ from typing import List, Optional
 from Model.Database.models.review import Review
 from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
-from Model.Database.repositories.script_repository import ScriptRepository
+from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
 
 # Import consistency review functionality using direct path to avoid circular import
-from T.Review.Script.Consistency.consistency_review import (
+from T.Review.Content.Consistency.consistency_review import (
     ConsistencyReview,
     ScriptConsistencyChecker,
     get_consistency_feedback,
@@ -63,7 +63,7 @@ class ConsistencyReviewResult:
     Attributes:
         story_id: ID of the processed story
         review_id: ID of the created Review record (if successful)
-        script_id: ID of the reviewed script
+        content_id: ID of the reviewed script
         previous_state: Story state before processing
         new_state: Story state after processing
         success: Whether the operation succeeded
@@ -75,7 +75,7 @@ class ConsistencyReviewResult:
 
     story_id: Optional[int] = None
     review_id: Optional[int] = None
-    script_id: Optional[int] = None
+    content_id: Optional[int] = None
     previous_state: Optional[str] = None
     new_state: Optional[str] = None
     success: bool = False
@@ -86,23 +86,23 @@ class ConsistencyReviewResult:
 
 
 class ScriptConsistencyReviewService:
-    """Service for PrismQ.T.Review.Script.Consistency workflow state.
+    """Service for PrismQ.T.Review.Content.Consistency workflow state.
 
     This service implements the workflow step that:
-    1. Selects the oldest Story where state is PrismQ.T.Review.Script.Consistency
+    1. Selects the oldest Story where state is PrismQ.T.Review.Content.Consistency
     2. Performs consistency review on the script
     3. Creates a Review record
-    4. Links Review directly to Script via review_id FK
+    4. Links Review directly to Content via review_id FK
     5. Updates Story state based on review result:
-       - NOT accepted: PrismQ.T.Script.From.Title.Review.Script
-       - Accepted: PrismQ.T.Review.Script.Content
+       - NOT accepted: PrismQ.T.Content.From.Title.Review.Content
+       - Accepted: PrismQ.T.Review.Content.Content
 
     The service processes stories in FIFO order (oldest first) to ensure
     fair processing of the backlog.
 
     Attributes:
         story_repo: Repository for Story operations
-        script_repo: Repository for Script operations
+        content_repo: Repository for Content operations
         review_repo: Repository for Review operations
         consistency_checker: Checker for performing consistency review
         pass_threshold: Minimum score required to pass (default 80)
@@ -134,7 +134,7 @@ class ScriptConsistencyReviewService:
         """
         self._conn = connection
         self.story_repo = StoryRepository(connection)
-        self.script_repo = ScriptRepository(connection)
+        self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
         self.pass_threshold = pass_threshold
         self.consistency_checker = ScriptConsistencyChecker(pass_threshold=pass_threshold)
@@ -143,7 +143,7 @@ class ScriptConsistencyReviewService:
         """Count stories waiting in the input state.
 
         Returns:
-            Number of stories with state PrismQ.T.Review.Script.Consistency.
+            Number of stories with state PrismQ.T.Review.Content.Consistency.
         """
         return self.story_repo.count_by_state(self.INPUT_STATE)
 
@@ -151,7 +151,7 @@ class ScriptConsistencyReviewService:
         """Get the oldest story in the input state.
 
         Returns:
-            The oldest Story in state PrismQ.T.Review.Script.Consistency,
+            The oldest Story in state PrismQ.T.Review.Content.Consistency,
             or None if no stories are in this state.
         """
         return self.story_repo.find_oldest_by_state(self.INPUT_STATE)
@@ -160,11 +160,11 @@ class ScriptConsistencyReviewService:
         """Process the oldest story in the input state.
 
         This method:
-        1. Finds the oldest Story with state PrismQ.T.Review.Script.Consistency
+        1. Finds the oldest Story with state PrismQ.T.Review.Content.Consistency
         2. Retrieves the script content
         3. Performs consistency review
         4. Creates a Review record
-        5. Links Review directly to Script via review_id FK
+        5. Links Review directly to Content via review_id FK
         6. Updates Story state based on review result
 
         Returns:
@@ -183,26 +183,26 @@ class ScriptConsistencyReviewService:
         result.story_id = story.id
         result.previous_state = story.state
 
-        # Validate story has script_id
-        if not story.script_id:
-            result.error = f"Story {story.id} has no script_id"
+        # Validate story has content_id
+        if not story.content_id:
+            result.error = f"Story {story.id} has no content_id"
             return result
 
-        result.script_id = story.script_id
+        result.content_id = story.content_id
 
         try:
             # Get the script content
-            script = self.script_repo.find_by_id(story.script_id)
+            script = self.content_repo.find_by_id(story.content_id)
             if not script:
-                result.error = f"Script with id {story.script_id} not found"
+                result.error = f"Content with id {story.content_id} not found"
                 return result
 
-            script_text = script.text
+            content_text = script.text
 
             # Perform consistency review
-            consistency_review = self.consistency_checker.review_script(
-                script_text=script_text,
-                script_id=f"script-{story.script_id}",
+            consistency_review = self.consistency_checker.review_content(
+                content_text=content_text,
+                content_id=f"script-{story.content_id}",
                 script_version=f"v{script.version}",
             )
 
@@ -219,8 +219,8 @@ class ScriptConsistencyReviewService:
             saved_review = self.review_repo.insert(review)
             result.review_id = saved_review.id
 
-            # Link Review directly to Script via review_id FK
-            self.script_repo.update_review_id(script.id, saved_review.id)
+            # Link Review directly to Content via review_id FK
+            self.content_repo.update_review_id(script.id, saved_review.id)
 
             # Update story state based on review result
             if consistency_review.passes:
@@ -348,9 +348,9 @@ class ScriptConsistencyReviewService:
 def process_oldest_consistency_review(
     connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
 ) -> ConsistencyReviewResult:
-    """Process the oldest story in PrismQ.T.Review.Script.Consistency state.
+    """Process the oldest story in PrismQ.T.Review.Content.Consistency state.
 
-    This is the main entry point for the PrismQ.T.Review.Script.Consistency module.
+    This is the main entry point for the PrismQ.T.Review.Content.Consistency module.
     It finds the oldest story in the state, performs consistency review,
     and updates the story state based on the result.
 
@@ -381,7 +381,7 @@ def process_all_consistency_reviews(
     pass_threshold: int = DEFAULT_PASS_THRESHOLD,
     limit: Optional[int] = None,
 ) -> dict:
-    """Process all stories in PrismQ.T.Review.Script.Consistency state.
+    """Process all stories in PrismQ.T.Review.Content.Consistency state.
 
     Args:
         connection: SQLite database connection.

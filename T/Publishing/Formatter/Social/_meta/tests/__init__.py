@@ -1,1 +1,1 @@
-"""Tests for T.Script.Formatter.Social module."""
+"""Tests for T.Content.Formatter.Social module."""

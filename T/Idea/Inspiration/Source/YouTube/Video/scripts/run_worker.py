@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-YouTube Video Worker Launcher Script
+YouTube Video Worker Launcher Content
 
 This script launches a YouTube Video Worker that processes video scraping tasks.
 The worker integrates with TaskManager API for task management and IdeaInspiration

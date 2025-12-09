@@ -1,4 +1,4 @@
-"""Tests for Script Acceptance Gate (MVP-013).
+"""Tests for Content Acceptance Gate (MVP-013).
 
 This test suite validates that the implementation meets all acceptance criteria
 specified in the problem statement for Worker10.
@@ -13,13 +13,13 @@ sys.path.insert(0, str(project_root))
 
 import pytest
 
-from T.Review.Script.Acceptance import ScriptAcceptanceResult, check_script_acceptance
+from T.Review.Content.Acceptance import ScriptAcceptanceResult, check_content_acceptance
 
 
 class TestScriptAcceptanceBasic:
     """Test basic acceptance functionality."""
 
-    def test_acceptance_accepted_script(self):
+    def test_acceptance_accepted_content(self):
         """Test that a well-formed script is accepted."""
         script = """
         In the old house on Elm Street, mysterious echoes fill the rooms.
@@ -30,7 +30,7 @@ class TestScriptAcceptanceBasic:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script_text=script, title=title, script_version="v3")
+        result = check_content_acceptance(content_text=script, title=title, script_version="v3")
 
         assert isinstance(result, dict)
         assert result["accepted"] is True
@@ -39,12 +39,12 @@ class TestScriptAcceptanceBasic:
         assert len(result["issues"]) == 0
         print("✓ Well-formed script is accepted")
 
-    def test_acceptance_rejected_incomplete_script(self):
+    def test_acceptance_rejected_incomplete_content(self):
         """Test that incomplete script is rejected."""
         script = "Just a short fragment"
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script_text=script, title=title)
+        result = check_content_acceptance(content_text=script, title=title)
 
         assert isinstance(result, dict)
         assert result["accepted"] is False
@@ -54,9 +54,9 @@ class TestScriptAcceptanceBasic:
         assert len(result["suggestions"]) > 0
         print("✓ Incomplete script is rejected")
 
-    def test_acceptance_empty_script(self):
+    def test_acceptance_empty_content(self):
         """Test that empty script is rejected."""
-        result = check_script_acceptance(script_text="", title="Some Title")
+        result = check_content_acceptance(content_text="", title="Some Title")
 
         assert result["accepted"] is False
         assert result["overall_score"] == 0
@@ -68,38 +68,38 @@ class TestScriptAcceptanceBasic:
         """Test that script without title is rejected."""
         script = "A well-formed script with good content and structure."
 
-        result = check_script_acceptance(script_text=script, title="")
+        result = check_content_acceptance(content_text=script, title="")
 
         assert result["accepted"] is False
         assert result["overall_score"] == 0
         assert "title" in result["reason"].lower()
-        print("✓ Script without title is rejected")
+        print("✓ Content without title is rejected")
 
 
 class TestCompleteness:
     """Test completeness evaluation criteria."""
 
-    def test_completeness_short_script(self):
+    def test_completeness_short_content(self):
         """Test completeness scoring for short script."""
         script = "A very short script."
         title = "Short"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert result["completeness_score"] < 50
         print("✓ Short script has low completeness score")
 
-    def test_completeness_medium_script(self):
+    def test_completeness_medium_content(self):
         """Test completeness scoring for medium-length script."""
         script = " ".join(["word"] * 60)  # 60 words
-        title = "Medium Script"
+        title = "Medium Content"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert result["completeness_score"] >= 50
         print("✓ Medium script has adequate completeness score")
 
-    def test_completeness_structured_script(self):
+    def test_completeness_structured_content(self):
         """Test completeness with narrative structure."""
         script = """
         First, we start our journey into the mystery.
@@ -109,9 +109,9 @@ class TestCompleteness:
         """
         title = "The Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
-        # Script with structure markers should score reasonably well
+        # Content with structure markers should score reasonably well
         assert result["completeness_score"] >= 60
         print("✓ Structured script has good completeness score")
 
@@ -128,22 +128,22 @@ class TestCoherence:
         """
         title = "Investigation"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # Should score well on coherence
         assert result["coherence_score"] >= 60
-        print("✓ Script with transitions has good coherence score")
+        print("✓ Content with transitions has good coherence score")
 
     def test_coherence_without_transitions(self):
         """Test coherence scoring without transition words."""
         script = "Word word word. Another sentence. More words here."
         title = "Simple"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # Lower coherence due to lack of transitions
         assert result["coherence_score"] < 80
-        print("✓ Script without transitions has lower coherence score")
+        print("✓ Content without transitions has lower coherence score")
 
 
 class TestAlignment:
@@ -158,7 +158,7 @@ class TestAlignment:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # Should have high alignment
         assert result["alignment_score"] >= 70
@@ -173,7 +173,7 @@ class TestAlignment:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # Should have low alignment
         assert result["alignment_score"] < 70
@@ -188,7 +188,7 @@ class TestAlignment:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # Should have moderate alignment (contains "mystery")
         assert 40 <= result["alignment_score"] <= 80
@@ -208,7 +208,7 @@ class TestAcceptanceCriteria:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script_text=script_v3, title=title, script_version="v3")
+        result = check_content_acceptance(content_text=script_v3, title=title, script_version="v3")
 
         assert isinstance(result, dict)
         assert "accepted" in result
@@ -224,7 +224,7 @@ class TestAcceptanceCriteria:
         script = "Beginning. Middle part happens. The end arrives."
         title = "Story"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert "completeness_score" in result
         assert isinstance(result["completeness_score"], int)
@@ -236,7 +236,7 @@ class TestAcceptanceCriteria:
         script = "Some text here. More text follows. Final text."
         title = "Text"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert "coherence_score" in result
         assert isinstance(result["coherence_score"], int)
@@ -248,7 +248,7 @@ class TestAcceptanceCriteria:
         script = "A story about echoes and mysteries in old houses."
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert "alignment_score" in result
         assert isinstance(result["alignment_score"], int)
@@ -266,7 +266,7 @@ class TestAcceptanceCriteria:
         """
         title = "The Echo Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         if result["accepted"]:
             assert "proceed" in result["reason"].lower()
@@ -278,7 +278,7 @@ class TestAcceptanceCriteria:
         script = "Short and incomplete."
         title = "Long Complex Title About Many Things"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         if not result["accepted"]:
             assert "loop back" in result["reason"].lower()
@@ -293,10 +293,10 @@ class TestAcceptanceCriteria:
         It has better structure and clearer narrative flow.
         The content aligns well with the title's promise.
         """
-        title = "Improved Script"
+        title = "Improved Content"
 
-        result = check_script_acceptance(
-            script_text=script_latest, title=title, script_version="v5"  # Latest version
+        result = check_content_acceptance(
+            content_text=script_latest, title=title, script_version="v5"  # Latest version
         )
 
         assert isinstance(result, dict)
@@ -307,7 +307,7 @@ class TestAcceptanceCriteria:
 class TestAcceptanceRejectionScenarios:
     """Test specific acceptance and rejection scenarios."""
 
-    def test_scenario_high_quality_script(self):
+    def test_scenario_high_quality_content(self):
         """Test acceptance of high-quality script."""
         script = """
         The journey begins in the ancient forest where echoes tell stories.
@@ -319,7 +319,7 @@ class TestAcceptanceRejectionScenarios:
         """
         title = "Echoes of the Ancient Forest"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert result["accepted"] is True
         assert result["completeness_score"] >= 75
@@ -328,19 +328,19 @@ class TestAcceptanceRejectionScenarios:
         assert result["overall_score"] >= 70
         print("✓ High-quality script is accepted")
 
-    def test_scenario_incomplete_script(self):
+    def test_scenario_incomplete_content(self):
         """Test rejection of incomplete script."""
         script = "The story starts but"
         title = "Complete Story"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert result["accepted"] is False
         assert "completeness" in str(result["issues"]).lower()
         assert len(result["suggestions"]) > 0
         print("✓ Incomplete script is rejected with feedback")
 
-    def test_scenario_incoherent_script(self):
+    def test_scenario_incoherent_content(self):
         """Test rejection of incoherent script."""
         script = """
         Random words here. Unconnected thoughts there.
@@ -349,14 +349,14 @@ class TestAcceptanceRejectionScenarios:
         """
         title = "Coherent Story"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         # May be rejected for low coherence
         if not result["accepted"]:
             assert result["coherence_score"] < 70 or result["overall_score"] < 70
             print("✓ Incoherent script is rejected")
 
-    def test_scenario_misaligned_script(self):
+    def test_scenario_misaligned_content(self):
         """Test rejection of script misaligned with title."""
         script = """
         The spaceship launches into orbit around Mars.
@@ -366,14 +366,14 @@ class TestAcceptanceRejectionScenarios:
         """
         title = "The Haunted Mansion Mystery"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert result["alignment_score"] < 60
         if not result["accepted"]:
             assert "alignment" in str(result["issues"]).lower()
             print("✓ Misaligned script is rejected")
 
-    def test_scenario_borderline_script(self):
+    def test_scenario_borderline_content(self):
         """Test borderline script near threshold."""
         script = """
         A mystery story about something interesting.
@@ -383,7 +383,7 @@ class TestAcceptanceRejectionScenarios:
         """
         title = "Mystery Story"
 
-        result = check_script_acceptance(script, title, acceptance_threshold=70)
+        result = check_content_acceptance(script, title, acceptance_threshold=70)
 
         # Should be near the threshold
         assert 55 <= result["overall_score"] <= 85
@@ -396,12 +396,12 @@ class TestAcceptanceRejectionScenarios:
         It has some structure and reasonable coherence.
         The content relates to the title somewhat.
         """
-        title = "Decent Script"
+        title = "Decent Content"
 
         # With low threshold
-        result_low = check_script_acceptance(script, title, acceptance_threshold=50)
+        result_low = check_content_acceptance(script, title, acceptance_threshold=50)
         # With high threshold
-        result_high = check_script_acceptance(script, title, acceptance_threshold=90)
+        result_high = check_content_acceptance(script, title, acceptance_threshold=90)
 
         # Should affect acceptance decision
         if result_low["overall_score"] >= 50 and result_low["overall_score"] < 90:
@@ -415,7 +415,7 @@ class TestReturnFormat:
 
     def test_return_dict_structure(self):
         """Test that return value has correct structure."""
-        result = check_script_acceptance(script_text="Some script text here.", title="Title")
+        result = check_content_acceptance(content_text="Some script text here.", title="Title")
 
         # Required fields
         assert "accepted" in result
@@ -442,9 +442,9 @@ class TestReturnFormat:
     def test_scores_in_valid_range(self):
         """Test that all scores are in valid range (0-100)."""
         script = "A script with various content and structure elements."
-        title = "Test Script"
+        title = "Test Content"
 
-        result = check_script_acceptance(script, title)
+        result = check_content_acceptance(script, title)
 
         assert 0 <= result["completeness_score"] <= 100
         assert 0 <= result["coherence_score"] <= 100

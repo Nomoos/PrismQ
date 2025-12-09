@@ -1,4 +1,4 @@
-"""PrismQ.T.Script.Formatter.Blog - Blog Format Optimizer.
+"""PrismQ.T.Content.Formatter.Blog - Blog Format Optimizer.
 
 This module transforms scripts into blog-optimized format with proper heading
 hierarchy, sections, and formatting for various blog platforms.

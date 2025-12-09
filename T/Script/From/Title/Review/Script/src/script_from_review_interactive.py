@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Interactive Script Improvement CLI for PrismQ.
+"""Interactive Content Improvement CLI for PrismQ.
 
 This script provides an interactive mode for improving scripts based on review feedback.
 
@@ -19,22 +19,22 @@ from typing import Any, Dict, List, Optional
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent.absolute()
-SCRIPT_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Script/From/Title/Review/Script
+SCRIPT_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Content/From/Title/Review/Content
 T_ROOT = SCRIPT_FROM_REVIEW_ROOT.parent.parent.parent.parent.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
 sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(SCRIPT_FROM_REVIEW_ROOT))
-sys.path.insert(0, str(T_ROOT / "Review" / "Script"))
-sys.path.insert(0, str(T_ROOT / "Review" / "Title" / "From" / "Script" / "Idea"))
+sys.path.insert(0, str(T_ROOT / "Review" / "Content"))
+sys.path.insert(0, str(T_ROOT / "Review" / "Title" / "From" / "Content" / "Idea"))
 
 # Import modules
 try:
     from script_improver import (
         ImprovedScript,
         ScriptImprover,
-        improve_script_from_reviews,
+        improve_content_from_reviews,
     )
 
     IMPROVER_AVAILABLE = True
@@ -119,14 +119,14 @@ def format_score(score: int) -> str:
 # =============================================================================
 
 
-def create_mock_script_review(script: str, title: str, score: int = 65) -> Optional["ScriptReview"]:
+def create_mock_content_review(script: str, title: str, score: int = 65) -> Optional["ScriptReview"]:
     """Create a mock script review for testing."""
     if not SCRIPT_REVIEW_AVAILABLE:
         return None
 
     return ScriptReview(
-        script_id=f"script-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-        script_text=script,
+        content_id=f"script-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        content_text=script,
         script_version="v1",
         overall_score=score,
         category_scores=[
@@ -177,24 +177,24 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logging.StreamHandler() if debug else logging.NullHandler(),
             ],
         )
-        logger = logging.getLogger("PrismQ.Script.From.Review")
+        logger = logging.getLogger("PrismQ.Content.From.Review")
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
     # Print header
     mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
-    print_header(f"PrismQ Script From Title Review - {mode_text}")
+    print_header(f"PrismQ Content From Title Review - {mode_text}")
 
     # Check module availability
     if not IMPROVER_AVAILABLE:
-        print_error(f"Script improver module not available: {IMPORT_ERROR}")
+        print_error(f"Content improver module not available: {IMPORT_ERROR}")
         if logger:
             logger.error(f"Module import failed: {IMPORT_ERROR}")
         return 1
 
-    print_success("Script improver module loaded")
+    print_success("Content improver module loaded")
     if logger:
-        logger.info("Script improver module loaded successfully")
+        logger.info("Content improver module loaded successfully")
 
     if preview:
         print_warning("Preview mode - results will NOT be saved to database")
@@ -203,7 +203,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     # Interactive loop
     print_section("Enter Improvement Input")
     print("Enter script text and title as JSON:")
-    print('JSON: {"script": "Script content...", "title": "Title", "score": 65}')
+    print('JSON: {"script": "Content content...", "title": "Title", "score": 65}')
     print("Or enter step by step (script, then title).")
     print("Type 'quit' to exit.\n")
 
@@ -223,7 +223,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             if first_line.startswith("{"):
                 try:
                     data = json.loads(first_line)
-                    original_script = data.get("script", "")
+                    original_content = data.get("script", "")
                     title_text = data.get("title", "")
                     mock_score = data.get("score", 65)
                 except json.JSONDecodeError:
@@ -238,7 +238,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     if line == "":
                         break
                     script_lines.append(line)
-                original_script = "\n".join(script_lines)
+                original_content = "\n".join(script_lines)
 
                 print(f"{Colors.CYAN}>>> Enter title: {Colors.END}", end="")
                 title_text = input().strip()
@@ -252,7 +252,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print_info("Interrupted. Type 'quit' to exit.")
             continue
 
-        if not original_script or not title_text:
+        if not original_content or not title_text:
             print_error("Both script and title are required")
             continue
 
@@ -263,13 +263,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print_section("Improvement Input")
         print(f"  Title: {Colors.BOLD}{title_text}{Colors.END}")
         script_preview = (
-            original_script[:200] + "..." if len(original_script) > 200 else original_script
+            original_content[:200] + "..." if len(original_content) > 200 else original_content
         )
-        print(f"  Script: {script_preview}")
+        print(f"  Content: {script_preview}")
 
         # Create reviews (mock)
         print_section("Creating Reviews")
-        script_review = create_mock_script_review(original_script, title_text, mock_score)
+        script_review = create_mock_content_review(original_content, title_text, mock_score)
 
         if not script_review:
             print_error("Could not create review - check dependencies")
@@ -278,12 +278,12 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print_success(f"Created script review (score: {mock_score}%)")
 
         # Generate improved script
-        print_section("Generating Improved Script")
+        print_section("Generating Improved Content")
 
         try:
             improver = ScriptImprover()
-            result = improver.improve_script(
-                original_script=original_script,
+            result = improver.improve_content(
+                original_content=original_content,
                 title_text=title_text,
                 script_review=script_review,
                 original_version_number="v1",
@@ -292,7 +292,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
             # Display results
             print_section("Improvement Results")
-            print(f"\n  Original length: {len(original_script)} chars")
+            print(f"\n  Original length: {len(original_content)} chars")
             print(f"  Improved length: {len(result.new_version.text)} chars")
 
             print_section("Changes Made")
@@ -316,18 +316,18 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     print(f"    {line}")
 
             # Show improved script
-            show_script = (
+            show_content = (
                 input(f"\n{Colors.CYAN}Show improved script? (y/n) [n]: {Colors.END}")
                 .strip()
                 .lower()
             )
-            if show_script == "y":
-                print_section("Improved Script Text")
+            if show_content == "y":
+                print_section("Improved Content Text")
                 print(result.new_version.text)
 
             if logger:
                 logger.info(
-                    f"Script improved: {len(original_script)} → {len(result.new_version.text)} chars"
+                    f"Content improved: {len(original_content)} → {len(result.new_version.text)} chars"
                 )
 
         except Exception as e:
@@ -353,7 +353,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Interactive Script Improvement from Reviews for PrismQ",
+        description="Interactive Content Improvement from Reviews for PrismQ",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

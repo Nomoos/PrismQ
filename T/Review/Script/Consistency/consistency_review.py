@@ -1,6 +1,6 @@
-"""Script Consistency Review - AI-powered consistency validation for scripts.
+"""Content Consistency Review - AI-powered consistency validation for scripts.
 
-This module implements PrismQ.T.Review.Script.Consistency for Stage 17 (MVP-017).
+This module implements PrismQ.T.Review.Content.Consistency for Stage 17 (MVP-017).
 Provides comprehensive consistency checking including character names, timeline,
 locations, and internal contradictions with detailed issue detection and JSON output.
 
@@ -10,7 +10,7 @@ with detailed feedback.
 
 Workflow Position:
     Stage 17 (MVP-017): Consistency Review
-    Script v3+ → Consistency Review → [PASS: Stage 18] or [FAIL: Script Refinement]
+    Content v3+ → Consistency Review → [PASS: Stage 18] or [FAIL: Content Refinement]
 """
 
 import re
@@ -72,7 +72,7 @@ class ConsistencyReview:
     returns to refinement (Stage 11) with consistency feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall consistency score (0-100)
         pass_threshold: Minimum score required to pass (default 80)
@@ -108,7 +108,7 @@ class ConsistencyReview:
 
     Example:
         >>> review = ConsistencyReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=85
         ... )
@@ -123,10 +123,10 @@ class ConsistencyReview:
         >>> if review.passes:
         ...     print("Ready for Stage 18: Editing Review")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 80  # Minimum score to pass
@@ -333,7 +333,7 @@ class ConsistencyReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 80),
@@ -363,7 +363,7 @@ class ConsistencyReview:
     def __repr__(self) -> str:
         """String representation of ConsistencyReview."""
         return (
-            f"ConsistencyReview(script={self.script_id}, "
+            f"ConsistencyReview(script={self.content_id}, "
             f"version={self.script_version}, "
             f"score={self.overall_score}%, "
             f"passes={'YES' if self.passes else 'NO'}, "
@@ -473,25 +473,25 @@ class ScriptConsistencyChecker:
         """
         self.pass_threshold = pass_threshold
 
-    def review_script(
-        self, script_text: str, script_id: str = "script-001", script_version: str = "v3"
+    def review_content(
+        self, content_text: str, content_id: str = "script-001", script_version: str = "v3"
     ) -> ConsistencyReview:
         """Review a script for consistency issues.
 
         Args:
-            script_text: The script text to review
-            script_id: Identifier for the script
+            content_text: The script text to review
+            content_id: Identifier for the script
             script_version: Version of the script (v3, v4, etc.)
 
         Returns:
             ConsistencyReview object with all detected issues
         """
         review = ConsistencyReview(
-            script_id=script_id, script_version=script_version, pass_threshold=self.pass_threshold
+            content_id=content_id, script_version=script_version, pass_threshold=self.pass_threshold
         )
 
         # Split script into lines for analysis
-        lines = script_text.split("\n")
+        lines = content_text.split("\n")
 
         # Track elements throughout the script
         character_mentions = defaultdict(list)  # name -> [line_numbers]
@@ -702,7 +702,7 @@ class ScriptConsistencyChecker:
 
         if total_issues == 0:
             review.summary = (
-                "Excellent! No consistency issues detected. Script maintains internal coherence."
+                "Excellent! No consistency issues detected. Content maintains internal coherence."
             )
             review.passes = True
             return
@@ -710,10 +710,10 @@ class ScriptConsistencyChecker:
         # Generate summary
         if review.passes:
             review.summary = (
-                f"Script passes consistency review with {total_issues} minor issue(s) detected."
+                f"Content passes consistency review with {total_issues} minor issue(s) detected."
             )
         else:
-            review.summary = f"Script requires revision. {total_issues} consistency issue(s) detected, including {review.critical_count} critical error(s)."
+            review.summary = f"Content requires revision. {total_issues} consistency issue(s) detected, including {review.critical_count} critical error(s)."
 
         # Identify primary concerns
         if review.critical_count > 0:
@@ -748,17 +748,17 @@ class ScriptConsistencyChecker:
             review.primary_concerns.append(f"{contradiction_count} internal contradiction(s)")
 
 
-def review_script_consistency(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_consistency(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 80,
 ) -> ConsistencyReview:
     """Convenience function to review script consistency.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -767,27 +767,27 @@ def review_script_consistency(
 
     Example:
         >>> script = "John walked into the room. Later, Johnny picked up the book."
-        >>> review = review_script_consistency(script)
+        >>> review = review_content_consistency(script)
         >>> print(f"Score: {review.overall_score}")
         >>> print(f"Passes: {review.passes}")
         >>> for issue in review.issues:
         ...     print(f"{issue.location}: {issue.description}")
     """
     checker = ScriptConsistencyChecker(pass_threshold=pass_threshold)
-    return checker.review_script(script_text, script_id, script_version)
+    return checker.review_content(content_text, content_id, script_version)
 
 
-def review_script_consistency_to_json(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_consistency_to_json(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 80,
 ) -> str:
     """Review script consistency and return results as JSON string.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -796,7 +796,7 @@ def review_script_consistency_to_json(
 
     Example:
         >>> script = "John walked in. Johnny left."
-        >>> json_result = review_script_consistency_to_json(script)
+        >>> json_result = review_content_consistency_to_json(script)
         >>> import json
         >>> result = json.loads(json_result)
         >>> print(result['overall_score'])
@@ -804,7 +804,7 @@ def review_script_consistency_to_json(
     """
     import json
 
-    review = review_script_consistency(script_text, script_id, script_version, pass_threshold)
+    review = review_content_consistency(content_text, content_id, script_version, pass_threshold)
     return json.dumps(review.to_dict(), indent=2)
 
 
@@ -818,15 +818,15 @@ def get_consistency_feedback(review: ConsistencyReview) -> Dict[str, Any]:
         Dictionary with structured feedback for script writers
 
     Example:
-        >>> review = review_script_consistency(script_text)
+        >>> review = review_content_consistency(content_text)
         >>> feedback = get_consistency_feedback(review)
         >>> if not feedback['passes']:
-        ...     print("Script needs revision:")
+        ...     print("Content needs revision:")
         ...     for issue in feedback['critical_issues']:
         ...         print(f"  {issue['location']}: {issue['description']}")
     """
     return {
-        "script_id": review.script_id,
+        "content_id": review.content_id,
         "script_version": review.script_version,
         "passes": review.passes,
         "overall_score": review.overall_score,
@@ -875,14 +875,14 @@ def get_consistency_feedback(review: ConsistencyReview) -> Dict[str, Any]:
         "next_action": (
             "Proceed to Stage 18 (Editing Review)"
             if review.passes
-            else "Return to Script Refinement (Stage 11)"
+            else "Return to Content Refinement (Stage 11)"
         ),
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    test_script = """John walked into the old house at dusk.
+    test_content = """John walked into the old house at dusk.
 The building was empty, dark and quiet.
 He looked around nervously.
 Suddenly, Johnny heard a noise from upstairs.
@@ -897,12 +897,12 @@ Yet here she was, standing before him.
 She smiled. "I never died, John. That was someone else."
 """
 
-    print("=== Script Consistency Review ===\n")
-    print("Script:")
-    print(test_script)
+    print("=== Content Consistency Review ===\n")
+    print("Content:")
+    print(test_content)
     print("\n" + "=" * 50 + "\n")
 
-    review = review_script_consistency(test_script, script_id="test-001", script_version="v3")
+    review = review_content_consistency(test_content, content_id="test-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Character Score: {review.character_score}/100")
@@ -926,5 +926,5 @@ She smiled. "I never died, John. That was someone else."
 
     print("\n" + "=" * 50)
     print("\nJSON Output (first 500 chars):")
-    json_output = review_script_consistency_to_json(test_script, script_id="test-001")
+    json_output = review_content_consistency_to_json(test_content, content_id="test-001")
     print(json_output[:500] + "...")

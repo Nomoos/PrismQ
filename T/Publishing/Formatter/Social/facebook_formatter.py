@@ -1,4 +1,4 @@
-"""Facebook post formatter for PrismQ.T.Script.Formatter.Social.
+"""Facebook post formatter for PrismQ.T.Content.Formatter.Social.
 
 This module transforms scripts into Facebook post format with preview
 optimization and engagement features.
@@ -40,7 +40,7 @@ class FacebookFormatter(BaseSocialFormatter):
         """Format script into Facebook post.
 
         Args:
-            script: Script content to format
+            script: Content content to format
             content_id: Unique identifier for content
             add_engagement_question: Whether to add engagement question
             use_emojis: Whether to add relevant emojis
@@ -103,7 +103,7 @@ class FacebookFormatter(BaseSocialFormatter):
         """Create compelling preview for first 400 characters.
 
         Args:
-            script: Script content
+            script: Content content
             use_emojis: Whether to add emojis
 
         Returns:
@@ -134,7 +134,7 @@ class FacebookFormatter(BaseSocialFormatter):
         """Format main content for Facebook.
 
         Args:
-            script: Script content
+            script: Content content
             preview: Preview text (to avoid duplication)
 
         Returns:
@@ -169,7 +169,7 @@ class FacebookFormatter(BaseSocialFormatter):
         """Generate engagement-driving question.
 
         Args:
-            script: Script content
+            script: Content content
 
         Returns:
             Engagement question
@@ -278,7 +278,7 @@ def format_facebook_post(
     """Convenience function to format script as Facebook post.
 
     Args:
-        script: Script content to format
+        script: Content content to format
         content_id: Unique identifier for content
         add_engagement_question: Whether to add engagement question
         use_emojis: Whether to add relevant emojis

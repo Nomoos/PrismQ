@@ -2,7 +2,7 @@
 
 This module provides functionality to generate Title (v0) for Stories
 that are ready for title generation (state = PrismQ.T.Title.From.Idea)
-and don't have Title or Script references yet.
+and don't have Title or Content references yet.
 
 Workflow Position: Stage 2 in MVP workflow
     PrismQ.T.Idea.Creation
@@ -11,7 +11,7 @@ Workflow Position: Stage 2 in MVP workflow
         ↓
     PrismQ.T.Title.From.Idea (generates Title v0) ← This module
         ↓
-    PrismQ.T.Script.Draft (v0)
+    PrismQ.T.Content.Draft (v0)
 
 The service:
 1. Finds Stories with state PrismQ.T.Title.From.Idea
@@ -290,20 +290,20 @@ class StoryTitleService:
         titles = self._title_repo.find_by_story_id(story_id)
         return len(titles) > 0
 
-    def story_has_script(self, story_id: int) -> bool:
-        """Check if a Story has a Script reference.
+    def story_has_content(self, story_id: int) -> bool:
+        """Check if a Story has a Content reference.
 
-        Note: This is a placeholder - Script repository would be needed
+        Note: This is a placeholder - Content repository would be needed
         for full implementation. Currently returns False.
 
         Args:
             story_id: The Story's database ID.
 
         Returns:
-            False (placeholder - no Script repository implemented yet).
+            False (placeholder - no Content repository implemented yet).
         """
-        # TODO: Implement when Script repository is available
-        # scripts = self._script_repo.find_by_story_id(story_id)
+        # TODO: Implement when Content repository is available
+        # scripts = self._content_repo.find_by_story_id(story_id)
         # return len(scripts) > 0
         return False
 

@@ -1,4 +1,4 @@
-"""Comprehensive tests for Script Editing Review (MVP-018).
+"""Comprehensive tests for Content Editing Review (MVP-018).
 
 Tests the editing review functionality including:
 - Well-edited scripts (should PASS)
@@ -24,25 +24,25 @@ from T.Review.Model import (
     EditingReview,
     EditingSeverity,
 )
-from T.Review.Script.Editing import (
+from T.Review.Content.Editing import (
     ScriptEditingChecker,
     get_editing_feedback,
-    review_script_editing,
-    review_script_editing_to_json,
+    review_content_editing,
+    review_content_editing_to_json,
 )
 
 
 class TestWellEditedScripts:
     """Test that well-edited scripts PASS the review."""
 
-    def test_perfect_script_passes(self):
+    def test_perfect_content_passes(self):
         """Test that a well-edited, clear script passes."""
         script = """The sun rises over the distant mountains.
 Birds sing their morning songs.
 A gentle breeze flows through the trees.
 Nature awakens to a new day."""
 
-        review = review_script_editing(script, script_id="perfect-001")
+        review = review_content_editing(script, content_id="perfect-001")
 
         assert review.passes is True
         assert review.overall_score >= 85
@@ -50,14 +50,14 @@ Nature awakens to a new day."""
         assert review.critical_count == 0
         assert "Excellent" in review.summary or "passes" in review.summary.lower()
 
-    def test_concise_active_voice_script_passes(self):
+    def test_concise_active_voice_content_passes(self):
         """Test that concise, active voice script passes."""
         script = """The hero grabs the sword.
 He charges forward.
 The battle begins at dawn.
 Victory requires courage and skill."""
 
-        review = review_script_editing(script, script_id="active-001")
+        review = review_content_editing(script, content_id="active-001")
 
         assert review.passes is True
         assert review.overall_score >= 85
@@ -79,7 +79,7 @@ No worries. I just got here.
 They sit down and begin their conversation.
 The ambient noise creates a cozy atmosphere."""
 
-        review = review_script_editing(script, script_id="dialogue-001")
+        review = review_content_editing(script, content_id="dialogue-001")
 
         # Should pass with minimal or no issues
         assert review.overall_score >= 75
@@ -94,7 +94,7 @@ class TestScriptsWithEditingIssues:
 At this point in time, the situation is unclear.
 Due to the fact that the weather is bad, we postpone the event."""
 
-        review = review_script_editing(script, script_id="wordy-001")
+        review = review_content_editing(script, content_id="wordy-001")
 
         # Should detect wordiness issues
         wordiness_issues = review.get_issues_by_type(EditingIssueType.WORDINESS)
@@ -113,7 +113,7 @@ We need to review the past history of events.
 The close proximity to the building is convenient.
 The exact same result occurred occurred again."""
 
-        review = review_script_editing(script, script_id="redundant-001")
+        review = review_content_editing(script, content_id="redundant-001")
 
         # Should detect redundancy issues
         redundancy_issues = review.get_issues_by_type(EditingIssueType.REDUNDANCY)
@@ -129,7 +129,7 @@ The exact same result occurred occurred again."""
 The project was completed by the team ahead of schedule.
 The message was delivered by the courier yesterday."""
 
-        review = review_script_editing(script, script_id="passive-001")
+        review = review_content_editing(script, content_id="passive-001")
 
         # Should detect clarity issues (passive voice)
         clarity_issues = review.get_issues_by_type(EditingIssueType.CLARITY)
@@ -146,7 +146,7 @@ And then he sees the villain.
 And so the battle begins.
 Also there is a sword on the table."""
 
-        review = review_script_editing(script, script_id="transition-001")
+        review = review_content_editing(script, content_id="transition-001")
 
         # Should detect transition issues
         transition_issues = review.get_issues_by_type(EditingIssueType.TRANSITION)
@@ -160,7 +160,7 @@ Also there is a sword on the table."""
         """Test that overly long sentences are flagged."""
         script = """The protagonist walks through the ancient forest, past the towering trees and over the mossy rocks, while thinking about the journey ahead and wondering if the destination would provide the answers to all the questions that have been haunting the mind for years."""
 
-        review = review_script_editing(script, script_id="long-001")
+        review = review_content_editing(script, content_id="long-001")
 
         # Should detect clarity issue for long sentence
         clarity_issues = review.get_issues_by_type(EditingIssueType.CLARITY)
@@ -176,12 +176,12 @@ class TestScoreCategorization:
 
     def test_multiple_issues_lower_score(self):
         """Test that multiple issues result in lower score."""
-        bad_script = """In order to make a decision, we gave consideration to all options.
+        bad_content = """In order to make a decision, we gave consideration to all options.
 The choice was made by the team at this point in time.
 Due to the fact that the weather is bad, the event is postponed postponed.
 In close proximity to the building, there is a very unique statue."""
 
-        review = review_script_editing(bad_script, script_id="bad-001")
+        review = review_content_editing(bad_content, content_id="bad-001")
 
         # Should have low score
         assert review.overall_score < 70
@@ -193,7 +193,7 @@ In close proximity to the building, there is a very unique statue."""
         script = """The close proximity is very convenient.
 The past history shows clear patterns."""
 
-        review = review_script_editing(script, script_id="high-severity-001")
+        review = review_content_editing(script, content_id="high-severity-001")
 
         # Should have high severity issues
         high_issues = review.get_issues_by_severity(EditingSeverity.HIGH)
@@ -211,13 +211,13 @@ class TestJSONOutput:
         """Test that JSON output is properly formatted."""
         script = """In order to complete this task, we proceed carefully."""
 
-        json_output = review_script_editing_to_json(script, script_id="json-001")
+        json_output = review_content_editing_to_json(script, content_id="json-001")
 
         # Should be valid JSON
         data = json.loads(json_output)
 
         # Check required fields
-        assert "script_id" in data
+        assert "content_id" in data
         assert "overall_score" in data
         assert "passes" in data
         assert "issues" in data
@@ -230,7 +230,7 @@ class TestJSONOutput:
         """Test that JSON output contains detailed issue information."""
         script = """Due to the fact that the weather is bad, we postpone."""
 
-        json_output = review_script_editing_to_json(script, script_id="json-002")
+        json_output = review_content_editing_to_json(script, content_id="json-002")
         data = json.loads(json_output)
 
         # Should have issues
@@ -254,11 +254,11 @@ class TestFeedbackGeneration:
         """Test that feedback has proper structure."""
         script = """In order to proceed, we give consideration to all factors."""
 
-        review = review_script_editing(script, script_id="feedback-001")
+        review = review_content_editing(script, content_id="feedback-001")
         feedback = get_editing_feedback(review)
 
         # Check required feedback fields
-        assert "script_id" in feedback
+        assert "content_id" in feedback
         assert "passes" in feedback
         assert "overall_score" in feedback
         assert "summary" in feedback
@@ -271,7 +271,7 @@ class TestFeedbackGeneration:
         script = """In order to complete this, we give consideration to options.
 The very unique statue statue is beautiful."""
 
-        review = review_script_editing(script, script_id="feedback-002")
+        review = review_content_editing(script, content_id="feedback-002")
         feedback = get_editing_feedback(review)
 
         # Should have quick fixes
@@ -289,27 +289,27 @@ The very unique statue statue is beautiful."""
 class TestEdgeCases:
     """Test edge cases and special scenarios."""
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test that empty script passes without errors."""
         script = ""
 
-        review = review_script_editing(script, script_id="empty-001")
+        review = review_content_editing(script, content_id="empty-001")
 
         # Should pass with perfect score
         assert review.passes is True
         assert review.overall_score == 100
         assert len(review.issues) == 0
 
-    def test_short_script(self):
+    def test_short_content(self):
         """Test that short script is handled correctly."""
         script = "The hero runs."
 
-        review = review_script_editing(script, script_id="short-001")
+        review = review_content_editing(script, content_id="short-001")
 
         # Should handle without errors
         assert review.overall_score >= 0
 
-    def test_dialogue_only_script(self):
+    def test_dialogue_only_content(self):
         """Test that dialogue-only script doesn't trigger false positives."""
         script = """SARAH
 "I can't believe this is happening!"
@@ -321,7 +321,7 @@ SARAH
 "But what if we're too late?"
 """
 
-        review = review_script_editing(script, script_id="dialogue-002")
+        review = review_content_editing(script, content_id="dialogue-002")
 
         # Should not flag dialogue lines as errors
         # Passive voice checks should skip dialogue
@@ -336,7 +336,7 @@ EXT. CITY STREET - DAY
 The hero walks down the empty street.
 """
 
-        review = review_script_editing(script, script_id="format-001")
+        review = review_content_editing(script, content_id="format-001")
 
         # Formatting lines should be ignored
         # Should pass or have minimal issues
@@ -351,10 +351,10 @@ class TestReviewerBehavior:
         script = """In order to proceed, we continue."""
 
         # Low threshold
-        review_low = review_script_editing(script, script_id="threshold-001", pass_threshold=50)
+        review_low = review_content_editing(script, content_id="threshold-001", pass_threshold=50)
 
         # High threshold
-        review_high = review_script_editing(script, script_id="threshold-002", pass_threshold=95)
+        review_high = review_content_editing(script, content_id="threshold-002", pass_threshold=95)
 
         # Same issues
         assert len(review_low.issues) == len(review_high.issues)
@@ -381,7 +381,7 @@ class TestReviewerBehavior:
         """Test that issues have appropriate confidence scores."""
         script = """In order to proceed, the decision was made made."""
 
-        review = review_script_editing(script, script_id="confidence-001")
+        review = review_content_editing(script, content_id="confidence-001")
 
         # All issues should have confidence scores
         for issue in review.issues:

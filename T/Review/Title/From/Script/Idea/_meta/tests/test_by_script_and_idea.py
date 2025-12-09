@@ -1,4 +1,4 @@
-"""Tests for title review function - review_title_by_script_and_idea."""
+"""Tests for title review function - review_title_by_content_and_idea."""
 
 import sys
 from pathlib import Path
@@ -13,13 +13,13 @@ from T.Review.Title.ByScriptAndIdea import (
     AlignmentAnalysis,
     TitleReview,
     TitleReviewCategory,
-    review_title_by_script_and_idea,
+    review_title_by_content_and_idea,
 )
-from T.Review.Title.ByScriptAndIdea.by_script_and_idea import (
+from T.Review.Title.ByScriptAndIdea.by_content_and_idea import (
     analyze_engagement,
     analyze_seo,
     analyze_title_idea_alignment,
-    analyze_title_script_alignment,
+    analyze_title_content_alignment,
     extract_keywords,
     generate_improvement_points,
 )
@@ -70,7 +70,7 @@ class TestAnalyzeTitleScriptAlignment:
         Every echo brings them closer to the truth.
         """
 
-        analysis = analyze_title_script_alignment(title, script)
+        analysis = analyze_title_content_alignment(title, script)
 
         assert isinstance(analysis, AlignmentAnalysis)
         assert analysis.score >= 50  # Good alignment with 100% keyword match
@@ -85,25 +85,25 @@ class TestAnalyzeTitleScriptAlignment:
         The haunting sound reveals dark secrets of the past.
         """
 
-        analysis = analyze_title_script_alignment(title, script)
+        analysis = analyze_title_content_alignment(title, script)
 
         assert analysis.score < 50
         assert len(analysis.mismatches) > 0
 
-    def test_with_script_summary(self):
+    def test_with_content_summary(self):
         """Test alignment analysis with script summary."""
         title = "The Echo"
         script = "A long script about many things that happen in various places."
         summary = "Story about mysterious echoes in a house"
 
-        analysis = analyze_title_script_alignment(title, script, summary)
+        analysis = analyze_title_content_alignment(title, script, summary)
 
         # Should get bonus for appearing in summary
         assert analysis.score > 0
 
     def test_empty_title(self):
         """Test with empty title."""
-        analysis = analyze_title_script_alignment("", "some script text")
+        analysis = analyze_title_content_alignment("", "some script text")
         assert analysis.score == 0
 
 
@@ -219,7 +219,7 @@ class TestAnalyzeSeo:
 class TestGenerateImprovementPoints:
     """Test improvement point generation."""
 
-    def test_low_script_alignment_improvement(self):
+    def test_low_content_alignment_improvement(self):
         """Test improvement for low script alignment."""
         script_alignment = AlignmentAnalysis(
             score=60,
@@ -331,8 +331,8 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Horror story about mysterious echoes in a haunted house"
 
-        review = review_title_by_script_and_idea(
-            title_text=title, script_text=script, idea_summary=idea
+        review = review_title_by_content_and_idea(
+            title_text=title, content_text=script, idea_summary=idea
         )
 
         assert isinstance(review, TitleReview)
@@ -346,12 +346,12 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_with_all_parameters(self):
         """Test review with all optional parameters."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The Echo Mystery",
-            script_text="A story about echoes and mysteries in a house",
+            content_text="A story about echoes and mysteries in a house",
             idea_summary="Mystery story with echoes",
             title_id="title-001",
-            script_id="script-001",
+            content_id="script-001",
             idea_id="idea-001",
             script_summary="Echoes reveal mysteries",
             idea_intent="Create suspense through sound",
@@ -361,7 +361,7 @@ class TestReviewTitleByScriptAndIdea:
         )
 
         assert review.title_id == "title-001"
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.idea_id == "idea-001"
         assert review.title_version == "v1"
         assert review.script_version == "v1"
@@ -369,12 +369,12 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_generates_ids(self):
         """Test that review generates IDs if not provided."""
-        review = review_title_by_script_and_idea(
-            title_text="Title", script_text="Script", idea_summary="Idea"
+        review = review_title_by_content_and_idea(
+            title_text="Title", content_text="Content", idea_summary="Idea"
         )
 
         assert review.title_id is not None
-        assert review.script_id is not None
+        assert review.content_id is not None
         assert review.idea_id is not None
         assert review.title_id.startswith("title-")
 
@@ -389,9 +389,9 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Mystery horror about echoes and shadows revealing secrets in a haunted house"
 
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text=title,
-            script_text=script,
+            content_text=script,
             idea_summary=idea,
             idea_intent="Create atmospheric mystery using sound and light",
         )
@@ -410,8 +410,8 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Horror mystery about echoes and shadows"
 
-        review = review_title_by_script_and_idea(
-            title_text=title, script_text=script, idea_summary=idea
+        review = review_title_by_content_and_idea(
+            title_text=title, content_text=script, idea_summary=idea
         )
 
         # Should score poorly with bad alignment
@@ -421,9 +421,9 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_has_category_scores(self):
         """Test that review includes all major categories."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The Echo",
-            script_text="A story about echoes",
+            content_text="A story about echoes",
             idea_summary="Story about echoes",
         )
 
@@ -436,9 +436,9 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_improvement_points_prioritized(self):
         """Test that improvement points are prioritized."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="A Story",
-            script_text="This is a long story about completely different things",
+            content_text="This is a long story about completely different things",
             idea_summary="Different concept entirely",
         )
 
@@ -452,8 +452,8 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_to_dict_compatibility(self):
         """Test that review can be converted to dict (JSON compatible)."""
-        review = review_title_by_script_and_idea(
-            title_text="The Echo", script_text="Story about echoes", idea_summary="Echo story"
+        review = review_title_by_content_and_idea(
+            title_text="The Echo", content_text="Story about echoes", idea_summary="Echo story"
         )
 
         # Should be able to convert to dict without errors
@@ -464,10 +464,10 @@ class TestReviewTitleByScriptAndIdea:
         assert "category_scores" in data
         assert "improvement_points" in data
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test handling of empty script."""
-        review = review_title_by_script_and_idea(
-            title_text="The Echo", script_text="", idea_summary="Story about echoes"
+        review = review_title_by_content_and_idea(
+            title_text="The Echo", content_text="", idea_summary="Story about echoes"
         )
 
         assert isinstance(review, TitleReview)
@@ -476,8 +476,8 @@ class TestReviewTitleByScriptAndIdea:
     def test_very_long_title(self):
         """Test handling of very long title."""
         long_title = "A" * 150
-        review = review_title_by_script_and_idea(
-            title_text=long_title, script_text="Some script", idea_summary="Some idea"
+        review = review_title_by_content_and_idea(
+            title_text=long_title, content_text="Some script", idea_summary="Some idea"
         )
 
         # Should have improvement point about length
@@ -486,8 +486,8 @@ class TestReviewTitleByScriptAndIdea:
     def test_very_short_title(self):
         """Test handling of very short title."""
         short_title = "A"
-        review = review_title_by_script_and_idea(
-            title_text=short_title, script_text="Some script", idea_summary="Some idea"
+        review = review_title_by_content_and_idea(
+            title_text=short_title, content_text="Some script", idea_summary="Some idea"
         )
 
         # Should have improvement point about length
@@ -499,9 +499,9 @@ class TestWorkflowIntegration:
 
     def test_review_ready_for_improvement(self):
         """Test that review is ready for improvement stage."""
-        review = review_title_by_script_and_idea(
+        review = review_title_by_content_and_idea(
             title_text="The Echo Mystery",
-            script_text="A mysterious echo haunts the house",
+            content_text="A mysterious echo haunts the house",
             idea_summary="Mystery about haunting echoes",
         )
 
@@ -510,8 +510,8 @@ class TestWorkflowIntegration:
 
     def test_iterative_improvement_tracking(self):
         """Test that review tracks iteration number."""
-        review = review_title_by_script_and_idea(
-            title_text="The Echo", script_text="Echo story", idea_summary="Echo idea"
+        review = review_title_by_content_and_idea(
+            title_text="The Echo", content_text="Echo story", idea_summary="Echo idea"
         )
 
         assert review.iteration_number == 1

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SQLite Queue Benchmark Script
+SQLite Queue Benchmark Content
 
 Comprehensive benchmarking of SQLite concurrency settings and performance
 for the PrismQ task queue system.

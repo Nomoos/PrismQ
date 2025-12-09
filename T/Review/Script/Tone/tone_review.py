@@ -14,7 +14,7 @@ The ToneReview model enables:
 
 Workflow Position:
     Stage 15 (MVP-015): Tone Review
-    Script v3+ (Grammar Passed) → ToneReview (AI Reviewer) → Script Refinement (if fails) → Stage 16
+    Content v3+ (Grammar Passed) → ToneReview (AI Reviewer) → Content Refinement (if fails) → Stage 16
 """
 
 from dataclasses import asdict, dataclass, field
@@ -74,7 +74,7 @@ class ToneReview:
     If it fails, script returns to refinement (Stage 11) with tone feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall tone appropriateness score (0-100)
         pass_threshold: Minimum score required to pass (default 80)
@@ -109,7 +109,7 @@ class ToneReview:
 
     Example:
         >>> review = ToneReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=88,
         ...     target_tone="dark suspense",
@@ -126,10 +126,10 @@ class ToneReview:
         >>> if review.passes:
         ...     print("Ready for Stage 16")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = (
@@ -294,7 +294,7 @@ class ToneReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 80),
@@ -324,7 +324,7 @@ class ToneReview:
     def __repr__(self) -> str:
         """String representation of ToneReview."""
         return (
-            f"ToneReview(script={self.script_id}, "
+            f"ToneReview(script={self.content_id}, "
             f"version={self.script_version}, "
             f"score={self.overall_score}%, "
             f"passes={'YES' if self.passes else 'NO'}, "

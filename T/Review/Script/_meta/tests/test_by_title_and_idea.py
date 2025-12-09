@@ -1,4 +1,4 @@
-"""Tests for review_script_by_title_and_idea module.
+"""Tests for review_content_by_title_and_idea module.
 
 Tests MVP-005: Review script v1 against title v1 and idea.
 """
@@ -6,12 +6,12 @@ Tests MVP-005: Review script v1 against title v1 and idea.
 import pytest
 
 from src.idea import ContentGenre, Idea
-from T.Review.Script import (
+from T.Review.Content import (
     AlignmentScore,
     ContentLength,
     ReviewCategory,
     ScriptReview,
-    review_script_by_title_and_idea,
+    review_content_by_title_and_idea,
 )
 
 
@@ -42,7 +42,7 @@ class TestReviewScriptByTitleAndIdea:
         trying to warn my past self. And I realized - I'm already too late.
         """
 
-        review = review_script_by_title_and_idea(script, title, idea)
+        review = review_content_by_title_and_idea(script, title, idea)
 
         # Verify basic properties
         assert isinstance(review, ScriptReview)
@@ -87,7 +87,7 @@ class TestReviewScriptByTitleAndIdea:
         revolutionary.
         """
 
-        review = review_script_by_title_and_idea(script, title, idea)
+        review = review_content_by_title_and_idea(script, title, idea)
 
         # Should have reasonably high overall score due to good alignment
         assert review.overall_score >= 60  # Adjusted for realistic baseline
@@ -114,7 +114,7 @@ class TestReviewScriptByTitleAndIdea:
 
         title = "Uncovering the Lost Civilization"
 
-        # Script about something completely different
+        # Content about something completely different
         script = """
         The best pizza recipes require three key ingredients: quality flour, fresh yeast,
         and good mozzarella cheese. Start by mixing your dough and letting it rise for
@@ -125,7 +125,7 @@ class TestReviewScriptByTitleAndIdea:
         until the crust is golden brown.
         """
 
-        review = review_script_by_title_and_idea(script, title, idea)
+        review = review_content_by_title_and_idea(script, title, idea)
 
         # Should have lower score due to misalignment
         assert review.overall_score < 65  # Adjusted for realistic scoring
@@ -137,26 +137,26 @@ class TestReviewScriptByTitleAndIdea:
         high_priority = [p for p in review.improvement_points if p.priority == "high"]
         assert len(high_priority) > 0
 
-    def test_review_with_custom_script_id(self):
+    def test_review_with_custom_content_id(self):
         """Test review with custom script ID."""
         idea = Idea(title="Test Idea", concept="Test concept", genre=ContentGenre.OTHER)
 
         custom_id = "custom-script-123"
-        review = review_script_by_title_and_idea(
-            "Test script content", "Test Title", idea, script_id=custom_id
+        review = review_content_by_title_and_idea(
+            "Test script content", "Test Title", idea, content_id=custom_id
         )
 
-        assert review.script_id == custom_id
+        assert review.content_id == custom_id
 
-    def test_review_generates_default_script_id(self):
+    def test_review_generates_default_content_id(self):
         """Test that review generates script ID from idea title if not provided."""
         idea = Idea(title="The Echo Mystery", concept="Test concept", genre=ContentGenre.OTHER)
 
-        review = review_script_by_title_and_idea("Test script", "Test Title", idea)
+        review = review_content_by_title_and_idea("Test script", "Test Title", idea)
 
         # Should generate ID based on idea title
-        assert "the-echo-mystery" in review.script_id.lower()
-        assert "v1" in review.script_id
+        assert "the-echo-mystery" in review.content_id.lower()
+        assert "v1" in review.content_id
 
     def test_review_with_target_length(self):
         """Test review with specified target length."""
@@ -164,7 +164,7 @@ class TestReviewScriptByTitleAndIdea:
             title="Quick Tips", concept="Short helpful advice", genre=ContentGenre.EDUCATIONAL
         )
 
-        review = review_script_by_title_and_idea(
+        review = review_content_by_title_and_idea(
             "Quick script content for a short video.",
             "Fast Learning Tips",
             idea,
@@ -176,7 +176,7 @@ class TestReviewScriptByTitleAndIdea:
         assert review.is_youtube_short is True
         assert review.optimal_length_seconds == 60
 
-    def test_review_estimates_script_length(self):
+    def test_review_estimates_content_length(self):
         """Test that review estimates script duration."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
@@ -184,7 +184,7 @@ class TestReviewScriptByTitleAndIdea:
         # Approximately 150 words (should be ~60 seconds at 2.5 words/second)
         script = " ".join(["word"] * 150)
 
-        review = review_script_by_title_and_idea(script, "Title", idea)
+        review = review_content_by_title_and_idea(script, "Title", idea)
 
         # Should have estimated length
         assert review.current_length_seconds is not None
@@ -201,7 +201,7 @@ class TestAlignmentAnalysis:
         title = "The Quick Brown Fox"
         script = "The quick brown fox jumps over the lazy dog. The fox is quick and brown."
 
-        review = review_script_by_title_and_idea(script, title, idea)
+        review = review_content_by_title_and_idea(script, title, idea)
 
         # Title words are well represented
         title_score = int(review.metadata["title_alignment_score"])
@@ -214,7 +214,7 @@ class TestAlignmentAnalysis:
         title = "Advanced Quantum Mechanics"
         script = "The cat sat on the mat. It was a sunny day."
 
-        review = review_script_by_title_and_idea(script, title, idea)
+        review = review_content_by_title_and_idea(script, title, idea)
 
         # Title words not well represented
         title_score = int(review.metadata["title_alignment_score"])
@@ -229,14 +229,14 @@ class TestAlignmentAnalysis:
             genre=ContentGenre.SCIENCE_FICTION,
         )
 
-        # Script that reflects the concept
+        # Content that reflects the concept
         script = """
         I can see the future. It started yesterday when I knew exactly what my friend
         would say before he said it. Now I can see events before they happen. I see
         the future unfolding like a movie in my mind.
         """
 
-        review = review_script_by_title_and_idea(script, "The Future Seer", idea)
+        review = review_content_by_title_and_idea(script, "The Future Seer", idea)
 
         # Should have good idea alignment
         idea_score = int(review.metadata["idea_alignment_score"])
@@ -246,14 +246,14 @@ class TestAlignmentAnalysis:
         """Test idea alignment considers genre indicators."""
         idea = Idea(title="Horror Story", concept="A scary tale", genre=ContentGenre.HORROR)
 
-        # Script with horror elements
+        # Content with horror elements
         script = """
         The darkness closed in around me. Fear gripped my heart as I heard the sound
         of footsteps behind me. Terror filled my mind as I realized I wasn't alone.
         The nightmare was only beginning.
         """
 
-        review = review_script_by_title_and_idea(script, "The Dark", idea)
+        review = review_content_by_title_and_idea(script, "The Dark", idea)
 
         # Should recognize horror genre
         idea_score = int(review.metadata["idea_alignment_score"])
@@ -275,7 +275,7 @@ class TestContentScoring:
         It started on a Tuesday morning...
         """
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         # Should have engagement score
         engagement = review.get_category_score(ReviewCategory.ENGAGEMENT)
@@ -286,7 +286,7 @@ class TestContentScoring:
         """Test pacing score calculation."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        # Script with good paragraph pacing
+        # Content with good paragraph pacing
         script = """
         First paragraph with moderate length content. This should be comfortable to read
         and not too long or too short. Just right for good pacing.
@@ -297,7 +297,7 @@ class TestContentScoring:
         Third paragraph concludes. Good structure and flow throughout.
         """
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         pacing = review.get_category_score(ReviewCategory.PACING)
         assert pacing is not None
@@ -307,13 +307,13 @@ class TestContentScoring:
         """Test clarity score calculation."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        # Script with clear, simple sentences
+        # Content with clear, simple sentences
         script = """
         The sun rose over the hills. Birds sang in the trees. It was a beautiful morning.
         John walked down the path. He smiled at the peaceful scene. Everything felt right.
         """
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         clarity = review.get_category_score(ReviewCategory.CLARITY)
         assert clarity is not None
@@ -323,14 +323,14 @@ class TestContentScoring:
         """Test impact scoring with emotional content."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        # Script with emotional words
+        # Content with emotional words
         script = """
         Fear gripped her heart as she realized the truth. The pain of discovery was
         overwhelming. But hope remained - a tiny spark that refused to die. Love
         would conquer all, she realized. Terror gave way to joy.
         """
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         impact = review.get_category_score(ReviewCategory.IMPACT)
         assert impact is not None
@@ -351,7 +351,7 @@ class TestImprovementGeneration:
         # Very short, misaligned script
         script = "The cat sat on the mat."
 
-        review = review_script_by_title_and_idea(script, "Understanding Quantum", idea)
+        review = review_content_by_title_and_idea(script, "Understanding Quantum", idea)
 
         # Should have improvement points
         assert len(review.improvement_points) > 0
@@ -366,7 +366,7 @@ class TestImprovementGeneration:
 
         script = "Short test."
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         # All improvements should have impact scores
         for improvement in review.improvement_points:
@@ -379,7 +379,7 @@ class TestImprovementGeneration:
 
         script = "Minimal content."
 
-        review = review_script_by_title_and_idea(script, "Test", idea)
+        review = review_content_by_title_and_idea(script, "Test", idea)
 
         if len(review.improvement_points) > 1:
             # Verify descending order
@@ -395,7 +395,7 @@ class TestImprovementGeneration:
 
         script = "Very minimal test script content here."
 
-        review = review_script_by_title_and_idea(script, "Different Title", idea)
+        review = review_content_by_title_and_idea(script, "Different Title", idea)
 
         # Should have some quick wins if there are improvements
         if len(review.improvement_points) > 0:
@@ -411,7 +411,7 @@ class TestTargetLengthDetermination:
             title="Test", concept="Test", genre=ContentGenre.OTHER, length_target="60 seconds video"
         )
 
-        review = review_script_by_title_and_idea("Test", "Test", idea)
+        review = review_content_by_title_and_idea("Test", "Test", idea)
 
         assert review.target_length in [
             ContentLength.YOUTUBE_SHORT,
@@ -422,7 +422,7 @@ class TestTargetLengthDetermination:
         """Test YouTube short detection from target_length_seconds."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        review = review_script_by_title_and_idea("Test", "Test", idea, target_length_seconds=55)
+        review = review_content_by_title_and_idea("Test", "Test", idea, target_length_seconds=55)
 
         assert review.target_length == ContentLength.YOUTUBE_SHORT
         assert review.is_youtube_short is True
@@ -431,7 +431,7 @@ class TestTargetLengthDetermination:
         """Test short form detection for longer content."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        review = review_script_by_title_and_idea("Test", "Test", idea, target_length_seconds=240)
+        review = review_content_by_title_and_idea("Test", "Test", idea, target_length_seconds=240)
 
         assert review.target_length == ContentLength.SHORT_FORM
 
@@ -444,7 +444,7 @@ class TestTargetLengthDetermination:
             target_platforms=["tiktok", "instagram"],
         )
 
-        review = review_script_by_title_and_idea("Test", "Test", idea)
+        review = review_content_by_title_and_idea("Test", "Test", idea)
 
         assert review.target_length == ContentLength.YOUTUBE_SHORT
 
@@ -458,7 +458,7 @@ class TestMetadataAndTracking:
             title="Test Idea", concept="Test concept", genre=ContentGenre.EDUCATIONAL, version=2
         )
 
-        review = review_script_by_title_and_idea(
+        review = review_content_by_title_and_idea(
             "Test script content with educational information", "Educational Test", idea
         )
 
@@ -492,7 +492,7 @@ class TestMetadataAndTracking:
         multiple scenarios and edge cases.
         """
 
-        review = review_script_by_title_and_idea(script, "System Test", idea)
+        review = review_content_by_title_and_idea(script, "System Test", idea)
 
         # Should have some strengths identified
         assert len(review.strengths) >= 0
@@ -506,7 +506,7 @@ class TestMetadataAndTracking:
         # Very short, misaligned script
         script = "Hello world."
 
-        review = review_script_by_title_and_idea(script, "Expert Guide", idea)
+        review = review_content_by_title_and_idea(script, "Expert Guide", idea)
 
         # Should identify a primary concern
         assert review.primary_concern != ""
@@ -516,24 +516,24 @@ class TestMetadataAndTracking:
 class TestEdgeCases:
     """Test edge cases and error handling."""
 
-    def test_handles_empty_script(self):
+    def test_handles_empty_content(self):
         """Test handling of empty script."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
-        review = review_script_by_title_and_idea("", "Test", idea)
+        review = review_content_by_title_and_idea("", "Test", idea)
 
         # Should complete without error
         assert isinstance(review, ScriptReview)
         assert review.overall_score < 60  # Should score poorly for empty script
 
-    def test_handles_very_long_script(self):
+    def test_handles_very_long_content(self):
         """Test handling of very long script."""
         idea = Idea(title="Test", concept="Test", genre=ContentGenre.OTHER)
 
         # Create a very long script
-        long_script = " ".join(["word"] * 10000)
+        long_content = " ".join(["word"] * 10000)
 
-        review = review_script_by_title_and_idea(long_script, "Test", idea)
+        review = review_content_by_title_and_idea(long_content, "Test", idea)
 
         # Should complete without error
         assert isinstance(review, ScriptReview)
@@ -543,7 +543,7 @@ class TestEdgeCases:
         """Test handling of idea with minimal information."""
         idea = Idea(title="Minimal", concept="Test")
 
-        review = review_script_by_title_and_idea("Some script content", "Title", idea)
+        review = review_content_by_title_and_idea("Some script content", "Title", idea)
 
         # Should complete without error
         assert isinstance(review, ScriptReview)
@@ -553,9 +553,9 @@ class TestEdgeCases:
         """Test handling of special characters."""
         idea = Idea(title="Test!@#", concept="Special chars: $%^&*()", genre=ContentGenre.OTHER)
 
-        script = "Script with special characters: !@#$%^&*()_+-={}[]|\\:;\"'<>,.?/"
+        script = "Content with special characters: !@#$%^&*()_+-={}[]|\\:;\"'<>,.?/"
 
-        review = review_script_by_title_and_idea(script, "Title!@#", idea)
+        review = review_content_by_title_and_idea(script, "Title!@#", idea)
 
         # Should complete without error
         assert isinstance(review, ScriptReview)

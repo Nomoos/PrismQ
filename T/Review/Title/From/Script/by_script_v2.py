@@ -12,7 +12,7 @@ The v2 reviewer provides:
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Title v2 + Script v2 + v1 Review → ByScript v2 Review → TitleReview Feedback → Title v3
+    Title v2 + Content v2 + v1 Review → ByScript v2 Review → TitleReview Feedback → Title v3
 """
 
 import os
@@ -23,14 +23,14 @@ from typing import Any, Dict, List, Optional
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from T.Review.Title.From.Script.Idea.by_script_and_idea import (
+from T.Review.Title.From.Content.Idea.by_content_and_idea import (
     AlignmentAnalysis,
     analyze_engagement,
     analyze_seo,
-    analyze_title_script_alignment,
+    analyze_title_content_alignment,
     extract_keywords,
 )
-from T.Review.Title.From.Script.Idea.title_review import (
+from T.Review.Title.From.Content.Idea.title_review import (
     TitleCategoryScore,
     TitleImprovementPoint,
     TitleReview,
@@ -204,11 +204,11 @@ def _generate_seo_feedback(delta: int) -> str:
         return "SEO optimization significantly worse"
 
 
-def review_title_by_script_v2(
+def review_title_by_content_v2(
     title_text: str,
-    script_text: str,
+    content_text: str,
     title_id: Optional[str] = None,
-    script_id: Optional[str] = None,
+    content_id: Optional[str] = None,
     script_summary: Optional[str] = None,
     title_version: str = "v2",
     script_version: str = "v2",
@@ -228,9 +228,9 @@ def review_title_by_script_v2(
 
     Args:
         title_text: The title text to review (v2)
-        script_text: The script text (v2)
+        content_text: The script text (v2)
         title_id: Optional identifier for the title
-        script_id: Optional identifier for the script
+        content_id: Optional identifier for the script
         script_summary: Optional summary of script content
         title_version: Version of title being reviewed (default "v2")
         script_version: Version of script being reviewed (default "v2")
@@ -241,14 +241,14 @@ def review_title_by_script_v2(
         TitleReview object with scores, feedback, and improvement comparisons
 
     Example:
-        >>> v1_review = review_title_by_script_and_idea(
+        >>> v1_review = review_title_by_content_and_idea(
         ...     title_text="The Echo",
-        ...     script_text="A horror short...",
+        ...     content_text="A horror short...",
         ...     idea_summary="Horror story"
         ... )
-        >>> v2_review = review_title_by_script_v2(
+        >>> v2_review = review_title_by_content_v2(
         ...     title_text="The Echo - A Haunting Discovery",
-        ...     script_text="Enhanced horror short...",
+        ...     content_text="Enhanced horror short...",
         ...     previous_review=v1_review
         ... )
         >>> print(v2_review.overall_score)  # Compare with v1
@@ -258,23 +258,23 @@ def review_title_by_script_v2(
     # Generate IDs if not provided
     if title_id is None:
         title_id = f"title-{uuid.uuid4().hex[:8]}"
-    if script_id is None:
-        script_id = f"script-{uuid.uuid4().hex[:8]}"
+    if content_id is None:
+        content_id = f"script-{uuid.uuid4().hex[:8]}"
 
     # Auto-generate script summary if not provided
-    if script_summary is None and script_text:
-        script_summary = script_text[:200] + "..." if len(script_text) > 200 else script_text
+    if script_summary is None and content_text:
+        script_summary = content_text[:200] + "..." if len(content_text) > 200 else content_text
 
     # Analyze title-script alignment
-    script_alignment = analyze_title_script_alignment(
-        title_text=title_text, script_text=script_text, script_summary=script_summary
+    script_alignment = analyze_title_content_alignment(
+        title_text=title_text, content_text=content_text, script_summary=script_summary
     )
 
     # Analyze engagement
     engagement_data = analyze_engagement(title_text)
 
     # Analyze SEO
-    script_keywords = extract_keywords(script_text, max_keywords=20)
+    script_keywords = extract_keywords(content_text, max_keywords=20)
     seo_data = analyze_seo(title_text, script_keywords)
 
     # Calculate overall score (script alignment is primary for v2)
@@ -394,13 +394,13 @@ def review_title_by_script_v2(
         overall_score=overall_score,
         category_scores=category_scores,
         improvement_points=improvement_points,
-        # Script Context
-        script_id=script_id,
+        # Content Context
+        content_id=content_id,
         script_title="",  # Not needed for v2 (focuses on alignment only)
         script_summary=script_summary or "",
         script_version=script_version,
         script_alignment_score=script_alignment.score,
-        key_script_elements=script_alignment.key_elements,
+        key_content_elements=script_alignment.key_elements,
         # Idea Context - Not used in v2 review (focuses on script only)
         idea_id="",
         idea_summary="",
@@ -430,7 +430,7 @@ def review_title_by_script_v2(
         improvement_trajectory=improvement_trajectory,
         # Additional Context
         strengths=[
-            f"Script alignment: {script_alignment.score}%",
+            f"Content alignment: {script_alignment.score}%",
             f"Engagement: {engagement_data['engagement_score']}%",
         ],
         primary_concern=(

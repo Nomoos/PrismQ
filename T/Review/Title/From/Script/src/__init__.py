@@ -1,9 +1,9 @@
-"""Review Title From Script src module.
+"""Review Title From Content src module.
 
-Provides the service for processing stories in the PrismQ.T.Review.Title.From.Script state.
+Provides the service for processing stories in the PrismQ.T.Review.Title.From.Content state.
 """
 
-from .review_title_from_script_service import (
+from .review_title_from_content_service import (
     TITLE_ACCEPTANCE_THRESHOLD,
     ReviewRepository,
     ReviewTitleFromScriptResult,

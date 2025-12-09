@@ -1,4 +1,4 @@
-"""PrismQ.T.Script.Formatter - Script formatting modules.
+"""PrismQ.T.Content.Formatter - Content formatting modules.
 
 This package provides various formatters to transform scripts into
 platform-specific formats.

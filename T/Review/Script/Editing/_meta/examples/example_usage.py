@@ -1,4 +1,4 @@
-"""Example usage of Script Editing Review (MVP-018).
+"""Example usage of Content Editing Review (MVP-018).
 
 This example demonstrates how to use the Editing Review module to validate
 script clarity, flow, and conciseness.
@@ -16,17 +16,17 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[6]
 sys.path.insert(0, str(project_root))
 
-from T.Review.Script.Editing import (
+from T.Review.Content.Editing import (
     get_editing_feedback,
-    review_script_editing,
-    review_script_editing_to_json,
+    review_content_editing,
+    review_content_editing_to_json,
 )
 
 
-def example_1_well_edited_script():
+def example_1_well_edited_content():
     """Example 1: Well-edited script that passes."""
     print("=" * 60)
-    print("EXAMPLE 1: Well-Edited Script")
+    print("EXAMPLE 1: Well-Edited Content")
     print("=" * 60)
 
     script = """INT. COFFEE SHOP - DAY
@@ -47,7 +47,7 @@ The ambient noise creates a cozy atmosphere."""
     print(script)
     print("\n" + "-" * 60)
 
-    review = review_script_editing(script, script_id="example-001", script_version="v3")
+    review = review_content_editing(script, content_id="example-001", script_version="v3")
 
     print(f"\nOverall Score: {review.overall_score}/100")
     print(f"Passes: {'✅ YES' if review.passes else '❌ NO'}")
@@ -55,15 +55,15 @@ The ambient noise creates a cozy atmosphere."""
     print(f"\nSummary: {review.summary}")
 
     if review.passes:
-        print("\n✅ Script is ready for Stage 19 (Title Readability)")
+        print("\n✅ Content is ready for Stage 19 (Title Readability)")
     else:
-        print("\n❌ Script needs revision - return to Stage 11 (Script Refinement)")
+        print("\n❌ Content needs revision - return to Stage 11 (Content Refinement)")
 
 
-def example_2_wordy_script():
+def example_2_wordy_content():
     """Example 2: Wordy script with editing issues."""
     print("\n\n" + "=" * 60)
-    print("EXAMPLE 2: Wordy Script (Needs Editing)")
+    print("EXAMPLE 2: Wordy Content (Needs Editing)")
     print("=" * 60)
 
     script = """In order to complete the mission, the team needs to proceed carefully.
@@ -75,7 +75,7 @@ The hero makes a decision to fight the villain in spite of the danger."""
     print(script)
     print("\n" + "-" * 60)
 
-    review = review_script_editing(script, script_id="example-002", script_version="v3")
+    review = review_content_editing(script, content_id="example-002", script_version="v3")
 
     print(f"\nOverall Score: {review.overall_score}/100")
     print(f"Passes: {'✅ YES' if review.passes else '❌ NO'}")
@@ -98,10 +98,10 @@ The hero makes a decision to fight the villain in spite of the danger."""
             print(f"   • {fix}")
 
 
-def example_3_redundant_script():
-    """Example 3: Script with redundancy issues."""
+def example_3_redundant_content():
+    """Example 3: Content with redundancy issues."""
     print("\n\n" + "=" * 60)
-    print("EXAMPLE 3: Redundant Script")
+    print("EXAMPLE 3: Redundant Content")
     print("=" * 60)
 
     script = """This opportunity is very unique and special.
@@ -113,7 +113,7 @@ The final outcome was exactly the exact same as predicted."""
     print(script)
     print("\n" + "-" * 60)
 
-    review = review_script_editing(script, script_id="example-003", script_version="v3")
+    review = review_content_editing(script, content_id="example-003", script_version="v3")
 
     print(f"\nOverall Score: {review.overall_score}/100")
     print(f"Passes: {'✅ YES' if review.passes else '❌ NO'}")
@@ -140,7 +140,7 @@ def example_4_json_output():
     print(script)
     print("\n" + "-" * 60)
 
-    json_output = review_script_editing_to_json(script, script_id="example-004")
+    json_output = review_content_editing_to_json(script, content_id="example-004")
 
     print("\n📄 JSON Output:")
     print(json_output[:500] + "...")
@@ -165,11 +165,11 @@ The decision was made made by the team at this point in time."""
     print(script)
     print("\n" + "-" * 60)
 
-    review = review_script_editing(script, script_id="example-005")
+    review = review_content_editing(script, content_id="example-005")
     feedback = get_editing_feedback(review)
 
     print(f"\n📊 Feedback Summary:")
-    print(f"   Script ID: {feedback['script_id']}")
+    print(f"   Content ID: {feedback['content_id']}")
     print(f"   Score: {feedback['overall_score']}/100")
     print(f"   Passes: {feedback['passes']}")
     print(f"   Total Issues: {feedback['total_issues']}")
@@ -200,10 +200,10 @@ def example_6_custom_threshold():
     print("\n" + "-" * 60)
 
     # Strict threshold (95)
-    review_strict = review_script_editing(script, script_id="strict", pass_threshold=95)
+    review_strict = review_content_editing(script, content_id="strict", pass_threshold=95)
 
     # Lenient threshold (70)
-    review_lenient = review_script_editing(script, script_id="lenient", pass_threshold=70)
+    review_lenient = review_content_editing(script, content_id="lenient", pass_threshold=70)
 
     print(f"\n📊 With Strict Threshold (95):")
     print(f"   Score: {review_strict.overall_score}/100")
@@ -224,9 +224,9 @@ if __name__ == "__main__":
     print("Stage 18: Editing Review - Clarity, Flow, and Conciseness")
     print("=" * 60)
 
-    example_1_well_edited_script()
-    example_2_wordy_script()
-    example_3_redundant_script()
+    example_1_well_edited_content()
+    example_2_wordy_content()
+    example_3_redundant_content()
     example_4_json_output()
     example_5_feedback_for_refinement()
     example_6_custom_threshold()

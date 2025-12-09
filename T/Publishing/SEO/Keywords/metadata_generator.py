@@ -5,7 +5,7 @@ title tags, and structured data for published content.
 
 Workflow Position:
     Stage: SEO Optimization (POST-001)
-    Input: Title + Script + Keywords → Generate Metadata → Output: SEO metadata
+    Input: Title + Content + Keywords → Generate Metadata → Output: SEO metadata
 """
 
 import re

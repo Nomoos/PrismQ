@@ -1,4 +1,4 @@
-"""Instagram caption formatter for PrismQ.T.Script.Formatter.Social.
+"""Instagram caption formatter for PrismQ.T.Content.Formatter.Social.
 
 This module transforms scripts into Instagram caption format with preview
 optimization, line breaks, and hashtag management.
@@ -45,7 +45,7 @@ class InstagramFormatter(BaseSocialFormatter):
         """Format script into Instagram caption.
 
         Args:
-            script: Script content to format
+            script: Content content to format
             content_id: Unique identifier for content
             add_hashtags: Whether to add hashtags
             num_hashtags: Number of hashtags (10-20 recommended)
@@ -127,7 +127,7 @@ class InstagramFormatter(BaseSocialFormatter):
         """Create engaging preview for first 125 characters.
 
         Args:
-            script: Script content
+            script: Content content
             add_emojis: Whether to add emoji
 
         Returns:
@@ -155,7 +155,7 @@ class InstagramFormatter(BaseSocialFormatter):
         """Format main content with Instagram line breaks.
 
         Args:
-            script: Script content
+            script: Content content
 
         Returns:
             Formatted content
@@ -181,7 +181,7 @@ class InstagramFormatter(BaseSocialFormatter):
         """Extract key message for Instagram.
 
         Args:
-            script: Script content
+            script: Content content
 
         Returns:
             Key message
@@ -245,7 +245,7 @@ class InstagramFormatter(BaseSocialFormatter):
         """Extract Instagram-optimized hashtags.
 
         Args:
-            script: Script content
+            script: Content content
             num_hashtags: Target number of hashtags
 
         Returns:
@@ -384,7 +384,7 @@ def format_instagram_caption(
     """Convenience function to format script as Instagram caption.
 
     Args:
-        script: Script content to format
+        script: Content content to format
         content_id: Unique identifier for content
         add_hashtags: Whether to add hashtags
         num_hashtags: Number of hashtags (10-20)

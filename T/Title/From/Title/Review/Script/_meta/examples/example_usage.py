@@ -17,8 +17,8 @@ sys.path.insert(
     0, str(project_root / "T" / "Title" / "FromOriginalTitleAndReviewAndScript" / "src")
 )
 sys.path.insert(0, str(project_root / "T" / "Review" / "Title" / "ByScriptAndIdea"))
-sys.path.insert(0, str(project_root / "T" / "Review" / "Script" / "ByTitle"))
-sys.path.insert(0, str(project_root / "T" / "Review" / "Script"))
+sys.path.insert(0, str(project_root / "T" / "Review" / "Content" / "ByTitle"))
+sys.path.insert(0, str(project_root / "T" / "Review" / "Content"))
 sys.path.insert(0, str(project_root / "T" / "Idea" / "Model" / "src"))
 
 from script_review import ContentLength, ImprovementPoint, ReviewCategory, ScriptReview
@@ -44,7 +44,7 @@ def example_complete_workflow():
     print(f"Title: '{title_v1}'")
 
     # -------------------------------------------------------------------------
-    # Stage 3: Script v1 (from Idea + Title)
+    # Stage 3: Content v1 (from Idea + Title)
     # -------------------------------------------------------------------------
     script_v1 = """
     In the abandoned Victorian house on Elm Street, strange echoes fill the air.
@@ -75,10 +75,10 @@ def example_complete_workflow():
         script_alignment_score=68,
         idea_alignment_score=75,
         engagement_score=70,
-        script_id="script-001",
+        content_id="script-001",
         script_title=title_v1,
         script_summary="Horror mystery about echoes revealing secrets",
-        key_script_elements=["Victorian", "secrets", "trapped souls", "curse", "mystery"],
+        key_content_elements=["Victorian", "secrets", "trapped souls", "curse", "mystery"],
         suggested_keywords=["Victorian", "curse", "souls"],
         current_length_chars=len(title_v1),
         optimal_length_chars=60,
@@ -90,7 +90,7 @@ def example_complete_workflow():
         TitleImprovementPoint(
             category=TitleReviewCategory.SCRIPT_ALIGNMENT,
             title="Missing Victorian era element",
-            description="Script emphasizes Victorian house but title doesn't reflect this setting",
+            description="Content emphasizes Victorian house but title doesn't reflect this setting",
             priority="high",
             impact_score=85,
             suggested_fix="Incorporate 'Victorian' or time period reference",
@@ -98,7 +98,7 @@ def example_complete_workflow():
         TitleImprovementPoint(
             category=TitleReviewCategory.ENGAGEMENT,
             title="Missing danger/stakes element",
-            description="Script has strong danger element (curse, trapped souls) not in title",
+            description="Content has strong danger element (curse, trapped souls) not in title",
             priority="high",
             impact_score=80,
             suggested_fix="Add element of danger or threat",
@@ -115,19 +115,19 @@ def example_complete_workflow():
 
     print("\n🔍 TITLE REVIEW (Stage 4: MVP-004)")
     print(f"Overall Score: {title_review.overall_score}%")
-    print(f"Script Alignment: {title_review.script_alignment_score}%")
+    print(f"Content Alignment: {title_review.script_alignment_score}%")
     print(f"Engagement: {title_review.engagement_score}%")
-    print(f"\nKey Script Elements: {', '.join(title_review.key_script_elements)}")
+    print(f"\nKey Content Elements: {', '.join(title_review.key_content_elements)}")
     print(f"\nImprovement Points ({len(title_review.improvement_points)}):")
     for i, point in enumerate(title_review.improvement_points, 1):
         print(f"  {i}. [{point.priority.upper()}] {point.title}")
         print(f"     {point.description}")
 
     # -------------------------------------------------------------------------
-    # Stage 5: Script Review (MVP-005)
+    # Stage 5: Content Review (MVP-005)
     # -------------------------------------------------------------------------
     script_review = ScriptReview(
-        script_id="script-001",
+        content_id="script-001",
         script_title=title_v1,
         overall_score=76,
         target_audience="Horror enthusiasts aged 18-35",
@@ -181,7 +181,7 @@ def example_complete_workflow():
     # Generate improved title
     result = improve_title_from_reviews(
         original_title=title_v1,
-        script_text=script_v1,
+        content_text=script_v1,
         title_review=title_review,
         script_review=script_review,
         idea=idea,
@@ -220,7 +220,7 @@ def example_complete_workflow():
 
     print("\n" + "=" * 80)
     print("✓ Title v2 generated successfully!")
-    print("Next Step: Stage 7 - Generate Script v2 (MVP-007)")
+    print("Next Step: Stage 7 - Generate Content v2 (MVP-007)")
     print("=" * 80)
 
     return result
@@ -266,8 +266,8 @@ def example_iteration_v2_to_v3():
         script_alignment_score=85,
         idea_alignment_score=84,
         engagement_score=80,
-        script_id="script-001",
-        key_script_elements=["curse", "Victorian", "souls", "warning"],
+        content_id="script-001",
+        key_content_elements=["curse", "Victorian", "souls", "warning"],
         current_length_chars=len(title_v2),
         optimal_length_chars=60,
     )
@@ -277,24 +277,24 @@ def example_iteration_v2_to_v3():
         TitleImprovementPoint(
             category=TitleReviewCategory.ENGAGEMENT,
             title="Could emphasize the danger/warning aspect",
-            description="Script shows souls are warning, could be in title",
+            description="Content shows souls are warning, could be in title",
             priority="medium",
             impact_score=70,
             suggested_fix="Consider 'Warning' or 'Curse' emphasis",
         )
     ]
 
-    script_review_v2 = ScriptReview(script_id="script-001", script_title=title_v2, overall_score=85)
+    script_review_v2 = ScriptReview(content_id="script-001", script_title=title_v2, overall_score=85)
 
     print(f"\n🔍 REVIEWS (v2)")
     print(f"Title Score: {title_review_v2.overall_score}%")
-    print(f"Script Score: {script_review_v2.overall_score}%")
+    print(f"Content Score: {script_review_v2.overall_score}%")
     print(f"Status: Good alignment, minor refinement suggested")
 
     # Generate v3
     result = improve_title_from_reviews(
         original_title=title_v2,
-        script_text=script_v2,
+        content_text=script_v2,
         title_review=title_review_v2,
         script_review=script_review_v2,
         original_version="v2",
@@ -316,7 +316,7 @@ if __name__ == "__main__":
     # Run examples
     print("\n" + "=" * 80)
     print("MVP-006: TITLE IMPROVEMENTS v2 - EXAMPLES")
-    print("Module: PrismQ.T.Title.From.Title.Review.Script")
+    print("Module: PrismQ.T.Title.From.Title.Review.Content")
     print("=" * 80)
 
     # Example 1: v1 → v2
@@ -334,14 +334,14 @@ This module implements MVP-006: Title Improvements v2
 
 Key Features:
 ✓ Generates improved title versions based on dual review feedback
-✓ Uses feedback from both Title Review (MVP-004) and Script Review (MVP-005)
+✓ Uses feedback from both Title Review (MVP-004) and Content Review (MVP-005)
 ✓ Maintains engagement while improving alignment
 ✓ Tracks version history and changes
 ✓ Provides detailed rationale for improvements
 ✓ Addresses specific improvement points from reviews
 
 Workflow Position:
-  Title v1 + Script v1 + Reviews → [THIS MODULE] → Title v2 → Next stages
+  Title v1 + Content v1 + Reviews → [THIS MODULE] → Title v2 → Next stages
 
 The module is ready for use in Stage 6 of the MVP workflow!
 """

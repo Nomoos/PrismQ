@@ -96,7 +96,7 @@ class TestStoryTitleService:
             assert title.version == 0
             assert len(title.text) > 0
 
-    def test_stories_in_script_from_idea_title_state(self):
+    def test_stories_in_content_from_idea_title_state(self):
         """Test that all stories are transitioned to SCRIPT_FROM_IDEA_TITLE state."""
         idea = Idea(
             title="Blockchain Technology",

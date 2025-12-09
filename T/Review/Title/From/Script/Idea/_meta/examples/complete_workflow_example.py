@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root))
 from T.Review.Title.ByScriptAndIdea import (
     TitleReview,
     TitleReviewCategory,
-    review_title_by_script_and_idea,
+    review_title_by_content_and_idea,
 )
 
 
@@ -52,14 +52,14 @@ def example_complete_workflow():
 
     # Perform AI review
     print("\n[AI REVIEWER ANALYZING TITLE...]")
-    review = review_title_by_script_and_idea(
+    review = review_title_by_content_and_idea(
         title_text=title,
-        script_text=script,
+        content_text=script,
         idea_summary=idea_summary,
         idea_intent=idea_intent,
         target_audience=target_audience,
         title_id="title-horror-001",
-        script_id="script-horror-001",
+        content_id="script-horror-001",
         idea_id="idea-horror-001",
     )
 
@@ -86,8 +86,8 @@ def example_complete_workflow():
     print(f"Average Alignment: {alignment_summary['average_alignment']}%")
     print(f"Needs Improvement: {'Yes' if alignment_summary['needs_improvement'] else 'No'}")
 
-    if review.key_script_elements:
-        print(f"\nKey Script Elements: {', '.join(review.key_script_elements[:5])}")
+    if review.key_content_elements:
+        print(f"\nKey Content Elements: {', '.join(review.key_content_elements[:5])}")
 
     # Engagement Metrics
     print("\n" + "=" * 80)
@@ -181,9 +181,9 @@ def example_json_output():
     print("=" * 80)
 
     # Perform review
-    review = review_title_by_script_and_idea(
+    review = review_title_by_content_and_idea(
         title_text="The Echo",
-        script_text="A mysterious echo haunts an abandoned house, revealing dark secrets.",
+        content_text="A mysterious echo haunts an abandoned house, revealing dark secrets.",
         idea_summary="Horror story about echoes revealing secrets",
     )
 
@@ -228,13 +228,13 @@ def example_comparison():
 
     results = []
     for title in titles:
-        review = review_title_by_script_and_idea(
-            title_text=title, script_text=script, idea_summary=idea
+        review = review_title_by_content_and_idea(
+            title_text=title, content_text=script, idea_summary=idea
         )
         results.append((title, review))
 
     # Display comparison
-    print(f"{'Title':<40} {'Overall':<8} {'Script':<8} {'Idea':<8} {'Engage':<8}")
+    print(f"{'Title':<40} {'Overall':<8} {'Content':<8} {'Idea':<8} {'Engage':<8}")
     print("-" * 80)
 
     for title, review in results:
@@ -265,8 +265,8 @@ def example_iterative_improvement():
     # Iteration 1
     print("\n[Iteration 1: Initial Title]")
     title_v1 = "A House Story"
-    review_v1 = review_title_by_script_and_idea(
-        title_text=title_v1, script_text=script, idea_summary=idea
+    review_v1 = review_title_by_content_and_idea(
+        title_text=title_v1, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v1}'")
     print(f"Score: {review_v1.overall_score}%")
@@ -275,8 +275,8 @@ def example_iterative_improvement():
     # Iteration 2 (hypothetical improvement based on feedback)
     print("\n[Iteration 2: After Improvements]")
     title_v2 = "The Echo Mystery"
-    review_v2 = review_title_by_script_and_idea(
-        title_text=title_v2, script_text=script, idea_summary=idea
+    review_v2 = review_title_by_content_and_idea(
+        title_text=title_v2, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v2}'")
     print(f"Score: {review_v2.overall_score}%")
@@ -285,8 +285,8 @@ def example_iterative_improvement():
     # Iteration 3
     print("\n[Iteration 3: Further Refinement]")
     title_v3 = "The Echoing Secrets: Mystery in the Abandoned House"
-    review_v3 = review_title_by_script_and_idea(
-        title_text=title_v3, script_text=script, idea_summary=idea
+    review_v3 = review_title_by_content_and_idea(
+        title_text=title_v3, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v3}'")
     print(f"Score: {review_v3.overall_score}%")

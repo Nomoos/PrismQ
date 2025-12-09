@@ -34,7 +34,7 @@ class TestTitleReviewBasic:
         assert review.overall_score == 75
         assert review.category_scores == []
         assert review.improvement_points == []
-        assert review.script_id == ""
+        assert review.content_id == ""
         assert review.script_alignment_score == 0
         assert review.idea_id == ""
         assert review.idea_alignment_score == 0
@@ -64,12 +64,12 @@ class TestTitleReviewBasic:
             title_text="The Echo - A Haunting Discovery",
             title_version="v1",
             overall_score=78,
-            script_id="script-001",
+            content_id="script-001",
             script_title="The Echo",
             script_summary="A horror short about mysterious echoes",
             script_version="v1",
             script_alignment_score=85,
-            key_script_elements=["echo", "haunting", "discovery", "mystery"],
+            key_content_elements=["echo", "haunting", "discovery", "mystery"],
             idea_id="idea-001",
             idea_summary="Horror story about sounds that repeat",
             idea_intent="Create suspense through auditory elements",
@@ -88,7 +88,7 @@ class TestTitleReviewBasic:
         assert review.title_id == "title-001"
         assert review.title_text == "The Echo - A Haunting Discovery"
         assert review.overall_score == 78
-        assert review.script_id == "script-001"
+        assert review.content_id == "script-001"
         assert review.script_alignment_score == 85
         assert review.idea_id == "idea-001"
         assert review.idea_alignment_score == 82
@@ -97,8 +97,8 @@ class TestTitleReviewBasic:
         assert review.curiosity_score == 80
         assert review.expectation_accuracy == 76
         assert review.seo_score == 68
-        assert len(review.key_script_elements) == 4
-        assert "echo" in review.key_script_elements
+        assert len(review.key_content_elements) == 4
+        assert "echo" in review.key_content_elements
 
 
 class TestTitleCategoryScore:
@@ -370,7 +370,7 @@ class TestTitleReviewSerialization:
             "title_text": "The Echo",
             "title_version": "v1",
             "overall_score": 75,
-            "script_id": "script-001",
+            "content_id": "script-001",
             "script_alignment_score": 80,
             "idea_id": "idea-001",
             "idea_alignment_score": 85,
@@ -412,7 +412,7 @@ class TestTitleReviewSerialization:
             title_id="title-001",
             title_text="The Echo - A Haunting Discovery",
             overall_score=78,
-            script_id="script-001",
+            content_id="script-001",
             script_alignment_score=85,
             idea_id="idea-001",
             idea_alignment_score=82,

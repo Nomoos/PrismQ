@@ -1,4 +1,4 @@
-"""Test configuration for Review.Script.ByTitle tests.
+"""Test configuration for Review.Content.ByTitle tests.
 
 Sets up sys.path to enable importing from T.Idea.Model.src
 """

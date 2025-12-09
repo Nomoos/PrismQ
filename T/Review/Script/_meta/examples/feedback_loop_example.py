@@ -1,7 +1,7 @@
-"""Example: Complete AI Script Review and Writer Feedback Loop
+"""Example: Complete AI Content Review and Writer Feedback Loop
 
-This example demonstrates the complete feedback loop between AI Script Reviewer
-and AI Script Writer for optimizing content for YouTube shorts.
+This example demonstrates the complete feedback loop between AI Content Reviewer
+and AI Content Writer for optimizing content for YouTube shorts.
 
 Workflow:
 1. AI Reviewer evaluates original script
@@ -15,17 +15,17 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
-from T.Review.Script import (
+from T.Review.Content import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
     ReviewCategory,
     ScriptReview,
 )
-from T.Script import OptimizationStrategy, ScriptWriter
+from T.Content import OptimizationStrategy, ScriptWriter
 
 
-def create_mock_review(script_text: str, iteration: int) -> ScriptReview:
+def create_mock_review(content_text: str, iteration: int) -> ScriptReview:
     """Create a mock review (simulates AI Reviewer evaluation).
 
     In production, this would be replaced with actual AI model.
@@ -35,7 +35,7 @@ def create_mock_review(script_text: str, iteration: int) -> ScriptReview:
     score = min(100, base_score + (iteration * 10))
 
     review = ScriptReview(
-        script_id=f"script-youtube-short-{iteration}",
+        content_id=f"script-youtube-short-{iteration}",
         script_title="The Echo - Horror Short",
         overall_score=score,
         target_audience="Horror enthusiasts aged 18-35",
@@ -171,7 +171,7 @@ def example_complete_feedback_loop():
     print("=" * 80)
 
     # Original script
-    original_script = """
+    original_content = """
     A girl wakes up at 3 AM to a voice calling her name. 
     
     The voice sounds exactly like her own. She investigates her apartment,
@@ -191,7 +191,7 @@ def example_complete_feedback_loop():
 
     print(f"\n📝 ORIGINAL SCRIPT:")
     print(f"Length: 145 seconds (target: 90 seconds for YouTube short)")
-    print(f"Content: {original_script[:100]}...")
+    print(f"Content: {original_content[:100]}...")
 
     # Initialize writer
     writer = ScriptWriter(
@@ -201,7 +201,7 @@ def example_complete_feedback_loop():
         optimization_strategy=OptimizationStrategy.YOUTUBE_SHORT,
     )
 
-    current_script = original_script
+    current_content = original_content
 
     # Feedback loop
     print("\n" + "=" * 80)
@@ -217,7 +217,7 @@ def example_complete_feedback_loop():
 
         # 1. AI REVIEWER evaluates
         print(f"\n🔍 AI REVIEWER: Evaluating script...")
-        review = create_mock_review(current_script, iteration)
+        review = create_mock_review(current_content, iteration)
 
         print(f"\n   Overall Score: {review.overall_score}%")
         print(
@@ -254,7 +254,7 @@ def example_complete_feedback_loop():
         # 2. AI WRITER optimizes
         print(f"\n✍️  AI WRITER: Optimizing based on feedback...")
         result = writer.optimize_from_review(
-            original_script=current_script,
+            original_content=current_content,
             review=review,
             target_audience="Horror enthusiasts aged 18-35",
         )
@@ -273,7 +273,7 @@ def example_complete_feedback_loop():
         )
 
         # Update current script (in production, this would be the actual optimized text)
-        current_script = result.optimized_text
+        current_content = result.optimized_text
 
         # Check if should continue
         if not writer.should_continue_iteration():

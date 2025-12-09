@@ -1,7 +1,7 @@
 """Review model for PrismQ content feedback.
 
 Simple review content model without relationship tracking.
-Title/Script reference Review directly via FK.
+Title/Content reference Review directly via FK.
 Story references Review via StoryReview linking table.
 """
 
@@ -21,7 +21,7 @@ class Review:
         created_at: Timestamp of creation
 
     Note:
-        - Title/Script have direct FK to Review (1:1 per version)
+        - Title/Content have direct FK to Review (1:1 per version)
         - Story uses StoryReview linking table (many reviews per story)
 
     Example:

@@ -1,4 +1,4 @@
-"""PrismQ.T.Review.Script.Consistency.src - Service module for consistency review.
+"""PrismQ.T.Review.Content.Consistency.src - Service module for consistency review.
 
 This module provides services for processing consistency reviews:
 - ScriptConsistencyReviewService: Main service class
@@ -6,7 +6,7 @@ This module provides services for processing consistency reviews:
 - process_all_consistency_reviews: Process all pending stories
 """
 
-from T.Review.Script.Consistency.src.script_consistency_review_service import (
+from T.Review.Content.Consistency.src.script_consistency_review_service import (
     DEFAULT_PASS_THRESHOLD,
     STATE_REVIEW_SCRIPT_CONSISTENCY,
     STATE_REVIEW_SCRIPT_CONTENT,

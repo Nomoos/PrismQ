@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Interactive Script Generation CLI for PrismQ.
+"""Interactive Content Generation CLI for PrismQ.
 
 This script provides an interactive mode for generating scripts from ideas and titles.
 It waits for user input, processes it through the script generator, and
@@ -23,12 +23,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Setup paths - Now in T/Script/From/Idea/Title/src/
+# Setup paths - Now in T/Content/From/Idea/Title/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
-SCRIPT_FROM_TITLE_ROOT = SCRIPT_DIR.parent  # T/Script/From/Idea/Title
-SCRIPT_FROM_IDEA_ROOT = SCRIPT_FROM_TITLE_ROOT.parent  # T/Script/From/Idea
-SCRIPT_FROM_ROOT = SCRIPT_FROM_IDEA_ROOT.parent  # T/Script/From
-SCRIPT_ROOT = SCRIPT_FROM_ROOT.parent  # T/Script
+SCRIPT_FROM_TITLE_ROOT = SCRIPT_DIR.parent  # T/Content/From/Idea/Title
+SCRIPT_FROM_IDEA_ROOT = SCRIPT_FROM_TITLE_ROOT.parent  # T/Content/From/Idea
+SCRIPT_FROM_ROOT = SCRIPT_FROM_IDEA_ROOT.parent  # T/Content/From
+SCRIPT_ROOT = SCRIPT_FROM_ROOT.parent  # T/Content
 T_ROOT = SCRIPT_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
@@ -64,7 +64,7 @@ except ImportError:
 
 # Try to import database
 try:
-    from Model.Database.repositories.script_repository import ScriptRepository
+    from Model.Database.repositories.content_repository import ContentRepository
 
     DB_AVAILABLE = True
 except ImportError:
@@ -253,17 +253,17 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 logging.StreamHandler() if debug else logging.NullHandler(),
             ],
         )
-        logger = logging.getLogger("PrismQ.Script.From.Idea.Title")
+        logger = logging.getLogger("PrismQ.Content.From.Idea.Title")
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
     # Print header
     mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
-    print_header(f"PrismQ Script From Idea+Title - {mode_text}")
+    print_header(f"PrismQ Content From Idea+Title - {mode_text}")
 
     # Check module availability
     if not SCRIPT_GENERATOR_AVAILABLE:
-        print_error(f"Script generator module not available: {IMPORT_ERROR}")
+        print_error(f"Content generator module not available: {IMPORT_ERROR}")
         if logger:
             logger.error(f"Module import failed: {IMPORT_ERROR}")
         return 1
@@ -272,9 +272,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print_error("Idea model not available")
         return 1
 
-    print_success("Script generator module loaded")
+    print_success("Content generator module loaded")
     if logger:
-        logger.info("Script generator module loaded successfully")
+        logger.info("Content generator module loaded successfully")
 
     if preview:
         print_warning("Preview mode - scripts will NOT be saved to database")
@@ -287,7 +287,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             preview = True
 
     # Show available options
-    print_section("Script Generation Options")
+    print_section("Content Generation Options")
     print("  Structure: hook_deliver_cta, three_act, problem_solution, story")
     print("  Tone: engaging, mysterious, educational, dramatic, conversational")
     print("  Platform: youtube_short, youtube_medium, youtube_long, tiktok, instagram_reel")
@@ -334,7 +334,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             continue
 
         print(f"  Idea Title: {Colors.BOLD}{idea.title}{Colors.END}")
-        print(f"  Script Title: {Colors.BOLD}{title}{Colors.END}")
+        print(f"  Content Title: {Colors.BOLD}{title}{Colors.END}")
         if idea.concept:
             concept_preview = (
                 idea.concept[:100] + "..." if len(idea.concept) > 100 else idea.concept
@@ -343,7 +343,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print(f"  Genre: {idea.genre.value if hasattr(idea.genre, 'value') else idea.genre}")
 
         # Generate script
-        print_section("Generating Script")
+        print_section("Generating Content")
 
         try:
             config = ScriptGeneratorConfig(
@@ -358,21 +358,21 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             if logger:
                 logger.info("Generating script")
 
-            script = generator.generate_script_v1(idea, title)
+            script = generator.generate_content_v1(idea, title)
 
         except Exception as e:
             print_error(f"Error generating script: {e}")
             if logger:
-                logger.exception("Script generation failed")
+                logger.exception("Content generation failed")
             continue
 
         # Display results
-        print_section(f"Generated Script")
+        print_section(f"Generated Content")
 
         print(f"\n{Colors.GREEN}{'─' * 60}{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}  Script: {script.title}{Colors.END}")
+        print(f"{Colors.GREEN}{Colors.BOLD}  Content: {script.title}{Colors.END}")
         print(f"{Colors.GREEN}{'─' * 60}{Colors.END}")
-        print(f"  ID: {script.script_id}")
+        print(f"  ID: {script.content_id}")
         print(f"  Structure: {script.structure_type.value}")
         print(f"  Platform: {script.platform_target.value}")
         print(f"  Duration: {script.total_duration_seconds}s")
@@ -390,9 +390,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             print(f"    Content: {content_preview}")
 
         if logger:
-            logger.info(f"Script generated: {script.script_id}")
+            logger.info(f"Content generated: {script.content_id}")
             logger.debug(
-                f"Script data: {json.dumps(script.to_dict(), indent=2, ensure_ascii=False)}"
+                f"Content data: {json.dumps(script.to_dict(), indent=2, ensure_ascii=False)}"
             )
 
         # Save to database (if not preview mode)
@@ -415,7 +415,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     logger.info("User skipped database save")
         elif preview:
             print_section("Preview Mode - No Database Save")
-            print_info("Script created - NOT saved to database")
+            print_info("Content created - NOT saved to database")
             if logger:
                 logger.info("Preview mode: script created but not saved")
 
@@ -434,7 +434,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             input(f"\n{Colors.CYAN}Show full script text? (y/n) [n]: {Colors.END}").strip().lower()
         )
         if full_text_choice == "y":
-            print_section("Full Script Text")
+            print_section("Full Content Text")
             print(script.full_text)
 
         print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
@@ -446,7 +446,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Interactive Script Generation from Idea+Title for PrismQ",
+        description="Interactive Content Generation from Idea+Title for PrismQ",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

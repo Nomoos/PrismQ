@@ -1,6 +1,6 @@
 """Review script v1 against title v1 and idea.
 
-This module implements MVP-005: Script review that evaluates how well
+This module implements MVP-005: Content review that evaluates how well
 a script aligns with its title and the core idea it's based on.
 
 The reviewer provides:
@@ -10,14 +10,14 @@ The reviewer provides:
 - Actionable improvement recommendations
 
 Workflow Position:
-    Idea + Title v1 → Script v1 → ByTitleAndIdea Review → Feedback/Approval
+    Idea + Title v1 → Content v1 → ByTitleAndIdea Review → Feedback/Approval
 """
 
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from T.Review.Script.script_review import (
+from T.Review.Content.script_review import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
@@ -124,11 +124,11 @@ class AlignmentScore:
     reasoning: str
 
 
-def review_script_by_title_and_idea(
-    script_text: str,
+def review_content_by_title_and_idea(
+    content_text: str,
     title: str,
     idea: Idea,
-    script_id: Optional[str] = None,
+    content_id: Optional[str] = None,
     target_length_seconds: Optional[int] = None,
     reviewer_id: str = "AI-ScriptReviewer-ByTitleAndIdea-001",
 ) -> ScriptReview:
@@ -142,10 +142,10 @@ def review_script_by_title_and_idea(
     - Specific improvement recommendations
 
     Args:
-        script_text: The script text to review
+        content_text: The script text to review
         title: The title v1 for the script
         idea: The Idea model object containing the core concept
-        script_id: Optional identifier for the script
+        content_id: Optional identifier for the script
         target_length_seconds: Optional target duration in seconds
         reviewer_id: Identifier for this reviewer
 
@@ -162,27 +162,27 @@ def review_script_by_title_and_idea(
         ... )
         >>> title = "The Voice That Knows Tomorrow"
         >>> script = "Last night I heard a whisper..."
-        >>> review = review_script_by_title_and_idea(script, title, idea)
+        >>> review = review_content_by_title_and_idea(script, title, idea)
         >>> print(f"Overall score: {review.overall_score}%")
     """
     # Generate script ID if not provided
-    if script_id is None:
-        script_id = f"script-{idea.title.lower().replace(' ', '-')}-v1"
+    if content_id is None:
+        content_id = f"script-{idea.title.lower().replace(' ', '-')}-v1"
 
     # Analyze title-script alignment
-    title_alignment = _analyze_title_alignment(script_text, title)
+    title_alignment = _analyze_title_alignment(content_text, title)
 
     # Analyze idea-script alignment
-    idea_alignment = _analyze_idea_alignment(script_text, idea)
+    idea_alignment = _analyze_idea_alignment(content_text, idea)
 
     # Calculate content quality scores
-    content_scores = _calculate_content_scores(script_text, title, idea)
+    content_scores = _calculate_content_scores(content_text, title, idea)
 
     # Determine target length category
     target_length = _determine_target_length(idea, target_length_seconds)
 
     # Estimate script length
-    current_length = _estimate_script_length(script_text)
+    current_length = _estimate_content_length(content_text)
 
     # Calculate overall score
     overall_score = _calculate_overall_score(
@@ -202,7 +202,7 @@ def review_script_by_title_and_idea(
 
     # Create and return ScriptReview
     review = ScriptReview(
-        script_id=script_id,
+        content_id=content_id,
         script_title=title,
         overall_score=overall_score,
         category_scores=category_scores,
@@ -231,11 +231,11 @@ def review_script_by_title_and_idea(
     return review
 
 
-def _analyze_title_alignment(script_text: str, title: str) -> AlignmentScore:
+def _analyze_title_alignment(content_text: str, title: str) -> AlignmentScore:
     """Analyze how well the script aligns with the title.
 
     Args:
-        script_text: The script text
+        content_text: The script text
         title: The title
 
     Returns:
@@ -249,7 +249,7 @@ def _analyze_title_alignment(script_text: str, title: str) -> AlignmentScore:
     # Filter out stopwords
     title_words = title_words - COMMON_STOPWORDS
 
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
 
     # Check for title word presence in script with word boundaries
     if title_words:
@@ -273,14 +273,14 @@ def _analyze_title_alignment(script_text: str, title: str) -> AlignmentScore:
         score = 45
 
     # Check script length appropriateness for title
-    if len(script_text) < 100:
-        mismatches.append("Script too short to fully develop title concept")
+    if len(content_text) < 100:
+        mismatches.append("Content too short to fully develop title concept")
         score = max(40, score - 10)
-    elif len(script_text) > 10000:
-        mismatches.append("Script may be too long for the title concept")
+    elif len(content_text) > 10000:
+        mismatches.append("Content may be too long for the title concept")
         score = max(50, score - 5)
     else:
-        matches.append("Script length appropriate for title")
+        matches.append("Content length appropriate for title")
 
     reasoning = (
         f"Title-script alignment: {score}%. "
@@ -290,11 +290,11 @@ def _analyze_title_alignment(script_text: str, title: str) -> AlignmentScore:
     return AlignmentScore(score=score, matches=matches, mismatches=mismatches, reasoning=reasoning)
 
 
-def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
+def _analyze_idea_alignment(content_text: str, idea: Idea) -> AlignmentScore:
     """Analyze how well the script aligns with the core idea.
 
     Args:
-        script_text: The script text
+        content_text: The script text
         idea: The Idea model
 
     Returns:
@@ -304,7 +304,7 @@ def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
     mismatches = []
     score = 70  # Start with baseline
 
-    script_lower = script_text.lower()
+    script_lower = content_text.lower()
 
     # Check concept alignment
     if idea.concept:
@@ -360,10 +360,10 @@ def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
         )
 
         if has_indicators:
-            matches.append(f"Script tone matches {idea.genre.value} genre")
+            matches.append(f"Content tone matches {idea.genre.value} genre")
             score += 5
         else:
-            mismatches.append(f"Script may not match {idea.genre.value} genre expectations")
+            mismatches.append(f"Content may not match {idea.genre.value} genre expectations")
             score -= 5
 
     # Ensure score is in valid range
@@ -371,17 +371,17 @@ def _analyze_idea_alignment(script_text: str, idea: Idea) -> AlignmentScore:
 
     reasoning = (
         f"Idea-script alignment: {score}%. "
-        f"Script {'well' if score >= 70 else 'somewhat'} reflects the core idea."
+        f"Content {'well' if score >= 70 else 'somewhat'} reflects the core idea."
     )
 
     return AlignmentScore(score=score, matches=matches, mismatches=mismatches, reasoning=reasoning)
 
 
-def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[str, int]:
+def _calculate_content_scores(content_text: str, title: str, idea: Idea) -> Dict[str, int]:
     """Calculate content quality scores across categories.
 
     Args:
-        script_text: The script text
+        content_text: The script text
         title: The title
         idea: The Idea model
 
@@ -392,7 +392,7 @@ def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[
 
     # ENGAGEMENT score
     # Check for strong opening
-    opening = script_text[:200] if len(script_text) >= 200 else script_text
+    opening = content_text[:200] if len(content_text) >= 200 else content_text
     has_strong_opening = any(
         indicator in opening.lower()
         for indicator in ["imagine", "what if", "last night", "suddenly", "?", "!"]
@@ -402,7 +402,7 @@ def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[
 
     # PACING score
     # Estimate based on paragraph structure
-    paragraphs = [p.strip() for p in script_text.split("\n\n") if p.strip()]
+    paragraphs = [p.strip() for p in content_text.split("\n\n") if p.strip()]
     avg_para_length = sum(len(p) for p in paragraphs) / len(paragraphs) if paragraphs else 0
 
     if 100 <= avg_para_length <= 500:
@@ -415,8 +415,8 @@ def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[
 
     # CLARITY score
     # Estimate based on sentence structure
-    sentences = script_text.count(".") + script_text.count("!") + script_text.count("?")
-    words = len(script_text.split())
+    sentences = content_text.count(".") + content_text.count("!") + content_text.count("?")
+    words = len(content_text.split())
     avg_words_per_sentence = words / sentences if sentences > 0 else 0
 
     if 10 <= avg_words_per_sentence <= 25:
@@ -430,7 +430,7 @@ def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[
     # STRUCTURE score
     # Check for basic story structure
     has_beginning = len(opening) >= 100
-    has_ending = len(script_text) >= 200
+    has_ending = len(content_text) >= 200
     has_paragraphs = len(paragraphs) >= 3
 
     structure_score = 60
@@ -447,7 +447,7 @@ def _calculate_content_scores(script_text: str, title: str, idea: Idea) -> Dict[
     emotion_count = sum(
         1
         for word in EMOTIONAL_WORDS
-        if re.search(r"\b" + re.escape(word) + r"\b", script_text.lower())
+        if re.search(r"\b" + re.escape(word) + r"\b", content_text.lower())
     )
 
     impact_score = 60 + min(20, emotion_count * 3)
@@ -491,18 +491,18 @@ def _determine_target_length(idea: Idea, target_length_seconds: Optional[int]) -
     return ContentLength.SHORT_FORM
 
 
-def _estimate_script_length(script_text: str) -> int:
+def _estimate_content_length(content_text: str) -> int:
     """Estimate script duration in seconds.
 
     Uses average speaking rate defined in WORDS_PER_SECOND_SPEAKING constant.
 
     Args:
-        script_text: The script text
+        content_text: The script text
 
     Returns:
         Estimated duration in seconds
     """
-    words = len(script_text.split())
+    words = len(content_text.split())
     seconds = int(words / WORDS_PER_SECOND_SPEAKING)
     return seconds
 
@@ -725,9 +725,9 @@ def _identify_primary_concern(
     min_score = all_scores[min_category]
 
     if min_category == "title_alignment":
-        return "Script doesn't strongly reflect the title"
+        return "Content doesn't strongly reflect the title"
     elif min_category == "idea_alignment":
-        return "Script doesn't clearly develop the core idea"
+        return "Content doesn't clearly develop the core idea"
     else:
         return f"Content {min_category} needs improvement"
 

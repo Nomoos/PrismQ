@@ -169,11 +169,11 @@ class TestMetaDescriptionGeneration:
         generator = MetadataGenerator()
 
         short_title = "Python Tutorial"
-        short_script = "Learn Python programming basics. Python is easy to learn and powerful."
+        short_content = "Learn Python programming basics. Python is easy to learn and powerful."
 
         metadata = generator.generate_metadata(
             title=short_title,
-            script=short_script,
+            script=short_content,
             primary_keywords=sample_keywords["primary"],
             secondary_keywords=sample_keywords["secondary"],
             keyword_density=sample_keywords["density"],

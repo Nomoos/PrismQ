@@ -1,6 +1,6 @@
-"""Script Readability Review - AI-powered voiceover readability validation for scripts.
+"""Content Readability Review - AI-powered voiceover readability validation for scripts.
 
-This module implements PrismQ.T.Review.Script.Readability for Stage 20 (MVP-020).
+This module implements PrismQ.T.Review.Content.Readability for Stage 20 (MVP-020).
 Provides comprehensive readability checking for voiceover suitability including
 natural flow, pronunciation, pacing, and spoken-word clarity.
 
@@ -9,8 +9,8 @@ pass before proceeding to Expert Review (Stage 21/MVP-021). If it fails, the scr
 returns to refinement with detailed feedback focused on spoken-word delivery.
 
 Workflow Position:
-    Stage 20 (MVP-020): Script Readability Review
-    Script v3+ → Readability Review → [PASS: Stage 21] or [FAIL: Script Refinement]
+    Stage 20 (MVP-020): Content Readability Review
+    Content v3+ → Readability Review → [PASS: Stage 21] or [FAIL: Content Refinement]
 """
 
 import re
@@ -72,7 +72,7 @@ class ReadabilityReview:
     returns to refinement (Stage 11) with voiceover-focused feedback.
 
     Attributes:
-        script_id: Identifier of the reviewed script
+        content_id: Identifier of the reviewed script
         script_version: Version of script being reviewed (v3, v4, etc.)
         overall_score: Overall readability score (0-100)
         pass_threshold: Minimum score required to pass (default 85)
@@ -104,7 +104,7 @@ class ReadabilityReview:
 
     Example:
         >>> review = ReadabilityReview(
-        ...     script_id="script-001",
+        ...     content_id="script-001",
         ...     script_version="v3",
         ...     overall_score=90
         ... )
@@ -119,10 +119,10 @@ class ReadabilityReview:
         >>> if review.passes:
         ...     print("Ready for Stage 21: Expert Review")
         ... else:
-        ...     print("Return to Stage 11: Script Refinement")
+        ...     print("Return to Stage 11: Content Refinement")
     """
 
-    script_id: str
+    content_id: str
     script_version: str = "v3"
     overall_score: int = 0  # 0-100
     pass_threshold: int = 85  # Minimum score to pass
@@ -278,7 +278,7 @@ class ReadabilityReview:
             )
 
         return cls(
-            script_id=data["script_id"],
+            content_id=data["content_id"],
             script_version=data.get("script_version", "v3"),
             overall_score=data.get("overall_score", 0),
             pass_threshold=data.get("pass_threshold", 85),
@@ -305,7 +305,7 @@ class ReadabilityReview:
     def __repr__(self) -> str:
         """String representation of ReadabilityReview."""
         return (
-            f"ReadabilityReview(script={self.script_id}, "
+            f"ReadabilityReview(script={self.content_id}, "
             f"version={self.script_version}, "
             f"score={self.overall_score}%, "
             f"passes={'YES' if self.passes else 'NO'}, "
@@ -378,25 +378,25 @@ class ScriptReadabilityChecker:
         """
         self.pass_threshold = pass_threshold
 
-    def review_script(
-        self, script_text: str, script_id: str = "script-001", script_version: str = "v3"
+    def review_content(
+        self, content_text: str, content_id: str = "script-001", script_version: str = "v3"
     ) -> ReadabilityReview:
         """Review a script for voiceover readability.
 
         Args:
-            script_text: The script text to review
-            script_id: Identifier for the script
+            content_text: The script text to review
+            content_id: Identifier for the script
             script_version: Version of the script (v3, v4, etc.)
 
         Returns:
             ReadabilityReview object with all detected issues
         """
         review = ReadabilityReview(
-            script_id=script_id, script_version=script_version, pass_threshold=self.pass_threshold
+            content_id=content_id, script_version=script_version, pass_threshold=self.pass_threshold
         )
 
         # Split script into lines for line-by-line analysis
-        lines = script_text.split("\n")
+        lines = content_text.split("\n")
 
         # Check each line
         for line_num, line in enumerate(lines, start=1):
@@ -622,15 +622,15 @@ class ScriptReadabilityChecker:
         total_issues = len(review.issues)
 
         if total_issues == 0:
-            review.summary = "Excellent! Script is perfectly suited for voiceover. Natural flow, easy pronunciation, and good pacing throughout."
+            review.summary = "Excellent! Content is perfectly suited for voiceover. Natural flow, easy pronunciation, and good pacing throughout."
             review.passes = True
             return
 
         # Generate summary
         if review.passes:
-            review.summary = f"Script passes readability review with {total_issues} minor issue(s) detected. Ready for voiceover with minimal adjustments."
+            review.summary = f"Content passes readability review with {total_issues} minor issue(s) detected. Ready for voiceover with minimal adjustments."
         else:
-            review.summary = f"Script requires revision for voiceover suitability. {total_issues} readability issue(s) detected, including {review.critical_count} critical issue(s)."
+            review.summary = f"Content requires revision for voiceover suitability. {total_issues} readability issue(s) detected, including {review.critical_count} critical issue(s)."
 
         # Identify primary concerns
         if review.critical_count > 0:
@@ -671,17 +671,17 @@ class ScriptReadabilityChecker:
             review.voiceover_notes.append(f"{twister_count} tongue twister(s) detected")
 
 
-def review_script_readability(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_readability(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> ReadabilityReview:
     """Convenience function to review script readability for voiceover.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -690,27 +690,27 @@ def review_script_readability(
 
     Example:
         >>> script = "Peter Piper picked a peck of particularly problematic peppers."
-        >>> review = review_script_readability(script)
+        >>> review = review_content_readability(script)
         >>> print(f"Score: {review.overall_score}")
         >>> print(f"Passes: {review.passes}")
         >>> for issue in review.issues:
         ...     print(f"Line {issue.line_number}: {issue.explanation}")
     """
     checker = ScriptReadabilityChecker(pass_threshold=pass_threshold)
-    return checker.review_script(script_text, script_id, script_version)
+    return checker.review_content(content_text, content_id, script_version)
 
 
-def review_script_readability_to_json(
-    script_text: str,
-    script_id: str = "script-001",
+def review_content_readability_to_json(
+    content_text: str,
+    content_id: str = "script-001",
     script_version: str = "v3",
     pass_threshold: int = 85,
 ) -> str:
     """Review script readability and return results as JSON string.
 
     Args:
-        script_text: The script text to review
-        script_id: Identifier for the script
+        content_text: The script text to review
+        content_id: Identifier for the script
         script_version: Version of the script
         pass_threshold: Minimum score required to pass
 
@@ -719,7 +719,7 @@ def review_script_readability_to_json(
 
     Example:
         >>> script = "The phenomenon of phosphorescence perplexed physicists."
-        >>> json_result = review_script_readability_to_json(script)
+        >>> json_result = review_content_readability_to_json(script)
         >>> import json
         >>> result = json.loads(json_result)
         >>> print(result['overall_score'])
@@ -727,7 +727,7 @@ def review_script_readability_to_json(
     """
     import json
 
-    review = review_script_readability(script_text, script_id, script_version, pass_threshold)
+    review = review_content_readability(content_text, content_id, script_version, pass_threshold)
     return json.dumps(review.to_dict(), indent=2)
 
 
@@ -741,15 +741,15 @@ def get_readability_feedback(review: ReadabilityReview) -> Dict[str, Any]:
         Dictionary with structured feedback for script writers
 
     Example:
-        >>> review = review_script_readability(script_text)
+        >>> review = review_content_readability(content_text)
         >>> feedback = get_readability_feedback(review)
         >>> if not feedback['passes']:
-        ...     print("Script needs voiceover revision:")
+        ...     print("Content needs voiceover revision:")
         ...     for issue in feedback['critical_issues']:
         ...         print(f"  Line {issue['line']}: {issue['explanation']}")
     """
     return {
-        "script_id": review.script_id,
+        "content_id": review.content_id,
         "script_version": review.script_version,
         "passes": review.passes,
         "overall_score": review.overall_score,
@@ -785,14 +785,14 @@ def get_readability_feedback(review: ReadabilityReview) -> Dict[str, Any]:
         "next_action": (
             "Proceed to Stage 21 (Expert Review)"
             if review.passes
-            else "Return to Script Refinement (Stage 11)"
+            else "Return to Content Refinement (Stage 11)"
         ),
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    test_script = """Peter Piper picked a peck of particularly problematic peppers from the phosphorescent patch.
+    test_content = """Peter Piper picked a peck of particularly problematic peppers from the phosphorescent patch.
 The phenomenon of phosphorescence perplexed physicists persistently pursuing explanations.
 This is a very long sentence that goes on and on without any natural pauses or breathing points making it extremely difficult for a voiceover artist to deliver smoothly and naturally.
 Subsequently, the methodology employed in the implementation of the aforementioned functionality was unequivocally quintessential.
@@ -800,12 +800,12 @@ Short line here.
 She sells seashells by the seashore, specifically selecting superior specimens.
 The strengths of the sixth method remained unclear."""
 
-    print("=== Script Readability Review for Voiceover ===\n")
-    print("Script:")
-    print(test_script)
+    print("=== Content Readability Review for Voiceover ===\n")
+    print("Content:")
+    print(test_content)
     print("\n" + "=" * 50 + "\n")
 
-    review = review_script_readability(test_script, script_id="test-001", script_version="v3")
+    review = review_content_readability(test_content, content_id="test-001", script_version="v3")
 
     print(f"Overall Score: {review.overall_score}/100")
     print(f"Pronunciation Score: {review.pronunciation_score}/100")
@@ -834,5 +834,5 @@ The strengths of the sixth method remained unclear."""
 
     print("\n" + "=" * 50)
     print("\nJSON Output (first 800 chars):")
-    json_output = review_script_readability_to_json(test_script, script_id="test-001")
+    json_output = review_content_readability_to_json(test_content, content_id="test-001")
     print(json_output[:800] + "...")

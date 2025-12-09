@@ -3,7 +3,7 @@
 AI-powered title evaluation against script content and idea intent.
 """
 
-from .by_script_and_idea import AlignmentAnalysis, review_title_by_script_and_idea
+from .by_content_and_idea import AlignmentAnalysis, review_title_by_content_and_idea
 from .title_review import (
     TitleCategoryScore,
     TitleImprovementPoint,
@@ -16,6 +16,6 @@ __all__ = [
     "TitleReviewCategory",
     "TitleImprovementPoint",
     "TitleCategoryScore",
-    "review_title_by_script_and_idea",
+    "review_title_by_content_and_idea",
     "AlignmentAnalysis",
 ]

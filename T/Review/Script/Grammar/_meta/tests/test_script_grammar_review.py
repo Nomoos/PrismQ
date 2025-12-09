@@ -1,4 +1,4 @@
-"""Comprehensive tests for Script Grammar Review (MVP-014).
+"""Comprehensive tests for Content Grammar Review (MVP-014).
 
 Tests the grammar review functionality including:
 - Grammatically correct scripts (should PASS)
@@ -18,29 +18,29 @@ sys.path.insert(0, str(project_root))
 
 import pytest
 
-from T.Review.Script.Grammar import (
+from T.Review.Content.Grammar import (
     GrammarIssue,
     GrammarIssueType,
     GrammarReview,
     GrammarSeverity,
     ScriptGrammarChecker,
     get_grammar_feedback,
-    review_script_grammar,
-    review_script_grammar_to_json,
+    review_content_grammar,
+    review_content_grammar_to_json,
 )
 
 
 class TestGrammaticallyCorrectScripts:
     """Test that grammatically correct scripts PASS the review."""
 
-    def test_perfect_script_passes(self):
+    def test_perfect_content_passes(self):
         """Test that a grammatically correct script passes."""
         script = """The sun rises over the distant mountains.
 Birds sing their morning songs.
 A gentle breeze flows through the trees.
 Nature awakens to a new day."""
 
-        review = review_script_grammar(script, script_id="perfect-001")
+        review = review_content_grammar(script, content_id="perfect-001")
 
         assert review.passes is True
         assert review.overall_score >= 85
@@ -48,7 +48,7 @@ Nature awakens to a new day."""
         assert review.critical_count == 0
         assert "Excellent" in review.summary or "passes" in review.summary.lower()
 
-    def test_dialogue_script_passes(self):
+    def test_dialogue_content_passes(self):
         """Test that well-formatted dialogue script passes."""
         script = """INT. COFFEE SHOP - DAY
 
@@ -64,13 +64,13 @@ No worries. I just got here myself.
 They sit down and begin their conversation.
 The ambient noise creates a cozy atmosphere."""
 
-        review = review_script_grammar(script, script_id="dialogue-001")
+        review = review_content_grammar(script, content_id="dialogue-001")
 
         # Should pass with minimal or no issues
         assert review.overall_score >= 75
         # Dialogue formatting might trigger some minor flags, but should generally pass
 
-    def test_action_script_passes(self):
+    def test_action_content_passes(self):
         """Test that action-heavy script with proper grammar passes."""
         script = """The hero stands at the edge of the cliff.
 Below, the ocean crashes against jagged rocks.
@@ -78,7 +78,7 @@ Thunder rumbles in the distance.
 Rain begins to fall.
 The hero takes a deep breath and prepares to jump."""
 
-        review = review_script_grammar(script, script_id="action-001")
+        review = review_content_grammar(script, content_id="action-001")
 
         assert review.passes is True
         assert review.overall_score >= 85
@@ -94,7 +94,7 @@ class TestGrammaticallyIncorrectScripts:
 The occassion was special.
 We definately need to meet again."""
 
-        review = review_script_grammar(script, script_id="spelling-001")
+        review = review_content_grammar(script, content_id="spelling-001")
 
         # Should detect spelling errors
         spelling_issues = review.get_issues_by_type(GrammarIssueType.SPELLING)
@@ -117,7 +117,7 @@ He were angry.
 They was confused.
 She are tired."""
 
-        review = review_script_grammar(script, script_id="agreement-001")
+        review = review_content_grammar(script, content_id="agreement-001")
 
         # Should fail due to critical grammar errors
         assert review.passes is False
@@ -145,7 +145,7 @@ She are tired."""
 birds were singing.
 everything seemed perfect."""
 
-        review = review_script_grammar(script, script_id="caps-001")
+        review = review_content_grammar(script, content_id="caps-001")
 
         # Should detect capitalization issues
         cap_issues = review.get_issues_by_type(GrammarIssueType.CAPITALIZATION)
@@ -163,7 +163,7 @@ everything seemed perfect."""
 He carefully examined everything that was in there
 The silence was deafening and everything was quiet"""
 
-        review = review_script_grammar(script, script_id="punct-001")
+        review = review_content_grammar(script, content_id="punct-001")
 
         # Should detect missing punctuation (longer sentences trigger the check)
         punct_issues = review.get_issues_by_type(GrammarIssueType.PUNCTUATION)
@@ -180,7 +180,7 @@ He were very excited about the news.
 The meeting occured yesterday
 We was all happy."""
 
-        review = review_script_grammar(script, script_id="multi-001")
+        review = review_content_grammar(script, content_id="multi-001")
 
         # Should fail due to multiple errors
         assert review.passes is False
@@ -194,13 +194,13 @@ We was all happy."""
 
     def test_score_decreases_with_errors(self):
         """Test that score decreases as errors increase."""
-        good_script = "The hero walks into the sunset."
-        review_good = review_script_grammar(good_script, script_id="good-001")
+        good_content = "The hero walks into the sunset."
+        review_good = review_content_grammar(good_content, content_id="good-001")
 
-        bad_script = """i recieved a message.
+        bad_content = """i recieved a message.
 He were happy.
 They was excited."""
-        review_bad = review_script_grammar(bad_script, script_id="bad-001")
+        review_bad = review_content_grammar(bad_content, content_id="bad-001")
 
         # Bad script should have lower score
         assert review_bad.overall_score < review_good.overall_score
@@ -224,7 +224,7 @@ I recieved an email on line 2.
 Line 3 is also correct.
 He were happy on line 4."""
 
-        review = review_script_grammar(script, script_id="line-test-001")
+        review = review_content_grammar(script, content_id="line-test-001")
 
         # Check that line numbers match
         issues = review.issues
@@ -249,7 +249,7 @@ I recieved a message on line 3.
 
 Line 5 is correct."""
 
-        review = review_script_grammar(script, script_id="empty-lines-001")
+        review = review_content_grammar(script, content_id="empty-lines-001")
 
         spelling_issues = review.get_issues_by_type(GrammarIssueType.SPELLING)
         if len(spelling_issues) > 0:
@@ -268,7 +268,7 @@ Line 5 is correct."""
                 lines.append(f"This is line {i} which is correct.")
 
         script = "\n".join(lines)
-        review = review_script_grammar(script, script_id="multiline-001")
+        review = review_content_grammar(script, content_id="multiline-001")
 
         # Check specific line numbers
         for issue in review.issues:
@@ -285,13 +285,13 @@ class TestJSONOutput:
         """Test that JSON output is valid and parseable."""
         script = "He were happy."
 
-        json_output = review_script_grammar_to_json(script, script_id="json-001")
+        json_output = review_content_grammar_to_json(script, content_id="json-001")
 
         # Should be valid JSON
         data = json.loads(json_output)
 
         # Check required fields
-        assert "script_id" in data
+        assert "content_id" in data
         assert "overall_score" in data
         assert "passes" in data
         assert "issues" in data
@@ -301,7 +301,7 @@ class TestJSONOutput:
         """Test that JSON output contains detailed issue information."""
         script = "I recieved a message. He were happy."
 
-        json_output = review_script_grammar_to_json(script, script_id="json-002")
+        json_output = review_content_grammar_to_json(script, content_id="json-002")
         data = json.loads(json_output)
 
         # Should have issues
@@ -322,15 +322,15 @@ class TestJSONOutput:
         script = "He were running. I recieved a message."
 
         # Create review and convert to JSON
-        review = review_script_grammar(script, script_id="roundtrip-001")
-        json_output = review_script_grammar_to_json(script, script_id="roundtrip-001")
+        review = review_content_grammar(script, content_id="roundtrip-001")
+        json_output = review_content_grammar_to_json(script, content_id="roundtrip-001")
         data = json.loads(json_output)
 
         # Reconstruct from JSON
         restored_review = GrammarReview.from_dict(data)
 
         # Compare key fields
-        assert restored_review.script_id == review.script_id
+        assert restored_review.content_id == review.content_id
         assert restored_review.overall_score == review.overall_score
         assert restored_review.passes == review.passes
         assert len(restored_review.issues) == len(review.issues)
@@ -341,11 +341,11 @@ class TestFeedbackGeneration:
 
     def test_feedback_contains_next_action(self):
         """Test that feedback includes next action guidance."""
-        passing_script = "The hero walks into the sunset."
-        failing_script = "He were happy. I recieved a gift."
+        passing_content = "The hero walks into the sunset."
+        failing_content = "He were happy. I recieved a gift."
 
-        review_pass = review_script_grammar(passing_script)
-        review_fail = review_script_grammar(failing_script)
+        review_pass = review_content_grammar(passing_content)
+        review_fail = review_content_grammar(failing_content)
 
         feedback_pass = get_grammar_feedback(review_pass)
         feedback_fail = get_grammar_feedback(review_fail)
@@ -365,7 +365,7 @@ class TestFeedbackGeneration:
 I recieved a message.
 The day was beautiful"""
 
-        review = review_script_grammar(script, script_id="priority-001")
+        review = review_content_grammar(script, content_id="priority-001")
         feedback = get_grammar_feedback(review)
 
         # Should have critical issues listed
@@ -382,7 +382,7 @@ The day was beautiful"""
         """Test that summary describes the issues found."""
         script = "He were happy. I recieved gifts."
 
-        review = review_script_grammar(script, script_id="summary-001")
+        review = review_content_grammar(script, content_id="summary-001")
 
         # Summary should mention issues
         assert review.summary != ""
@@ -405,11 +405,11 @@ I recieved a message."""
 
         # With high threshold, might fail
         checker_strict = ScriptGrammarChecker(pass_threshold=95)
-        review_strict = checker_strict.review_script(script, script_id="strict-001")
+        review_strict = checker_strict.review_content(script, content_id="strict-001")
 
         # With low threshold, might pass
         checker_lenient = ScriptGrammarChecker(pass_threshold=70)
-        review_lenient = checker_lenient.review_script(script, script_id="lenient-001")
+        review_lenient = checker_lenient.review_content(script, content_id="lenient-001")
 
         # Same issues but different pass/fail based on threshold
         assert len(review_strict.issues) == len(review_lenient.issues)
@@ -425,7 +425,7 @@ I recieved many gifts.
 Everything was perfect"""
 
         checker = ScriptGrammarChecker()
-        review = checker.review_script(script, script_id="alltypes-001")
+        review = checker.review_content(script, content_id="alltypes-001")
 
         # Should detect multiple error types
         error_types = {issue.issue_type for issue in review.issues}
@@ -440,28 +440,28 @@ Everything was perfect"""
 class TestEdgeCases:
     """Test edge cases and special scenarios."""
 
-    def test_empty_script(self):
+    def test_empty_content(self):
         """Test handling of empty script."""
         script = ""
 
-        review = review_script_grammar(script, script_id="empty-001")
+        review = review_content_grammar(script, content_id="empty-001")
 
         # Should pass (no errors in empty script)
         assert review.passes is True
         assert len(review.issues) == 0
         assert review.overall_score == 100
 
-    def test_single_line_script(self):
+    def test_single_line_content(self):
         """Test handling of single-line script."""
         script = "The hero saves the day."
 
-        review = review_script_grammar(script, script_id="single-001")
+        review = review_content_grammar(script, content_id="single-001")
 
         # Should pass
         assert review.passes is True
         assert review.overall_score >= 85
 
-    def test_script_with_special_formatting(self):
+    def test_content_with_special_formatting(self):
         """Test handling of scripts with special formatting."""
         script = """[Scene: The beach at sunset]
 
@@ -470,24 +470,24 @@ class TestEdgeCases:
 
 (Voiceover begins)"""
 
-        review = review_script_grammar(script, script_id="format-001")
+        review = review_content_grammar(script, content_id="format-001")
 
         # Should not flag special formatting as errors
         # Score should be reasonable
         assert review.overall_score >= 70
 
-    def test_very_long_script(self):
+    def test_very_long_content(self):
         """Test handling of very long script."""
         lines = ["This is a correct sentence."] * 100
         script = "\n".join(lines)
 
-        review = review_script_grammar(script, script_id="long-001")
+        review = review_content_grammar(script, content_id="long-001")
 
         # Should pass and handle long script
         assert review.passes is True
         assert review.overall_score >= 85
 
-    def test_script_with_numbers_and_symbols(self):
+    def test_content_with_numbers_and_symbols(self):
         """Test handling of scripts with numbers and symbols."""
         script = """Chapter 1: The Beginning
         
@@ -495,7 +495,7 @@ He woke up at 5:00 AM.
 The year was 2024.
 Everything cost $5.99."""
 
-        review = review_script_grammar(script, script_id="symbols-001")
+        review = review_content_grammar(script, content_id="symbols-001")
 
         # Should handle numbers and symbols without issues
         # May have some capitalization issues but should be reasonable
