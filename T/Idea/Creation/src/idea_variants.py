@@ -103,21 +103,47 @@ class IdeaGenerator:
             'keywords': flavor.get('keywords', []),
         }
         
-        # Generate content for each field
-        # AI will be used automatically if available via the helper methods
-        focus_field = flavor.get('focus', 'core_concept')
+        # Generate complete refined idea using idea_improvement prompt
+        # This generates 5 sentences that we'll distribute across fields
+        if not self.ai_generator:
+            raise RuntimeError(
+                "AI generator not available. Cannot generate ideas without AI. "
+                "Please ensure Ollama is installed and running."
+            )
         
-        for field_name, field_desc in default_fields.items():
-            if field_name == focus_field:
-                # Make the focus field more detailed
-                idea[field_name] = self._generate_focused_content(
-                    title, description, field_desc, flavor_name, seed
-                )
+        # Create input text
+        input_text = title
+        if description:
+            input_text = f"{title}: {description}"
+        
+        # Use idea_improvement prompt to generate complete refined idea
+        generated_idea = self.ai_generator.generate_with_custom_prompt(
+            input_text=input_text,
+            prompt_template_name="idea_improvement",
+            flavor=flavor_name,
+            use_random_flavor=False
+        )
+        
+        # Validate content
+        if not generated_idea or len(generated_idea) <= self.MIN_AI_CONTENT_LENGTH:
+            raise RuntimeError(
+                f"AI generated insufficient content. "
+                f"Generated: {len(generated_idea) if generated_idea else 0} characters, "
+                f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
+            )
+        
+        # Parse the 5-sentence output into fields
+        # Split by periods and clean up
+        sentences = [s.strip() + '.' for s in generated_idea.split('.') if s.strip()]
+        
+        # Map sentences to fields
+        field_names = list(default_fields.keys())
+        for i, field_name in enumerate(field_names):
+            if i < len(sentences):
+                idea[field_name] = sentences[i]
             else:
-                # Generate standard content
-                idea[field_name] = self._generate_field_content(
-                    title, description, field_desc, flavor_name, seed
-                )
+                # If we have fewer sentences than fields, use the last sentence
+                idea[field_name] = sentences[-1] if sentences else generated_idea
         
         # Add metadata
         idea['generated_at'] = datetime.now().isoformat()
