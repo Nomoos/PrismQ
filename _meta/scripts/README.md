@@ -2,6 +2,10 @@
 
 This directory contains scripts for the PrismQ content production workflow.
 
+## 🚀 Quick Start
+
+**New to PrismQ Scripts?** Check **[NEXT_STEPS.md](NEXT_STEPS.md)** for guidance on your current progress and what to do next in the pipeline.
+
 ## New Numbered Module Structure
 
 Each module has its own numbered directory with `Run.bat` and `Preview.bat` scripts:
