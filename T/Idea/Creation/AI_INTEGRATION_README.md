@@ -24,15 +24,17 @@ Integrated AI generation into the `idea_variants.py` module to use Ollama for ge
    - **Raises `RuntimeError` if AI is requested but Ollama is not available**
    - Removed template fallback - AI is now required
 
-2. **Custom Field Generation Prompt** (`field_generation.txt`)
-   - Created a specialized prompt for generating field-specific content
-   - Instructs AI to generate concrete, specific content (not template-like)
-   - Avoids phrases like "relates to" or "for this topic"
+2. **Idea Improvement Prompt** (`idea_improvement.txt`)
+   - Uses the user-specified prompt format with `[FLAVOR]` and `[INSERT TEXT HERE]` placeholders
+   - Generates exactly 5 sentences that express a refined, improved idea
+   - Allows "light atmospheric or descriptive language" for tone/context
+   - Remains conceptual while incorporating thematic flavor influence
+   - Output is parsed and distributed across idea fields
 
 3. **Updated Generation Methods**
-   - `_generate_focused_content()`: Requires AI, raises error if unavailable
-   - `_generate_field_content()`: Requires AI, raises error if unavailable
-   - `_try_ai_generation()`: Returns content or raises `RuntimeError`
+   - `generate_from_flavor()`: Uses `idea_improvement` prompt to generate complete 5-sentence idea
+   - Parses 5 sentences into fields: hook, core_concept, emotional_core, audience_connection, key_elements, tone_style
+   - Raises `RuntimeError` if AI unavailable or generates insufficient content
    - Added comprehensive error messages with setup instructions
 
 ### Architecture
@@ -46,7 +48,11 @@ AI Available?      Error (RuntimeError)
     ↓
 AIIdeaGenerator
     ↓
-field_generation.txt
+idea_improvement.txt (with [FLAVOR] and [INSERT TEXT HERE])
+    ↓
+5-sentence refined idea
+    ↓
+Parse into fields
     ↓
 Rich AI content
 ```
@@ -63,10 +69,28 @@ ideas = create_ideas_from_input("Acadia Night Hikers", count=10)
 
 for idea in ideas:
     print(f"Hook: {idea['hook']}")
-    # Output: Rich, narrative content like:
-    # "Sarah discovers an ancient map hidden in her grandmother's attic, 
-    #  leading to a treasure hunt through Acadia's moonlit trails."
+    # Output: First sentence from 5-sentence refined idea, e.g.:
+    # "Three friends discover the Acadia trails transform after midnight 
+    #  into pathways of bioluminescent moss and ancient whispers."
+    print(f"Core: {idea['core_concept']}")
+    # Output: Second sentence, e.g.:
+    # "The night hikes become rituals of self-discovery, where darkness 
+    #  provides cover for vulnerability and authentic connection."
 ```
+
+### Prompt Format
+
+The system uses `idea_improvement.txt` with these placeholders:
+- `[FLAVOR]` - Thematic flavor (e.g., "Mystery + Unease", "Identity + Empowerment")
+- `[INSERT TEXT HERE]` - Source idea/title to refine
+
+The prompt generates exactly 5 sentences that are parsed into fields:
+1. Hook (sentence 1)
+2. Core Concept (sentence 2)
+3. Emotional Core (sentence 3)
+4. Audience Connection (sentence 4)
+5. Key Elements (sentence 5)
+6. Tone/Style (uses last sentence if < 6 sentences)
 
 ### Without Ollama (Will Raise Error)
 
