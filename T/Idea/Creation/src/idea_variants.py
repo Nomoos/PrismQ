@@ -66,6 +66,7 @@ class IdeaGenerator:
         # Build idea dictionary
         idea = {
             'flavor_name': flavor_name,
+            'variant_name': flavor_name,  # Add for display compatibility
             'flavor_description': flavor['description'],
             'source_title': title,
             'source_description': description,
