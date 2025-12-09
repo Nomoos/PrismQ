@@ -64,6 +64,7 @@ def apply_template(template: str, **kwargs) -> str:
     
     Supports multiple placeholder formats:
     - {variable} - Standard Python format strings
+    - [VARIABLE] - Bracket notation (e.g., [FLAVOR], [INSERT TEXT HERE])
     - INSERTTEXTHERE or INSERT_TEXT_HERE - Custom placeholder formats
     
     Args:
@@ -78,6 +79,8 @@ def apply_template(template: str, **kwargs) -> str:
         'Hello World!'
         >>> apply_template("Text: INSERTTEXTHERE", input="My text")
         'Text: My text'
+        >>> apply_template("Flavor: [FLAVOR]", flavor="Mystery")
+        'Flavor: Mystery'
     """
     # First handle custom placeholder formats
     result = template
@@ -89,6 +92,20 @@ def apply_template(template: str, **kwargs) -> str:
         result = result.replace('INSERTTEXTHERE', str(input_value))
         result = result.replace('INSERT_TEXT_HERE', str(input_value))
         result = result.replace('INSERT TEXT HERE', str(input_value))
+        result = result.replace('[INSERT TEXT HERE]', str(input_value))
+    
+    # Handle [FLAVOR] and similar bracket notation
+    if 'flavor' in kwargs:
+        flavor_value = kwargs['flavor']
+        result = result.replace('[FLAVOR]', str(flavor_value))
+    
+    # Handle generic [VARIABLE] bracket notation
+    bracket_placeholders = re.findall(r'\[(\w+(?:\s+\w+)*)\]', result)
+    for placeholder in bracket_placeholders:
+        # Try to find matching key (case-insensitive)
+        key = placeholder.lower().replace(' ', '_')
+        if key in kwargs:
+            result = result.replace(f'[{placeholder}]', str(kwargs[key]))
     
     # Then apply standard Python format string substitution
     # Use a safe approach that only substitutes available keys
@@ -272,6 +289,7 @@ class AIIdeaGenerator:
         input_text: str,
         prompt_template_name: Optional[str] = None,
         prompt_template: Optional[str] = None,
+        flavor: Optional[str] = None,
         **kwargs,
     ) -> str:
         """Generate text using a custom prompt template.
@@ -283,12 +301,14 @@ class AIIdeaGenerator:
         
         The template supports multiple placeholder formats:
         - {input} or {variable} - Standard Python format strings
+        - [FLAVOR] - Thematic flavor for idea refinement
         - INSERTTEXTHERE - Custom placeholder format
         
         Args:
             input_text: The input text to process
             prompt_template_name: Name of prompt template file (without .txt)
             prompt_template: Template string directly (if not using a file)
+            flavor: Optional thematic flavor for refinement (e.g., "Mystery + Unease")
             **kwargs: Additional variables for template substitution
             
         Returns:
@@ -299,10 +319,11 @@ class AIIdeaGenerator:
             
         Examples:
             >>> gen = AIIdeaGenerator()
-            >>> # Using a template file
+            >>> # Using a template file with flavor
             >>> result = gen.generate_with_custom_prompt(
             ...     "The Vanishing Tide",
-            ...     prompt_template_name="idea_improvement"
+            ...     prompt_template_name="idea_improvement",
+            ...     flavor="Mystery + Unease"
             ... )
             >>> # Using a template string
             >>> result = gen.generate_with_custom_prompt(
@@ -327,8 +348,12 @@ class AIIdeaGenerator:
             template = prompt_template
             logger.info("Using provided prompt template string")
         
-        # Apply template with input text and any additional kwargs
+        # Apply template with input text, flavor, and any additional kwargs
         kwargs['input'] = input_text
+        if flavor:
+            kwargs['flavor'] = flavor
+            logger.info(f"Using flavor: {flavor}")
+        
         prompt = apply_template(template, **kwargs)
         
         logger.debug(f"Generated prompt: {prompt[:200]}...")

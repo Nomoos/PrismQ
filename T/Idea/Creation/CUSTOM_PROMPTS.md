@@ -2,14 +2,70 @@
 
 ## Overview
 
-PrismQ's Idea Creation module now supports flexible custom prompt templates for AI-powered idea generation. This allows you to create and use your own prompts with local AI models (via Ollama).
+PrismQ's Idea Creation module now supports flexible custom prompt templates for AI-powered idea generation with thematic flavors. This allows you to create and use your own prompts with local AI models (via Ollama), guided by 93 different thematic orientations.
 
 ## Features
 
-- **Flexible Placeholder Formats**: Supports both `{variable}` and `INSERTTEXTHERE` placeholder formats
+- **Flexible Placeholder Formats**: Supports `{variable}`, `[FLAVOR]`, and `INSERTTEXTHERE` placeholder formats
+- **Thematic Flavors**: 93 flavors derived from all variant templates to guide idea refinement
 - **Template Files**: Store reusable prompts in `_meta/prompts/` directory
 - **Inline Templates**: Use template strings directly in code
 - **Easy Integration**: Works seamlessly with existing AI generation system
+
+## Flavor System
+
+All 93 variant templates have been transformed into thematic flavors that can guide AI-powered idea refinement.
+
+### What are Flavors?
+
+Flavors are thematic orientations derived from variant templates that guide the conceptual refinement of ideas. Examples include:
+
+- **Emotional Drama + Growth** - Focus on emotional depth and character development
+- **Mystery + Unease** - Orient toward enigma, discovery, and uncertainty
+- **Psychological Tension** - Emphasize internal conflict and mental states
+- **Introspective Transformation** - Center on self-discovery and change
+- **Existential Conflict** - Explore fundamental questions of identity and meaning
+- **Romantic Tension** - Focus on attraction and connection
+- **Moral Dilemma** - Emphasize ethical choice and difficult decisions
+- ...and 86 more!
+
+### Browsing Flavors
+
+```python
+from flavors import list_flavors, list_flavor_categories, search_flavors_by_keyword
+
+# List all flavors (93 total)
+all_flavors = list_flavors()
+print(f"Total flavors: {len(all_flavors)}")
+
+# Browse by category
+categories = list_flavor_categories()
+for category, flavors in categories.items():
+    print(f"{category}: {len(flavors)} flavors")
+
+# Search by keyword
+mystery_flavors = search_flavors_by_keyword("mystery")
+emotional_flavors = search_flavors_by_keyword("emotional")
+```
+
+### Using Flavors with Templates
+
+The `idea_improvement.txt` template now supports the `[FLAVOR]` placeholder:
+
+```python
+from ai_generator import AIIdeaGenerator
+
+generator = AIIdeaGenerator()
+
+# Refine with a specific thematic flavor
+result = generator.generate_with_custom_prompt(
+    input_text="Acadia Night Hikers",
+    prompt_template_name="idea_improvement",
+    flavor="Mystery + Unease"  # Guides the conceptual orientation
+)
+```
+
+Different flavors produce different conceptual emphases while maintaining the core idea.
 
 ## Quick Start
 
