@@ -11,6 +11,7 @@ Transform minimal input (title or description) into multiple, fully-formed Ideas
 ## Key Features
 
 - **AI-Powered Generation**: Uses local LLMs (Llama 3.1 70B, Qwen 2.5, etc.) via Ollama
+- **Custom Prompt Templates**: NEW! Flexible templating system with multiple placeholder formats
 - **Default 10 Ideas**: Generates 10 high-quality ideas by default (Path 2: Manual Creation)
 - **RTX 5090 Optimized**: Configured for best models on high-end GPUs
 - **Intelligent Fallback**: Automatically falls back when AI unavailable
@@ -131,7 +132,40 @@ creator = IdeaCreator(config)
 ideas = creator.create_from_title("Creative Story Ideas")
 ```
 
-### Example 6: Fallback Mode (No AI)
+### Example 6: Custom Prompt Templates (New!)
+
+The module now supports flexible custom prompt templates for advanced AI usage:
+
+```python
+from PrismQ.T.Idea.Creation.src.ai_generator import AIIdeaGenerator
+
+# Initialize AI generator
+generator = AIIdeaGenerator()
+
+# Use a pre-made template by name
+result = generator.generate_with_custom_prompt(
+    input_text="The Vanishing Tide",
+    prompt_template_name="idea_improvement"
+)
+
+# Or use an inline template
+custom_template = """
+Task: Improve this story concept.
+
+Concept: {input}
+
+Output an enhanced version with stronger hooks and clearer themes.
+"""
+
+result = generator.generate_with_custom_prompt(
+    input_text="My story idea",
+    prompt_template=custom_template
+)
+```
+
+**See [CUSTOM_PROMPTS.md](./CUSTOM_PROMPTS.md) for complete guide**
+
+### Example 7: Fallback Mode (No AI)
 
 ```python
 # Disable AI to use placeholder generation
@@ -189,14 +223,17 @@ Each AI-generated Idea includes:
 
 ### Documentation
 - **[AI Generation Guide](./AI_GENERATION.md)** - Complete AI setup and usage
+- **[Custom Prompts Guide](./CUSTOM_PROMPTS.md)** - NEW: Flexible templating system
 - **[Local AI Setup](../Model/_meta/docs/LOCAL_AI_GENERATION.md)** - Ollama configuration
 
 ### Examples
 - **[AI Examples](../_meta/examples/ai_creation_examples.py)** - Complete code examples
+- **[Custom Prompt Examples](./_meta/examples/custom_prompt_example.py)** - NEW: Templating examples
 - **[Usage Examples](./_meta/examples/)** - Additional examples
 
 ### Tests
 - **[Test Suite](./_meta/tests/test_creation.py)** - 40 tests including AI tests
+- **[Custom Prompt Tests](./_meta/tests/test_custom_prompts.py)** - NEW: 22 templating tests
 
 ## Troubleshooting
 
