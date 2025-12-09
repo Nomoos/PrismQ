@@ -1,8 +1,17 @@
 """Title Generation module for creating title variants from Ideas.
 
+⚠️  DEPRECATED: This template-based title generation is deprecated.
+⚠️  Use ai_title_generator.AITitleGenerator instead.
+⚠️  
+⚠️  The ONLY approved way to generate titles is through AI with the
+⚠️  literary-focused prompt in ai_title_generator module.
+
 This module provides functionality to generate 3-10 compelling title variants
 from an Idea object, focusing on engagement, clarity, and SEO optimization.
 Default is 10 variants using diverse generation strategies.
+
+This module is kept for backward compatibility only and should not be used
+for new code. It will be removed in a future version.
 """
 
 import os
@@ -41,33 +50,8 @@ class TitleConfig:
     include_keywords: bool = True
 
 
-@dataclass
-class TitleVariant:
-    """Represents a single title variant.
-
-    Attributes:
-        text: The title text
-        style: Style/approach of this variant
-        length: Character length
-        keywords: Extracted keywords
-        score: Quality score (0-1)
-    """
-
-    text: str
-    style: str
-    length: int
-    keywords: List[str]
-    score: float = 0.8
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary representation."""
-        return {
-            "text": self.text,
-            "style": self.style,
-            "length": self.length,
-            "keywords": self.keywords,
-            "score": self.score,
-        }
+# Import TitleVariant from the new modular structure
+from title_variant import TitleVariant
 
 
 class TitleGenerator:
