@@ -62,10 +62,11 @@ def list_available_prompts() -> List[str]:
 def apply_template(template: str, **kwargs) -> str:
     """Apply variable substitution to a template string.
     
-    Supports multiple placeholder formats:
+    Supports standard placeholder formats:
     - {variable} - Standard Python format strings
-    - [VARIABLE] - Bracket notation (e.g., [FLAVOR], [INSERT TEXT HERE])
-    - INSERTTEXTHERE or INSERT_TEXT_HERE - Custom placeholder formats
+    - [INPUT] - Source text/idea placeholder
+    - [FLAVOR] - Thematic flavor placeholder
+    - [VARIABLE] - Generic bracket notation for other variables
     
     Args:
         template: The template string with placeholders
@@ -77,33 +78,30 @@ def apply_template(template: str, **kwargs) -> str:
     Examples:
         >>> apply_template("Hello {name}!", name="World")
         'Hello World!'
-        >>> apply_template("Text: INSERTTEXTHERE", input="My text")
+        >>> apply_template("Text: [INPUT]", input="My text")
         'Text: My text'
         >>> apply_template("Flavor: [FLAVOR]", flavor="Mystery")
         'Flavor: Mystery'
     """
-    # First handle custom placeholder formats
+    # Handle placeholders - use only standard versions
     result = template
     
-    # Handle INSERTTEXTHERE and similar custom formats
+    # Handle [INPUT] placeholder for text input
     if 'input' in kwargs:
         input_value = kwargs['input']
-        # Replace various custom placeholder formats
-        result = result.replace('INSERTTEXTHERE', str(input_value))
-        result = result.replace('INSERT_TEXT_HERE', str(input_value))
-        result = result.replace('INSERT TEXT HERE', str(input_value))
-        result = result.replace('[INSERT TEXT HERE]', str(input_value))
-        result = result.replace('[INPUT]', str(input_value))  # Simpler placeholder
-        result = result.replace('[TEXT]', str(input_value))   # Alternative placeholder
+        result = result.replace('[INPUT]', str(input_value))
     
-    # Handle [FLAVOR] and similar bracket notation
+    # Handle [FLAVOR] placeholder
     if 'flavor' in kwargs:
         flavor_value = kwargs['flavor']
         result = result.replace('[FLAVOR]', str(flavor_value))
     
-    # Handle generic [VARIABLE] bracket notation
+    # Handle generic [VARIABLE] bracket notation for other variables
     bracket_placeholders = re.findall(r'\[(\w+(?:\s+\w+)*)\]', result)
     for placeholder in bracket_placeholders:
+        # Skip INPUT and FLAVOR as they're already handled
+        if placeholder in ['INPUT', 'FLAVOR']:
+            continue
         # Try to find matching key (case-insensitive)
         key = placeholder.lower().replace(' ', '_')
         if key in kwargs:

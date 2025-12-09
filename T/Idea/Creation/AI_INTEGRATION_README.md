@@ -25,17 +25,24 @@ Integrated AI generation into the `idea_variants.py` module to use Ollama for ge
    - Removed template fallback - AI is now required
 
 2. **Idea Improvement Prompt** (`idea_improvement.txt`)
-   - Uses the user-specified prompt format with `[FLAVOR]` and `[INSERT TEXT HERE]` placeholders
+   - Uses the user-specified prompt format with `[FLAVOR]` and `[INPUT]` placeholders
    - Generates exactly 5 sentences that express a refined, improved idea
    - Allows "light atmospheric or descriptive language" for tone/context
    - Remains conceptual while incorporating thematic flavor influence
-   - Output is parsed and distributed across idea fields
+   - **Output stored as single paragraph (not parsed into fields)**
 
 3. **Updated Generation Methods**
    - `generate_from_flavor()`: Uses `idea_improvement` prompt to generate complete 5-sentence idea
-   - Parses 5 sentences into fields: hook, core_concept, emotional_core, audience_connection, key_elements, tone_style
+   - **Stores complete paragraph in 'hook' field only** (other fields left empty)
+   - **20% chance to add a second flavor** for richer thematic influence
+   - Dual flavors shown as "Flavor1 + Flavor2" in variant name
    - Raises `RuntimeError` if AI unavailable or generates insufficient content
    - Added comprehensive error messages with setup instructions
+
+4. **Placeholder Updates** (`ai_generator.py`)
+   - Changed from `[INSERT TEXT HERE]` to simpler `[INPUT]`
+   - Also supports `[TEXT]` as alternative placeholder
+   - Maintains backward compatibility
 
 ### Architecture
 
@@ -46,13 +53,15 @@ Input Title → IdeaGenerator
     ↓                   ↓
 AI Available?      Error (RuntimeError)
     ↓
+Select Flavor(s) (20% chance for dual flavor)
+    ↓
 AIIdeaGenerator
     ↓
-idea_improvement.txt (with [FLAVOR] and [INSERT TEXT HERE])
+idea_improvement.txt (with [FLAVOR] and [INPUT])
     ↓
-5-sentence refined idea
+5-sentence refined idea (single paragraph)
     ↓
-Parse into fields
+Store in 'hook' field
     ↓
 Rich AI content
 ```
@@ -68,29 +77,57 @@ from idea_variants import create_ideas_from_input
 ideas = create_ideas_from_input("Acadia Night Hikers", count=10)
 
 for idea in ideas:
-    print(f"Hook: {idea['hook']}")
-    # Output: First sentence from 5-sentence refined idea, e.g.:
+    print(f"Variant: {idea['variant_name']}")
+    # May show dual flavor: "Identity + Empowerment + Teen Girl Drama"
+    
+    print(f"Idea: {idea['hook']}")
+    # Output: Complete 5-sentence paragraph, e.g.:
     # "Three friends discover the Acadia trails transform after midnight 
-    #  into pathways of bioluminescent moss and ancient whispers."
-    print(f"Core: {idea['core_concept']}")
-    # Output: Second sentence, e.g.:
-    # "The night hikes become rituals of self-discovery, where darkness 
-    #  provides cover for vulnerability and authentic connection."
+    #  into pathways of bioluminescent moss and ancient whispers. The night 
+    #  hikes become rituals of self-discovery, where darkness provides cover 
+    #  for vulnerability and authentic connection. Each participant carries 
+    #  a secret fear or doubt that the natural setting gradually brings to 
+    #  light. The group dynamic shifts from casual friendship to chosen family 
+    #  through shared moments of wonder and honesty. The story speaks to those 
+    #  who find themselves more at home in liminal spaces than conventional 
+    #  daylight interactions."
 ```
 
 ### Prompt Format
 
 The system uses `idea_improvement.txt` with these placeholders:
-- `[FLAVOR]` - Thematic flavor (e.g., "Mystery + Unease", "Identity + Empowerment")
-- `[INSERT TEXT HERE]` - Source idea/title to refine
+- `[FLAVOR]` - Thematic flavor (single or dual: "Flavor1" or "Flavor1 and Flavor2")
+- `[INPUT]` - Source idea/title to refine (simplified from `[INSERT TEXT HERE]`)
 
-The prompt generates exactly 5 sentences that are parsed into fields:
-1. Hook (sentence 1)
-2. Core Concept (sentence 2)
-3. Emotional Core (sentence 3)
-4. Audience Connection (sentence 4)
-5. Key Elements (sentence 5)
-6. Tone/Style (uses last sentence if < 6 sentences)
+The prompt generates exactly 5 sentences as a single continuous paragraph:
+- **Stored in**: `hook` field only
+- **Other fields**: Left empty (not parsed)
+- **Dual flavors**: 20% chance to combine two flavors for richer themes
+
+### Second Flavor Feature
+
+```python
+from idea_variants import IdeaGenerator
+
+gen = IdeaGenerator(use_ai=True)
+
+# Default: 20% chance of dual flavor
+idea1 = gen.generate_from_flavor("My Title", "Mystery/Curiosity Gap")
+
+# Explicit control: 50% chance of dual flavor
+idea2 = gen.generate_from_flavor(
+    "My Title", 
+    "Mystery/Curiosity Gap",
+    second_flavor_chance=0.5
+)
+
+# No second flavor: 0% chance
+idea3 = gen.generate_from_flavor(
+    "My Title", 
+    "Mystery/Curiosity Gap",
+    second_flavor_chance=0.0
+)
+```
 
 ### Without Ollama (Will Raise Error)
 
