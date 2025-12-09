@@ -301,16 +301,18 @@ def parse_idea_input(text: str, logger: Optional[logging.Logger] = None) -> Opti
 # =============================================================================
 
 
-def run_interactive_mode(preview: bool = False, debug: bool = False):
+def run_interactive_mode(preview: bool = False, debug: bool = False, manual: bool = False):
     """Run the interactive title generation mode.
 
     Args:
         preview: If True, don't save to database (preview/test mode)
         debug: If True, enable extensive debug logging
+        manual: If True, enables manual mode where prompts are shown
+               and responses are entered by the user
     """
     # Setup logging
     logger = None
-    if debug or preview:
+    if debug or preview or manual:
         log_filename = f"title_from_idea_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         log_path = SCRIPT_DIR / log_filename
 
@@ -323,11 +325,16 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             ],
         )
         logger = logging.getLogger("PrismQ.Title.From.Idea")
-        logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
+        logger.info(f"Session started - Preview: {preview}, Debug: {debug}, Manual: {manual}")
         print_info(f"Logging to: {log_path}")
 
     # Print header
-    mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
+    if manual:
+        mode_text = "MANUAL MODE"
+    elif preview:
+        mode_text = "PREVIEW MODE"
+    else:
+        mode_text = "INTERACTIVE MODE"
     print_header(f"PrismQ Title From Idea - {mode_text}")
 
     # Check module availability
@@ -419,8 +426,8 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             raise AIGenUnavailableError("AI title generator module not available")
 
         try:
-            ai_generator = AITitleGenerator()
-            if not ai_generator.is_available():
+            ai_generator = AITitleGenerator(manual_mode=manual)
+            if not ai_generator.is_available() and not manual:
                 print_error("AI (Ollama) not available")
                 print_error("Please ensure Ollama is running with the required model")
                 print_info("  1. Start Ollama: ollama serve")
@@ -431,9 +438,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     "Ollama not available - AI is required for title generation"
                 )
 
-            print_success("AI title generation available (Ollama)")
+            if manual:
+                print_warning("Manual mode - you will provide AI responses manually")
+                print_info("Prompts will be displayed and you'll paste responses")
+            else:
+                print_success("AI title generation available (Ollama)")
             if logger:
-                logger.info("AI title generation available via Ollama")
+                logger.info(f"AI title generation - Manual mode: {manual}")
 
         except AIGenUnavailableError:
             raise  # Re-raise AIGenUnavailableError
@@ -840,6 +851,9 @@ Examples:
   python title_from_idea_interactive.py --interactive      # Interactive mode with DB save
   python title_from_idea_interactive.py --interactive --preview  # Preview mode (no DB save)
   python title_from_idea_interactive.py --interactive --debug    # Debug mode with extensive logging
+  
+  # Manual mode (manual AI interaction)
+  python title_from_idea_interactive.py --manual --debug   # Show prompts and manually enter responses
 
 Note: AI (Ollama) is REQUIRED for title generation. No template fallback available.
         """,
@@ -858,6 +872,12 @@ Note: AI (Ollama) is REQUIRED for title generation. No template fallback availab
         help="Run interactive mode (manual input instead of continuous)",
     )
     parser.add_argument(
+        "--manual",
+        "-m",
+        action="store_true",
+        help="Manual mode - display prompts and manually enter AI responses",
+    )
+    parser.add_argument(
         "--db",
         type=str,
         default=None,
@@ -866,8 +886,8 @@ Note: AI (Ollama) is REQUIRED for title generation. No template fallback availab
 
     args = parser.parse_args()
 
-    if args.interactive:
-        return run_interactive_mode(preview=args.preview, debug=args.debug)
+    if args.interactive or args.manual:
+        return run_interactive_mode(preview=args.preview, debug=args.debug, manual=args.manual)
     else:
         # Default: continuous mode (auto-process Stories without user input)
         return run_state_workflow_mode(args.db, preview=args.preview, debug=args.debug)
