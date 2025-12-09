@@ -51,15 +51,11 @@ def db_connection():
         
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id TEXT NULL,
-            idea_json TEXT NULL,
-            title_id INTEGER NULL,
-            script_id INTEGER NULL,
+            idea_id INTEGER NULL,
             state TEXT NOT NULL DEFAULT 'PrismQ.T.Title.From.Idea',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (title_id) REFERENCES Title(id),
-            FOREIGN KEY (script_id) REFERENCES Script(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id)
         );
         
         CREATE INDEX IF NOT EXISTS idx_story_state ON Story(state);

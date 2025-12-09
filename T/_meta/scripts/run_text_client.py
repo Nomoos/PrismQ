@@ -313,6 +313,7 @@ class TextClient:
                     idea_id INTEGER NULL,
                     state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (idea_id) REFERENCES Idea(id)
                 )
             """
