@@ -10,6 +10,7 @@ maintenance and editing.
 
 import json
 import logging
+import random
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -80,14 +81,15 @@ class AITitleConfig:
 
     model: str = "qwen3:32b"  # Qwen3:30b for RTX 5090
     api_base: str = "http://localhost:11434"
-    temperature: float = 0.8
+    temperature: float = 0.7  # Default base temperature (not used with randomization)
     max_tokens: int = 2000
     timeout: int = 60
     num_variants: int = 10
     
-    # Temperature variation for diversity (min, increment per variant)
-    temperature_base: float = 0.7
-    temperature_increment: float = 0.02
+    # Temperature randomization for diversity (sweet spot for creative titles)
+    # Random value between 0.6-0.8 for each variant
+    temperature_min: float = 0.6
+    temperature_max: float = 0.8
     
     # Title length scoring thresholds (in characters)
     ideal_length_min: int = 45
@@ -254,13 +256,14 @@ class AITitleGenerator:
         logger.info(f"Generated prompt for {n_variants} title variants")
         logger.info(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
         
-        # Generate variants with temperature variation for diversity
+        # Generate variants with random temperature for diversity
         variants = []
         try:
             for i in range(n_variants):
-                # Vary temperature for diversity using config values
-                temp_variation = self.config.temperature_base + (i * self.config.temperature_increment)
-                response_text = self._call_ollama(prompt, temperature=temp_variation)
+                # Use random temperature between min and max for balanced creativity
+                # Sweet spot (0.6-0.8) for creative titles without being chaotic
+                temp = random.uniform(self.config.temperature_min, self.config.temperature_max)
+                response_text = self._call_ollama(prompt, temperature=temp)
                 variant = self._parse_single_title_response(response_text, idea)
                 if variant:
                     variants.append(variant)

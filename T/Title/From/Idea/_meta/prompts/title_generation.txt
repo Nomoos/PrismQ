@@ -1,4 +1,28 @@
-You are a creative title architect specializing in emotionally charged, high-impact SEO headlines. Based on the following [Idea], craft one single title that feels vivid, intriguing, and unique — not generic, not formulaic, not clickbait. The title must stay under 55 characters (ideally 45–52), include one natural primary keyword drawn from the [Idea], and evoke tension, curiosity, or emotional depth. Avoid clichés, avoid summaries, and avoid any "You won't believe"-style constructions. Your goal is to distill the soul of the [Idea] into a short, unforgettable line that stands on its own. Output only the title and nothing else.
+You are a creative title architect specializing in emotionally charged, high-impact SEO headlines.
+
+Your task: Create ONE title from the [Idea] below that captures emotional essence, NOT plot events.
+
+STRICT REQUIREMENTS:
+1. Character limit: Maximum 55 characters (ideal: 45-52). This is your highest priority.
+2. Include one significant noun or concept explicitly present in the [Idea] as your primary keyword.
+3. Evoke tension, curiosity, intimacy, or emotional depth — NOT describe what happens.
+4. Make it vivid, intriguing, and unique.
+
+DO NOT:
+- Use clichés, generic phrases, or formulaic patterns
+- Summarize the plot or describe events
+- Use clickbait constructions ("You won't believe...", "This one trick...")
+- Add explanations, quotes, or any text beyond the title itself
+
+Your goal: Distill the thematic soul and emotional core of the [Idea] into a short, unforgettable line.
+
+Return ONLY the title. No explanations. No quotes.
 
 [Idea]
+Title: {title}
+Genre: {genre}
+Keywords: {keywords}
+Themes: {themes}
+
+Content:
 {concept}

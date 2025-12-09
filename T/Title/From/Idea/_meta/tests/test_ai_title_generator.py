@@ -112,7 +112,7 @@ class TestAITitleGeneratorPrompt:
         generator = AITitleGenerator()
         template = generator.get_prompt_template()
 
-        assert "{num_variants}" in template
+        # Check for required placeholders (num_variants not needed for single-title format)
         assert "{title}" in template
         assert "{concept}" in template
         assert "{genre}" in template
