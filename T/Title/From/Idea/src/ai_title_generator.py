@@ -284,36 +284,12 @@ class AITitleGenerator:
         Returns:
             Formatted prompt string
         """
-        # Extract information from idea
-        title = idea.title or "Untitled"
-        concept = idea.concept or idea.title or "No concept provided"
-
-        # Get genre
-        genre = "general"
-        if hasattr(idea, "genre") and idea.genre:
-            genre = idea.genre.value if hasattr(idea.genre, "value") else str(idea.genre)
-
-        # Get keywords
-        keywords = []
-        if hasattr(idea, "keywords") and idea.keywords:
-            keywords = idea.keywords[:5]
-        keywords_str = ", ".join(keywords) if keywords else "none specified"
-
-        # Get themes
-        themes = []
-        if hasattr(idea, "themes") and idea.themes:
-            themes = idea.themes[:3]
-        themes_str = ", ".join(themes) if themes else "none specified"
+        # Extract the complete idea text (concept is the primary content)
+        idea_text = idea.concept or idea.title or "No idea provided"
 
         template = self.get_prompt_template()
 
-        return template.format(
-            title=title,
-            concept=concept,
-            genre=genre,
-            keywords=keywords_str,
-            themes=themes_str,
-        )
+        return template.format(IDEA=idea_text)
 
     def _call_ollama(self, prompt: str, temperature: Optional[float] = None) -> str:
         """Call Ollama API to generate titles.

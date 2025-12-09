@@ -112,12 +112,8 @@ class TestAITitleGeneratorPrompt:
         generator = AITitleGenerator()
         template = generator.get_prompt_template()
 
-        # Check for required placeholders (num_variants not needed for single-title format)
-        assert "{title}" in template
-        assert "{concept}" in template
-        assert "{genre}" in template
-        assert "{keywords}" in template
-        assert "{themes}" in template
+        # Check for required placeholder (single IDEA placeholder for complete idea text)
+        assert "{IDEA}" in template
 
     @patch("ai_title_generator.requests.get")
     def test_custom_prompt_template(self, mock_get):
