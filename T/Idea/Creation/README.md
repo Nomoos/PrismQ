@@ -39,14 +39,14 @@ print(f"Created {len(ideas)} ideas")  # Output: Created 10 ideas
 ### Prerequisites
 
 1. **Install Ollama**: https://ollama.com/
-2. **Pull the model**: `ollama pull qwen2.5:32b`
+2. **Pull the model**: `ollama pull qwen3:32b`
 3. **Start server**: `ollama serve`
 
 ### Recommended Models
 
 | Model | VRAM | Best For |
 |-------|------|----------|
-| `qwen2.5:32b` | ~20GB | Qwen 3.30b - idea refinement (default) |
+| `qwen3:32b` | ~20GB | Qwen 3 32B - idea refinement (default) |
 | `qwen2.5:72b-q4_K_M` | 23GB | Creative writing (larger) |
 | `llama3.1:70b-q4_K_M` | 22GB | All-around alternative |
 
@@ -192,7 +192,7 @@ class CreationConfig:
     
     # AI settings
     use_ai: bool = True                        # Enable AI generation
-    ai_model: str = "qwen2.5:32b"             # Model name (Qwen 3.30b default)
+    ai_model: str = "qwen3:32b"               # Model name (Qwen 3 32B default)
     ai_temperature: float = 0.8                # Creativity (0.0-2.0)
     default_num_ideas: int = 10                # Default: 10 ideas
 ```
@@ -247,7 +247,7 @@ WARNING: Ollama not available, using fallback
 
 ### Model Not Found
 ```bash
-ollama pull qwen2.5:32b
+ollama pull qwen3:32b
 ```
 
 ### Out of Memory

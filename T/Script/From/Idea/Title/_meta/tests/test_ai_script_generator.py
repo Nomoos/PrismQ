@@ -111,7 +111,7 @@ class TestAIScriptGeneratorConfig:
     def test_default_model_is_qwen(self):
         """Test that default model is Qwen3:30b."""
         config = AIScriptGeneratorConfig()
-        assert config.model == "qwen3:30b"
+        assert config.model == "qwen3:32b"
 
     def test_default_api_base(self):
         """Test default API base URL."""
@@ -135,7 +135,7 @@ class TestAIScriptGenerator:
     def test_initialization_with_default_config(self):
         """Test initialization with default config."""
         generator = AIScriptGenerator()
-        assert generator.config.model == "qwen3:30b"
+        assert generator.config.model == "qwen3:32b"
 
     def test_is_available_returns_bool(self):
         """Test that is_available returns boolean."""
@@ -242,7 +242,7 @@ class TestScriptGeneratorAIIntegration:
     def test_default_ai_model_is_qwen(self):
         """Test that default AI model is Qwen3:30b."""
         config = ScriptGeneratorConfig()
-        assert config.ai_model == "qwen3:30b"
+        assert config.ai_model == "qwen3:32b"
 
     def test_generator_has_is_ai_available_method(self):
         """Test that ScriptGenerator has is_ai_available method."""

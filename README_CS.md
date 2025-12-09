@@ -188,7 +188,7 @@ Viz [src/README.md](./src/README.md) pro kompletní dokumentaci konfigurace.
 
 ## 🤖 Lokální AI model
 
-PrismQ používá **Qwen 3:30B** (`qwen3:30b`) jako výchozí lokální AI model pro generování obsahu a SEO optimalizaci. Tento model běží lokálně přes [Ollama](https://ollama.com/) a poskytuje výborný poměr mezi kvalitou a rychlostí.
+PrismQ používá **Qwen 3:30B** (`qwen3:32b`) jako výchozí lokální AI model pro generování obsahu a SEO optimalizaci. Tento model běží lokálně přes [Ollama](https://ollama.com/) a poskytuje výborný poměr mezi kvalitou a rychlostí.
 
 ### Rychlá instalace
 
@@ -197,7 +197,7 @@ PrismQ používá **Qwen 3:30B** (`qwen3:30b`) jako výchozí lokální AI model
 # Navštivte: https://ollama.com/
 
 # 2. Stáhněte výchozí model
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 
 # 3. Spusťte server
 ollama serve

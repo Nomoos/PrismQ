@@ -40,7 +40,7 @@ class TestAITitleConfig:
         """Test default configuration values."""
         config = AITitleConfig()
 
-        assert config.model == "qwen3:30b"
+        assert config.model == "qwen3:32b"
         assert config.api_base == "http://localhost:11434"
         assert config.temperature == 0.8
         assert config.max_tokens == 2000

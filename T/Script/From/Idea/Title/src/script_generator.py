@@ -182,7 +182,7 @@ class ScriptGeneratorConfig:
     include_cta: bool = True
     tone: ScriptTone = ScriptTone.ENGAGING
     # AI generation settings (required - all generation uses AI)
-    ai_model: str = "qwen3:30b"
+    ai_model: str = "qwen3:32b"
     ai_api_base: str = "http://localhost:11434"
     ai_temperature: float = 0.7
     ai_timeout: int = 120

@@ -62,7 +62,7 @@ extraction = extract_keywords(
 
 # Step 2: Configure AI (using default Qwen 3:30B model)
 config = AIConfig(
-    model="qwen3:30b",  # Default local AI model
+    model="qwen3:32b",  # Default local AI model
     temperature=0.3,  # Lower for more focused output
     max_tokens=500,
     enable_ai=True
@@ -92,7 +92,7 @@ print(metadata.quality_score)
 from T.Publishing.SEO.Keywords import AIConfig
 
 config = AIConfig(
-    model="qwen3:30b",  # Default local AI model (Ollama)
+    model="qwen3:32b",  # Default local AI model (Ollama)
     api_base="http://localhost:11434",  # Ollama API URL
     temperature=0.3,  # 0.0-2.0 (lower = more focused)
     max_tokens=500,  # Maximum tokens to generate
@@ -103,7 +103,7 @@ config = AIConfig(
 
 ### Default Local AI Model
 
-PrismQ uses **Qwen 3:30B** (`qwen3:30b`) as the default local AI model. This model provides an excellent balance of quality and speed for content generation tasks.
+PrismQ uses **Qwen 3:30B** (`qwen3:32b`) as the default local AI model. This model provides an excellent balance of quality and speed for content generation tasks.
 
 **Why Qwen 3:30B?**
 - Strong reasoning and instruction-following capabilities
@@ -118,7 +118,7 @@ PrismQ uses **Qwen 3:30B** (`qwen3:30b`) as the default local AI model. This mod
 # Visit: https://ollama.com/
 
 # Pull the default model
-ollama pull qwen3:30b
+ollama pull qwen3:32b
 
 # Start the server
 ollama serve
@@ -127,7 +127,7 @@ ollama serve
 ### Model Recommendations
 
 **Default Model**:
-- `qwen3:30b` - Default choice, excellent balance of quality and speed
+- `qwen3:32b` - Default choice, excellent balance of quality and speed
 
 **Alternative Models for Higher Performance (RTX 5090)**:
 - `llama3.1:70b-q4_K_M` - Excellent quality, optimized quantization
@@ -434,7 +434,7 @@ python -m T.Publishing.SEO.Keywords._meta.examples.ai_usage_example
 
 **Solutions**:
 1. Install Ollama: https://ollama.com/
-2. Pull the default model: `ollama pull qwen3:30b`
+2. Pull the default model: `ollama pull qwen3:32b`
 3. Start server: `ollama serve`
 4. Check connection: `curl http://localhost:11434/api/tags`
 

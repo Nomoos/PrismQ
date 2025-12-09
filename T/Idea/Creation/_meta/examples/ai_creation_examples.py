@@ -136,14 +136,14 @@ def example_alternative_models():
     print("Example 6: Alternative AI Models")
     print("=" * 80)
 
-    # Qwen 3.30b - Excellent for creative writing and balance
-    config_qwen = CreationConfig(use_ai=True, ai_model="qwen3:30b", ai_temperature=0.9)
+    # Qwen 3 32B - Excellent for idea refinement and balance
+    config_qwen = CreationConfig(use_ai=True, ai_model="qwen3:32b", ai_temperature=0.9)
 
     # Command-R - Great for structured output
     config_command = CreationConfig(use_ai=True, ai_model="command-r:35b", ai_temperature=0.7)
 
     print("\nAvailable model configurations:")
-    print(f"1. Qwen 3.30b: qwen2.5:32b (Default, optimized for idea refinement)")
+    print(f"1. Qwen 3 32B: qwen3:32b (Default, optimized for idea refinement)")
     print(f"2. Qwen 2.5 72B: qwen2.5:72b-q4_K_M (Creative writing, larger)")
     print(f"3. Llama 3.1 70B: llama3.1:70b-q4_K_M (Alternative, all-around)")
     print(f"4. Command-R 35B: command-r:35b (Structured output)")

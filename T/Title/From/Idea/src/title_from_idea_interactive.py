@@ -15,7 +15,7 @@ Modes:
     Preview: Creates titles for testing without saving (extensive logging)
 
 Requirements:
-    - Ollama must be running with qwen3:30b model
+    - Ollama must be running with qwen3:32b model
     - AI is required - script will fail if Ollama is unavailable
 """
 
@@ -424,7 +424,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 print_error("AI (Ollama) not available")
                 print_error("Please ensure Ollama is running with the required model")
                 print_info("  1. Start Ollama: ollama serve")
-                print_info("  2. Pull model: ollama pull qwen3:30b")
+                print_info("  2. Pull model: ollama pull qwen3:32b")
                 if logger:
                     logger.error("Ollama not available - cannot proceed")
                 raise AIGenUnavailableError(
@@ -606,14 +606,14 @@ def run_state_workflow_mode(
     print_section("Checking AI Availability")
     if not service.is_ai_available():
         print_error("AI title generation is NOT available!")
-        print_error("Ollama must be running with the required model (qwen3:30b)")
+        print_error("Ollama must be running with the required model (qwen3:32b)")
         print_info("Please start Ollama and ensure the model is loaded:")
         print_info("  1. Start Ollama: ollama serve")
-        print_info("  2. Pull model: ollama pull qwen3:30b")
+        print_info("  2. Pull model: ollama pull qwen3:32b")
         print_info("  3. Re-run this script")
         conn.close()
         raise AIUnavailableError(
-            "AI title generation unavailable. Ollama must be running with qwen3:30b model. "
+            "AI title generation unavailable. Ollama must be running with qwen3:32b model. "
             "No fallback titles will be generated."
         )
     print_success("AI title generation is available")
