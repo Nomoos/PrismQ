@@ -1,7 +1,7 @@
 # PARALLEL_RUN_NEXT - Implementation Commands
 
 > **Current Focus**: REVIEW-001 through REVIEW-007 (Stages 10-16 - Local AI Quality Reviews)  
-> **Issue Specs**: See `T/WORKFLOW_DETAILED.md` for stage specifications
+> **Issue Specs**: See `T/_meta/docs/WORKFLOW_DETAILED.md` for stage specifications
 
 **Updated**: 2025-12-01 | **Sprint**: 5 - Local AI Quality Reviews
 
@@ -193,8 +193,8 @@ Stage 17-18: Story Review & Polish (Next Sprint)
 
 ## 📚 RELATED DOCUMENTATION
 
-- **[T/WORKFLOW_DETAILED.md](../../T/WORKFLOW_DETAILED.md)** - Complete 18-stage workflow with all stages described
-- **[T/WORKFLOW_STATE_MACHINE.md](../../T/WORKFLOW_STATE_MACHINE.md)** - Visual state machine diagram
+- **[T/_meta/docs/WORKFLOW_DETAILED.md](../../T/_meta/docs/WORKFLOW_DETAILED.md)** - Complete 18-stage workflow with all stages described
+- **[T/_meta/docs/WORKFLOW_STATE_MACHINE.md](../../T/_meta/docs/WORKFLOW_STATE_MACHINE.md)** - Visual state machine diagram
 - **[PARALLEL_RUN_NEXT_FULL.md](PARALLEL_RUN_NEXT_FULL.md)** - Complete POST-MVP roadmap
 - **[new/CORE-001-Title-From-Idea.md](new/CORE-001-Title-From-Idea.md)** - CORE-001 specification (Complete)
 - **[new/CORE-002-Script-FromIdeaAndTitle.md](new/CORE-002-Script-FromIdeaAndTitle.md)** - CORE-002 specification (Complete)

@@ -133,7 +133,7 @@ cat M/README.md | grep -E "^#|^##"
 1. **New User Journey**:
    - Start: Main README
    - Goal: Understand T module workflow
-   - Path: Main README → T/README.md → T/TITLE_SCRIPT_WORKFLOW.md
+   - Path: Main README → T/README.md → T/_meta/docs/TITLE_SCRIPT_WORKFLOW.md
    - [ ] All links work
    - [ ] Information flow is logical
    - [ ] No dead ends
