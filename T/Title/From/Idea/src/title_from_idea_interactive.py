@@ -68,7 +68,7 @@ try:
     from Model.Database.models.story import Story
     from Model.Database.repositories.story_repository import StoryRepository
     from Model.Database.repositories.title_repository import TitleRepository
-    from Model.State.constants.state_names import StoryState
+    from Model.State.constants.state_names import StoryState, StateNames
 
     DB_AVAILABLE = True
 except ImportError:
@@ -802,7 +802,7 @@ def run_state_workflow_mode(
                 print(f"  Stories processed in this run: {processed_count}")
                 print(f"  Errors in this run: {error_count}")
                 print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
-                print(f"  Next state: PrismQ.T.Content.From.Idea.Title")
+                print(f"  Next state: {StateNames.CONTENT_FROM_IDEA_TITLE}")
             
             # Wait 1ms before next check
             time.sleep(0.001)
