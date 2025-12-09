@@ -95,6 +95,17 @@ class AITitleConfig:
     good_length_min: int = 40
     good_length_max: int = 55
     acceptable_length_max: int = 60
+    
+    # Scoring values
+    base_score: float = 0.85
+    ideal_score: float = 0.95
+    good_score: float = 0.90
+    short_score: float = 0.80
+    acceptable_score: float = 0.82
+    long_score: float = 0.75
+    
+    # Style inference
+    listicle_check_prefix_length: int = 10  # Check first N chars for numbers
 
 
 class AITitleGenerator:
@@ -203,13 +214,13 @@ class AITitleGenerator:
 
         # Call Ollama multiple times to generate n_variants titles
         # The new prompt generates one title per call
-        # Each call uses slightly different temperature for diversity
+        # Build prompt once (it's the same for all calls with the new single-title format)
+        prompt = self._create_prompt(idea, n_variants)
+        
+        # Generate variants with temperature variation for diversity
         variants = []
         try:
             for i in range(n_variants):
-                # Build prompt for this iteration (num_variants not used by new prompt)
-                prompt = self._create_prompt(idea, n_variants)
-                
                 # Vary temperature for diversity using config values
                 temp_variation = self.config.temperature_base + (i * self.config.temperature_increment)
                 response_text = self._call_ollama(prompt, temperature=temp_variation)
@@ -339,19 +350,18 @@ class AITitleGenerator:
             # Calculate a score based on title characteristics
             # Prefer titles in the ideal length range per prompt requirements
             length = len(title_text)
-            score = 0.85  # Base score
             
-            # Use config thresholds for scoring
+            # Use config thresholds and scores
             if self.config.ideal_length_min <= length <= self.config.ideal_length_max:
-                score = 0.95  # Ideal length (45-52 chars)
+                score = self.config.ideal_score  # Ideal length (45-52 chars)
             elif self.config.good_length_min <= length <= self.config.good_length_max:
-                score = 0.90  # Good length (40-55 chars)
+                score = self.config.good_score  # Good length (40-55 chars)
             elif length < self.config.good_length_min:
-                score = 0.80  # A bit short
+                score = self.config.short_score  # A bit short
             elif length <= self.config.acceptable_length_max:
-                score = 0.82  # A bit long but acceptable (56-60 chars)
+                score = self.config.acceptable_score  # A bit long but acceptable (56-60 chars)
             else:
-                score = 0.75  # Too long
+                score = self.config.long_score  # Too long
             
             return TitleVariant(
                 text=title_text,
@@ -383,8 +393,8 @@ class AITitleGenerator:
         if title_lower.startswith("how to"):
             return "how-to"
         
-        # Check for listicle (numbers)
-        if any(char.isdigit() for char in title_text[:10]):
+        # Check for listicle (numbers in first N characters)
+        if any(char.isdigit() for char in title_text[:self.config.listicle_check_prefix_length]):
             return "listicle"
         
         # Default to direct style
