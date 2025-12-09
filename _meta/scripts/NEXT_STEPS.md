@@ -22,14 +22,22 @@
 
 **How to run**:
 
-```batch
-# Testing mode (no database save, extensive logging)
+**Windows:**
+```cmd
+REM Testing mode (no database save, extensive logging)
 cd _meta\scripts\03_PrismQ.T.Title.From.Idea
 Preview.bat
 
-# Production mode (saves to database)
+REM Production mode (saves to database)
 cd _meta\scripts\03_PrismQ.T.Title.From.Idea
 Run.bat
+```
+
+**Linux/Mac:**
+```bash
+# Navigate to the script directory
+cd _meta/scripts/03_PrismQ.T.Title.From.Idea
+# Note: Windows .bat scripts may need adaptation for Unix systems
 ```
 
 **What happens next**: After generating titles, you'll proceed to Stage 04 to create scripts from the titles and ideas.
@@ -180,7 +188,7 @@ Each script directory contains:
 
 ### Documentation
 - **[README.md](README.md)** - Complete scripts documentation
-- **[_meta/WORKFLOW.md](../../WORKFLOW.md)** - State machine overview
+- **[WORKFLOW.md](../WORKFLOW.md)** - State machine overview
 - **[T/README.md](../../T/README.md)** - Text module documentation
 - **[PARALLEL_RUN_NEXT.md](../issues/PARALLEL_RUN_NEXT.md)** - Development roadmap
 
