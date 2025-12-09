@@ -198,10 +198,13 @@ class AITitleGenerator:
             try:
                 line = input()
                 if not line:
+                    # Empty line - increment counter
                     empty_line_count += 1
                     if empty_line_count >= 2:
+                        # Two consecutive empty lines - done
                         break
                 else:
+                    # Non-empty line - reset counter and add line
                     empty_line_count = 0
                     lines.append(line)
             except EOFError:
