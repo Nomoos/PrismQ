@@ -116,17 +116,20 @@ class AITitleGenerator:
     Falls back to template-based generation if Ollama is unavailable.
     """
 
-    def __init__(self, config: Optional[AITitleConfig] = None):
+    def __init__(self, config: Optional[AITitleConfig] = None, manual_mode: bool = False):
         """Initialize AI title generator with configuration.
 
         Args:
             config: Optional AI configuration
+            manual_mode: If True, enables manual mode where prompts are shown
+                        and responses are entered by the user
         """
         self.config = config or AITitleConfig()
+        self.manual_mode = manual_mode
         self.available = self._check_ollama_availability()
         self._custom_prompt_template: Optional[str] = None
 
-        if not self.available:
+        if not self.available and not manual_mode:
             logger.error(
                 f"Ollama not available at {self.config.api_base}. "
                 "AI title generation will not be possible until Ollama is available."
@@ -205,7 +208,8 @@ class AITitleGenerator:
         if n_variants < 3 or n_variants > 10:
             raise ValueError("num_variants must be between 3 and 10")
 
-        if not self.available:
+        # In manual mode, skip availability check since user will provide responses
+        if not self.available and not self.manual_mode:
             error_msg = (
                 f"AI title generation unavailable: Ollama not running at {self.config.api_base}"
             )
@@ -216,6 +220,10 @@ class AITitleGenerator:
         # The new prompt generates one title per call
         # Build prompt once (it's the same for all calls with the new single-title format)
         prompt = self._create_prompt(idea, n_variants)
+        
+        # Log the prompt template for debugging/preview purposes
+        logger.info(f"Generated prompt for {n_variants} title variants")
+        logger.info(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
         
         # Generate variants with temperature variation for diversity
         variants = []
@@ -289,10 +297,50 @@ class AITitleGenerator:
         Raises:
             RuntimeError: If API call fails
         """
-        try:
-            # Use provided temperature or fall back to config
-            temp = temperature if temperature is not None else self.config.temperature
+        # Use provided temperature or fall back to config
+        temp = temperature if temperature is not None else self.config.temperature
+        
+        # Log the prompt being sent to AI
+        logger.debug(f"Sending prompt to AI (temperature={temp}):\n{prompt}")
+        
+        # Manual mode: show prompt and wait for user to provide response
+        if self.manual_mode:
+            print("\n" + "=" * 80)
+            print("MANUAL MODE - PROMPT TO SEND TO AI")
+            print("=" * 80)
+            print(f"\nModel: {self.config.model}")
+            print(f"Temperature: {temp}")
+            print(f"\nPrompt:\n{'-' * 80}")
+            print(prompt)
+            print("-" * 80)
+            print("\nInstructions:")
+            print("1. Copy the prompt above")
+            print("2. Run it in your AI tool (e.g., Ollama CLI: ollama run " + self.config.model + ")")
+            print("3. Paste the AI response below")
+            print("\nEnter AI response (press Enter twice when done):")
             
+            # Read multi-line input until double newline or EOF
+            lines = []
+            empty_line_count = 0
+            while True:
+                try:
+                    line = input()
+                    if not line:
+                        empty_line_count += 1
+                        if empty_line_count >= 2:
+                            break
+                    else:
+                        empty_line_count = 0
+                        lines.append(line)
+                except EOFError:
+                    break
+            
+            response_text = "\n".join(lines).strip()
+            logger.info(f"Manual mode: Received {len(response_text)} characters of response")
+            return response_text
+        
+        # Automatic mode: call Ollama API
+        try:
             response = requests.post(
                 f"{self.config.api_base}/api/generate",
                 json={
