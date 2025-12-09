@@ -4,14 +4,28 @@
 
 The Creation module generates **10 Ideas by default** from simple inputs like titles or descriptions using **local AI models** (Ollama) optimized for RTX 5090 and other high-end GPUs. It creates rich, detailed Ideas with variable-length content and comprehensive narrative structure.
 
+## Recent Updates ✨
+
+**Flavors System Migration** - The system has transitioned from a variant-centric to a **flavor-centric** interface:
+- **110 flavors** available (93 base + 17 custom audience-specific)
+- **Automatic weighted selection** optimized for primary audience (13-17 young women in US/Canada)
+- **Custom audience flavors** for different demographics
+- **Scoring system** rates flavors for audience fit (0.0-10.0)
+- **Removed unused variant template files** - cleaner codebase
+
+**[→ See FLAVORS_MIGRATION.md for details](./FLAVORS_MIGRATION.md)**
+
 ## Purpose
 
 Transform minimal input (title or description) into multiple, fully-formed Ideas with comprehensive narrative structure, targeting information, and content specifications using advanced AI models.
 
 ## Key Features
 
+- **Flavor-Based Generation**: 110 thematic flavors with weighted selection for target audiences
 - **AI-Powered Generation**: Uses local LLMs (Qwen 3.30b default, optimized for idea refinement) via Ollama
-- **Custom Prompt Templates**: NEW! Flexible templating system with multiple placeholder formats
+- **Audience Optimization**: Custom flavors for specific demographics (teen girls, US women, Maine youth, etc.)
+- **Flavor Scoring**: Rate flavors for audience fit with automated scoring system
+- **Custom Prompt Templates**: Flexible templating system with multiple placeholder formats
 - **Default 10 Ideas**: Generates 10 high-quality ideas by default (Path 2: Manual Creation)
 - **RTX 5090 Optimized**: Configured for best models on high-end GPUs
 - **Intelligent Fallback**: Automatically falls back when AI unavailable
@@ -21,6 +35,33 @@ Transform minimal input (title or description) into multiple, fully-formed Ideas
 - **Platform Targeting**: Automatic platform-specific optimization
 
 ## Quick Start
+
+### Using Flavors (Recommended)
+
+```python
+from PrismQ.T.Idea.Creation.src.flavors import (
+    get_top_flavors_for_audience,
+    score_flavor_for_audience,
+    list_flavors_by_audience
+)
+
+# Get top flavors for your audience
+top_flavors = get_top_flavors_for_audience(
+    audience='13-17 young women US/Canada',
+    count=10
+)
+
+print("Top flavors for primary audience:")
+for flavor in top_flavors:
+    score = score_flavor_for_audience(flavor)
+    print(f"  [{score:.1f}] {flavor}")
+
+# Filter by specific audience
+teen_flavors = list_flavors_by_audience('teen girls')
+print(f"\nTeen girl flavors: {len(teen_flavors)}")
+```
+
+### Using Idea Creator (Original)
 
 ```python
 from PrismQ.T.Idea.Creation import IdeaCreator
