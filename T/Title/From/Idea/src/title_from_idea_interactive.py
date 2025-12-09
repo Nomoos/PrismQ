@@ -524,10 +524,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 def run_state_workflow_mode(
     db_path: Optional[str] = None, preview: bool = False, debug: bool = False
 ):
-    """Run the state-based workflow mode for title generation.
+    """Run the state-based workflow mode for title generation in continuous mode.
 
-    This mode automatically processes Stories with state PrismQ.T.Title.From.Idea,
+    This mode automatically and continuously processes Stories with state PrismQ.T.Title.From.Idea,
     generates titles using AI with similarity checking, and transitions to the next state.
+    
+    Runs continuously by default with 1ms delay between runs, checking for new stories
+    to process. Press Ctrl+C to stop.
 
     IMPORTANT: This mode requires AI (Ollama) to be running. If AI is unavailable,
     the script will raise an error and stop - no fallback titles will be generated.
@@ -542,6 +545,7 @@ def run_state_workflow_mode(
         AIUnavailableError: If AI (Ollama) is not available for title generation.
     """
     import sqlite3
+    import time
 
     # Use default database paths if not provided
     if db_path is None:
@@ -566,8 +570,11 @@ def run_state_workflow_mode(
         logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
-    # Print header - RUN MODE as specified in problem statement
-    print_header("PrismQ.T.Title.From.Idea - RUN MODE")
+    # Print header - CONTINUOUS MODE is now default
+    print_header("PrismQ.T.Title.From.Idea - CONTINUOUS MODE")
+    print_info("Running continuously with 1ms delay between runs")
+    print_info("Press Ctrl+C to stop")
+    print()
 
     # Check module availability
     if not TITLE_GENERATOR_AVAILABLE:
@@ -624,158 +631,195 @@ def run_state_workflow_mode(
     idea_db.connect()
     print_success("Connected to Idea database")
 
-    # Find Stories with state TITLE_FROM_IDEA
-    print_section("Finding Stories for Title Generation")
-    stories_to_process = service.get_stories_without_titles()
+    # Continuous mode loop (default behavior)
+    run_count = 0
+    total_processed = 0
+    total_errors = 0
+    
+    try:
+        while True:
+            run_count += 1
+            
+            # Show run header for subsequent runs
+            if run_count > 1:
+                print(f"\n{Colors.CYAN}{'═' * 80}{Colors.END}")
+                print(f"{Colors.CYAN}Run #{run_count} - Checking for new stories...{Colors.END}")
+                print(f"{Colors.CYAN}{'═' * 80}{Colors.END}\n")
 
-    if not stories_to_process:
-        print_info("No Stories found with state PrismQ.T.Title.From.Idea")
-        print_info("Make sure Stories are created using PrismQ.T.Story.From.Idea first")
+            # Find Stories with state TITLE_FROM_IDEA
+            if run_count == 1:
+                print_section("Finding Stories for Title Generation")
+            
+            stories_to_process = service.get_stories_without_titles()
+
+            if not stories_to_process:
+                if run_count == 1:
+                    print_info("No Stories found with state PrismQ.T.Title.From.Idea")
+                    print_info("Make sure Stories are created using PrismQ.T.Story.From.Idea first")
+                    print_info("Waiting for new stories...")
+                # Wait and check again
+                time.sleep(0.001)  # 1ms delay
+                continue
+
+            if run_count == 1:
+                print_success(f"Found {len(stories_to_process)} Stories ready for title generation")
+            else:
+                print_success(f"Found {len(stories_to_process)} new Stories")
+
+            # Track processing results for this run
+            processed_count = 0
+            error_count = 0
+
+            # Process each story
+            for i, story in enumerate(stories_to_process, 1):
+                print_section(f"Processing Story {i}/{len(stories_to_process)} (ID: {story.id})")
+                print(f"  Idea ID: {story.idea_id}")
+
+                # Get sibling stories for context
+                siblings = service.get_sibling_stories(story)
+                sibling_titles = service.get_sibling_titles(story)
+
+                print(f"  Sibling Stories: {len(siblings)}")
+                print(f"  Existing Sibling Titles: {len(sibling_titles)}")
+
+                if sibling_titles:
+                    print(f"\n  {Colors.GRAY}Existing titles from same Idea:{Colors.END}")
+                    for st in sibling_titles[:5]:  # Show up to 5
+                        print(f"    - {st.text[:60]}{'...' if len(st.text) > 60 else ''}")
+                    if len(sibling_titles) > 5:
+                        print(f"    ... and {len(sibling_titles) - 5} more")
+
+                # Fetch Idea from Idea database using story.idea_id
+                idea = None
+                if story.idea_id is not None:
+                    try:
+                        idea_id = int(story.idea_id)
+                        idea_dict = idea_db.get_idea(idea_id)
+                        if idea_dict:
+                            # Create Idea object from SimpleIdea data
+                            idea_text = idea_dict.get("text", "")
+                            if idea_text and IDEA_MODEL_AVAILABLE:
+                                # Truncate title to reasonable length (max 100 chars)
+                                MAX_TITLE_LENGTH = 100
+                                if len(idea_text) <= MAX_TITLE_LENGTH:
+                                    title = idea_text
+                                else:
+                                    title = idea_text[: MAX_TITLE_LENGTH - 3] + "..."
+                                idea = Idea(title=title, concept=idea_text, genre=ContentGenre.OTHER)
+                                print_info(f"Fetched Idea from database (ID: {idea_id})")
+                                if logger:
+                                    logger.info(f"Created Idea from database: {idea_text[:50]}...")
+                            else:
+                                print_warning(f"Idea {idea_id} has no text content")
+                        else:
+                            print_warning(f"Idea {idea_id} not found in database")
+                    except (ValueError, TypeError) as e:
+                        print_warning(f"Invalid idea_id format: {story.idea_id}")
+                        if logger:
+                            logger.warning(f"Failed to parse idea_id: {e}")
+
+                # AI title generation requires an Idea - no fallback
+                if idea is None:
+                    print_error(f"Cannot generate title: No Idea data available for Story {story.id}")
+                    print_error("Ensure the Idea exists in the database with valid text content")
+                    error_count += 1
+                    continue
+
+                # Generate title variants using AI
+                print_section("Generating AI Title Variants")
+
+                try:
+                    # Use service constant for number of variants
+                    num_variants = StoryTitleService.NUM_VARIANTS
+
+                    print_info(f"Generating {num_variants} variants from Idea: '{idea.title[:50]}...'")
+
+                    # Generate variants using AI through the service
+                    variants = service.generate_title_variants(idea, num_variants=num_variants)
+
+                    if not variants:
+                        raise AIUnavailableError("AI returned no title variants")
+
+                    # Select best title using similarity check
+                    print_section("Selecting Best Title (with Similarity Check)")
+                    best_variant, similar_titles = service.select_best_title(variants, story)
+
+                    # Display all variants
+                    print(f"\n  {Colors.CYAN}Generated {len(variants)} AI Title Variants:{Colors.END}")
+                    for j, v in enumerate(variants, 1):
+                        is_best = v.text == best_variant.text
+                        marker = f"{Colors.GREEN}★{Colors.END}" if is_best else " "
+                        print(f"  {marker} {j}. [{v.style}] {v.text}")
+                        print(f"       Length: {v.length} chars | Score: {v.score:.2f}")
+
+                    # Show similarity warnings
+                    if similar_titles:
+                        print(f"\n  {Colors.YELLOW}⚠ Similarity warnings:{Colors.END}")
+                        for sim_title, sim_score in similar_titles:
+                            print(f"    - {sim_score:.0%} similar to: '{sim_title[:50]}...'")
+
+                    # Show selected best
+                    print(f"\n  {Colors.GREEN}Selected Best Title:{Colors.END}")
+                    print(f"    {best_variant.text}")
+                    print(f"    Style: {best_variant.style} | Score: {best_variant.score:.2f}")
+
+                    if preview:
+                        print_warning("PREVIEW MODE - Title NOT saved to database")
+                        print_info(f"Would transition state: TITLE_FROM_IDEA → SCRIPT_FROM_IDEA_TITLE")
+                        processed_count += 1
+                    else:
+                        # Save title and update state
+                        print_section("Database Operations")
+                        try:
+                            title = service.generate_title_for_story(story, idea)
+                            if title:
+                                print_success(f"Title saved with ID: {title.id}")
+                                print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
+                                processed_count += 1
+                            else:
+                                print_warning("Story already has a title, skipped")
+                        except Exception as e:
+                            print_error(f"Failed to save title: {e}")
+                            if logger:
+                                logger.exception("Database save failed")
+                            error_count += 1
+
+                except AIUnavailableError as e:
+                    print_error(f"AI title generation failed: {e}")
+                    print_error("Stopping processing - AI is required for title generation")
+                    if logger:
+                        logger.error(f"AI unavailable: {e}")
+                    idea_db.close()
+                    conn.close()
+                    raise  # Re-raise to stop processing
+
+            # Summary for this run
+            total_processed += processed_count
+            total_errors += error_count
+            
+            if processed_count > 0 or error_count > 0:
+                print_section(f"Run #{run_count} Summary")
+                print(f"  Stories processed in this run: {processed_count}")
+                print(f"  Errors in this run: {error_count}")
+                print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
+                print(f"  Next state: PrismQ.T.Content.From.Idea.Title")
+            
+            # Wait 1ms before next check
+            time.sleep(0.001)
+            
+    except KeyboardInterrupt:
+        # Handle Ctrl+C gracefully
+        print(f"\n\n{Colors.YELLOW}{'═' * 80}{Colors.END}")
+        print(f"{Colors.YELLOW}Interrupted by user (Ctrl+C){Colors.END}")
+        print(f"{Colors.YELLOW}{'═' * 80}{Colors.END}\n")
+        print_section("Final Summary")
+        print(f"  Total runs completed: {run_count}")
+        print(f"  Total stories processed: {total_processed}")
+        print(f"  Total errors: {total_errors}")
+        print_success("Processing stopped gracefully")
         idea_db.close()
         conn.close()
         return 0
-
-    print_success(f"Found {len(stories_to_process)} Stories ready for title generation")
-
-    # Track processing results
-    processed_count = 0
-    error_count = 0
-
-    # Process each story
-    for i, story in enumerate(stories_to_process, 1):
-        print_section(f"Processing Story {i}/{len(stories_to_process)} (ID: {story.id})")
-        print(f"  Idea ID: {story.idea_id}")
-
-        # Get sibling stories for context
-        siblings = service.get_sibling_stories(story)
-        sibling_titles = service.get_sibling_titles(story)
-
-        print(f"  Sibling Stories: {len(siblings)}")
-        print(f"  Existing Sibling Titles: {len(sibling_titles)}")
-
-        if sibling_titles:
-            print(f"\n  {Colors.GRAY}Existing titles from same Idea:{Colors.END}")
-            for st in sibling_titles[:5]:  # Show up to 5
-                print(f"    - {st.text[:60]}{'...' if len(st.text) > 60 else ''}")
-            if len(sibling_titles) > 5:
-                print(f"    ... and {len(sibling_titles) - 5} more")
-
-        # Fetch Idea from Idea database using story.idea_id
-        idea = None
-        if story.idea_id is not None:
-            try:
-                idea_id = int(story.idea_id)
-                idea_dict = idea_db.get_idea(idea_id)
-                if idea_dict:
-                    # Create Idea object from SimpleIdea data
-                    idea_text = idea_dict.get("text", "")
-                    if idea_text and IDEA_MODEL_AVAILABLE:
-                        # Truncate title to reasonable length (max 100 chars)
-                        MAX_TITLE_LENGTH = 100
-                        if len(idea_text) <= MAX_TITLE_LENGTH:
-                            title = idea_text
-                        else:
-                            title = idea_text[: MAX_TITLE_LENGTH - 3] + "..."
-                        idea = Idea(title=title, concept=idea_text, genre=ContentGenre.OTHER)
-                        print_info(f"Fetched Idea from database (ID: {idea_id})")
-                        if logger:
-                            logger.info(f"Created Idea from database: {idea_text[:50]}...")
-                    else:
-                        print_warning(f"Idea {idea_id} has no text content")
-                else:
-                    print_warning(f"Idea {idea_id} not found in database")
-            except (ValueError, TypeError) as e:
-                print_warning(f"Invalid idea_id format: {story.idea_id}")
-                if logger:
-                    logger.warning(f"Failed to parse idea_id: {e}")
-
-        # AI title generation requires an Idea - no fallback
-        if idea is None:
-            print_error(f"Cannot generate title: No Idea data available for Story {story.id}")
-            print_error("Ensure the Idea exists in the database with valid text content")
-            error_count += 1
-            continue
-
-        # Generate title variants using AI
-        print_section("Generating AI Title Variants")
-
-        try:
-            # Use service constant for number of variants
-            num_variants = StoryTitleService.NUM_VARIANTS
-
-            print_info(f"Generating {num_variants} variants from Idea: '{idea.title[:50]}...'")
-
-            # Generate variants using AI through the service
-            variants = service.generate_title_variants(idea, num_variants=num_variants)
-
-            if not variants:
-                raise AIUnavailableError("AI returned no title variants")
-
-            # Select best title using similarity check
-            print_section("Selecting Best Title (with Similarity Check)")
-            best_variant, similar_titles = service.select_best_title(variants, story)
-
-            # Display all variants
-            print(f"\n  {Colors.CYAN}Generated {len(variants)} AI Title Variants:{Colors.END}")
-            for j, v in enumerate(variants, 1):
-                is_best = v.text == best_variant.text
-                marker = f"{Colors.GREEN}★{Colors.END}" if is_best else " "
-                print(f"  {marker} {j}. [{v.style}] {v.text}")
-                print(f"       Length: {v.length} chars | Score: {v.score:.2f}")
-
-            # Show similarity warnings
-            if similar_titles:
-                print(f"\n  {Colors.YELLOW}⚠ Similarity warnings:{Colors.END}")
-                for sim_title, sim_score in similar_titles:
-                    print(f"    - {sim_score:.0%} similar to: '{sim_title[:50]}...'")
-
-            # Show selected best
-            print(f"\n  {Colors.GREEN}Selected Best Title:{Colors.END}")
-            print(f"    {best_variant.text}")
-            print(f"    Style: {best_variant.style} | Score: {best_variant.score:.2f}")
-
-            if preview:
-                print_warning("PREVIEW MODE - Title NOT saved to database")
-                print_info(f"Would transition state: TITLE_FROM_IDEA → SCRIPT_FROM_IDEA_TITLE")
-                processed_count += 1
-            else:
-                # Save title and update state
-                print_section("Database Operations")
-                try:
-                    title = service.generate_title_for_story(story, idea)
-                    if title:
-                        print_success(f"Title saved with ID: {title.id}")
-                        print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
-                        processed_count += 1
-                    else:
-                        print_warning("Story already has a title, skipped")
-                except Exception as e:
-                    print_error(f"Failed to save title: {e}")
-                    if logger:
-                        logger.exception("Database save failed")
-                    error_count += 1
-
-        except AIUnavailableError as e:
-            print_error(f"AI title generation failed: {e}")
-            print_error("Stopping processing - AI is required for title generation")
-            if logger:
-                logger.error(f"AI unavailable: {e}")
-            idea_db.close()
-            conn.close()
-            raise  # Re-raise to stop processing
-
-    # Summary
-    print_section("Processing Summary")
-    print(f"  Total Stories found: {len(stories_to_process)}")
-    print(f"  Successfully processed: {processed_count}")
-    print(f"  Errors: {error_count}")
-    print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
-    print(f"  Next state: PrismQ.T.Content.From.Idea.Title")
-
-    idea_db.close()
-    conn.close()
-    print_success("Processing complete!")
-    return 0
 
 
 def main():
