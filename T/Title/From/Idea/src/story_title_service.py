@@ -64,33 +64,18 @@ src_dir = current_file.parent
 if str(src_dir) not in sys.path:
     sys.path.insert(0, str(src_dir))
 
-# Import TitleGenerator from same directory
-from title_generator import TitleConfig, TitleGenerator, TitleVariant
+# Import title generation components from refactored modules using relative imports
+from .title_variant import TitleVariant
+from .ai_title_generator import (
+    AITitleGenerator,
+    TitleGeneratorConfig,
+    AIUnavailableError as _AIUnavailableError,
+)
+
+# Use the AI module's exception
+AIUnavailableError = _AIUnavailableError
 
 from idea import Idea
-
-
-class AIUnavailableError(Exception):
-    """Exception raised when AI service (Ollama) is unavailable.
-
-    This exception is raised instead of falling back to alternative methods,
-    as per the requirement to not perform fallback when AI is unavailable.
-    The caller should handle this exception and wait for AI to become available.
-    """
-
-    pass
-
-
-# Import AI title generator (required - no fallback when AI unavailable)
-try:
-    from ai_title_generator import AITitleConfig, AITitleGenerator
-    from ai_title_generator import AIUnavailableError as _AIUnavailableError
-
-    # Use the imported exception to keep consistent error handling
-    AIUnavailableError = _AIUnavailableError
-    AI_TITLE_AVAILABLE = True
-except ImportError:
-    AI_TITLE_AVAILABLE = False
 
 # Import database models and repositories
 from Model.Database.models.story import Story, StoryState
@@ -167,7 +152,7 @@ class StoryTitleService:
     def __init__(
         self,
         connection: Optional[sqlite3.Connection] = None,
-        title_config: Optional[TitleConfig] = None,
+        title_config: Optional[TitleGeneratorConfig] = None,
         use_ai: bool = True,
         auto_create_schema: bool = True,
     ):
@@ -205,7 +190,7 @@ class StoryTitleService:
         # Initialize AI title generator (required for title generation)
         self._use_ai = use_ai
         self._ai_title_generator = None
-        if use_ai and AI_TITLE_AVAILABLE:
+        if use_ai:
             self._ai_title_generator = AITitleGenerator()
             if not self._ai_title_generator.is_available():
                 self._ai_title_generator = None
@@ -743,7 +728,7 @@ def create_stories_from_idea(
     idea: Idea,
     connection: Optional[sqlite3.Connection] = None,
     idea_id: Optional[str] = None,
-    title_config: Optional[TitleConfig] = None,
+    title_config: Optional[TitleGeneratorConfig] = None,
     skip_if_exists: bool = True,
 ) -> Optional[StoryTitleResult]:
     """Convenience function to create Stories with Titles from an Idea.
@@ -783,7 +768,7 @@ def create_stories_from_idea(
 
 
 def process_stories_without_titles(
-    connection: sqlite3.Connection, idea_db=None, title_config: Optional[TitleConfig] = None
+    connection: sqlite3.Connection, idea_db=None, title_config: Optional[TitleGeneratorConfig] = None
 ) -> StoryTitleResult:
     """Process Stories without Title references and generate Title v0 for each.
 

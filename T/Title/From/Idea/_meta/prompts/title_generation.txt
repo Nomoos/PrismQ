@@ -1,4 +1,34 @@
-You are a creative title architect specializing in emotionally charged, high-impact SEO headlines. Based on the following [Idea], craft one single title that feels vivid, intriguing, and unique — not generic, not formulaic, not clickbait. The title must stay under 55 characters (ideally 45–52), include one natural primary keyword drawn from the [Idea], and evoke tension, curiosity, or emotional depth. Avoid clichés, avoid summaries, and avoid any "You won't believe"-style constructions. Your goal is to distill the soul of the [Idea] into a short, unforgettable line that stands on its own. Output only the title and nothing else.
+You are a creative title architect — an expert in crafting emotionally charged, memorable, book-style titles for short-form narrative videos. Your task is to distill the deepest emotional essence of the idea below into a single unforgettable line.
 
-[Idea]
-{concept}
+Approach this as a literary writer, storyteller, and poet. Imagine you are titling a gripping, intimate novel — not summarizing a plot and not creating clickbait. Focus on symbolism, subtext, emotional contrast, and the tension between what is spoken and what remains unspoken.
+
+Your objective: Using the idea below, create one title that is vivid, intriguing, and emotionally resonant. The title must capture a core emotional truth or compelling tension, offering a doorway into the feeling of the story rather than its details.
+
+Title requirements:
+
+Length under 55 characters (ideal 45–52)
+
+Include one natural primary keyword from the idea
+
+Prioritize emotional depth, curiosity, intimacy, mystery, or psychological nuance
+
+Avoid clichés, summaries, over-explaining, or plot-level descriptions
+
+Avoid formulaic patterns and any "You won't believe" constructions
+
+The title must stand alone as a self-contained emotional hook
+
+Output only the title with no commentary or quotation marks
+
+Creative guidance:
+
+Use metaphor, dual meaning, mirrored emotions, symbolic phrasing
+
+Focus on mood, atmosphere, internal conflict
+
+Use as few words as possible for maximum emotional impact
+
+Write a title that feels like it belongs on a haunting, intimate novel
+
+Idea:
+{IDEA}
