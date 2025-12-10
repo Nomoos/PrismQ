@@ -2,9 +2,21 @@
 
 This directory contains scripts for the PrismQ content production workflow.
 
+## 📚 Documentation
+
+- **[FUNKCIONALITA_AKTUALNI.md](FUNKCIONALITA_AKTUALNI.md)** - 🇨🇿 Kompletní shrnutí současné funkcionality (Current functionality summary in Czech)
+- **[FUNKCIONALITA_NAVRH.md](FUNKCIONALITA_NAVRH.md)** - 🇨🇿 Návrh dalšího vývoje a priorit (Future development recommendations in Czech)
+- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Next steps guide and workflow progress
+- **[TASK_COMPLETION.md](TASK_COMPLETION.md)** - Task completion history
+- **[VALIDATION_REPORT.md](VALIDATION_REPORT.md)** - Mermaid diagram validation report
+
 ## 🚀 Quick Start
 
 **New to PrismQ Scripts?** Check **[NEXT_STEPS.md](NEXT_STEPS.md)** for guidance on your current progress and what to do next in the pipeline.
+
+**Want to understand what's implemented?** See **[FUNKCIONALITA_AKTUALNI.md](FUNKCIONALITA_AKTUALNI.md)** for a complete analysis.
+
+**Planning future development?** Read **[FUNKCIONALITA_NAVRH.md](FUNKCIONALITA_NAVRH.md)** for prioritized recommendations.
 
 ## New Numbered Module Structure
 
