@@ -170,7 +170,7 @@ Každý modul je popsán ve formátu:
     - Flavor template (styl, tón, zaměření)
     - Variation index (pro unikátnost)
   - **01.6.4** Prompt se pošle na Ollama API
-  - **01.6.5** AI (qwen2.5:14b-instruct model) generuje odpověď
+  - **01.6.5** AI (qwen3:32b model) generuje odpověď
   - **01.6.6** Odpověď se parsuje do struktury Idea objektu
   - **01.6.7** Validuje se kvalita výstupu
   - **01.6.8** Vytvoří se Idea objekt (dict) s fieldy:
@@ -197,7 +197,7 @@ Každý modul je popsán ve formátu:
 **Technologie:**
 - Ollama HTTP API (POST request)
 - JSON strukturování promptů
-- AI model: qwen2.5:14b-instruct (14B parametrů)
+- AI model: qwen3:32b (32B parametrů)
 - Response parsing a validation
 
 **Progress indikace:**
@@ -345,7 +345,7 @@ Display results → Save to DB (if not preview) → Loop back or Exit
 **Klíčové technologie:**
 - Windows Batch scripting
 - Python 3.x
-- Ollama AI (qwen2.5:14b-instruct)
+- Ollama AI (qwen3:32b)
 - SQLite database
 - ANSI terminal colors
 - JSON data structures
@@ -1293,7 +1293,7 @@ Idea Creation (01) → Story From Idea (02) → Title From Idea (03) → Script 
 | Aspekt | Modul 01 | Modul 02 | Modul 03 |
 |--------|----------|----------|----------|
 | Input | Interaktivní user text | Auto (Ideas z DB) | Auto (Stories z DB) |
-| AI Model | qwen2.5:14b | Žádné | qwen3:32b |
+| AI Model | qwen3:32b | Žádné | qwen3:32b |
 | Output Count | 10 Ideas | 10 Stories per Idea | 1 Title per Story (10 variants) |
 | Loop Type | Interactive | Continuous | Continuous |
 | Delay | Žádný (čeká na user) | Dynamic (1-30s) | Fixed (1ms) |

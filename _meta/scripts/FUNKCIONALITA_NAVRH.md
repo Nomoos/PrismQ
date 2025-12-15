@@ -70,7 +70,7 @@ T/Script/From/Title/Idea/src/
 8. ✅ Continuous mode
 
 **AI integrace:**
-- Model: qwen2.5:14b-instruct (již používán)
+- Model: qwen3:32b (již používán)
 - Input: Idea + Title
 - Output: Strukturovaný Script
 - Format: Markdown s sekcemi
