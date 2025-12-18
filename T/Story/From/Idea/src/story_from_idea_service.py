@@ -141,14 +141,12 @@ class StoryFromIdeaService:
             Set of Idea IDs (integers) that have at least one Story.
         """
         cursor = self._story_conn.execute("SELECT DISTINCT idea_id FROM Story")
-        # idea_id is stored as TEXT in Story, so we need to convert
+        # idea_id is stored as INTEGER in Story
         referenced_ids = set()
         for row in cursor.fetchall():
-            try:
-                referenced_ids.add(int(row[0]))
-            except (ValueError, TypeError):
-                # Skip non-integer idea_ids (legacy or external IDs)
-                pass
+            idea_id = row[0]
+            if idea_id is not None:
+                referenced_ids.add(idea_id)
         return referenced_ids
 
     def get_unreferenced_ideas(self) -> List[SimpleIdea]:
@@ -198,7 +196,7 @@ class StoryFromIdeaService:
         Returns:
             True if the Idea already has Stories, False otherwise.
         """
-        count = self._story_repo.count_by_idea_id(str(idea_id))
+        count = self._story_repo.count_by_idea_id(idea_id)
         return count > 0
 
     def create_stories_from_idea(
@@ -229,8 +227,8 @@ class StoryFromIdeaService:
         for _ in range(self.NUM_STORIES):
             # Create Story with reference to Idea
             story = Story(
-                idea_id=str(idea_id),  # Story.idea_id is TEXT
-                state=StoryState.TITLE_FROM_IDEA,  # Ready for PrismQ.T.Title.From.Idea processing
+                idea_id=idea_id,  # Story.idea_id is INTEGER
+                state=StoryState.TITLE_FROM_IDEA,  # "PrismQ.T.Title.From.Idea" - Ready for title generation
             )
 
             # Persist Story
