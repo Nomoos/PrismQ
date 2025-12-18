@@ -420,39 +420,33 @@ Display results → Save to DB (if not preview) → Loop back or Exit
 
 ---
 
-## 02.3 Připojení k databázím
+## 02.3 Připojení k databázi
 
 **Co se děje:**
-- **02.3.1** Získá se cesta k hlavní databázi (PrismQ DB)
+- **02.3.1** Získá se cesta k databázi (PrismQ DB)
   - Z `Config.get_database_path()`
-  - Obsahuje tabulku `Story`
-- **02.3.2** Otevře se connection k hlavní DB
+  - Obsahuje tabulky `Story` a `Idea`
+- **02.3.2** Otevře se connection k databázi
 - **02.3.3** Nastaví se `row_factory = sqlite3.Row` (pro dict-like rows)
-- **02.3.4** Získá se cesta k Idea databázi
-  - Z `Config.get_idea_database_path()`
-  - Obsahuje tabulku `Idea`
-- **02.3.5** Vytvoří se `SimpleIdeaDatabase` instance
-- **02.3.6** Připojí se k Idea databázi
-- **02.3.7** Vytvoří se `StoryFromIdeaService` instance
+- **02.3.4** Vytvoří se `SimpleIdeaDatabase` instance s touto connection
+- **02.3.5** Vytvoří se `StoryFromIdeaService` instance
 
 **Vstupy:**
-- Database paths z Config
+- Database path z Config
 
 **Výstupy:**
-- `story_conn` - SQLite connection (Story DB)
-- `idea_db` - SimpleIdeaDatabase instance (Idea DB)
+- `db_conn` - SQLite connection (PrismQ DB)
+- `idea_db` - SimpleIdeaDatabase instance
 - `service` - StoryFromIdeaService instance
 
 **Technologie:**
 - Python sqlite3
-- Multiple database connections
+- Single database connection
 
 **Database struktura:**
 ```
 PrismQ DB (db.s3db):
 - Story table (id, idea_id, state, created_at...)
-
-Idea DB (idea.db):
 - Idea table (id, text, version, created_at)
 ```
 
@@ -555,14 +549,14 @@ target = 4  # Nejstarší (nejnižší ID)
     ```python
     story = Story(
         id=None,  # Auto-assign při save
-        idea_id=str(target_idea_id),
-        state=StoryState.TITLE_FROM_IDEA,
+        idea_id=target_idea_id,
+        state="PrismQ.T.Title.From.Idea",
         created_at=datetime.now()
     )
     ```
   - **02.7.2** Story obsahuje:
-    - `idea_id` - Reference na Idea (string)
-    - `state` - `"PrismQ.T.Title.From.Idea"` (konstanta)
+    - `idea_id` - Reference na Idea (integer)
+    - `state` - `"PrismQ.T.Title.From.Idea"` (string konstanta)
     - `created_at` - Timestamp
     - `title_id` - NULL (zatím žádný titulek)
     - `content_id` - NULL (zatím žádný obsah)
