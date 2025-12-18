@@ -15,7 +15,7 @@ Key Components:
     - SEED_VARIATIONS: 500 predefined seed words for creative variation
 """
 
-from .ai_content_generator import (
+from .ai_script_generator import (
     SEED_VARIATIONS,
     AIScriptGenerator,
     AIScriptGeneratorConfig,
@@ -32,7 +32,7 @@ from .script_generator import (
     ScriptTone,
     ScriptV1,
 )
-from .story_content_service import (  # State-based processing
+from .story_script_service import (  # State-based processing
     INITIAL_SCRIPT_VERSION,
     STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
     STATE_SCRIPT_FROM_IDEA_TITLE,
