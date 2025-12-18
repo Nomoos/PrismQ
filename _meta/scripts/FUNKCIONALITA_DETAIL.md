@@ -897,24 +897,21 @@ Title:
 ## 03.6 Načtení zdrojové Idea
 
 **Co se děje:**
-- **03.6.1** Z `target_story` se získá `idea_id`
-- **03.6.2** Idea se načte z Idea database (pokud je separate)
-  - Nebo se rekonstruuje z Story metadata
-- **03.6.3** Idea text se parsuje:
-  - Extrahuje se title
-  - Extrahuje se description
-  - Extrahuje se metadata (flavor, target audience, etc.)
+- **03.6.1** Z `target_story` se získá `idea_id` (integer)
+- **03.6.2** Idea se načte z Idea tabulky (stejná databáze)
+  - SQL: `SELECT * FROM Idea WHERE id = ?`
+- **03.6.3** Získá se `idea_text` - kompletní text Idea objektu
+- **03.6.4** Text se použije přímo pro AI generování (žádný parsing)
 
 **Vstupy:**
-- `target_story.idea_id` - Reference na Idea
+- `target_story.idea_id` - Reference na Idea (integer)
 
 **Výstupy:**
-- `idea_text` - Text zdrojové Idea
-- `idea_metadata` - Parsed metadata z Idea
+- `idea_text` - Text zdrojové Idea (použit přímo pro AI prompt)
 
 **Technologie:**
-- Text parsing
-- Metadata extraction
+- SQL query
+- Text retrieval (bez parsování)
 
 ---
 
