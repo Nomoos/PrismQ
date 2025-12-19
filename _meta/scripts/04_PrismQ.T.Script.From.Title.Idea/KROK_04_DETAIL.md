@@ -17,13 +17,14 @@
 
 **Výstup:**
 - `Script` objekt (`ScriptV1`) s:
-  - Vygenerovaný text skriptu (~225 slov pro 90s video)
+  - Vygenerovaný text skriptu (~300 slov pro 120s video, max 175s)
   - Strukturované sekce (introduction, body, conclusion)
-  - Metadata (word_count, duration, platform, seed)
+  - Metadata (word_count, duration, audience, seed)
   - `state = "PrismQ.T.Review.Title.From.Script.Idea"` (připraveno pro krok 05)
 
-**AI Model:** Qwen3:30b via Ollama  
-**Seed Variations:** 504 jednoduchých slov pro kreativní inspiraci
+**AI Model:** Získán globálně přes `get_local_ai_model()` (např. Qwen3:30b via Ollama)  
+**Seed Variations:** 504 jednoduchých slov pro kreativní inspiraci  
+**Target Audience:** Věk 13-23, Ženy, USA (defaultně)
 
 ---
 
@@ -247,11 +248,12 @@ INFO: No stories ready for script generation
 
 **Co se děje:**
 - Vytvoří se `ScriptGeneratorConfig` s parametry
-- Nastaví se platforma, délka, struktura, tón
-- Nastaví se AI parametry (model, temperature, timeout)
+- Nastaví se délka videa a cílová audience
+- AI model a temperature jsou získány globálně přes `get_local_ai()` nebo `get_local_ai_model()`
 
 **Vstupy:**
 - Uživatelská konfigurace nebo defaulty
+- Globální AI konfigurace (model, temperature)
 
 **Výstupy:**
 - `config` objekt typu `ScriptGeneratorConfig`
@@ -259,39 +261,26 @@ INFO: No stories ready for script generation
 **Technologie:**
 - Python dataclass
 - Configuration management
+- Globální AI konfigurace
 
 **Konfigurace defaulty:**
 ```python
 ScriptGeneratorConfig(
-    platform_target=PlatformTarget.YOUTUBE_MEDIUM,  # YouTube 60-120s
-    target_duration_seconds=90,                      # 90 sekund
-    structure_type=ScriptStructure.HOOK_DELIVER_CTA, # Hook-Deliver-CTA
-    tone=ScriptTone.ENGAGING,                        # Engaging tón
-    ai_model="qwen3:32b",                            # Qwen3 32B model
-    ai_api_base="http://localhost:11434",            # Ollama API
-    ai_temperature=0.7,                              # Kreativita
-    ai_timeout=120                                   # 2 minuty timeout
+    target_duration_seconds=120,  # Výchozí délka: 120 sekund
+    max_duration_seconds=175,     # Maximální délka: 175 sekund (5s před limity platforem)
+    audience={
+        "age_range": "13-23",
+        "gender": "Female",
+        "country": "United States"
+    }
 )
 ```
 
-**Platform options:**
-- `YOUTUBE_SHORT` - 30-60s
-- `YOUTUBE_MEDIUM` - 60-120s
-- `YOUTUBE_LONG` - 120-600s
-- `TIKTOK` - 15-60s
-- `INSTAGRAM_REEL` - 15-90s
-
-**Structure options:**
-- `HOOK_DELIVER_CTA` - Hook → Deliver → CTA
-- `PROBLEM_SOLUTION` - Problem → Solution
-- `STORY_ARC` - Setup → Conflict → Resolution
-
-**Tone options:**
-- `ENGAGING` - Poutavý
-- `DRAMATIC` - Dramatický
-- `INFORMATIVE` - Informativní
-- `CASUAL` - Neformální
-- `PROFESSIONAL` - Profesionální
+**Poznámky k nastavení:**
+- Video je multiplatformní (ne vázané na konkrétní platformu)
+- Default 120 sekund, max 175 sekund (5 sekund před hlavními limity platforem)
+- AI model a temperature jsou fixní pro lokální AI a nastavené globálně
+- AI temperature je náhodná mezi definovanými limity (řešeno na globální úrovni)
 
 ---
 
@@ -302,17 +291,15 @@ ScriptGeneratorConfig(
 - Kombinuje:
   - **Title** - Titulek (z kroku 03)
   - **Idea text** - Concept, premise, synopsis (z idea objektu)
-  - **Seed** - Vybraný seed pro inspiraci
-  - **Target duration** - Požadovaná délka (90s = ~225 slov)
-  - **Platform** - Cílová platforma (YouTube, TikTok...)
-  - **Structure** - Požadovaná struktura (Hook-Deliver-CTA)
-  - **Tone** - Požadovaný tón (Engaging, Dramatic...)
+  - **Seed** - Vybraný seed pro inspiraci (používá se symbolicky/tematicky)
+  - **Target duration** - Požadovaná délka (120s = ~300 slov)
+  - **Audience** - Cílová audience (věk, pohlaví, země)
 
 **Vstupy:**
 - `title` - String
 - `idea_text` - String (kombinace concept + premise + synopsis)
 - `seed` - String (např. "midnight")
-- `config` - ScriptGeneratorConfig
+- `config` - ScriptGeneratorConfig (s audience)
 
 **Výstupy:**
 - `prompt` - Formátovaný AI prompt (string)
@@ -320,34 +307,47 @@ ScriptGeneratorConfig(
 **Technologie:**
 - String templating
 - Prompt engineering
-- Structured instructions pro AI
+- Structured instructions pro lokální AI model
 
 **Prompt struktura:**
 ```
-TASK: Generate a script for video content
+SYSTEM INSTRUCTION:
+You are a professional video script writer.
+Follow instructions exactly. Do not add extra sections or explanations.
 
-TITLE: [Title from step 03]
+TASK:
+Generate a video script.
 
-IDEA: [Concept, premise, synopsis from idea]
+INPUTS:
+TITLE: [Title]
+IDEA: [Idea]
+INSPIRATION SEED: [Single word used only as creative inspiration, e.g. "midnight"]
 
-INSPIRATION SEED: [Random seed word - e.g., "midnight"]
-
-TARGET:
-- Duration: 90 seconds (~225 words)
-- Platform: YouTube Medium (60-120s)
-- Structure: Hook-Deliver-CTA
-- Tone: Engaging
+TARGET AUDIENCE:
+- Age: 13–23
+- Gender: Female
+- Country: United States
 
 REQUIREMENTS:
-1. Start with a strong hook (first 5 seconds)
-2. Deliver the main content clearly
-3. End with a call-to-action
-4. Match the tone and style
-5. Use the seed for creative inspiration
+1. Hook must strongly capture attention within the first 5 seconds.
+2. Deliver the main idea clearly and coherently.
+3. End with a clear and natural call-to-action.
+4. Maintain consistent engaging tone throughout.
+5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
 
-OUTPUT FORMAT:
-[Generated script text]
+OUTPUT RULES:
+- Output ONLY the script text.
+- No headings, no labels, no explanations.
+- Do not mention the word "hook", "CTA", or any structure explicitly.
+- Do not mention that this is a script.
+
+The first sentence must create immediate curiosity or tension.
 ```
+
+**Důležité poznámky:**
+- Seed se používá jemně a symbolicky, ne doslovně
+- První věta musí vytvořit okamžitou zvědavost nebo napětí
+- Output obsahuje pouze samotný text skriptu bez strukturálních značek
 
 ---
 
@@ -356,44 +356,46 @@ OUTPUT FORMAT:
 **Co se děje:**
 - **04.8.1** `AIScriptGenerator.generate()` posílá request na Ollama
 - **04.8.2** POST request na `http://localhost:11434/api/generate`
-- **04.8.3** Request payload:
+- **04.8.3** AI model a temperature jsou získány z globální konfigurace (`get_local_ai_model()`)
+- **04.8.4** Request payload:
   ```json
   {
-    "model": "qwen3:32b",
+    "model": "[z get_local_ai_model()]",
     "prompt": "[AI prompt from 04.7]",
-    "temperature": 0.7,
+    "temperature": "[náhodná mezi limity z globální konfigurace]",
     "stream": false
   }
   ```
-- **04.8.4** Čeká na odpověď (timeout 120s)
-- **04.8.5** Parsuje JSON odpověď
-- **04.8.6** Extrahuje vygenerovaný text
+- **04.8.5** Čeká na odpověď (timeout 120s)
+- **04.8.6** Parsuje JSON odpověď
+- **04.8.7** Extrahuje vygenerovaný text
 
 **Vstupy:**
 - `prompt` - AI prompt
-- `config` - API konfigurace
+- Globální AI konfigurace (model, temperature range)
 
 **Výstupy:**
-- `script_text` - Vygenerovaný skript (string, ~225 slov)
+- `script_text` - Vygenerovaný skript (string, ~300 slov pro 120s)
 
 **Technologie:**
 - HTTP POST request
 - JSON encoding/decoding
 - Ollama API protocol
 - Error handling a retry logic
+- Globální AI konfigurace
 
 **API response:**
 ```json
 {
-  "model": "qwen3:32b",
+  "model": "[from global config]",
   "created_at": "2025-12-18T...",
-  "response": "[Generated script text with ~225 words...]",
+  "response": "[Generated script text with ~300 words...]",
   "done": true
 }
 ```
 
 **Timing:**
-- Typicky 5-15 sekund pro 225 slov
+- Typicky 8-20 sekund pro 300 slov
 - Závisí na hardware a load
 - Timeout 120s pro bezpečnost
 
@@ -443,7 +445,8 @@ OUTPUT FORMAT:
 ```python
 word_count = len(script_text.split())
 estimated_duration = word_count / 2.5  # 2.5 words per second
-# Pro 225 slov: 225 / 2.5 = 90 sekund ✓
+# Pro 300 slov: 300 / 2.5 = 120 sekund ✓
+# Maximum: 175 sekund (437 slov)
 ```
 
 ---
@@ -466,19 +469,22 @@ estimated_duration = word_count / 2.5  # 2.5 words per second
 - `script_v1` - ScriptV1 objekt:
   ```python
   ScriptV1(
-    text="[Full script text ~225 words]",
+    text="[Full script text ~300 words]",
     sections=[
       ScriptSection(type="introduction", content="..."),
       ScriptSection(type="body", content="..."),
       ScriptSection(type="conclusion", content="...")
     ],
-    word_count=225,
-    estimated_duration_seconds=90,
-    platform_target="youtube_medium",
-    structure_type="hook_deliver_cta",
-    tone="engaging",
+    word_count=300,
+    estimated_duration_seconds=120,
+    max_duration_seconds=175,
+    audience={
+      "age_range": "13-23",
+      "gender": "Female",
+      "country": "United States"
+    },
     ai_generated=True,
-    ai_model="qwen3:32b",
+    ai_model="[získán z get_local_ai_model()]",
     seed_used="midnight",
     title_used="[Title from step 03]",
     idea_id=123,
@@ -521,11 +527,9 @@ estimated_duration = word_count / 2.5  # 2.5 words per second
 
 Title: [Title from step 03]
 Seed: midnight
-Word Count: 225 words
-Duration: 90 seconds
-Platform: YouTube Medium
-Structure: Hook-Deliver-CTA
-Tone: Engaging
+Word Count: 300 words
+Duration: 120 seconds (max: 175s)
+Target Audience: Female, 13-23, USA
 
 ───────────────────────────────────────────────
   📝 SCRIPT TEXT
@@ -535,13 +539,13 @@ Tone: Engaging
 ───────────────────────────────────────────────
   📊 SECTIONS
 ───────────────────────────────────────────────
-Introduction (50 words):
+Introduction (75 words):
 [Hook and intro...]
 
-Body (130 words):
+Body (175 words):
 [Main content...]
 
-Conclusion (45 words):
+Conclusion (50 words):
 [Conclusion and CTA...]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -609,9 +613,10 @@ Table: Script
 - text TEXT NOT NULL
 - word_count INTEGER
 - duration_seconds INTEGER
-- platform TEXT
-- structure TEXT
-- tone TEXT
+- max_duration_seconds INTEGER
+- audience_age_range TEXT
+- audience_gender TEXT
+- audience_country TEXT
 - ai_model TEXT
 - seed_used TEXT
 - version INTEGER DEFAULT 1
@@ -630,8 +635,9 @@ Table: Story (update)
 │  Preview Mode - No Database Save         │
 │  Script would be saved with:             │
 │  - Story ID: 123                         │
-│  - Word Count: 225                       │
-│  - Duration: 90s                         │
+│  - Word Count: 300                       │
+│  - Duration: 120s (max: 175s)            │
+│  - Audience: Female, 13-23, USA          │
 │  - Seed: midnight                        │
 └──────────────────────────────────────────┘
 ```
@@ -702,11 +708,11 @@ Krok 05: Review.Title.From.Script.Idea
 - **04.1-04.3:** Environment setup: ~2-5 sekund (první běh)
 - **04.4:** Database load: <1 sekunda
 - **04.5-04.7:** Seed selection a prompt: <1 sekunda
-- **04.8:** AI generation: ~5-15 sekund (závisí na hardware)
+- **04.8:** AI generation: ~8-20 sekund (závisí na hardware, pro 300 slov)
 - **04.9-04.10:** Strukturování: <1 sekunda
 - **04.11:** Display: <1 sekunda
 - **04.12:** Database save: <1 sekunda
-- **CELKEM:** ~8-24 sekund na jeden skript
+- **CELKEM:** ~12-30 sekund na jeden skript
 
 ### Throughput
 - **S Ollama:** ~3-6 skriptů za minutu
@@ -734,10 +740,11 @@ Krok 05: Review.Title.From.Script.Idea
 - `script_from_idea_title_interactive.py` - CLI
 
 ### AI Model
-- **Qwen3:30b** (32 billion parameters)
-- Generative AI model
+- Model získán globálně přes `get_local_ai_model()` (např. Qwen3:30b)
+- Generative AI model pro lokální inference
 - Lokální inference přes Ollama
-- Temperature 0.7 pro kreativitu
+- Temperature je náhodná mezi definovanými limity (globální konfigurace)
+- Fixní nastavení pro lokální AI modely
 
 ### Database
 - **SQLite** (`Model/db.s3db`)
@@ -787,7 +794,10 @@ Krok 05: Review.Title.From.Script.Idea
 
 **Klíčové vlastnosti:**
 - ✅ AI-powered generování s 504 seed variacemi
-- ✅ Konfigurovatelné parametry (platform, duration, tone, structure)
+- ✅ Multiplatformní přístup (ne vázáno na jednu platformu)
+- ✅ Target audience konfigurace (věk 13-23, ženy, USA)
+- ✅ Flexibilní délka (default 120s, max 175s)
+- ✅ Globální AI konfigurace (model a temperature)
 - ✅ Automatické strukturování do sekcí
 - ✅ Transakční databázové operace
 - ✅ Preview režim pro bezpečné testování
