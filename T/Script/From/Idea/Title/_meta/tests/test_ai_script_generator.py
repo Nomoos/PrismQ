@@ -1,10 +1,10 @@
-"""Tests for AI Content Generator (Qwen3:30b).
+"""Tests for AI Script Generator (Qwen3:30b).
 
 These tests verify:
 1. AIScriptGeneratorConfig default values
 2. AIScriptGenerator initialization
-3. Seed variations functionality (500 simple words like "pudding", "fire", "ocean")
-4. AI generation with Title + Idea + Seed
+3. Seed variations functionality (504 simple words like "pudding", "fire", "ocean")
+4. AI generation with Title + Idea + Seed + Audience
 5. Integration with ScriptGenerator
 """
 
@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from T.Content.From.Idea.Title.src.ai_content_generator import (
+from T.Script.From.Idea.Title.src.ai_script_generator import (
     SEED_VARIATIONS,
     AIScriptGenerator,
     AIScriptGeneratorConfig,
@@ -20,19 +20,16 @@ from T.Content.From.Idea.Title.src.ai_content_generator import (
     get_random_seed,
     get_seed_by_index,
 )
-from T.Content.From.Idea.Title.src.script_generator import (
-    PlatformTarget,
+from T.Script.From.Idea.Title.src.script_generator import (
     ScriptGenerator,
     ScriptGeneratorConfig,
-    ScriptStructure,
-    ScriptTone,
     ScriptV1,
 )
 
 # Patch paths for mocking
-AI_SCRIPT_GEN_REQUESTS_GET = "T.Content.From.Idea.Title.src.ai_content_generator.requests.get"
-AI_SCRIPT_GEN_REQUESTS_POST = "T.Content.From.Idea.Title.src.ai_content_generator.requests.post"
-SCRIPT_GEN_AI_MODULE = "T.Content.From.Idea.Title.src.script_generator._get_ai_generator_module"
+AI_SCRIPT_GEN_REQUESTS_GET = "T.Script.From.Idea.Title.src.ai_script_generator.requests.get"
+AI_SCRIPT_GEN_REQUESTS_POST = "T.Script.From.Idea.Title.src.ai_script_generator.requests.post"
+SCRIPT_GEN_AI_MODULE = "T.Script.From.Idea.Title.src.script_generator._get_ai_generator_module"
 
 # Import Idea for test data
 import sys
@@ -231,18 +228,21 @@ class TestGenerateScriptConvenience:
 class TestScriptGeneratorAIIntegration:
     """Tests for ScriptGenerator AI integration."""
 
-    def test_config_has_ai_settings(self):
-        """Test that ScriptGeneratorConfig has AI settings."""
+    def test_config_has_new_settings(self):
+        """Test that ScriptGeneratorConfig has new multiplatform settings."""
         config = ScriptGeneratorConfig()
-        assert hasattr(config, "ai_model")
-        assert hasattr(config, "ai_api_base")
-        assert hasattr(config, "ai_temperature")
-        assert hasattr(config, "ai_timeout")
+        assert hasattr(config, "target_duration_seconds")
+        assert hasattr(config, "max_duration_seconds")
+        assert hasattr(config, "audience")
+        assert config.target_duration_seconds == 120
+        assert config.max_duration_seconds == 175
 
-    def test_default_ai_model_is_qwen(self):
-        """Test that default AI model is Qwen3:30b."""
+    def test_config_has_audience_defaults(self):
+        """Test that ScriptGeneratorConfig has audience defaults."""
         config = ScriptGeneratorConfig()
-        assert config.ai_model == "qwen3:32b"
+        assert config.audience["age_range"] == "13-23"
+        assert config.audience["gender"] == "Female"
+        assert config.audience["country"] == "United States"
 
     def test_generator_has_is_ai_available_method(self):
         """Test that ScriptGenerator has is_ai_available method."""
