@@ -148,13 +148,13 @@ Start Ollama with: ollama run qwen3:32b
   ```sql
   SELECT * FROM Story 
   WHERE state = 'PrismQ.T.Title.From.Idea'
-    AND title IS NOT NULL
     AND idea_id IS NOT NULL
   ORDER BY created_at ASC
   LIMIT 1
   ```
 - Načte se nejstarší Story čekající na zpracování
-- Načte se také související Idea objekt přes `idea_id`
+- Načte se související Idea objekt přes `idea_id`
+- Načte se Title z tabulky Title přes `story_id`
 
 **Vstupy:**
 - Database: `Model/db.s3db`
@@ -163,9 +163,15 @@ Start Ollama with: ollama run qwen3:32b
 **Výstupy:**
 - `story` objekt s fieldy:
   - `id` - Story ID
-  - `title` - Titulek (z kroku 03)
   - `idea_id` - Odkaz na Idea
   - `state` - Aktuální stav
+  - `created_at` - Timestamp
+- `title` objekt z tabulky Title:
+  - `id` - Title ID
+  - `story_id` - Odkaz na Story
+  - `version` - Verze titulku
+  - `text` - Text titulku (z kroku 03)
+  - `review_id` - Odkaz na review (pokud existuje)
   - `created_at` - Timestamp
 - `idea` objekt s fieldy:
   - `concept` - Koncept nápadu
@@ -607,6 +613,14 @@ Conclusion (50 words):
 
 **Database schema:**
 ```sql
+Table: Title (vstup z kroku 03)
+- id INTEGER PRIMARY KEY AUTOINCREMENT
+- story_id INTEGER NOT NULL (FK → Story.id)
+- version INTEGER
+- text TEXT NOT NULL
+- review_id INTEGER
+- created_at TIMESTAMP
+
 Table: Script
 - id INTEGER PRIMARY KEY AUTOINCREMENT
 - story_id INTEGER NOT NULL (FK → Story.id)
@@ -748,7 +762,7 @@ Krok 05: Review.Title.From.Script.Idea
 
 ### Database
 - **SQLite** (`Model/db.s3db`)
-- Tables: `Story`, `Script`, `Idea`
+- Tables: `Story`, `Title`, `Script`, `Idea`
 - Foreign keys a constraints
 - Transaction management
 
