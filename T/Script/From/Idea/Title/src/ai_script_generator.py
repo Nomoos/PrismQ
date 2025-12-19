@@ -661,9 +661,9 @@ class AIScriptGenerator:
         self,
         title: str,
         idea_text: str,
-        target_duration_seconds: int = 90,
-        platform: str = "youtube_medium",
-        tone: str = "engaging",
+        target_duration_seconds: int = 120,
+        max_duration_seconds: int = 175,
+        audience: Optional[dict] = None,
         seed: Optional[str] = None,
     ) -> Optional[str]:
         """Generate a complete script using AI.
@@ -671,10 +671,10 @@ class AIScriptGenerator:
         Args:
             title: The title for the script (Titulek)
             idea_text: The idea/concept text
-            target_duration_seconds: Target duration in seconds
-            platform: Target platform (youtube_short, youtube_medium, tiktok, etc.)
-            tone: Content tone (engaging, mysterious, educational, dramatic)
-            seed: Optional specific seed to use (if None, picks randomly from 500)
+            target_duration_seconds: Target duration in seconds (default: 120)
+            max_duration_seconds: Maximum duration in seconds (default: 175)
+            audience: Target audience dict with age_range, gender, country
+            seed: Optional specific seed to use (if None, picks randomly from 504)
 
         Returns:
             Generated script text, or None if AI is unavailable
@@ -690,7 +690,15 @@ class AIScriptGenerator:
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-        # Pick one seed from 500 variations
+        # Set default audience if not provided
+        if audience is None:
+            audience = {
+                "age_range": "13-23",
+                "gender": "Female",
+                "country": "United States",
+            }
+
+        # Pick one seed from 504 variations
         selected_seed = seed if seed else get_random_seed()
         logger.info(f"Using seed: {selected_seed}")
 
@@ -699,8 +707,8 @@ class AIScriptGenerator:
             idea_text=idea_text,
             seed=selected_seed,
             target_duration=target_duration_seconds,
-            platform=platform,
-            tone=tone,
+            max_duration=max_duration_seconds,
+            audience=audience,
         )
 
         try:
@@ -714,55 +722,67 @@ class AIScriptGenerator:
             raise RuntimeError(error_msg)
 
     def _create_content_prompt(
-        self, title: str, idea_text: str, seed: str, target_duration: int, platform: str, tone: str
+        self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
     ) -> str:
-        """Create prompt for script generation.
+        """Create prompt for script generation using updated structure for local models.
 
         Input:
         - Title (Titulek)
         - Idea text
-        - Seed (one picked from 500 variations)
+        - Seed (one picked from 504 variations)
+        - Audience (age_range, gender, country)
 
         Args:
             title: Content title
             idea_text: Idea/concept text
-            seed: Creative direction seed
-            target_duration: Target duration in seconds
-            platform: Target platform
-            tone: Content tone
+            seed: Creative direction seed (used symbolically/thematically)
+            target_duration: Target duration in seconds (default: 120)
+            max_duration: Maximum duration in seconds (default: 175)
+            audience: Target audience dict
 
         Returns:
-            Engineered prompt for AI
+            Engineered prompt for local AI model
         """
         # Calculate approximate word count (2.5 words per second for narration)
         target_words = int(target_duration * 2.5)
+        max_words = int(max_duration * 2.5)
 
-        # Platform-specific instructions
-        platform_instructions = self._get_platform_instructions(platform)
+        # Build the optimized prompt for local models
+        prompt = f"""SYSTEM INSTRUCTION:
+You are a professional video script writer.
+Follow instructions exactly. Do not add extra sections or explanations.
 
-        prompt_template = _load_prompt("script_generation.txt")
+TASK:
+Generate a video script.
 
-        return prompt_template.format(
-            title=title,
-            idea_text=idea_text,
-            seed=seed,
-            target_duration=target_duration,
-            target_words=target_words,
-            platform=platform,
-            tone=tone,
-            platform_instructions=platform_instructions,
-        )
+INPUTS:
+TITLE: {title}
+IDEA: {idea_text}
+INSPIRATION SEED: {seed} (Single word used only as creative inspiration)
 
-    def _get_platform_instructions(self, platform: str) -> str:
-        """Get platform-specific writing instructions."""
-        instructions = {
-            "youtube_short": """**PLATFORM (YouTube Shorts)**: Maximum engagement in first 3 seconds. Very short sentences. High energy.""",
-            "youtube_medium": """**PLATFORM (YouTube)**: Strong hook in first 5-10 seconds. Good pacing. Balance entertainment with substance.""",
-            "youtube_long": """**PLATFORM (YouTube Long)**: Build to key moments. Multiple hooks. Deeper storytelling.""",
-            "tiktok": """**PLATFORM (TikTok)**: Extremely attention-grabbing. Snappy sentences. Trend-aware.""",
-            "instagram_reel": """**PLATFORM (Instagram)**: Visual storytelling. Polished tone. Clear messaging.""",
-        }
-        return instructions.get(platform, "**PLATFORM**: Focus on engagement and clear language.")
+TARGET AUDIENCE:
+- Age: {audience.get('age_range', '13-23')}
+- Gender: {audience.get('gender', 'Female')}
+- Country: {audience.get('country', 'United States')}
+
+REQUIREMENTS:
+1. Hook must strongly capture attention within the first 5 seconds.
+2. Deliver the main idea clearly and coherently.
+3. End with a clear and natural call-to-action.
+4. Maintain consistent engaging tone throughout.
+5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
+6. Target length: approximately {target_words} words (for {target_duration} seconds).
+7. Maximum length: {max_words} words ({max_duration} seconds).
+
+OUTPUT RULES:
+- Output ONLY the script text.
+- No headings, no labels, no explanations.
+- Do not mention the word "hook", "CTA", or any structure explicitly.
+- Do not mention that this is a script.
+
+The first sentence must create immediate curiosity or tension."""
+
+        return prompt
 
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate content."""
@@ -811,9 +831,9 @@ class AIScriptGenerator:
 def generate_content(
     title: str,
     idea_text: str,
-    target_duration_seconds: int = 90,
-    platform: str = "youtube_medium",
-    tone: str = "engaging",
+    target_duration_seconds: int = 120,
+    max_duration_seconds: int = 175,
+    audience: Optional[dict] = None,
     seed: Optional[str] = None,
     config: Optional[AIScriptGeneratorConfig] = None,
 ) -> str:
@@ -822,10 +842,10 @@ def generate_content(
     Args:
         title: Content title (Titulek)
         idea_text: Idea/concept text
-        target_duration_seconds: Target duration in seconds
-        platform: Target platform
-        tone: Content tone
-        seed: Optional specific seed (if None, picks randomly from 500)
+        target_duration_seconds: Target duration in seconds (default: 120)
+        max_duration_seconds: Maximum duration in seconds (default: 175)
+        audience: Target audience dict with age_range, gender, country
+        seed: Optional specific seed (if None, picks randomly from 504)
         config: Optional AI configuration
 
     Returns:
@@ -838,7 +858,8 @@ def generate_content(
         >>> script = generate_content(
         ...     title="The Mystery of the Abandoned House",
         ...     idea_text="A girl discovers a time-loop in an abandoned house...",
-        ...     target_duration_seconds=90
+        ...     target_duration_seconds=120,
+        ...     audience={"age_range": "13-23", "gender": "Female", "country": "United States"}
         ... )
         >>> print(script)
     """
@@ -847,8 +868,8 @@ def generate_content(
         title=title,
         idea_text=idea_text,
         target_duration_seconds=target_duration_seconds,
-        platform=platform,
-        tone=tone,
+        max_duration_seconds=max_duration_seconds,
+        audience=audience,
         seed=seed,
     )
 
