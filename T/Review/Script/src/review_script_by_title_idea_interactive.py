@@ -211,48 +211,59 @@ def get_manual_input(logger: Optional[logging.Logger] = None) -> tuple:
     print_info("Please provide the following information:")
     print()
 
-    # Get title
-    title_text = input(f"{Colors.CYAN}Title: {Colors.END}").strip()
-    
-    # Get script content
-    print(f"\n{Colors.CYAN}Script content (paste text, then press Enter twice):{Colors.END}")
-    lines = []
-    empty_count = 0
-    while empty_count < 2:
-        line = input()
-        if not line:
-            empty_count += 1
-        else:
-            empty_count = 0
-            lines.append(line)
-    content_text = "\n".join(lines).strip()
-
-    # Get idea information
-    print(f"\n{Colors.CYAN}Idea concept:{Colors.END}")
-    concept = input().strip()
-
-    print(f"\n{Colors.CYAN}Idea premise (optional):{Colors.END}")
-    premise = input().strip()
-
-    print(f"\n{Colors.CYAN}Genre (horror/mystery/science_fiction/educational/other):{Colors.END}")
-    genre_input = input().strip().upper() or "OTHER"
     try:
-        genre = ContentGenre[genre_input]
-    except KeyError:
-        genre = ContentGenre.OTHER
-        print_warning(f"Unknown genre '{genre_input}', using OTHER")
+        # Get title
+        title_text = input(f"{Colors.CYAN}Title: {Colors.END}").strip()
+        
+        # Get script content
+        print(f"\n{Colors.CYAN}Script content (paste text, then press Enter twice):{Colors.END}")
+        lines = []
+        empty_count = 0
+        while empty_count < 2:
+            try:
+                line = input()
+                if not line:
+                    empty_count += 1
+                else:
+                    empty_count = 0
+                    lines.append(line)
+            except EOFError:
+                # Handle Ctrl+D / EOF gracefully
+                break
+        content_text = "\n".join(lines).strip()
 
-    # Create idea
-    idea = None
-    if IDEA_MODEL_AVAILABLE:
-        idea = Idea(
-            title=title_text,
-            concept=concept,
-            premise=premise or concept,
-            genre=genre,
-        )
+        # Get idea information
+        print(f"\n{Colors.CYAN}Idea concept:{Colors.END}")
+        concept = input().strip()
 
-    return content_text, title_text, idea
+        print(f"\n{Colors.CYAN}Idea premise (optional):{Colors.END}")
+        premise = input().strip()
+
+        print(f"\n{Colors.CYAN}Genre (horror/mystery/science_fiction/educational/other):{Colors.END}")
+        genre_input = input().strip().upper() or "OTHER"
+        try:
+            genre = ContentGenre[genre_input]
+        except KeyError:
+            genre = ContentGenre.OTHER
+            print_warning(f"Unknown genre '{genre_input}', using OTHER")
+
+        # Create idea
+        idea = None
+        if IDEA_MODEL_AVAILABLE:
+            idea = Idea(
+                title=title_text,
+                concept=concept,
+                premise=premise or concept,
+                genre=genre,
+            )
+
+        return content_text, title_text, idea
+    
+    except EOFError:
+        # User pressed Ctrl+D, return empty values
+        if logger:
+            logger.info("User cancelled input (EOF)")
+        return None, None, None
 
 
 # =============================================================================
@@ -342,13 +353,13 @@ def save_review_to_database(
         logger: Logger instance
 
     Returns:
-        True if saved successfully, False otherwise
+        True if saved successfully or in preview mode, False otherwise
     """
     if preview_mode:
         print_warning("Preview mode - review NOT saved to database")
         if logger:
             logger.info("Preview mode - skipping database save")
-        return True
+        return True  # Return True in preview mode (operation successful, just skipped)
 
     # TODO: Implement database save functionality
     # This would integrate with Model.Entities.review and appropriate repository
@@ -356,7 +367,7 @@ def save_review_to_database(
     if logger:
         logger.warning("Database save functionality not implemented")
     
-    return False
+    return False  # Return False when not implemented (operation not successful)
 
 
 # =============================================================================
@@ -395,9 +406,9 @@ def setup_logging(debug: bool = False) -> logging.Logger:
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
-    # Console handler (errors only by default, debug if enabled)
+    # Console handler (warnings and errors by default, debug if enabled)
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG if debug else logging.ERROR)
+    console_handler.setLevel(logging.DEBUG if debug else logging.WARNING)
     console_formatter = logging.Formatter("%(levelname)s: %(message)s")
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
