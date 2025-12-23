@@ -4,7 +4,8 @@
 **Purpose**: Defines the expected behavior and output format for AI-powered title review  
 **Date**: 2025-12-23  
 **Status**: Specification - To Be Implemented  
-**Version**: 2.0 (Updated with Narrative Format)
+**Version**: 2.1 (Updated with Qwen3:32b Optimization)  
+**Target Model**: Qwen3:32b via Ollama
 
 ---
 
@@ -507,19 +508,67 @@ Since narrative format doesn't provide explicit scores, use NLP-based estimation
 ### Recommended Models
 
 **For Narrative Format**:
+- **Qwen3:32b** ⭐ (USED IN THIS PROJECT): Excellent for editorial critique, strong reasoning, multilingual
 - **Llama 3 8B/70B**: Excellent prose quality, good at critique
 - **Mistral 7B**: Fast, concise, works well with constrained output
 - **Mixtral 8x7B**: Best quality for local deployment
 - **GPT4All models**: Lightweight, good for basic reviews
 
 **For Structured Format**:
+- **Qwen3:32b** ⭐ (USED IN THIS PROJECT): Good format compliance, reliable ratings
 - **Llama 3 70B**: Better at following strict format
 - **Yi 34B**: Good at structured output
 - **Mixtral 8x7B**: Reliable format compliance
 
 ### Model Parameters
 
-**For Narrative Format**:
+**For Qwen3:32b (This Project)**:
+
+Narrative Format:
+```json
+{
+  "temperature": 0.75,
+  "top_p": 0.9,
+  "top_k": 40,
+  "max_tokens": 900,
+  "repeat_penalty": 1.05,
+  "presence_penalty": 0.0,
+  "frequency_penalty": 0.0,
+  "stop": ["INPUT:", "ANALYSIS RULES", "---"]
+}
+```
+
+Structured Format:
+```json
+{
+  "temperature": 0.5,
+  "top_p": 0.85,
+  "top_k": 30,
+  "max_tokens": 700,
+  "repeat_penalty": 1.1,
+  "presence_penalty": 0.0,
+  "frequency_penalty": 0.0,
+  "stop": ["INPUT:", "CONSTRAINTS:"]
+}
+```
+
+**Qwen3:32b Strengths**:
+- Excellent at following instructions and maintaining tone
+- Strong reasoning and analytical capabilities
+- Good at editorial/critique tasks
+- Handles long context well (useful for long content)
+- Multilingual capability (useful if content in multiple languages)
+- Good balance between creativity and accuracy
+
+**Qwen3:32b Considerations**:
+- Slightly higher temperature (0.75) works well for natural prose
+- Lower repeat_penalty (1.05) as model doesn't repeat much naturally
+- Can handle longer outputs (900 tokens for narrative)
+- Responds well to "professional, precise" tone instructions
+
+**For Other Models**:
+
+Narrative Format:
 ```json
 {
   "temperature": 0.7,
@@ -530,7 +579,7 @@ Since narrative format doesn't provide explicit scores, use NLP-based estimation
 }
 ```
 
-**For Structured Format**:
+Structured Format:
 ```json
 {
   "temperature": 0.4,
@@ -543,6 +592,16 @@ Since narrative format doesn't provide explicit scores, use NLP-based estimation
 
 ### Prompt Engineering Tips for Local Models
 
+**Specific Tips for Qwen3:32b**:
+1. **Leverage Strong Reasoning**: Qwen3 excels at analytical tasks - use detailed analysis rules
+2. **Set Professional Tone Early**: Model responds well to tone instructions in system prompt
+3. **Use Specific Examples**: Qwen3 learns well from 1-2 examples in context
+4. **Be Explicit About Format**: Clear format instructions work better than implicit expectations
+5. **Utilize Long Context**: Model handles up to 32K tokens - don't truncate content unnecessarily
+6. **Temperature Sweet Spot**: 0.75 for narrative, 0.5 for structured (higher than other models)
+7. **Minimal Repeat Penalty**: Use 1.05-1.1 (model naturally avoids repetition)
+
+**General Tips for Local Models**:
 1. **Keep Instructions Clear**: Local models benefit from explicit, simple instructions
 2. **Use Examples**: Add 1-2 example reviews in system prompt for better consistency
 3. **Avoid Over-Constraining**: Narrative format works better with looser constraints
@@ -593,6 +652,172 @@ If local model produces poor output:
 - If no optimized title provided, mark as incomplete
 - If wrong format used, regenerate with explicit format reminder
 - Log all format violations for prompt improvement
+
+---
+
+## Ollama Integration Guide
+
+### Setup for Qwen3:32b
+
+**1. Install Model**:
+```bash
+ollama pull qwen3:32b
+```
+
+**2. Test Model**:
+```bash
+ollama run qwen3:32b "Test prompt"
+```
+
+**3. Python Integration**:
+```python
+import requests
+import json
+
+def review_title_with_ollama(
+    idea_summary: str,
+    content_text: str,
+    title_text: str,
+    format_type: str = "narrative"
+) -> str:
+    """Review title using Ollama + Qwen3:32b."""
+    
+    # Load appropriate prompt template
+    if format_type == "narrative":
+        prompt = NARRATIVE_PROMPT_TEMPLATE.format(
+            idea=idea_summary,
+            content=content_text,
+            title=title_text
+        )
+        params = {
+            "temperature": 0.75,
+            "top_p": 0.9,
+            "top_k": 40,
+            "num_predict": 900,
+            "repeat_penalty": 1.05,
+            "stop": ["INPUT:", "ANALYSIS RULES", "---"]
+        }
+    else:  # structured
+        prompt = STRUCTURED_PROMPT_TEMPLATE.format(
+            idea=idea_summary,
+            content=content_text,
+            title=title_text
+        )
+        params = {
+            "temperature": 0.5,
+            "top_p": 0.85,
+            "top_k": 30,
+            "num_predict": 700,
+            "repeat_penalty": 1.1,
+            "stop": ["INPUT:", "CONSTRAINTS:"]
+        }
+    
+    # Call Ollama API
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "qwen3:32b",
+            "prompt": prompt,
+            "stream": False,
+            "options": params
+        }
+    )
+    
+    result = response.json()
+    return result["response"]
+```
+
+**4. Alternative: Use Ollama Python Library**:
+```python
+import ollama
+
+def review_title_with_ollama_lib(
+    idea_summary: str,
+    content_text: str,
+    title_text: str
+) -> str:
+    """Review using Ollama Python library."""
+    
+    prompt = NARRATIVE_PROMPT_TEMPLATE.format(
+        idea=idea_summary,
+        content=content_text,
+        title=title_text
+    )
+    
+    response = ollama.generate(
+        model='qwen3:32b',
+        prompt=prompt,
+        options={
+            'temperature': 0.75,
+            'top_p': 0.9,
+            'top_k': 40,
+            'num_predict': 900,
+            'repeat_penalty': 1.05
+        }
+    )
+    
+    return response['response']
+```
+
+### Ollama Performance Considerations
+
+**For Qwen3:32b**:
+- **Model Size**: ~20GB disk space
+- **RAM Required**: 24-32GB recommended
+- **VRAM (GPU)**: 16-24GB for good performance
+- **CPU-Only**: Possible but slow (~2-5 min per review)
+- **With GPU**: Fast (~10-30 seconds per review)
+
+**Optimization Tips**:
+- Use GPU if available (CUDA/ROCm/Metal)
+- Keep Ollama running as a service (faster subsequent calls)
+- Batch multiple reviews to amortize model loading time
+- Consider smaller models (qwen3:8b) if hardware limited
+
+### Monitoring Ollama
+
+**Check Model Status**:
+```bash
+ollama list
+```
+
+**View Running Models**:
+```bash
+ollama ps
+```
+
+**Check Ollama Logs**:
+```bash
+# macOS/Linux
+journalctl -u ollama
+
+# Or check Ollama output
+ollama serve
+```
+
+### Troubleshooting
+
+**Common Issues**:
+
+1. **Out of Memory**:
+   - Solution: Use smaller model (qwen3:8b) or add more RAM/VRAM
+   - Workaround: Reduce num_predict (max_tokens)
+
+2. **Slow Performance**:
+   - Solution: Enable GPU acceleration
+   - Workaround: Use smaller model or reduce content length
+
+3. **Inconsistent Output**:
+   - Solution: Lower temperature (try 0.6-0.7)
+   - Workaround: Add more explicit instructions
+
+4. **Model Not Found**:
+   - Solution: Run `ollama pull qwen3:32b`
+   - Check: `ollama list` to verify installation
+
+5. **Connection Refused**:
+   - Solution: Start Ollama service (`ollama serve`)
+   - Check: http://localhost:11434 is accessible
 
 ---
 
@@ -650,6 +875,15 @@ Generate both formats:
 
 ## Changelog
 
+**Version 2.1** (2025-12-23):
+- Added specific optimization for Qwen3:32b model (used in this project)
+- Added Ollama integration guide with code examples
+- Added model-specific parameter recommendations for Qwen3:32b
+- Added performance considerations and hardware requirements
+- Added troubleshooting section for common Ollama issues
+- Added Qwen3:32b strengths and considerations
+- Updated model recommendations to highlight Qwen3:32b
+
 **Version 2.0** (2025-12-23):
 - Added Narrative Format as RECOMMENDED approach
 - Moved original format to "Structured Format Alternative"
@@ -663,11 +897,12 @@ Generate both formats:
 
 ---
 
-**Document Version**: 2.0  
+**Document Version**: 2.1  
 **Created**: 2025-12-23  
 **Updated**: 2025-12-23  
 **Purpose**: Specification for AI title review with dual format support  
-**Status**: Ready for Implementation - Narrative Format Recommended
+**Status**: Ready for Implementation - Narrative Format Recommended  
+**Target Model**: Qwen3:32b via Ollama
 ```
 STORY IDEA:
 A horror story about mysterious echoes in an abandoned house that reveal dark secrets from the past.
