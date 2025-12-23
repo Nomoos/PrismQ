@@ -1,4 +1,4 @@
-"""PrismQ.T.Review.Title.From.Script.Idea - AI Title Review Module
+"""PrismQ.T.Review.Title.From.Content.Idea - AI Title Review Module
 
 AI-powered title evaluation against script content and idea intent.
 """

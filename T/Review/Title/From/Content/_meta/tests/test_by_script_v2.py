@@ -1,4 +1,4 @@
-"""Tests for PrismQ.T.Review.Title.From.Script (v2) module.
+"""Tests for PrismQ.T.Review.Title.From.Content (v2) module.
 
 This test suite validates the v2 title review functionality including:
 - Review of v2 title against v2 script
@@ -16,16 +16,16 @@ import pytest
 # Add parent directories to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
-from T.Review.Title.From.Script.by_script_v2 import (
+from T.Review.Title.From.Content.by_script_v2 import (
     ImprovementComparison,
     compare_reviews,
     get_improvement_summary,
     review_title_by_content_v2,
 )
-from T.Review.Title.From.Script.Idea.by_script_and_idea import (
+from T.Review.Title.From.Content.Idea.by_script_and_idea import (
     review_title_by_content_and_idea,
 )
-from T.Review.Title.From.Script.Idea.title_review import TitleReview
+from T.Review.Title.From.Content.Idea.title_review import TitleReview
 
 
 @pytest.fixture

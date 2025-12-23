@@ -1,7 +1,7 @@
-"""PrismQ.T.Review.Title.From.Script Service Module.
+"""PrismQ.T.Review.Title.From.Content Service Module.
 
 This module provides the service to process stories in the
-PrismQ.T.Review.Title.From.Script state by:
+PrismQ.T.Review.Title.From.Content state by:
 1. Selecting the oldest Story in this state
 2. Reviewing the title against the script
 3. Creating a Review record with text and score
@@ -9,7 +9,7 @@ PrismQ.T.Review.Title.From.Script state by:
 
 State Transitions:
     - If review accepts title (score >= threshold) -> PrismQ.T.Review.Script.From.Title
-    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Script.Review.Title
+    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Content.Review.Title
 """
 
 import logging
@@ -45,7 +45,7 @@ from Model.State.constants.state_names import StateNames
 
 # Try to import the review function
 try:
-    from T.Review.Title.From.Script.by_script_v2 import (
+    from T.Review.Title.From.Content.by_content_v2 import (
         SCORE_THRESHOLD_HIGH,
         review_title_by_content_v2,
     )
@@ -411,7 +411,7 @@ class ReviewTitleFromScriptService:
             )
 
     def process_oldest_story(self) -> ReviewTitleFromScriptResult:
-        """Process the oldest story in the Review.Title.From.Script state.
+        """Process the oldest story in the Review.Title.From.Content state.
 
         Returns:
             ReviewTitleFromScriptResult with processing outcome
