@@ -2,10 +2,11 @@
 
 This module implements the script generation logic using local AI models:
 - Takes Idea object and Title v1 as input
-- Generates structured script with intro, body, and conclusion using Qwen3:30b
-- Optimizes for platform requirements (YouTube shorts < 180s)
+- Generates structured script with intro, body, and conclusion using Qwen3:32b
+- Multiplatform approach (not tied to specific platforms)
 - Maintains coherence with title promises and idea intent
 - ALL generation goes through local AI models via Ollama
+- AI configuration obtained from global functions (similar to database path pattern)
 """
 
 import logging
@@ -33,6 +34,14 @@ except ImportError:
     # Fallback for testing or development
     pass
 
+# Import AI configuration from global module
+try:
+    from .ai_config import get_local_ai_config, get_local_ai_model, get_local_ai_temperature
+    AI_CONFIG_AVAILABLE = True
+except ImportError:
+    logger.warning("AI config module not available")
+    AI_CONFIG_AVAILABLE = False
+
 # Import AI script generator (lazy import to avoid circular dependency)
 _ai_generator_module = None
 
@@ -42,7 +51,7 @@ def _get_ai_generator_module():
     global _ai_generator_module
     if _ai_generator_module is None:
         try:
-            from . import ai_content_generator as _ai_generator_module
+            from . import ai_script_generator as _ai_generator_module
         except ImportError:
             logger.warning("AI script generator module not available")
             _ai_generator_module = False
@@ -101,8 +110,8 @@ class ScriptV1:
         full_text: Complete script text
         sections: Breakdown into intro, body, conclusion
         total_duration_seconds: Estimated total duration
-        structure_type: Type of structure used
-        platform_target: Target platform
+        max_duration_seconds: Maximum allowed duration (default: 175s)
+        audience: Target audience configuration (age, gender, country)
         metadata: Additional metadata
         created_at: Creation timestamp
         version: Version number (integer, 1 for initial draft)
@@ -115,8 +124,12 @@ class ScriptV1:
     full_text: str
     sections: List[ScriptSection]
     total_duration_seconds: int
-    structure_type: ScriptStructure
-    platform_target: PlatformTarget
+    max_duration_seconds: int = 175
+    audience: Dict[str, str] = field(default_factory=lambda: {
+        "age_range": "13-23",
+        "gender": "Female",
+        "country": "United States"
+    })
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     version: int = 1
@@ -147,8 +160,8 @@ class ScriptV1:
                 for s in self.sections
             ],
             "total_duration_seconds": self.total_duration_seconds,
-            "structure_type": self.structure_type.value,
-            "platform_target": self.platform_target.value,
+            "max_duration_seconds": self.max_duration_seconds,
+            "audience": self.audience,
             "metadata": self.metadata,
             "created_at": self.created_at,
             "version": self.version,
@@ -161,30 +174,28 @@ class ScriptGeneratorConfig:
     """Configuration for AI-powered script generation.
 
     All script generation uses local AI models via Ollama.
+    AI configuration (model, temperature) is obtained from global functions.
 
     Attributes:
-        platform_target: Target platform for optimization
-        target_duration_seconds: Target script duration
-        structure_type: Content structure to use
+        target_duration_seconds: Target script duration (default: 120s)
+        max_duration_seconds: Maximum allowed duration (default: 175s, 5s before major platform limits)
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
-        tone: Content tone (engaging, mysterious, educational, etc.)
-        ai_model: AI model to use for generation (default: Qwen3:30b)
+        audience: Target audience configuration (age_range, gender, country)
         ai_api_base: Base URL for Ollama API
-        ai_temperature: AI generation temperature (0.0-2.0)
         ai_timeout: AI request timeout in seconds
     """
 
-    platform_target: PlatformTarget = PlatformTarget.YOUTUBE_MEDIUM
-    target_duration_seconds: int = 90
-    structure_type: ScriptStructure = ScriptStructure.HOOK_DELIVER_CTA
+    target_duration_seconds: int = 120  # Default 120s for multiplatform content
+    max_duration_seconds: int = 175  # 5 seconds before major platform limits
     words_per_second: float = 2.5  # Average speaking rate
     include_cta: bool = True
-    tone: ScriptTone = ScriptTone.ENGAGING
-    # AI generation settings (required - all generation uses AI)
-    ai_model: str = "qwen3:32b"
+    audience: Dict[str, str] = field(default_factory=lambda: {
+        "age_range": "13-23",
+        "gender": "Female",
+        "country": "United States"
+    })
     ai_api_base: str = "http://localhost:11434"
-    ai_temperature: float = 0.7
     ai_timeout: int = 120
 
 
@@ -210,7 +221,7 @@ class ScriptGenerator:
         self._init_ai_generator()
 
     def _init_ai_generator(self):
-        """Initialize AI generator."""
+        """Initialize AI generator using global AI configuration."""
         ai_module = _get_ai_generator_module()
         if ai_module is None:
             error_msg = "AI script generator module not available. Cannot proceed without AI."
@@ -218,21 +229,30 @@ class ScriptGenerator:
             raise RuntimeError(error_msg)
 
         try:
+            # Get AI configuration from global functions
+            if AI_CONFIG_AVAILABLE:
+                ai_model = get_local_ai_model()
+                ai_temperature = get_local_ai_temperature()
+            else:
+                # Fallback to hardcoded values if config not available
+                ai_model = "qwen3:32b"
+                ai_temperature = 0.7
+                logger.warning("Using fallback AI configuration")
+
             ai_config = ai_module.AIScriptGeneratorConfig(
-                model=self.config.ai_model,
+                model=ai_model,
                 api_base=self.config.ai_api_base,
-                temperature=self.config.ai_temperature,
+                temperature=ai_temperature,
                 timeout=self.config.ai_timeout,
-                enable_ai=True,
             )
             self._ai_generator = ai_module.AIScriptGenerator(config=ai_config)
             self._ai_available = self._ai_generator.is_available()
 
             if self._ai_available:
-                logger.info(f"AI script generation initialized with model: {self.config.ai_model}")
+                logger.info(f"AI script generation initialized with model: {ai_model}")
             else:
                 logger.warning(
-                    f"AI model '{self.config.ai_model}' not available at {self.config.ai_api_base}"
+                    f"AI model '{ai_model}' not available at {self.config.ai_api_base}"
                 )
         except Exception as e:
             logger.error(f"Failed to initialize AI generator: {e}")
@@ -252,7 +272,7 @@ class ScriptGenerator:
     ) -> ScriptV1:
         """Generate initial script (v1) from idea and title using AI.
 
-        All generation uses local AI models (Qwen2.5-14B-Instruct).
+        All generation uses local AI models (Qwen3:32b via Ollama).
         An error is raised if AI is not available.
 
         Args:
@@ -278,9 +298,10 @@ class ScriptGenerator:
 
         # Check if AI is available
         if not self._ai_available:
+            ai_model = get_local_ai_model() if AI_CONFIG_AVAILABLE else "qwen3:32b"
             error_msg = (
                 f"AI script generation is not available. "
-                f"Please ensure Ollama is running with model '{config.ai_model}' at {config.ai_api_base}"
+                f"Please ensure Ollama is running with model '{ai_model}' at {config.ai_api_base}"
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg)
@@ -293,9 +314,10 @@ class ScriptGenerator:
         full_text, sections = self._generate_with_ai(idea, title, config)
 
         if full_text is None:
+            ai_model = get_local_ai_model() if AI_CONFIG_AVAILABLE else "qwen3:32b"
             error_msg = (
                 f"AI script generation failed for '{title}'. "
-                f"Please check that Ollama is running and the model '{config.ai_model}' is available."
+                f"Please check that Ollama is running and the model '{ai_model}' is available."
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg)
@@ -313,23 +335,21 @@ class ScriptGenerator:
             full_text=full_text,
             sections=sections,
             total_duration_seconds=total_duration,
-            structure_type=config.structure_type,
-            platform_target=config.platform_target,
+            max_duration_seconds=config.max_duration_seconds,
+            audience=config.audience,
             metadata={
                 "idea_concept": idea.concept if hasattr(idea, "concept") else "",
                 "idea_genre": idea.genre.value if hasattr(idea, "genre") else "unknown",
-                "target_audience": getattr(idea, "target_audience", "general"),
+                "target_audience": config.audience,
                 "generation_config": {
-                    "tone": (
-                        config.tone.value if hasattr(config.tone, "value") else str(config.tone)
-                    ),
                     "target_duration": config.target_duration_seconds,
+                    "max_duration": config.max_duration_seconds,
                     "words_per_second": config.words_per_second,
-                    "ai_model": config.ai_model,
+                    "ai_model": get_local_ai_model() if AI_CONFIG_AVAILABLE else "qwen3:32b",
                 },
                 "ai_generated": True,
             },
-            notes=f"Generated from idea '{getattr(idea, 'title', 'untitled')}' with title '{title}' (AI-powered)",
+            notes=f"Generated from idea '{getattr(idea, 'title', 'untitled')}' with title '{title}' (AI-powered, multiplatform)",
         )
 
         return script
@@ -362,28 +382,16 @@ class ScriptGenerator:
             if hasattr(idea, "genre"):
                 genre_value = idea.genre.value if hasattr(idea.genre, "value") else str(idea.genre)
                 idea_parts.append(f"Genre: {genre_value}")
-            if hasattr(idea, "target_audience") and idea.target_audience:
-                idea_parts.append(f"Target audience: {idea.target_audience}")
 
             idea_text = " | ".join(idea_parts) if idea_parts else "General content"
 
-            # Get platform string
-            platform = (
-                config.platform_target.value
-                if hasattr(config.platform_target, "value")
-                else str(config.platform_target)
-            )
-
-            # Get tone string
-            tone = config.tone.value if hasattr(config.tone, "value") else str(config.tone)
-
-            # Generate full script using AI (title + idea_text + random seed)
+            # Generate full script using AI (title + idea_text + random seed + audience)
             full_text = self._ai_generator.generate_content(
                 title=title,
                 idea_text=idea_text,
                 target_duration_seconds=config.target_duration_seconds,
-                platform=platform,
-                tone=tone,
+                max_duration_seconds=config.max_duration_seconds,
+                audience=config.audience,
             )
 
             if full_text is None:
