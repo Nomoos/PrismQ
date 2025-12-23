@@ -12,13 +12,17 @@ The v2 reviewer provides:
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Title v2 + Content v2 + v1 Review → ByScript v2 Review → TitleReview Feedback → Title v3
+    Title v2 + Content v2 + v1 Review → From.Script v2 Review → TitleReview Feedback → Title v3
 """
 
+import logging
 import os
 import sys
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
@@ -240,6 +244,10 @@ def review_title_by_content_v2(
     Returns:
         TitleReview object with scores, feedback, and improvement comparisons
 
+    Raises:
+        ValueError: If title_text or content_text is empty or invalid
+        TypeError: If parameters are of incorrect type
+
     Example:
         >>> v1_review = review_title_by_content_and_idea(
         ...     title_text="The Echo",
@@ -255,35 +263,94 @@ def review_title_by_content_v2(
     """
     import uuid
 
+    # Parameter validation
+    if not title_text or not isinstance(title_text, str):
+        raise ValueError("title_text must be a non-empty string")
+    
+    if not content_text or not isinstance(content_text, str):
+        raise ValueError("content_text must be a non-empty string")
+    
+    if not isinstance(title_version, str) or not title_version:
+        raise ValueError("title_version must be a non-empty string")
+    
+    if not isinstance(script_version, str) or not script_version:
+        raise ValueError("script_version must be a non-empty string")
+    
+    if not isinstance(reviewer_id, str) or not reviewer_id:
+        raise ValueError("reviewer_id must be a non-empty string")
+    
+    if previous_review is not None and not isinstance(previous_review, TitleReview):
+        raise TypeError("previous_review must be a TitleReview instance or None")
+    
+    # Sanitize inputs (strip excess whitespace)
+    title_text = title_text.strip()
+    content_text = content_text.strip()
+    
+    # Validate length constraints
+    if len(title_text) > 200:
+        raise ValueError(f"title_text exceeds maximum length of 200 characters (got {len(title_text)})")
+    
+    if len(title_text) < 3:
+        raise ValueError(f"title_text is too short (minimum 3 characters, got {len(title_text)})")
+    
+    if len(content_text) < 10:
+        raise ValueError(f"content_text is too short (minimum 10 characters, got {len(content_text)})")
+
+    logger.info(
+        "Starting title review",
+        extra={
+            "title_version": title_version,
+            "script_version": script_version,
+            "title_length": len(title_text),
+            "content_length": len(content_text),
+            "has_previous_review": previous_review is not None,
+        }
+    )
+
     # Generate IDs if not provided
     if title_id is None:
         title_id = f"title-{uuid.uuid4().hex[:8]}"
+        logger.debug(f"Generated title_id: {title_id}")
     if content_id is None:
         content_id = f"script-{uuid.uuid4().hex[:8]}"
+        logger.debug(f"Generated content_id: {content_id}")
 
     # Auto-generate script summary if not provided
     if script_summary is None and content_text:
         script_summary = content_text[:200] + "..." if len(content_text) > 200 else content_text
+        logger.debug(f"Generated script summary ({len(script_summary)} chars)")
 
-    # Analyze title-script alignment
-    script_alignment = analyze_title_content_alignment(
-        title_text=title_text, content_text=content_text, script_summary=script_summary
-    )
+    try:
+        # Analyze title-script alignment
+        logger.debug("Analyzing title-script alignment")
+        script_alignment = analyze_title_content_alignment(
+            title_text=title_text, content_text=content_text, script_summary=script_summary
+        )
+        logger.debug(f"Script alignment score: {script_alignment.score}")
 
-    # Analyze engagement
-    engagement_data = analyze_engagement(title_text)
+        # Analyze engagement
+        logger.debug("Analyzing engagement")
+        engagement_data = analyze_engagement(title_text)
+        logger.debug(f"Engagement score: {engagement_data['engagement_score']}")
 
-    # Analyze SEO
-    script_keywords = extract_keywords(content_text, max_keywords=20)
-    seo_data = analyze_seo(title_text, script_keywords)
+        # Analyze SEO
+        logger.debug("Analyzing SEO")
+        script_keywords = extract_keywords(content_text, max_keywords=20)
+        seo_data = analyze_seo(title_text, script_keywords)
+        logger.debug(f"SEO score: {seo_data['seo_score']}")
 
-    # Calculate overall score (script alignment is primary for v2)
-    overall_score = int(
-        script_alignment.score * 0.40  # Higher weight on script alignment
-        + engagement_data["engagement_score"] * 0.30
-        + seo_data["seo_score"] * 0.20
-        + seo_data["length_score"] * 0.10
-    )
+        # Calculate overall score (script alignment is primary for v2)
+        overall_score = int(
+            script_alignment.score * 0.40  # Higher weight on script alignment
+            + engagement_data["engagement_score"] * 0.30
+            + seo_data["seo_score"] * 0.20
+            + seo_data["length_score"] * 0.10
+        )
+        logger.info(f"Calculated overall score: {overall_score}")
+
+    except Exception as e:
+        logger.error(f"Error during review analysis: {e}", exc_info=True)
+        raise
 
     # Build category scores
     category_scores = [
