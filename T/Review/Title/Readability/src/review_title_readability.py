@@ -42,12 +42,13 @@ from Model.Database.models.review import Review
 from Model.Database.models.story import Story
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Score threshold for accepting a title readability review
 ACCEPTANCE_THRESHOLD = 75
 
 # State constants
+CURRENT_STATE = StateNames.REVIEW_TITLE_READABILITY
 STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
 STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 STATE_STORY_REVIEW = StateNames.STORY_REVIEW

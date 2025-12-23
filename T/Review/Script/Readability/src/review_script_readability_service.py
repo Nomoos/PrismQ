@@ -37,7 +37,7 @@ from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Load the script_readability_review module directly with error handling
 _module_dir = Path(__file__).parent.parent
@@ -66,6 +66,7 @@ except (FileNotFoundError, ImportError, SyntaxError, AttributeError) as e:
 ACCEPTANCE_THRESHOLD = 75
 
 # State constants
+CURRENT_STATE = StateNames.REVIEW_CONTENT_READABILITY
 STATE_REVIEW_SCRIPT_READABILITY = StateNames.REVIEW_SCRIPT_READABILITY
 STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE
 STATE_STORY_REVIEW = StateNames.STORY_REVIEW
