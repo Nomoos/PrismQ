@@ -9,6 +9,34 @@
 - **[A - Audio Generation Pipeline](./A/README.md)** - Convert published text into professional audio
 - **[V - Video Generation Pipeline](./V/README.md)** - Combine audio with visuals for video platforms
 
+## 🏗️ Module Structure & Guidelines
+
+**Essential reading for all developers and AI assistants:**
+
+### Module Structure Standards
+- **[Coding Guidelines](./_meta/docs/guidelines/CODING_GUIDELINES.md)** - Core principles, module hierarchy, namespace shortcuts, placement decision tree
+- **[Module Hierarchy](./_meta/docs/guidelines/MODULE_HIERARCHY_UPDATED.md)** - Dependency direction, layer responsibilities, abstraction levels
+- **[PR Review Checklist](./_meta/docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - Required verification before merging
+
+### Module Layout Convention
+```
+module/
+├── src/        # Production source code only (runtime code)
+├── _meta/      # Tests, docs, examples, scripts, auxiliary files
+```
+
+**Key Principles:**
+- **Generic functionality belongs higher** in the hierarchy (src/ → T/src/ → T/Content/src/)
+- **Specialized functionality belongs lower** in the hierarchy
+- **Dependencies flow specialized → generic** (never the reverse)
+- **Cross-cutting concerns** → `src/` (e.g., database configuration)
+- **Domain foundations** → `T/src/` (e.g., AI configuration for Text domain)
+- **No duplication** - reusable logic moves upward to common parent
+
+### Module-Specific Documentation
+- **[AI Configuration Placement](./T/_meta/docs/AI_CONFIG_PLACEMENT.md)** - Why AI config lives at T/src/ foundation level
+- **[Script Compliance Audit](./_meta/docs/guidelines/SCRIPT_COMPLIANCE_AUDIT.md)** - Script naming and structure standards
+
 ### Supporting Modules
 - **[P - Publishing Module](./P/README.md)** - Multi-platform content distribution
 - **[M - Metrics & Analytics Module](./M/README.md)** - Performance tracking and insights

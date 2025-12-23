@@ -1,68 +1,116 @@
-"""Global AI configuration for content generation.
+"""Title-specific AI configuration wrapper.
 
-This module provides global AI configuration functions used across all content generation modules.
-Similar to how database path is obtained globally, AI model and temperature are configured here.
+This module provides AI configuration for the Title workflow.
+It imports from T/src level (foundation) because AI is shared across Text domains.
+
+Module Hierarchy:
+- src/: Cross-cutting (database, config)
+- T/: Text foundation (AI for all Text domains) ← AI CONFIG IS HERE
+- T/Content/: Content processing (uses T foundation AI)
+- T/Content/From/Idea/Title/: Title-specific logic
+
+This module is just a wrapper for backward compatibility.
+For new code, import directly from T.src.ai_config.
 """
 
-import random
-from typing import Tuple
+import logging
+import sys
+from pathlib import Path
 
+logger = logging.getLogger(__name__)
 
-def get_local_ai_model() -> str:
-    """Get the local AI model name for content generation.
-    
-    Returns fixed model name for local AI inference via Ollama.
-    
-    Returns:
-        Model name string (e.g., "qwen3:32b")
-    """
-    return "qwen3:32b"
+# Add T/src to path
+SCRIPT_DIR = Path(__file__).parent
+T_SRC = SCRIPT_DIR.parent.parent.parent.parent.parent / "src"  # T/src
+sys.path.insert(0, str(T_SRC))
 
-
-def get_local_ai_api_base() -> str:
-    """Get the local AI API base URL.
-    
-    Returns:
-        API base URL for Ollama (default: http://localhost:11434)
-    """
-    return "http://localhost:11434"
-
-
-def get_local_ai_temperature() -> float:
-    """Get a random AI temperature within defined limits.
-    
-    Temperature controls creativity/randomness of AI generation.
-    Returns a random value between configured min and max limits.
-    
-    Returns:
-        Random temperature value between 0.6 and 0.8
-    """
-    # Temperature limits for content generation
-    MIN_TEMPERATURE = 0.6
-    MAX_TEMPERATURE = 0.8
-    
-    # Return random temperature within limits
-    return random.uniform(MIN_TEMPERATURE, MAX_TEMPERATURE)
-
-
-def get_local_ai_timeout() -> int:
-    """Get the AI request timeout in seconds.
-    
-    Returns:
-        Timeout in seconds (default: 120)
-    """
-    return 120
-
-
-def get_local_ai_config() -> Tuple[str, str, float, int]:
-    """Get complete local AI configuration.
-    
-    Returns:
-        Tuple of (model, api_base, temperature, timeout)
-    """
-    return (
-        get_local_ai_model(),
-        get_local_ai_api_base(),
-        get_local_ai_temperature(),
-        get_local_ai_timeout(),
+try:
+    # Import from T foundation level (correct hierarchy)
+    from ai_config import (
+        DEFAULT_AI_MODEL,
+        DEFAULT_AI_API_BASE,
+        AI_TEMPERATURE_MIN,
+        AI_TEMPERATURE_MAX,
+        AISettings,
+        create_ai_config,
+        check_ollama_available,
     )
+    
+    # Backward compatibility wrapper functions
+    def get_local_ai_model() -> str:
+        """Get the local AI model name.
+        
+        DEPRECATED: Import from T.src.ai_config instead.
+        """
+        return DEFAULT_AI_MODEL
+    
+    def get_local_ai_api_base() -> str:
+        """Get the local AI API base URL.
+        
+        DEPRECATED: Import from T.src.ai_config instead.
+        """
+        return DEFAULT_AI_API_BASE
+    
+    def get_local_ai_temperature() -> float:
+        """Get a random AI temperature.
+        
+        DEPRECATED: Import from T.src.ai_config instead.
+        """
+        import random
+        return random.uniform(AI_TEMPERATURE_MIN, AI_TEMPERATURE_MAX)
+    
+    def get_local_ai_timeout() -> int:
+        """Get the AI request timeout.
+        
+        Returns:
+            Timeout in seconds (default: 120)
+        """
+        return 120
+    
+    def get_local_ai_config():
+        """Get complete local AI configuration.
+        
+        DEPRECATED: Use create_ai_config() from T.src.ai_config instead.
+        
+        Returns:
+            Tuple of (model, api_base, temperature, timeout)
+        """
+        return (
+            get_local_ai_model(),
+            get_local_ai_api_base(),
+            get_local_ai_temperature(),
+            get_local_ai_timeout(),
+        )
+
+except ImportError as e:
+    logger.error(f"Failed to import from T.Content.src.ai_config: {e}")
+    logger.warning("Falling back to local implementation")
+    
+    # Fallback implementation
+    import random
+    from typing import Tuple
+    
+    DEFAULT_AI_MODEL = "qwen3:32b"
+    DEFAULT_AI_API_BASE = "http://localhost:11434"
+    AI_TEMPERATURE_MIN = 0.6
+    AI_TEMPERATURE_MAX = 0.8
+    
+    def get_local_ai_model() -> str:
+        return DEFAULT_AI_MODEL
+    
+    def get_local_ai_api_base() -> str:
+        return DEFAULT_AI_API_BASE
+    
+    def get_local_ai_temperature() -> float:
+        return random.uniform(AI_TEMPERATURE_MIN, AI_TEMPERATURE_MAX)
+    
+    def get_local_ai_timeout() -> int:
+        return 120
+    
+    def get_local_ai_config() -> Tuple[str, str, float, int]:
+        return (
+            get_local_ai_model(),
+            get_local_ai_api_base(),
+            get_local_ai_temperature(),
+            get_local_ai_timeout(),
+        )

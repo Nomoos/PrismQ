@@ -36,6 +36,11 @@ Usage:
 
 from .config import Config
 from .idea import IdeaDatabase, setup_idea_database
+from .startup import (
+    DatabaseConfig,
+    create_database_config,
+    get_database_path,  # Backward compatibility (deprecated)
+)
 from .story import StoryDatabase, setup_story_database
 
 __all__ = [
@@ -44,5 +49,9 @@ __all__ = [
     "setup_idea_database",
     "StoryDatabase",
     "setup_story_database",
+    # Database configuration
+    "DatabaseConfig",
+    "create_database_config",
+    "get_database_path",  # Backward compatibility (deprecated)
 ]
 __version__ = "1.0.0"
