@@ -1,58 +1,68 @@
-"""AI Configuration for Content Generation (Step 04).
+"""Global AI configuration for script generation.
 
-This module provides AI configuration functions for the PrismQ.T.Content.From.Idea.Title
-workflow. It uses the global AI configuration functions from src.startup to maintain
-consistency across the entire PrismQ system.
-
-All AI configuration is centralized through global functions, similar to how database
-paths are handled. This ensures that all scripts use the same AI model and configuration.
-
-Usage:
-    from ai_config import (
-        get_local_ai_model,
-        get_local_ai_temperature,
-        get_local_ai_api_base,
-        get_local_ai_config
-    )
-    
-    # Get individual config values
-    model = get_local_ai_model()  # Returns: "qwen3:32b"
-    temperature = get_local_ai_temperature()  # Returns: random 0.6-0.8
-    api_base = get_local_ai_api_base()  # Returns: "http://localhost:11434"
-    
-    # Or get complete config
-    model, temp, api_base = get_local_ai_config()
+This module provides global AI configuration functions used across all script generation modules.
+Similar to how database path is obtained globally, AI model and temperature are configured here.
 """
 
-import logging
-import os
-import sys
-from pathlib import Path
+import random
+from typing import Tuple
 
-logger = logging.getLogger(__name__)
 
-# Add repo root to path for imports
-SCRIPT_DIR = Path(__file__).parent
-REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent  # Up to repo root
-sys.path.insert(0, str(REPO_ROOT))
+def get_local_ai_model() -> str:
+    """Get the local AI model name for script generation.
+    
+    Returns fixed model name for local AI inference via Ollama.
+    
+    Returns:
+        Model name string (e.g., "qwen3:32b")
+    """
+    return "qwen3:32b"
 
-try:
-    from src.startup import (
-        check_ollama_available,
-        get_local_ai_api_base,
-        get_local_ai_config,
-        get_local_ai_model,
-        get_local_ai_temperature,
+
+def get_local_ai_api_base() -> str:
+    """Get the local AI API base URL.
+    
+    Returns:
+        API base URL for Ollama (default: http://localhost:11434)
+    """
+    return "http://localhost:11434"
+
+
+def get_local_ai_temperature() -> float:
+    """Get a random AI temperature within defined limits.
+    
+    Temperature controls creativity/randomness of AI generation.
+    Returns a random value between configured min and max limits.
+    
+    Returns:
+        Random temperature value between 0.6 and 0.8
+    """
+    # Temperature limits for script generation
+    MIN_TEMPERATURE = 0.6
+    MAX_TEMPERATURE = 0.8
+    
+    # Return random temperature within limits
+    return random.uniform(MIN_TEMPERATURE, MAX_TEMPERATURE)
+
+
+def get_local_ai_timeout() -> int:
+    """Get the AI request timeout in seconds.
+    
+    Returns:
+        Timeout in seconds (default: 120)
+    """
+    return 120
+
+
+def get_local_ai_config() -> Tuple[str, str, float, int]:
+    """Get complete local AI configuration.
+    
+    Returns:
+        Tuple of (model, api_base, temperature, timeout)
+    """
+    return (
+        get_local_ai_model(),
+        get_local_ai_api_base(),
+        get_local_ai_temperature(),
+        get_local_ai_timeout(),
     )
-except ImportError as e:
-    logger.error(f"Failed to import AI config functions from src.startup: {e}")
-    raise
-
-# Re-export functions for convenience
-__all__ = [
-    "get_local_ai_model",
-    "get_local_ai_temperature",
-    "get_local_ai_api_base",
-    "get_local_ai_config",
-    "check_ollama_available",
-]
