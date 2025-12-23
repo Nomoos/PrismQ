@@ -37,7 +37,7 @@ from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Load the script_readability_review module directly with error handling
 _module_dir = Path(__file__).parent.parent

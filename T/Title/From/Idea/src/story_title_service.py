@@ -83,7 +83,7 @@ from Model.Database.models.title import Title
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.Database.schema_manager import SchemaManager
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 
 @dataclass

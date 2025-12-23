@@ -41,7 +41,7 @@ from Model.Database.models.story import Story
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Import ContentGenerator from local module
 from .content_generator import (

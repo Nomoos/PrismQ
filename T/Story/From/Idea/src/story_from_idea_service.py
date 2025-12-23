@@ -66,7 +66,7 @@ from simple_idea_db import SimpleIdeaDatabase
 # Import database models and repositories
 from Model.Database.models.story import Story, StoryState
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 
 @dataclass

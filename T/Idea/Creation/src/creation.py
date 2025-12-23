@@ -26,9 +26,9 @@ from idea import ContentGenre, Idea, IdeaStatus
 
 # Import StateNames for workflow state constants
 try:
-    from Model.State.constants.state_names import StateNames
+    from Model import StateNames
 except ImportError:
-    # Fallback if Model.State not available
+    # Fallback if Model not available
     class StateNames:
         IDEA_CREATION = "PrismQ.T.Idea.Creation"
 

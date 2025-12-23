@@ -38,7 +38,7 @@ from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Import consistency review functionality using direct path to avoid circular import
 from T.Review.Content.Consistency.consistency_review import (
