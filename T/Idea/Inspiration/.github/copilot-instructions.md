@@ -1,13 +1,70 @@
-# PrismQ Module - GitHub Copilot Instructions
+# PrismQ.T.Idea.Inspiration - GitHub Copilot Instructions
 
-## Project Context
+> **Note**: This is a submodule within the PrismQ project. For general project guidelines, see the [main repository's copilot instructions](../../../.github/copilot-instructions.md).
 
-This is a PrismQ module template for AI-powered content generation applications. It's part of the PrismQ ecosystem which includes:
-- **PrismQ.IdeaCollector** - Gathering idea inspirations
-- **StoryGenerator** - Automated story and video generation pipeline
-- Other specialized AI content generation modules
+## Module Context
 
-## Target Platform
+This is the **Inspiration submodule** of PrismQ.T.Idea - the entry point for all content creation in the PrismQ workflow. It collects, classifies, and scores raw inspiration from diverse sources before they're developed into structured Ideas.
+
+**Module Namespace**: `PrismQ.T.Idea.Inspiration`
+
+Part of the PrismQ ecosystem:
+- **Workflow Position**: [*] → Idea.Inspiration → Idea (Model/Outline/Review) → Script...
+- **Purpose**: Transform raw inspiration into structured, scored concepts
+- **Integration**: Connects with 24+ sources (Reddit, Twitter, RSS feeds, analytics, etc.)
+
+---
+
+## Module-Specific Guidelines
+
+### Module Structure
+```
+T/Idea/Inspiration/
+├── Source/                    # Production source code (runtime)
+├── Research_Layers/          # Research and experimental code
+├── _meta/                    # Tests, docs, issues, scripts
+│   ├── docs/                 # Module documentation
+│   ├── issues/               # Issue tracking
+│   ├── research/             # Research artifacts
+│   └── scripts/              # Utility scripts
+├── .github/                  # GitHub configuration & copilot instructions
+└── README.md                 # Module overview
+```
+
+### This Module's Responsibility
+- **Collect** inspiration from 24+ sources (social media, news, analytics)
+- **Classify** inspiration into categories (technology, product, lifestyle, etc.)
+- **Score** inspiration based on potential and performance data
+- **Transform** raw inspiration into structured concepts for Idea development
+
+### Key Design Patterns
+- **Source Adapters**: Each source has its own adapter (Reddit, Twitter, RSS, etc.)
+- **Classification Pipeline**: Automated categorization using ML/AI
+- **Scoring System**: Multi-factor scoring based on engagement, trends, and analytics
+- **Feedback Loop**: Performance data from published content informs future scoring
+
+---
+
+## Project-Wide Guidelines
+
+For detailed project-wide guidelines, refer to the [main repository documentation](../../../):
+- **[Root Copilot Instructions](../../../.github/copilot-instructions.md)** - Core principles and module hierarchy
+- **[Coding Guidelines](../../../_meta/docs/guidelines/CODING_GUIDELINES.md)** - Module placement and dependency rules
+- **[Module Hierarchy](../../../_meta/docs/guidelines/MODULE_HIERARCHY_UPDATED.md)** - Detailed hierarchy diagrams
+- **[PR Review Checklist](../../../_meta/docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - Pre-merge verification
+
+### Quick Reference: Key Project Rules
+1. **Module Structure**: Standard is `src/` for production code, `_meta/` for everything else
+   - **Note**: This submodule uses `Source/` instead of `src/` (historical naming)
+2. **Dependency Direction**: Specialized → Generic (never reversed)
+3. **Namespace Shortcuts**: Use `T` (not `PrismQ.Text`)
+4. **No Side Effects**: No I/O at import time
+5. **SOLID Principles**: Single responsibility, dependency injection, abstraction
+
+---
+
+
+## Target Platform Optimization
 
 All code should be optimized for:
 - **Operating System**: Windows
@@ -15,96 +72,71 @@ All code should be optimized for:
 - **CPU**: AMD Ryzen processor
 - **RAM**: 64GB DDR5
 
-## Development Guidelines
+### AI/ML Considerations for This Module
+- Use mixed precision (FP16/BF16) for RTX 5090
+- Implement proper batch sizing for 32GB VRAM
+- Profile GPU memory usage for classification models
+- Consider model quantization for efficiency
 
-### Code Style
+---
+
+## Development Workflow
+
+### Code Style (Python)
 - Follow PEP 8 for Python code
 - Use type hints for all function parameters and return values
 - Write comprehensive docstrings using Google style
 - Keep functions focused and under 50 lines when possible
 
-### SOLID Principles
-Always apply SOLID design principles (see `_meta/docs/SOLID_PRINCIPLES.md`):
-- **Single Responsibility**: Each class should have one reason to change
-- **Open/Closed**: Open for extension, closed for modification  
-- **Liskov Substitution**: Subtypes must be substitutable for their base types
-- **Interface Segregation**: Use focused, minimal interfaces (Python Protocols)
-- **Dependency Inversion**: Depend on abstractions (Protocols), inject dependencies
-
-### Additional Design Principles
-- **DRY (Don't Repeat Yourself)**: Eliminate code duplication
-- **KISS (Keep It Simple)**: Favor simplicity over complexity
-- **YAGNI (You Aren't Gonna Need It)**: Only implement what's needed now
-- **Composition Over Inheritance**: Prefer object composition to class inheritance
-
-### Performance Considerations
-- Optimize for GPU utilization on RTX 5090
-- Consider memory constraints (32GB VRAM, 64GB RAM)
-- Use batch processing where applicable
-- Implement proper CUDA memory management
-
 ### Testing
-- Write unit tests for all new functionality
+- Write unit tests for all new functionality in `_meta/tests/`
 - Aim for >80% code coverage
-- Include performance benchmarks for GPU-intensive operations
-- Test on the target platform when possible
+- Include performance benchmarks for AI/ML operations
+- Test source adapters with mock data
 
-### Documentation
-- Keep README.md up-to-date
-- Document API changes
-- Include usage examples
-- Note platform-specific considerations
+### Adding New Inspiration Sources
+1. Create adapter in `Source/adapters/<source_name>/`
+2. Implement source-specific collection logic
+3. Add classifier integration
+4. Add scoring logic
+5. Write tests in `_meta/tests/`
+6. Update documentation
+7. Test with real data (if available)
 
-## Common Tasks
+---
 
-### Adding New Features
-1. Create issue in `_meta/issues/new/`
-2. Move to `_meta/issues/wip/` when starting work
-3. Write tests first (TDD approach)
-4. Implement feature
-5. Update documentation
-6. Run full test suite
-7. Move issue to `_meta/issues/done/`
+## Integration Points
 
-### Code Organization
-- **src/** - Main source code
-- **tests/** - Unit and integration tests
-- **_meta/docs/** - Project-level documentation
-- **_meta/issues/** - Issue tracking
-- **_meta/research/** - Research and experiments
-- **scripts/** - Utility scripts
+### Upstream Dependencies
+- None (entry point to workflow)
 
-### Dependencies
-- Prefer well-maintained, GPU-accelerated libraries
-- Document version requirements clearly
-- Consider CUDA/cuDNN compatibility
-- Test compatibility with PyTorch/TensorFlow if using deep learning
+### Downstream Consumers
+- **PrismQ.T.Idea** - Receives structured, scored inspirations
+- **Analytics Feedback Loop** - Performance data from published content
 
-## AI/ML Considerations
+### External Systems
+- Social media APIs (Reddit, Twitter, Instagram, TikTok)
+- RSS feed aggregators
+- News APIs
+- Analytics platforms
 
-When working with AI models:
-- Use mixed precision (FP16/BF16) for RTX 5090
-- Implement proper batch sizing for 32GB VRAM
-- Use CUDA graphs for repetitive operations
-- Profile GPU memory usage
-- Consider model quantization for efficiency
+---
 
-## Integration with PrismQ Ecosystem
+## Questions to Ask Before Implementation
 
-- Follow consistent naming conventions across modules
-- Use compatible data formats
-- Document integration points
-- Consider pipeline compatibility
+When working on this module, consider:
+- Does this follow the module placement rules? (Check root copilot instructions)
+- Is this a new inspiration source? (Follow source adapter pattern)
+- Does this affect classification or scoring? (Consider ML model updates)
+- Is this compatible with the analytics feedback loop?
+- Have I tested with real-world data sources?
+- Does this respect API rate limits and terms of service?
+- Is error handling robust for external API failures?
 
-## Questions to Ask
+---
 
-Before implementing features, consider:
-- Does this follow SOLID principles (single responsibility, dependency inversion, etc.)?
-- Does this leverage the RTX 5090 efficiently?
-- Is this compatible with the PrismQ ecosystem?
-- Have I included proper error handling?
-- Are there edge cases to consider?
-- Is the code documented and tested?
-- Can this be simplified (KISS principle)?
-- Am I implementing only what's needed (YAGNI)?
-- Have I eliminated code duplication (DRY)?
+## Additional Resources
+
+- **[Module README](../README.md)** - Detailed module documentation
+- **[Development Plan](../DEVELOPMENT_PLAN.md)** - Development roadmap and architecture
+- **[Main Project README](../../../README.md)** - Overall project context
