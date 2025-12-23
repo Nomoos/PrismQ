@@ -12,13 +12,30 @@ Create content (v1) from the original idea and title using Qwen3:32b via Ollama.
 
 ## 🤖 AI-Powered Content Generation
 
+### Model: Qwen3:32b (Optimized)
+This module uses **Qwen3:32b** via Ollama with an optimized prompt structure designed specifically for this model's strengths:
+
+**Prompt Optimization**:
+- **Structured Format**: Uses markdown sections for clarity
+- **Role Definition**: Clear expert persona (video content writer)
+- **Audience Context**: Explicitly incorporates target demographic
+- **Constraint-Based**: Precise word counts and style guidelines
+- **Natural Language**: Emphasizes engaging, conversational output
+- **Anti-Meta**: Prevents the model from explaining itself
+
+**Why Qwen3:32b?**
+- Excellent instruction following
+- Strong creative writing capabilities
+- Good at maintaining consistent tone
+- Handles structured constraints well
+
 ### Input to AI
 - **Title** (Titulek) - the content title
 - **Idea text** - concept, synopsis, premise from the Idea object  
 - **Seed** - one word randomly picked from 500 predefined variations (e.g., "pudding", "fire", "ocean", "Chicago", "Germany", "chill")
 
 ### Features
-- **Qwen3:32b Model**: High-quality content generation
+- **Qwen3:32b Model**: High-quality content generation with optimized prompts
 - **500 Seed Variations**: Simple words for creative inspiration (food, places, feelings, colors, etc.)
 - **Platform Optimization**: YouTube Shorts, TikTok, Instagram Reels
 - **No Fallback**: Error if AI unavailable (ensures AI is always used)

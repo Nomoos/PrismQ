@@ -1,7 +1,7 @@
-"""AI-Powered Content Generator using Qwen3:30b via Ollama.
+"""AI-Powered Content Generator using Qwen3:32b via Ollama.
 
 This module provides AI-powered content generation for the PrismQ.T.Content.From.Idea.Title
-workflow using the Qwen3:30b model.
+workflow using the Qwen3:32b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
 
@@ -14,8 +14,13 @@ Workflow Position:
     Stage: PrismQ.T.Content.From.Idea.Title
     Input: Title + Idea + Seed → AI Generation → Output: Content v1
 
-Prompts are stored as separate text files in _meta/prompts/ for easier
-maintenance and editing.
+Prompt Optimization for Qwen3:32b:
+    - Structured markdown format for clarity
+    - Clear role definition (expert content writer)
+    - Explicit audience context
+    - Specific constraints (word count, style, format)
+    - Natural language emphasis
+    - Avoids meta-commentary requirements
 """
 
 import logging
@@ -820,13 +825,13 @@ class AIContentGenerator:
     def _create_content_prompt(
         self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
     ) -> str:
-        """Create prompt for content generation using updated structure for local models.
+        """Create optimized prompt for Qwen3:32b model.
 
-        Input:
-        - Title (Titulek)
-        - Idea text
-        - Seed (one picked from 504 variations)
-        - Audience (age_range, gender, country)
+        Optimized for Qwen3's strengths:
+        - Clear role definition and instruction following
+        - Structured constraints and requirements
+        - Explicit output format specification
+        - Natural language generation focus
 
         Args:
             title: Content title
@@ -837,46 +842,45 @@ class AIContentGenerator:
             audience: Target audience dict
 
         Returns:
-            Engineered prompt for local AI model
+            Optimized prompt for Qwen3:32b model
         """
         # Calculate approximate word count (2.5 words per second for narration)
         target_words = int(target_duration * 2.5)
         max_words = int(max_duration * 2.5)
 
-        # Build the optimized prompt for local models
-        prompt = f"""SYSTEM INSTRUCTION:
-You are a professional video content writer.
-Follow instructions exactly. Do not add extra sections or explanations.
+        # Optimized prompt structure for Qwen3:32b
+        prompt = f"""You are an expert video content writer specializing in engaging short-form content for {audience.get('gender', 'Female')} audiences aged {audience.get('age_range', '13-23')} in {audience.get('country', 'United States')}.
 
-TASK:
-Generate a video content.
+# Your Task
+Write compelling video narration for: "{title}"
 
-INPUTS:
-TITLE: {title}
-IDEA: {idea_text}
-INSPIRATION SEED: {seed} (Single word used only as creative inspiration)
+# Context
+{idea_text}
 
-TARGET AUDIENCE:
-- Age: {audience.get('age_range', '13-23')}
-- Gender: {audience.get('gender', 'Female')}
-- Country: {audience.get('country', 'United States')}
+# Creative Direction
+Draw subtle inspiration from: {seed}
+(Use this thematically or symbolically—do not mention it directly)
 
-REQUIREMENTS:
-1. Hook must strongly capture attention within the first 5 seconds.
-2. Deliver the main idea clearly and coherently.
-3. End with a clear and natural call-to-action.
-4. Maintain consistent engaging tone throughout.
-5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
-6. Target length: approximately {target_words} words (for {target_duration} seconds).
-7. Maximum length: {max_words} words ({max_duration} seconds).
+# Requirements
+**Structure**: Begin with an attention-grabbing hook, deliver the core message clearly, end with a natural call-to-action.
 
-OUTPUT RULES:
-- Output ONLY the content text.
-- No headings, no labels, no explanations.
-- Do not mention the word "hook", "CTA", or any structure explicitly.
-- Do not mention that this is a script.
+**Length**: {target_words} words (target) | {max_words} words (maximum)
 
-The first sentence must create immediate curiosity or tension."""
+**Style Guidelines**:
+- First sentence must create immediate curiosity or tension
+- Use conversational, engaging language throughout
+- Maintain consistent energy and pacing
+- Make every word count—no filler
+- End with a clear action for viewers
+
+**Critical Constraints**:
+- Write ONLY the narration text—no labels, headings, or meta-commentary
+- Never mention "hook", "CTA", "script", or structural elements
+- Never explain what you're doing—just deliver the content
+- Stay within word limit
+
+# Output Format
+Write the complete narration as a single, flowing text. Start immediately with the hook."""
 
         return prompt
 
