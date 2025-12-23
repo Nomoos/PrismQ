@@ -60,7 +60,7 @@ module/
 ### `PrismQ.T` (Text foundation)
 - Shared **foundation for Text modules**.
 - Base types, primitives, and utilities used by multiple `PrismQ.T.*` modules.
-- Currently: No foundation layer implemented (future extension point)
+- Examples: **AI configuration** (`T/src/ai_config.py`) - used by Content, Publishing, Story
 
 ---
 
@@ -95,7 +95,7 @@ especially when it spans multiple domains.
 
 - **`PrismQ.T.Content`** (`T/Content/`)
   Generic functionality for working with content artifacts, independent of origin.
-  - **AI configuration** (`T/Content/src/ai_config.py`) - for content generation
+  - **Uses** AI configuration from T/src (foundation level)
   - Content processing utilities
   - Generation helpers
 
