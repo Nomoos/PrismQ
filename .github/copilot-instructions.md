@@ -31,13 +31,13 @@
 **Before making changes, review these core documents:**
 
 ### Module Structure & Architecture
-- **[Coding Guidelines](_meta/docs/guidelines/CODING_GUIDELINES.md)** - Module hierarchy, placement rules, dependency direction
-- **[Module Hierarchy](_meta/docs/guidelines/MODULE_HIERARCHY_UPDATED.md)** - Detailed hierarchy and dependency diagrams
-- **[PR Review Checklist](_meta/docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - Required verification before merging
+- **[Coding Guidelines](../_meta/docs/guidelines/CODING_GUIDELINES.md)** - Module hierarchy, placement rules, dependency direction
+- **[Module Hierarchy](../_meta/docs/guidelines/MODULE_HIERARCHY_UPDATED.md)** - Detailed hierarchy and dependency diagrams
+- **[PR Review Checklist](../_meta/docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - Required verification before merging
 
 ### Quick Reference
 - **[README.md](../README.md)** - Project overview and module navigation
-- **[Workflow Documentation](_meta/WORKFLOW.md)** - State machine and workflow processes
+- **[Workflow Documentation](../_meta/WORKFLOW.md)** - State machine and workflow processes
 
 ---
 
