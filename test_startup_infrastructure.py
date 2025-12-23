@@ -95,12 +95,12 @@ def test_general_startup_module():
 def test_step04_ai_config():
     """Test Step 04 specific AI config module."""
     print("\n" + "=" * 70)
-    print("TEST 2: Step 04 AI Config Module (T/Script/From/Idea/Title/src/ai_config.py)")
+    print("TEST 2: Step 04 AI Config Module (T/Content/From/Idea/Title/src/ai_config.py)")
     print("=" * 70)
     
     try:
-        # Add Step 04 src to path
-        step04_src = REPO_ROOT / "T" / "Script" / "From" / "Idea" / "Title" / "src"
+        # Add Step 04 src to path (updated path: Content instead of Script)
+        step04_src = REPO_ROOT / "T" / "Content" / "From" / "Idea" / "Title" / "src"
         sys.path.insert(0, str(step04_src))
         
         from ai_config import (
@@ -140,6 +140,13 @@ def test_step04_ai_config():
         assert api == "http://localhost:11434"
         assert timeout == 120
         
+        # Verify it's using top-level module (check if constants are imported)
+        try:
+            from ai_config import DEFAULT_AI_MODEL, AISettings
+            print(f"✓ Using top-level src.startup module (DEFAULT_AI_MODEL={DEFAULT_AI_MODEL})")
+        except ImportError:
+            print("⚠ Using fallback implementation (not importing from src.startup)")
+        
         print("\n✅ Step 04 AI Config: ALL TESTS PASSED")
         return True
         
@@ -152,24 +159,24 @@ def test_step04_ai_config():
 
 
 def test_step04_integration():
-    """Test Step 04 script_generator integration."""
+    """Test Step 04 content_generator integration."""
     print("\n" + "=" * 70)
-    print("TEST 3: Step 04 Integration (script_generator, ai_script_generator)")
+    print("TEST 3: Step 04 Integration (content_generator, ai_content_generator)")
     print("=" * 70)
     
     try:
-        # Add Step 04 src to path
-        step04_src = REPO_ROOT / "T" / "Script" / "From" / "Idea" / "Title" / "src"
+        # Add Step 04 src to path (updated path: Content instead of Script)
+        step04_src = REPO_ROOT / "T" / "Content" / "From" / "Idea" / "Title" / "src"
         sys.path.insert(0, str(step04_src))
         
-        from script_generator import ScriptGenerator, ScriptGeneratorConfig, ScriptV1
-        from ai_script_generator import AIScriptGenerator, AIScriptGeneratorConfig, get_random_seed
+        from content_generator import ContentGenerator, ContentGeneratorConfig, ContentV1
+        from ai_content_generator import AIContentGenerator, AIContentGeneratorConfig, get_random_seed
         
         print("✓ All imports successful")
         
-        # Test ScriptGeneratorConfig
-        config = ScriptGeneratorConfig()
-        print(f"✓ ScriptGeneratorConfig created")
+        # Test ContentGeneratorConfig
+        config = ContentGeneratorConfig()
+        print(f"✓ ContentGeneratorConfig created")
         print(f"  - target_duration: {config.target_duration_seconds}s")
         print(f"  - max_duration: {config.max_duration_seconds}s")
         print(f"  - audience: {config.audience}")
@@ -186,9 +193,9 @@ def test_step04_integration():
         assert isinstance(seed, str), "Seed should be a string"
         assert len(seed) > 0, "Seed should not be empty"
         
-        # Test AIScriptGeneratorConfig
-        ai_config = AIScriptGeneratorConfig()
-        print(f"✓ AIScriptGeneratorConfig created")
+        # Test AIContentGeneratorConfig
+        ai_config = AIContentGeneratorConfig()
+        print(f"✓ AIContentGeneratorConfig created")
         print(f"  - model: {ai_config.model}")
         print(f"  - temperature: {ai_config.temperature}")
         print(f"  - timeout: {ai_config.timeout}")
@@ -215,7 +222,7 @@ def main():
     print("=" * 70)
     print("\nTesting both:")
     print("1. General startup module (src/startup.py) - reusable across all scripts")
-    print("2. Step 04 specific implementation - works with Step 04")
+    print("2. Step 04 specific implementation (T/Content/From/Idea/Title) - uses top-level module")
     
     results = []
     
