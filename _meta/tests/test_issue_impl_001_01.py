@@ -116,11 +116,8 @@ class TestInteractiveModuleStructure:
 
     def test_module_imports_successfully(self):
         """Verify the module can be imported."""
-        try:
-            import idea_creation_interactive
-            assert True
-        except ImportError as e:
-            pytest.fail(f"Failed to import idea_creation_interactive: {e}")
+        import idea_creation_interactive  # noqa: F401
+        # If import fails, pytest will catch and report the ImportError
 
     def test_module_has_main_function(self):
         """Verify the module has a main function."""
