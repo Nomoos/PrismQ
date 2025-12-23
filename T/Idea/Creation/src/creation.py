@@ -24,6 +24,14 @@ from ai_generator import AIConfig, AIIdeaGenerator
 
 from idea import ContentGenre, Idea, IdeaStatus
 
+# Import StateNames for workflow state constants
+try:
+    from Model import StateNames
+except ImportError:
+    # Fallback if Model not available
+    class StateNames:
+        IDEA_CREATION = "PrismQ.T.Idea.Creation"
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,6 +73,9 @@ class IdeaCreator:
     AI-powered content generation (via Ollama) with variable length optimization.
     AI is required - if AI is not available, an error is logged and an empty list is returned.
     """
+    
+    # State constant for Idea creation workflow
+    CURRENT_STATE = StateNames.IDEA_CREATION
 
     def __init__(self, config: Optional[CreationConfig] = None):
         """Initialize IdeaCreator with configuration.

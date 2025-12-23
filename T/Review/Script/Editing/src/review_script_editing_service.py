@@ -56,12 +56,13 @@ from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Score threshold for accepting an editing review
 ACCEPTANCE_THRESHOLD = 75
 
 # State constants
+CURRENT_STATE = StateNames.REVIEW_CONTENT_EDITING
 STATE_REVIEW_SCRIPT_EDITING = StateNames.REVIEW_SCRIPT_EDITING
 STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
 # Content Refinement state (Stage 8/11) - Content.From.Title.Review.Content
