@@ -1,7 +1,7 @@
 # Production Readiness Changes Required
 
-**Module**: `T/Review/Title/From/Script/Idea` (`PrismQ.T.Review.Title.From.Script.Idea`)  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea`  
+**Module**: `T/Review/Title/From/Content/Idea` (`PrismQ.T.Review.Title.From.Content.Idea`)  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
 **Date**: 2025-12-23  
 **Status**: Analysis Complete - Implementation Required
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The Title Review module (`T/Review/Title/From/Script/Idea`) has solid core functionality for reviewing titles against scripts and ideas. However, several production readiness issues must be addressed before it can be deployed reliably:
+The Title Review module (`T/Review/Title/From/Content/Idea`) has solid core functionality for reviewing titles against content and ideas. However, several production readiness issues must be addressed before it can be deployed reliably:
 
 ### Critical Issues (Must Fix)
 1. **Script path mismatch** - Run.bat references wrong directory path
@@ -34,9 +34,9 @@ The Title Review module (`T/Review/Title/From/Script/Idea`) has solid core funct
 **Status**: **PASS** (with minor improvements needed)
 
 ### Findings:
-- Core review logic in `by_script_and_idea.py` is well-designed
+- Core review logic in `by_content_and_idea.py` is well-designed
 - Scoring algorithms are reasonable and documented
-- Alignment analysis correctly evaluates title-script-idea relationships
+- Alignment analysis correctly evaluates title-content-idea relationships
 - Engagement and SEO scoring follow industry best practices
 
 ### Minor Improvements Needed:
@@ -56,7 +56,7 @@ The Title Review module (`T/Review/Title/From/Script/Idea`) has solid core funct
 ### Issues Found:
 
 #### Issue 2.1: No input validation in review function
-**Location**: `by_script_and_idea.py:498-717`
+**Location**: `by_content_and_idea.py:498-717`
 **Severity**: HIGH
 
 Problems:
@@ -92,7 +92,7 @@ Score values (0-100) are not enforced.
 ### Issues Found:
 
 #### Issue 3.1: No exception handling in main review function
-**Location**: `by_script_and_idea.py:498-717`
+**Location**: `by_content_and_idea.py:498-717`
 **Severity**: HIGH
 
 Problem: If any analysis step fails (e.g., regex error, division by zero), entire review crashes with no recovery.
@@ -151,7 +151,7 @@ Need timing decorators to track function execution time.
 ### Issues Found:
 
 #### Issue 5.1: Review IDs generated from hash
-**Location**: `by_script_and_idea.py:550-552`
+**Location**: `by_content_and_idea.py:550-552`
 **Severity**: MEDIUM
 
 Current code uses `hash()` which:
@@ -224,7 +224,7 @@ Same text analyzed multiple times for keywords - could cache results.
 #### Issue 7.2: Inefficient string operations for large texts
 **Severity**: LOW
 
-For very large scripts, multiple `kw in script_lower` checks could be slow.
+For very large scripts, multiple `kw in content_lower` checks could be slow.
 
 #### Issue 7.3: No text length warnings
 **Severity**: LOW
@@ -277,7 +277,7 @@ Uses Python 3.9+ features without specifying version requirement.
 ### Issues Found:
 
 #### Issue 9.1: Missing tests for error conditions
-**Location**: `_meta/tests/test_by_script_and_idea.py`
+**Location**: `_meta/tests/test_by_content_and_idea.py`
 **Severity**: MEDIUM
 
 Current test coverage: Basic happy path tested
@@ -312,34 +312,34 @@ No end-to-end workflow test from idea → title → script → review.
 ### Issues Found:
 
 #### Issue 10.1: Run.bat references wrong path
-**Location**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Run.bat:17,26`
+**Location**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat:17,26`
 **Severity**: CRITICAL
 
 Current code:
 ```batch
 REM Line 17
-python ..\..\..\T\Review\Title\ByScriptIdea\src\review_title_by_script_idea_interactive.py
+python ..\..\..\T\Review\Title\ByContentIdea\src\review_title_by_content_idea_interactive.py
 
 REM Line 26
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByScriptIdea
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByContentIdea
 ```
 
 Problem:
-- Path `T\Review\Title\ByScriptIdea` does not exist
-- Actual module is at `T/Review/Title/From/Script/Idea`
+- Path `T\Review\Title\ByContentIdea` does not exist
+- Actual module is at `T/Review/Title/From/Content/Idea`
 - Script will fail immediately
 
 Correct path should be:
 ```batch
 REM Line 17
-python ..\..\..\T\Review\Title\From\Script\Idea\src\review_title_by_script_idea_interactive.py
+python ..\..\..\T\Review\Title\From\Content\Idea\src\review_title_by_content_idea_interactive.py
 
 REM Line 26
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\From\Script\Idea
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\From\Content\Idea
 ```
 
 #### Issue 10.2: Missing interactive script file
-**Location**: Expected at `T/Review/Title/From/Script/Idea/src/review_title_by_script_idea_interactive.py`
+**Location**: Expected at `T/Review/Title/From/Content/Idea/src/review_title_by_content_idea_interactive.py`
 **Severity**: CRITICAL
 
 Problem: File does not exist. Run.bat cannot execute.
@@ -354,7 +354,7 @@ Preview.bat likely has same path issues.
 ### Actions Required:
 1. ✅ Fix paths in Run.bat (lines 17, 26)
 2. ✅ Fix paths in Preview.bat
-3. ✅ Create `review_title_by_script_idea_interactive.py`
+3. ✅ Create `review_title_by_content_idea_interactive.py`
 4. Test script execution
 5. Update README with correct paths
 
@@ -431,7 +431,7 @@ Preview.bat likely has same path issues.
 
 - [CODING_GUIDELINES.md](../../docs/guidelines/CODING_GUIDELINES.md)
 - [SCRIPT_COMPLIANCE_AUDIT.md](../../docs/guidelines/SCRIPT_COMPLIANCE_AUDIT.md)
-- [ISSUE-IMPL-005-05 Original](./ISSUE-IMPL-005-05_PrismQ.T.Review.Title.By.Script.Idea.md)
+- [ISSUE-IMPL-005-05 Original](./ISSUE-IMPL-005-05_PrismQ.T.Review.Title.By.Content.Idea.md)
 
 ---
 

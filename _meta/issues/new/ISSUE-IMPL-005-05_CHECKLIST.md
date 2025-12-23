@@ -1,7 +1,7 @@
 # Production Readiness Checklist
 
-**Module**: `T/Review/Title/From/Script/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea`  
+**Module**: `T/Review/Title/From/Content/Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
 **Review Date**: 2025-12-23  
 **Status**: NOT PRODUCTION READY
 
@@ -17,10 +17,10 @@
 |---|------|--------|----------|---------|------|
 | 1 | Fix Run.bat path (line 17, 26) | ❌ | 🔴 CRITICAL | `_meta/scripts/05_.../Run.bat` | 15 min |
 | 2 | Fix Preview.bat path | ❌ | 🔴 CRITICAL | `_meta/scripts/05_.../Preview.bat` | 15 min |
-| 3 | Create interactive script | ❌ | 🔴 CRITICAL | `T/.../Idea/src/review_title_by_script_idea_interactive.py` | 2-3 hrs |
-| 4 | Add parameter validation | ❌ | 🔴 CRITICAL | `by_script_and_idea.py:498` | 2 hrs |
-| 5 | Add error handling | ❌ | 🔴 CRITICAL | `by_script_and_idea.py` (all functions) | 2 hrs |
-| 6 | Add logging infrastructure | ❌ | 🔴 CRITICAL | `by_script_and_idea.py` (module-level) | 2 hrs |
+| 3 | Create interactive script | ❌ | 🔴 CRITICAL | `T/.../Idea/src/review_title_by_content_idea_interactive.py` | 2-3 hrs |
+| 4 | Add parameter validation | ❌ | 🔴 CRITICAL | `by_content_and_idea.py:498` | 2 hrs |
+| 5 | Add error handling | ❌ | 🔴 CRITICAL | `by_content_and_idea.py` (all functions) | 2 hrs |
+| 6 | Add logging infrastructure | ❌ | 🔴 CRITICAL | `by_content_and_idea.py` (module-level) | 2 hrs |
 | 7 | Test script execution | ❌ | 🔴 CRITICAL | Manual testing | 30 min |
 
 **Phase 1 Total**: 4-6 hours
@@ -31,9 +31,9 @@
 
 | # | Item | Status | Priority | File(s) | Time |
 |---|------|--------|----------|---------|------|
-| 8 | Add input sanitization | ❌ | 🟡 HIGH | `by_script_and_idea.py` (new function) | 2 hrs |
-| 9 | Fix ID generation (SHA256) | ❌ | 🟡 HIGH | `by_script_and_idea.py:550-552` | 1 hr |
-| 10 | Add idempotency checks | ❌ | 🟡 HIGH | `by_script_and_idea.py` (new functions) | 1 hr |
+| 8 | Add input sanitization | ❌ | 🟡 HIGH | `by_content_and_idea.py` (new function) | 2 hrs |
+| 9 | Fix ID generation (SHA256) | ❌ | 🟡 HIGH | `by_content_and_idea.py:550-552` | 1 hr |
+| 10 | Add idempotency checks | ❌ | 🟡 HIGH | `by_content_and_idea.py` (new functions) | 1 hr |
 | 11 | Add validation error tests | ❌ | 🟡 HIGH | `_meta/tests/test_validation_errors.py` | 2 hrs |
 | 12 | Add error handling tests | ❌ | 🟡 HIGH | `_meta/tests/test_validation_errors.py` | 1 hr |
 | 13 | Add security tests | ❌ | 🟡 HIGH | `_meta/tests/test_validation_errors.py` | 1 hr |
@@ -62,9 +62,9 @@
 
 | # | Item | Status | Priority | File(s) | Time |
 |---|------|--------|----------|---------|------|
-| 21 | Add keyword caching | ❌ | ✅ LOW | `by_script_and_idea.py:129` | 1 hr |
-| 22 | Optimize string operations | ❌ | ✅ LOW | `by_script_and_idea.py:156-223` | 1 hr |
-| 23 | Add performance warnings | ❌ | ✅ LOW | `by_script_and_idea.py:498` | 30 min |
+| 21 | Add keyword caching | ❌ | ✅ LOW | `by_content_and_idea.py:129` | 1 hr |
+| 22 | Optimize string operations | ❌ | ✅ LOW | `by_content_and_idea.py:156-223` | 1 hr |
+| 23 | Add performance warnings | ❌ | ✅ LOW | `by_content_and_idea.py:498` | 30 min |
 | 24 | Add performance benchmarks | ❌ | ✅ LOW | `_meta/tests/test_performance.py` | 1 hr |
 
 **Phase 4 Total**: 2-3 hours
@@ -148,13 +148,13 @@
 ## Quick Reference
 
 ### Files to Modify (Critical)
-1. `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Run.bat`
-2. `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Preview.bat`
-3. `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+1. `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`
+2. `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Preview.bat`
+3. `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 
 ### Files to Create (Critical)
-1. `T/Review/Title/From/Script/Idea/src/review_title_by_script_idea_interactive.py`
-2. `T/Review/Title/From/Script/Idea/_meta/tests/test_validation_errors.py`
+1. `T/Review/Title/From/Content/Idea/src/review_title_by_content_idea_interactive.py`
+2. `T/Review/Title/From/Content/Idea/_meta/tests/test_validation_errors.py`
 
 ### Documentation References
 - Full analysis: `ISSUE-IMPL-005-05_PRODUCTION_READINESS_CHANGES.md`

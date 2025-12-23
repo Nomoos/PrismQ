@@ -1,10 +1,10 @@
 # Executive Summary: Production Readiness Review
-## PrismQ.T.Review.Title.From.Script.Idea
+## PrismQ.T.Review.Title.From.Content.Idea
 
 **Date**: December 23, 2025  
 **Reviewer**: GitHub Copilot  
-**Module**: `T/Review/Title/From/Script/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea`
+**Module**: `T/Review/Title/From/Content/Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`
 
 ---
 
@@ -30,11 +30,11 @@
 **Fix Time**: 30 minutes  
 **Risk Level**: 🔴 CRITICAL
 
-The batch scripts reference `T\Review\Title\ByScriptIdea` which doesn't exist. The actual module is at `T\Review\Title\From\Script\Idea`.
+The batch scripts reference `T\Review\Title\ByContentIdea` which doesn't exist. The actual module is at `T\Review\Title\From\Content\Idea`.
 
 ### 2. ❌ Missing Interactive Script
 **Impact**: Run.bat fails immediately  
-**Cause**: `review_title_by_script_idea_interactive.py` doesn't exist  
+**Cause**: `review_title_by_content_idea_interactive.py` doesn't exist  
 **Fix Time**: 2-3 hours  
 **Risk Level**: 🔴 CRITICAL
 
@@ -322,3 +322,16 @@ For questions about this review:
 ---
 
 *This is a technical assessment based on industry best practices for production software. Business considerations (deadlines, resources, priorities) should be factored into final deployment decisions.*
+
+---
+
+## ⚠️ Important Note on Directory Structure
+
+**Current Filesystem Path**: `T/Review/Title/From/Script/Idea`  
+**Correct Path (Documented)**: `T/Review/Title/From/Content/Idea`
+
+The module directory is currently named `Script` but all documentation in this review uses the correct terminology "Content" (Script is obsolete). 
+
+**Action Required**: The directory should be renamed from `Script` to `Content` as part of implementing the production readiness fixes. All paths in this analysis assume the correct "Content" naming.
+
+---

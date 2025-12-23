@@ -1,7 +1,7 @@
 # Production Readiness Changes - Quick Reference
 
-**Module**: `T/Review/Title/From/Script/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea`  
+**Module**: `T/Review/Title/From/Content/Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
 **Date**: 2025-12-23
 
 ---
@@ -11,27 +11,27 @@
 ### 🔴 CRITICAL - Must Fix Immediately
 
 #### 1. Fix Script Paths
-**Files**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Run.bat`, `Preview.bat`
+**Files**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`, `Preview.bat`
 
 **Current (WRONG)**:
 ```batch
-python ..\..\..\T\Review\Title\ByScriptIdea\src\review_title_by_script_idea_interactive.py
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByScriptIdea
+python ..\..\..\T\Review\Title\ByContentIdea\src\review_title_by_content_idea_interactive.py
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByContentIdea
 ```
 
 **Fixed (CORRECT)**:
 ```batch
-python ..\..\..\T\Review\Title\From\Script\Idea\src\review_title_by_script_idea_interactive.py
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\From\Script\Idea
+python ..\..\..\T\Review\Title\From\Content\Idea\src\review_title_by_content_idea_interactive.py
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\From\Content\Idea
 ```
 
 #### 2. Create Missing Interactive Script
-**Create**: `T/Review/Title/From/Script/Idea/src/review_title_by_script_idea_interactive.py`
+**Create**: `T/Review/Title/From/Content/Idea/src/review_title_by_content_idea_interactive.py`
 
-Based on pattern from: `T/Review/Title/From/Script/src/review_title_from_script_interactive.py`
+Based on pattern from: `T/Review/Title/From/Script/src/review_title_from_content_interactive.py`
 
 #### 3. Add Parameter Validation
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 **Function**: `review_title_by_content_and_idea()`
 
 Add at function start:
@@ -42,7 +42,7 @@ Add at function start:
 - Raise ValueError/TypeError for invalid inputs
 
 #### 4. Add Error Handling
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 **Location**: Wrap all analysis steps in try-except
 
 Add:
@@ -53,7 +53,7 @@ Add:
 - Return minimal TitleReview with error metadata if complete failure
 
 #### 5. Add Logging Infrastructure
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 
 Add:
 ```python
@@ -72,7 +72,7 @@ logger = logging.getLogger(__name__)
 ### 🟡 HIGH PRIORITY - Fix Soon
 
 #### 6. Add Input Sanitization
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 
 Create function:
 ```python
@@ -86,7 +86,7 @@ def sanitize_text_input(text: str, max_length: int) -> str:
 Apply to all user inputs before processing.
 
 #### 7. Fix ID Generation (Idempotency)
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 **Location**: Lines 550-552
 
 **Current (WRONG)**:
@@ -106,7 +106,7 @@ title_id = title_id or _generate_deterministic_id(title_text, "title")
 ```
 
 #### 8. Add Comprehensive Tests
-**Create**: `T/Review/Title/From/Script/Idea/_meta/tests/test_validation_errors.py`
+**Create**: `T/Review/Title/From/Content/Idea/_meta/tests/test_validation_errors.py`
 
 Add tests for:
 - Empty inputs (should raise ValueError)
@@ -116,7 +116,7 @@ Add tests for:
 - Null bytes (should handle safely)
 - Unicode (should work correctly)
 
-**Create**: `T/Review/Title/From/Script/Idea/_meta/tests/test_performance.py`
+**Create**: `T/Review/Title/From/Content/Idea/_meta/tests/test_performance.py`
 
 Add tests with pytest.mark.timeout for:
 - Large content (50KB) completes in <5 seconds
@@ -127,7 +127,7 @@ Add tests with pytest.mark.timeout for:
 ### 🟢 MEDIUM PRIORITY - Improvements
 
 #### 9. Add Performance Optimization
-**File**: `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
+**File**: `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 
 Add:
 ```python
@@ -145,7 +145,7 @@ if len(content_text) > 50000:
 ```
 
 #### 10. Document Environment Requirements
-**Update**: `T/Review/Title/From/Script/Idea/requirements.txt`
+**Update**: `T/Review/Title/From/Content/Idea/requirements.txt`
 
 Add:
 ```txt
@@ -163,7 +163,7 @@ mypy>=1.0.0
 pylint>=2.15.0
 ```
 
-**Create**: `T/Review/Title/From/Script/Idea/pyproject.toml` or update existing:
+**Create**: `T/Review/Title/From/Content/Idea/pyproject.toml` or update existing:
 ```toml
 [project]
 requires-python = ">=3.9"
@@ -246,29 +246,29 @@ requires-python = ">=3.9"
 
 ### Run Tests
 ```bash
-cd T/Review/Title/From/Script/Idea
+cd T/Review/Title/From/Content/Idea
 python -m pytest _meta/tests/ -v
 python -m pytest _meta/tests/ --cov=. --cov-report=html
 ```
 
 ### Run Script
 ```bash
-cd _meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea
+cd _meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea
 Run.bat          # Full mode (saves to DB)
 Preview.bat      # Preview mode (no save)
 ```
 
 ### Type Checking
 ```bash
-cd T/Review/Title/From/Script/Idea
-mypy by_script_and_idea.py title_review.py
+cd T/Review/Title/From/Content/Idea
+mypy by_content_and_idea.py title_review.py
 ```
 
 ### Linting
 ```bash
-cd T/Review/Title/From/Script/Idea
-pylint by_script_and_idea.py title_review.py
-black by_script_and_idea.py title_review.py --check
+cd T/Review/Title/From/Content/Idea
+pylint by_content_and_idea.py title_review.py
+black by_content_and_idea.py title_review.py --check
 ```
 
 ---
@@ -276,19 +276,19 @@ black by_script_and_idea.py title_review.py --check
 ## Related Files
 
 ### Must Modify
-- `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Run.bat`
-- `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/Preview.bat`
-- `T/Review/Title/From/Script/Idea/by_script_and_idea.py`
-- `T/Review/Title/From/Script/Idea/requirements.txt`
+- `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`
+- `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Preview.bat`
+- `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
+- `T/Review/Title/From/Content/Idea/requirements.txt`
 
 ### Must Create
-- `T/Review/Title/From/Script/Idea/src/review_title_by_script_idea_interactive.py`
-- `T/Review/Title/From/Script/Idea/_meta/tests/test_validation_errors.py`
-- `T/Review/Title/From/Script/Idea/_meta/tests/test_performance.py`
+- `T/Review/Title/From/Content/Idea/src/review_title_by_content_idea_interactive.py`
+- `T/Review/Title/From/Content/Idea/_meta/tests/test_validation_errors.py`
+- `T/Review/Title/From/Content/Idea/_meta/tests/test_performance.py`
 
 ### Should Update
-- `T/Review/Title/From/Script/Idea/README.md` (document changes)
-- `T/Review/Title/From/Script/Idea/pyproject.toml` (Python version requirement)
+- `T/Review/Title/From/Content/Idea/README.md` (document changes)
+- `T/Review/Title/From/Content/Idea/pyproject.toml` (Python version requirement)
 
 ---
 
@@ -304,3 +304,19 @@ For questions about these changes:
 **Document Version**: 1.0  
 **Created**: 2025-12-23  
 **Status**: Ready for Implementation
+
+---
+
+## ⚠️ Important Note on Directory Structure
+
+**Current Directory**: `T/Review/Title/From/Script/Idea` (currently exists on filesystem)  
+**Correct Directory**: `T/Review/Title/From/Content/Idea` (should be renamed)
+
+The directory is currently named `Script` but should be renamed to `Content` for consistency with:
+- The function name: `review_title_by_content_and_idea()`
+- The correct terminology: "Content" (Script is obsolete)
+- The coding guidelines: Content refers to content artifacts
+
+**Action Required**: Rename the directory from `Script` to `Content` before implementing the fixes described in this document.
+
+---
