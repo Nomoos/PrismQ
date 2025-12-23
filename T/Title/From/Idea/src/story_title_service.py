@@ -83,6 +83,7 @@ from Model.Database.models.title import Title
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.Database.schema_manager import SchemaManager
+from Model.State.constants.state_names import StateNames
 
 
 @dataclass
@@ -145,6 +146,9 @@ class StoryTitleService:
         ...     print(f"AI unavailable: {e}")
     """
 
+    # State constant for this service
+    CURRENT_STATE = StateNames.TITLE_FROM_IDEA
+    
     NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
     NUM_VARIANTS = 10  # Number of title variants to generate
     DEFAULT_SIMILARITY_THRESHOLD = 0.7  # Threshold for similarity detection

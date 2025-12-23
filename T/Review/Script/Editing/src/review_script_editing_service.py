@@ -62,6 +62,7 @@ from Model.State.constants.state_names import StateNames
 ACCEPTANCE_THRESHOLD = 75
 
 # State constants
+CURRENT_STATE = StateNames.REVIEW_CONTENT_EDITING
 STATE_REVIEW_SCRIPT_EDITING = StateNames.REVIEW_SCRIPT_EDITING
 STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
 # Content Refinement state (Stage 8/11) - Content.From.Title.Review.Content

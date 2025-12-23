@@ -120,6 +120,9 @@ class StoryContentService:
         >>> successful = [r for r in results if r.success]
         >>> print(f"Successfully generated {len(successful)} scripts")
     """
+    
+    # State constant for this service
+    CURRENT_STATE = StateNames.CONTENT_FROM_IDEA_TITLE
 
     def __init__(
         self,
@@ -500,7 +503,9 @@ class ContentFromIdeaTitleService:
         ... else:
         ...     print(f"No stories to process or error: {result.error}")
     """
-
+    
+    # State constants for this service
+    CURRENT_STATE = StateNames.CONTENT_FROM_IDEA_TITLE
     INPUT_STATE = STATE_CONTENT_FROM_IDEA_TITLE
     OUTPUT_STATE = STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
 
