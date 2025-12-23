@@ -13,6 +13,10 @@
 
 **Essential reading for all developers and AI assistants:**
 
+### GitHub Copilot Instructions
+- **[GitHub Copilot Instructions](./.github/copilot-instructions.md)** - Core principles, decision trees, and quick reference for AI-assisted development
+- Module-specific instructions: [T](./T/.github/copilot-instructions.md), [A](./A/.github/copilot-instructions.md), [V](./V/.github/copilot-instructions.md)
+
 ### Module Structure Standards
 - **[Coding Guidelines](./_meta/docs/guidelines/CODING_GUIDELINES.md)** - Core principles, module hierarchy, namespace shortcuts, placement decision tree
 - **[Module Hierarchy](./_meta/docs/guidelines/MODULE_HIERARCHY_UPDATED.md)** - Dependency direction, layer responsibilities, abstraction levels
