@@ -3,13 +3,19 @@
 **Module**: `T/Review/Title/From/Content/Idea`  
 **Purpose**: Defines the expected behavior and output format for AI-powered title review  
 **Date**: 2025-12-23  
-**Status**: Specification - To Be Implemented
+**Status**: Specification - To Be Implemented  
+**Version**: 2.0 (Updated with Narrative Format)
 
 ---
 
 ## Overview
 
-This document specifies the AI prompt template and expected behavior for the title review functionality. The AI reviewer acts as a senior title editor and viral content strategist, evaluating titles based on story idea and content.
+This document specifies TWO AI prompt templates for title review functionality:
+
+1. **Narrative Format** (RECOMMENDED) - Natural language review, optimized for local AI models
+2. **Structured Format** - Explicit sections with ratings, for programmatic parsing
+
+Both approaches have the same role and analysis rules but differ in output format.
 
 ---
 
@@ -17,15 +23,155 @@ This document specifies the AI prompt template and expected behavior for the tit
 
 **Role**: Senior title editor and viral content strategist
 
-**Task**: REVIEW and OPTIMIZE a TITLE based on:
+**Task**: WRITE A TEXTUAL REVIEW of a TITLE based on:
 - **STORY IDEA** (original intent and promise)
 - **CONTENT** (existing or obsolete script / final content)
 
-**Important**: The AI is NOT reviewing the script quality. It is reviewing how well the TITLE performs given the IDEA and the CONTENT.
+**Important**: The AI is NOT reviewing the content quality. It is reviewing the TITLE's effectiveness, accuracy, and emotional performance given what the audience is promised (Idea) and what they actually receive (Content).
 
 ---
 
-## Prompt Template
+## 🆕 RECOMMENDED: Narrative Format Prompt
+
+### Why This Format?
+
+**Advantages**:
+- More natural for local AI models (less constrained output)
+- Easier for humans to read and understand
+- Flexible - AI can adapt tone and depth naturally
+- Better quality from smaller models (less rigid structure)
+- Professional, critique-style output
+
+**Best For**:
+- Local AI models (Ollama, LM Studio, etc.)
+- Human review workflow
+- Exploratory analysis
+- Non-technical stakeholders
+
+### Prompt Template (Narrative)
+
+```
+You are a senior title editor and viral content strategist.
+
+Your task is to WRITE A TEXTUAL REVIEW of a TITLE based on:
+- the STORY IDEA (original intent and promise)
+- the CONTENT (existing / obsolete script or final content)
+
+You are NOT reviewing the content quality.
+You are reviewing the TITLE's effectiveness, accuracy, and emotional performance
+given what the audience is promised (Idea) and what they actually receive (Content).
+
+---
+
+INPUT:
+
+STORY IDEA:
+{PASTE IDEA HERE}
+
+CONTENT:
+{PASTE CONTENT HERE}
+
+CURRENT TITLE:
+{PASTE TITLE HERE}
+
+---
+
+ANALYSIS RULES (internal, do not output):
+- Compare title promise vs idea intent
+- Compare title promise vs content delivery
+- Detect overpromise, underpromise, or misdirection
+- Judge emotional pull in under 1 second
+- Consider trust, retention, and replay motivation
+- Assume short-form, audio-first, emotion-driven platforms
+
+---
+
+OUTPUT RULES (STRICT):
+- Output ONLY a continuous review text (paragraphs allowed)
+- Do NOT use headings, lists, or bullet points
+- Do NOT quote the prompt or structure
+- Do NOT mention scores or labels explicitly
+- Do NOT rewrite or summarize the content
+- Do NOT suggest content changes
+- You MAY suggest title improvements or alternatives naturally within the text
+- Tone: professional, precise, critical but constructive
+
+The review should clearly answer:
+- Does the title fit the idea?
+- Does the title truthfully represent the content?
+- Does it create enough emotional tension to earn the click?
+- What is the main risk of keeping this title as-is?
+```
+
+### Analysis Rules (Internal Logic - Narrative Format)
+
+The AI reviewer must internally evaluate these aspects (guide analysis, don't output explicitly):
+
+1. **Title–Idea Alignment**: Compare title promise vs idea intent
+2. **Title–Content Alignment**: Compare title promise vs content delivery  
+3. **Promise Calibration**: Detect overpromise, underpromise, or misdirection
+4. **Emotional Impact**: Judge emotional pull in under 1 second
+5. **Audience Trust**: Consider trust, retention, and replay motivation
+6. **Platform Fit**: Assume short-form, audio-first, emotion-driven platforms
+
+### Output Requirements (Narrative Format)
+
+**Must Do**:
+- Write continuous prose (paragraphs allowed)
+- Professional, precise, critical but constructive tone
+- Answer the four key questions naturally:
+  1. Does the title fit the idea?
+  2. Does the title truthfully represent the content?
+  3. Does it create enough emotional tension to earn the click?
+  4. What is the main risk of keeping this title as-is?
+- May suggest title improvements/alternatives naturally within the text
+
+**Must NOT Do**:
+- Use headings, lists, or bullet points
+- Quote the prompt or reveal structure
+- Mention scores or labels explicitly (e.g., "HIGH", "MEDIUM", "LOW")
+- Rewrite or summarize the content
+- Suggest content changes
+- Explain methodology or reasoning process
+
+### Example Output (Narrative Format)
+
+**Input**:
+- Idea: "A horror story about mysterious echoes in an abandoned house that reveal dark secrets from the past"
+- Content: "In an old, forgotten house at the edge of town, every sound echoes..."
+- Title: "The House at the Edge of Town"
+
+**Expected Review**:
+
+```
+The title undersells the core supernatural element that drives this story. While "The House at the Edge of Town" is descriptive and establishes setting, it reads as generic rural Gothic rather than capturing the haunting, revelatory nature of the echoes that form the story's central mystery. The original idea promises audiences a specific paranormal phenomenon—sounds that expose hidden truths—but the title could describe any abandoned house story.
+
+In terms of content alignment, the title is technically accurate but fails to deliver on the emotional intensity present in the narrative. The content establishes the echoes as sentient, almost malevolent entities that "whisper secrets" and "pull you deeper," yet the title offers no hint of this psychological tension. For audio-first platforms where the title needs to work when spoken aloud, the current phrasing lacks the rhythmic punch or unsettling quality that would make listeners pause.
+
+The main risk here is underpromising. Audiences seeking horror content will scroll past what appears to be a standard haunted house setup, missing the more compelling hook about secrets revealed through sound. A stronger approach might center the echoes themselves—something like "The Echoes That Remember Everything" or "What the Walls Whisper Back"—which honors both the supernatural premise and the revelation theme while creating immediate intrigue about what these echoes might reveal.
+
+The emotional pull is currently minimal. In the critical first second of audience decision-making, "The House at the Edge of Town" triggers familiarity rather than curiosity. For short-form content competing for attention, the title needs to promise something audiences haven't heard before, and the echo phenomenon provides that uniqueness if brought forward.
+```
+
+---
+
+## ALTERNATIVE: Structured Format Prompt
+
+### Why This Format?
+
+**Advantages**:
+- Explicit ratings for programmatic parsing
+- Structured data integration with TitleReview model
+- Consistent format across reviews
+- Easier to extract metrics
+
+**Best For**:
+- API-based AI services (OpenAI, Anthropic, etc.)
+- Automated workflows
+- Data analytics and tracking
+- A/B testing title variants
+
+### Prompt Template (Structured)
 
 ```
 You are a senior title editor and viral content strategist.
@@ -104,9 +250,40 @@ CONSTRAINTS:
 
 ---
 
-## Analysis Rules (Internal Logic)
+## Comparison: Narrative vs Structured
 
-The AI reviewer must internally evaluate the following (these guide the analysis but are not output):
+| Aspect | Narrative Format | Structured Format |
+|--------|------------------|-------------------|
+| **Output Style** | Continuous prose | Explicit sections |
+| **Readability** | Natural, essay-like | Clear, scannable |
+| **AI Model Fit** | Better for local/smaller models | Better for API services |
+| **Parsing** | Requires NLP | Simple string matching |
+| **Flexibility** | AI can adjust depth/tone | Fixed structure |
+| **Human Review** | Easier to read | Requires interpretation |
+| **Metrics** | Implicit (need extraction) | Explicit ratings |
+| **Title Suggestions** | Embedded naturally | Dedicated sections |
+| **Best Use** | Editorial review workflow | Automated pipelines |
+
+### Recommendation
+
+**For This Project**: Use **Narrative Format** as primary approach because:
+1. Local AI models produce better quality narrative reviews
+2. More natural for human stakeholders to read
+3. Less likely to produce parsing errors
+4. Better adaptation to edge cases
+5. Professional critique style matches editorial workflow
+
+**Keep Structured Format** as optional for:
+- Automated batch processing
+- Analytics dashboards
+- A/B testing frameworks
+- Integration with external tools
+
+---
+
+## Shared Analysis Rules (Both Formats)
+
+Both prompt formats use the same internal analysis logic:
 
 ### 1. Title–Idea Alignment
 - **Promise vs Intent**: Does the title promise what the idea intended?
@@ -239,8 +416,9 @@ The AI reviewer must internally evaluate the following (these guide the analysis
 
 ## Implementation Guidance
 
-### For AI Integration
-When implementing this prompt template in the AI review system:
+### For Narrative Format (RECOMMENDED)
+
+When implementing the narrative format:
 
 1. **Input Preparation**:
    - Extract `{PASTE IDEA HERE}` from idea_summary parameter
@@ -250,9 +428,45 @@ When implementing this prompt template in the AI review system:
 2. **Prompt Construction**:
    - Use exact template with placeholders replaced
    - Maintain all analysis rules and constraints
-   - Enforce output format strictly
+   - Set AI temperature to 0.7-0.8 for natural prose
 
-3. **Response Parsing**:
+3. **Response Parsing (NLP Required)**:
+   - Store complete review text as primary output
+   - Use NLP to extract implicit assessments:
+     - Sentiment analysis for overall evaluation
+     - Pattern matching for risk identification (e.g., "underpromising", "overpromising")
+     - Entity extraction for suggested titles (quoted phrases)
+   - Look for key phrases:
+     - "The title undersells..." → underpromise risk
+     - "fails to deliver..." → low accuracy
+     - "lacks emotional impact..." → low emotional pull
+     - "perfectly captures..." → high alignment
+
+4. **Integration with TitleReview Model**:
+   - Store narrative text in `notes` field
+   - Extract sentiment-based scores for category_scores
+   - Parse suggested titles from quoted text
+   - Create TitleImprovementPoint from identified weaknesses
+
+5. **Quality Assurance**:
+   - Verify output is continuous prose (no lists/headings)
+   - Check that four key questions are answered
+   - Validate professional tone
+   - Ensure no methodology explanations
+
+### For Structured Format (ALTERNATIVE)
+
+When implementing structured format:
+
+1. **Input Preparation**: (same as narrative)
+
+2. **Prompt Construction**:
+   - Use exact template with placeholders replaced
+   - Maintain all analysis rules and constraints
+   - Set AI temperature to 0.3-0.5 for consistency
+   - Enforce strict format compliance
+
+3. **Response Parsing (Simple String Matching)**:
    - Parse structured sections (TITLE REVIEW, OPTIMIZED TITLE, etc.)
    - Extract ratings (LOW/MEDIUM/HIGH, WEAK/ADEQUATE/STRONG)
    - Extract suggested titles and improvement notes
@@ -264,24 +478,196 @@ When implementing this prompt template in the AI review system:
    - Create TitleImprovementPoint objects from improvement notes
    - Store optimized titles as suggestions
 
-### Scoring Conversion
+### Scoring Conversion (Structured Format Only)
 
 **Suggested Mapping**:
 - LOW / WEAK → 0-40
 - MEDIUM / ADEQUATE → 41-70
 - HIGH / STRONG → 71-100
 
-### Error Handling
-- If AI output doesn't match format, flag for manual review
-- If ratings are missing, use conservative defaults (MEDIUM)
+### Scoring Estimation (Narrative Format)
+
+Since narrative format doesn't provide explicit scores, use NLP-based estimation:
+
+**Sentiment Ranges**:
+- Very negative language → 0-40 (e.g., "fails completely", "misses entirely")
+- Mixed/cautious language → 41-70 (e.g., "partially captures", "somewhat effective")
+- Positive language → 71-100 (e.g., "perfectly captures", "strongly aligns")
+
+**Pattern Keywords for Categories**:
+- **Accuracy**: "truthfully", "accurately", "misrepresents", "misleading"
+- **Alignment**: "honors", "captures", "deviates", "matches intent"
+- **Emotional Pull**: "compelling", "flat", "engaging", "generic"
+- **Risk Assessment**: "underpromising", "overpromising", "misdirection"
+
+---
+
+## Optimizing for Local AI Models
+
+### Recommended Models
+
+**For Narrative Format**:
+- **Llama 3 8B/70B**: Excellent prose quality, good at critique
+- **Mistral 7B**: Fast, concise, works well with constrained output
+- **Mixtral 8x7B**: Best quality for local deployment
+- **GPT4All models**: Lightweight, good for basic reviews
+
+**For Structured Format**:
+- **Llama 3 70B**: Better at following strict format
+- **Yi 34B**: Good at structured output
+- **Mixtral 8x7B**: Reliable format compliance
+
+### Model Parameters
+
+**For Narrative Format**:
+```json
+{
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 800,
+  "repeat_penalty": 1.1,
+  "stop": ["INPUT:", "ANALYSIS RULES", "---"]
+}
+```
+
+**For Structured Format**:
+```json
+{
+  "temperature": 0.4,
+  "top_p": 0.85,
+  "max_tokens": 600,
+  "repeat_penalty": 1.15,
+  "stop": ["INPUT:", "CONSTRAINTS:"]
+}
+```
+
+### Prompt Engineering Tips for Local Models
+
+1. **Keep Instructions Clear**: Local models benefit from explicit, simple instructions
+2. **Use Examples**: Add 1-2 example reviews in system prompt for better consistency
+3. **Avoid Over-Constraining**: Narrative format works better with looser constraints
+4. **Test Extensively**: Local models vary significantly - test with your specific model
+5. **Adjust Temperature**: Start at 0.7, lower if output too creative, raise if too rigid
+
+### Quality Checks for Local Models
+
+**Narrative Format**:
+- [ ] Output is continuous prose (no lists/bullets)
+- [ ] Professional, critical tone maintained
+- [ ] Four key questions answered
+- [ ] At least one title suggestion provided
+- [ ] Specific examples from content cited
+- [ ] No methodology explanations present
+
+**Structured Format**:
+- [ ] All sections present (TITLE REVIEW, OPTIMIZED TITLE, etc.)
+- [ ] Ratings use correct format (LOW/MEDIUM/HIGH)
+- [ ] Optimized title ≤ 12 words
+- [ ] 3-5 improvement notes provided
+- [ ] No extraneous sections added
+
+### Fallback Strategy
+
+If local model produces poor output:
+1. **Retry** with temperature 0.3 (more conservative)
+2. **Simplify** prompt (remove some constraints)
+3. **Switch format** (try structured if narrative fails)
+4. **Use smaller inputs** (truncate very long content)
+5. **Flag for human review** if still failing
+
+---
+
+## Error Handling
+## Error Handling
+
+**For Narrative Format**:
+- If output contains lists/bullets, regenerate with stronger emphasis on prose
+- If output is too short (<200 words), regenerate with higher temperature
+- If output is too long (>1000 words), truncate or regenerate with max_tokens limit
+- If no title suggestions found, flag for manual title creation
+- Log all quality violations for prompt tuning
+
+**For Structured Format**:
+- If AI output doesn't match format, attempt regex extraction
+- If ratings are missing, use conservative defaults (MEDIUM/ADEQUATE)
 - If no optimized title provided, mark as incomplete
+- If wrong format used, regenerate with explicit format reminder
 - Log all format violations for prompt improvement
 
 ---
 
-## Example Usage
+## Summary & Decision Matrix
 
-### Input:
+### Choose Narrative Format If:
+- ✅ Using local AI models (Ollama, LM Studio, etc.)
+- ✅ Primary audience is human reviewers/editors
+- ✅ Quality of critique matters more than structured data
+- ✅ Workflow includes editorial judgment
+- ✅ Want natural, professional-sounding reviews
+
+### Choose Structured Format If:
+- ✅ Using API-based AI (OpenAI, Anthropic, Google)
+- ✅ Need programmatic parsing and data extraction
+- ✅ Building automated pipelines
+- ✅ Running A/B tests or analytics
+- ✅ Integrating with dashboards/metrics
+
+### Hybrid Approach:
+Generate both formats:
+1. **Primary**: Narrative for human stakeholders
+2. **Secondary**: Structured for metrics/tracking
+3. Store both in TitleReview.metadata
+
+---
+
+## Implementation Priority
+
+### Phase 1: MVP (Choose One Format)
+- Implement **Narrative Format** for local AI integration
+- Focus on quality reviews for human workflow
+- Manual extraction of key insights
+
+### Phase 2: Enhanced (Add Structure)
+- Add NLP-based scoring extraction from narrative
+- Populate TitleReview model fields
+- Create improvement points from review text
+
+### Phase 3: Advanced (Dual Format)
+- Support both formats based on use case
+- Automated format selection based on model type
+- Advanced analytics and tracking
+
+---
+
+## Related Documentation
+
+- **PRODUCTION_READINESS_CHANGES.md**: Technical implementation requirements
+- **FUNCTIONALITY_STEPS.md**: Step-by-step implementation breakdown  
+- **CHANGES_SUMMARY.md**: Quick reference for developers
+- **CHECKLIST.md**: Implementation task tracker
+
+---
+
+## Changelog
+
+**Version 2.0** (2025-12-23):
+- Added Narrative Format as RECOMMENDED approach
+- Moved original format to "Structured Format Alternative"
+- Added comparison matrix
+- Added local AI model optimization guidance
+- Added quality checks and fallback strategies
+- Added implementation phases and decision matrix
+
+**Version 1.0** (2025-12-23):
+- Initial specification with structured format only
+
+---
+
+**Document Version**: 2.0  
+**Created**: 2025-12-23  
+**Updated**: 2025-12-23  
+**Purpose**: Specification for AI title review with dual format support  
+**Status**: Ready for Implementation - Narrative Format Recommended
 ```
 STORY IDEA:
 A horror story about mysterious echoes in an abandoned house that reveal dark secrets from the past.
