@@ -150,5 +150,5 @@ When working on this module:
 ## Module Documentation
 
 - **[T Module README](../README.md)** - Detailed workflow and module structure
-- **[Title & Script Workflow](../TITLE_SCRIPT_WORKFLOW.md)** - Complete workflow guide
-- **[Workflow State Machine](../WORKFLOW_STATE_MACHINE.md)** - Visual state diagram
+- **[Title & Script Workflow](../_meta/docs/TITLE_SCRIPT_WORKFLOW.md)** - Complete workflow guide
+- **[Workflow State Machine](../_meta/docs/WORKFLOW_STATE_MACHINE.md)** - Visual state diagram
