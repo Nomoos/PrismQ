@@ -54,7 +54,8 @@ For detailed project-wide guidelines, refer to the [main repository documentatio
 - **[PR Review Checklist](../../../_meta/docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - Pre-merge verification
 
 ### Quick Reference: Key Project Rules
-1. **Module Structure**: `src/` for production code, `_meta/` for everything else
+1. **Module Structure**: Standard is `src/` for production code, `_meta/` for everything else
+   - **Note**: This submodule uses `Source/` instead of `src/` (historical naming)
 2. **Dependency Direction**: Specialized → Generic (never reversed)
 3. **Namespace Shortcuts**: Use `T` (not `PrismQ.Text`)
 4. **No Side Effects**: No I/O at import time
