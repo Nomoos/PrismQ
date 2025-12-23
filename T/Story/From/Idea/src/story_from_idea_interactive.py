@@ -475,6 +475,7 @@ def main():
 Examples:
   python story_from_idea_interactive.py           # Run continuously with DB save
   python story_from_idea_interactive.py --preview # Preview mode (no DB save)
+  python story_from_idea_interactive.py --debug   # Same as --preview (no DB save)
 
 Wait times are dynamic based on remaining unreferenced ideas:
   - 1 ms when >= 100 unreferenced ideas
@@ -488,10 +489,17 @@ Press Ctrl+C or close the window to stop.
     parser.add_argument(
         "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
     )
+    
+    parser.add_argument(
+        "--debug", "-d", action="store_true", help="Enable preview mode (alias for --preview, does not save to database)"
+    )
 
     args = parser.parse_args()
+    
+    # Treat --debug as enabling preview mode (they can be used together)
+    preview_mode = args.preview or args.debug
 
-    return run_continuous_mode(preview=args.preview)
+    return run_continuous_mode(preview=preview_mode)
 
 
 if __name__ == "__main__":
