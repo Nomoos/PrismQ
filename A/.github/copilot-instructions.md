@@ -19,7 +19,7 @@ PublishedText → Audio Pipeline → PublishedAudio → Video Pipeline
 
 ```
 A/
-├── src/                     # Audio foundation layer (if needed)
+├── src/                     # Audio foundation layer (shared Audio utilities, if any)
 ├── Voiceover/              # Professional audio recording
 │   ├── Recording/         # Voice recording from text
 │   ├── Review/            # Quality check and retakes
@@ -65,7 +65,7 @@ PublishedText → Voiceover → Processing → Publishing → PublishedAudio
 ```
 A/<Submodule>  (specialized audio operations)
         ↓
-A/src (Audio foundation, if needed)
+A/src (Audio foundation, currently not needed but available for shared utilities)
         ↓
 src/ (root)    (generic utilities)
 ```

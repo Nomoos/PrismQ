@@ -19,7 +19,7 @@ PublishedAudio → Video Pipeline → PublishedVideo
 
 ```
 V/
-├── src/                     # Video foundation layer (if needed)
+├── src/                     # Video foundation layer (shared Video utilities, if any)
 ├── Scene/                  # Scene planning and composition
 │   ├── Planning/          # Scene breakdown
 │   ├── Keyframe/          # Keyframe generation
@@ -69,7 +69,7 @@ PublishedAudio → Scene Planning → Visual Generation → Assembly → Renderi
 ```
 V/<Submodule>  (specialized video operations)
         ↓
-V/src (Video foundation, if needed)
+V/src (Video foundation, currently not needed but available for shared utilities)
         ↓
 src/ (root)    (generic utilities)
 ```
