@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent.absolute()
-REVIEW_TITLE_FROM_SCRIPT_ROOT = SCRIPT_DIR.parent  # T/Review/Title/From/Content
+REVIEW_TITLE_FROM_SCRIPT_ROOT = SCRIPT_DIR.parent  # T/Review/Title/From/Script
 REVIEW_TITLE_FROM_ROOT = REVIEW_TITLE_FROM_SCRIPT_ROOT.parent  # T/Review/Title/From
 REVIEW_TITLE_ROOT = REVIEW_TITLE_FROM_ROOT.parent  # T/Review/Title
 REVIEW_ROOT = REVIEW_TITLE_ROOT.parent  # T/Review

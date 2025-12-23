@@ -23,14 +23,14 @@ from typing import Any, Dict, List, Optional
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from T.Review.Title.From.Content.Idea.by_content_and_idea import (
+from T.Review.Title.From.Script.Idea.by_script_and_idea import (
     AlignmentAnalysis,
     analyze_engagement,
     analyze_seo,
     analyze_title_content_alignment,
     extract_keywords,
 )
-from T.Review.Title.From.Content.Idea.title_review import (
+from T.Review.Title.From.Script.Idea.title_review import (
     TitleCategoryScore,
     TitleImprovementPoint,
     TitleReview,

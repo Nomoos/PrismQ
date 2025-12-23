@@ -1,9 +1,9 @@
-"""PrismQ.T.Review.Title.ByScript - Title Review v2 Module
+"""PrismQ.T.Review.Title.From.Script - Title Review v2 Module
 
 AI-powered title evaluation for v2+ iterations with improvement tracking.
 """
 
-from .by_content_v2 import (
+from .by_script_v2 import (
     ImprovementComparison,
     compare_reviews,
     get_improvement_summary,

@@ -41,7 +41,7 @@ from Model.State.constants.state_names import StateNames
 
 # Try to import the review function
 try:
-    from T.Review.Title.From.Content.by_content_v2 import (
+    from T.Review.Title.From.Script.by_script_v2 import (
         SCORE_THRESHOLD_HIGH,
         review_title_by_content_v2,
     )
