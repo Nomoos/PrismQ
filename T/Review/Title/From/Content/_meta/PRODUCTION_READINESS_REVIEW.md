@@ -33,15 +33,15 @@ The `PrismQ.T.Review.Title.From.Content` module has been reviewed for production
 - Updated all import paths to use `T.Review.Title.From.Content`
 - Fixed Run.bat script to point to correct path
 - Updated all documentation to use "From.Content" naming consistently
-- Fixed __init__.py imports (by_script_v2 vs by_content_v2)
+- Fixed __init__.py imports (by_content_v2 vs by_content_v2)
 - Updated Idea submodule imports
 
 **Files Modified**:
 - `_meta/scripts/07_PrismQ.T.Review.Title.By.Script/Run.bat`
 - `__init__.py`
 - `Idea/__init__.py`
-- `_meta/tests/test_by_script_v2.py`
-- `by_script_v2.py`
+- `_meta/tests/test_by_content_v2.py`
+- `by_content_v2.py`
 - `src/review_title_from_script_service.py`
 - `src/review_title_from_script_interactive.py`
 - `README.md`
@@ -80,8 +80,8 @@ Added comprehensive parameter validation in `review_title_by_content_v2()`:
 ```
 
 **Files Modified**:
-- `by_script_v2.py` - Added validation logic
-- `_meta/tests/test_by_script_v2.py` - Added 9 validation tests
+- `by_content_v2.py` - Added validation logic
+- `_meta/tests/test_by_content_v2.py` - Added 9 validation tests
 
 **Test Coverage**: 9 new tests covering all validation scenarios
 
@@ -116,7 +116,7 @@ review = review_title_by_content_v2(title_text="", content_text="script")
 ```
 
 **Files Modified**:
-- `by_script_v2.py` - Added error handling in review function
+- `by_content_v2.py` - Added error handling in review function
 - `src/review_title_from_script_service.py` - Added error handling in service
 
 ---
@@ -161,7 +161,7 @@ INFO: Story 123: Title accepted (score 72 vs threshold 70)
 ```
 
 **Files Modified**:
-- `by_script_v2.py` - Added logging import and statements
+- `by_content_v2.py` - Added logging import and statements
 - `src/review_title_from_script_service.py` - Added comprehensive logging
 
 ---

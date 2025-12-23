@@ -117,12 +117,12 @@ print(f"Improvement Trajectory: {v3_review.improvement_trajectory}")
 
 ## API Reference
 
-### review_title_by_script_v2()
+### review_title_by_content_v2()
 
 Main review function for v2+ titles.
 
 ```python
-def review_title_by_script_v2(
+def review_title_by_content_v2(
     title_text: str,
     script_text: str,
     title_id: Optional[str] = None,
@@ -340,12 +340,12 @@ After v2 review:
 ```
 T/Review/Title/From/Content/
 ├── __init__.py              # Module exports
-├── by_script_v2.py          # Main v2 review implementation
+├── by_content_v2.py          # Main v2 review implementation
 ├── _meta/
 │   ├── examples/
 │   │   └── example_usage.py # Usage examples
 │   └── tests/
-│       └── test_by_script_v2.py  # Test suite
+│       └── test_by_content_v2.py  # Test suite
 └── README.md                # This file
 ```
 

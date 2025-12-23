@@ -3,7 +3,7 @@
 AI-powered title evaluation for v2+ iterations with improvement tracking.
 """
 
-from .by_script_v2 import (
+from .by_content_v2 import (
     ImprovementComparison,
     compare_reviews,
     get_improvement_summary,
