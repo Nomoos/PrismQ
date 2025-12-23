@@ -4,6 +4,71 @@
 
 This document describes the PrismQ module hierarchy based on **hierarchical responsibility** where each module is responsible only for its own level of abstraction.
 
+## Module Layout Convention
+
+Each module follows the same internal structure:
+
+```
+module/
+├── src/        # Source code for the module (production code only)
+├── _meta/      # Tests, issues, scripts, docs, auxiliary tooling
+```
+
+- `src/` contains **only production code**
+- `_meta/` contains:
+  - Tests
+  - Issue tracking artifacts
+  - Maintenance scripts
+  - Documentation and supporting files
+
+## Dependency Direction
+
+Dependencies must flow **from specialized → to generic**.  
+**Generic modules must never depend on specialized modules.**
+
+### Dependency Flow Diagram
+
+```
+PrismQ.T.Content.From.Idea.Title  (most specialized)
+            ↓
+PrismQ.T.Content.From.Idea
+            ↓
+PrismQ.T.Content.From
+            ↓
+PrismQ.T.Content
+            ↓
+PrismQ.T
+            ↓
+PrismQ (src/)                     (most generic)
+```
+
+### Dependency Rules
+
+**A module may depend on:**
+- Itself
+- Any module **above it** in the diagram (more generic)
+
+**A module must NOT depend on:**
+- Any module **below it** in the diagram (more specialized)
+
+### Examples
+
+**✅ Allowed:**
+- `PrismQ.T.Content.From.Idea.Title` → `PrismQ.T.Content.From.Idea`
+- `PrismQ.T.Content.From.Idea` → `PrismQ.T.Content`
+- `PrismQ.T.Content` → `PrismQ.T` → `PrismQ`
+
+**❌ Not Allowed:**
+- `PrismQ` → `PrismQ.T`
+- `PrismQ.T.Content.From` → `PrismQ.T.Content.From.Idea.Title`
+- `PrismQ.T.Content.From.Idea` → `PrismQ.T.Content.From.Idea.Title`
+
+### Guiding Principle
+
+> **Each module knows exactly one thing — and nothing more.**
+
+This keeps the system predictable, testable, maintainable, and easy to extend.
+
 ## Module Levels
 
 ### 1. src/ (PrismQ) - Cross-Cutting Concerns
@@ -209,40 +274,49 @@ from T.Content.src.ai_config import DEFAULT_AI_MODEL  # ✓ Import
 
 ---
 
-## Module Layout Convention
-
-Each module follows the same internal structure:
-
-```
-ModuleName/
-├── src/              # Source code
-│   ├── __init__.py
-│   └── *.py
-├── _meta/            # Metadata, docs, tests
-│   ├── docs/
-│   ├── examples/
-│   └── tests/
-└── __init__.py
-```
-
----
-
 ## Verification
 
-Run this test to verify hierarchy:
+### Verify Dependency Direction
+
+Run this test to verify that dependencies flow correctly (specialized → generic):
 
 ```python
-# Test 1: src/ - Cross-cutting
+# Test 1: src/ (most generic) - Cross-cutting, no dependencies on T/
 from src.startup import DatabaseConfig
 db = DatabaseConfig(database_path="/path/to/db")
+# ✓ src/ is independent
 
-# Test 2: T/Content/ - Content processing
+# Test 2: T/Content/ (generic) - Content processing, no dependencies on specialized
 from T.Content.src.ai_config import AISettings
 ai = AISettings()
+# ✓ T/Content/ is independent of Title
 
-# Test 3: Title imports from T/Content (no duplication)
+# Test 3: Title (specialized) - Imports from T/Content (allowed dependency)
 from T.Content.From.Idea.Title.src.ai_config import get_local_ai_model
-# This imports from T/Content, not duplicate
+# ✓ Title depends on T/Content (specialized → generic)
+```
+
+### Verify Module Structure
+
+Check that each module follows the layout convention:
+
+```bash
+# Each module should have:
+module/
+├── src/        # Production code only
+└── _meta/      # Tests, docs, auxiliary
+```
+
+### Verification Checklist
+
+- [ ] Generic modules (src/, T/Content/) don't import from specialized modules
+- [ ] Specialized modules import from generic modules (not duplicate code)
+- [ ] Each module has src/ for production code
+- [ ] Each module has _meta/ for tests and documentation
+- [ ] No duplication of generic logic in lower layers
+- [ ] Dependencies flow upward (specialized → generic)
+
+---
 ```
 
 ---
