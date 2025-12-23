@@ -3,13 +3,12 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Client" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Classification" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/ConfigLoad" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Model" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Scoring" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Sources" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Sources/Content" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/IdeaInspiration/Sources/Content/Shorts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Classification" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/ConfigLoad" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Model" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Scoring" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Sources" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Sources/Content" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/T/Idea/Inspiration/Sources/Content/Shorts" vcs="Git" />
   </component>
 </project>
