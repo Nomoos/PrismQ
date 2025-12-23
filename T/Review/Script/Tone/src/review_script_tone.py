@@ -38,12 +38,13 @@ from Model.Database.models.content import Content
 from Model.Database.models.story import Story
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
 # Score threshold for accepting a script review
 ACCEPTANCE_THRESHOLD = 75
 
 # State constants
+CURRENT_STATE = StateNames.REVIEW_CONTENT_TONE
 STATE_REVIEW_SCRIPT_TONE = StateNames.REVIEW_SCRIPT_TONE
 STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
 STATE_REVIEW_SCRIPT_EDITING = StateNames.REVIEW_SCRIPT_EDITING
