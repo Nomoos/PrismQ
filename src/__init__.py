@@ -36,6 +36,15 @@ Usage:
 
 from .config import Config
 from .idea import IdeaDatabase, setup_idea_database
+from .startup import (
+    check_ollama_available,
+    get_database_path,
+    get_local_ai_api_base,
+    get_local_ai_config,
+    get_local_ai_model,
+    get_local_ai_temperature,
+    initialize_environment,
+)
 from .story import StoryDatabase, setup_story_database
 
 __all__ = [
@@ -44,5 +53,12 @@ __all__ = [
     "setup_idea_database",
     "StoryDatabase",
     "setup_story_database",
+    "get_database_path",
+    "get_local_ai_model",
+    "get_local_ai_temperature",
+    "get_local_ai_api_base",
+    "get_local_ai_config",
+    "check_ollama_available",
+    "initialize_environment",
 ]
 __version__ = "1.0.0"
