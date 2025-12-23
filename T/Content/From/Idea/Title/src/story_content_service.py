@@ -678,30 +678,6 @@ class ContentFromIdeaTitleService:
 
         return result
 
-            # Save to database
-            saved_content = self.content_repo.insert(script_model)
-
-            # Update the story with the script reference and new state
-            story.content_id = saved_content.id
-            story.state = self.OUTPUT_STATE
-            story.updated_at = datetime.now()
-            self.story_repo.update(story)
-
-            # Populate result
-            result.success = True
-            result.content_id = saved_content.id
-            result.new_state = self.OUTPUT_STATE
-            result.script_v1 = script_v1
-
-        except json.JSONDecodeError as e:
-            result.error = f"Failed to parse idea_json: {str(e)}"
-        except ValueError as e:
-            result.error = f"Invalid idea or title: {str(e)}"
-        except Exception as e:
-            result.error = f"Content generation failed: {str(e)}"
-
-        return result
-
     def process_all_pending(self, limit: Optional[int] = None) -> List[StateBasedContentResult]:
         """Process all stories in the input state.
 
