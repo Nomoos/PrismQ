@@ -1,4 +1,4 @@
-# Module Review: Step 04 - PrismQ.T.Script.From.Title.Idea
+# Module Review: Step 04 - PrismQ.T.Content.From.Title.Idea
 
 **Date:** 2025-12-18  
 **Reviewer:** GitHub Copilot  
@@ -8,9 +8,9 @@
 
 ## 📋 Executive Summary
 
-**Module:** `04_PrismQ.T.Script.From.Title.Idea`  
-**Purpose:** Generate scripts from title and idea using AI (Qwen3:30b via Ollama)  
-**Location:** `T/Script/From/Idea/Title/`  
+**Module:** `04_PrismQ.T.Content.From.Title.Idea`  
+**Purpose:** Generate content from title and idea using AI (Qwen3:30b via Ollama)  
+**Location:** `T/Content/From/Idea/Title/`  
 **Status:** ✅ **IMPLEMENTED AND FUNCTIONAL**
 
 ### Key Findings
@@ -35,20 +35,20 @@
 ### Module Structure
 
 ```
-T/Script/From/Idea/Title/
+T/Content/From/Idea/Title/
 ├── README.md (4.3KB)                               ✅ Complete documentation
 ├── requirements.txt                                 ✅ Dependencies defined
 ├── __init__.py                                      ✅ Exports (FIXED)
 └── src/
     ├── __init__.py                                  ✅ Module exports
-    ├── ai_script_generator.py (18.7KB)             ✅ AI generation core
-    ├── script_generator.py (18.8KB)                ✅ Script generator
-    ├── script_from_idea_title_interactive.py (16.3KB) ✅ Interactive CLI
-    └── story_script_service.py (25.7KB)            ✅ Service layer
+    ├── ai_content_generator.py (18.7KB)             ✅ AI generation core
+    ├── content_generator.py (18.8KB)                ✅ Script generator
+    ├── content_from_idea_title_interactive.py (16.3KB) ✅ Interactive CLI
+    └── story_content_service.py (25.7KB)            ✅ Service layer
 └── _meta/
     └── tests/
-        ├── test_ai_script_generator.py (11.8KB)    ⚠️ Import paths need update
-        └── test_story_script_service.py (39.1KB)   ⚠️ Import paths need update
+        ├── test_ai_content_generator.py (11.8KB)    ⚠️ Import paths need update
+        └── test_story_content_service.py (39.1KB)   ⚠️ Import paths need update
 ```
 
 **Total Code:** ~79KB of Python implementation  
@@ -59,7 +59,7 @@ T/Script/From/Idea/Title/
 
 ## 🔍 Detailed Module Analysis
 
-### 1. AI Script Generator (`ai_script_generator.py`)
+### 1. AI Script Generator (`ai_content_generator.py`)
 
 **Size:** 18,774 bytes  
 **Status:** ✅ **FULLY FUNCTIONAL**
@@ -81,7 +81,7 @@ T/Script/From/Idea/Title/
 ✅ get_random_seed() -> str
 ✅ get_seed_by_index(index: int) -> str
 ✅ generate_content(title, idea_text, target_duration_seconds, seed) -> str
-✅ AIScriptGenerator class with full configuration
+✅ AIContentGenerator class with full configuration
 ✅ AIScriptGeneratorConfig dataclass
 ```
 
@@ -106,7 +106,7 @@ script = generate_content(
 
 ---
 
-### 2. Script Generator (`script_generator.py`)
+### 2. Script Generator (`content_generator.py`)
 
 **Size:** 18,815 bytes  
 **Status:** ✅ **FULLY FUNCTIONAL**
@@ -120,22 +120,22 @@ script = generate_content(
 
 **Classes:**
 ```python
-✅ ScriptGeneratorConfig - Configuration dataclass
-✅ ScriptGenerator - Main generator class
-✅ ScriptV1 - Script data model
-✅ ScriptSection - Section model
+✅ ContentGeneratorConfig - Configuration dataclass
+✅ ContentGenerator - Main generator class
+✅ ContentV1 - Script data model
+✅ ContentSection - Section model
 ✅ PlatformTarget - Platform enum
-✅ ScriptStructure - Structure enum
-✅ ScriptTone - Tone enum
+✅ ContentStructure - Structure enum
+✅ ContentTone - Tone enum
 ```
 
 **Configuration Options:**
 ```python
-config = ScriptGeneratorConfig(
+config = ContentGeneratorConfig(
     platform_target=PlatformTarget.YOUTUBE_MEDIUM,
     target_duration_seconds=90,
-    structure_type=ScriptStructure.HOOK_DELIVER_CTA,
-    tone=ScriptTone.ENGAGING,
+    structure_type=ContentStructure.HOOK_DELIVER_CTA,
+    tone=ContentTone.ENGAGING,
     ai_model="qwen3:30b",
     ai_api_base="http://localhost:11434",
     ai_temperature=0.7
@@ -149,7 +149,7 @@ config = ScriptGeneratorConfig(
 
 ---
 
-### 3. Interactive CLI (`script_from_idea_title_interactive.py`)
+### 3. Interactive CLI (`content_from_idea_title_interactive.py`)
 
 **Size:** 16,276 bytes  
 **Status:** ✅ **FULLY FUNCTIONAL**
@@ -165,13 +165,13 @@ config = ScriptGeneratorConfig(
 **Usage Modes:**
 ```bash
 # Production mode (saves to database)
-python script_from_idea_title_interactive.py
+python content_from_idea_title_interactive.py
 
 # Preview mode (no database save, extensive logging)
-python script_from_idea_title_interactive.py --preview
+python content_from_idea_title_interactive.py --preview
 
 # Debug mode (detailed logging)
-python script_from_idea_title_interactive.py --preview --debug
+python content_from_idea_title_interactive.py --preview --debug
 ```
 
 **Workflow:**
@@ -184,7 +184,7 @@ python script_from_idea_title_interactive.py --preview --debug
 
 ---
 
-### 4. Service Layer (`story_script_service.py`)
+### 4. Service Layer (`story_content_service.py`)
 
 **Size:** 25,670 bytes  
 **Status:** ✅ **FULLY FUNCTIONAL**
@@ -198,7 +198,7 @@ python script_from_idea_title_interactive.py --preview --debug
 
 **Key Functions:**
 ```python
-✅ ScriptFromIdeaTitleService - Main service class
+✅ ContentFromIdeaTitleService - Main service class
 ✅ process_oldest_from_idea_title() - Process single item
 ✅ process_all_pending_stories() - Batch processing
 ✅ StateBasedScriptResult - Result dataclass
@@ -207,8 +207,8 @@ python script_from_idea_title_interactive.py --preview --debug
 
 **State Management:**
 ```python
-STATE_SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Script.From.Idea.Title"
-STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
+STATE_SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Content.From.Idea.Title"
+STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Content.Idea"
 ```
 
 **Database Schema:**
@@ -221,7 +221,7 @@ STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
 
 ### 5. Batch Scripts
 
-**Location:** `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/`  
+**Location:** `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/`  
 **Status:** ✅ **FUNCTIONAL**
 
 #### Run.bat (Production Mode)
@@ -255,13 +255,13 @@ STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
 
 ### Test Files
 
-1. **`test_ai_script_generator.py`** (11.8KB)
+1. **`test_ai_content_generator.py`** (11.8KB)
    - Tests seed variations (504 seeds)
    - Tests AI generation mocking
    - Tests configuration
    - ⚠️ Import paths need update: `T.Content` → `T.Script`
 
-2. **`test_story_script_service.py`** (39.1KB)
+2. **`test_story_content_service.py`** (39.1KB)
    - Tests service layer
    - Tests database integration
    - Tests state transitions
@@ -287,7 +287,7 @@ STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
    ```python
    ✅ from T.Script.From.Idea.Title.src import get_random_seed
    ✅ from T.Script.From.Idea.Title.src import SEED_VARIATIONS
-   ✅ from T.Script.From.Idea.Title.src import ScriptGenerator
+   ✅ from T.Script.From.Idea.Title.src import ContentGenerator
    ✅ 504 seed variations loaded successfully
    ```
 
@@ -300,7 +300,7 @@ STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Script.Idea"
 
 3. **Configuration**
    ```python
-   ✅ ScriptGeneratorConfig with defaults
+   ✅ ContentGeneratorConfig with defaults
    ✅ AIScriptGeneratorConfig with API settings
    ✅ Platform targeting options
    ✅ Duration targeting (30s-180s)
@@ -349,8 +349,8 @@ from .story_content_service import ...
 **Fix Applied:**
 ```python
 # ✅ AFTER (correct names)
-from .ai_script_generator import ...
-from .story_script_service import ...
+from .ai_content_generator import ...
+from .story_content_service import ...
 ```
 
 **Status:** ✅ FIXED
@@ -366,7 +366,7 @@ from T.Content.From.Idea.Title.src.ai_content_generator import ...
 **Required Fix:**
 ```python
 # ✅ Should be
-from T.Script.From.Idea.Title.src.ai_script_generator import ...
+from T.Script.From.Idea.Title.src.ai_content_generator import ...
 ```
 
 **Status:** ⚠️ NEEDS UPDATE (tests work with mocking but imports need correction)
@@ -425,12 +425,12 @@ WHERE state = 'PrismQ.T.Title.From.Idea'
 
 **Script Object:**
 ```python
-ScriptV1(
+ContentV1(
     text="[Generated script content]",
     sections=[
-        ScriptSection(type="introduction", content="..."),
-        ScriptSection(type="body", content="..."),
-        ScriptSection(type="conclusion", content="...")
+        ContentSection(type="introduction", content="..."),
+        ContentSection(type="body", content="..."),
+        ContentSection(type="conclusion", content="...")
     ],
     word_count=225,
     estimated_duration_seconds=90,
@@ -443,16 +443,16 @@ ScriptV1(
 **Database State After:**
 ```sql
 UPDATE Story 
-SET state = 'PrismQ.T.Review.Title.From.Script.Idea',
-    script_text = '[Generated script]',
-    script_version = 'v1'
+SET state = 'PrismQ.T.Review.Title.From.Content.Idea',
+    content_text = '[Generated script]',
+    content_version = 'v1'
 WHERE id = [story_id]
 ```
 
 ### Next Stage
 
 After successful generation, story moves to:
-- **Stage 05:** `PrismQ.T.Review.Title.From.Script.Idea`
+- **Stage 05:** `PrismQ.T.Review.Title.From.Content.Idea`
 - Review title based on generated script and original idea
 
 ---
@@ -557,7 +557,7 @@ SQLite (Model/db.s3db)
 ### Functionality
 - [x] AI integration implemented
 - [x] Seed variations working (504 seeds)
-- [x] Script generation functional
+- [x] Content generation functional
 - [x] Database integration working
 - [x] Batch processing supported
 

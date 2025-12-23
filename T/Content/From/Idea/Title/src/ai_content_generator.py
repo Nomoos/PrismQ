@@ -1,6 +1,6 @@
 """AI-Powered Content Generator using Qwen3:30b via Ollama.
 
-This module provides AI-powered script generation for the PrismQ.T.Content.From.Idea.Title
+This module provides AI-powered content generation for the PrismQ.T.Content.From.Idea.Title
 workflow using the Qwen3:30b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
@@ -22,7 +22,7 @@ import logging
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 import requests
 
@@ -596,8 +596,8 @@ def get_seed_by_index(index: int) -> str:
 
 
 @dataclass
-class AIScriptGeneratorConfig:
-    """Configuration for AI-powered script generation.
+class AIContentGeneratorConfig:
+    """Configuration for AI-powered content generation.
 
     All generation uses local AI models via Ollama.
 
@@ -613,11 +613,11 @@ class AIScriptGeneratorConfig:
     api_base: str = "http://localhost:11434"
     temperature: float = 0.7  # Moderate creativity for engaging scripts
     max_tokens: int = 2000
-    timeout: int = 120  # Longer timeout for script generation
+    timeout: int = 120  # Longer timeout for content generation
 
 
-class AIScriptGenerator:
-    """Generate scripts using AI with Qwen3:30b.
+class AIContentGenerator:
+    """Generate content using AI with Qwen3:30b.
 
     All generation goes through local AI models.
 
@@ -627,13 +627,13 @@ class AIScriptGenerator:
         - One seed (randomly picked from 500 predefined variations)
     """
 
-    def __init__(self, config: Optional[AIScriptGeneratorConfig] = None):
+    def __init__(self, config: Optional[AIContentGeneratorConfig] = None):
         """Initialize the AI script generator.
 
         Args:
             config: Optional AI configuration
         """
-        self.config = config or AIScriptGeneratorConfig()
+        self.config = config or AIContentGeneratorConfig()
         self.available = self._check_ollama_availability()
 
     def _check_ollama_availability(self) -> bool:
@@ -650,7 +650,7 @@ class AIScriptGenerator:
             return False
 
     def is_available(self) -> bool:
-        """Check if AI script generation is available.
+        """Check if AI content generation is available.
 
         Returns:
             True if AI generation is available, False otherwise
@@ -663,7 +663,7 @@ class AIScriptGenerator:
         idea_text: str,
         target_duration_seconds: int = 120,
         max_duration_seconds: int = 175,
-        audience: Optional[Dict[str, str]] = None,
+        audience: Optional[dict] = None,
         seed: Optional[str] = None,
     ) -> Optional[str]:
         """Generate a complete script using AI.
@@ -671,34 +671,34 @@ class AIScriptGenerator:
         Args:
             title: The title for the script (Titulek)
             idea_text: The idea/concept text
-            target_duration_seconds: Target duration in seconds (default: 120s)
-            max_duration_seconds: Maximum allowed duration (default: 175s)
-            audience: Target audience configuration (age_range, gender, country)
-            seed: Optional specific seed to use (if None, picks randomly from 500)
+            target_duration_seconds: Target duration in seconds (default: 120)
+            max_duration_seconds: Maximum duration in seconds (default: 175)
+            audience: Target audience dict with age_range, gender, country
+            seed: Optional specific seed to use (if None, picks randomly from 504)
 
         Returns:
-            Generated script text, or None if AI is unavailable
+            Generated content text, or None if AI is unavailable
 
         Raises:
             RuntimeError: If AI is not available
         """
         if not self.available:
             error_msg = (
-                f"AI script generation is not available. "
+                f"AI content generation is not available. "
                 f"Please ensure Ollama is running with model '{self.config.model}' at {self.config.api_base}"
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-        # Default audience if not provided
+        # Set default audience if not provided
         if audience is None:
             audience = {
                 "age_range": "13-23",
                 "gender": "Female",
-                "country": "United States"
+                "country": "United States",
             }
 
-        # Pick one seed from 500 variations
+        # Pick one seed from 504 variations
         selected_seed = seed if seed else get_random_seed()
         logger.info(f"Using seed: {selected_seed}")
 
@@ -714,53 +714,51 @@ class AIScriptGenerator:
         try:
             response = self._call_ollama(prompt)
             script = self._extract_content_text(response)
-            logger.info(f"AI script generation successful for '{title}'")
+            logger.info(f"AI content generation successful for '{title}'")
             return script
         except Exception as e:
-            error_msg = f"AI script generation failed: {e}"
+            error_msg = f"AI content generation failed: {e}"
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
     def _create_content_prompt(
-        self, 
-        title: str, 
-        idea_text: str, 
-        seed: str, 
-        target_duration: int,
-        max_duration: int,
-        audience: Dict[str, str]
+        self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
     ) -> str:
-        """Create prompt for script generation optimized for local AI models.
+        """Create prompt for content generation using updated structure for local models.
 
-        Uses a structured prompt format designed for local models like Qwen3:32b.
+        Input:
+        - Title (Titulek)
+        - Idea text
+        - Seed (one picked from 504 variations)
+        - Audience (age_range, gender, country)
 
         Args:
             title: Content title
             idea_text: Idea/concept text
-            seed: Creative direction seed (used subtly/thematically)
-            target_duration: Target duration in seconds (default: 120s)
-            max_duration: Maximum duration in seconds (default: 175s)
-            audience: Target audience (age_range, gender, country)
+            seed: Creative direction seed (used symbolically/thematically)
+            target_duration: Target duration in seconds (default: 120)
+            max_duration: Maximum duration in seconds (default: 175)
+            audience: Target audience dict
 
         Returns:
-            Engineered prompt for AI
+            Engineered prompt for local AI model
         """
         # Calculate approximate word count (2.5 words per second for narration)
-        target_words = int(target_duration * 2.5)  # 120s = 300 words
-        max_words = int(max_duration * 2.5)  # 175s = 437 words
+        target_words = int(target_duration * 2.5)
+        max_words = int(max_duration * 2.5)
 
-        # Create structured prompt optimized for local models
+        # Build the optimized prompt for local models
         prompt = f"""SYSTEM INSTRUCTION:
-You are a professional video script writer.
+You are a professional video content writer.
 Follow instructions exactly. Do not add extra sections or explanations.
 
 TASK:
-Generate a video script.
+Generate a video content.
 
 INPUTS:
 TITLE: {title}
 IDEA: {idea_text}
-INSPIRATION SEED: {seed}
+INSPIRATION SEED: {seed} (Single word used only as creative inspiration)
 
 TARGET AUDIENCE:
 - Age: {audience.get('age_range', '13-23')}
@@ -773,17 +771,16 @@ REQUIREMENTS:
 3. End with a clear and natural call-to-action.
 4. Maintain consistent engaging tone throughout.
 5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
-6. Target length: {target_words} words (approximately {target_duration} seconds)
-7. Maximum length: {max_words} words (approximately {max_duration} seconds)
+6. Target length: approximately {target_words} words (for {target_duration} seconds).
+7. Maximum length: {max_words} words ({max_duration} seconds).
 
 OUTPUT RULES:
-- Output ONLY the script text.
+- Output ONLY the content text.
 - No headings, no labels, no explanations.
 - Do not mention the word "hook", "CTA", or any structure explicitly.
 - Do not mention that this is a script.
-- The first sentence must create immediate curiosity or tension.
 
-Generate the script now:"""
+The first sentence must create immediate curiosity or tension."""
 
         return prompt
 
@@ -813,7 +810,7 @@ Generate the script now:"""
             raise RuntimeError(f"Failed to generate AI script: {e}")
 
     def _extract_content_text(self, response: str) -> str:
-        """Extract script text from AI response."""
+        """Extract content text from AI response."""
         cleaned = response.strip()
 
         # Remove common prefixes
@@ -834,25 +831,25 @@ Generate the script now:"""
 def generate_content(
     title: str,
     idea_text: str,
-    target_duration_seconds: int = 90,
-    platform: str = "youtube_medium",
-    tone: str = "engaging",
+    target_duration_seconds: int = 120,
+    max_duration_seconds: int = 175,
+    audience: Optional[dict] = None,
     seed: Optional[str] = None,
-    config: Optional[AIScriptGeneratorConfig] = None,
+    config: Optional[AIContentGeneratorConfig] = None,
 ) -> str:
     """Convenience function to generate an AI-powered script.
 
     Args:
         title: Content title (Titulek)
         idea_text: Idea/concept text
-        target_duration_seconds: Target duration in seconds
-        platform: Target platform
-        tone: Content tone
-        seed: Optional specific seed (if None, picks randomly from 500)
+        target_duration_seconds: Target duration in seconds (default: 120)
+        max_duration_seconds: Maximum duration in seconds (default: 175)
+        audience: Target audience dict with age_range, gender, country
+        seed: Optional specific seed (if None, picks randomly from 504)
         config: Optional AI configuration
 
     Returns:
-        Generated script text
+        Generated content text
 
     Raises:
         RuntimeError: If AI is not available or generation fails
@@ -861,24 +858,25 @@ def generate_content(
         >>> script = generate_content(
         ...     title="The Mystery of the Abandoned House",
         ...     idea_text="A girl discovers a time-loop in an abandoned house...",
-        ...     target_duration_seconds=90
+        ...     target_duration_seconds=120,
+        ...     audience={"age_range": "13-23", "gender": "Female", "country": "United States"}
         ... )
         >>> print(script)
     """
-    generator = AIScriptGenerator(config=config)
+    generator = AIContentGenerator(config=config)
     return generator.generate_content(
         title=title,
         idea_text=idea_text,
         target_duration_seconds=target_duration_seconds,
-        platform=platform,
-        tone=tone,
+        max_duration_seconds=max_duration_seconds,
+        audience=audience,
         seed=seed,
     )
 
 
 __all__ = [
-    "AIScriptGenerator",
-    "AIScriptGeneratorConfig",
+    "AIContentGenerator",
+    "AIContentGeneratorConfig",
     "generate_content",
     "get_random_seed",
     "get_seed_by_index",

@@ -1,6 +1,6 @@
 # T/Script/From/Idea/Title - AI Script Generation
 
-**Namespace**: `PrismQ.T.Script.From.Idea.Title`
+**Namespace**: `PrismQ.T.Content.From.Idea.Title`
 
 Generate script drafts from idea and title using **local AI models only**.
 
@@ -18,7 +18,7 @@ Create script (v1) from the original idea and title using Qwen2.5-14B-Instruct v
 - **Seed** - one word randomly picked from 500 predefined variations (e.g., "pudding", "fire", "ocean", "Chicago", "Germany", "chill")
 
 ### Features
-- **Qwen2.5-14B-Instruct Model**: High-quality script generation
+- **Qwen2.5-14B-Instruct Model**: High-quality content generation
 - **500 Seed Variations**: Simple words for creative inspiration (food, places, feelings, colors, etc.)
 - **Platform Optimization**: YouTube Shorts, TikTok, Instagram Reels
 - **No Fallback**: Error if AI unavailable (ensures AI is always used)
@@ -27,23 +27,23 @@ Create script (v1) from the original idea and title using Qwen2.5-14B-Instruct v
 
 ```python
 from T.Script.From.Idea.Title.src import (
-    ScriptGenerator,
-    ScriptGeneratorConfig,
-    generate_script,
+    ContentGenerator,
+    ContentGeneratorConfig,
+    generate_content,
     get_random_seed,
     SEED_VARIATIONS
 )
 
-# Option 1: Use ScriptGenerator (requires Idea object)
-config = ScriptGeneratorConfig(
+# Option 1: Use ContentGenerator (requires Idea object)
+config = ContentGeneratorConfig(
     ai_model="qwen2.5:14b-instruct",
     target_duration_seconds=90
 )
-generator = ScriptGenerator(config=config)
-script = generator.generate_script_v1(idea, title)
+generator = ContentGenerator(config=config)
+script = generator.generate_content_v1(idea, title)
 
-# Option 2: Use generate_script directly (simpler)
-script_text = generate_script(
+# Option 2: Use generate_content directly (simpler)
+content_text = generate_content(
     title="The Mystery of the Abandoned House",
     idea_text="A girl discovers a time-loop in an abandoned house",
     target_duration_seconds=90,
@@ -77,12 +77,12 @@ The module includes ~500 simple seed words organized by category:
 ## Configuration
 
 ```python
-# ScriptGeneratorConfig
-config = ScriptGeneratorConfig(
+# ContentGeneratorConfig
+config = ContentGeneratorConfig(
     platform_target=PlatformTarget.YOUTUBE_MEDIUM,
     target_duration_seconds=90,
-    structure_type=ScriptStructure.HOOK_DELIVER_CTA,
-    tone=ScriptTone.ENGAGING,
+    structure_type=ContentStructure.HOOK_DELIVER_CTA,
+    tone=ContentTone.ENGAGING,
     ai_model="qwen2.5:14b-instruct",
     ai_api_base="http://localhost:11434",
     ai_temperature=0.7,
@@ -104,9 +104,9 @@ ai_config = AIScriptGeneratorConfig(
 AI is **required**. If Ollama is not running, a `RuntimeError` is raised:
 
 ```python
-from T.Script.From.Idea.Title.src import ScriptGenerator
+from T.Script.From.Idea.Title.src import ContentGenerator
 
-generator = ScriptGenerator()
+generator = ContentGenerator()
 
 # Check availability
 if not generator.is_ai_available():
@@ -114,7 +114,7 @@ if not generator.is_ai_available():
 
 # This raises RuntimeError if AI unavailable
 try:
-    script = generator.generate_script_v1(idea, title)
+    script = generator.generate_content_v1(idea, title)
 except RuntimeError as e:
     print(f"AI required but not available: {e}")
 ```
@@ -128,7 +128,7 @@ Stage 1: PrismQ.T.Idea.Creation
     ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
-Stage 3: PrismQ.T.Script.From.Idea.Title (v1) ← THIS STATE
+Stage 3: PrismQ.T.Content.From.Idea.Title (v1) ← THIS STATE
     ↓
 Stage 4: PrismQ.T.Review.Title.ByScript
 ```
@@ -140,13 +140,13 @@ T/Script/From/Idea/Title/
 ├── README.md
 └── src/
     ├── __init__.py              # Exports
-    ├── ai_script_generator.py   # AI generation (Qwen2.5-14B-Instruct)
+    ├── ai_content_generator.py   # AI generation (Qwen2.5-14B-Instruct)
     │   ├── SEED_VARIATIONS      # 500 seed words
     │   ├── get_random_seed()    # Pick random seed
-    │   ├── AIScriptGenerator    # Main AI class
-    │   └── generate_script()    # Convenience function
-    ├── script_generator.py      # ScriptGenerator class
-    └── story_script_service.py  # State-based processing
+    │   ├── AIContentGenerator    # Main AI class
+    │   └── generate_content()    # Convenience function
+    ├── content_generator.py      # ContentGenerator class
+    └── story_content_service.py  # State-based processing
 ```
 
 ## Example
@@ -165,6 +165,6 @@ TARGET: 90 seconds
 ```
 
 **Output:**
-- AI-generated script text (~225 words for 90s)
+- AI-generated content text (~225 words for 90s)
 - Sections: introduction, body, conclusion
 - Metadata: ai_generated=True

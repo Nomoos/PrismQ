@@ -25,8 +25,8 @@
 
 ### 1. Fixed Code Issues
 - ✅ Fixed `__init__.py` import paths
-  - Changed: `ai_content_generator` → `ai_script_generator`
-  - Changed: `story_content_service` → `story_script_service`
+  - Changed: `ai_content_generator` → `ai_content_generator`
+  - Changed: `story_content_service` → `story_content_service`
 
 ### 2. Created Documentation
 - ✅ **MODULE_REVIEW.md** (15KB) - Comprehensive English review
@@ -36,7 +36,7 @@
 ### 3. Verified Functionality
 - ✅ All imports work correctly
 - ✅ 504 seed variations load successfully
-- ✅ ScriptGenerator class instantiates
+- ✅ ContentGenerator class instantiates
 - ✅ Configuration options work
 - ✅ Batch scripts are properly structured
 
@@ -49,7 +49,7 @@
 1. **Test Import Paths**
    - ❌ Current: `from T.Content.From.Idea.Title...`
    - ✅ Should be: `from T.Script.From.Idea.Title...`
-   - **Files:** `test_ai_script_generator.py`, `test_story_script_service.py`
+   - **Files:** `test_ai_content_generator.py`, `test_story_content_service.py`
 
 2. **Outdated Documentation**
    - `FUNKCIONALITA_AKTUALNI.md` says Step 04 is missing
@@ -101,14 +101,14 @@ The project documentation claims:
 
 ### Modified
 ```
-T/Script/From/Idea/Title/src/__init__.py
+T/Content/From/Idea/Title/src/__init__.py
 ```
 
 ### Created
 ```
-_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/MODULE_REVIEW.md
-_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/SOUHRN_CS.md
-_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/VERIFICATION_STATUS.md
+_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/MODULE_REVIEW.md
+_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/SOUHRN_CS.md
+_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/VERIFICATION_STATUS.md
 ```
 
 ---

@@ -1,8 +1,8 @@
-# 🎯 Modul 04: PrismQ.T.Script.From.Title.Idea
+# 🎯 Modul 04: PrismQ.T.Content.From.Title.Idea
 
-**Účel:** Generování skriptů (Script v1) z titulku a nápadu pomocí AI  
-**Adresář:** `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/`  
-**Python moduly:** `T/Script/From/Idea/Title/src/`  
+**Účel:** Generování obsahu (Content v1) z titulku a nápadu pomocí AI  
+**Adresář:** `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/`  
+**Python moduly:** `T/Content/From/Idea/Title/src/`  
 **Status:** ✅ **PLNĚ IMPLEMENTOVÁNO**
 
 ---
@@ -16,11 +16,11 @@
   - `state = "PrismQ.T.Title.From.Idea"` (připraveno pro krok 04)
 
 **Výstup:**
-- `Script` objekt (`ScriptV1`) s:
+- `Content` objekt (ContentV1) s:
   - Vygenerovaný text skriptu (~300 slov pro 120s video, max 175s)
   - Strukturované sekce (introduction, body, conclusion)
   - Metadata (word_count, duration, audience, seed)
-  - `state = "PrismQ.T.Review.Title.From.Script.Idea"` (připraveno pro krok 05)
+  - `state = "PrismQ.T.Review.Title.From.Content.Idea"` (připraveno pro krok 05)
 
 **AI Model:** Získán globálně přes `get_local_ai_model()` (např. Qwen3:30b via Ollama)  
 **Seed Variations:** 504 jednoduchých slov pro kreativní inspiraci  
@@ -33,7 +33,7 @@
 **Co se děje:**
 - Batch skript (`Run.bat` nebo `Preview.bat`) se spustí
 - Kontroluje se dostupnost Python
-- Vytváří se nebo aktivuje virtual environment (`.venv` v `T/Script/From/Idea/Title/`)
+- Vytváří se nebo aktivuje virtual environment (`.venv` v `T/Content/From/Idea/Title/`)
 - Instalují se dependencies z `requirements.txt`:
   - `pytest>=7.0.0` - Pro testování
   - `pytest-cov>=4.0.0` - Pro coverage
@@ -57,7 +57,7 @@
 **Batch skript ukázka:**
 ```batch
 call "%VENV_DIR%\Scripts\activate.bat"
-python T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
+python T\Script\From\Idea\Title\src\content_from_idea_title_interactive.py
 ```
 
 ---
@@ -65,11 +65,11 @@ python T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
 ## 04.2 Import a setup Python modulu
 
 **Co se děje:**
-- Python skript `script_from_idea_title_interactive.py` se spustí
+- Python skript `content_from_idea_title_interactive.py` se spustí
 - Importují se moduly:
-  - `script_generator.py` - Hlavní generátor skriptů
-  - `ai_script_generator.py` - AI integrace (504 seed variations)
-  - `story_script_service.py` - Service layer pro databázové operace
+  - `content_generator.py` - Hlavní generátor skriptů
+  - `ai_content_generator.py` - AI integrace (504 seed variations)
+  - `story_content_service.py` - Service layer pro databázové operace
   - Database moduly - Pro čtení/zápis do SQLite
 - Nastavují se cesty k modulům (sys.path)
 - Kontroluje se dostupnost AI (Ollama)
@@ -83,7 +83,7 @@ python T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
 - Inicializované Python moduly
 - Logger (pokud `--debug`)
 - Režim běhu (preview vs. production)
-- `ScriptGenerator` instance
+- `ContentGenerator` instance
 
 **Technologie:**
 - Python importy
@@ -93,17 +93,17 @@ python T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
 
 **Import struktura:**
 ```python
-from script_generator import (
-    ScriptGenerator,
-    ScriptGeneratorConfig,
+from content_generator import (
+    ContentGenerator,
+    ContentGeneratorConfig,
     PlatformTarget,
-    ScriptStructure,
-    ScriptTone
+    ContentStructure,
+    ContentTone
 )
-from ai_script_generator import (
+from ai_content_generator import (
     get_random_seed,
     SEED_VARIATIONS,
-    AIScriptGenerator
+    AIContentGenerator
 )
 ```
 
@@ -112,7 +112,7 @@ from ai_script_generator import (
 ## 04.3 Kontrola dostupnosti AI
 
 **Co se děje:**
-- `ScriptGenerator.is_ai_available()` kontroluje Ollama
+- `ContentGenerator.is_ai_available()` kontroluje Ollama
 - Posílá GET request na `http://localhost:11434/api/tags`
 - Ověřuje, že model `qwen3:32b` je dostupný
 - Pokud AI není dostupné, vyhodí `RuntimeError`
@@ -188,7 +188,7 @@ Start Ollama with: ollama run qwen3:32b
 
 **Pokud není Story k dispozici:**
 ```
-INFO: No stories ready for script generation
+INFO: No stories ready for content generation
 ```
 
 ---
@@ -253,7 +253,7 @@ INFO: No stories ready for script generation
 ## 04.6 Konfigurace generátoru
 
 **Co se děje:**
-- Vytvoří se `ScriptGeneratorConfig` s parametry
+- Vytvoří se `ContentGeneratorConfig` s parametry
 - Nastaví se délka videa a cílová audience
 - AI model a temperature jsou získány globálně přes `get_local_ai()` nebo `get_local_ai_model()`
 
@@ -262,7 +262,7 @@ INFO: No stories ready for script generation
 - Globální AI konfigurace (model, temperature)
 
 **Výstupy:**
-- `config` objekt typu `ScriptGeneratorConfig`
+- `config` objekt typu `ContentGeneratorConfig`
 
 **Technologie:**
 - Python dataclass
@@ -271,7 +271,7 @@ INFO: No stories ready for script generation
 
 **Konfigurace defaulty:**
 ```python
-ScriptGeneratorConfig(
+ContentGeneratorConfig(
     target_duration_seconds=120,  # Výchozí délka: 120 sekund
     max_duration_seconds=175,     # Maximální délka: 175 sekund (5s před limity platforem)
     audience={
@@ -293,7 +293,7 @@ ScriptGeneratorConfig(
 ## 04.7 Vytvoření AI promptu
 
 **Co se děje:**
-- `AIScriptGenerator._create_prompt()` sestaví prompt pro AI
+- `AIContentGenerator._create_prompt()` sestaví prompt pro AI
 - Kombinuje:
   - **Title** - Titulek (z kroku 03)
   - **Idea text** - Concept, premise, synopsis (z idea objektu)
@@ -305,7 +305,7 @@ ScriptGeneratorConfig(
 - `title` - String
 - `idea_text` - String (kombinace concept + premise + synopsis)
 - `seed` - String (např. "midnight")
-- `config` - ScriptGeneratorConfig (s audience)
+- `config` - ContentGeneratorConfig (s audience)
 
 **Výstupy:**
 - `prompt` - Formátovaný AI prompt (string)
@@ -318,11 +318,11 @@ ScriptGeneratorConfig(
 **Prompt struktura:**
 ```
 SYSTEM INSTRUCTION:
-You are a professional video script writer.
+You are a professional video content writer.
 Follow instructions exactly. Do not add extra sections or explanations.
 
 TASK:
-Generate a video script.
+Generate a video content.
 
 INPUTS:
 TITLE: [Title]
@@ -342,7 +342,7 @@ REQUIREMENTS:
 5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
 
 OUTPUT RULES:
-- Output ONLY the script text.
+- Output ONLY the content text.
 - No headings, no labels, no explanations.
 - Do not mention the word "hook", "CTA", or any structure explicitly.
 - Do not mention that this is a script.
@@ -360,7 +360,7 @@ The first sentence must create immediate curiosity or tension.
 ## 04.8 Volání Ollama API
 
 **Co se děje:**
-- **04.8.1** `AIScriptGenerator.generate()` posílá request na Ollama
+- **04.8.1** `AIContentGenerator.generate()` posílá request na Ollama
 - **04.8.2** POST request na `http://localhost:11434/api/generate`
 - **04.8.3** AI model a temperature jsou získány z globální konfigurace (`get_local_ai_model()`)
 - **04.8.4** Request payload:
@@ -381,7 +381,7 @@ The first sentence must create immediate curiosity or tension.
 - Globální AI konfigurace (model, temperature range)
 
 **Výstupy:**
-- `script_text` - Vygenerovaný skript (string, ~300 slov pro 120s)
+- `content_text` - Vygenerovaný skript (string, ~300 slov pro 120s)
 
 **Technologie:**
 - HTTP POST request
@@ -395,7 +395,7 @@ The first sentence must create immediate curiosity or tension.
 {
   "model": "[from global config]",
   "created_at": "2025-12-18T...",
-  "response": "[Generated script text with ~300 words...]",
+  "response": "[Generated content text with ~300 words...]",
   "done": true
 }
 ```
@@ -410,31 +410,31 @@ The first sentence must create immediate curiosity or tension.
 ## 04.9 Strukturování skriptu
 
 **Co se děje:**
-- `ScriptGenerator._structure_script()` rozdělí text do sekcí
+- `ContentGenerator._structure_content()` rozdělí text do sekcí
 - Identifikuje:
   - **Introduction** - Hook a úvod (první 1-2 věty)
   - **Body** - Hlavní obsah (střední část)
   - **Conclusion** - Závěr a CTA (poslední 1-2 věty)
-- Vytvoří `ScriptSection` objekty pro každou sekci
+- Vytvoří `ContentSection` objekty pro každou sekci
 - Počítá word count a odhaduje duration
 
 **Vstupy:**
-- `script_text` - Vygenerovaný text z AI
-- `config` - ScriptGeneratorConfig
+- `content_text` - Vygenerovaný text z AI
+- `config` - ContentGeneratorConfig
 
 **Výstupy:**
-- `sections` - List[ScriptSection]:
+- `sections` - List[ContentSection]:
   ```python
   [
-    ScriptSection(
+    ContentSection(
       type="introduction",
       content="[Hook and intro sentences...]"
     ),
-    ScriptSection(
+    ContentSection(
       type="body",
       content="[Main content...]"
     ),
-    ScriptSection(
+    ContentSection(
       type="conclusion",
       content="[Conclusion and CTA...]"
     )
@@ -449,7 +449,7 @@ The first sentence must create immediate curiosity or tension.
 
 **Duration calculation:**
 ```python
-word_count = len(script_text.split())
+word_count = len(content_text.split())
 estimated_duration = word_count / 2.5  # 2.5 words per second
 # Pro 300 slov: 300 / 2.5 = 120 sekund ✓
 # Maximum: 175 sekund (437 slov)
@@ -457,14 +457,14 @@ estimated_duration = word_count / 2.5  # 2.5 words per second
 
 ---
 
-## 04.10 Vytvoření ScriptV1 objektu
+## 04.10 Vytvoření Content objektu
 
 **Co se děje:**
-- `ScriptGenerator.generate_script_v1()` vytvoří finální objekt
-- Sestaví `ScriptV1` dataclass s všemi metadata
+- `ContentGenerator.generate_content_v1()` vytvoří finální objekt
+- Sestaví `ContentV1` dataclass s všemi metadata
 
 **Vstupy:**
-- `script_text` - Vygenerovaný text
+- `content_text` - Vygenerovaný text
 - `sections` - List sekcí
 - `idea` - Původní Idea objekt
 - `title` - Titulek
@@ -472,14 +472,14 @@ estimated_duration = word_count / 2.5  # 2.5 words per second
 - `config` - Konfigurace
 
 **Výstupy:**
-- `script_v1` - ScriptV1 objekt:
+- `script_v1` - Content objekt:
   ```python
-  ScriptV1(
-    text="[Full script text ~300 words]",
+  ContentV1(
+    text="[Full content text ~300 words]",
     sections=[
-      ScriptSection(type="introduction", content="..."),
-      ScriptSection(type="body", content="..."),
-      ScriptSection(type="conclusion", content="...")
+      ContentSection(type="introduction", content="..."),
+      ContentSection(type="body", content="..."),
+      ContentSection(type="conclusion", content="...")
     ],
     word_count=300,
     estimated_duration_seconds=120,
@@ -514,7 +514,7 @@ estimated_duration = word_count / 2.5  # 2.5 words per second
 - V debug režimu se loguje do souboru
 
 **Vstupy:**
-- `script_v1` - ScriptV1 objekt
+- `script_v1` - Content objekt
 
 **Výstupy:**
 - Konzolový výstup (barevný)
@@ -540,7 +540,7 @@ Target Audience: Female, 13-23, USA
 ───────────────────────────────────────────────
   📝 SCRIPT TEXT
 ───────────────────────────────────────────────
-[Generated script text...]
+[Generated content text...]
 
 ───────────────────────────────────────────────
   📊 SECTIONS
@@ -562,7 +562,7 @@ Conclusion (50 words):
 ## 04.12 Ukládání do databáze
 
 **Co se děje (pouze v Production režimu, NE v Preview):**
-- **04.12.1** `ScriptFromIdeaTitleService.save_script()` se zavolá
+- **04.12.1** `ContentFromIdeaTitleService.save_content()` se zavolá
 - **04.12.2** Vytvoří se záznam v tabulce `Script`:
   ```sql
   INSERT INTO Script (
@@ -582,9 +582,9 @@ Conclusion (50 words):
 - **04.12.3** Aktualizuje se Story stav:
   ```sql
   UPDATE Story 
-  SET state = 'PrismQ.T.Review.Title.From.Script.Idea',
-      script_text = ?,
-      script_version = 'v1',
+  SET state = 'PrismQ.T.Review.Title.From.Content.Idea',
+      content_text = ?,
+      content_version = 'v1',
       updated_at = ?
   WHERE id = ?
   ```
@@ -592,17 +592,17 @@ Conclusion (50 words):
 - **04.12.5** Zobrazí se potvrzení s Script ID
 
 **Vstupy:**
-- `script_v1` - ScriptV1 objekt
+- `script_v1` - Content objekt
 - `story_id` - ID Story objektu
 - `preview` - Boolean flag (False pro save)
 
 **Výstupy:**
 - Nový záznam v tabulce `Script`
 - Aktualizovaný záznam v tabulce `Story`:
-  - `state` změněn na `"PrismQ.T.Review.Title.From.Script.Idea"`
-  - `script_text` uložen
-  - `script_version` = "v1"
-- `script_id` - Auto-increment ID
+  - `state` změněn na `"PrismQ.T.Review.Title.From.Content.Idea"`
+  - `content_text` uložen
+  - `content_version` = "v1"
+- `content_id` - Auto-increment ID
 - Konzolové potvrzení
 
 **Technologie:**
@@ -637,9 +637,9 @@ Table: Script
 - created_at TIMESTAMP
 
 Table: Story (update)
-- state TEXT → "PrismQ.T.Review.Title.From.Script.Idea"
-- script_text TEXT → [saved script text]
-- script_version TEXT → "v1"
+- state TEXT → "PrismQ.T.Review.Title.From.Content.Idea"
+- content_text TEXT → [saved content text]
+- content_version TEXT → "v1"
 - updated_at TIMESTAMP → [current time]
 ```
 
@@ -670,7 +670,7 @@ Table: Story (update)
 **Výstupy:**
 - Story.state změněn z:
   - `"PrismQ.T.Title.From.Idea"` (vstup kroku 04)
-  - → `"PrismQ.T.Review.Title.From.Script.Idea"` (vstup kroku 05)
+  - → `"PrismQ.T.Review.Title.From.Content.Idea"` (vstup kroku 05)
 
 **Technologie:**
 - SQL UPDATE
@@ -681,7 +681,7 @@ Table: Story (update)
 Krok 03: Title.From.Idea
   ↓ (Story.state = "PrismQ.T.Title.From.Idea")
 Krok 04: Script.From.Title.Idea  ← TENTO KROK
-  ↓ (Story.state = "PrismQ.T.Review.Title.From.Script.Idea")
+  ↓ (Story.state = "PrismQ.T.Review.Title.From.Content.Idea")
 Krok 05: Review.Title.From.Script.Idea
 ```
 
@@ -748,10 +748,10 @@ Krok 05: Review.Title.From.Script.Idea
 ## 🔧 Technologie stack
 
 ### Python (3.10+)
-- `script_generator.py` - Hlavní logika
-- `ai_script_generator.py` - AI integrace
-- `story_script_service.py` - Service layer
-- `script_from_idea_title_interactive.py` - CLI
+- `content_generator.py` - Hlavní logika
+- `ai_content_generator.py` - AI integrace
+- `story_content_service.py` - Service layer
+- `content_from_idea_title_interactive.py` - CLI
 
 ### AI Model
 - Model získán globálně přes `get_local_ai_model()` (např. Qwen3:30b)
@@ -789,7 +789,7 @@ Krok 05: Review.Title.From.Script.Idea
 - [x] 504 seed variations načteny
 - [x] AI kontrola funguje (is_ai_available)
 - [x] Database queries funkční
-- [x] Script generation s mock AI
+- [x] Content generation s mock AI
 - [x] Strukturování textu do sekcí
 - [x] Database save transakce
 - [x] State transitions správné
@@ -826,7 +826,7 @@ Krok 05: Review.Title.From.Script.Idea
 - ✅ Dependencies: Jasně definované
 
 **Následující krok:**
-- ➡️ **Krok 05:** `PrismQ.T.Review.Title.From.Script.Idea`
+- ➡️ **Krok 05:** `PrismQ.T.Review.Title.From.Content.Idea`
 - Revize titulku na základě vygenerovaného skriptu a původního nápadu
 
 ---

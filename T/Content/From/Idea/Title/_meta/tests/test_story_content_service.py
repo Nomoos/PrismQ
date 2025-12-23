@@ -352,7 +352,7 @@ class TestStoryRepository:
         assert stories_desc[2].id == story1.id  # Oldest
 
 
-class TestStoryContentService:
+class TestStoryScriptService:
     """Tests for StoryContentService."""
 
     def test_count_stories_needing_contents(self, db_connection):
@@ -502,7 +502,7 @@ class TestProcessAllPendingStories:
         assert summary["success_rate"] == 1.0
 
 
-class TestStoryContentServiceStateBased:
+class TestStoryScriptServiceStateBased:
     """Tests for the state-based workflow (primary workflow).
 
     Tests the new methods:
@@ -605,8 +605,8 @@ class TestStoryContentServiceStateBased:
 # =============================================================================
 
 from T.Content.From.Idea.Title.src.story_content_service import (
-    STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA,
-    STATE_SCRIPT_FROM_IDEA_TITLE,
+    STATE_REVIEW_TITLE_FROM_CONTENT_IDEA,
+    STATE_CONTENT_FROM_IDEA_TITLE,
     ContentFromIdeaTitleService,
     StateBasedContentResult,
     process_oldest_from_idea_title,
@@ -627,27 +627,27 @@ class TestStoryRepositoryFindOldestByState:
         # Create stories with different creation times
         story_oldest = Story(
             idea_json='{"title": "Oldest"}',
-            state=STATE_SCRIPT_FROM_IDEA_TITLE,
+            state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=3),
         )
         story_repo.insert(story_oldest)
 
         story_middle = Story(
             idea_json='{"title": "Middle"}',
-            state=STATE_SCRIPT_FROM_IDEA_TITLE,
+            state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=1),
         )
         story_repo.insert(story_middle)
 
         story_newest = Story(
             idea_json='{"title": "Newest"}',
-            state=STATE_SCRIPT_FROM_IDEA_TITLE,
+            state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time,
         )
         story_repo.insert(story_newest)
 
         # Find oldest
-        oldest = story_repo.find_oldest_by_state(STATE_SCRIPT_FROM_IDEA_TITLE)
+        oldest = story_repo.find_oldest_by_state(STATE_CONTENT_FROM_IDEA_TITLE)
 
         assert oldest is not None
         assert oldest.id == story_oldest.id
@@ -661,7 +661,7 @@ class TestStoryRepositoryFindOldestByState:
         story_repo.insert(Story(idea_json='{"title": "Different State"}', state="DIFFERENT_STATE"))
 
         # Find oldest in target state
-        oldest = story_repo.find_oldest_by_state(STATE_SCRIPT_FROM_IDEA_TITLE)
+        oldest = story_repo.find_oldest_by_state(STATE_CONTENT_FROM_IDEA_TITLE)
 
         assert oldest is None
 
@@ -684,17 +684,17 @@ class TestStoryRepositoryFindOldestByState:
         # Create story with correct state (newer)
         story2 = Story(
             idea_json=json.dumps(sample_idea.to_dict()),
-            state=STATE_SCRIPT_FROM_IDEA_TITLE,
+            state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=1),
         )
         story_repo.insert(story2)
 
         # Find oldest in target state
-        oldest = story_repo.find_oldest_by_state(STATE_SCRIPT_FROM_IDEA_TITLE)
+        oldest = story_repo.find_oldest_by_state(STATE_CONTENT_FROM_IDEA_TITLE)
 
         assert oldest is not None
         assert oldest.id == story2.id
-        assert oldest.state == STATE_SCRIPT_FROM_IDEA_TITLE
+        assert oldest.state == STATE_CONTENT_FROM_IDEA_TITLE
 
     def test_count_stories_by_state(self, db_connection, sample_idea):
         """Test counting stories with the correct state."""
@@ -759,7 +759,7 @@ class TestStoryRepositoryFindOldestByState:
         assert updated_story.content_id == result.content_id
 
 
-class TestContentFromIdeaTitleService:
+class TestScriptFromIdeaTitleService:
     """Tests for ContentFromIdeaTitleService."""
 
     def test_count_pending(self, db_connection, sample_idea):
@@ -775,7 +775,7 @@ class TestContentFromIdeaTitleService:
         for i in range(3):
             story = story_repo.insert(
                 Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE
+                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
                 )
             )
             title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
@@ -798,7 +798,7 @@ class TestContentFromIdeaTitleService:
         story1 = story_repo.insert(
             Story(
                 idea_json=json.dumps(sample_idea.to_dict()),
-                state=STATE_SCRIPT_FROM_IDEA_TITLE,
+                state=STATE_CONTENT_FROM_IDEA_TITLE,
                 created_at=base_time - timedelta(hours=2),
             )
         )
@@ -809,7 +809,7 @@ class TestContentFromIdeaTitleService:
         story2 = story_repo.insert(
             Story(
                 idea_json=json.dumps(sample_idea.to_dict()),
-                state=STATE_SCRIPT_FROM_IDEA_TITLE,
+                state=STATE_CONTENT_FROM_IDEA_TITLE,
                 created_at=base_time,
             )
         )
@@ -831,7 +831,7 @@ class TestContentFromIdeaTitleService:
 
         # Create a story in the target state
         story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE)
+            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
         )
         title = title_repo.insert(
             Title(story_id=story.id, version=0, text="The Mystery of the Abandoned House")
@@ -850,7 +850,7 @@ class TestContentFromIdeaTitleService:
 
         # Verify state changed
         updated_story = story_repo.find_by_id(story.id)
-        assert updated_story.state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+        assert updated_story.state == STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
         assert updated_story.content_id == result.content_id
 
     def test_process_oldest_story_missing_idea(self, db_connection):
@@ -948,7 +948,7 @@ class TestContentFromIdeaTitleService:
 
         # Create a story without title_id
         story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE)
+            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
         )
 
         result = service.process_oldest_story()
@@ -965,7 +965,7 @@ class TestContentFromIdeaTitleService:
         title_repo = TitleRepository(db_connection)
 
         # Create a story without idea_json
-        story = story_repo.insert(Story(idea_json=None, state=STATE_SCRIPT_FROM_IDEA_TITLE))
+        story = story_repo.insert(Story(idea_json=None, state=STATE_CONTENT_FROM_IDEA_TITLE))
         title = title_repo.insert(Title(story_id=story.id, version=0, text="Test Title"))
         story.title_id = title.id
         story_repo.update(story)
@@ -987,7 +987,7 @@ class TestContentFromIdeaTitleService:
         for i in range(3):
             story = story_repo.insert(
                 Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE
+                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
                 )
             )
             title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
@@ -1013,7 +1013,7 @@ class TestContentFromIdeaTitleService:
         for i in range(5):
             story = story_repo.insert(
                 Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE
+                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
                 )
             )
             title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
@@ -1036,7 +1036,7 @@ class TestContentFromIdeaTitleService:
         for i in range(2):
             story = story_repo.insert(
                 Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE
+                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
                 )
             )
             title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
@@ -1050,8 +1050,8 @@ class TestContentFromIdeaTitleService:
         assert summary["successful"] == 2
         assert summary["failed"] == 0
         assert summary["success_rate"] == 1.0
-        assert summary["input_state"] == STATE_SCRIPT_FROM_IDEA_TITLE
-        assert summary["output_state"] == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+        assert summary["input_state"] == STATE_CONTENT_FROM_IDEA_TITLE
+        assert summary["output_state"] == STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
 
 
 class TestProcessOldestFromIdeaTitle:
@@ -1064,7 +1064,7 @@ class TestProcessOldestFromIdeaTitle:
 
         # Create a story
         story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_SCRIPT_FROM_IDEA_TITLE)
+            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
         )
         title = title_repo.insert(Title(story_id=story.id, version=0, text="Test Title"))
         story.title_id = title.id
@@ -1075,7 +1075,7 @@ class TestProcessOldestFromIdeaTitle:
 
         assert result.success is True
         assert result.story_id == story.id
-        assert result.new_state == STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+        assert result.new_state == STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
 
     def test_process_oldest_from_idea_title_empty(self, db_connection):
         """Test the convenience function when no stories are pending."""

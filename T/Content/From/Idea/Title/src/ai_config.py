@@ -1,6 +1,6 @@
-"""Global AI configuration for script generation.
+"""Global AI configuration for content generation.
 
-This module provides global AI configuration functions used across all script generation modules.
+This module provides global AI configuration functions used across all content generation modules.
 Similar to how database path is obtained globally, AI model and temperature are configured here.
 """
 
@@ -9,7 +9,7 @@ from typing import Tuple
 
 
 def get_local_ai_model() -> str:
-    """Get the local AI model name for script generation.
+    """Get the local AI model name for content generation.
     
     Returns fixed model name for local AI inference via Ollama.
     
@@ -37,7 +37,7 @@ def get_local_ai_temperature() -> float:
     Returns:
         Random temperature value between 0.6 and 0.8
     """
-    # Temperature limits for script generation
+    # Temperature limits for content generation
     MIN_TEMPERATURE = 0.6
     MAX_TEMPERATURE = 0.8
     
