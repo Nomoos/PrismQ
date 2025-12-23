@@ -22,7 +22,7 @@ import logging
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import requests
 
@@ -663,7 +663,7 @@ class AIScriptGenerator:
         idea_text: str,
         target_duration_seconds: int = 120,
         max_duration_seconds: int = 175,
-        audience: Optional[dict] = None,
+        audience: Optional[Dict[str, str]] = None,
         seed: Optional[str] = None,
     ) -> Optional[str]:
         """Generate a complete script using AI.
@@ -671,10 +671,10 @@ class AIScriptGenerator:
         Args:
             title: The title for the script (Titulek)
             idea_text: The idea/concept text
-            target_duration_seconds: Target duration in seconds (default: 120)
-            max_duration_seconds: Maximum duration in seconds (default: 175)
-            audience: Target audience dict with age_range, gender, country
-            seed: Optional specific seed to use (if None, picks randomly from 504)
+            target_duration_seconds: Target duration in seconds (default: 120s)
+            max_duration_seconds: Maximum allowed duration (default: 175s)
+            audience: Target audience configuration (age_range, gender, country)
+            seed: Optional specific seed to use (if None, picks randomly from 500)
 
         Returns:
             Generated script text, or None if AI is unavailable
@@ -690,15 +690,15 @@ class AIScriptGenerator:
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-        # Set default audience if not provided
+        # Default audience if not provided
         if audience is None:
             audience = {
                 "age_range": "13-23",
                 "gender": "Female",
-                "country": "United States",
+                "country": "United States"
             }
 
-        # Pick one seed from 504 variations
+        # Pick one seed from 500 variations
         selected_seed = seed if seed else get_random_seed()
         logger.info(f"Using seed: {selected_seed}")
 
@@ -722,32 +722,34 @@ class AIScriptGenerator:
             raise RuntimeError(error_msg)
 
     def _create_content_prompt(
-        self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
+        self, 
+        title: str, 
+        idea_text: str, 
+        seed: str, 
+        target_duration: int,
+        max_duration: int,
+        audience: Dict[str, str]
     ) -> str:
-        """Create prompt for script generation using updated structure for local models.
+        """Create prompt for script generation optimized for local AI models.
 
-        Input:
-        - Title (Titulek)
-        - Idea text
-        - Seed (one picked from 504 variations)
-        - Audience (age_range, gender, country)
+        Uses a structured prompt format designed for local models like Qwen3:32b.
 
         Args:
             title: Content title
             idea_text: Idea/concept text
-            seed: Creative direction seed (used symbolically/thematically)
-            target_duration: Target duration in seconds (default: 120)
-            max_duration: Maximum duration in seconds (default: 175)
-            audience: Target audience dict
+            seed: Creative direction seed (used subtly/thematically)
+            target_duration: Target duration in seconds (default: 120s)
+            max_duration: Maximum duration in seconds (default: 175s)
+            audience: Target audience (age_range, gender, country)
 
         Returns:
-            Engineered prompt for local AI model
+            Engineered prompt for AI
         """
         # Calculate approximate word count (2.5 words per second for narration)
-        target_words = int(target_duration * 2.5)
-        max_words = int(max_duration * 2.5)
+        target_words = int(target_duration * 2.5)  # 120s = 300 words
+        max_words = int(max_duration * 2.5)  # 175s = 437 words
 
-        # Build the optimized prompt for local models
+        # Create structured prompt optimized for local models
         prompt = f"""SYSTEM INSTRUCTION:
 You are a professional video script writer.
 Follow instructions exactly. Do not add extra sections or explanations.
@@ -758,7 +760,7 @@ Generate a video script.
 INPUTS:
 TITLE: {title}
 IDEA: {idea_text}
-INSPIRATION SEED: {seed} (Single word used only as creative inspiration)
+INSPIRATION SEED: {seed}
 
 TARGET AUDIENCE:
 - Age: {audience.get('age_range', '13-23')}
@@ -771,16 +773,17 @@ REQUIREMENTS:
 3. End with a clear and natural call-to-action.
 4. Maintain consistent engaging tone throughout.
 5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
-6. Target length: approximately {target_words} words (for {target_duration} seconds).
-7. Maximum length: {max_words} words ({max_duration} seconds).
+6. Target length: {target_words} words (approximately {target_duration} seconds)
+7. Maximum length: {max_words} words (approximately {max_duration} seconds)
 
 OUTPUT RULES:
 - Output ONLY the script text.
 - No headings, no labels, no explanations.
 - Do not mention the word "hook", "CTA", or any structure explicitly.
 - Do not mention that this is a script.
+- The first sentence must create immediate curiosity or tension.
 
-The first sentence must create immediate curiosity or tension."""
+Generate the script now:"""
 
         return prompt
 
@@ -831,9 +834,9 @@ The first sentence must create immediate curiosity or tension."""
 def generate_content(
     title: str,
     idea_text: str,
-    target_duration_seconds: int = 120,
-    max_duration_seconds: int = 175,
-    audience: Optional[dict] = None,
+    target_duration_seconds: int = 90,
+    platform: str = "youtube_medium",
+    tone: str = "engaging",
     seed: Optional[str] = None,
     config: Optional[AIScriptGeneratorConfig] = None,
 ) -> str:
@@ -842,10 +845,10 @@ def generate_content(
     Args:
         title: Content title (Titulek)
         idea_text: Idea/concept text
-        target_duration_seconds: Target duration in seconds (default: 120)
-        max_duration_seconds: Maximum duration in seconds (default: 175)
-        audience: Target audience dict with age_range, gender, country
-        seed: Optional specific seed (if None, picks randomly from 504)
+        target_duration_seconds: Target duration in seconds
+        platform: Target platform
+        tone: Content tone
+        seed: Optional specific seed (if None, picks randomly from 500)
         config: Optional AI configuration
 
     Returns:
@@ -858,8 +861,7 @@ def generate_content(
         >>> script = generate_content(
         ...     title="The Mystery of the Abandoned House",
         ...     idea_text="A girl discovers a time-loop in an abandoned house...",
-        ...     target_duration_seconds=120,
-        ...     audience={"age_range": "13-23", "gender": "Female", "country": "United States"}
+        ...     target_duration_seconds=90
         ... )
         >>> print(script)
     """
@@ -868,8 +870,8 @@ def generate_content(
         title=title,
         idea_text=idea_text,
         target_duration_seconds=target_duration_seconds,
-        max_duration_seconds=max_duration_seconds,
-        audience=audience,
+        platform=platform,
+        tone=tone,
         seed=seed,
     )
 
