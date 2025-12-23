@@ -1,6 +1,6 @@
 """Content Generator for creating v1 scripts from ideas and titles.
 
-This module implements the script generation logic using local AI models:
+This module implements the content generation logic using local AI models:
 - Takes Idea object and Title v1 as input
 - Generates structured script with intro, body, and conclusion using Qwen3:30b
 - Optimizes for platform requirements (YouTube shorts < 180s)
@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 # Add parent directories to path for imports
-# Path: T/Content/From/Idea/Title/src/script_generator.py
+# Path: T/Content/From/Idea/Title/src/content_generator.py
 # Up 6 levels to T/, then into Idea/Model/src
 parent_dir = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
@@ -49,7 +49,7 @@ def _get_ai_generator_module():
     return _ai_generator_module if _ai_generator_module else None
 
 
-class ScriptStructure(Enum):
+class ContentStructure(Enum):
     """Content structure types."""
 
     THREE_ACT = "three_act"  # Introduction, Development, Conclusion
@@ -69,7 +69,7 @@ class PlatformTarget(Enum):
     GENERAL = "general"  # No specific constraints
 
 
-class ScriptTone(Enum):
+class ContentTone(Enum):
     """Content tone options."""
 
     ENGAGING = "engaging"
@@ -80,7 +80,7 @@ class ScriptTone(Enum):
 
 
 @dataclass
-class ScriptSection:
+class ContentSection:
     """A section of the script."""
 
     section_type: str  # "introduction", "body", "conclusion"
@@ -91,14 +91,14 @@ class ScriptSection:
 
 
 @dataclass
-class ScriptV1:
+class ContentV1:
     """Initial script draft (version 1).
 
     Attributes:
         content_id: Unique identifier for this script
         idea_id: str
         title: The title (v1) this script was generated from
-        full_text: Complete script text
+        full_text: Complete content text
         sections: Breakdown into intro, body, conclusion
         total_duration_seconds: Estimated total duration
         max_duration_seconds: Maximum allowed duration
@@ -113,7 +113,7 @@ class ScriptV1:
     idea_id: str
     title: str
     full_text: str
-    sections: List[ScriptSection]
+    sections: List[ContentSection]
     total_duration_seconds: int
     max_duration_seconds: int
     audience: Dict[str, str]
@@ -122,7 +122,7 @@ class ScriptV1:
     version: int = 1
     notes: str = ""
 
-    def get_section(self, section_type: str) -> Optional[ScriptSection]:
+    def get_section(self, section_type: str) -> Optional[ContentSection]:
         """Get a specific section by type."""
         for section in self.sections:
             if section.section_type == section_type:
@@ -157,10 +157,10 @@ class ScriptV1:
 
 
 @dataclass
-class ScriptGeneratorConfig:
-    """Configuration for AI-powered script generation.
+class ContentGeneratorConfig:
+    """Configuration for AI-powered content generation.
 
-    All script generation uses local AI models via Ollama.
+    All content generation uses local AI models via Ollama.
     AI model and temperature are obtained from global configuration.
 
     Attributes:
@@ -184,15 +184,15 @@ class ScriptGeneratorConfig:
     include_cta: bool = True
 
 
-class ScriptGenerator:
+class ContentGenerator:
     """Generate script drafts (v1) from ideas and titles using local AI models.
 
-    This class uses Qwen3:30b via Ollama for all script generation.
+    This class uses Qwen3:30b via Ollama for all content generation.
     AI availability is required - an error is raised if AI is not available.
     """
 
-    def __init__(self, config: Optional[ScriptGeneratorConfig] = None):
-        """Initialize ScriptGenerator with configuration.
+    def __init__(self, config: Optional[ContentGeneratorConfig] = None):
+        """Initialize ContentGenerator with configuration.
 
         Args:
             config: Optional generation configuration
@@ -200,7 +200,7 @@ class ScriptGenerator:
         Raises:
             RuntimeError: If AI module is not available
         """
-        self.config = config or ScriptGeneratorConfig()
+        self.config = config or ContentGeneratorConfig()
         self._ai_generator = None
         self._ai_available = False
         self._init_ai_generator()
@@ -225,18 +225,18 @@ class ScriptGenerator:
             raise RuntimeError(error_msg)
 
         try:
-            ai_config = ai_module.AIScriptGeneratorConfig(
+            ai_config = ai_module.AIContentGeneratorConfig(
                 model=ai_model,
                 api_base=ai_api_base,
                 temperature=ai_temperature,
                 timeout=ai_timeout,
                 enable_ai=True,
             )
-            self._ai_generator = ai_module.AIScriptGenerator(config=ai_config)
+            self._ai_generator = ai_module.AIContentGenerator(config=ai_config)
             self._ai_available = self._ai_generator.is_available()
 
             if self._ai_available:
-                logger.info(f"AI script generation initialized with model: {ai_model}")
+                logger.info(f"AI content generation initialized with model: {ai_model}")
             else:
                 logger.warning(
                     f"AI model '{ai_model}' not available at {ai_api_base}"
@@ -247,7 +247,7 @@ class ScriptGenerator:
             self._ai_available = False
 
     def is_ai_available(self) -> bool:
-        """Check if AI-powered script generation is available.
+        """Check if AI-powered content generation is available.
 
         Returns:
             True if AI generation is available, False otherwise
@@ -256,7 +256,7 @@ class ScriptGenerator:
 
     def generate_content_v1(
         self, idea: "Idea", title: str, content_id: Optional[str] = None, **kwargs
-    ) -> ScriptV1:
+    ) -> ContentV1:
         """Generate initial script (v1) from idea and title using AI.
 
         All generation uses local AI models (Qwen2.5-14B-Instruct).
@@ -269,7 +269,7 @@ class ScriptGenerator:
             **kwargs: Additional configuration overrides
 
         Returns:
-            ScriptV1 object with AI-generated structured script
+            ContentV1 object with AI-generated structured script
 
         Raises:
             ValueError: If idea or title is invalid
@@ -295,7 +295,7 @@ class ScriptGenerator:
                 ai_api_base = "http://localhost:11434"
             
             error_msg = (
-                f"AI script generation is not available. "
+                f"AI content generation is not available. "
                 f"Please ensure Ollama is running with model '{ai_model}' at {ai_api_base}"
             )
             logger.error(error_msg)
@@ -317,18 +317,18 @@ class ScriptGenerator:
                 ai_model = "qwen3:32b"
             
             error_msg = (
-                f"AI script generation failed for '{title}'. "
+                f"AI content generation failed for '{title}'. "
                 f"Please check that Ollama is running and the model '{ai_model}' is available."
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-        logger.info("AI script generation successful")
+        logger.info("AI content generation successful")
 
         # Calculate total duration
         total_duration = sum(s.estimated_duration_seconds for s in sections)
 
-        # Create ScriptV1 object
+        # Create ContentV1 object
         # Get AI model from global config for metadata
         try:
             from .ai_config import get_local_ai_model
@@ -336,7 +336,7 @@ class ScriptGenerator:
         except ImportError:
             ai_model = "qwen3:32b"
         
-        script = ScriptV1(
+        script = ContentV1(
             content_id=content_id,
             idea_id=getattr(idea, "id", "unknown"),
             title=title,
@@ -361,7 +361,7 @@ class ScriptGenerator:
 
         return script
 
-    def _generate_with_ai(self, idea: "Idea", title: str, config: ScriptGeneratorConfig) -> tuple:
+    def _generate_with_ai(self, idea: "Idea", title: str, config: ContentGeneratorConfig) -> tuple:
         """Generate script content using AI.
 
         Args:
@@ -412,30 +412,30 @@ class ScriptGenerator:
             return full_text, sections
 
         except Exception as e:
-            logger.error(f"AI script generation error: {e}")
+            logger.error(f"AI content generation error: {e}")
             return None, None
 
     def _create_sections_from_ai_text(
-        self, full_text: str, config: ScriptGeneratorConfig
-    ) -> List[ScriptSection]:
+        self, full_text: str, config: ContentGeneratorConfig
+    ) -> List[ContentSection]:
         """Create section objects from AI-generated text.
 
         Since AI generates a cohesive script, we estimate section boundaries
         based on the target duration ratios.
 
         Args:
-            full_text: AI-generated script text
+            full_text: AI-generated content text
             config: Generation configuration
 
         Returns:
-            List of ScriptSection objects
+            List of ContentSection objects
         """
         # Calculate section durations based on structure type
-        if config.structure_type == ScriptStructure.HOOK_DELIVER_CTA:
+        if config.structure_type == ContentStructure.HOOK_DELIVER_CTA:
             intro_ratio, body_ratio, conclusion_ratio = 0.15, 0.70, 0.15
-        elif config.structure_type == ScriptStructure.THREE_ACT:
+        elif config.structure_type == ContentStructure.THREE_ACT:
             intro_ratio, body_ratio, conclusion_ratio = 0.25, 0.50, 0.25
-        elif config.structure_type == ScriptStructure.PROBLEM_SOLUTION:
+        elif config.structure_type == ContentStructure.PROBLEM_SOLUTION:
             intro_ratio, body_ratio, conclusion_ratio = 0.30, 0.50, 0.20
         else:
             intro_ratio, body_ratio, conclusion_ratio = 0.20, 0.60, 0.20
@@ -457,21 +457,21 @@ class ScriptGenerator:
         conclusion_duration = int(config.target_duration_seconds * conclusion_ratio)
 
         sections = [
-            ScriptSection(
+            ContentSection(
                 section_type="introduction",
                 content=intro_text,
                 estimated_duration_seconds=intro_duration,
                 purpose="AI-generated hook to grab attention",
                 notes=f"Generated with {config.ai_model}",
             ),
-            ScriptSection(
+            ContentSection(
                 section_type="body",
                 content=body_text,
                 estimated_duration_seconds=body_duration,
                 purpose="AI-generated main content",
                 notes=f"Generated with {config.ai_model}",
             ),
-            ScriptSection(
+            ContentSection(
                 section_type="conclusion",
                 content=conclusion_text,
                 estimated_duration_seconds=conclusion_duration,
@@ -482,9 +482,9 @@ class ScriptGenerator:
 
         return sections
 
-    def _apply_config_overrides(self, kwargs: Dict[str, Any]) -> ScriptGeneratorConfig:
+    def _apply_config_overrides(self, kwargs: Dict[str, Any]) -> ContentGeneratorConfig:
         """Apply configuration overrides from kwargs."""
-        config = ScriptGeneratorConfig(
+        config = ContentGeneratorConfig(
             platform_target=kwargs.get("platform_target", self.config.platform_target),
             target_duration_seconds=kwargs.get(
                 "target_duration_seconds", self.config.target_duration_seconds
@@ -509,11 +509,11 @@ class ScriptGenerator:
 
 
 __all__ = [
-    "ScriptGenerator",
-    "ScriptGeneratorConfig",
-    "ScriptV1",
-    "ScriptSection",
-    "ScriptStructure",
+    "ContentGenerator",
+    "ContentGeneratorConfig",
+    "ContentV1",
+    "ContentSection",
+    "ContentStructure",
     "PlatformTarget",
-    "ScriptTone",
+    "ContentTone",
 ]

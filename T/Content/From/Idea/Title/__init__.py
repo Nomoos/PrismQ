@@ -44,7 +44,7 @@ from .src.script_generator import (
     ScriptV1,
 )
 from .src.story_content_service import (
-    ScriptGenerationResult,
+    ContentGenerationResult,
     StoryScriptService,
     process_all_pending_stories,
 )
@@ -61,6 +61,6 @@ __all__ = [
     "ScriptTone",
     # Story Content Service
     "StoryScriptService",
-    "ScriptGenerationResult",
+    "ContentGenerationResult",
     "process_all_pending_stories",
 ]

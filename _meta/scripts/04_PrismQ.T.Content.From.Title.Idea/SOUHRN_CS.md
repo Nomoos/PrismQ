@@ -1,4 +1,4 @@
-# Souhrn revize: Krok 04 - PrismQ.T.Script.From.Title.Idea
+# Souhrn revize: Krok 04 - PrismQ.T.Content.From.Title.Idea
 
 **Datum:** 18. prosince 2025  
 **Kontrolor:** GitHub Copilot  
@@ -8,9 +8,9 @@
 
 ## 🎯 Shrnutí
 
-**Modul:** `04_PrismQ.T.Script.From.Title.Idea`  
-**Účel:** Generování skriptů z titulku a nápadu pomocí AI (Qwen3:30b přes Ollama)  
-**Umístění:** `T/Script/From/Idea/Title/`  
+**Modul:** `04_PrismQ.T.Content.From.Title.Idea`  
+**Účel:** Generování obsahu z titulku a nápadu pomocí AI (Qwen3:30b přes Ollama)  
+**Umístění:** `T/Content/From/Idea/Title/`  
 **Stav:** ✅ **IMPLEMENTOVÁNO A FUNKČNÍ**
 
 ---
@@ -33,7 +33,7 @@
 
 1. **`__init__.py` měl nesprávné importy**
    - ❌ Před: `from .ai_content_generator import ...`
-   - ✅ Po: `from .ai_script_generator import ...`
+   - ✅ Po: `from .ai_content_generator import ...`
    - **Stav:** ✅ OPRAVENO
 
 ### ⚠️ Identifikované problémy
@@ -54,20 +54,20 @@
 ## 📊 Struktura modulu
 
 ```
-T/Script/From/Idea/Title/
+T/Content/From/Idea/Title/
 ├── README.md (4.3KB)                               ✅ Kompletní dokumentace
 ├── requirements.txt                                 ✅ Závislosti definovány
 ├── __init__.py                                      ✅ Exporty (OPRAVENO)
 └── src/
     ├── __init__.py                                  ✅ Exporty modulu
-    ├── ai_script_generator.py (18.7KB)             ✅ Jádro AI generování
-    ├── script_generator.py (18.8KB)                ✅ Generátor skriptů
-    ├── script_from_idea_title_interactive.py (16.3KB) ✅ Interaktivní CLI
-    └── story_script_service.py (25.7KB)            ✅ Servisní vrstva
+    ├── ai_content_generator.py (18.7KB)             ✅ Jádro AI generování
+    ├── content_generator.py (18.8KB)                ✅ Generátor skriptů
+    ├── content_from_idea_title_interactive.py (16.3KB) ✅ Interaktivní CLI
+    └── story_content_service.py (25.7KB)            ✅ Servisní vrstva
 └── _meta/
     └── tests/
-        ├── test_ai_script_generator.py (11.8KB)    ⚠️ Cesty importů potřebují aktualizaci
-        └── test_story_script_service.py (39.1KB)   ⚠️ Cesty importů potřebují aktualizaci
+        ├── test_ai_content_generator.py (11.8KB)    ⚠️ Cesty importů potřebují aktualizaci
+        └── test_story_content_service.py (39.1KB)   ⚠️ Cesty importů potřebují aktualizaci
 ```
 
 **Celkový kód:** ~79KB Python implementace  
@@ -128,13 +128,13 @@ script = generate_content(
 **Režimy:**
 ```bash
 # Produkční režim (ukládá do databáze)
-python script_from_idea_title_interactive.py
+python content_from_idea_title_interactive.py
 
 # Preview režim (neukládá, rozšířené logování)
-python script_from_idea_title_interactive.py --preview
+python content_from_idea_title_interactive.py --preview
 
 # Debug režim (detailní logování)
-python script_from_idea_title_interactive.py --preview --debug
+python content_from_idea_title_interactive.py --preview --debug
 ```
 
 ### 3. Batch skripty
@@ -155,7 +155,7 @@ python script_from_idea_title_interactive.py --preview --debug
 1. Načte `Story` z databáze (stav: `PrismQ.T.Title.From.Idea`)
 2. Vygeneruje skript pomocí AI
 3. Uloží `Script` do databáze
-4. Aktualizuje stav na: `PrismQ.T.Review.Title.From.Script.Idea`
+4. Aktualizuje stav na: `PrismQ.T.Review.Title.From.Content.Idea`
 
 **Transakční bezpečnost:**
 - Commit při úspěchu
@@ -239,7 +239,7 @@ if not generator.is_ai_available():
 ### Funkcionalita
 - [x] AI integrace implementována
 - [x] Seed variace fungují (504 seedů)
-- [x] Generování skriptů funkční
+- [x] Generování obsahu funkční
 - [x] Databázová integrace funguje
 - [x] Dávkové zpracování podporováno
 

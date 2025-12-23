@@ -1,6 +1,6 @@
 """AI-Powered Content Generator using Qwen3:30b via Ollama.
 
-This module provides AI-powered script generation for the PrismQ.T.Content.From.Idea.Title
+This module provides AI-powered content generation for the PrismQ.T.Content.From.Idea.Title
 workflow using the Qwen3:30b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
@@ -596,8 +596,8 @@ def get_seed_by_index(index: int) -> str:
 
 
 @dataclass
-class AIScriptGeneratorConfig:
-    """Configuration for AI-powered script generation.
+class AIContentGeneratorConfig:
+    """Configuration for AI-powered content generation.
 
     All generation uses local AI models via Ollama.
 
@@ -613,11 +613,11 @@ class AIScriptGeneratorConfig:
     api_base: str = "http://localhost:11434"
     temperature: float = 0.7  # Moderate creativity for engaging scripts
     max_tokens: int = 2000
-    timeout: int = 120  # Longer timeout for script generation
+    timeout: int = 120  # Longer timeout for content generation
 
 
-class AIScriptGenerator:
-    """Generate scripts using AI with Qwen3:30b.
+class AIContentGenerator:
+    """Generate content using AI with Qwen3:30b.
 
     All generation goes through local AI models.
 
@@ -627,13 +627,13 @@ class AIScriptGenerator:
         - One seed (randomly picked from 500 predefined variations)
     """
 
-    def __init__(self, config: Optional[AIScriptGeneratorConfig] = None):
+    def __init__(self, config: Optional[AIContentGeneratorConfig] = None):
         """Initialize the AI script generator.
 
         Args:
             config: Optional AI configuration
         """
-        self.config = config or AIScriptGeneratorConfig()
+        self.config = config or AIContentGeneratorConfig()
         self.available = self._check_ollama_availability()
 
     def _check_ollama_availability(self) -> bool:
@@ -650,7 +650,7 @@ class AIScriptGenerator:
             return False
 
     def is_available(self) -> bool:
-        """Check if AI script generation is available.
+        """Check if AI content generation is available.
 
         Returns:
             True if AI generation is available, False otherwise
@@ -677,14 +677,14 @@ class AIScriptGenerator:
             seed: Optional specific seed to use (if None, picks randomly from 504)
 
         Returns:
-            Generated script text, or None if AI is unavailable
+            Generated content text, or None if AI is unavailable
 
         Raises:
             RuntimeError: If AI is not available
         """
         if not self.available:
             error_msg = (
-                f"AI script generation is not available. "
+                f"AI content generation is not available. "
                 f"Please ensure Ollama is running with model '{self.config.model}' at {self.config.api_base}"
             )
             logger.error(error_msg)
@@ -714,17 +714,17 @@ class AIScriptGenerator:
         try:
             response = self._call_ollama(prompt)
             script = self._extract_content_text(response)
-            logger.info(f"AI script generation successful for '{title}'")
+            logger.info(f"AI content generation successful for '{title}'")
             return script
         except Exception as e:
-            error_msg = f"AI script generation failed: {e}"
+            error_msg = f"AI content generation failed: {e}"
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
     def _create_content_prompt(
         self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
     ) -> str:
-        """Create prompt for script generation using updated structure for local models.
+        """Create prompt for content generation using updated structure for local models.
 
         Input:
         - Title (Titulek)
@@ -749,11 +749,11 @@ class AIScriptGenerator:
 
         # Build the optimized prompt for local models
         prompt = f"""SYSTEM INSTRUCTION:
-You are a professional video script writer.
+You are a professional video content writer.
 Follow instructions exactly. Do not add extra sections or explanations.
 
 TASK:
-Generate a video script.
+Generate a video content.
 
 INPUTS:
 TITLE: {title}
@@ -775,7 +775,7 @@ REQUIREMENTS:
 7. Maximum length: {max_words} words ({max_duration} seconds).
 
 OUTPUT RULES:
-- Output ONLY the script text.
+- Output ONLY the content text.
 - No headings, no labels, no explanations.
 - Do not mention the word "hook", "CTA", or any structure explicitly.
 - Do not mention that this is a script.
@@ -810,7 +810,7 @@ The first sentence must create immediate curiosity or tension."""
             raise RuntimeError(f"Failed to generate AI script: {e}")
 
     def _extract_content_text(self, response: str) -> str:
-        """Extract script text from AI response."""
+        """Extract content text from AI response."""
         cleaned = response.strip()
 
         # Remove common prefixes
@@ -835,7 +835,7 @@ def generate_content(
     max_duration_seconds: int = 175,
     audience: Optional[dict] = None,
     seed: Optional[str] = None,
-    config: Optional[AIScriptGeneratorConfig] = None,
+    config: Optional[AIContentGeneratorConfig] = None,
 ) -> str:
     """Convenience function to generate an AI-powered script.
 
@@ -849,7 +849,7 @@ def generate_content(
         config: Optional AI configuration
 
     Returns:
-        Generated script text
+        Generated content text
 
     Raises:
         RuntimeError: If AI is not available or generation fails
@@ -863,7 +863,7 @@ def generate_content(
         ... )
         >>> print(script)
     """
-    generator = AIScriptGenerator(config=config)
+    generator = AIContentGenerator(config=config)
     return generator.generate_content(
         title=title,
         idea_text=idea_text,
@@ -875,8 +875,8 @@ def generate_content(
 
 
 __all__ = [
-    "AIScriptGenerator",
-    "AIScriptGeneratorConfig",
+    "AIContentGenerator",
+    "AIContentGeneratorConfig",
     "generate_content",
     "get_random_seed",
     "get_seed_by_index",
