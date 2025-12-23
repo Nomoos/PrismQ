@@ -494,8 +494,11 @@ Press Ctrl+C or close the window to stop.
     )
 
     args = parser.parse_args()
+    
+    # Treat --debug as enabling preview mode (they can be used together)
+    preview_mode = args.preview or args.debug
 
-    return run_continuous_mode(preview=args.preview)
+    return run_continuous_mode(preview=preview_mode)
 
 
 if __name__ == "__main__":
