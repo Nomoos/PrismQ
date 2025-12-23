@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from T.Review.Content.script_review import (
+from script_review import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
