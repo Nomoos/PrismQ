@@ -66,6 +66,7 @@ from simple_idea_db import SimpleIdeaDatabase
 # Import database models and repositories
 from Model.Database.models.story import Story, StoryState
 from Model.Database.repositories.story_repository import StoryRepository
+from Model import StateNames
 
 
 @dataclass
@@ -122,6 +123,9 @@ class StoryFromIdeaService:
     """
 
     NUM_STORIES = 10  # Number of stories to create from each Idea
+    
+    # State constant - stories are created with this state
+    CURRENT_STATE = StateNames.TITLE_FROM_IDEA
 
     def __init__(self, story_connection: sqlite3.Connection, idea_db: SimpleIdeaDatabase):
         """Initialize the service.
