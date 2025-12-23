@@ -1,20 +1,20 @@
-"""Story Content Service - Generate scripts for stories from Idea and Title.
+"""Story Content Service - Generate content for stories from Idea and Title.
 
 This module provides a service that:
 1. Selects the oldest Story where state is PrismQ.T.Content.From.Idea.Title
-2. Generates scripts using the ScriptGenerator from Idea and Title
+2. Generates scripts using the ContentGenerator from Idea and Title
 3. Updates the Story with the generated Content
 4. Changes state to PrismQ.T.Review.Title.From.Content
 
-This is the main entry point for automated script generation in the workflow.
+This is the main entry point for automated content generation in the workflow.
 
 Usage:
     >>> import sqlite3
-    >>> from T.Content.From.Idea.Title.src.story_content_service import StoryScriptService
+    >>> from T.Content.From.Idea.Title.src.story_content_service import StoryContentService
     >>>
     >>> conn = sqlite3.connect("prismq.db")
     >>> conn.row_factory = sqlite3.Row
-    >>> service = StoryScriptService(conn)
+    >>> service = StoryContentService(conn)
     >>>
     >>> # Process oldest story needing script (by state)
     >>> result = service.process_oldest_story()
@@ -43,14 +43,14 @@ from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
 
-# Import ScriptGenerator from local module
-from .script_generator import (
+# Import ContentGenerator from local module
+from .content_generator import (
     PlatformTarget,
-    ScriptGenerator,
-    ScriptGeneratorConfig,
-    ScriptStructure,
-    ScriptTone,
-    ScriptV1,
+    ContentGenerator,
+    ContentGeneratorConfig,
+    ContentStructure,
+    ContentTone,
+    ContentV1,
 )
 
 _current_file = Path(__file__)
@@ -65,25 +65,25 @@ from idea import ContentGenre, Idea
 
 
 @dataclass
-class ScriptGenerationResult:
-    """Result of script generation for a story.
+class ContentGenerationResult:
+    """Result of content generation for a story.
 
     Attributes:
         story_id: ID of the story processed
         content_id: ID of the generated script (if successful)
-        success: Whether script generation was successful
+        success: Whether content generation was successful
         error: Error message if generation failed
-        script_v1: The generated ScriptV1 object (if successful)
+        script_v1: The generated ContentV1 object (if successful)
     """
 
     story_id: int
     content_id: Optional[int] = None
     success: bool = False
     error: Optional[str] = None
-    script_v1: Optional[ScriptV1] = None
+    script_v1: Optional[ContentV1] = None
 
 
-class StoryScriptService:
+class StoryContentService:
     """Service for generating scripts for stories from Idea and Title.
 
     This service implements the workflow step:
@@ -103,12 +103,12 @@ class StoryScriptService:
         story_repo: Repository for Story operations
         content_repo: Repository for Content operations
         title_repo: Repository for Title operations
-        script_generator: Generator for creating scripts
+        content_generator: Generator for creating scripts
 
     Example:
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
-        >>> service = StoryScriptService(conn)
+        >>> service = StoryContentService(conn)
         >>>
         >>> # Process oldest story by state (primary workflow)
         >>> result = service.process_oldest_story()
@@ -124,41 +124,41 @@ class StoryScriptService:
     def __init__(
         self,
         connection: sqlite3.Connection,
-        script_generator_config: Optional[ScriptGeneratorConfig] = None,
+        content_generator_config: Optional[ContentGeneratorConfig] = None,
     ):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection with row_factory = sqlite3.Row
-            script_generator_config: Optional configuration for script generation
+            content_generator_config: Optional configuration for content generation
         """
         self._conn = connection
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.title_repo = TitleRepository(connection)
 
-        config = script_generator_config or ScriptGeneratorConfig(
+        config = content_generator_config or ContentGeneratorConfig(
             platform_target=PlatformTarget.YOUTUBE_MEDIUM,
             target_duration_seconds=90,
-            structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+            structure_type=ContentStructure.HOOK_DELIVER_CTA,
             include_cta=True,
-            tone=ScriptTone.ENGAGING,
+            tone=ContentTone.ENGAGING,
         )
-        self.script_generator = ScriptGenerator(config)
+        self.content_generator = ContentGenerator(config)
 
     def count_stories_needing_contents(self) -> int:
-        """Count stories that need script generation.
+        """Count stories that need content generation.
 
         Returns:
-            Number of stories ready for script generation.
+            Number of stories ready for content generation.
         """
         return self.story_repo.count_needing_content()
 
     def get_stories_needing_contents(self) -> List[Story]:
-        """Get all stories that need script generation.
+        """Get all stories that need content generation.
 
         Returns:
-            List of Story objects ready for script generation.
+            List of Story objects ready for content generation.
         """
         return self.story_repo.find_needing_content()
 
@@ -192,7 +192,7 @@ class StoryScriptService:
         """
         return self.story_repo.count_by_state(StateNames.SCRIPT_FROM_IDEA_TITLE)
 
-    def process_oldest_story(self) -> Optional[ScriptGenerationResult]:
+    def process_oldest_story(self) -> Optional[ContentGenerationResult]:
         """Process the oldest story with state PrismQ.T.Content.From.Idea.Title.
 
         This is the primary entry point for the state-based workflow.
@@ -202,7 +202,7 @@ class StoryScriptService:
         3. Updates Story state to PrismQ.T.Review.Title.From.Content
 
         Returns:
-            ScriptGenerationResult if a story was processed, None if no stories found.
+            ContentGenerationResult if a story was processed, None if no stories found.
 
         Example:
             >>> result = service.process_oldest_story()
@@ -219,18 +219,18 @@ class StoryScriptService:
 
         return self._generate_content_with_state_transition(story)
 
-    def _generate_content_with_state_transition(self, story: Story) -> ScriptGenerationResult:
+    def _generate_content_with_state_transition(self, story: Story) -> ContentGenerationResult:
         """Generate script and transition state to PrismQ.T.Review.Title.From.Content.
 
-        Internal method that handles the state-based workflow script generation.
+        Internal method that handles the state-based workflow content generation.
 
         Args:
             story: Story object with state PrismQ.T.Content.From.Idea.Title
 
         Returns:
-            ScriptGenerationResult with success status and details
+            ContentGenerationResult with success status and details
         """
-        result = ScriptGenerationResult(story_id=story.id)
+        result = ContentGenerationResult(story_id=story.id)
 
         # Validate story has required content
         if not story.has_idea():
@@ -255,7 +255,7 @@ class StoryScriptService:
             title_text = title.text
 
             # Generate the script
-            script_v1 = self.script_generator.generate_content_v1(idea=idea, title=title_text)
+            script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
 
             # Create Content model for database
             script_model = ScriptModel(
@@ -286,7 +286,7 @@ class StoryScriptService:
 
     # === Legacy workflow methods (content-based) ===
 
-    def generate_content_for_story(self, story: Story) -> ScriptGenerationResult:
+    def generate_content_for_story(self, story: Story) -> ContentGenerationResult:
         """Generate a script for a single story (legacy workflow).
 
         NOTE: This is the legacy method that uses content-based detection
@@ -296,7 +296,7 @@ class StoryScriptService:
         This method:
         1. Retrieves the Idea from story.idea_json
         2. Retrieves the Title from story.title_id
-        3. Generates a script using ScriptGenerator
+        3. Generates a script using ContentGenerator
         4. Saves the script to the database
         5. Updates the story with the content_id (sets state to 'SCRIPT')
 
@@ -304,11 +304,11 @@ class StoryScriptService:
             story: Story object with idea_json and title_id set
 
         Returns:
-            ScriptGenerationResult with success status and details
+            ContentGenerationResult with success status and details
         """
-        result = ScriptGenerationResult(story_id=story.id)
+        result = ContentGenerationResult(story_id=story.id)
 
-        # Validate story is ready for script generation
+        # Validate story is ready for content generation
         if not story.needs_content():
             result.error = "Story does not need script (missing idea, title, or already has script)"
             return result
@@ -327,7 +327,7 @@ class StoryScriptService:
             title_text = title.text
 
             # Generate the script
-            script_v1 = self.script_generator.generate_content_v1(idea=idea, title=title_text)
+            script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
 
             # Create Content model for database
             script_model = ScriptModel(
@@ -359,8 +359,8 @@ class StoryScriptService:
 
     def process_stories_needing_contents(
         self, limit: Optional[int] = None
-    ) -> List[ScriptGenerationResult]:
-        """Process all stories that need script generation (legacy workflow).
+    ) -> List[ContentGenerationResult]:
+        """Process all stories that need content generation (legacy workflow).
 
         NOTE: This is the legacy method that uses content-based detection.
         For the state-based workflow, use process_oldest_story() instead.
@@ -372,7 +372,7 @@ class StoryScriptService:
             limit: Optional maximum number of stories to process
 
         Returns:
-            List of ScriptGenerationResult objects with results for each story
+            List of ContentGenerationResult objects with results for each story
         """
         stories = self.get_stories_needing_contents()
 
@@ -386,11 +386,11 @@ class StoryScriptService:
 
         return results
 
-    def get_processing_summary(self, results: List[ScriptGenerationResult]) -> dict:
-        """Get a summary of script generation results.
+    def get_processing_summary(self, results: List[ContentGenerationResult]) -> dict:
+        """Get a summary of content generation results.
 
         Args:
-            results: List of ScriptGenerationResult from process_stories_needing_contents
+            results: List of ContentGenerationResult from process_stories_needing_contents
 
         Returns:
             Dictionary with summary statistics
@@ -414,7 +414,7 @@ def process_all_pending_stories(
 ) -> dict:
     """Convenience function to process all stories needing scripts.
 
-    This is the main entry point for the script generation workflow.
+    This is the main entry point for the content generation workflow.
 
     Args:
         connection: SQLite database connection
@@ -431,7 +431,7 @@ def process_all_pending_stories(
         >>> print(f"Processed {summary['total_processed']} stories")
         >>> print(f"Success rate: {summary['success_rate']:.1%}")
     """
-    service = StoryScriptService(connection)
+    service = StoryContentService(connection)
     results = service.process_stories_needing_contents(limit=limit)
     return service.get_processing_summary(results)
 
@@ -441,16 +441,16 @@ def process_all_pending_stories(
 # =============================================================================
 
 # State constants following StateNames convention
-STATE_SCRIPT_FROM_IDEA_TITLE = "PrismQ.T.Content.From.Idea.Title"
-STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA = "PrismQ.T.Review.Title.From.Content.Idea"
+STATE_CONTENT_FROM_IDEA_TITLE = "PrismQ.T.Content.From.Idea.Title"
+STATE_REVIEW_TITLE_FROM_CONTENT_IDEA = "PrismQ.T.Review.Title.From.Content.Idea"
 
 # Version constant for initial script creation
-INITIAL_SCRIPT_VERSION = 0
+INITIAL_CONTENT_VERSION = 0
 
 
 @dataclass
-class StateBasedScriptResult:
-    """Result of state-based script generation.
+class StateBasedContentResult:
+    """Result of state-based content generation.
 
     Attributes:
         story_id: ID of the processed story
@@ -459,7 +459,7 @@ class StateBasedScriptResult:
         new_state: The state after processing
         success: Whether the operation succeeded
         error: Error message if failed
-        script_v1: Generated ScriptV1 object (if successful)
+        script_v1: Generated ContentV1 object (if successful)
     """
 
     story_id: Optional[int] = None
@@ -468,10 +468,10 @@ class StateBasedScriptResult:
     new_state: Optional[str] = None
     success: bool = False
     error: Optional[str] = None
-    script_v1: Optional[ScriptV1] = None
+    script_v1: Optional[ContentV1] = None
 
 
-class ScriptFromIdeaTitleService:
+class ContentFromIdeaTitleService:
     """Service for PrismQ.T.Content.From.Idea.Title workflow state.
 
     This service implements the workflow step that:
@@ -486,12 +486,12 @@ class ScriptFromIdeaTitleService:
         story_repo: Repository for Story operations
         content_repo: Repository for Content operations
         title_repo: Repository for Title operations
-        script_generator: Generator for creating scripts
+        content_generator: Generator for creating scripts
 
     Example:
         >>> conn = sqlite3.connect(":memory:")
         >>> conn.row_factory = sqlite3.Row
-        >>> service = ScriptFromIdeaTitleService(conn)
+        >>> service = ContentFromIdeaTitleService(conn)
         >>>
         >>> # Process the oldest story in the state
         >>> result = service.process_oldest_story()
@@ -501,33 +501,33 @@ class ScriptFromIdeaTitleService:
         ...     print(f"No stories to process or error: {result.error}")
     """
 
-    INPUT_STATE = STATE_SCRIPT_FROM_IDEA_TITLE
-    OUTPUT_STATE = STATE_REVIEW_TITLE_FROM_SCRIPT_IDEA
+    INPUT_STATE = STATE_CONTENT_FROM_IDEA_TITLE
+    OUTPUT_STATE = STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
 
     def __init__(
         self,
         connection: sqlite3.Connection,
-        script_generator_config: Optional[ScriptGeneratorConfig] = None,
+        content_generator_config: Optional[ContentGeneratorConfig] = None,
     ):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection with row_factory = sqlite3.Row
-            script_generator_config: Optional configuration for script generation
+            content_generator_config: Optional configuration for content generation
         """
         self._conn = connection
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.title_repo = TitleRepository(connection)
 
-        config = script_generator_config or ScriptGeneratorConfig(
+        config = content_generator_config or ContentGeneratorConfig(
             platform_target=PlatformTarget.YOUTUBE_MEDIUM,
             target_duration_seconds=90,
-            structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+            structure_type=ContentStructure.HOOK_DELIVER_CTA,
             include_cta=True,
-            tone=ScriptTone.ENGAGING,
+            tone=ContentTone.ENGAGING,
         )
-        self.script_generator = ScriptGenerator(config)
+        self.content_generator = ContentGenerator(config)
 
     def count_pending(self) -> int:
         """Count stories waiting in the input state.
@@ -546,7 +546,7 @@ class ScriptFromIdeaTitleService:
         """
         return self.story_repo.find_oldest_by_state(self.INPUT_STATE)
 
-    def process_oldest_story(self) -> StateBasedScriptResult:
+    def process_oldest_story(self) -> StateBasedContentResult:
         """Process the oldest story in the input state.
 
         This method:
@@ -556,10 +556,10 @@ class ScriptFromIdeaTitleService:
         4. Updates the Story state to PrismQ.T.Review.Title.From.Content.Idea
 
         Returns:
-            StateBasedScriptResult with processing details.
+            StateBasedContentResult with processing details.
             If no stories are pending, returns result with success=False.
         """
-        result = StateBasedScriptResult()
+        result = StateBasedContentResult()
 
         # Find the oldest story in the input state
         story = self.get_oldest_story()
@@ -594,11 +594,11 @@ class ScriptFromIdeaTitleService:
             title_text = title.text
 
             # Generate the script
-            script_v1 = self.script_generator.generate_content_v1(idea=idea, title=title_text)
+            script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
 
             # Create Content model for database
             script_model = ScriptModel(
-                story_id=story.id, version=INITIAL_SCRIPT_VERSION, text=script_v1.full_text
+                story_id=story.id, version=INITIAL_CONTENT_VERSION, text=script_v1.full_text
             )
 
             # Save to database
@@ -625,7 +625,7 @@ class ScriptFromIdeaTitleService:
 
         return result
 
-    def process_all_pending(self, limit: Optional[int] = None) -> List[StateBasedScriptResult]:
+    def process_all_pending(self, limit: Optional[int] = None) -> List[StateBasedContentResult]:
         """Process all stories in the input state.
 
         This method processes stories in FIFO order (oldest first) until
@@ -635,7 +635,7 @@ class ScriptFromIdeaTitleService:
             limit: Optional maximum number of stories to process.
 
         Returns:
-            List of StateBasedScriptResult for each processed story.
+            List of StateBasedContentResult for each processed story.
         """
         results = []
         processed = 0
@@ -655,11 +655,11 @@ class ScriptFromIdeaTitleService:
 
         return results
 
-    def get_processing_summary(self, results: List[StateBasedScriptResult]) -> dict:
+    def get_processing_summary(self, results: List[StateBasedContentResult]) -> dict:
         """Get a summary of processing results.
 
         Args:
-            results: List of StateBasedScriptResult from processing.
+            results: List of StateBasedContentResult from processing.
 
         Returns:
             Dictionary with summary statistics.
@@ -680,7 +680,7 @@ class ScriptFromIdeaTitleService:
         }
 
 
-def process_oldest_from_idea_title(connection: sqlite3.Connection) -> StateBasedScriptResult:
+def process_oldest_from_idea_title(connection: sqlite3.Connection) -> StateBasedContentResult:
     """Process the oldest story in PrismQ.T.Content.From.Idea.Title state.
 
     This is the main entry point for the PrismQ.T.Content.From.Idea.Title module.
@@ -691,7 +691,7 @@ def process_oldest_from_idea_title(connection: sqlite3.Connection) -> StateBased
         connection: SQLite database connection.
 
     Returns:
-        StateBasedScriptResult with processing details.
+        StateBasedContentResult with processing details.
 
     Example:
         >>> import sqlite3
@@ -704,5 +704,5 @@ def process_oldest_from_idea_title(connection: sqlite3.Connection) -> StateBased
         ... else:
         ...     print(f"Error: {result.error}")
     """
-    service = ScriptFromIdeaTitleService(connection)
+    service = ContentFromIdeaTitleService(connection)
     return service.process_oldest_story()

@@ -6,9 +6,9 @@ It waits for user input, processes it through the script generator, and
 optionally saves to the database.
 
 Usage:
-    python script_from_idea_title_interactive.py                    # Interactive mode with DB save
-    python script_from_idea_title_interactive.py --preview          # Preview mode (no DB save)
-    python script_from_idea_title_interactive.py --preview --debug  # Debug mode with extensive logging
+    python content_from_idea_title_interactive.py                    # Interactive mode with DB save
+    python content_from_idea_title_interactive.py --preview          # Preview mode (no DB save)
+    python content_from_idea_title_interactive.py --preview --debug  # Debug mode with extensive logging
 
 Modes:
     Default: Creates scripts and saves to database
@@ -39,14 +39,14 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
 
 # Import script generator
 try:
-    from script_generator import (
+    from content_generator import (
         PlatformTarget,
-        ScriptGenerator,
-        ScriptGeneratorConfig,
-        ScriptSection,
-        ScriptStructure,
-        ScriptTone,
-        ScriptV1,
+        ContentGenerator,
+        ContentGeneratorConfig,
+        ContentSection,
+        ContentStructure,
+        ContentTone,
+        ContentV1,
     )
 
     SCRIPT_GENERATOR_AVAILABLE = True
@@ -233,7 +233,7 @@ def parse_input(text: str, logger: Optional[logging.Logger] = None) -> tuple:
 
 
 def run_interactive_mode(preview: bool = False, debug: bool = False):
-    """Run the interactive script generation mode.
+    """Run the interactive content generation mode.
 
     Args:
         preview: If True, don't save to database (preview/test mode)
@@ -346,14 +346,14 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         print_section("Generating Content")
 
         try:
-            config = ScriptGeneratorConfig(
+            config = ContentGeneratorConfig(
                 platform_target=PlatformTarget.YOUTUBE_MEDIUM,
                 target_duration_seconds=90,
-                structure_type=ScriptStructure.HOOK_DELIVER_CTA,
+                structure_type=ContentStructure.HOOK_DELIVER_CTA,
                 include_cta=True,
-                tone=ScriptTone.ENGAGING,
+                tone=ContentTone.ENGAGING,
             )
-            generator = ScriptGenerator(config)
+            generator = ContentGenerator(config)
             print_info("Generating script with HOOK_DELIVER_CTA structure...")
             if logger:
                 logger.info("Generating script")
@@ -429,9 +429,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             if logger:
                 logger.info("User requested JSON output")
 
-        # Output full script text
+        # Output full content text
         full_text_choice = (
-            input(f"\n{Colors.CYAN}Show full script text? (y/n) [n]: {Colors.END}").strip().lower()
+            input(f"\n{Colors.CYAN}Show full content text? (y/n) [n]: {Colors.END}").strip().lower()
         )
         if full_text_choice == "y":
             print_section("Full Content Text")
@@ -450,9 +450,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python script_from_idea_title_interactive.py                    # Interactive mode with DB save
-  python script_from_idea_title_interactive.py --preview          # Preview mode (no DB save)
-  python script_from_idea_title_interactive.py --preview --debug  # Debug mode with extensive logging
+  python content_from_idea_title_interactive.py                    # Interactive mode with DB save
+  python content_from_idea_title_interactive.py --preview          # Preview mode (no DB save)
+  python content_from_idea_title_interactive.py --preview --debug  # Debug mode with extensive logging
         """,
     )
 

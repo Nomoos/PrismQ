@@ -1,11 +1,11 @@
-"""Tests for AI Content Generator (Qwen3:30b).
+"""Tests for AI Script Generator (Qwen3:30b).
 
 These tests verify:
-1. AIScriptGeneratorConfig default values
-2. AIScriptGenerator initialization
-3. Seed variations functionality (500 simple words like "pudding", "fire", "ocean")
-4. AI generation with Title + Idea + Seed
-5. Integration with ScriptGenerator
+1. AIContentGeneratorConfig default values
+2. AIContentGenerator initialization
+3. Seed variations functionality (504 simple words like "pudding", "fire", "ocean")
+4. AI generation with Title + Idea + Seed + Audience
+5. Integration with ContentGenerator
 """
 
 from unittest.mock import MagicMock, patch
@@ -14,25 +14,22 @@ import pytest
 
 from T.Content.From.Idea.Title.src.ai_content_generator import (
     SEED_VARIATIONS,
-    AIScriptGenerator,
-    AIScriptGeneratorConfig,
+    AIContentGenerator,
+    AIContentGeneratorConfig,
     generate_content,
     get_random_seed,
     get_seed_by_index,
 )
-from T.Content.From.Idea.Title.src.script_generator import (
-    PlatformTarget,
-    ScriptGenerator,
-    ScriptGeneratorConfig,
-    ScriptStructure,
-    ScriptTone,
-    ScriptV1,
+from T.Content.From.Idea.Title.src.content_generator import (
+    ContentGenerator,
+    ContentGeneratorConfig,
+    ContentV1,
 )
 
 # Patch paths for mocking
 AI_SCRIPT_GEN_REQUESTS_GET = "T.Content.From.Idea.Title.src.ai_content_generator.requests.get"
 AI_SCRIPT_GEN_REQUESTS_POST = "T.Content.From.Idea.Title.src.ai_content_generator.requests.post"
-SCRIPT_GEN_AI_MODULE = "T.Content.From.Idea.Title.src.script_generator._get_ai_generator_module"
+SCRIPT_GEN_AI_MODULE = "T.Content.From.Idea.Title.src.content_generator._get_ai_generator_module"
 
 # Import Idea for test data
 import sys
@@ -105,51 +102,51 @@ class TestSeedVariations:
         assert get_seed_by_index(length + 5) == get_seed_by_index(5)
 
 
-class TestAIScriptGeneratorConfig:
-    """Tests for AIScriptGeneratorConfig."""
+class TestAIContentGeneratorConfig:
+    """Tests for AIContentGeneratorConfig."""
 
     def test_default_model_is_qwen(self):
         """Test that default model is Qwen3:30b."""
-        config = AIScriptGeneratorConfig()
+        config = AIContentGeneratorConfig()
         assert config.model == "qwen3:32b"
 
     def test_default_api_base(self):
         """Test default API base URL."""
-        config = AIScriptGeneratorConfig()
+        config = AIContentGeneratorConfig()
         assert config.api_base == "http://localhost:11434"
 
     def test_default_temperature(self):
-        """Test default temperature for script generation."""
-        config = AIScriptGeneratorConfig()
+        """Test default temperature for content generation."""
+        config = AIContentGeneratorConfig()
         assert config.temperature == 0.7
 
     def test_default_timeout(self):
-        """Test default timeout is adequate for script generation."""
-        config = AIScriptGeneratorConfig()
+        """Test default timeout is adequate for content generation."""
+        config = AIContentGeneratorConfig()
         assert config.timeout >= 60
 
 
 class TestAIScriptGenerator:
-    """Tests for AIScriptGenerator."""
+    """Tests for AIContentGenerator."""
 
     def test_initialization_with_default_config(self):
         """Test initialization with default config."""
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
         assert generator.config.model == "qwen3:32b"
 
     def test_is_available_returns_bool(self):
         """Test that is_available returns boolean."""
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
         assert isinstance(generator.is_available(), bool)
 
     @patch(AI_SCRIPT_GEN_REQUESTS_GET)
     @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_generate_content_with_mock_api(self, mock_post, mock_get):
-        """Test script generation with mocked Ollama API."""
+        """Test content generation with mocked Ollama API."""
         # Mock API availability check
         mock_get.return_value = MagicMock(status_code=200)
 
-        # Mock script generation response
+        # Mock content generation response
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -159,7 +156,7 @@ class TestAIScriptGenerator:
         }
         mock_post.return_value = mock_response
 
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
 
         result = generator.generate_content(
             title="The Mystery of the Abandoned House",
@@ -174,13 +171,13 @@ class TestAIScriptGenerator:
     @patch(AI_SCRIPT_GEN_REQUESTS_GET)
     @patch(AI_SCRIPT_GEN_REQUESTS_POST)
     def test_generate_content_with_specific_seed(self, mock_post, mock_get):
-        """Test script generation with a specific seed."""
+        """Test content generation with a specific seed."""
         mock_get.return_value = MagicMock(status_code=200)
         mock_post.return_value = MagicMock(
             status_code=200, json=MagicMock(return_value={"response": "Test script content"})
         )
 
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
         result = generator.generate_content(
             title="Test Title", idea_text="Test idea", seed="ocean"  # Specific seed
         )
@@ -196,7 +193,7 @@ class TestAIScriptGenerator:
             status_code=200, json=MagicMock(return_value={"response": "Test"})
         )
 
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
         generator.generate_content(title="Test", idea_text="Test idea", seed="fire")
 
         # Check the prompt contains the seed
@@ -220,7 +217,7 @@ class TestGenerateScriptConvenience:
         """Test convenience function with mocked API."""
         mock_get.return_value = MagicMock(status_code=200)
         mock_post.return_value = MagicMock(
-            status_code=200, json=MagicMock(return_value={"response": "Generated script text"})
+            status_code=200, json=MagicMock(return_value={"response": "Generated content text"})
         )
 
         result = generate_content(title="Test Title", idea_text="Test idea text")
@@ -229,25 +226,28 @@ class TestGenerateScriptConvenience:
 
 
 class TestScriptGeneratorAIIntegration:
-    """Tests for ScriptGenerator AI integration."""
+    """Tests for ContentGenerator AI integration."""
 
-    def test_config_has_ai_settings(self):
-        """Test that ScriptGeneratorConfig has AI settings."""
-        config = ScriptGeneratorConfig()
-        assert hasattr(config, "ai_model")
-        assert hasattr(config, "ai_api_base")
-        assert hasattr(config, "ai_temperature")
-        assert hasattr(config, "ai_timeout")
+    def test_config_has_new_settings(self):
+        """Test that ContentGeneratorConfig has new multiplatform settings."""
+        config = ContentGeneratorConfig()
+        assert hasattr(config, "target_duration_seconds")
+        assert hasattr(config, "max_duration_seconds")
+        assert hasattr(config, "audience")
+        assert config.target_duration_seconds == 120
+        assert config.max_duration_seconds == 175
 
-    def test_default_ai_model_is_qwen(self):
-        """Test that default AI model is Qwen3:30b."""
-        config = ScriptGeneratorConfig()
-        assert config.ai_model == "qwen3:32b"
+    def test_config_has_audience_defaults(self):
+        """Test that ContentGeneratorConfig has audience defaults."""
+        config = ContentGeneratorConfig()
+        assert config.audience["age_range"] == "13-23"
+        assert config.audience["gender"] == "Female"
+        assert config.audience["country"] == "United States"
 
     def test_generator_has_is_ai_available_method(self):
-        """Test that ScriptGenerator has is_ai_available method."""
+        """Test that ContentGenerator has is_ai_available method."""
         try:
-            generator = ScriptGenerator()
+            generator = ContentGenerator()
             assert hasattr(generator, "is_ai_available")
         except RuntimeError:
             # Expected if AI module not available
@@ -256,11 +256,11 @@ class TestScriptGeneratorAIIntegration:
     def test_generator_raises_error_when_ai_unavailable(self, sample_idea):
         """Test that generator raises error when AI is unavailable."""
         try:
-            generator = ScriptGenerator()
+            generator = ContentGenerator()
             if not generator.is_ai_available():
                 with pytest.raises(RuntimeError) as exc_info:
                     generator.generate_content_v1(idea=sample_idea, title="Test Title")
-                assert "AI script generation is not available" in str(exc_info.value)
+                assert "AI content generation is not available" in str(exc_info.value)
         except RuntimeError:
             # Expected if AI module not available
             pass
@@ -276,12 +276,12 @@ class TestScriptGeneratorAIIntegration:
         )
 
         mock_module = MagicMock()
-        mock_module.AIScriptGeneratorConfig = AIScriptGeneratorConfig
-        mock_module.AIScriptGenerator.return_value = mock_ai_generator
+        mock_module.AIContentGeneratorConfig = AIContentGeneratorConfig
+        mock_module.AIContentGenerator.return_value = mock_ai_generator
         mock_get_module.return_value = mock_module
 
-        config = ScriptGeneratorConfig()
-        generator = ScriptGenerator(config=config)
+        config = ContentGeneratorConfig()
+        generator = ContentGenerator(config=config)
 
         # Force reinitialize with mock
         generator._ai_generator = mock_ai_generator
@@ -306,7 +306,7 @@ class TestAIScriptGeneratorRobustness:
 
         mock_get.side_effect = requests.exceptions.ConnectionError()
 
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
         assert generator.is_available() is False
 
     @patch(AI_SCRIPT_GEN_REQUESTS_GET)
@@ -318,7 +318,7 @@ class TestAIScriptGeneratorRobustness:
         mock_get.return_value = MagicMock(status_code=200)
         mock_post.side_effect = requests.exceptions.RequestException("API Error")
 
-        generator = AIScriptGenerator()
+        generator = AIContentGenerator()
 
         with pytest.raises(RuntimeError):
             generator.generate_content(title="Test Title", idea_text="Test idea")
