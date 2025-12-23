@@ -1,9 +1,15 @@
-"""Content-specific AI configuration - uses general startup module.
+"""Title-specific AI configuration wrapper.
 
-This module provides AI configuration for the Content.From.Idea.Title workflow.
-It re-exports functions from src.startup for convenience and backward compatibility.
+This module provides AI configuration for the Title workflow.
+It imports from T.Content level (not src level) because AI is content-specific.
 
-For new code, prefer importing directly from src.startup instead.
+Module Hierarchy:
+- src/: Cross-cutting (database, config)
+- T/Content/: Content processing (AI for content)
+- T/Content/From/Idea/Title/: Title-specific logic
+
+This module is just a wrapper for backward compatibility.
+For new code, import directly from T.Content.src.ai_config.
 """
 
 import logging
@@ -12,46 +18,43 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Add repo root to path for imports
+# Add T/Content/src to path
 SCRIPT_DIR = Path(__file__).parent
-REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent  # Up to repo root
-sys.path.insert(0, str(REPO_ROOT))
+T_CONTENT_SRC = SCRIPT_DIR.parent.parent.parent.parent / "src"  # T/Content/src
+sys.path.insert(0, str(T_CONTENT_SRC))
 
 try:
-    # Import from top-level general module (RECOMMENDED)
-    from src.startup import (
+    # Import from T/Content level (correct hierarchy)
+    from ai_config import (
         DEFAULT_AI_MODEL,
         DEFAULT_AI_API_BASE,
         AI_TEMPERATURE_MIN,
         AI_TEMPERATURE_MAX,
         AISettings,
-        create_startup_config,
+        create_ai_config,
+        check_ollama_available,
     )
     
-    # For backward compatibility, provide wrapper functions
+    # Backward compatibility wrapper functions
     def get_local_ai_model() -> str:
         """Get the local AI model name.
         
-        DEPRECATED: Import from src.startup instead.
-        This is a wrapper for backward compatibility.
+        DEPRECATED: Import from T.Content.src.ai_config instead.
         """
         return DEFAULT_AI_MODEL
     
     def get_local_ai_api_base() -> str:
         """Get the local AI API base URL.
         
-        DEPRECATED: Import from src.startup instead.
-        This is a wrapper for backward compatibility.
+        DEPRECATED: Import from T.Content.src.ai_config instead.
         """
         return DEFAULT_AI_API_BASE
     
     def get_local_ai_temperature() -> float:
         """Get a random AI temperature.
         
-        DEPRECATED: Import from src.startup instead.
-        This is a wrapper for backward compatibility.
+        DEPRECATED: Import from T.Content.src.ai_config instead.
         """
-        # Use AISettings to get temperature
         import random
         return random.uniform(AI_TEMPERATURE_MIN, AI_TEMPERATURE_MAX)
     
@@ -66,8 +69,7 @@ try:
     def get_local_ai_config():
         """Get complete local AI configuration.
         
-        DEPRECATED: Use create_startup_config() from src.startup instead.
-        This is a wrapper for backward compatibility.
+        DEPRECATED: Use create_ai_config() from T.Content.src.ai_config instead.
         
         Returns:
             Tuple of (model, api_base, temperature, timeout)
@@ -80,10 +82,10 @@ try:
         )
 
 except ImportError as e:
-    logger.error(f"Failed to import from src.startup: {e}")
-    logger.warning("Falling back to local implementation (not recommended)")
+    logger.error(f"Failed to import from T.Content.src.ai_config: {e}")
+    logger.warning("Falling back to local implementation")
     
-    # Fallback implementation if src.startup is not available
+    # Fallback implementation
     import random
     from typing import Tuple
     

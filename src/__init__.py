@@ -37,18 +37,9 @@ Usage:
 from .config import Config
 from .idea import IdeaDatabase, setup_idea_database
 from .startup import (
-    # New composition root pattern (recommended)
-    AISettings,
-    StartupConfig,
-    create_startup_config,
-    # Backward compatibility (deprecated)
-    check_ollama_available,
-    get_database_path,
-    get_local_ai_api_base,
-    get_local_ai_config,
-    get_local_ai_model,
-    get_local_ai_temperature,
-    initialize_environment,
+    DatabaseConfig,
+    create_database_config,
+    get_database_path,  # Backward compatibility (deprecated)
 )
 from .story import StoryDatabase, setup_story_database
 
@@ -58,17 +49,9 @@ __all__ = [
     "setup_idea_database",
     "StoryDatabase",
     "setup_story_database",
-    # New pattern (recommended)
-    "StartupConfig",
-    "AISettings",
-    "create_startup_config",
-    # Backward compatibility (deprecated)
-    "get_database_path",
-    "get_local_ai_model",
-    "get_local_ai_temperature",
-    "get_local_ai_api_base",
-    "get_local_ai_config",
-    "check_ollama_available",
-    "initialize_environment",
+    # Database configuration
+    "DatabaseConfig",
+    "create_database_config",
+    "get_database_path",  # Backward compatibility (deprecated)
 ]
 __version__ = "1.0.0"
