@@ -1,160 +1,313 @@
 """General startup utilities for PrismQ scripts.
 
-This module provides reusable functions for database connection and Ollama local AI
-configuration that can be used across all scripts in the PrismQ system.
+This module provides reusable configuration and dependency injection patterns
+for database connection and Ollama local AI that can be used across all scripts.
 
-Key Features:
-- Database path configuration (reusable across all scripts)
-- Local AI model configuration (Ollama integration)
-- AI availability checking
-- Random temperature generation for creative variety
+Design Principles:
+- No work at import time (lazy loading)
+- Pure functions and classes (no side effects)
+- Explicit dependency injection
+- Clear composition root pattern
+- Deterministic and testable
 
 Usage:
-    from src.startup import (
-        get_database_path,
-        get_local_ai_model,
-        get_local_ai_temperature,
-        get_local_ai_api_base,
-        get_local_ai_config,
-        check_ollama_available
-    )
+    from src.startup import StartupConfig, create_startup_config
     
-    # Get database path
-    db_path = get_database_path()
+    # In your main() or composition root:
+    config = create_startup_config()
     
-    # Get AI configuration
-    model = get_local_ai_model()
-    temperature = get_local_ai_temperature()
-    api_base = get_local_ai_api_base()
+    db_path = config.get_database_path()
+    ai_settings = config.get_ai_settings()
     
-    # Or get complete config
-    model, temperature, api_base = get_local_ai_config()
-    
-    # Check if Ollama is available
-    if check_ollama_available():
+    if config.check_ollama_available():
         print("Ollama is ready!")
 """
 
 import logging
 import random
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Tuple
-
-import requests
-
-from .config import Config
 
 logger = logging.getLogger(__name__)
 
 
 # =============================================================================
-# Database Configuration
+# Constants - Define at module level, no side effects
 # =============================================================================
 
+DEFAULT_AI_MODEL = "qwen3:32b"
+DEFAULT_AI_API_BASE = "http://localhost:11434"
+AI_TEMPERATURE_MIN = 0.6
+AI_TEMPERATURE_MAX = 0.8
+DEFAULT_AI_TIMEOUT = 5
 
-def get_database_path(config: Optional[Config] = None) -> str:
-    """Get the database path for PrismQ.
+
+# =============================================================================
+# AI Settings - Plain data class (no side effects)
+# =============================================================================
+
+@dataclass
+class AISettings:
+    """AI configuration settings - plain data, no behavior."""
     
-    This function provides a centralized way to get the database path that can
-    be reused across all scripts in the PrismQ system.
+    model: str = DEFAULT_AI_MODEL
+    api_base: str = DEFAULT_AI_API_BASE
+    temperature: float = 0.7  # Will be randomized when requested
+    timeout: int = 120
     
-    Args:
-        config: Optional Config instance. If not provided, a new one will be created.
+    def get_random_temperature(self) -> float:
+        """Get a random temperature within defined limits.
+        
+        Returns a random value between 0.6 and 0.8 for creative variety
+        while maintaining coherent output.
+        
+        Returns:
+            Random float between 0.6 and 0.8
+        """
+        return random.uniform(AI_TEMPERATURE_MIN, AI_TEMPERATURE_MAX)
+
+
+# =============================================================================
+# Startup Configuration - Composition root helper
+# =============================================================================
+
+@dataclass
+class StartupConfig:
+    """Startup configuration container - inject dependencies explicitly.
     
-    Returns:
-        Absolute path to the database file (db.s3db)
+    This class provides a composition root pattern for PrismQ scripts.
+    All dependencies are injected via constructor, no global state.
     
     Example:
-        >>> db_path = get_database_path()
-        >>> print(db_path)
-        C:/PrismQ/db.s3db
+        # In your main() function:
+        config = StartupConfig(
+            database_path="/path/to/db.s3db",
+            ai_settings=AISettings()
+        )
+        
+        # Or use factory:
+        config = create_startup_config()
+    """
+    
+    database_path: str
+    ai_settings: AISettings = field(default_factory=AISettings)
+    _ollama_available: Optional[bool] = field(default=None, init=False, repr=False)
+    
+    def get_database_path(self) -> str:
+        """Get the database path.
+        
+        Returns:
+            Absolute path to the database file
+        """
+        return self.database_path
+    
+    def get_ai_settings(self) -> AISettings:
+        """Get AI settings object.
+        
+        Returns:
+            AISettings instance
+        """
+        return self.ai_settings
+    
+    def get_ai_config(self) -> Tuple[str, float, str]:
+        """Get complete AI configuration tuple.
+        
+        Returns:
+            Tuple of (model_name, temperature, api_base_url)
+        """
+        return (
+            self.ai_settings.model,
+            self.ai_settings.get_random_temperature(),
+            self.ai_settings.api_base
+        )
+    
+    def check_ollama_available(self, force_recheck: bool = False) -> bool:
+        """Check if Ollama is running (lazy, cached).
+        
+        This method does network I/O - call explicitly from composition root,
+        not at import time.
+        
+        Args:
+            force_recheck: If True, bypass cache and check again
+        
+        Returns:
+            True if Ollama is available, False otherwise
+        """
+        if self._ollama_available is not None and not force_recheck:
+            return self._ollama_available
+        
+        # Lazy import - only load when actually checking
+        try:
+            import requests
+        except ImportError:
+            logger.warning("requests module not available, cannot check Ollama")
+            self._ollama_available = False
+            return False
+        
+        try:
+            response = requests.get(
+                f"{self.ai_settings.api_base}/api/tags",
+                timeout=DEFAULT_AI_TIMEOUT
+            )
+            
+            if response.status_code != 200:
+                logger.warning(f"Ollama API returned status {response.status_code}")
+                self._ollama_available = False
+                return False
+            
+            # Check if model is available
+            models_data = response.json()
+            available_models = [m.get("name", "") for m in models_data.get("models", [])]
+            
+            if self.ai_settings.model not in available_models:
+                logger.warning(
+                    f"Model '{self.ai_settings.model}' not found. "
+                    f"Available: {available_models}"
+                )
+                self._ollama_available = False
+                return False
+            
+            self._ollama_available = True
+            return True
+        
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Failed to connect to Ollama: {e}")
+            self._ollama_available = False
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error checking Ollama: {e}")
+            self._ollama_available = False
+            return False
+
+
+# =============================================================================
+# Factory Functions - Create configured instances
+# =============================================================================
+
+def create_startup_config(
+    database_path: Optional[str] = None,
+    ai_model: Optional[str] = None,
+    ai_api_base: Optional[str] = None,
+    interactive: bool = False
+) -> StartupConfig:
+    """Factory function to create StartupConfig with defaults.
+    
+    This is the recommended composition root entry point.
+    Call this from your main() function, not at module import time.
+    
+    Args:
+        database_path: Override database path (default: from Config)
+        ai_model: Override AI model (default: qwen3:32b)
+        ai_api_base: Override API base (default: localhost:11434)
+        interactive: Whether Config should prompt for missing values
+    
+    Returns:
+        Configured StartupConfig instance
+    
+    Example:
+        def main():
+            # Create config at startup
+            config = create_startup_config()
+            
+            # Use it
+            db_path = config.get_database_path()
+            if config.check_ollama_available():
+                process_with_ai(config)
+    """
+    # Lazy import Config - only when factory is called
+    from .config import Config
+    
+    # Determine database path
+    if database_path is None:
+        # Create Config instance to get database path
+        cfg = Config(interactive=interactive)
+        database_path = cfg.database_path
+    
+    # Create AI settings
+    ai_settings = AISettings(
+        model=ai_model or DEFAULT_AI_MODEL,
+        api_base=ai_api_base or DEFAULT_AI_API_BASE
+    )
+    
+    # Return configured instance
+    return StartupConfig(
+        database_path=database_path,
+        ai_settings=ai_settings
+    )
+
+
+# =============================================================================
+# Backward Compatibility Functions (deprecated, use StartupConfig instead)
+# =============================================================================
+
+def get_database_path(config: Optional['Config'] = None) -> str:
+    """Get the database path for PrismQ.
+    
+    DEPRECATED: Use create_startup_config().get_database_path() instead.
+    
+    This function is provided for backward compatibility but violates
+    best practices by potentially doing work at import time.
+    
+    Args:
+        config: Optional Config instance
+    
+    Returns:
+        Absolute path to the database file
     """
     if config is None:
+        from .config import Config
         config = Config(interactive=False)
     
     return config.database_path
 
 
-# =============================================================================
-# Local AI Configuration (Ollama)
-# =============================================================================
-
-
 def get_local_ai_model() -> str:
-    """Get the local AI model name for content generation.
+    """Get the local AI model name.
     
-    Returns the fixed model name used for local AI operations via Ollama.
-    Currently configured to use Qwen3:32b model.
+    DEPRECATED: Use create_startup_config().get_ai_settings().model instead.
     
     Returns:
         Model name string (e.g., "qwen3:32b")
-    
-    Example:
-        >>> model = get_local_ai_model()
-        >>> print(model)
-        qwen3:32b
     """
-    return "qwen3:32b"
+    return DEFAULT_AI_MODEL
 
 
 def get_local_ai_temperature() -> float:
     """Get a random temperature value for AI generation.
     
-    Returns a random temperature between 0.6 and 0.8 for creative variety
-    while maintaining coherent output. Each call returns a different random
-    value within this range.
+    DEPRECATED: Use create_startup_config().get_ai_settings().get_random_temperature() instead.
     
     Returns:
         Random float between 0.6 and 0.8
-    
-    Example:
-        >>> temp1 = get_local_ai_temperature()
-        >>> temp2 = get_local_ai_temperature()
-        >>> print(f"{temp1:.2f}, {temp2:.2f}")
-        0.67, 0.74
     """
-    return random.uniform(0.6, 0.8)
+    return random.uniform(AI_TEMPERATURE_MIN, AI_TEMPERATURE_MAX)
 
 
 def get_local_ai_api_base() -> str:
     """Get the Ollama API base URL.
     
-    Returns the base URL for Ollama API calls. Default is localhost:11434.
+    DEPRECATED: Use create_startup_config().get_ai_settings().api_base instead.
     
     Returns:
         API base URL string
-    
-    Example:
-        >>> api_base = get_local_ai_api_base()
-        >>> print(api_base)
-        http://localhost:11434
     """
-    return "http://localhost:11434"
+    return DEFAULT_AI_API_BASE
 
 
 def get_local_ai_config() -> Tuple[str, float, str]:
     """Get complete local AI configuration as a tuple.
     
-    Convenience function that returns all AI configuration parameters in one call.
+    DEPRECATED: Use create_startup_config().get_ai_config() instead.
     
     Returns:
         Tuple of (model_name, temperature, api_base_url)
-    
-    Example:
-        >>> model, temp, api_base = get_local_ai_config()
-        >>> print(f"Model: {model}, Temp: {temp:.2f}, API: {api_base}")
-        Model: qwen3:32b, Temp: 0.72, API: http://localhost:11434
     """
     return (
-        get_local_ai_model(),
+        DEFAULT_AI_MODEL,
         get_local_ai_temperature(),
-        get_local_ai_api_base()
+        DEFAULT_AI_API_BASE
     )
-
-
-# =============================================================================
-# Ollama Availability Check
-# =============================================================================
 
 
 def check_ollama_available(
@@ -162,96 +315,61 @@ def check_ollama_available(
     model: Optional[str] = None,
     timeout: int = 5
 ) -> bool:
-    """Check if Ollama is running and the specified model is available.
+    """Check if Ollama is running.
     
-    Sends a GET request to Ollama's /api/tags endpoint to verify that:
-    1. Ollama server is running
-    2. The specified model is available (if model is provided)
+    DEPRECATED: Use create_startup_config().check_ollama_available() instead.
+    
+    This function does network I/O and should not be called at import time.
     
     Args:
-        api_base: Ollama API base URL. If None, uses get_local_ai_api_base()
-        model: Model name to check. If None, uses get_local_ai_model()
-        timeout: Request timeout in seconds (default: 5)
+        api_base: Ollama API base URL
+        model: Model name to check
+        timeout: Request timeout in seconds
     
     Returns:
-        True if Ollama is available (and model exists if specified), False otherwise
-    
-    Example:
-        >>> if check_ollama_available():
-        ...     print("Ollama is ready!")
-        ... else:
-        ...     print("Ollama is not available")
-        Ollama is ready!
+        True if Ollama is available, False otherwise
     """
-    if api_base is None:
-        api_base = get_local_ai_api_base()
-    
-    if model is None:
-        model = get_local_ai_model()
-    
-    try:
-        # Check if Ollama is running
-        response = requests.get(
-            f"{api_base}/api/tags",
-            timeout=timeout
+    # Create temporary config for checking
+    config = StartupConfig(
+        database_path="",  # Not needed for this check
+        ai_settings=AISettings(
+            model=model or DEFAULT_AI_MODEL,
+            api_base=api_base or DEFAULT_AI_API_BASE
         )
-        
-        if response.status_code != 200:
-            logger.warning(f"Ollama API returned status {response.status_code}")
-            return False
-        
-        # Check if model is available (if specified)
-        if model:
-            models_data = response.json()
-            available_models = [m.get("name", "") for m in models_data.get("models", [])]
-            
-            if model not in available_models:
-                logger.warning(f"Model '{model}' not found in Ollama. Available: {available_models}")
-                return False
-        
-        return True
-    
-    except requests.exceptions.RequestException as e:
-        logger.warning(f"Failed to connect to Ollama: {e}")
-        return False
-    except Exception as e:
-        logger.error(f"Unexpected error checking Ollama: {e}")
-        return False
-
-
-# =============================================================================
-# Startup Initialization
-# =============================================================================
+    )
+    return config.check_ollama_available()
 
 
 def initialize_environment(
     check_ai: bool = True,
     interactive: bool = False
-) -> Tuple[Config, bool]:
-    """Initialize the PrismQ environment with database and AI checks.
+) -> Tuple['Config', bool]:
+    """Initialize the PrismQ environment.
     
-    This is a convenience function that:
-    1. Loads configuration
-    2. Checks Ollama availability (if requested)
-    3. Returns ready-to-use config and AI status
+    DEPRECATED: Use create_startup_config() in your main() function instead.
+    
+    This function violates best practices by doing work that should be
+    in a composition root.
     
     Args:
-        check_ai: Whether to check Ollama availability (default: True)
-        interactive: Whether to run Config in interactive mode (default: False)
+        check_ai: Whether to check Ollama availability
+        interactive: Whether to run Config in interactive mode
     
     Returns:
         Tuple of (Config instance, AI available boolean)
-    
-    Example:
-        >>> config, ai_available = initialize_environment()
-        >>> if not ai_available:
-        ...     print("Warning: Ollama not available!")
-        >>> db_path = config.database_path
     """
+    from .config import Config
+    
     # Load configuration
     config = Config(interactive=interactive)
     
     # Check AI availability if requested
-    ai_available = check_ollama_available() if check_ai else False
+    ai_available = False
+    if check_ai:
+        startup_config = StartupConfig(
+            database_path=config.database_path,
+            ai_settings=AISettings()
+        )
+        ai_available = startup_config.check_ollama_available()
     
     return config, ai_available

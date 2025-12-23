@@ -21,54 +21,65 @@ def test_general_startup_module():
     print("=" * 70)
     
     try:
-        from src.startup import (
-            get_database_path,
-            get_local_ai_model,
-            get_local_ai_temperature,
-            get_local_ai_api_base,
-            get_local_ai_config,
-            check_ollama_available,
-            initialize_environment
-        )
-        print("✓ All imports successful")
+        # Test new pattern (recommended)
+        from src.startup import create_startup_config, StartupConfig, AISettings
+        print("✓ Imports successful (new pattern)")
+        
+        # Create config (composition root)
+        config = create_startup_config()
+        print("✓ Created StartupConfig via factory")
         
         # Test database path
-        db_path = get_database_path()
+        db_path = config.get_database_path()
         print(f"✓ Database path: {db_path}")
         assert db_path is not None, "Database path should not be None"
         
-        # Test AI model
-        model = get_local_ai_model()
-        print(f"✓ AI Model: {model}")
-        assert model == "qwen3:32b", f"Expected qwen3:32b, got {model}"
+        # Test AI settings
+        ai_settings = config.get_ai_settings()
+        print(f"✓ AI Settings: model={ai_settings.model}")
+        assert ai_settings.model == "qwen3:32b", f"Expected qwen3:32b, got {ai_settings.model}"
+        assert ai_settings.api_base == "http://localhost:11434"
         
-        # Test AI temperature
-        temp = get_local_ai_temperature()
-        print(f"✓ AI Temperature: {temp:.3f}")
-        assert 0.6 <= temp <= 0.8, f"Temperature should be between 0.6 and 0.8, got {temp}"
-        
-        # Test API base
-        api_base = get_local_ai_api_base()
-        print(f"✓ API Base: {api_base}")
-        assert api_base == "http://localhost:11434", f"Expected http://localhost:11434, got {api_base}"
+        # Test temperature generation
+        temp1 = ai_settings.get_random_temperature()
+        temp2 = ai_settings.get_random_temperature()
+        print(f"✓ Random temperatures: {temp1:.3f}, {temp2:.3f}")
+        assert 0.6 <= temp1 <= 0.8, f"Temperature should be between 0.6 and 0.8, got {temp1}"
+        assert 0.6 <= temp2 <= 0.8, f"Temperature should be between 0.6 and 0.8, got {temp2}"
         
         # Test complete config
-        model, temp, api = get_local_ai_config()
+        model, temp, api = config.get_ai_config()
         print(f"✓ Full Config: model={model}, temp={temp:.3f}, api={api}")
         assert model == "qwen3:32b"
         assert 0.6 <= temp <= 0.8
         assert api == "http://localhost:11434"
         
-        # Test Ollama availability (will be False in CI)
-        ollama_available = check_ollama_available()
-        print(f"✓ Ollama check: {ollama_available} (expected False in CI)")
+        # Test Ollama availability (explicit, not at import)
+        ollama_available = config.check_ollama_available()
+        print(f"✓ Ollama check (explicit): {ollama_available} (expected False in CI)")
         assert isinstance(ollama_available, bool), "Should return boolean"
         
-        # Test environment initialization
-        config, ai_available = initialize_environment(check_ai=True, interactive=False)
-        print(f"✓ Environment initialized: config type={type(config).__name__}, ai_available={ai_available}")
-        assert config is not None, "Config should not be None"
-        assert isinstance(ai_available, bool), "AI available should be boolean"
+        # Test manual instantiation (DI pattern)
+        custom_ai = AISettings(model="test-model", api_base="http://test:9999")
+        custom_config = StartupConfig(
+            database_path="/test/db.s3db",
+            ai_settings=custom_ai
+        )
+        print(f"✓ Custom config (DI): db={custom_config.get_database_path()}, model={custom_config.get_ai_settings().model}")
+        
+        # Test backward compatibility functions
+        from src.startup import (
+            get_database_path,
+            get_local_ai_model,
+            get_local_ai_temperature,
+            get_local_ai_config
+        )
+        print("✓ Backward compatibility imports successful")
+        
+        db_path_old = get_database_path()
+        model_old = get_local_ai_model()
+        temp_old = get_local_ai_temperature()
+        print(f"✓ Old functions work: db={db_path_old is not None}, model={model_old}, temp={temp_old:.3f}")
         
         print("\n✅ General Startup Module: ALL TESTS PASSED")
         return True
