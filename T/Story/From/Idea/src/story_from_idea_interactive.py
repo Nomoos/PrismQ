@@ -488,6 +488,10 @@ Press Ctrl+C or close the window to stop.
     parser.add_argument(
         "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
     )
+    
+    parser.add_argument(
+        "--debug", "-d", action="store_true", help="Enable debug output (currently same as preview mode)"
+    )
 
     args = parser.parse_args()
 
