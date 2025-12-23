@@ -1,9 +1,9 @@
-# ISSUE-IMPL-006 — Implementation check: `06_PrismQ.T.Review.Script.By.Title.Idea`
+# ISSUE-IMPL-006 — Implementation check: `06_PrismQ.T.Review.Content.By.Title.Idea`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/06_PrismQ.T.Review.Script.By.Title.Idea`  
-**Module Path**: `T/Review/Content/` or `T/Review/Content/`
+**Script Folder**: `PrismQ/_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea`  
+**Module Path**: `T/Review/Content/From/Title/Idea/` or `T/Review/Content/From/Title/Idea/`
 
 ---
 
@@ -100,7 +100,7 @@ Reviews Script/Content quality based on Title and Idea context. Validates that g
 - **Status**: IMPROVED
 - **Added**: Full logging system in interactive script:
   - Configurable log levels (INFO/DEBUG)
-  - Log files stored in `T/Review/Content/_meta/logs/`
+  - Log files stored in `T/Review/Content/From/Title/Idea/_meta/logs/`
   - Timestamped log files for audit trail
   - Both file and console handlers
   - Structured logging with timestamps and levels
@@ -156,7 +156,7 @@ Reviews Script/Content quality based on Title and Idea context. Validates that g
 ## Production Readiness Changes Implemented
 
 ### 1. ✅ Created Interactive Script
-**File**: `T/Review/Content/src/review_script_by_title_idea_interactive.py`
+**File**: `T/Review/Content/From/Title/Idea/src/review_script_by_title_idea_interactive.py`
 
 **Features**:
 - Full CLI with argparse (--preview, --debug flags)
@@ -169,22 +169,22 @@ Reviews Script/Content quality based on Title and Idea context. Validates that g
 
 ### 2. ✅ Module Structure Compliance
 **Changes**:
-- Created `T/Review/Content/src/` directory (production code)
-- Logs stored in `T/Review/Content/_meta/logs/` (auxiliary files)
+- Created `T/Review/Content/From/Title/Idea/src/` directory (production code)
+- Logs stored in `T/Review/Content/From/Title/Idea/_meta/logs/` (auxiliary files)
 - Follows src/_meta convention
 - No production code in _meta directory
 
 ### 3. ✅ Fixed Script References
 **Files Updated**:
-- `_meta/scripts/06_PrismQ.T.Review.Script.By.Title.Idea/Run.bat`
-- `_meta/scripts/06_PrismQ.T.Review.Script.By.Title.Idea/Preview.bat`
+- `_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea/Run.bat`
+- `_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea/Preview.bat`
 
 **Changes**:
 - Corrected module path from `T\Review\Script\ByTitleIdea\` to `T\Review\Script\`
 - Fixed python script path to point to actual implementation
 
 ### 4. ✅ Added Requirements File
-**File**: `T/Review/Content/requirements.txt`
+**File**: `T/Review/Content/From/Title/Idea/requirements.txt`
 
 **Contents**:
 - pytest>=7.0.0 (for testing)

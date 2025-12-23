@@ -24,15 +24,19 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Setup paths - We're in T/Review/Content/src/
+# Setup paths - We're in T/Review/Content/From/Title/Idea/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
-REVIEW_CONTENT_ROOT = SCRIPT_DIR.parent  # T/Review/Content
+FROM_TITLE_IDEA_ROOT = SCRIPT_DIR.parent  # T/Review/Content/From/Title/Idea
+FROM_TITLE_ROOT = FROM_TITLE_IDEA_ROOT.parent  # T/Review/Content/From/Title
+FROM_ROOT = FROM_TITLE_ROOT.parent  # T/Review/Content/From
+REVIEW_CONTENT_ROOT = FROM_ROOT.parent  # T/Review/Content
 REVIEW_ROOT = REVIEW_CONTENT_ROOT.parent  # T/Review
 T_ROOT = REVIEW_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
 sys.path.insert(0, str(SCRIPT_DIR))
+sys.path.insert(0, str(FROM_TITLE_IDEA_ROOT))
 sys.path.insert(0, str(REVIEW_CONTENT_ROOT))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 sys.path.insert(0, str(REPO_ROOT))
@@ -385,7 +389,7 @@ def setup_logging(debug: bool = False) -> logging.Logger:
         Configured logger instance
     """
     # Create logs directory if it doesn't exist
-    log_dir = REVIEW_CONTENT_ROOT / "_meta" / "logs"
+    log_dir = FROM_TITLE_IDEA_ROOT / "_meta" / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
 
     # Create logger
