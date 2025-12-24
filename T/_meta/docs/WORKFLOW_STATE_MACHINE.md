@@ -10,22 +10,22 @@ stateDiagram-v2
     
     IdeaCreation --> StoryFromIdea
     StoryFromIdea --> TitleFromIdea
-    TitleFromIdea --> ContentFromTitleIdea
-    ContentFromTitleIdea --> ReviewTitleByContentIdea
+    TitleFromIdea --> ContentFromIdeaTitle
+    ContentFromIdeaTitle --> ReviewTitleFromContentIdea
     
-    ReviewTitleByContentIdea --> ReviewContentByTitleIdea
+    ReviewTitleFromContentIdea --> ReviewContentFromTitleIdea
     
-    ReviewContentByTitleIdea --> ReviewTitleByContent
+    ReviewContentFromTitleIdea --> ReviewTitleFromContent
     
-    ReviewTitleByContent --> TitleFromContentReviewTitle
-    ReviewTitleByContent --> ReviewContentByTitle
+    ReviewTitleFromContent --> TitleFromTitleReviewContent
+    ReviewTitleFromContent --> ReviewContentFromTitle
     
-    TitleFromContentReviewTitle --> ContentFromTitleReviewContent
+    TitleFromTitleReviewContent --> ContentFromTitleReviewContent
     
-    ContentFromTitleReviewContent --> ReviewTitleByContent
+    ContentFromTitleReviewContent --> ReviewTitleFromContent
     
-    ReviewContentByTitle --> ContentFromTitleReviewContent
-    ReviewContentByTitle --> ReviewContentGrammar
+    ReviewContentFromTitle --> ContentFromTitleReviewContent
+    ReviewContentFromTitle --> ReviewContentGrammar
     
     ReviewContentGrammar --> ReviewContentTone
     ReviewContentGrammar --> ContentFromTitleReviewContent
@@ -43,7 +43,7 @@ stateDiagram-v2
     ReviewContentEditing --> ContentFromTitleReviewContent
     
     ReviewTitleReadability --> ReviewContentReadability
-    ReviewTitleReadability --> TitleFromContentReviewTitle
+    ReviewTitleReadability --> TitleFromTitleReviewContent
     
     ReviewContentReadability --> StoryReview
     ReviewContentReadability --> ContentFromTitleReviewContent
@@ -70,17 +70,17 @@ stateDiagram-v2
         Location: T/Title/From/Idea/
     end note
     
-    note right of ContentFromTitleIdea
+    note right of ContentFromIdeaTitle
         Stage 3: Generate content v1
         Location: T/Content/From/Idea/Title/
     end note
     
-    note right of ReviewTitleByContentIdea
+    note right of ReviewTitleFromContentIdea
         Stage 4: Review title (no conditional)
         Always proceeds to Stage 5
     end note
     
-    note right of ReviewContentByTitleIdea
+    note right of ReviewContentFromTitleIdea
         Stage 5: Review content (no conditional)
         Always proceeds to Stage 6
     end note
@@ -107,13 +107,13 @@ stateDiagram-v2
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ |
-| ContentFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ |
-| ReviewTitleByContentIdea | PrismQ.T.Review.Title.By.Content.Idea | 4 | T/Review/Title/ByContentIdea/ |
-| ReviewContentByTitleIdea | PrismQ.T.Review.Content.By.Title.Idea | 5 | T/Review/Content/ByTitleIdea/ |
-| ReviewTitleByContent | PrismQ.T.Review.Title.By.Content | 6 | T/Review/Title/ByContent/ |
-| TitleFromContentReviewTitle | PrismQ.T.Title.From.Content.Review.Title | 7 | T/Title/From/Title/Review/Content/ |
+| ContentFromIdeaTitle | PrismQ.T.Content.From.Idea.Title | 3 | T/Content/From/Idea/Title/ |
+| ReviewTitleFromContentIdea | PrismQ.T.Review.Title.From.Content.Idea | 4 | T/Review/Title/From/Content/Idea/ |
+| ReviewContentFromTitleIdea | PrismQ.T.Review.Content.From.Title.Idea | 5 | T/Review/Content/From/Title/Idea/ |
+| ReviewTitleFromContent | PrismQ.T.Review.Title.From.Content | 6 | T/Review/Title/From/Content/ |
+| TitleFromTitleReviewContent | PrismQ.T.Title.From.Title.Review.Content | 7 | T/Title/From/Title/Review/Content/ |
 | ContentFromTitleReviewContent | PrismQ.T.Content.From.Title.Review.Content | 8 | T/Content/From/Title/Review/Content/ |
-| ReviewContentByTitle | PrismQ.T.Review.Content.By.Title | 9 | T/Review/Content/ByTitle/ |
+| ReviewContentFromTitle | PrismQ.T.Review.Content.From.Title | 9 | T/Review/Content/From/Title/ |
 
 ### Quality Review States
 
@@ -150,38 +150,38 @@ Initial linear flow through the workflow:
 IdeaCreation 
   → StoryFromIdea
   → TitleFromIdea 
-  → ContentFromTitleIdea 
-  → ReviewTitleByContentIdea
+  → ContentFromIdeaTitle 
+  → ReviewTitleFromContentIdea
 ```
 
 ### Conditional Branches
 
 #### Title Review Branch
 ```
-ReviewTitleByContentIdea
-  ├─ accepted → ReviewContentByTitleIdea
-  └─ not accepted → TitleFromContentReviewTitle → ReviewContentByTitleIdea
+ReviewTitleFromContentIdea
+  ├─ accepted → ReviewContentFromTitleIdea
+  └─ not accepted → TitleFromTitleReviewContent → ReviewContentFromTitleIdea
 ```
 
 #### Content Review Branch
 ```
-ReviewContentByTitleIdea
-  ├─ accepted → ReviewTitleByContent
-  └─ not accepted → ContentFromTitleReviewContent → ReviewTitleByContent
+ReviewContentFromTitleIdea
+  ├─ accepted → ReviewTitleFromContent
+  └─ not accepted → ContentFromTitleReviewContent → ReviewTitleFromContent
 ```
 
 #### Title Re-Review Branch
 ```
-ReviewTitleByContent
-  ├─ accepted → ReviewContentByTitle
-  └─ not accepted → TitleFromContentReviewTitle → ReviewContentByTitle
+ReviewTitleFromContent
+  ├─ accepted → ReviewContentFromTitle
+  └─ not accepted → TitleFromTitleReviewContent → ReviewContentFromTitle
 ```
 
 #### Content Re-Review Branch
 ```
-ReviewContentByTitle
+ReviewContentFromTitle
   ├─ accepted → QualityReviews (ReviewContentGrammar)
-  └─ not accepted → ContentFromTitleReviewContent → ReviewContentByTitle
+  └─ not accepted → ContentFromTitleReviewContent → ReviewContentFromTitle
 ```
 
 ### Quality Review Sequence
@@ -237,11 +237,11 @@ ExpertReviewLoop:
 ```
 IdeaCreation
 → TitleFromIdea
-→ ContentFromTitleIdea
-→ ReviewTitleByContentIdea (accepted)
-→ ReviewContentByTitleIdea (accepted)
-→ ReviewTitleByContent (accepted)
-→ ReviewContentByTitle (accepted)
+→ ContentFromIdeaTitle
+→ ReviewTitleFromContentIdea (accepted)
+→ ReviewContentFromTitleIdea (accepted)
+→ ReviewTitleFromContent (accepted)
+→ ReviewContentFromTitle (accepted)
 → ReviewContentGrammar (passes)
 → ReviewContentTone (passes)
 → ReviewContentContent (passes)
@@ -260,18 +260,18 @@ IdeaCreation
 ```
 IdeaCreation
 → TitleFromIdea
-→ ContentFromTitleIdea
-→ ReviewTitleByContentIdea (not accepted)
-→ TitleFromContentReviewTitle
-→ ReviewContentByTitleIdea (accepted)
-→ ReviewTitleByContent (accepted)
-→ ReviewContentByTitle (not accepted)
+→ ContentFromIdeaTitle
+→ ReviewTitleFromContentIdea (not accepted)
+→ TitleFromTitleReviewContent
+→ ReviewContentFromTitleIdea (accepted)
+→ ReviewTitleFromContent (accepted)
+→ ReviewContentFromTitle (not accepted)
 → ContentFromTitleReviewContent
-→ ReviewContentByTitle (accepted)
+→ ReviewContentFromTitle (accepted)
 → ReviewContentGrammar (passes)
 → ReviewContentTone (fails)
 → ContentFromTitleReviewContent
-→ ReviewContentByTitle (accepted)
+→ ReviewContentFromTitle (accepted)
 → ReviewContentGrammar (passes)
 → ReviewContentTone (passes)
 → ReviewContentContent (passes)
@@ -318,16 +318,16 @@ The ExpertReviewLoop state encapsulates the final expert review cycle (17-18). T
 
 ### Refinement States
 States that improve artifacts based on feedback:
-- **TitleFromContentReviewTitle**: Title refinement (used multiple times)
+- **TitleFromTitleReviewContent**: Title refinement (used multiple times)
 - **ContentFromTitleReviewContent**: Content refinement (used multiple times)
 - **StoryPolish**: Expert-level polish
 
 ### Review States
 States that evaluate quality and make accept/reject decisions:
-- **ReviewTitleByContentIdea**: Title review with full context
-- **ReviewContentByTitleIdea**: Content review with full context
-- **ReviewTitleByContent**: Title review against content
-- **ReviewContentByTitle**: Content review against title
+- **ReviewTitleFromContentIdea**: Title review with full context
+- **ReviewContentFromTitleIdea**: Content review with full context
+- **ReviewTitleFromContent**: Title review against content
+- **ReviewContentFromTitle**: Content review against title
 - **ReviewContentGrammar**: Grammar validation
 - **ReviewContentTone**: Tone validation
 - **ReviewContentContent**: Content validation

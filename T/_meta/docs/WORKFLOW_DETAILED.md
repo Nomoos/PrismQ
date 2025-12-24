@@ -15,24 +15,24 @@ PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
 PrismQ.T.Title.From.Idea
     ↓
-PrismQ.T.Content.From.Title.Idea
+PrismQ.T.Content.From.Idea.Title
     ↓
-PrismQ.T.Review.Title.By.Content.Idea
+PrismQ.T.Review.Title.From.Content.Idea
     ↓
-PrismQ.T.Review.Content.By.Title.Idea
+PrismQ.T.Review.Content.From.Title.Idea
     ↓
-PrismQ.T.Review.Title.By.Content
-    ├─ if not accepted → PrismQ.T.Title.From.Content.Review.Title
+PrismQ.T.Review.Title.From.Content
+    ├─ if not accepted → PrismQ.T.Title.From.Title.Review.Content
     │                      ↓
     │                   PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Content.By.Title
+PrismQ.T.Review.Content.From.Title
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -42,45 +42,45 @@ Local AI Quality Reviews
 PrismQ.T.Review.Content.Grammar
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Content.Tone
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Content.Content
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Content.Consistency
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Content.Editing
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Title.Readability
-    ├─ if not accepted → PrismQ.T.Title.From.Content.Review.Title
+    ├─ if not accepted → PrismQ.T.Title.From.Title.Review.Content
     │                      ↓
     │                   PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Content.Readability
     ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Content (loop back)
+    │                   PrismQ.T.Review.Title.From.Content (loop back)
     └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -148,11 +148,11 @@ PrismQ.T.Story.Review
 - Multiple title variants
 - SEO considerations
 
-**Transitions To**: PrismQ.T.Content.From.Title.Idea
+**Transitions To**: PrismQ.T.Content.From.Idea.Title
 
 ---
 
-### Stage 3: PrismQ.T.Content.From.Title.Idea
+### Stage 3: PrismQ.T.Content.From.Idea.Title
 
 **Purpose**: Generate initial content from title and idea
 
@@ -167,15 +167,15 @@ PrismQ.T.Story.Review
 - Narrative structure
 - Content outline
 
-**Transitions To**: PrismQ.T.Review.Title.By.Content.Idea
+**Transitions To**: PrismQ.T.Review.Title.From.Content.Idea
 
 ---
 
-### Stage 4: PrismQ.T.Review.Title.By.Content.Idea
+### Stage 4: PrismQ.T.Review.Title.From.Content.Idea
 
 **Purpose**: Review title against content and original idea
 
-**Location**: `T/Review/Title/ByContentIdea/`
+**Location**: `T/Review/Title/From/Content/Idea/`
 
 **Input**:
 - Current Title
@@ -186,17 +186,17 @@ PrismQ.T.Story.Review
 - Review feedback for Title
 - Assessment of title quality
 
-**Transitions To**: PrismQ.T.Review.Content.By.Title.Idea (Stage 5)
+**Transitions To**: PrismQ.T.Review.Content.From.Title.Idea (Stage 5)
 
 **Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 5: PrismQ.T.Review.Content.By.Title.Idea
+### Stage 5: PrismQ.T.Review.Content.From.Title.Idea
 
 **Purpose**: Review content against current title and original idea
 
-**Location**: `T/Review/Content/ByTitleIdea/`
+**Location**: `T/Review/Content/From/Title/Idea/`
 
 **Input**:
 - Current Content
@@ -207,17 +207,17 @@ PrismQ.T.Story.Review
 - Review feedback for Content
 - Assessment of content quality
 
-**Transitions To**: PrismQ.T.Review.Title.By.Content (Stage 6)
+**Transitions To**: PrismQ.T.Review.Title.From.Content (Stage 6)
 
 **Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 6: PrismQ.T.Review.Title.By.Content
+### Stage 6: PrismQ.T.Review.Title.From.Content
 
 **Purpose**: Review title against refined content
 
-**Location**: `T/Review/Title/ByContent/`
+**Location**: `T/Review/Title/From/Content/`
 
 **Input**:
 - Current Title
@@ -229,11 +229,11 @@ PrismQ.T.Story.Review
 
 **Decision Point**:
 - **If Not Accepted**: Proceed to Title Refinement (Stage 7) → Content Refinement (Stage 8) → Return to Stage 6
-- **If Accepted**: Continue to PrismQ.T.Review.Content.By.Title (Stage 9)
+- **If Accepted**: Continue to PrismQ.T.Review.Content.From.Title (Stage 9)
 
 ---
 
-### Stage 7: PrismQ.T.Title.From.Content.Review.Title
+### Stage 7: PrismQ.T.Title.From.Title.Review.Content
 
 **Purpose**: Refine title based on content and review feedback
 
@@ -269,17 +269,17 @@ PrismQ.T.Story.Review
 - Content v2 (or higher version)
 - Improvements documented
 
-**Transitions To**: PrismQ.T.Review.Title.By.Content (Stage 6)
+**Transitions To**: PrismQ.T.Review.Title.From.Content (Stage 6)
 
 **Note**: This stage is used extensively throughout the workflow when content refinement is needed
 
 ---
 
-### Stage 9: PrismQ.T.Review.Content.By.Title
+### Stage 9: PrismQ.T.Review.Content.From.Title
 
 **Purpose**: Final review of content against finalized title
 
-**Location**: `T/Review/Content/ByTitle/`
+**Location**: `T/Review/Content/From/Title/`
 
 **Input**:
 - Current Content
@@ -290,7 +290,7 @@ PrismQ.T.Story.Review
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Not Accepted**: Proceed to Content Refinement (Stage 8) → Return to Review.Title.By.Content (Stage 6)
+- **If Not Accepted**: Proceed to Content Refinement (Stage 8) → Return to Review.Title.From.Content (Stage 6)
 - **If Accepted**: Continue to Grammar Review (Stage 10)
 
 ---
@@ -473,7 +473,7 @@ These stages use GPT-based expert review for final quality assurance before publ
 ### Conditional Stages
 
 Several stages are conditional and only executed based on review results:
-- **PrismQ.T.Title.From.Content.Review.Title**: Only when title review fails
+- **PrismQ.T.Title.From.Title.Review.Content**: Only when title review fails
 - **PrismQ.T.Content.From.Title.Review.Content**: Only when content review fails
 
 ### Iterative Loops
