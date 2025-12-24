@@ -365,13 +365,57 @@ def save_review_to_database(
             logger.info("Preview mode - skipping database save")
         return True  # Return True in preview mode (operation successful, just skipped)
 
-    # TODO: Implement database save functionality
-    # This would integrate with Model.Entities.review and appropriate repository
-    print_warning("Database save not yet implemented")
-    if logger:
-        logger.warning("Database save functionality not implemented")
-    
-    return False  # Return False when not implemented (operation not successful)
+    try:
+        # Import database dependencies
+        from Model.Infrastructure.connection import connection_context
+        from Model.Entities.review import Review
+        from Model.Repositories.review_repository import ReviewRepository
+        
+        # Import config to get database path
+        if not CONFIG_AVAILABLE:
+            print_error("Database configuration not available")
+            if logger:
+                logger.error("Cannot save review: Config module not available")
+            return False
+        
+        # Get database path from config
+        config = Config(interactive=False)
+        db_path = config.database_path
+        
+        if logger:
+            logger.info(f"Saving review to database: {db_path}")
+        
+        # Serialize the review to JSON for storage
+        review_json = json.dumps(review.to_dict(), indent=2)
+        
+        # Create Review entity
+        review_entity = Review(
+            text=review_json,
+            score=review.overall_score
+        )
+        
+        # Save to database
+        with connection_context(db_path) as conn:
+            repo = ReviewRepository(conn)
+            saved_review = repo.insert(review_entity)
+            conn.commit()
+            
+            if logger:
+                logger.info(f"Review saved successfully with ID: {saved_review.id}")
+            
+            print_success(f"Review saved to database with ID: {saved_review.id}")
+            return True
+            
+    except ImportError as e:
+        print_error(f"Database module import failed: {e}")
+        if logger:
+            logger.error(f"Cannot save review: Import error - {e}")
+        return False
+    except Exception as e:
+        print_error(f"Failed to save review to database: {e}")
+        if logger:
+            logger.error(f"Database save failed: {e}", exc_info=True)
+        return False
 
 
 # =============================================================================
