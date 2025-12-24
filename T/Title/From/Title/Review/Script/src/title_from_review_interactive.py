@@ -10,8 +10,11 @@ Usage:
     python title_from_review_interactive.py --preview --debug  # Debug mode
 
 Modes:
-    Default: Improves titles and saves results to database
-    Preview: Improves titles for testing without saving (extensive logging)
+    Default: Improves titles and displays results (for manual review)
+    Preview: Same as default but with extensive logging enabled
+    
+Note: This module does NOT currently persist results. Integration with persistence
+      layer (database, file system, etc.) should be implemented by calling code.
 """
 
 import json
@@ -248,8 +251,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         logger.info("Title improver module loaded successfully")
 
     if preview:
-        print_warning("Preview mode - results will NOT be saved to database")
+        print_warning("Preview mode - extensive logging enabled")
         print_info("This mode is for testing and tuning. Check logs for details.")
+        print_info("Note: Results are displayed but not persisted automatically.")
 
     # Interactive loop
     print_section("Enter Improvement Input")
@@ -402,7 +406,7 @@ Examples:
     )
 
     parser.add_argument(
-        "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
+        "--preview", "-p", action="store_true", help="Preview mode - enables extensive logging"
     )
     parser.add_argument("--debug", "-d", action="store_true", help="Enable debug logging")
 
