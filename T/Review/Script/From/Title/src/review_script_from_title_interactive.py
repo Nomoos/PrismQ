@@ -77,6 +77,14 @@ except ImportError:
 
 
 # =============================================================================
+# Constants
+# =============================================================================
+
+# Maximum input size to prevent memory exhaustion (1MB)
+MAX_INPUT_SIZE = 1_000_000
+
+
+# =============================================================================
 # ANSI Colors for Terminal Output
 # =============================================================================
 
@@ -155,7 +163,6 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
     text = text.strip()
     
     # Validate input size (prevent memory issues)
-    MAX_INPUT_SIZE = 1_000_000  # 1MB
     if len(text) > MAX_INPUT_SIZE:
         error_msg = f"Input too large: {len(text)} chars (max {MAX_INPUT_SIZE})"
         if logger:
@@ -330,9 +337,8 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     continue
                 
                 # Validate size limits
-                MAX_CONTENT_SIZE = 1_000_000
-                if len(content_text) > MAX_CONTENT_SIZE:
-                    print_error(f"Content too large: {len(content_text)} chars (max {MAX_CONTENT_SIZE})")
+                if len(content_text) > MAX_INPUT_SIZE:
+                    print_error(f"Content too large: {len(content_text)} chars (max {MAX_INPUT_SIZE})")
                     if logger:
                         logger.warning(f"Content size exceeded: {len(content_text)}")
                     continue
