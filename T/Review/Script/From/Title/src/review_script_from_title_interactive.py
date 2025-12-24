@@ -148,8 +148,22 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
 
     Returns:
         Tuple of (content_text, title_text, idea) or (None, None, None)
+    
+    Raises:
+        ValueError: If input is invalid or exceeds size limits
     """
     text = text.strip()
+    
+    # Validate input size (prevent memory issues)
+    MAX_INPUT_SIZE = 1_000_000  # 1MB
+    if len(text) > MAX_INPUT_SIZE:
+        error_msg = f"Input too large: {len(text)} chars (max {MAX_INPUT_SIZE})"
+        if logger:
+            logger.error(error_msg)
+        raise ValueError(error_msg)
+    
+    if not text:
+        raise ValueError("Input text is empty")
 
     if logger:
         logger.info(f"Parsing input text ({len(text)} chars)")
@@ -163,6 +177,12 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
 
             content_text = data.get("content_text") or data.get("script") or ""
             title_text = data.get("title_text") or data.get("title") or ""
+            
+            # Validate required fields
+            if not content_text:
+                raise ValueError("Missing required field: content_text or script")
+            if not title_text:
+                raise ValueError("Missing required field: title_text or title")
 
             # Create idea if provided
             idea = None
@@ -185,12 +205,17 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
         except json.JSONDecodeError as e:
             if logger:
                 logger.warning(f"JSON parse failed: {e}")
+            raise ValueError(f"Invalid JSON input: {e}")
 
     # Plain text - split by double newline
     parts = text.split("\n\n", 1)
     if len(parts) >= 2:
         content_text = parts[0].strip()
         title_text = parts[1].strip()
+        
+        if not content_text or not title_text:
+            raise ValueError("Both content and title must be non-empty")
+        
         idea = (
             Idea(title=title_text, concept=title_text, genre=ContentGenre.OTHER)
             if IDEA_MODEL_AVAILABLE
@@ -233,9 +258,16 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
     # Check module availability
     if not REVIEW_AVAILABLE and not REVIEW_V2_AVAILABLE:
-        print_error(f"Review module not available")
-        if logger:
-            logger.error(f"Module import failed")
+        print_error("Review module not available")
+        if not REVIEW_AVAILABLE:
+            print_error(f"  Standard review import failed: {IMPORT_ERROR}")
+            if logger:
+                logger.error(f"Standard review import failed: {IMPORT_ERROR}")
+        if not REVIEW_V2_AVAILABLE:
+            print_error(f"  V2 review import failed: {IMPORT_ERROR_V2}")
+            if logger:
+                logger.error(f"V2 review import failed: {IMPORT_ERROR_V2}")
+        print_info("Please ensure all dependencies are installed: pip install -r requirements.txt")
         return 1
 
     print_success("Content review module loaded")
@@ -267,7 +299,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
             # If JSON, process immediately
             if first_line.startswith("{"):
-                content_text, title_text, idea = parse_review_input(first_line, logger)
+                try:
+                    content_text, title_text, idea = parse_review_input(first_line, logger)
+                except ValueError as e:
+                    print_error(f"Invalid input: {e}")
+                    if logger:
+                        logger.warning(f"Input validation failed: {e}")
+                    continue
             else:
                 # Get full script (multiline)
                 script_lines = [first_line]
@@ -282,6 +320,23 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 # Get title
                 print(f"{Colors.CYAN}>>> Enter title: {Colors.END}", end="")
                 title_text = input().strip()
+                
+                # Validate inputs
+                if not content_text:
+                    print_error("Content cannot be empty")
+                    continue
+                if not title_text:
+                    print_error("Title cannot be empty")
+                    continue
+                
+                # Validate size limits
+                MAX_CONTENT_SIZE = 1_000_000
+                if len(content_text) > MAX_CONTENT_SIZE:
+                    print_error(f"Content too large: {len(content_text)} chars (max {MAX_CONTENT_SIZE})")
+                    if logger:
+                        logger.warning(f"Content size exceeded: {len(content_text)}")
+                    continue
+                
                 idea = (
                     Idea(title=title_text, concept=title_text, genre=ContentGenre.OTHER)
                     if IDEA_MODEL_AVAILABLE
