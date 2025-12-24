@@ -153,9 +153,9 @@ class ReviewTitleFromScriptService:
     """
 
     # State names for transitions
-    CURRENT_STATE = StateNames.REVIEW_TITLE_FROM_SCRIPT
-    STATE_ON_ACCEPT = StateNames.REVIEW_SCRIPT_FROM_TITLE
-    STATE_ON_REJECT = StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
+    CURRENT_STATE = StateNames.REVIEW_TITLE_FROM_CONTENT
+    STATE_ON_ACCEPT = StateNames.REVIEW_CONTENT_FROM_TITLE
+    STATE_ON_REJECT = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
 
     def __init__(
         self,
