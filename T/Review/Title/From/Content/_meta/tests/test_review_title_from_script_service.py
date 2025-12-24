@@ -1,4 +1,4 @@
-"""Tests for ReviewTitleFromContentService.
+"""Tests for ReviewTitleFromScriptService.
 
 This module tests the service that processes stories in the
 PrismQ.T.Review.Title.From.Content state.
@@ -25,11 +25,11 @@ from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
-from T.Review.Title.From.Content.src.review_title_from_content_service import (
+from T.Review.Title.From.Content.src.review_title_from_script_service import (
     TITLE_ACCEPTANCE_THRESHOLD,
     ReviewRepository,
-    ReviewTitleFromContentResult,
-    ReviewTitleFromContentService,
+    ReviewTitleFromScriptResult,
+    ReviewTitleFromScriptService,
     create_review_table_sql,
 )
 
@@ -41,7 +41,7 @@ def db_connection():
     conn.row_factory = sqlite3.Row
 
     # Create all required tables
-    conn.executecontent(
+    conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +78,7 @@ def db_connection():
     )
 
     # Create Review table
-    conn.executecontent(create_review_table_sql())
+    conn.executescript(create_review_table_sql())
 
     yield conn
     conn.close()
@@ -98,7 +98,7 @@ def repositories(db_connection):
 @pytest.fixture
 def service(repositories):
     """Create the service instance."""
-    return ReviewTitleFromContentService(
+    return ReviewTitleFromScriptService(
         story_repo=repositories["story"],
         title_repo=repositories["title"],
         content_repo=repositories["content"],
@@ -147,8 +147,8 @@ class TestReviewRepository:
         assert found is None
 
 
-class TestReviewTitleFromContentService:
-    """Tests for the ReviewTitleFromContentService class."""
+class TestReviewTitleFromScriptService:
+    """Tests for the ReviewTitleFromScriptService class."""
 
     def test_find_oldest_story_no_stories(self, service):
         """Test finding oldest story when none exist."""
@@ -159,7 +159,7 @@ class TestReviewTitleFromContentService:
     def test_find_oldest_story_wrong_state(self, service, repositories):
         """Test that stories in wrong state are not found."""
         # Create story in wrong state
-        story = Story(idea_json='{"title": "Test"}', state="PrismQ.T.Title.From.Idea")
+        story = Story(idea_id='{"title": "Test"}', state="PrismQ.T.Title.From.Idea")
         repositories["story"].insert(story)
 
         found = service.find_oldest_story_to_process()
@@ -169,7 +169,7 @@ class TestReviewTitleFromContentService:
     def test_find_oldest_story_correct_state(self, service, repositories):
         """Test finding oldest story in correct state."""
         # Create story in correct state
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved = repositories["story"].insert(story)
 
         found = service.find_oldest_story_to_process()
@@ -183,16 +183,16 @@ class TestReviewTitleFromContentService:
 
         # Create first story (older)
         story1 = Story(
-            idea_json='{"title": "First"}',
-            state=StateNames.REVIEW_TITLE_FROM_SCRIPT,
+            idea_id='{"title": "First"}',
+            state=StateNames.REVIEW_TITLE_FROM_CONTENT,
             created_at=datetime(2025, 1, 1, 10, 0, 0),
         )
         saved1 = repositories["story"].insert(story1)
 
         # Create second story (newer)
         story2 = Story(
-            idea_json='{"title": "Second"}',
-            state=StateNames.REVIEW_TITLE_FROM_SCRIPT,
+            idea_id='{"title": "Second"}',
+            state=StateNames.REVIEW_TITLE_FROM_CONTENT,
             created_at=datetime(2025, 1, 2, 10, 0, 0),
         )
         saved2 = repositories["story"].insert(story2)
@@ -210,7 +210,7 @@ class TestReviewTitleFromContentService:
         # Add stories
         for i in range(3):
             story = Story(
-                idea_json=f'{{"title": "Test {i}"}}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT
+                idea_id=f'{{"title": "Test {i}"}}', state=StateNames.REVIEW_TITLE_FROM_CONTENT
             )
             repositories["story"].insert(story)
 
@@ -218,7 +218,7 @@ class TestReviewTitleFromContentService:
 
     def test_process_story_no_title(self, service, repositories):
         """Test processing story without a title fails gracefully."""
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved = repositories["story"].insert(story)
 
         result = service.process_story(saved)
@@ -229,7 +229,7 @@ class TestReviewTitleFromContentService:
     def test_process_story_no_content(self, service, repositories):
         """Test processing story without a content fails gracefully."""
         # Create story
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved_story = repositories["story"].insert(story)
 
         # Create title but no content
@@ -239,11 +239,11 @@ class TestReviewTitleFromContentService:
         result = service.process_story(saved_story)
 
         assert not result.success
-        assert "No content found" in result.error_message
+        assert "No script found" in result.error_message
 
     def test_process_story_wrong_state(self, service, repositories):
         """Test processing story in wrong state fails."""
-        story = Story(idea_json='{"title": "Test"}', state="PrismQ.T.Title.From.Idea")
+        story = Story(idea_id='{"title": "Test"}', state="PrismQ.T.Title.From.Idea")
         saved = repositories["story"].insert(story)
 
         result = service.process_story(saved)
@@ -254,7 +254,7 @@ class TestReviewTitleFromContentService:
     def test_process_story_accepts_title(self, repositories):
         """Test processing story that accepts title."""
         # Create service with lower threshold for accepting titles
-        service = ReviewTitleFromContentService(
+        service = ReviewTitleFromScriptService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
             content_repo=repositories["content"],
@@ -263,7 +263,7 @@ class TestReviewTitleFromContentService:
         )
 
         # Create story
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved_story = repositories["story"].insert(story)
 
         # Create title with matching keywords
@@ -287,14 +287,14 @@ class TestReviewTitleFromContentService:
         # Verify story state was updated
         updated_story = repositories["story"].find_by_id(saved_story.id)
         assert updated_story.state in [
-            StateNames.REVIEW_SCRIPT_FROM_TITLE,
-            StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE,
+            StateNames.REVIEW_CONTENT_FROM_TITLE,
+            StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT,
         ]
 
     def test_process_story_rejects_title(self, repositories):
         """Test processing story that rejects title."""
         # Create service with very high threshold to ensure rejection
-        service = ReviewTitleFromContentService(
+        service = ReviewTitleFromScriptService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
             content_repo=repositories["content"],
@@ -303,7 +303,7 @@ class TestReviewTitleFromContentService:
         )
 
         # Create story
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved_story = repositories["story"].insert(story)
 
         # Create title with no matching keywords
@@ -326,12 +326,12 @@ class TestReviewTitleFromContentService:
 
         # Verify story state was updated to rejection state
         updated_story = repositories["story"].find_by_id(saved_story.id)
-        assert updated_story.state == StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
+        assert updated_story.state == StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
 
     def test_process_oldest_story(self, service, repositories):
         """Test processing the oldest story."""
         # Create story with all needed content
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved_story = repositories["story"].insert(story)
 
         title = Title(story_id=saved_story.id, version=0, text="Test Title about Mystery")
@@ -361,7 +361,7 @@ class TestReviewTitleFromContentService:
         # Create multiple stories
         for i in range(3):
             story = Story(
-                idea_json=f'{{"title": "Story {i}"}}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT
+                idea_id=f'{{"title": "Story {i}"}}', state=StateNames.REVIEW_TITLE_FROM_CONTENT
             )
             saved_story = repositories["story"].insert(story)
 
@@ -385,7 +385,7 @@ class TestReviewTitleFromContentService:
         # Create multiple stories
         for i in range(5):
             story = Story(
-                idea_json=f'{{"title": "Story {i}"}}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT
+                idea_id=f'{{"title": "Story {i}"}}', state=StateNames.REVIEW_TITLE_FROM_CONTENT
             )
             saved_story = repositories["story"].insert(story)
 
@@ -406,7 +406,7 @@ class TestStateTransitions:
     def test_acceptance_threshold_boundary(self, repositories):
         """Test state transition at acceptance threshold boundary."""
         # Create service with specific threshold
-        service = ReviewTitleFromContentService(
+        service = ReviewTitleFromScriptService(
             story_repo=repositories["story"],
             title_repo=repositories["title"],
             content_repo=repositories["content"],
@@ -415,7 +415,7 @@ class TestStateTransitions:
         )
 
         # Create story
-        story = Story(idea_json='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_SCRIPT)
+        story = Story(idea_id='{"title": "Test"}', state=StateNames.REVIEW_TITLE_FROM_CONTENT)
         saved_story = repositories["story"].insert(story)
 
         # Create title and content with known matching content
@@ -437,25 +437,25 @@ class TestStateTransitions:
 
         updated_story = repositories["story"].find_by_id(saved_story.id)
         expected_state = (
-            StateNames.REVIEW_SCRIPT_FROM_TITLE
+            StateNames.REVIEW_CONTENT_FROM_TITLE
             if result.title_accepted
-            else StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE
+            else StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
         )
         assert updated_story.state == expected_state
 
 
-class TestReviewTitleFromContentResult:
+class TestReviewTitleFromScriptResult:
     """Tests for the result dataclass."""
 
     def test_successful_result(self):
         """Test creating a successful result."""
-        result = ReviewTitleFromContentResult(
+        result = ReviewTitleFromScriptResult(
             success=True,
             story_id=1,
             review_id=5,
             review_score=85,
             review_text="Great title alignment.",
-            new_state=StateNames.REVIEW_SCRIPT_FROM_TITLE,
+            new_state=StateNames.REVIEW_CONTENT_FROM_TITLE,
             title_accepted=True,
         )
 
@@ -467,7 +467,7 @@ class TestReviewTitleFromContentResult:
 
     def test_failed_result(self):
         """Test creating a failed result."""
-        result = ReviewTitleFromContentResult(success=False, error_message="No stories found")
+        result = ReviewTitleFromScriptResult(success=False, error_message="No stories found")
 
         assert not result.success
         assert result.error_message == "No stories found"
@@ -483,8 +483,8 @@ class TestIntegrationWorkflow:
         """Test the complete review workflow from story to state transition."""
         # 1. Create story in correct state
         story = Story(
-            idea_json='{"title": "Horror Story", "concept": "A scary adventure"}',
-            state=StateNames.REVIEW_TITLE_FROM_SCRIPT,
+            idea_id='{"title": "Horror Story", "concept": "A scary adventure"}',
+            state=StateNames.REVIEW_TITLE_FROM_CONTENT,
         )
         saved_story = repositories["story"].insert(story)
 
@@ -510,8 +510,8 @@ class TestIntegrationWorkflow:
         assert result.review_score is not None
         assert result.review_text is not None
         assert result.new_state in [
-            StateNames.REVIEW_SCRIPT_FROM_TITLE,
-            StateNames.TITLE_FROM_SCRIPT_REVIEW_TITLE,
+            StateNames.REVIEW_CONTENT_FROM_TITLE,
+            StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT,
         ]
 
         # 6. Verify Review was created
