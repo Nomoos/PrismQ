@@ -13,21 +13,21 @@ Stage 1.5: PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
-Stage 3: PrismQ.T.Content.FromIdeaAndTitle (v1)
+Stage 3: PrismQ.T.Content.From.Idea.Title (v1)
     ↓
-Stage 4: PrismQ.T.Review.Title.ByContent (v1)
+Stage 4: PrismQ.T.Review.Title.From.Content (v1)
     ↓
-Stage 5: PrismQ.T.Review.Content.ByTitle (v1)
+Stage 5: PrismQ.T.Review.Content.From.Title (v1)
     ↓
 Stage 6: PrismQ.T.Title.From.Title.Review.Content (v2)
     ↓
 Stage 7: PrismQ.T.Content.Improvements (v2)
     ↓
-Stage 8: PrismQ.T.Review.Title.ByContent (v2) ←──────────────┐
+Stage 8: PrismQ.T.Review.Title.From.Content (v2) ←──────────────┐
     ↓                                                       │
 Stage 9: PrismQ.T.Title.Refinement (v3)                    │
     ↓                                                       │
-Stage 10: PrismQ.T.Review.Content.ByTitle (v2) ←─────────┐  │
+Stage 10: PrismQ.T.Review.Content.From.Title (v2) ←─────────┐  │
     ↓                                                    │  │
 Stage 11: PrismQ.T.Content.Refinement (v3)               │  │
     ↓                                                    │  │
@@ -238,15 +238,15 @@ titles_v1 = [
 selected_title_v1 = titles_v1[0]  # Best scored variant
 ```
 
-**Next Stage**: Stage 3 (Content.FromIdeaAndTitle)
+**Next Stage**: Stage 3 (Content.From.Idea.Title)
 
 ---
 
-### Stage 3: PrismQ.T.Content.FromIdeaAndTitle (v1)
+### Stage 3: PrismQ.T.Content.From.Idea.Title (v1)
 
 **Purpose**: Generate first content from idea and title v1
 
-**Folder**: `T/Content/FromIdeaAndTitle/`  
+**Folder**: `T/Content/From/Idea/Title/`  
 **Worker**: Worker02  
 **Effort**: 3 days
 
@@ -268,7 +268,7 @@ selected_title_v1 = titles_v1[0]  # Best scored variant
 
 **API**:
 ```python
-from PrismQ.T.Content.FromIdeaAndTitle import generate_content_v1
+from PrismQ.T.Content.From.Idea.Title import generate_content_v1
 
 content = generate_content_v1(
     idea=idea,
@@ -279,7 +279,7 @@ content = generate_content_v1(
 # Returns: Content object
 ```
 
-**Next Stage**: Stage 4 (Review.Title.ByContent)
+**Next Stage**: Stage 4 (Review.Title.From.Content)
 
 ---
 
@@ -287,13 +287,13 @@ content = generate_content_v1(
 
 These stages implement the co-dependent improvement methodology where title and content are reviewed against each other and iteratively refined. The complete workflow includes:
 
-**Stage 4**: PrismQ.T.Review.Title.ByContent (v1) - Review title v1 against content v1 and idea  
-**Stage 5**: PrismQ.T.Review.Content.ByTitle (v1) - Review content v1 against title v1 and idea  
+**Stage 4**: PrismQ.T.Review.Title.From.Content (v1) - Review title v1 against content v1 and idea  
+**Stage 5**: PrismQ.T.Review.Content.From.Title (v1) - Review content v1 against title v1 and idea  
 **Stage 6**: PrismQ.T.Title.From.Title.Review.Content (v2) - Generate improved title v2 using both reviews  
 **Stage 7**: PrismQ.T.Content.Improvements (v2) - Generate improved content v2 with new title v2  
-**Stage 8**: PrismQ.T.Review.Title.ByContent (v2) - Review title v2 against content v2  
+**Stage 8**: PrismQ.T.Review.Title.From.Content (v2) - Review title v2 against content v2  
 **Stage 9**: PrismQ.T.Title.Refinement (v3) - Refine title to v3 based on v2 review  
-**Stage 10**: PrismQ.T.Review.Content.ByTitle (v2) - Review content v2 against title v3  
+**Stage 10**: PrismQ.T.Review.Content.From.Title (v2) - Review content v2 against title v3  
 **Stage 11**: PrismQ.T.Content.Refinement (v3) - Refine content to v3 aligned with title v3
 
 Each of these stages follows a similar API pattern. For the original detailed specification with complete examples for all stages, see the [MVP_WORKFLOW.md](./_meta/issues/MVP_WORKFLOW.md) source document.

@@ -31,7 +31,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │               STAGE 3: Content from Title + Idea                │
-│              PrismQ.T.Content.From.Title.Idea                    │
+│              PrismQ.T.Content.From.Idea.Title                    │
 │                          (v1)                                    │
 └────────────────────────────┬────────────────────────────────────┘
                              │
@@ -43,17 +43,17 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 │          ╚══════════════════════════════════════════╝            │
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 4: Review Title by Content + Idea                   │  │
+│  │ Stage 4: Review Title From Content + Idea                 │  │
 │  │   (Always proceeds to Stage 5 - no conditional)           │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 5: Review Content by Title + Idea                   │  │
+│  │ Stage 5: Review Content From Title + Idea                 │  │
 │  │   (Always proceeds to Stage 6 - no conditional)           │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 6: Review Title by Content                          │  │
+│  │ Stage 6: Review Title From Content                        │  │
 │  │   ├─ Not Accepted? → Stage 7: Refine Title               │  │
 │  │   │                  ↓                                     │  │
 │  │   │               Stage 8: Refine Content                 │  │
@@ -63,7 +63,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 │  └───────────────────────────────────────────────────────────┘  │
 │                          ↓                                       │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Stage 9: Review Content by Title                          │  │
+│  │ Stage 9: Review Content From Title                        │  │
 │  │   ├─ Not Accepted? → Stage 8: Refine Content             │  │
 │  │   │                  ↓                                     │  │
 │  │   │               Return to Stage 6 (Title Review)        │  │
@@ -159,17 +159,17 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 | 1 | Idea.Creation | Initial idea capture |
 | 1.5 | Story.From.Idea | Create 10 Story objects per Idea |
 | 2 | Title.From.Idea | Generate initial title (v1) |
-| 3 | Content.From.Title.Idea | Generate initial content (v1) |
+| 3 | Content.From.Idea.Title | Generate initial content (v1) |
 
 ### Alignment Loop (4-9)
 | Stage | Name | Purpose |
 |-------|------|---------|
-| 4 | Review.Title.By.Content.Idea | Review title (always proceeds to Stage 5) |
-| 5 | Review.Content.By.Title.Idea | Review content (always proceeds to Stage 6) |
-| 6 | Review.Title.By.Content | Re-review title (may loop through 7→8→6) |
-| 7 | Title.From.Content.Review.Title | Refine title (conditional) |
+| 4 | Review.Title.From.Content.Idea | Review title (always proceeds to Stage 5) |
+| 5 | Review.Content.From.Title.Idea | Review content (always proceeds to Stage 6) |
+| 6 | Review.Title.From.Content | Re-review title (may loop through 7→8→6) |
+| 7 | Title.From.Title.Review.Content | Refine title (conditional) |
 | 8 | Content.From.Title.Review.Content | Refine content (conditional, used extensively) |
-| 9 | Review.Content.By.Title | Final content review (may loop through 8→6) |
+| 9 | Review.Content.From.Title | Final content review (may loop through 8→6) |
 
 ### Quality Reviews (10-16)
 | Stage | Name | Focus |
@@ -234,19 +234,19 @@ Multiple rejections lead to more refinement cycles, but the workflow eventually 
 
 ### Stage 7: Title Refinement
 **Called from**:
-- Stage 6 (Review.Title.By.Content fails)
+- Stage 6 (Review.Title.From.Content fails)
 - Stage 15 (Review.Title.Readability fails)
 
-**Returns to**: Stage 8 (Content Refinement) → Stage 6 (Review.Title.By.Content)
+**Returns to**: Stage 8 (Content Refinement) → Stage 6 (Review.Title.From.Content)
 
 ### Stage 8: Content Refinement
 **Called from**:
 - Stage 6 (as part of title failure loop, after Stage 7)
-- Stage 9 (Review.Content.By.Title fails)
+- Stage 9 (Review.Content.From.Title fails)
 - Stages 10-14, 16 (if any content quality review fails)
 - Stage 15 (as part of title readability failure loop, after Stage 7)
 
-**Returns to**: Stage 6 (Review.Title.By.Content)
+**Returns to**: Stage 6 (Review.Title.From.Content)
 
 **Note**: This is the most frequently used refinement stage, serving as the central hub for all content improvements
 

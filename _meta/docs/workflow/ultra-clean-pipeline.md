@@ -15,12 +15,12 @@ The Ultra-Clean Pipeline is a simplified, readable representation of the core it
 ```
 Idea.Creation 
 → Title.From.Idea 
-→ Content.From.Title.Idea 
-→ Review.Title.By.Content.Idea 
-→ Title.From.Content.Review.Title 
-→ Review.Content.By.Title.Idea 
+→ Content.From.Idea.Title 
+→ Review.Title.From.Content.Idea 
+→ Title.From.Title.Review.Content 
+→ Review.Content.From.Title.Idea 
 → Content.From.Title.Review.Content 
-→ Review.Idea.By.Title.Content 
+→ Review.Idea.From.Title.Content 
 → Idea.From.Title.Content.Review.Idea
 ```
 
@@ -44,7 +44,7 @@ Creates the first version of the title based solely on the idea.
 
 ---
 
-### Stage 3: `Content.From.Title.Idea`
+### Stage 3: `Content.From.Idea.Title`
 **Purpose**: Generate initial content  
 **Inputs**: `Title`, `Idea`  
 **Outputs**: `Content` (v1)
@@ -53,7 +53,7 @@ Creates the first version of the content using both the title and original idea 
 
 ---
 
-### Stage 4: `Review.Title.By.Content.Idea`
+### Stage 4: `Review.Title.From.Content.Idea`
 **Purpose**: Review title against content and idea  
 **Inputs**: `Title`, `Content`, `Idea`  
 **Outputs**: `Review.Title` (feedback)
@@ -62,7 +62,7 @@ Evaluates whether the title is well-aligned with the content and original idea.
 
 ---
 
-### Stage 5: `Title.From.Content.Review.Title`
+### Stage 5: `Title.From.Title.Review.Content`
 **Purpose**: Improve title based on content and review  
 **Inputs**: `Content`, `Review.Title`, (previous) `Title`  
 **Outputs**: `Title` (v2)
@@ -71,7 +71,7 @@ Generates an improved version of the title using insights from the content and t
 
 ---
 
-### Stage 6: `Review.Content.By.Title.Idea`
+### Stage 6: `Review.Content.From.Title.Idea`
 **Purpose**: Review content against title and idea  
 **Inputs**: `Content`, `Title`, `Idea`  
 **Outputs**: `Review.Content` (feedback)
@@ -89,7 +89,7 @@ Generates an improved version of the content using the updated title and review 
 
 ---
 
-### Stage 8: `Review.Idea.By.Title.Content`
+### Stage 8: `Review.Idea.From.Title.Content`
 **Purpose**: Validate complete alignment  
 **Inputs**: `Idea`, `Title`, `Content`  
 **Outputs**: `Review.Idea` (validation)
@@ -118,8 +118,8 @@ Each stage is represented in the format `Entity.Action.Context`:
 ### 2. **Explicit Dependencies**
 The notation explicitly shows what each stage depends on:
 - `Title.From.Idea` → Title depends on Idea
-- `Content.From.Title.Idea` → Content depends on both Title and Idea
-- `Review.Title.By.Content.Idea` → Review evaluates Title using Content and Idea
+- `Content.From.Idea.Title` → Content depends on both Idea and Title
+- `Review.Title.From.Content.Idea` → Review evaluates Title using Content and Idea
 
 ### 3. **Iterative Refinement**
 The pattern shows how artifacts are iteratively improved:
@@ -143,12 +143,12 @@ The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how
 |-------------------|------------|-------------|
 | `Idea.Creation` | Stage 1 | PrismQ.T.Idea.Creation |
 | `Title.From.Idea` | Stage 2 | PrismQ.T.Title.From.Idea (v1) |
-| `Content.From.Title.Idea` | Stage 3 | PrismQ.T.Content.FromIdeaAndTitle (v1) |
-| `Review.Title.By.Content.Idea` | Stage 4 | PrismQ.T.Review.Title.ByContent (v1) |
-| `Title.From.Content.Review.Title` | Stage 6 | PrismQ.T.Title.From.Title.Review.Content (v2) |
-| `Review.Content.By.Title.Idea` | Stage 5, 10 | PrismQ.T.Review.Content.ByTitle (v1, v2) |
+| `Content.From.Idea.Title` | Stage 3 | PrismQ.T.Content.From.Idea.Title (v1) |
+| `Review.Title.From.Content.Idea` | Stage 4 | PrismQ.T.Review.Title.From.Content (v1) |
+| `Title.From.Title.Review.Content` | Stage 6 | PrismQ.T.Title.From.Title.Review.Content (v2) |
+| `Review.Content.From.Title.Idea` | Stage 5, 10 | PrismQ.T.Review.Content.From.Title (v1, v2) |
 | `Content.From.Title.Review.Content` | Stage 7, 11 | PrismQ.T.Content.Improvements (v2, v3) |
-| `Review.Idea.By.Title.Content` | Stages 12-13 | Title & Content Acceptance Checks |
+| `Review.Idea.From.Title.Content` | Stages 12-13 | Title & Content Acceptance Checks |
 | `Idea.From.Title.Content.Review.Idea` | Stages 14-23 | Quality reviews, expert review, publishing |
 
 ## Benefits of Ultra-Clean Notation

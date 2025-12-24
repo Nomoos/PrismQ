@@ -256,7 +256,7 @@ This document provides a clear, step-by-step workflow for creating titles and co
 ---
 
 ### Stage 4: Content Creation
-**Location:** `T/Content/FromIdeaAndTitle`  
+**Location:** `T/Content/From/Idea/Title/`  
 **Purpose:** Write initial content from structured idea
 
 **Activities:**
@@ -451,8 +451,8 @@ ContentApproved → TextPublishing → PublishedText ✓
 - **FromOriginalTitleAndReviewAndContent**: Title improvements (v2+)
 
 ### T/Content Module
-- **FromIdeaAndTitle**: Initial content creation from idea and title (v1)
-- **FromOriginalContentAndReviewAndTitle**: Content improvements (v2+)
+- **From.Idea.Title**: Initial content creation from idea and title (v1)
+- **From.Title.Review.Content**: Content improvements (v2+)
 - **Writer**: AI-powered content optimization support
 
 ### T/Review Module
