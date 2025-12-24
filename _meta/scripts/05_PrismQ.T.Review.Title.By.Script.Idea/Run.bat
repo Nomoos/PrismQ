@@ -1,6 +1,6 @@
 @echo off
-REM Run.bat - PrismQ.T.Review.Title.By.Script.Idea
-REM Review title against script and idea - saves to database
+REM Run.bat - PrismQ.T.Review.Title.From.Idea.Content
+REM Review title against idea and content - saves to database
 REM
 REM Usage: Run.bat
 
@@ -10,11 +10,11 @@ call :setup_env
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Title.By.Script.Idea - RUN MODE
+echo PrismQ.T.Review.Title.From.Idea.Content - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Title\ByScriptIdea\src\review_title_by_script_idea_interactive.py
+python ..\..\..\T\Review\Title\From\Idea\Content\src\review_title_by_idea_content_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -23,7 +23,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\ByScriptIdea
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Review\Title\From\Idea\Content
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
