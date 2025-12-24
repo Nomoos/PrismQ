@@ -231,7 +231,7 @@ class StoryFromIdeaService:
         for _ in range(self.NUM_STORIES):
             # Create Story with reference to Idea
             story = Story(
-                idea_id=idea_id,  # Story.idea_id is INTEGER
+                idea_id=str(idea_id),  # Story.idea_id is TEXT (stored as string)
                 state=StoryState.TITLE_FROM_IDEA,  # "PrismQ.T.Title.From.Idea" - Ready for title generation
             )
 

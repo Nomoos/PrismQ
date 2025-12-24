@@ -1,7 +1,7 @@
 @echo off
 REM Run.bat - PrismQ.T.Story.From.Idea
 REM Create Story objects from Idea - saves to database
-REM Runs continuously with 1 second pause until cancelled (Ctrl+C or close window)
+REM Runs continuously with dynamic wait times until cancelled (Ctrl+C or close window)
 REM
 REM Usage: Run.bat
 
