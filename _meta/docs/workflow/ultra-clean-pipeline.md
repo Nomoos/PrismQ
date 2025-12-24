@@ -15,13 +15,13 @@ The Ultra-Clean Pipeline is a simplified, readable representation of the core it
 ```
 Idea.Creation 
 → Title.From.Idea 
-→ Script.From.Title.Idea 
-→ Review.Title.By.Script.Idea 
-→ Title.From.Script.Review.Title 
-→ Review.Script.By.Title.Idea 
-→ Script.From.Title.Review.Script 
-→ Review.Idea.By.Title.Script 
-→ Idea.From.Title.Script.Review.Idea
+→ Content.From.Title.Idea 
+→ Review.Title.By.Content.Idea 
+→ Title.From.Content.Review.Title 
+→ Review.Content.By.Title.Idea 
+→ Content.From.Title.Review.Content 
+→ Review.Idea.By.Title.Content 
+→ Idea.From.Title.Content.Review.Idea
 ```
 
 ## Pattern Explanation
@@ -44,66 +44,66 @@ Creates the first version of the title based solely on the idea.
 
 ---
 
-### Stage 3: `Script.From.Title.Idea`
-**Purpose**: Generate initial script  
+### Stage 3: `Content.From.Title.Idea`
+**Purpose**: Generate initial content  
 **Inputs**: `Title`, `Idea`  
-**Outputs**: `Script` (v1)
+**Outputs**: `Content` (v1)
 
-Creates the first version of the script using both the title and original idea as context.
+Creates the first version of the content using both the title and original idea as context.
 
 ---
 
-### Stage 4: `Review.Title.By.Script.Idea`
-**Purpose**: Review title against script and idea  
-**Inputs**: `Title`, `Script`, `Idea`  
+### Stage 4: `Review.Title.By.Content.Idea`
+**Purpose**: Review title against content and idea  
+**Inputs**: `Title`, `Content`, `Idea`  
 **Outputs**: `Review.Title` (feedback)
 
-Evaluates whether the title is well-aligned with the script content and original idea.
+Evaluates whether the title is well-aligned with the content and original idea.
 
 ---
 
-### Stage 5: `Title.From.Script.Review.Title`
-**Purpose**: Improve title based on script and review  
-**Inputs**: `Script`, `Review.Title`, (previous) `Title`  
+### Stage 5: `Title.From.Content.Review.Title`
+**Purpose**: Improve title based on content and review  
+**Inputs**: `Content`, `Review.Title`, (previous) `Title`  
 **Outputs**: `Title` (v2)
 
-Generates an improved version of the title using insights from the script and the review feedback.
+Generates an improved version of the title using insights from the content and the review feedback.
 
 ---
 
-### Stage 6: `Review.Script.By.Title.Idea`
-**Purpose**: Review script against title and idea  
-**Inputs**: `Script`, `Title`, `Idea`  
-**Outputs**: `Review.Script` (feedback)
+### Stage 6: `Review.Content.By.Title.Idea`
+**Purpose**: Review content against title and idea  
+**Inputs**: `Content`, `Title`, `Idea`  
+**Outputs**: `Review.Content` (feedback)
 
-Evaluates whether the script aligns well with the updated title and original idea.
-
----
-
-### Stage 7: `Script.From.Title.Review.Script`
-**Purpose**: Improve script based on title and review  
-**Inputs**: `Title`, `Review.Script`, (previous) `Script`  
-**Outputs**: `Script` (v2)
-
-Generates an improved version of the script using the updated title and review feedback.
+Evaluates whether the content aligns well with the updated title and original idea.
 
 ---
 
-### Stage 8: `Review.Idea.By.Title.Script`
+### Stage 7: `Content.From.Title.Review.Content`
+**Purpose**: Improve content based on title and review  
+**Inputs**: `Title`, `Review.Content`, (previous) `Content`  
+**Outputs**: `Content` (v2)
+
+Generates an improved version of the content using the updated title and review feedback.
+
+---
+
+### Stage 8: `Review.Idea.By.Title.Content`
 **Purpose**: Validate complete alignment  
-**Inputs**: `Idea`, `Title`, `Script`  
+**Inputs**: `Idea`, `Title`, `Content`  
 **Outputs**: `Review.Idea` (validation)
 
-Final validation that all components (idea, title, script) are cohesively aligned.
+Final validation that all components (idea, title, content) are cohesively aligned.
 
 ---
 
-### Stage 9: `Idea.From.Title.Script.Review.Idea`
+### Stage 9: `Idea.From.Title.Content.Review.Idea`
 **Purpose**: Finalize or refine idea representation  
-**Inputs**: `Title`, `Script`, `Review.Idea`  
+**Inputs**: `Title`, `Content`, `Review.Idea`  
 **Outputs**: `Idea` (refined/finalized)
 
-Updates or confirms the idea representation based on the fully developed title, script, and validation feedback.
+Updates or confirms the idea representation based on the fully developed title, content, and validation feedback.
 
 ---
 
@@ -111,26 +111,26 @@ Updates or confirms the idea representation based on the fully developed title, 
 
 ### 1. **Dot Notation**
 Each stage is represented in the format `Entity.Action.Context`:
-- **Entity**: The primary artifact being created or modified (Idea, Title, Script, Review)
+- **Entity**: The primary artifact being created or modified (Idea, Title, Content, Review)
 - **Action**: The operation being performed (Creation, From, By)
-- **Context**: The inputs informing the operation (Idea, Title, Script, Review)
+- **Context**: The inputs informing the operation (Idea, Title, Content, Review)
 
 ### 2. **Explicit Dependencies**
 The notation explicitly shows what each stage depends on:
 - `Title.From.Idea` → Title depends on Idea
-- `Script.From.Title.Idea` → Script depends on both Title and Idea
-- `Review.Title.By.Script.Idea` → Review evaluates Title using Script and Idea
+- `Content.From.Title.Idea` → Content depends on both Title and Idea
+- `Review.Title.By.Content.Idea` → Review evaluates Title using Content and Idea
 
 ### 3. **Iterative Refinement**
 The pattern shows how artifacts are iteratively improved:
 - Title v1 → Review → Title v2
-- Script v1 → Review → Script v2
+- Content v1 → Review → Content v2
 - Multiple cross-reviews ensure alignment
 
 ### 4. **Co-Improvement Cycle**
 The pattern demonstrates the co-dependent improvement methodology:
-- Title is reviewed against Script
-- Script is reviewed against Title
+- Title is reviewed against Content
+- Content is reviewed against Title
 - Both are continuously refined based on mutual feedback
 
 ## Mapping to Full Workflow
@@ -143,13 +143,13 @@ The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how
 |-------------------|------------|-------------|
 | `Idea.Creation` | Stage 1 | PrismQ.T.Idea.Creation |
 | `Title.From.Idea` | Stage 2 | PrismQ.T.Title.From.Idea (v1) |
-| `Script.From.Title.Idea` | Stage 3 | PrismQ.T.Script.FromIdeaAndTitle (v1) |
-| `Review.Title.By.Script.Idea` | Stage 4 | PrismQ.T.Review.Title.ByScript (v1) |
-| `Title.From.Script.Review.Title` | Stage 6 | PrismQ.T.Title.From.Title.Review.Script (v2) |
-| `Review.Script.By.Title.Idea` | Stage 5, 10 | PrismQ.T.Review.Script.ByTitle (v1, v2) |
-| `Script.From.Title.Review.Script` | Stage 7, 11 | PrismQ.T.Script.Improvements (v2, v3) |
-| `Review.Idea.By.Title.Script` | Stages 12-13 | Title & Script Acceptance Checks |
-| `Idea.From.Title.Script.Review.Idea` | Stages 14-23 | Quality reviews, expert review, publishing |
+| `Content.From.Title.Idea` | Stage 3 | PrismQ.T.Content.FromIdeaAndTitle (v1) |
+| `Review.Title.By.Content.Idea` | Stage 4 | PrismQ.T.Review.Title.ByContent (v1) |
+| `Title.From.Content.Review.Title` | Stage 6 | PrismQ.T.Title.From.Title.Review.Content (v2) |
+| `Review.Content.By.Title.Idea` | Stage 5, 10 | PrismQ.T.Review.Content.ByTitle (v1, v2) |
+| `Content.From.Title.Review.Content` | Stage 7, 11 | PrismQ.T.Content.Improvements (v2, v3) |
+| `Review.Idea.By.Title.Content` | Stages 12-13 | Title & Content Acceptance Checks |
+| `Idea.From.Title.Content.Review.Idea` | Stages 14-23 | Quality reviews, expert review, publishing |
 
 ## Benefits of Ultra-Clean Notation
 
@@ -187,7 +187,7 @@ Incorporate it into high-level architecture diagrams to show the core content cr
 - **[MVP Stages](./mvp-stages.md)** - Complete 26-stage workflow with detailed implementation
 - **[State Machine](./state-machine.md)** - Full state machine documentation
 - **[Transitions](./transitions.md)** - State transition rules and logic
-- **[Title & Script Workflow](../../T/TITLE_SCRIPT_WORKFLOW.md)** - Detailed T module workflow
+- **[Title & Content Workflow](../../T/TITLE_SCRIPT_WORKFLOW.md)** - Detailed T module workflow
 
 ---
 
