@@ -16,7 +16,7 @@ echo.
 echo This mode is for TESTING. Improvements will NOT be saved.
 echo.
 
-python ..\..\..\T\Script\From\Title\Review\Script\src\script_improver_interactive.py --preview --debug
+python ..\..\..\T\Script\From\Title\Review\Script\src\script_from_review_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
