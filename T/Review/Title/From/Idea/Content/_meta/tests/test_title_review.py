@@ -11,7 +11,7 @@ from datetime import datetime
 
 import pytest
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Idea.Content import (
     TitleCategoryScore,
     TitleImprovementPoint,
     TitleReview,
@@ -67,7 +67,7 @@ class TestTitleReviewBasic:
             content_id="script-001",
             script_title="The Echo",
             script_summary="A horror short about mysterious echoes",
-            script_version="v1",
+            content_version="v1",
             script_alignment_score=85,
             key_content_elements=["echo", "haunting", "discovery", "mystery"],
             idea_id="idea-001",
@@ -107,14 +107,14 @@ class TestTitleCategoryScore:
     def test_create_category_score(self):
         """Test creating TitleCategoryScore."""
         score = TitleCategoryScore(
-            category=TitleReviewCategory.SCRIPT_ALIGNMENT,
+            category=TitleReviewCategory.CONTENT_ALIGNMENT,
             score=85,
             reasoning="Title accurately reflects script content",
             strengths=["Mentions key element 'echo'", "Indicates genre"],
             weaknesses=["Could be more specific", "Generic subtitle"],
         )
 
-        assert score.category == TitleReviewCategory.SCRIPT_ALIGNMENT
+        assert score.category == TitleReviewCategory.CONTENT_ALIGNMENT
         assert score.score == 85
         assert score.reasoning == "Title accurately reflects script content"
         assert len(score.strengths) == 2
@@ -123,7 +123,7 @@ class TestTitleCategoryScore:
     def test_all_review_categories(self):
         """Test all title review categories exist."""
         categories = [
-            TitleReviewCategory.SCRIPT_ALIGNMENT,
+            TitleReviewCategory.CONTENT_ALIGNMENT,
             TitleReviewCategory.IDEA_ALIGNMENT,
             TitleReviewCategory.ENGAGEMENT,
             TitleReviewCategory.EXPECTATION_SETTING,
@@ -182,7 +182,7 @@ class TestTitleReviewMethods:
         # Add category scores
         self.review.category_scores.append(
             TitleCategoryScore(
-                category=TitleReviewCategory.SCRIPT_ALIGNMENT,
+                category=TitleReviewCategory.CONTENT_ALIGNMENT,
                 score=75,
                 reasoning="Good alignment with script",
                 strengths=["Clear", "Concise"],
@@ -213,7 +213,7 @@ class TestTitleReviewMethods:
 
         self.review.improvement_points.append(
             TitleImprovementPoint(
-                category=TitleReviewCategory.SCRIPT_ALIGNMENT,
+                category=TitleReviewCategory.CONTENT_ALIGNMENT,
                 title="Reference key scene",
                 description="Mention discovery element",
                 priority="high",
@@ -233,10 +233,10 @@ class TestTitleReviewMethods:
 
     def test_get_category_score(self):
         """Test retrieving specific category score."""
-        script_score = self.review.get_category_score(TitleReviewCategory.SCRIPT_ALIGNMENT)
+        script_score = self.review.get_category_score(TitleReviewCategory.CONTENT_ALIGNMENT)
         assert script_score is not None
         assert script_score.score == 75
-        assert script_score.category == TitleReviewCategory.SCRIPT_ALIGNMENT
+        assert script_score.category == TitleReviewCategory.CONTENT_ALIGNMENT
 
         # Test non-existent category
         seo_score = self.review.get_category_score(TitleReviewCategory.SEO_OPTIMIZATION)
@@ -338,7 +338,7 @@ class TestTitleReviewSerialization:
 
         review.category_scores.append(
             TitleCategoryScore(
-                category=TitleReviewCategory.SCRIPT_ALIGNMENT, score=80, reasoning="Good alignment"
+                category=TitleReviewCategory.CONTENT_ALIGNMENT, score=80, reasoning="Good alignment"
             )
         )
 
@@ -402,7 +402,7 @@ class TestTitleReviewSerialization:
         assert review.title_text == "The Echo"
         assert review.overall_score == 75
         assert len(review.category_scores) == 1
-        assert review.category_scores[0].category == TitleReviewCategory.SCRIPT_ALIGNMENT
+        assert review.category_scores[0].category == TitleReviewCategory.CONTENT_ALIGNMENT
         assert len(review.improvement_points) == 1
         assert review.improvement_points[0].category == TitleReviewCategory.ENGAGEMENT
 
@@ -420,7 +420,7 @@ class TestTitleReviewSerialization:
 
         original.category_scores.append(
             TitleCategoryScore(
-                category=TitleReviewCategory.SCRIPT_ALIGNMENT,
+                category=TitleReviewCategory.CONTENT_ALIGNMENT,
                 score=85,
                 reasoning="Strong alignment",
                 strengths=["Accurate", "Clear"],
