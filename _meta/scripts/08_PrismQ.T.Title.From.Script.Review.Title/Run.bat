@@ -1,6 +1,7 @@
 @echo off
 REM Run.bat - PrismQ.T.Title.From.Script.Review.Title
-REM Refine title from script and review feedback - saves to database
+REM Refine title from script and review feedback - displays improved titles
+REM Note: Results are not automatically persisted to database
 REM
 REM Usage: Run.bat
 
@@ -14,7 +15,7 @@ echo PrismQ.T.Title.From.Script.Review.Title - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Title\From\Title\Review\Script\src\title_improver_interactive.py
+python ..\..\..\T\Title\From\Title\Review\Script\src\title_from_review_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

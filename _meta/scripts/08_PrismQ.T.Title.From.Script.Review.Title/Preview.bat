@@ -1,6 +1,6 @@
 @echo off
 REM Preview.bat - PrismQ.T.Title.From.Script.Review.Title
-REM Preview mode - does NOT save to database
+REM Preview mode - enables extensive logging for debugging
 REM
 REM Usage: Preview.bat
 
@@ -13,10 +13,10 @@ echo ========================================
 echo PrismQ.T.Title.From.Script.Review.Title - PREVIEW MODE
 echo ========================================
 echo.
-echo This mode is for TESTING. Improvements will NOT be saved.
+echo Preview mode with extensive logging enabled
 echo.
 
-python ..\..\..\T\Title\From\Title\Review\Script\src\title_improver_interactive.py --preview --debug
+python ..\..\..\T\Title\From\Title\Review\Script\src\title_from_review_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
