@@ -77,6 +77,14 @@ except ImportError:
 
 
 # =============================================================================
+# Constants
+# =============================================================================
+
+# Maximum input size to prevent memory exhaustion (1MB)
+MAX_INPUT_SIZE = 1_000_000
+
+
+# =============================================================================
 # ANSI Colors for Terminal Output
 # =============================================================================
 
@@ -139,6 +147,26 @@ def format_score(score: int) -> str:
 # =============================================================================
 
 
+def validate_input_size(text: str, logger: Optional[logging.Logger] = None) -> None:
+    """Validate input text size.
+    
+    Args:
+        text: Input text to validate
+        logger: Optional logger for recording validation attempts
+        
+    Raises:
+        ValueError: If input exceeds MAX_INPUT_SIZE or is empty
+    """
+    if not text:
+        raise ValueError("Input text is empty")
+    
+    if len(text) > MAX_INPUT_SIZE:
+        error_msg = f"Input too large: {len(text)} chars (max {MAX_INPUT_SIZE})"
+        if logger:
+            logger.error(error_msg)
+        raise ValueError(error_msg)
+
+
 def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tuple:
     """Parse input text for script review.
 
@@ -148,8 +176,14 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
 
     Returns:
         Tuple of (content_text, title_text, idea) or (None, None, None)
+    
+    Raises:
+        ValueError: If input is invalid or exceeds size limits
     """
     text = text.strip()
+    
+    # Validate input size
+    validate_input_size(text, logger)
 
     if logger:
         logger.info(f"Parsing input text ({len(text)} chars)")
@@ -163,6 +197,12 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
 
             content_text = data.get("content_text") or data.get("script") or ""
             title_text = data.get("title_text") or data.get("title") or ""
+            
+            # Validate required fields
+            if not content_text:
+                raise ValueError("Missing required field: content_text or script")
+            if not title_text:
+                raise ValueError("Missing required field: title_text or title")
 
             # Create idea if provided
             idea = None
@@ -183,14 +223,20 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
             return content_text, title_text, idea
 
         except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON input at line {e.lineno}, column {e.colno}: {e.msg}"
             if logger:
-                logger.warning(f"JSON parse failed: {e}")
+                logger.warning(f"JSON parse failed: {error_msg}")
+            raise ValueError(error_msg)
 
     # Plain text - split by double newline
     parts = text.split("\n\n", 1)
     if len(parts) >= 2:
         content_text = parts[0].strip()
         title_text = parts[1].strip()
+        
+        if not content_text or not title_text:
+            raise ValueError("Both content and title must be non-empty")
+        
         idea = (
             Idea(title=title_text, concept=title_text, genre=ContentGenre.OTHER)
             if IDEA_MODEL_AVAILABLE
@@ -233,9 +279,16 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
     # Check module availability
     if not REVIEW_AVAILABLE and not REVIEW_V2_AVAILABLE:
-        print_error(f"Review module not available")
-        if logger:
-            logger.error(f"Module import failed")
+        print_error("Review module not available")
+        if not REVIEW_AVAILABLE:
+            print_error(f"  Standard review import failed: {IMPORT_ERROR}")
+            if logger:
+                logger.error(f"Standard review import failed: {IMPORT_ERROR}")
+        if not REVIEW_V2_AVAILABLE:
+            print_error(f"  V2 review import failed: {IMPORT_ERROR_V2}")
+            if logger:
+                logger.error(f"V2 review import failed: {IMPORT_ERROR_V2}")
+        print_info("Please ensure all dependencies are installed: pip install -r requirements.txt")
         return 1
 
     print_success("Content review module loaded")
@@ -267,7 +320,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
             # If JSON, process immediately
             if first_line.startswith("{"):
-                content_text, title_text, idea = parse_review_input(first_line, logger)
+                try:
+                    content_text, title_text, idea = parse_review_input(first_line, logger)
+                except ValueError as e:
+                    print_error(f"Invalid input: {e}")
+                    if logger:
+                        logger.warning(f"Input validation failed: {e}")
+                    continue
             else:
                 # Get full script (multiline)
                 script_lines = [first_line]
@@ -282,6 +341,16 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 # Get title
                 print(f"{Colors.CYAN}>>> Enter title: {Colors.END}", end="")
                 title_text = input().strip()
+                
+                # Validate inputs
+                try:
+                    validate_input_size(content_text, logger)
+                    if not title_text:
+                        raise ValueError("Title cannot be empty")
+                except ValueError as e:
+                    print_error(f"Validation error: {e}")
+                    continue
+                
                 idea = (
                     Idea(title=title_text, concept=title_text, genre=ContentGenre.OTHER)
                     if IDEA_MODEL_AVAILABLE
