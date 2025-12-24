@@ -34,7 +34,7 @@ PrismQ.<ContentType>.<What>.<From>.<Source>.<Context>
    - `Review` - Reviews
 4. **From** - Indicates source-based creation (optional)
 5. **Source** - What we create from, in creation order:
-   - `Idea` → `Title` → `Content` → `Story`
+   - `Idea` → `Title` → `Content` → `Review` → `Story`
 6. **Context** - Additional contextual elements in creation order
 
 ## Examples
@@ -61,15 +61,15 @@ PrismQ.<ContentType>.<What>.<From>.<Source>.<Context>
 
 | Directory Path | Module/State Name |
 |----------------|-------------------|
-| `T/Content/From/Title/Review/Content/` | `PrismQ.T.Content.From.Title.Review.Content` |
-| `T/Title/From/Title/Review/Content/` | `PrismQ.T.Title.From.Title.Review.Content` |
+| `T/Content/From/Title/Content/Review/` | `PrismQ.T.Content.From.Title.Content.Review` |
+| `T/Title/From/Title/Title/Review/Content/` | `PrismQ.T.Title.From.Title.Title.Review.Content` |
 
 ## Creation Order
 
 When multiple sources are involved, they appear in **creation order**:
 
 ```
-Idea → Title → Content → Story
+Idea → Title → Content → Review → Story
 ```
 
 ### Examples of Creation Order:
