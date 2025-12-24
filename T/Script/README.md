@@ -1,15 +1,15 @@
 # T/Script - Script Development Module
 
-**Namespace**: `PrismQ.T.Script`
+**Namespace**: `PrismQ.T.Content`
 
 Develop and refine scripts through iterative drafting, improvement, and optimization.
 
 ## Current State Note
 
 This module implements a comprehensive script development workflow with the following structure:
-- **Namespace**: All scripts in this module use the `PrismQ.T.Script` namespace
+- **Namespace**: All scripts in this module use the `PrismQ.T.Content` namespace
 - **Submodules**: `From/Idea/Title` (initial drafts) and `From/Title/Review/Script` (improvements)
-- **ScriptWriter**: The AI-powered ScriptWriter is located in `T/Script/src/` but imported as `from PrismQ.T.Script import ScriptWriter` for cleaner usage
+- **ScriptWriter**: The AI-powered ScriptWriter is located in `T/Content/src/` but imported as `from PrismQ.T.Content import ScriptWriter` for cleaner usage
 - **Integration**: Works with `PrismQ.T.Review.Script` for feedback loop optimization
 
 ## Purpose
@@ -102,7 +102,7 @@ The **[T/Review/Script](../Review/Script/)** (AI Script Reviewer) and ScriptWrit
 
 ```python
 from PrismQ.T.Review.Script import ScriptReview, ContentLength
-from PrismQ.T.Script import ScriptWriter
+from PrismQ.T.Content import ScriptWriter
 
 # AI Reviewer evaluates
 review = ScriptReview(

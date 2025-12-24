@@ -1,6 +1,6 @@
-# T/Script/src - AI Script Writer with Feedback Loop
+# T/Content/src - AI Script Writer with Feedback Loop
 
-**Namespace**: `PrismQ.T.Script`
+**Namespace**: `PrismQ.T.Content`
 
 AI-powered script writer with iterative optimization based on review feedback from the AI Script Reviewer.
 
@@ -73,7 +73,7 @@ Loop continues until:
 
 ```python
 from PrismQ.T.Review.Script import ScriptReview, ReviewCategory
-from PrismQ.T.Script import ScriptWriter, OptimizationStrategy
+from PrismQ.T.Content import ScriptWriter, OptimizationStrategy
 
 # Original script
 original_script = """
@@ -129,7 +129,7 @@ print(f"\nOptimized script:\n{result.optimized_text}")
 
 ```python
 from PrismQ.T.Review.Script import ScriptReview
-from PrismQ.T.Script import ScriptWriter
+from PrismQ.T.Content import ScriptWriter
 
 # Initialize writer
 writer = ScriptWriter(
@@ -238,8 +238,8 @@ Writer automatically selects optimization strategy based on:
 ## Module Structure
 
 ```
-T/Script/src/
-├── __init__.py              # Module exports (exports ScriptWriter to PrismQ.T.Script namespace)
+T/Content/src/
+├── __init__.py              # Module exports (exports ScriptWriter to PrismQ.T.Content namespace)
 ├── script_writer.py         # Core writer model
 ├── README.md                # This file
 └── _meta/
@@ -248,7 +248,7 @@ T/Script/src/
     └── tests/               # Test suites
 ```
 
-**Note**: The ScriptWriter class is located in `T/Script/src/` and is imported directly as `from PrismQ.T.Script import ScriptWriter`.
+**Note**: The ScriptWriter class is located in `T/Content/src/` and is imported directly as `from PrismQ.T.Content import ScriptWriter`.
 
 ## Integration Points
 

@@ -4,7 +4,7 @@
 **Worker**: Worker12 (Content Specialist)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Script.Formatter.Blog`  
+**Module**: `PrismQ.T.Content.Formatter.Blog`  
 **Sprint**: Sprint 4 (Weeks 9-10)  
 **Status**: 🎯 PLANNED
 
@@ -102,10 +102,10 @@ Closing thoughts
 - Include bookmark cards for links
 
 ### Files to Create
-- `T/Script/Formatter/Blog/blog_formatter.py` (new)
-- `T/Script/Formatter/Blog/platform_adapters.py` (new)
-- `T/Script/Formatter/Blog/templates/` (new directory with templates)
-- `T/Script/Formatter/Blog/__init__.py` (new)
+- `T/Content/Formatter/Blog/blog_formatter.py` (new)
+- `T/Content/Formatter/Blog/platform_adapters.py` (new)
+- `T/Content/Formatter/Blog/templates/` (new directory with templates)
+- `T/Content/Formatter/Blog/__init__.py` (new)
 
 ### Reading Time Calculation
 ```python

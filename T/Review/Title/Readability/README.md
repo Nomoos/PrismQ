@@ -20,7 +20,7 @@ This ensures stories with fewer revision iterations get processed before heavily
 
 ## State Transitions
 
-- **If review doesn't accept title** → `PrismQ.T.Script.From.Title.Review.Script` (return to script refinement)
+- **If review doesn't accept title** → `PrismQ.T.Content.From.Title.Review.Script` (return to script refinement)
 - **If review accepts title** → `PrismQ.T.Story.Review` (proceed to story review)
 
 ## Review Output Schema

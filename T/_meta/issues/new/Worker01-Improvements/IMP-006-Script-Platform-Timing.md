@@ -4,7 +4,7 @@
 **Worker**: Worker02 (Python Specialist)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Script` (all submodules)  
+**Module**: `PrismQ.T.Content` (all submodules)  
 **Category**: Script Generation  
 **Status**: 🎯 PLANNED
 
@@ -115,7 +115,7 @@ Currently, scripts use generic timing guidelines (e.g., "< 180 seconds"). This e
 
 ### Implementation Approach
 
-1. **Duration Estimator** (`T/Script/timing/duration_estimator.py`):
+1. **Duration Estimator** (`T/Content/timing/duration_estimator.py`):
 ```python
 class DurationEstimator:
     # Speaking pace standards
@@ -156,7 +156,7 @@ class DurationEstimator:
         return periods + commas + questions
 ```
 
-2. **Platform Optimizer** (`T/Script/timing/platform_optimizer.py`):
+2. **Platform Optimizer** (`T/Content/timing/platform_optimizer.py`):
 ```python
 PLATFORM_CONFIGS = {
     "youtube_shorts": {
@@ -213,7 +213,7 @@ class PlatformOptimizer:
         )
 ```
 
-3. **Content Compressor** (`T/Script/timing/content_compressor.py`):
+3. **Content Compressor** (`T/Content/timing/content_compressor.py`):
 ```python
 class ContentCompressor:
     def compress_script(
@@ -265,15 +265,15 @@ class ContentCompressor:
 ### Files to Create
 
 **New Files**:
-- `T/Script/timing/duration_estimator.py` - Duration calculation
-- `T/Script/timing/platform_optimizer.py` - Platform-specific optimization
-- `T/Script/timing/content_compressor.py` - Intelligent compression
-- `T/Script/timing/content_expander.py` - Intelligent expansion
-- `T/Script/config/platforms.py` - Platform timing configurations
+- `T/Content/timing/duration_estimator.py` - Duration calculation
+- `T/Content/timing/platform_optimizer.py` - Platform-specific optimization
+- `T/Content/timing/content_compressor.py` - Intelligent compression
+- `T/Content/timing/content_expander.py` - Intelligent expansion
+- `T/Content/config/platforms.py` - Platform timing configurations
 
 **Modified Files**:
-- `T/Script/FromIdeaAndTitle/src/script_generator.py` - Add platform parameter
-- `T/Script/FromOriginalScriptAndReviewAndTitle/src/script_improver.py` - Add timing awareness
+- `T/Content/FromIdeaAndTitle/src/script_generator.py` - Add platform parameter
+- `T/Content/FromOriginalScriptAndReviewAndTitle/src/script_improver.py` - Add timing awareness
 
 ### Database Schema Update
 

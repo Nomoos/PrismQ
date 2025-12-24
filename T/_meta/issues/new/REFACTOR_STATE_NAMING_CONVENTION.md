@@ -8,8 +8,8 @@ The current state names follow folder structure but lack Review-related processe
 - `PrismQ.T.Idea.Creation`
 - `PrismQ.T.Title.From.Idea`
 - `PrismQ.T.Title.From.Title.Review.Script`
-- `PrismQ.T.Script.FromIdeaAndTitle`
-- `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle`
+- `PrismQ.T.Content.FromIdeaAndTitle`
+- `PrismQ.T.Content.FromOriginalScriptAndReviewAndTitle`
 - `PrismQ.T.Publishing`
 
 ## Problem
@@ -36,11 +36,11 @@ Where:
 |---------|---------------------|-----------------|
 | Create Idea | `PrismQ.T.Idea.Creation` | ∅ → Idea |
 | Create Title from Idea | `PrismQ.T.Title.From.Idea` | Idea → Title |
-| Create Script from Idea+Title | `PrismQ.T.Script.From.Idea.Title` | Idea, Title → Script |
+| Create Script from Idea+Title | `PrismQ.T.Content.From.Idea.Title` | Idea, Title → Script |
 | Review Title (using Script) | `PrismQ.T.Review.Title.From.Script` | Script → TitleReview |
 | Review Script (using Title) | `PrismQ.T.Review.Script.From.Title` | Title → ScriptReview |
 | Iterate Title (from original + script + review) | `PrismQ.T.Title.From.Script.Review.Title` | Title, Script, TitleReview → Title v2 |
-| Iterate Script (from original + title + review) | `PrismQ.T.Script.From.Title.Review.Script` | Script, Title, ScriptReview → Script v2 |
+| Iterate Script (from original + title + review) | `PrismQ.T.Content.From.Title.Review.Script` | Script, Title, ScriptReview → Script v2 |
 | Publishing | `PrismQ.T.Publishing` | Title, Script → Published |
 
 ### Key Examples
@@ -48,7 +48,7 @@ Where:
 PrismQ.T.Title.From.Idea
   → Creating a new title from the idea
 
-PrismQ.T.Script.From.Idea.Title
+PrismQ.T.Content.From.Idea.Title
   → Creating a new script from idea and title
 
 PrismQ.T.Review.Title.From.Script
@@ -57,7 +57,7 @@ PrismQ.T.Review.Title.From.Script
 PrismQ.T.Title.From.Script.Review.Title
   → Creating a new title version from the original title, script, and title review
 
-PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Content.From.Title.Review.Script
   → Creating a new script version from the original script, title, and script review
 ```
 

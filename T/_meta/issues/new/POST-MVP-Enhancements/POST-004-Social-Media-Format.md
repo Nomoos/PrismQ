@@ -4,7 +4,7 @@
 **Worker**: Worker12 (Content Specialist)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Script.Formatter.Social`  
+**Module**: `PrismQ.T.Content.Formatter.Social`  
 **Sprint**: Sprint 4 (Weeks 9-10)  
 **Status**: 🎯 PLANNED
 
@@ -114,12 +114,12 @@ def create_twitter_thread(script: str) -> list[str]:
 ```
 
 ### Files to Create
-- `T/Script/Formatter/Social/twitter_formatter.py` (new)
-- `T/Script/Formatter/Social/linkedin_formatter.py` (new)
-- `T/Script/Formatter/Social/instagram_formatter.py` (new)
-- `T/Script/Formatter/Social/facebook_formatter.py` (new)
-- `T/Script/Formatter/Social/base_formatter.py` (new - shared logic)
-- `T/Script/Formatter/Social/__init__.py` (new)
+- `T/Content/Formatter/Social/twitter_formatter.py` (new)
+- `T/Content/Formatter/Social/linkedin_formatter.py` (new)
+- `T/Content/Formatter/Social/instagram_formatter.py` (new)
+- `T/Content/Formatter/Social/facebook_formatter.py` (new)
+- `T/Content/Formatter/Social/base_formatter.py` (new - shared logic)
+- `T/Content/Formatter/Social/__init__.py` (new)
 
 ### Social Media Best Practices
 

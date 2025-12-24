@@ -6,7 +6,7 @@
 
 **Original Question**: "How this fit into existing structure isn't there T.Reviewer.Script or something like that?"
 
-**Resolution**: Moved `T/Script/Review/` → `T/Review/Script/` as requested.
+**Resolution**: Moved `T/Content/Review/` → `T/Review/Script/` as requested.
 
 **Updated Structure**:
 ```
@@ -31,7 +31,7 @@ T/
     └── _meta/                       # Script module metadata
 ```
 
-**Note**: The ScriptWriter class is located in `T/Script/src/` and imported as `from PrismQ.T.Script import ScriptWriter`.
+**Note**: The ScriptWriter class is located in `T/Content/src/` and imported as `from PrismQ.T.Content import ScriptWriter`.
 
 **Why T/Review/Script?**
 
@@ -40,7 +40,7 @@ Now grouped with other automated review modules (Grammar, Tone, Readability, etc
 **Key Characteristics**:
 - **T/Review/Script**: Holistic script review with scoring (0-100%) across all aspects, YouTube short optimization, feedback loop with ScriptWriter
 - **T/Review/Grammar, Tone, etc.**: Dimensional review focusing on specific quality aspects
-- **T/Script/src**: Contains ScriptWriter which pairs with T/Review/Script in feedback loop during script development
+- **T/Content/src**: Contains ScriptWriter which pairs with T/Review/Script in feedback loop during script development
 
 ### 2. Script Versioning for Comparison and Research
 
@@ -145,7 +145,7 @@ versions = data['script_versions_history']
 
 Both concerns addressed:
 
-1. **Structure**: Clarified why `T/Script/Review` is separate from `T/Review` (AI vs. manual, feedback loop integration)
+1. **Structure**: Clarified why `T/Content/Review` is separate from `T/Review` (AI vs. manual, feedback loop integration)
 2. **Versioning**: Fully implemented script version tracking for comparison and research with comprehensive tests and examples
 
 The versioning feature enables:

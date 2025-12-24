@@ -16,8 +16,8 @@
 
 ### Key Findings
 
-1. **Script directory naming** uses old namespace format ("PrismQ.T.Script") instead of "PrismQ.T.Content"
-2. **Module path references** point to deprecated structure (T/Script/ vs T/Content/)
+1. **Script directory naming** uses old namespace format ("PrismQ.T.Content") instead of "PrismQ.T.Content"
+2. **Module path references** point to deprecated structure (T/Content/ vs T/Content/)
 3. **Namespace comments** use incorrect module names in headers
 4. **Common utility** location compliant
 
@@ -30,18 +30,18 @@
 **Guideline:** CODING_GUIDELINES.md Section 6 - Cross-cutting "Content" subtree
 
 **Problem:**  
-Directory `04_PrismQ.T.Script.From.Title.Idea` uses deprecated namespace.  
-According to guidelines, content generation belongs under `PrismQ.T.Content.*`, not `PrismQ.T.Script.*`.
+Directory `04_PrismQ.T.Content.From.Title.Idea` uses deprecated namespace.  
+According to guidelines, content generation belongs under `PrismQ.T.Content.*`, not `PrismQ.T.Content.*`.
 
 **Correct naming should be:** `04_PrismQ.T.Content.From.Idea.Title`
 
 **Files Affected:**
-- Directory: `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/`
+- Directory: `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/`
 - Files: `Run.bat`, `Preview.bat`
 
 **GitHub Copilot Command:**
 ```
-Rename directory _meta/scripts/04_PrismQ.T.Script.From.Title.Idea to _meta/scripts/04_PrismQ.T.Content.From.Idea.Title to comply with PrismQ.T.Content.* namespace for content pipelines per CODING_GUIDELINES.md Section 6.
+Rename directory _meta/scripts/04_PrismQ.T.Content.From.Title.Idea to _meta/scripts/04_PrismQ.T.Content.From.Idea.Title to comply with PrismQ.T.Content.* namespace for content pipelines per CODING_GUIDELINES.md Section 6.
 ```
 
 ---
@@ -51,7 +51,7 @@ Rename directory _meta/scripts/04_PrismQ.T.Script.From.Title.Idea to _meta/scrip
 **Guideline:** CODING_GUIDELINES.md Section 3, 6 - Namespace-to-folder mapping
 
 **Problem:**  
-Script `04_PrismQ.T.Script.From.Title.Idea/Run.bat` line 17 references:
+Script `04_PrismQ.T.Content.From.Title.Idea/Run.bat` line 17 references:
 ```batch
 python ..\..\..\T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
 ```
@@ -61,12 +61,12 @@ Should reference:
 python ..\..\..\T\Content\From\Idea\Title\src\content_from_idea_title_interactive.py
 ```
 
-**File:** `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat`  
+**File:** `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Run.bat`  
 **Lines:** 17, 26
 
 **GitHub Copilot Command:**
 ```
-In _meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat, update line 17 to reference T\Content\From\Idea\Title\src\ instead of T\Script\From\Idea\Title\src\ and update line 26 MODULE_DIR path accordingly to match the PrismQ.T.Content.* namespace structure per CODING_GUIDELINES.md.
+In _meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Run.bat, update line 17 to reference T\Content\From\Idea\Title\src\ instead of T\Script\From\Idea\Title\src\ and update line 26 MODULE_DIR path accordingly to match the PrismQ.T.Content.* namespace structure per CODING_GUIDELINES.md.
 ```
 
 ---
@@ -78,7 +78,7 @@ In _meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat, update line 17 to r
 **Problem:**  
 Header comment at line 2 states:
 ```batch
-REM Run.bat - PrismQ.T.Script.From.Title.Idea
+REM Run.bat - PrismQ.T.Content.From.Title.Idea
 ```
 
 Should state:
@@ -88,12 +88,12 @@ REM Run.bat - PrismQ.T.Content.From.Idea.Title
 
 Also line 3 description references "script" instead of "content".
 
-**File:** `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat`  
+**File:** `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Run.bat`  
 **Lines:** 2-3
 
 **GitHub Copilot Command:**
 ```
-In _meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat lines 2-3, update header comment from "PrismQ.T.Script.From.Title.Idea" to "PrismQ.T.Content.From.Idea.Title" and change "Generate script" to "Generate content" to align with content pipeline namespace per CODING_GUIDELINES.md Section 6.
+In _meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Run.bat lines 2-3, update header comment from "PrismQ.T.Content.From.Title.Idea" to "PrismQ.T.Content.From.Idea.Title" and change "Generate script" to "Generate content" to align with content pipeline namespace per CODING_GUIDELINES.md Section 6.
 ```
 
 ---
@@ -105,12 +105,12 @@ In _meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Run.bat lines 2-3, update he
 **Problem:**  
 Preview.bat header likely contains same namespace errors as Run.bat.
 
-**File:** `_meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Preview.bat`  
+**File:** `_meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Preview.bat`  
 **Lines:** 1-5 (estimated)
 
 **GitHub Copilot Command:**
 ```
-In _meta/scripts/04_PrismQ.T.Script.From.Title.Idea/Preview.bat header comments, update all references from "PrismQ.T.Script.From.Title.Idea" to "PrismQ.T.Content.From.Idea.Title" and ensure module paths reference T\Content\From\Idea\Title\ per CODING_GUIDELINES.md.
+In _meta/scripts/04_PrismQ.T.Content.From.Title.Idea/Preview.bat header comments, update all references from "PrismQ.T.Content.From.Title.Idea" to "PrismQ.T.Content.From.Idea.Title" and ensure module paths reference T\Content\From\Idea\Title\ per CODING_GUIDELINES.md.
 ```
 
 ---
@@ -129,7 +129,7 @@ Review-related scripts (05-17) use mixed conventions. Need to verify if these ar
 - `06_PrismQ.T.Review.Script.By.Title.Idea`
 - `07_PrismQ.T.Review.Title.By.Script`
 - `08_PrismQ.T.Title.From.Script.Review.Title`
-- `09_PrismQ.T.Script.From.Title.Review.Script`
+- `09_PrismQ.T.Content.From.Title.Review.Script`
 - `10_PrismQ.T.Review.Script.By.Title`
 - `11_PrismQ.T.Review.Script.Grammar`
 - `12_PrismQ.T.Review.Script.Tone`
@@ -193,7 +193,7 @@ Verify _meta/scripts/02_PrismQ.T.Story.From.Idea/ - if this generates Story arti
 
 ### Immediate Actions Required
 
-1. **Rename directory** `04_PrismQ.T.Script.From.Title.Idea` → `04_PrismQ.T.Content.From.Idea.Title`
+1. **Rename directory** `04_PrismQ.T.Content.From.Title.Idea` → `04_PrismQ.T.Content.From.Idea.Title`
 2. **Update all path references** in Run.bat and Preview.bat for script 04
 3. **Update header comments** to reflect correct namespace
 

@@ -57,9 +57,9 @@ This implementation adds AI-powered script review and writer optimization with a
 - `get_youtube_short_readiness()` - Calculate YouTube short compliance
 - `add_script_version()` - Track script versions for comparison
 
-#### 2. T/Script/src/ - ScriptWriter with Feedback Loop
-**File:** `T/Script/src/script_writer.py`
-**Namespace:** `PrismQ.T.Script` (imported as `from PrismQ.T.Script import ScriptWriter`)
+#### 2. T/Content/src/ - ScriptWriter with Feedback Loop
+**File:** `T/Content/src/script_writer.py`
+**Namespace:** `PrismQ.T.Content` (imported as `from PrismQ.T.Content import ScriptWriter`)
 
 **Core Classes:**
 - `ScriptWriter` - Main writer with feedback loop integration
@@ -120,7 +120,7 @@ Text Publishing (IdeaStatus.TEXT_PUBLISHING)
   - Serialization (to_dict, from_dict, roundtrip)
   - String representation
 
-**T/Script/src/_meta/tests/test_script_writer.py:**
+**T/Content/src/_meta/tests/test_script_writer.py:**
 - 18 tests covering:
   - Basic writer creation
   - Optimization from review
@@ -144,7 +144,7 @@ Demonstrates:
 - Applied improvements: pacing, opening hook, length reduction
 
 **2. Idea Integration Example**
-**File:** `T/Script/src/_meta/examples/idea_integration_example.py`
+**File:** `T/Content/src/_meta/examples/idea_integration_example.py`
 
 Shows:
 - Complete workflow from Idea to Script Approved
@@ -156,8 +156,8 @@ Shows:
 
 **Module Documentation:**
 - `T/Review/Script/README.md` - Complete review module documentation
-- `T/Script/src/README.md` - ScriptWriter module documentation
-- `T/Script/README.md` - Updated with feedback loop workflow
+- `T/Content/src/README.md` - ScriptWriter module documentation
+- `T/Content/README.md` - Updated with feedback loop workflow
 
 **Content:**
 - Purpose and features
@@ -242,24 +242,24 @@ print(f"Score: {summary['initial_score']}% → {summary['current_score']}%")
 **Core Implementation:**
 - `T/Review/Script/src/script_review.py`
 - `T/Review/Script/src/script_version.py`
-- `T/Script/src/script_writer.py`
-- `T/Script/__init__.py` (exports ScriptWriter)
+- `T/Content/src/script_writer.py`
+- `T/Content/__init__.py` (exports ScriptWriter)
 - `T/Title/__init__.py` (namespace consistency)
 
 **Tests:**
 - `T/Review/Script/_meta/tests/test_script_review.py`
 - `T/Review/Script/_meta/tests/test_versioning.py`
-- `T/Script/src/_meta/tests/test_script_writer.py`
+- `T/Content/src/_meta/tests/test_script_writer.py`
 
 **Examples:**
 - `T/Review/Script/_meta/examples/feedback_loop_example.py`
 - `T/Review/Script/_meta/examples/versioning_example.py`
-- `T/Script/src/_meta/examples/idea_integration_example.py`
+- `T/Content/src/_meta/examples/idea_integration_example.py`
 
 **Documentation:**
 - `T/Review/Script/README.md`
-- `T/Script/src/README.md`
-- `T/Script/README.md` (updated)
+- `T/Content/src/README.md`
+- `T/Content/README.md` (updated)
 - `T/Title/README.md` (updated)
 
 ## Performance Characteristics
@@ -292,6 +292,6 @@ Successfully implemented complete AI-powered script review and ScriptWriter feed
 - ✅ Optimizes content for target audience based on review feedback
 - ✅ Includes comprehensive tests and documentation
 - ✅ Integrates seamlessly with existing PrismQ workflow
-- ✅ Uses correct namespace: `PrismQ.T.Script` (not `PrismQ.T.Script.Writer`)
+- ✅ Uses correct namespace: `PrismQ.T.Content` (not `PrismQ.T.Content.Writer`)
 
 All requirements from the problem statement have been met.

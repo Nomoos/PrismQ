@@ -189,7 +189,7 @@ The Review module feeds directly into the Script Writer's feedback loop:
 
 ```python
 from PrismQ.T.Review.Script import ScriptReview
-from PrismQ.T.Script import ScriptWriter
+from PrismQ.T.Content import ScriptWriter
 
 # AI Reviewer evaluates script
 review = ScriptReview(...)

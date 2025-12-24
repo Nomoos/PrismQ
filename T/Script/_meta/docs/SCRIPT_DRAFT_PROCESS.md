@@ -1,6 +1,6 @@
 # Script Draft Process
 
-**Module**: `PrismQ.T.Script.FromIdeaAndTitle`
+**Module**: `PrismQ.T.Content.FromIdeaAndTitle`
 
 ## Purpose
 
@@ -386,7 +386,7 @@ Quick verification:
 
 **1. Save the Script Draft**
 ```
-Location: T/Script/FromIdeaAndTitle/
+Location: T/Content/FromIdeaAndTitle/
 Filename: {idea_id}_script_draft_v1.md
 Format: Markdown with metadata header
 ```

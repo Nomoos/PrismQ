@@ -312,7 +312,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Grammar review results
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 11
 
 ---
@@ -328,7 +328,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Tone review results
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 12
 
 ---
@@ -346,7 +346,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Content review results
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 13
 
 ---
@@ -362,7 +362,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Consistency review results
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 14
 
 ---
@@ -378,7 +378,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Editing review results
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 15
 
 ---
@@ -394,7 +394,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Title readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to Title Refinement (Stage 7) → Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Title Refinement (Stage 7) → Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 16
 
 ---
@@ -410,7 +410,7 @@ These stages perform automated quality reviews on the content and title. Each re
 **Output**: Content readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.From.Content (Stage 6)
 - **If Passes**: Continue to Stage 17
 
 ---

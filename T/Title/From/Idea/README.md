@@ -21,7 +21,7 @@ PrismQ.T.Idea.Creation
     ↓
 PrismQ.T.Title.From.Idea (v0) ← Creates Stories + Initial titles (AI-powered)
     ↓
-PrismQ.T.Script.Draft (v0)
+PrismQ.T.Content.Draft (v0)
 ```
 
 ## Input

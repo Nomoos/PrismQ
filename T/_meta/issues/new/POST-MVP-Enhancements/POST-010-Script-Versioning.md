@@ -87,9 +87,9 @@ def store_delta(previous_content: str, new_content: str) -> str:
 ```
 
 ### Files to Create
-- `T/Script/Versioning/version_manager.py` (new)
-- `T/Script/Versioning/diff_generator.py` (new)
-- `T/Script/Versioning/rollback_handler.py` (new)
+- `T/Content/Versioning/version_manager.py` (new)
+- `T/Content/Versioning/diff_generator.py` (new)
+- `T/Content/Versioning/rollback_handler.py` (new)
 
 ---
 

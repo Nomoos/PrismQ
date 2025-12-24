@@ -109,7 +109,7 @@ Implements centralized state name constants for the workflow state machine with 
 2. **Consistent Naming Convention**
    - All states follow `PrismQ.T.*` prefix pattern
    - Generation states use `.From.` pattern consistently
-   - Review states use `.By.` pattern consistently
+   - Review states use `.From.` pattern consistently
    - Tests verify naming convention compliance
 
 3. **Rich Helper API**

@@ -168,7 +168,7 @@ PublishedText → Audio Pipeline (A)
 ### Python Namespace
 ```python
 from PrismQ.T.Idea import Outline, Model
-from PrismQ.T.Script import Draft, Improvements
+from PrismQ.T.Content import Draft, Improvements
 from PrismQ.T.Publishing import SEO, Finalization
 ```
 

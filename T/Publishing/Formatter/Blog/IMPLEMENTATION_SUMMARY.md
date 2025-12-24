@@ -16,18 +16,18 @@ Successfully implemented a blog format optimizer that transforms narrative scrip
 ### Files Created
 
 1. **Core Module Files**:
-   - `T/Script/Formatter/Blog/blog_formatter.py` (659 lines) - Core formatting engine
-   - `T/Script/Formatter/Blog/platform_adapters.py` (186 lines) - Platform-specific adapters
-   - `T/Script/Formatter/Blog/__init__.py` - Public API exports
-   - `T/Script/Formatter/__init__.py` - Formatter package initialization
+   - `T/Content/Formatter/Blog/blog_formatter.py` (659 lines) - Core formatting engine
+   - `T/Content/Formatter/Blog/platform_adapters.py` (186 lines) - Platform-specific adapters
+   - `T/Content/Formatter/Blog/__init__.py` - Public API exports
+   - `T/Content/Formatter/__init__.py` - Formatter package initialization
 
 2. **Testing**:
-   - `T/Script/Formatter/Blog/_meta/tests/test_blog_formatter.py` (433 lines) - Comprehensive test suite
-   - `T/Script/Formatter/Blog/_meta/tests/__init__.py` - Test package initialization
+   - `T/Content/Formatter/Blog/_meta/tests/test_blog_formatter.py` (433 lines) - Comprehensive test suite
+   - `T/Content/Formatter/Blog/_meta/tests/__init__.py` - Test package initialization
 
 3. **Documentation & Examples**:
-   - `T/Script/Formatter/Blog/README.md` (361 lines) - Complete module documentation
-   - `T/Script/Formatter/Blog/_meta/examples/example_usage.py` (289 lines) - Usage examples
+   - `T/Content/Formatter/Blog/README.md` (361 lines) - Complete module documentation
+   - `T/Content/Formatter/Blog/_meta/examples/example_usage.py` (289 lines) - Usage examples
 
 4. **Configuration**:
    - Updated `pytest.ini` to include new test path
