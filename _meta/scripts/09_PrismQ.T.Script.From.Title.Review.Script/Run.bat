@@ -14,7 +14,7 @@ echo PrismQ.T.Script.From.Title.Review.Script - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Script\From\Title\Review\Script\src\script_improver_interactive.py
+python ..\..\..\T\Script\From\Title\Review\Script\src\script_from_review_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

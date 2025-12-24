@@ -15,10 +15,10 @@ import json
 
 import pytest
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Idea.Content import (
     TitleReview,
     TitleReviewCategory,
-    review_title_by_content_and_idea,
+    review_title_by_idea_and_content,
 )
 
 
@@ -36,7 +36,7 @@ class TestAcceptanceCriteria:
         idea = "Mystery story about echoes revealing secrets in an old house"
 
         # Should be able to review title against both script and idea
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text=title, content_text=script, idea_summary=idea
         )
 
@@ -57,7 +57,7 @@ class TestAcceptanceCriteria:
 
     def test_ac2_generate_structured_feedback(self):
         """AC2: Generate structured feedback (alignment, clarity, engagement)."""
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text="The Echo Mystery",
             content_text="A mystery about echoes in a haunted house",
             idea_summary="Mystery horror with echoes",
@@ -68,7 +68,7 @@ class TestAcceptanceCriteria:
 
         # Should include alignment categories
         categories = [cs.category for cs in review.category_scores]
-        assert TitleReviewCategory.SCRIPT_ALIGNMENT in categories
+        assert TitleReviewCategory.CONTENT_ALIGNMENT in categories
         assert TitleReviewCategory.IDEA_ALIGNMENT in categories
         assert TitleReviewCategory.ENGAGEMENT in categories
 
@@ -97,7 +97,7 @@ class TestAcceptanceCriteria:
         """
         idea = "Horror mystery about echoes"
 
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text=title, content_text=script, idea_summary=idea
         )
 
@@ -111,7 +111,7 @@ class TestAcceptanceCriteria:
         script_alignment_issues = [
             imp
             for imp in review.improvement_points
-            if imp.category == TitleReviewCategory.SCRIPT_ALIGNMENT
+            if imp.category == TitleReviewCategory.CONTENT_ALIGNMENT
         ]
         assert len(script_alignment_issues) > 0
 
@@ -128,7 +128,7 @@ class TestAcceptanceCriteria:
 
     def test_ac4_suggest_improvements(self):
         """AC4: Suggest improvements for title."""
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text="A Title",  # Intentionally weak title
             content_text="A complex story about echoes revealing mysteries",
             idea_summary="Mystery with echoes",
@@ -162,7 +162,7 @@ class TestAcceptanceCriteria:
 
     def test_ac5_json_output_format(self):
         """AC5: Output JSON format with feedback categories."""
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text="The Echo Mystery",
             content_text="A mysterious echo in an old house reveals secrets",
             idea_summary="Mystery about echoes and secrets",
@@ -225,7 +225,7 @@ class TestAcceptanceCriteria:
             "idea": "Mystery horror about echoes revealing secrets in an old house",
         }
 
-        review1 = review_title_by_content_and_idea(
+        review1 = review_title_by_idea_and_content(
             title_text=sample1["title"], content_text=sample1["script"], idea_summary=sample1["idea"]
         )
 
@@ -240,7 +240,7 @@ class TestAcceptanceCriteria:
             "idea": "Horror story about ghosts",
         }
 
-        review2 = review_title_by_content_and_idea(
+        review2 = review_title_by_idea_and_content(
             title_text=sample2["title"], content_text=sample2["script"], idea_summary=sample2["idea"]
         )
 
@@ -255,7 +255,7 @@ class TestAcceptanceCriteria:
             "idea": "Discovery story about hidden secrets",
         }
 
-        review3 = review_title_by_content_and_idea(
+        review3 = review_title_by_idea_and_content(
             title_text=sample3["title"], content_text=sample3["script"], idea_summary=sample3["idea"]
         )
 
@@ -277,12 +277,12 @@ class TestWorkflowIntegration:
         idea_summary = "Mystery about echoes revealing secrets"
 
         # Review should work with v1 versions
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text=title_v1,
             content_text=script_v1_text,
             idea_summary=idea_summary,
             title_version="v1",
-            script_version="v1",
+            content_version="v1",
         )
 
         assert review.title_version == "v1"
@@ -293,7 +293,7 @@ class TestWorkflowIntegration:
 
     def test_feedback_for_title_v2(self):
         """Test that review provides feedback suitable for generating title v2."""
-        review = review_title_by_content_and_idea(
+        review = review_title_by_idea_and_content(
             title_text="The House",
             content_text="Echoes in an abandoned house reveal dark secrets and mysteries",
             idea_summary="Horror mystery with echoes revealing secrets",

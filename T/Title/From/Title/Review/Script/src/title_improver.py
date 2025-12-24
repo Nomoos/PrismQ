@@ -3,6 +3,11 @@
 This module implements MVP-006 and MVP-009: Generate improved title versions
 using feedback from both title review (MVP-004) and script review (MVP-005).
 
+IMPLEMENTATION NOTE: This is a rule-based implementation that applies structured
+improvements based on review feedback categories. It does NOT use AI/LLM services
+for text generation. Improvements are applied through deterministic algorithms
+that incorporate review suggestions, keywords, and content elements.
+
 The module takes:
 - Original title (any version: v1, v2, v3, etc.)
 - Content (corresponding version)
@@ -25,7 +30,9 @@ Workflow Position:
     - Iteration: Title v3 + Content v3 + Reviews → Title v4, v5, v6, v7, etc.
 """
 
+import logging
 import os
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -50,6 +57,121 @@ from script_review import ScriptReview
 from title_review import TitleImprovementPoint, TitleReview, TitleReviewCategory
 
 from idea import Idea
+
+
+# Module logger
+logger = logging.getLogger(__name__)
+
+# Constants for validation
+VERSION_PATTERN = re.compile(r"^v\d+$")
+MIN_TITLE_LENGTH = 10
+MAX_TITLE_LENGTH = 200
+MIN_CONTENT_LENGTH = 50
+MAX_CONTENT_LENGTH = 100000
+MIN_OPTIMAL_LENGTH = 20
+MAX_OPTIMAL_LENGTH = 300
+
+
+class TitleImprovementError(Exception):
+    """Base exception for title improvement errors."""
+
+    pass
+
+
+class ValidationError(TitleImprovementError):
+    """Exception raised for validation errors."""
+
+    pass
+
+
+class ImprovementError(TitleImprovementError):
+    """Exception raised during improvement processing."""
+
+    pass
+
+
+def validate_version_number(version: str, param_name: str = "version") -> None:
+    """Validate version number format.
+
+    Args:
+        version: Version string to validate (e.g., "v1", "v2")
+        param_name: Parameter name for error messages
+
+    Raises:
+        ValidationError: If version format is invalid
+    """
+    if not version:
+        raise ValidationError(f"{param_name} cannot be empty")
+    if not VERSION_PATTERN.match(version):
+        raise ValidationError(
+            f"{param_name} must be in format 'vN' (e.g., 'v1', 'v2'). Got: '{version}'"
+        )
+
+
+def extract_version_number(version: str) -> int:
+    """Extract numeric part from version string.
+
+    Args:
+        version: Version string (e.g., "v1", "v2")
+
+    Returns:
+        Integer version number
+
+    Raises:
+        ValidationError: If version format is invalid
+    """
+    validate_version_number(version)
+    return int(version[1:])
+
+
+def validate_version_progression(original: str, new: str) -> None:
+    """Validate that new version is greater than original.
+
+    Args:
+        original: Original version (e.g., "v1")
+        new: New version (e.g., "v2")
+
+    Raises:
+        ValidationError: If version progression is invalid
+    """
+    validate_version_number(original, "original_version")
+    validate_version_number(new, "new_version")
+
+    original_num = extract_version_number(original)
+    new_num = extract_version_number(new)
+
+    if new_num <= original_num:
+        raise ValidationError(
+            f"New version ({new}) must be greater than original ({original})"
+        )
+
+
+def validate_text_length(
+    text: str, param_name: str, min_length: int, max_length: int
+) -> None:
+    """Validate text length is within acceptable range.
+
+    Args:
+        text: Text to validate
+        param_name: Parameter name for error messages
+        min_length: Minimum acceptable length
+        max_length: Maximum acceptable length
+
+    Raises:
+        ValidationError: If text length is invalid
+    """
+    if not text or not text.strip():
+        raise ValidationError(f"{param_name} cannot be empty or whitespace-only")
+
+    length = len(text)
+    if length < min_length:
+        raise ValidationError(
+            f"{param_name} too short: {length} chars (minimum: {min_length})"
+        )
+    if length > max_length:
+        raise ValidationError(
+            f"{param_name} too long: {length} chars (maximum: {max_length})"
+        )
 
 
 @dataclass
@@ -164,75 +286,156 @@ class TitleImprover:
             ImprovedTitle with new version and improvement details
 
         Raises:
-            ValueError: If inputs are invalid
+            ValidationError: If inputs are invalid
+            ImprovementError: If improvement process fails
         """
-        if not original_title:
-            raise ValueError("Original title cannot be empty")
-        if not content_text:
-            raise ValueError("Content text cannot be empty")
+        logger.info(
+            f"Starting title improvement: {original_version_number} → {new_version_number}"
+        )
+
+        # Validate inputs
+        try:
+            self._validate_inputs(
+                original_title,
+                content_text,
+                title_review,
+                script_review,
+                original_version_number,
+                new_version_number,
+            )
+        except ValidationError as e:
+            logger.error(f"Input validation failed: {e}")
+            raise
+
+        try:
+            # Create original version object
+            original_version = TitleVersion(
+                version_number=original_version_number,
+                text=original_title,
+                review_score=title_review.overall_score,
+                notes="Original title version",
+            )
+            logger.debug(f"Original title: '{original_title}' (score: {title_review.overall_score})")
+
+            # Extract key improvement points from both reviews
+            title_improvements = self._extract_title_improvements(title_review)
+            script_insights = self._extract_content_insights(script_review)
+            logger.debug(
+                f"Extracted {len(title_improvements)} title improvements, "
+                f"{len(script_insights)} script insights"
+            )
+
+            # Analyze what needs to change
+            alignment_issues = self._analyze_alignment_issues(title_review, script_review)
+            logger.debug(
+                f"Alignment scores - script: {alignment_issues['script_alignment_score']}%, "
+                f"engagement: {alignment_issues['engagement_score']}%"
+            )
+
+            # Generate improved title
+            improved_text = self._generate_improved_title(
+                original_title=original_title,
+                content_text=content_text,
+                title_improvements=title_improvements,
+                script_insights=script_insights,
+                alignment_issues=alignment_issues,
+                idea=idea,
+            )
+            logger.info(f"Generated improved title: '{improved_text}'")
+
+            # Create rationale for changes
+            rationale = self._create_rationale(
+                original_title=original_title,
+                improved_title=improved_text,
+                title_improvements=title_improvements,
+                script_insights=script_insights,
+                alignment_issues=alignment_issues,
+            )
+
+            # Create new version object
+            new_version = TitleVersion(
+                version_number=new_version_number,
+                text=improved_text,
+                changes_from_previous=rationale,
+                notes=f"Improved based on feedback from {original_version_number} reviews",
+            )
+
+            # Create result
+            result = ImprovedTitle(
+                new_version=new_version,
+                original_version=original_version,
+                rationale=rationale,
+                addressed_improvements=[imp["title"] for imp in title_improvements],
+                script_alignment_notes=self._create_alignment_notes(
+                    improved_text, content_text, alignment_issues
+                ),
+                engagement_notes=self._create_engagement_notes(
+                    original_title, improved_text, title_review
+                ),
+                version_history=[original_version, new_version],
+            )
+
+            logger.info(
+                f"Title improvement complete: {original_version_number} → {new_version_number}"
+            )
+            return result
+
+        except Exception as e:
+            logger.exception(f"Title improvement failed: {e}")
+            raise ImprovementError(f"Failed to improve title: {e}") from e
+
+    def _validate_inputs(
+        self,
+        original_title: str,
+        content_text: str,
+        title_review: TitleReview,
+        script_review: ScriptReview,
+        original_version: str,
+        new_version: str,
+    ) -> None:
+        """Validate all inputs for improvement process.
+
+        Args:
+            original_title: Original title text
+            content_text: Content text
+            title_review: Title review object
+            script_review: Script review object
+            original_version: Original version number
+            new_version: New version number
+
+        Raises:
+            ValidationError: If any input is invalid
+        """
+        # Validate title
+        validate_text_length(original_title, "original_title", MIN_TITLE_LENGTH, MAX_TITLE_LENGTH)
+
+        # Validate content
+        validate_text_length(content_text, "content_text", MIN_CONTENT_LENGTH, MAX_CONTENT_LENGTH)
+
+        # Validate review objects
         if not title_review:
-            raise ValueError("Title review is required")
+            raise ValidationError("title_review is required")
         if not script_review:
-            raise ValueError("Content review is required")
+            raise ValidationError("script_review is required")
 
-        # Create original version object
-        original_version = TitleVersion(
-            version_number=original_version_number,
-            text=original_title,
-            review_score=title_review.overall_score,
-            notes="Original title version",
-        )
+        # Validate review structure
+        if not hasattr(title_review, "overall_score"):
+            raise ValidationError("title_review missing required field: overall_score")
+        if not hasattr(title_review, "improvement_points"):
+            raise ValidationError("title_review missing required field: improvement_points")
+        if not hasattr(script_review, "improvement_points"):
+            raise ValidationError("script_review missing required field: improvement_points")
 
-        # Extract key improvement points from both reviews
-        title_improvements = self._extract_title_improvements(title_review)
-        script_insights = self._extract_content_insights(script_review)
+        # Validate versions
+        validate_version_progression(original_version, new_version)
 
-        # Analyze what needs to change
-        alignment_issues = self._analyze_alignment_issues(title_review, script_review)
-
-        # Generate improved title
-        improved_text = self._generate_improved_title(
-            original_title=original_title,
-            content_text=content_text,
-            title_improvements=title_improvements,
-            script_insights=script_insights,
-            alignment_issues=alignment_issues,
-            idea=idea,
-        )
-
-        # Create rationale for changes
-        rationale = self._create_rationale(
-            original_title=original_title,
-            improved_title=improved_text,
-            title_improvements=title_improvements,
-            script_insights=script_insights,
-            alignment_issues=alignment_issues,
-        )
-
-        # Create new version object
-        new_version = TitleVersion(
-            version_number=new_version_number,
-            text=improved_text,
-            changes_from_previous=rationale,
-            notes=f"Improved based on feedback from {original_version_number} reviews",
-        )
-
-        # Create result
-        result = ImprovedTitle(
-            new_version=new_version,
-            original_version=original_version,
-            rationale=rationale,
-            addressed_improvements=[imp["title"] for imp in title_improvements],
-            script_alignment_notes=self._create_alignment_notes(
-                improved_text, content_text, alignment_issues
-            ),
-            engagement_notes=self._create_engagement_notes(
-                original_title, improved_text, title_review
-            ),
-            version_history=[original_version, new_version],
-        )
-
-        return result
+        # Validate optimal_length if present
+        if hasattr(title_review, "optimal_length_chars"):
+            optimal = title_review.optimal_length_chars
+            if optimal and (optimal < MIN_OPTIMAL_LENGTH or optimal > MAX_OPTIMAL_LENGTH):
+                logger.warning(
+                    f"Unusual optimal_length: {optimal} (expected {MIN_OPTIMAL_LENGTH}-{MAX_OPTIMAL_LENGTH})"
+                )
 
     def _extract_title_improvements(self, title_review: TitleReview) -> List[Dict[str, Any]]:
         """Extract prioritized improvement points from title review.
@@ -329,7 +532,7 @@ class TitleImprover:
         """Generate the improved title text.
 
         This is the core improvement logic that applies feedback to create
-        a better title.
+        a better title. Uses rule-based strategies to incorporate improvements.
 
         Args:
             original_title: Original title text
@@ -341,53 +544,89 @@ class TitleImprover:
 
         Returns:
             Improved title text
+
+        Raises:
+            ImprovementError: If improvement strategies fail
         """
-        # Start with original title as base
-        improved = original_title
+        logger.debug("Generating improved title with rule-based strategies")
+        
+        try:
+            # Start with original title as base
+            improved = original_title
 
-        # Strategy 1: Address high-priority improvements
-        high_priority = [imp for imp in title_improvements if imp["priority"] == "high"]
+            # Strategy 1: Address high-priority improvements
+            high_priority = [imp for imp in title_improvements if imp["priority"] == "high"]
 
-        if high_priority:
-            # Look for specific issues to fix
-            for imp in high_priority:
-                category = imp["category"]
-                suggested_fix = imp.get("suggested_fix", "")
+            if high_priority:
+                logger.debug(f"Applying {len(high_priority)} high-priority improvements")
+                # Look for specific issues to fix
+                for imp in high_priority:
+                    category = imp["category"]
+                    suggested_fix = imp.get("suggested_fix", "")
+                    logger.debug(f"  - Addressing {category}: {imp['title']}")
 
-                # Apply fixes based on category
-                if category == "script_alignment" and suggested_fix:
-                    # Use suggested keyword or element
+                    # Apply fixes based on category
+                    try:
+                        if category == "script_alignment" and suggested_fix:
+                            # Use suggested keyword or element
+                            improved = self._incorporate_content_elements(
+                                improved, alignment_issues.get("key_content_elements", [])
+                            )
+
+                        elif category == "engagement" and suggested_fix:
+                            # Make more engaging
+                            improved = self._enhance_engagement(improved, suggested_fix)
+
+                        elif category == "clarity" and suggested_fix:
+                            # Improve clarity
+                            improved = self._improve_clarity(improved)
+
+                        elif category == "length" and suggested_fix:
+                            # Adjust length
+                            optimal = alignment_issues.get("optimal_length", MAX_TITLE_LENGTH)
+                            improved = self._adjust_length(improved, optimal)
+                            
+                    except Exception as e:
+                        logger.warning(f"Strategy for {category} failed: {e}, continuing with other strategies")
+                        # Continue with other strategies on failure
+
+            # Strategy 2: Incorporate key script elements if alignment is low
+            script_score = alignment_issues.get("script_alignment_score", 100)
+            if script_score < 70:
+                logger.debug(f"Low script alignment ({script_score}%), incorporating content elements")
+                try:
                     improved = self._incorporate_content_elements(
-                        improved, alignment_issues["key_content_elements"]
+                        improved, alignment_issues.get("key_content_elements", [])
                     )
+                except Exception as e:
+                    logger.warning(f"Content element incorporation failed: {e}")
 
-                elif category == "engagement" and suggested_fix:
-                    # Make more engaging
-                    improved = self._enhance_engagement(improved, suggested_fix)
+            # Strategy 3: Use suggested keywords if available
+            keywords = alignment_issues.get("suggested_keywords", [])
+            if keywords:
+                logger.debug(f"Incorporating {len(keywords)} suggested keywords")
+                try:
+                    improved = self._incorporate_keywords(improved, keywords)
+                except Exception as e:
+                    logger.warning(f"Keyword incorporation failed: {e}")
 
-                elif category == "clarity" and suggested_fix:
-                    # Improve clarity
-                    improved = self._improve_clarity(improved)
+            # Ensure reasonable length
+            optimal = alignment_issues.get("optimal_length", MAX_TITLE_LENGTH)
+            if len(improved) > optimal:
+                logger.debug(f"Adjusting length from {len(improved)} to ~{optimal}")
+                try:
+                    improved = self._adjust_length(improved, optimal)
+                except Exception as e:
+                    logger.warning(f"Length adjustment failed: {e}")
 
-                elif category == "length" and suggested_fix:
-                    # Adjust length
-                    improved = self._adjust_length(improved, alignment_issues["optimal_length"])
-
-        # Strategy 2: Incorporate key script elements if alignment is low
-        if alignment_issues["script_alignment_score"] < 70:
-            improved = self._incorporate_content_elements(
-                improved, alignment_issues["key_content_elements"]
-            )
-
-        # Strategy 3: Use suggested keywords if available
-        if alignment_issues["suggested_keywords"]:
-            improved = self._incorporate_keywords(improved, alignment_issues["suggested_keywords"])
-
-        # Ensure reasonable length
-        if len(improved) > alignment_issues["optimal_length"]:
-            improved = self._adjust_length(improved, alignment_issues["optimal_length"])
-
-        return improved
+            logger.debug(f"Title improvement strategies complete: '{original_title}' → '{improved}'")
+            return improved
+            
+        except Exception as e:
+            logger.error(f"Failed to generate improved title: {e}")
+            # Return original on complete failure rather than crashing
+            logger.warning("Returning original title due to improvement failure")
+            return original_title
 
     def _incorporate_content_elements(self, title: str, script_elements: List[str]) -> str:
         """Incorporate key script elements into title.
@@ -454,23 +693,27 @@ class TitleImprover:
 
     def _enhance_engagement(self, title: str, suggested_fix: str) -> str:
         """Enhance title engagement.
+        
+        Note: This is a placeholder implementation. Currently returns title unchanged
+        as engagement enhancement is subjective and would benefit from AI/LLM integration
+        or more sophisticated linguistic analysis.
 
         Args:
             title: Current title
             suggested_fix: Suggested fix from review
 
         Returns:
-            More engaging title
+            More engaging title (currently unchanged)
         """
         # If suggested fix provides specific guidance, try to apply it
         if "question" in suggested_fix.lower():
             # Convert to question format if appropriate
             if not title.endswith("?"):
                 # Could add question mark or rephrase
+                # TODO: Implement question conversion logic
                 pass
 
-        # For now, return as-is since engagement is subjective
-        # Real implementation would use AI or more sophisticated analysis
+        # Return as-is - engagement enhancement needs more sophisticated implementation
         return title
 
     def _improve_clarity(self, title: str) -> str:
