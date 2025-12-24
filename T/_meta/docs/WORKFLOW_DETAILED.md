@@ -15,72 +15,72 @@ PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
 PrismQ.T.Title.From.Idea
     ↓
-PrismQ.T.Script.From.Title.Idea
+PrismQ.T.Content.From.Title.Idea
     ↓
-PrismQ.T.Review.Title.By.Script.Idea
+PrismQ.T.Review.Title.By.Content.Idea
     ↓
-PrismQ.T.Review.Script.By.Title.Idea
+PrismQ.T.Review.Content.By.Title.Idea
     ↓
-PrismQ.T.Review.Title.By.Script
-    ├─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
+PrismQ.T.Review.Title.By.Content
+    ├─ if not accepted → PrismQ.T.Title.From.Content.Review.Title
     │                      ↓
-    │                   PrismQ.T.Script.From.Title.Review.Script
+    │                   PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.By.Title
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.By.Title
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Local AI Quality Reviews
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ↓
-PrismQ.T.Review.Script.Grammar
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Grammar
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.Tone
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Tone
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.Content
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Content
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.Consistency
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Consistency
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.Editing
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Editing
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
 PrismQ.T.Review.Title.Readability
-    ├─ if not accepted → PrismQ.T.Title.From.Script.Review.Title
+    ├─ if not accepted → PrismQ.T.Title.From.Content.Review.Title
     │                      ↓
-    │                   PrismQ.T.Script.From.Title.Review.Script
+    │                   PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
-PrismQ.T.Review.Script.Readability
-    ├─ if not accepted → PrismQ.T.Script.From.Title.Review.Script
+PrismQ.T.Review.Content.Readability
+    ├─ if not accepted → PrismQ.T.Content.From.Title.Review.Content
     │                      ↓
-    │                   PrismQ.T.Review.Title.By.Script (loop back)
+    │                   PrismQ.T.Review.Title.By.Content (loop back)
     └─ if accepted → continue
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -148,237 +148,237 @@ PrismQ.T.Story.Review
 - Multiple title variants
 - SEO considerations
 
-**Transitions To**: PrismQ.T.Script.From.Title.Idea
+**Transitions To**: PrismQ.T.Content.From.Title.Idea
 
 ---
 
-### Stage 3: PrismQ.T.Script.From.Title.Idea
+### Stage 3: PrismQ.T.Content.From.Title.Idea
 
-**Purpose**: Generate initial script from title and idea
+**Purpose**: Generate initial content from title and idea
 
-**Location**: `T/Script/From/Idea/Title/`
+**Location**: `T/Content/From/Idea/Title/`
 
 **Input**:
 - Title (v1) from Stage 2
 - Idea document from Stage 1
 
 **Output**:
-- Script v1
+- Content v1
 - Narrative structure
 - Content outline
 
-**Transitions To**: PrismQ.T.Review.Title.By.Script.Idea
+**Transitions To**: PrismQ.T.Review.Title.By.Content.Idea
 
 ---
 
-### Stage 4: PrismQ.T.Review.Title.By.Script.Idea
+### Stage 4: PrismQ.T.Review.Title.By.Content.Idea
 
-**Purpose**: Review title against script and original idea
+**Purpose**: Review title against content and original idea
 
-**Location**: `T/Review/Title/ByScriptIdea/`
+**Location**: `T/Review/Title/ByContentIdea/`
 
 **Input**:
 - Current Title
-- Current Script
+- Current Content
 - Original Idea
 
 **Output**:
 - Review feedback for Title
 - Assessment of title quality
 
-**Transitions To**: PrismQ.T.Review.Script.By.Title.Idea (Stage 5)
+**Transitions To**: PrismQ.T.Review.Content.By.Title.Idea (Stage 5)
 
 **Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 5: PrismQ.T.Review.Script.By.Title.Idea
+### Stage 5: PrismQ.T.Review.Content.By.Title.Idea
 
-**Purpose**: Review script against current title and original idea
+**Purpose**: Review content against current title and original idea
 
-**Location**: `T/Review/Script/ByTitleIdea/`
+**Location**: `T/Review/Content/ByTitleIdea/`
 
 **Input**:
-- Current Script
+- Current Content
 - Current Title
 - Original Idea
 
 **Output**:
-- Review feedback for Script
-- Assessment of script quality
+- Review feedback for Content
+- Assessment of content quality
 
-**Transitions To**: PrismQ.T.Review.Title.By.Script (Stage 6)
+**Transitions To**: PrismQ.T.Review.Title.By.Content (Stage 6)
 
 **Note**: This review is always executed; there is no conditional branching based on acceptance
 
 ---
 
-### Stage 6: PrismQ.T.Review.Title.By.Script
+### Stage 6: PrismQ.T.Review.Title.By.Content
 
-**Purpose**: Review title against refined script
+**Purpose**: Review title against refined content
 
-**Location**: `T/Review/Title/ByScript/`
+**Location**: `T/Review/Title/ByContent/`
 
 **Input**:
 - Current Title
-- Current Script
+- Current Content
 
 **Output**:
 - Review feedback for Title
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Not Accepted**: Proceed to Title Refinement (Stage 7) → Script Refinement (Stage 8) → Return to Stage 6
-- **If Accepted**: Continue to PrismQ.T.Review.Script.By.Title (Stage 9)
+- **If Not Accepted**: Proceed to Title Refinement (Stage 7) → Content Refinement (Stage 8) → Return to Stage 6
+- **If Accepted**: Continue to PrismQ.T.Review.Content.By.Title (Stage 9)
 
 ---
 
-### Stage 7: PrismQ.T.Title.From.Script.Review.Title
+### Stage 7: PrismQ.T.Title.From.Content.Review.Title
 
-**Purpose**: Refine title based on script and review feedback
+**Purpose**: Refine title based on content and review feedback
 
-**Location**: `T/Title/From/Title/Review/Script/`
+**Location**: `T/Title/From/Title/Review/Content/`
 
 **Input**:
 - Previous Title
-- Current Script
+- Current Content
 - Review feedback from Stage 6
 
 **Output**:
 - Title v2 (or higher version)
 - Improvements documented
 
-**Transitions To**: PrismQ.T.Script.From.Title.Review.Script (Stage 8)
+**Transitions To**: PrismQ.T.Content.From.Title.Review.Content (Stage 8)
 
 **Note**: This stage is used later in the workflow when title refinement is needed (from Stage 15 Title.Readability)
 
 ---
 
-### Stage 8: PrismQ.T.Script.From.Title.Review.Script
+### Stage 8: PrismQ.T.Content.From.Title.Review.Content
 
-**Purpose**: Refine script based on title and review feedback
+**Purpose**: Refine content based on title and review feedback
 
-**Location**: `T/Script/From/Title/Review/Script/`
+**Location**: `T/Content/From/Title/Review/Content/`
 
 **Input**:
-- Previous Script
+- Previous Content
 - Current Title
 - Review feedback (from various stages)
 
 **Output**:
-- Script v2 (or higher version)
+- Content v2 (or higher version)
 - Improvements documented
 
-**Transitions To**: PrismQ.T.Review.Title.By.Script (Stage 6)
+**Transitions To**: PrismQ.T.Review.Title.By.Content (Stage 6)
 
-**Note**: This stage is used extensively throughout the workflow when script refinement is needed
+**Note**: This stage is used extensively throughout the workflow when content refinement is needed
 
 ---
 
-### Stage 9: PrismQ.T.Review.Script.By.Title
+### Stage 9: PrismQ.T.Review.Content.By.Title
 
-**Purpose**: Final review of script against finalized title
+**Purpose**: Final review of content against finalized title
 
-**Location**: `T/Review/Script/ByTitle/`
+**Location**: `T/Review/Content/ByTitle/`
 
 **Input**:
-- Current Script
+- Current Content
 - Current Title
 
 **Output**:
-- Review feedback for Script
+- Review feedback for Content
 - Acceptance/Rejection decision
 
 **Decision Point**:
-- **If Not Accepted**: Proceed to Script Refinement (Stage 8) → Return to Review.Title.By.Script (Stage 6)
+- **If Not Accepted**: Proceed to Content Refinement (Stage 8) → Return to Review.Title.By.Content (Stage 6)
 - **If Accepted**: Continue to Grammar Review (Stage 10)
 
 ---
 
 ### Stages 10-16: Local AI Quality Reviews
 
-These stages perform automated quality reviews on the script and title. Each review checks a specific quality dimension and loops back through script refinement and title review if issues are found.
+These stages perform automated quality reviews on the content and title. Each review checks a specific quality dimension and loops back through content refinement and title review if issues are found.
 
 ---
 
-### Stage 10: PrismQ.T.Review.Script.Grammar
+### Stage 10: PrismQ.T.Review.Content.Grammar
 
 **Purpose**: Grammar and syntax validation
 
 **Location**: `T/Review/Grammar/`
 
-**Input**: Current Script
+**Input**: Current Content
 
 **Output**: Grammar review results
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 11
 
 ---
 
-### Stage 11: PrismQ.T.Review.Script.Tone
+### Stage 11: PrismQ.T.Review.Content.Tone
 
 **Purpose**: Tone and voice consistency check
 
 **Location**: `T/Review/Tone/`
 
-**Input**: Current Script
+**Input**: Current Content
 
 **Output**: Tone review results
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 12
 
 ---
 
-### Stage 12: PrismQ.T.Review.Script.Content
+### Stage 12: PrismQ.T.Review.Content.Content
 
 **Purpose**: Content accuracy and relevance validation
 
 **Location**: `T/Review/Content/`
 
 **Input**: 
-- Current Script
+- Current Content
 - Original Idea
 
 **Output**: Content review results
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 13
 
 ---
 
-### Stage 13: PrismQ.T.Review.Script.Consistency
+### Stage 13: PrismQ.T.Review.Content.Consistency
 
 **Purpose**: Style and consistency validation
 
 **Location**: `T/Review/Consistency/`
 
-**Input**: Current Script
+**Input**: Current Content
 
 **Output**: Consistency review results
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 14
 
 ---
 
-### Stage 14: PrismQ.T.Review.Script.Editing
+### Stage 14: PrismQ.T.Review.Content.Editing
 
 **Purpose**: Final editing pass for polish
 
 **Location**: `T/Review/Editing/`
 
-**Input**: Current Script
+**Input**: Current Content
 
 **Output**: Editing review results
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 15
 
 ---
@@ -394,23 +394,23 @@ These stages perform automated quality reviews on the script and title. Each rev
 **Output**: Title readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to Title Refinement (Stage 7) → Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Title Refinement (Stage 7) → Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 16
 
 ---
 
-### Stage 16: PrismQ.T.Review.Script.Readability
+### Stage 16: PrismQ.T.Review.Content.Readability
 
-**Purpose**: Script readability and clarity check
+**Purpose**: Content readability and clarity check
 
-**Location**: `T/Review/Readability/` (Script focus)
+**Location**: `T/Review/Readability/` (Content focus)
 
-**Input**: Current Script
+**Input**: Current Content
 
-**Output**: Script readability score and feedback
+**Output**: Content readability score and feedback
 
 **Decision Point**:
-- **If Fails**: Return to Script Refinement (Stage 8) → Review.Title.By.Script (Stage 6)
+- **If Fails**: Return to Content Refinement (Stage 8) → Review.Title.By.Content (Stage 6)
 - **If Passes**: Continue to Stage 17
 
 ---
@@ -423,13 +423,13 @@ These stages use GPT-based expert review for final quality assurance before publ
 
 ### Stage 17: PrismQ.T.Story.Review
 
-**Purpose**: Expert-level review of complete story (Title + Script + Context)
+**Purpose**: Expert-level review of complete story (Title + Content + Context)
 
 **Location**: `T/Story/Review/`
 
 **Input**:
 - Final Title
-- Final Script
+- Final Content
 - Audience context
 - Original Idea
 
@@ -454,12 +454,12 @@ These stages use GPT-based expert review for final quality assurance before publ
 
 **Input**:
 - Current Title
-- Current Script
+- Current Content
 - Expert review feedback from Stage 17
 
 **Output**:
 - Polished Title
-- Polished Script
+- Polished Content
 - Improvements documented
 
 **Transitions To**: PrismQ.T.Story.Review (Stage 17) - Loop back for validation
@@ -473,16 +473,16 @@ These stages use GPT-based expert review for final quality assurance before publ
 ### Conditional Stages
 
 Several stages are conditional and only executed based on review results:
-- **PrismQ.T.Title.From.Script.Review.Title**: Only when title review fails
-- **PrismQ.T.Script.From.Title.Review.Script**: Only when script review fails
+- **PrismQ.T.Title.From.Content.Review.Title**: Only when title review fails
+- **PrismQ.T.Content.From.Title.Review.Content**: Only when content review fails
 
 ### Iterative Loops
 
 The workflow contains multiple iterative loops:
 
-1. **Title-Script Alignment Loop** (Stages 4-9):
-   - Review Title → Refine Title → Review Script → Refine Script
-   - Ensures title and script are mutually aligned
+1. **Title-Content Alignment Loop** (Stages 4-9):
+   - Review Title → Refine Title → Review Content → Refine Content
+   - Ensures title and content are mutually aligned
 
 2. **Quality Review Loop** (Stages 10-16):
    - Each quality dimension can send back to refinement
@@ -502,9 +502,9 @@ Key decision points that control workflow branching:
 ## Quality Gates
 
 ### Early Stage Gates (Stages 4-10)
-- Title-Script alignment
+- Title-Content alignment
 - Title-Idea alignment
-- Script-Idea alignment
+- Content-Idea alignment
 - Mutual consistency
 
 ### Mid Stage Gates (Stages 10-16)
@@ -514,7 +514,7 @@ Key decision points that control workflow branching:
 - Style consistency
 - Editing quality
 - Title readability
-- Script readability
+- Content readability
 
 ### Final Gate (Stages 17-18)
 - Expert-level holistic review
@@ -525,7 +525,7 @@ Key decision points that control workflow branching:
 
 ### Starting the Workflow
 1. Create a well-defined idea in Stage 1
-2. Allow the initial title and script to be rough drafts
+2. Allow the initial title and content to be rough drafts
 3. Trust the iterative review process to improve quality
 
 ### During Review Cycles
@@ -560,7 +560,7 @@ See [T/Publishing/README.md](./Publishing/README.md) for details.
 - **[T Module Overview](./README.md)** - Text pipeline overview
 - **[T Workflow Visual Guide](./WORKFLOW_VISUAL.md)** - Quick visual reference with diagrams
 - **[T Workflow State Machine](./WORKFLOW_STATE_MACHINE.md)** - Mermaid state diagram with all states and transitions
-- **[Title & Script Workflow](./TITLE_SCRIPT_WORKFLOW.md)** - Original workflow documentation
+- **[Title & Content Workflow](./TITLE_SCRIPT_WORKFLOW.md)** - Original workflow documentation
 - **[Ultra-Clean Pipeline](../_meta/docs/workflow/ultra-clean-pipeline.md)** - Simplified workflow view
 - **[MVP Stages](../_meta/docs/workflow/mvp-stages.md)** - Complete 26-stage workflow
 - **[State Machine](../_meta/docs/workflow/state-machine.md)** - Full state machine

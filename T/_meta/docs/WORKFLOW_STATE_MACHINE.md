@@ -10,43 +10,43 @@ stateDiagram-v2
     
     IdeaCreation --> StoryFromIdea
     StoryFromIdea --> TitleFromIdea
-    TitleFromIdea --> ScriptFromTitleIdea
-    ScriptFromTitleIdea --> ReviewTitleByScriptIdea
+    TitleFromIdea --> ContentFromTitleIdea
+    ContentFromTitleIdea --> ReviewTitleByContentIdea
     
-    ReviewTitleByScriptIdea --> ReviewScriptByTitleIdea
+    ReviewTitleByContentIdea --> ReviewContentByTitleIdea
     
-    ReviewScriptByTitleIdea --> ReviewTitleByScript
+    ReviewContentByTitleIdea --> ReviewTitleByContent
     
-    ReviewTitleByScript --> TitleFromScriptReviewTitle
-    ReviewTitleByScript --> ReviewScriptByTitle
+    ReviewTitleByContent --> TitleFromContentReviewTitle
+    ReviewTitleByContent --> ReviewContentByTitle
     
-    TitleFromScriptReviewTitle --> ScriptFromTitleReviewScript
+    TitleFromContentReviewTitle --> ContentFromTitleReviewContent
     
-    ScriptFromTitleReviewScript --> ReviewTitleByScript
+    ContentFromTitleReviewContent --> ReviewTitleByContent
     
-    ReviewScriptByTitle --> ScriptFromTitleReviewScript
-    ReviewScriptByTitle --> ReviewScriptGrammar
+    ReviewContentByTitle --> ContentFromTitleReviewContent
+    ReviewContentByTitle --> ReviewContentGrammar
     
-    ReviewScriptGrammar --> ReviewScriptTone
-    ReviewScriptGrammar --> ScriptFromTitleReviewScript
+    ReviewContentGrammar --> ReviewContentTone
+    ReviewContentGrammar --> ContentFromTitleReviewContent
     
-    ReviewScriptTone --> ReviewScriptContent
-    ReviewScriptTone --> ScriptFromTitleReviewScript
+    ReviewContentTone --> ReviewContentContent
+    ReviewContentTone --> ContentFromTitleReviewContent
     
-    ReviewScriptContent --> ReviewScriptConsistency
-    ReviewScriptContent --> ScriptFromTitleReviewScript
+    ReviewContentContent --> ReviewContentConsistency
+    ReviewContentContent --> ContentFromTitleReviewContent
     
-    ReviewScriptConsistency --> ReviewScriptEditing
-    ReviewScriptConsistency --> ScriptFromTitleReviewScript
+    ReviewContentConsistency --> ReviewContentEditing
+    ReviewContentConsistency --> ContentFromTitleReviewContent
     
-    ReviewScriptEditing --> ReviewTitleReadability
-    ReviewScriptEditing --> ScriptFromTitleReviewScript
+    ReviewContentEditing --> ReviewTitleReadability
+    ReviewContentEditing --> ContentFromTitleReviewContent
     
-    ReviewTitleReadability --> ReviewScriptReadability
-    ReviewTitleReadability --> TitleFromScriptReviewTitle
+    ReviewTitleReadability --> ReviewContentReadability
+    ReviewTitleReadability --> TitleFromContentReviewTitle
     
-    ReviewScriptReadability --> StoryReview
-    ReviewScriptReadability --> ScriptFromTitleReviewScript
+    ReviewContentReadability --> StoryReview
+    ReviewContentReadability --> ContentFromTitleReviewContent
     
     StoryReview --> StoryPolish
     StoryReview --> Publishing
@@ -70,25 +70,25 @@ stateDiagram-v2
         Location: T/Title/From/Idea/
     end note
     
-    note right of ScriptFromTitleIdea
-        Stage 3: Generate script v1
-        Location: T/Script/From/Idea/Title/
+    note right of ContentFromTitleIdea
+        Stage 3: Generate content v1
+        Location: T/Content/From/Idea/Title/
     end note
     
-    note right of ReviewTitleByScriptIdea
+    note right of ReviewTitleByContentIdea
         Stage 4: Review title (no conditional)
         Always proceeds to Stage 5
     end note
     
-    note right of ReviewScriptByTitleIdea
-        Stage 5: Review script (no conditional)
+    note right of ReviewContentByTitleIdea
+        Stage 5: Review content (no conditional)
         Always proceeds to Stage 6
     end note
     
-    note right of ReviewScriptGrammar
+    note right of ReviewContentGrammar
         Stages 10-16: Local AI reviews
         All failures loop through
-        Script Refinement → Title Review
+        Content Refinement → Title Review
     end note
     
     note right of StoryReview
@@ -107,25 +107,25 @@ stateDiagram-v2
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ |
-| ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/From/Idea/Title/ |
-| ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | T/Review/Title/ByScriptIdea/ |
-| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 5 | T/Review/Script/ByTitleIdea/ |
-| ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 6 | T/Review/Title/ByScript/ |
-| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | T/Title/From/Title/Review/Script/ |
-| ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 8 | T/Script/From/Title/Review/Script/ |
-| ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | T/Review/Script/ByTitle/ |
+| ContentFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ |
+| ReviewTitleByContentIdea | PrismQ.T.Review.Title.By.Content.Idea | 4 | T/Review/Title/ByContentIdea/ |
+| ReviewContentByTitleIdea | PrismQ.T.Review.Content.By.Title.Idea | 5 | T/Review/Content/ByTitleIdea/ |
+| ReviewTitleByContent | PrismQ.T.Review.Title.By.Content | 6 | T/Review/Title/ByContent/ |
+| TitleFromContentReviewTitle | PrismQ.T.Title.From.Content.Review.Title | 7 | T/Title/From/Title/Review/Content/ |
+| ContentFromTitleReviewContent | PrismQ.T.Content.From.Title.Review.Content | 8 | T/Content/From/Title/Review/Content/ |
+| ReviewContentByTitle | PrismQ.T.Review.Content.By.Title | 9 | T/Review/Content/ByTitle/ |
 
 ### Quality Review States
 
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
-| ReviewScriptGrammar | PrismQ.T.Review.Script.Grammar | 10 | T/Review/Grammar/ |
-| ReviewScriptTone | PrismQ.T.Review.Script.Tone | 11 | T/Review/Tone/ |
-| ReviewScriptContent | PrismQ.T.Review.Script.Content | 12 | T/Review/Content/ |
-| ReviewScriptConsistency | PrismQ.T.Review.Script.Consistency | 13 | T/Review/Consistency/ |
-| ReviewScriptEditing | PrismQ.T.Review.Script.Editing | 14 | T/Review/Editing/ |
+| ReviewContentGrammar | PrismQ.T.Review.Content.Grammar | 10 | T/Review/Grammar/ |
+| ReviewContentTone | PrismQ.T.Review.Content.Tone | 11 | T/Review/Tone/ |
+| ReviewContentContent | PrismQ.T.Review.Content.Content | 12 | T/Review/Content/ |
+| ReviewContentConsistency | PrismQ.T.Review.Content.Consistency | 13 | T/Review/Consistency/ |
+| ReviewContentEditing | PrismQ.T.Review.Content.Editing | 14 | T/Review/Editing/ |
 | ReviewTitleReadability | PrismQ.T.Review.Title.Readability | 15 | T/Review/Readability/ |
-| ReviewScriptReadability | PrismQ.T.Review.Script.Readability | 16 | T/Review/Readability/ |
+| ReviewContentReadability | PrismQ.T.Review.Content.Readability | 16 | T/Review/Readability/ |
 
 ### Expert Review Loop States
 
@@ -150,38 +150,38 @@ Initial linear flow through the workflow:
 IdeaCreation 
   → StoryFromIdea
   → TitleFromIdea 
-  → ScriptFromTitleIdea 
-  → ReviewTitleByScriptIdea
+  → ContentFromTitleIdea 
+  → ReviewTitleByContentIdea
 ```
 
 ### Conditional Branches
 
 #### Title Review Branch
 ```
-ReviewTitleByScriptIdea
-  ├─ accepted → ReviewScriptByTitleIdea
-  └─ not accepted → TitleFromScriptReviewTitle → ReviewScriptByTitleIdea
+ReviewTitleByContentIdea
+  ├─ accepted → ReviewContentByTitleIdea
+  └─ not accepted → TitleFromContentReviewTitle → ReviewContentByTitleIdea
 ```
 
-#### Script Review Branch
+#### Content Review Branch
 ```
-ReviewScriptByTitleIdea
-  ├─ accepted → ReviewTitleByScript
-  └─ not accepted → ScriptFromTitleReviewScript → ReviewTitleByScript
+ReviewContentByTitleIdea
+  ├─ accepted → ReviewTitleByContent
+  └─ not accepted → ContentFromTitleReviewContent → ReviewTitleByContent
 ```
 
 #### Title Re-Review Branch
 ```
-ReviewTitleByScript
-  ├─ accepted → ReviewScriptByTitle
-  └─ not accepted → TitleFromScriptReviewTitle → ReviewScriptByTitle
+ReviewTitleByContent
+  ├─ accepted → ReviewContentByTitle
+  └─ not accepted → TitleFromContentReviewTitle → ReviewContentByTitle
 ```
 
-#### Script Re-Review Branch
+#### Content Re-Review Branch
 ```
-ReviewScriptByTitle
-  ├─ accepted → QualityReviews (ReviewScriptGrammar)
-  └─ not accepted → ScriptFromTitleReviewScript → ReviewScriptByTitle
+ReviewContentByTitle
+  ├─ accepted → QualityReviews (ReviewContentGrammar)
+  └─ not accepted → ContentFromTitleReviewContent → ReviewContentByTitle
 ```
 
 ### Quality Review Sequence
@@ -190,33 +190,33 @@ Sequential quality reviews with failure feedback:
 
 ```
 QualityReviews:
-  ReviewScriptGrammar
-    ├─ passes → ReviewScriptTone
-    └─ fails → ScriptFromTitleReviewScript
+  ReviewContentGrammar
+    ├─ passes → ReviewContentTone
+    └─ fails → ContentFromTitleReviewContent
     
-  ReviewScriptTone
-    ├─ passes → ReviewScriptContent
-    └─ fails → ScriptFromTitleReviewScript
+  ReviewContentTone
+    ├─ passes → ReviewContentContent
+    └─ fails → ContentFromTitleReviewContent
     
-  ReviewScriptContent
-    ├─ passes → ReviewScriptConsistency
-    └─ fails → ScriptFromTitleReviewScript
+  ReviewContentContent
+    ├─ passes → ReviewContentConsistency
+    └─ fails → ContentFromTitleReviewContent
     
-  ReviewScriptConsistency
-    ├─ passes → ReviewScriptEditing
-    └─ fails → ScriptFromTitleReviewScript
+  ReviewContentConsistency
+    ├─ passes → ReviewContentEditing
+    └─ fails → ContentFromTitleReviewContent
     
-  ReviewScriptEditing
+  ReviewContentEditing
     ├─ passes → ReviewTitleReadability
-    └─ fails → ScriptFromTitleReviewScript
+    └─ fails → ContentFromTitleReviewContent
     
   ReviewTitleReadability
-    ├─ passes → ReviewScriptReadability
-    └─ fails → TitleFromScriptReviewTitle
+    ├─ passes → ReviewContentReadability
+    └─ fails → TitleFromContentReviewTitle
     
-  ReviewScriptReadability
+  ReviewContentReadability
     ├─ passes → ExpertReviewLoop (StoryReview)
-    └─ fails → ScriptFromTitleReviewScript
+    └─ fails → ContentFromTitleReviewContent
 ```
 
 ### Expert Review Loop
@@ -237,18 +237,18 @@ ExpertReviewLoop:
 ```
 IdeaCreation
 → TitleFromIdea
-→ ScriptFromTitleIdea
-→ ReviewTitleByScriptIdea (accepted)
-→ ReviewScriptByTitleIdea (accepted)
-→ ReviewTitleByScript (accepted)
-→ ReviewScriptByTitle (accepted)
-→ ReviewScriptGrammar (passes)
-→ ReviewScriptTone (passes)
-→ ReviewScriptContent (passes)
-→ ReviewScriptConsistency (passes)
-→ ReviewScriptEditing (passes)
+→ ContentFromTitleIdea
+→ ReviewTitleByContentIdea (accepted)
+→ ReviewContentByTitleIdea (accepted)
+→ ReviewTitleByContent (accepted)
+→ ReviewContentByTitle (accepted)
+→ ReviewContentGrammar (passes)
+→ ReviewContentTone (passes)
+→ ReviewContentContent (passes)
+→ ReviewContentConsistency (passes)
+→ ReviewContentEditing (passes)
 → ReviewTitleReadability (passes)
-→ ReviewScriptReadability (passes)
+→ ReviewContentReadability (passes)
 → StoryReview (accepted)
 → Publishing
 ```
@@ -260,25 +260,25 @@ IdeaCreation
 ```
 IdeaCreation
 → TitleFromIdea
-→ ScriptFromTitleIdea
-→ ReviewTitleByScriptIdea (not accepted)
-→ TitleFromScriptReviewTitle
-→ ReviewScriptByTitleIdea (accepted)
-→ ReviewTitleByScript (accepted)
-→ ReviewScriptByTitle (not accepted)
-→ ScriptFromTitleReviewScript
-→ ReviewScriptByTitle (accepted)
-→ ReviewScriptGrammar (passes)
-→ ReviewScriptTone (fails)
-→ ScriptFromTitleReviewScript
-→ ReviewScriptByTitle (accepted)
-→ ReviewScriptGrammar (passes)
-→ ReviewScriptTone (passes)
-→ ReviewScriptContent (passes)
-→ ReviewScriptConsistency (passes)
-→ ReviewScriptEditing (passes)
+→ ContentFromTitleIdea
+→ ReviewTitleByContentIdea (not accepted)
+→ TitleFromContentReviewTitle
+→ ReviewContentByTitleIdea (accepted)
+→ ReviewTitleByContent (accepted)
+→ ReviewContentByTitle (not accepted)
+→ ContentFromTitleReviewContent
+→ ReviewContentByTitle (accepted)
+→ ReviewContentGrammar (passes)
+→ ReviewContentTone (fails)
+→ ContentFromTitleReviewContent
+→ ReviewContentByTitle (accepted)
+→ ReviewContentGrammar (passes)
+→ ReviewContentTone (passes)
+→ ReviewContentContent (passes)
+→ ReviewContentConsistency (passes)
+→ ReviewContentEditing (passes)
 → ReviewTitleReadability (passes)
-→ ReviewScriptReadability (passes)
+→ ReviewContentReadability (passes)
 → StoryReview (not accepted)
 → StoryPolish
 → StoryReview (accepted)
@@ -296,7 +296,7 @@ If every review initially fails, the workflow could involve significantly more i
 ### QualityReviews Composite State
 
 The QualityReviews state encapsulates 7 sequential review stages (10-16). This composite state:
-- Has a single entry point (ReviewScriptGrammar)
+- Has a single entry point (ReviewContentGrammar)
 - Has two exit conditions:
   - Success: All reviews pass → exits to StoryReview
   - Failure: Any review fails → exits to appropriate refinement stage
@@ -318,23 +318,23 @@ The ExpertReviewLoop state encapsulates the final expert review cycle (17-18). T
 
 ### Refinement States
 States that improve artifacts based on feedback:
-- **TitleFromScriptReviewTitle**: Title refinement (used multiple times)
-- **ScriptFromTitleReviewScript**: Script refinement (used multiple times)
+- **TitleFromContentReviewTitle**: Title refinement (used multiple times)
+- **ContentFromTitleReviewContent**: Content refinement (used multiple times)
 - **StoryPolish**: Expert-level polish
 
 ### Review States
 States that evaluate quality and make accept/reject decisions:
-- **ReviewTitleByScriptIdea**: Title review with full context
-- **ReviewScriptByTitleIdea**: Script review with full context
-- **ReviewTitleByScript**: Title review against script
-- **ReviewScriptByTitle**: Script review against title
-- **ReviewScriptGrammar**: Grammar validation
-- **ReviewScriptTone**: Tone validation
-- **ReviewScriptContent**: Content validation
-- **ReviewScriptConsistency**: Consistency validation
-- **ReviewScriptEditing**: Editing validation
+- **ReviewTitleByContentIdea**: Title review with full context
+- **ReviewContentByTitleIdea**: Content review with full context
+- **ReviewTitleByContent**: Title review against content
+- **ReviewContentByTitle**: Content review against title
+- **ReviewContentGrammar**: Grammar validation
+- **ReviewContentTone**: Tone validation
+- **ReviewContentContent**: Content validation
+- **ReviewContentConsistency**: Consistency validation
+- **ReviewContentEditing**: Editing validation
 - **ReviewTitleReadability**: Title readability validation
-- **ReviewScriptReadability**: Script readability validation
+- **ReviewContentReadability**: Content readability validation
 - **StoryReview**: Expert holistic review
 
 ### Terminal State
@@ -342,12 +342,12 @@ States that evaluate quality and make accept/reject decisions:
 
 ## Quality Gates
 
-### Gate 1: Title-Script Initial Alignment (Stages 4-6)
-- Ensures title and script are initially aligned with idea
+### Gate 1: Title-Content Initial Alignment (Stages 4-6)
+- Ensures title and content are initially aligned with idea
 - First iteration of mutual consistency
 
-### Gate 2: Title-Script Refined Alignment (Stages 8-10)
-- Ensures refined title and script are mutually aligned
+### Gate 2: Title-Content Refined Alignment (Stages 8-10)
+- Ensures refined title and content are mutually aligned
 - Second iteration of mutual consistency
 - Final check before quality reviews
 
