@@ -1,15 +1,15 @@
-# ISSUE-IMPL-005 — Implementation check: `05_PrismQ.T.Review.Title.By.Script.Idea`
+# ISSUE-IMPL-005 — Implementation check: `05_PrismQ.T.Review.Title.By.Content.Idea`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea`  
+**Script Folder**: `PrismQ/_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
 **Module Path**: `T/Review/Title/`
 
 ---
 
 ## Purpose
 
-Reviews Title quality based on Script and Idea context. Part of the content review workflow to ensure title quality before proceeding in the pipeline.
+Reviews Title from content and idea context. Part of the content review workflow to ensure title quality before proceeding in the pipeline.
 
 ---
 

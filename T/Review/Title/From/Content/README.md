@@ -1,4 +1,4 @@
-# PrismQ.T.Review.Title.ByScript (v2)
+# PrismQ.T.Review.Title.From.Content (v2)
 
 **AI-powered title evaluation for v2+ iterations with improvement tracking**
 
@@ -6,12 +6,12 @@
 
 This module implements the v2 title review functionality for PrismQ's iterative content refinement workflow. It evaluates refined titles (v2, v3, v4+) against refined scripts while tracking improvements from previous versions.
 
-**Module**: `PrismQ.T.Review.Title.ByScript`  
+**Module**: `PrismQ.T.Review.Title.From.Content`  
 **Stage**: MVP-008 (Title Review v2)  
 **Workflow Position**: Stage 8 in the 26-stage MVP workflow
 
 ```
-Title v2 + Script v2 + v1 Review → ByScript v2 Review → TitleReview Feedback → Title v3
+Title v2 + Script v2 + v1 Review → From.Content v2 Review → TitleReview Feedback → Title v3
 ```
 
 ## Key Features
@@ -32,10 +32,10 @@ No additional installation required. Part of the PrismQ.T module.
 ### Basic v2 Review
 
 ```python
-from T.Review.Title.ByScript import review_title_by_script_v2
+from T.Review.Title.From.Content import review_title_by_content_v2
 
 # Review v2 title against v2 script
-review = review_title_by_script_v2(
+review = review_title_by_content_v2(
     title_text="The Echo - A Haunting Discovery",
     script_text="The Echo follows Sarah as she explores...",
     title_version="v2",
@@ -49,11 +49,11 @@ print(f"Script Alignment: {review.script_alignment_score}%")
 ### v1 to v2 Comparison
 
 ```python
-from T.Review.Title.ByScriptAndIdea import review_title_by_script_and_idea
-from T.Review.Title.ByScript import review_title_by_script_v2, get_improvement_summary
+from T.Review.Title.From.Content.Idea import review_title_by_content_and_idea
+from T.Review.Title.From.Content import review_title_by_content_v2, get_improvement_summary
 
 # Step 1: Review v1
-v1_review = review_title_by_script_and_idea(
+v1_review = review_title_by_content_and_idea(
     title_text="The Echo",
     script_text="A horror short about...",
     idea_summary="Horror story about mysterious sounds",
@@ -61,7 +61,7 @@ v1_review = review_title_by_script_and_idea(
 )
 
 # Step 2: Review v2 with comparison
-v2_review = review_title_by_script_v2(
+v2_review = review_title_by_content_v2(
     title_text="The Echo - A Haunting Discovery",
     script_text="Enhanced horror short about...",
     title_version="v2",
@@ -81,7 +81,7 @@ print(f"Recommendation: {summary['recommendation']}")
 ```python
 import json
 
-review = review_title_by_script_v2(
+review = review_title_by_content_v2(
     title_text="Your Title v2",
     script_text="Your script v2..."
 )
@@ -96,17 +96,17 @@ print(json_output)
 
 ```python
 # v1
-v1_review = review_title_by_script_and_idea(...)
+v1_review = review_title_by_content_and_idea(...)
 
 # v2
-v2_review = review_title_by_script_v2(
+v2_review = review_title_by_content_v2(
     ...,
     previous_review=v1_review,
     title_version="v2"
 )
 
 # v3
-v3_review = review_title_by_script_v2(
+v3_review = review_title_by_content_v2(
     ...,
     previous_review=v2_review,
     title_version="v3"
@@ -117,12 +117,12 @@ print(f"Improvement Trajectory: {v3_review.improvement_trajectory}")
 
 ## API Reference
 
-### review_title_by_script_v2()
+### review_title_by_content_v2()
 
 Main review function for v2+ titles.
 
 ```python
-def review_title_by_script_v2(
+def review_title_by_content_v2(
     title_text: str,
     script_text: str,
     title_id: Optional[str] = None,
@@ -253,7 +253,7 @@ Run the test suite:
 
 ```bash
 cd /home/runner/work/PrismQ/PrismQ
-python -m pytest T/Review/Title/ByScript/_meta/tests/ -v
+python -m pytest T/Review/Title/From/Content/_meta/tests/ -v
 ```
 
 ### Test Coverage
@@ -279,7 +279,7 @@ See `_meta/examples/example_usage.py` for complete working examples:
 Run examples:
 
 ```bash
-python T/Review/Title/ByScript/_meta/examples/example_usage.py
+python T/Review/Title/From/Content/_meta/examples/example_usage.py
 ```
 
 ## Acceptance Criteria (MVP-008)
@@ -301,7 +301,7 @@ Stage 6: Title.From.Title.Review.Script (v2) ✓
     ↓
 Stage 7: Script.Improvements (v2) ✓
     ↓
-Stage 8: Review.Title.ByScript (v2) ← YOU ARE HERE
+Stage 8: Review.Title.From.Content (v2) ← YOU ARE HERE
     ↓
 Stage 9: Title.Refinement (v3)
     ↓
@@ -314,7 +314,7 @@ Stage 11: Script.Refinement (v3)
 
 - Title v2 (from `T.Title.From.Title.Review.Script`)
 - Script v2 (from `T.Script.FromOriginalScriptAndReviewAndTitle`)
-- v1 Review (from `T.Review.Title.ByScriptAndIdea`)
+- v1 Review (from `T.Review.Title.From.Content.Idea`)
 
 ### Outputs
 
@@ -331,21 +331,21 @@ After v2 review:
 
 ## Dependencies
 
-- `T.Review.Title.ByScriptAndIdea`: Reuses data models and analysis functions
+- `T.Review.Title.From.Content.Idea`: Reuses data models and analysis functions
 - Python 3.7+
 - No external dependencies beyond standard library
 
 ## Module Structure
 
 ```
-T/Review/Title/ByScript/
+T/Review/Title/From/Content/
 ├── __init__.py              # Module exports
-├── by_script_v2.py          # Main v2 review implementation
+├── by_content_v2.py          # Main v2 review implementation
 ├── _meta/
 │   ├── examples/
 │   │   └── example_usage.py # Usage examples
 │   └── tests/
-│       └── test_by_script_v2.py  # Test suite
+│       └── test_by_content_v2.py  # Test suite
 └── README.md                # This file
 ```
 
@@ -379,7 +379,7 @@ T/Review/Title/ByScript/
 
 ## Related Modules
 
-- **T.Review.Title.ByScriptAndIdea**: v1 title review with idea context
+- **T.Review.Title.From.Content.Idea**: v1 title review with idea context
 - **T.Review.Script.ByTitle**: Script review by title
 - **T.Title.From.Title.Review.Script**: Title v2 generation
 - **T.Script.FromOriginalScriptAndReviewAndTitle**: Script v2 generation

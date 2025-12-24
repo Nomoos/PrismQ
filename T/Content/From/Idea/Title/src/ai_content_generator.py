@@ -1,7 +1,7 @@
-"""AI-Powered Content Generator using Qwen3:30b via Ollama.
+"""AI-Powered Content Generator using Qwen3:32b via Ollama.
 
 This module provides AI-powered content generation for the PrismQ.T.Content.From.Idea.Title
-workflow using the Qwen3:30b model.
+workflow using the Qwen3:32b model.
 
 ALL generation goes through local AI models. No fallback to rule-based generation.
 
@@ -14,12 +14,18 @@ Workflow Position:
     Stage: PrismQ.T.Content.From.Idea.Title
     Input: Title + Idea + Seed → AI Generation → Output: Content v1
 
-Prompts are stored as separate text files in _meta/prompts/ for easier
-maintenance and editing.
+Prompt Optimization for Qwen3:32b:
+    - Structured markdown format for clarity
+    - Clear role definition (expert content writer)
+    - Explicit audience context
+    - Specific constraints (word count, style, format)
+    - Natural language emphasis
+    - Avoids meta-commentary requirements
 """
 
 import logging
 import random
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -27,6 +33,46 @@ from typing import Optional
 import requests
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# INPUT SANITIZATION
+# =============================================================================
+
+
+def _sanitize_text_input(text: str, max_length: int = 10000, field_name: str = "text") -> str:
+    """Sanitize text input to prevent injection attacks and ensure safety.
+    
+    Args:
+        text: Input text to sanitize
+        max_length: Maximum allowed length
+        field_name: Name of the field (for error messages)
+        
+    Returns:
+        Sanitized text
+        
+    Raises:
+        ValueError: If text is invalid or too long
+    """
+    if not text or not text.strip():
+        raise ValueError(f"{field_name} cannot be empty")
+    
+    text = text.strip()
+    
+    # Check length
+    if len(text) > max_length:
+        raise ValueError(f"{field_name} too long ({len(text)} chars). Maximum: {max_length}")
+    
+    # Remove any null bytes
+    text = text.replace('\x00', '')
+    
+    # Check for suspicious patterns (basic protection)
+    # Note: This is just basic sanitization. The AI prompt is safe since we control it.
+    # The main concern is preventing extremely malicious input
+    if len(text) != len(text.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')):
+        logger.warning(f"Input contains non-UTF-8 characters in {field_name}")
+    
+    return text
 
 
 # =============================================================================
@@ -674,14 +720,47 @@ class AIContentGenerator:
             target_duration_seconds: Target duration in seconds (default: 120)
             max_duration_seconds: Maximum duration in seconds (default: 175)
             audience: Target audience dict with age_range, gender, country
-            seed: Optional specific seed to use (if None, picks randomly from 504)
+            seed: Optional specific seed to use (if None, picks randomly from 500)
 
         Returns:
             Generated content text, or None if AI is unavailable
 
         Raises:
-            RuntimeError: If AI is not available
+            ValueError: If parameters are invalid
+            RuntimeError: If AI is not available or generation fails
         """
+        # Validate inputs
+        if not title or not title.strip():
+            raise ValueError("title cannot be empty")
+        if not idea_text or not idea_text.strip():
+            raise ValueError("idea_text cannot be empty")
+        
+        # Sanitize inputs
+        title = _sanitize_text_input(title, max_length=500, field_name="title")
+        idea_text = _sanitize_text_input(idea_text, max_length=10000, field_name="idea_text")
+        
+        # Validate duration parameters
+        if target_duration_seconds <= 0:
+            raise ValueError(f"target_duration_seconds must be positive, got: {target_duration_seconds}")
+        if max_duration_seconds <= 0:
+            raise ValueError(f"max_duration_seconds must be positive, got: {max_duration_seconds}")
+        if target_duration_seconds > max_duration_seconds:
+            raise ValueError(
+                f"target_duration_seconds ({target_duration_seconds}) cannot exceed "
+                f"max_duration_seconds ({max_duration_seconds})"
+            )
+        
+        # Validate audience structure if provided
+        if audience is not None:
+            if not isinstance(audience, dict):
+                raise ValueError("audience must be a dictionary")
+            # Optionally validate audience fields
+            valid_keys = {"age_range", "gender", "country"}
+            invalid_keys = set(audience.keys()) - valid_keys
+            if invalid_keys:
+                logger.warning(f"Audience contains unexpected keys: {invalid_keys}")
+        
+        # Check AI availability
         if not self.available:
             error_msg = (
                 f"AI content generation is not available. "
@@ -698,14 +777,19 @@ class AIContentGenerator:
                 "country": "United States",
             }
 
-        # Pick one seed from 504 variations
-        selected_seed = seed if seed else get_random_seed()
-        logger.info(f"Using seed: {selected_seed}")
+        # Validate or pick seed
+        if seed is not None:
+            seed = _sanitize_text_input(seed, max_length=100, field_name="seed")
+        else:
+            # Pick one seed from 500 variations
+            seed = get_random_seed()
+        
+        logger.info(f"Using seed: {seed}")
 
         prompt = self._create_content_prompt(
             title=title,
             idea_text=idea_text,
-            seed=selected_seed,
+            seed=seed,
             target_duration=target_duration_seconds,
             max_duration=max_duration_seconds,
             audience=audience,
@@ -714,8 +798,25 @@ class AIContentGenerator:
         try:
             response = self._call_ollama(prompt)
             script = self._extract_content_text(response)
+            
+            # Validate generated content
+            if not script or not script.strip():
+                raise RuntimeError("AI generated empty content")
+            
             logger.info(f"AI content generation successful for '{title}'")
             return script
+        except requests.exceptions.Timeout as e:
+            error_msg = f"AI content generation timed out after {self.config.timeout}s: {e}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        except requests.exceptions.ConnectionError as e:
+            error_msg = f"Failed to connect to Ollama at {self.config.api_base}: {e}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        except requests.exceptions.RequestException as e:
+            error_msg = f"AI content generation request failed: {e}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
         except Exception as e:
             error_msg = f"AI content generation failed: {e}"
             logger.error(error_msg)
@@ -724,13 +825,13 @@ class AIContentGenerator:
     def _create_content_prompt(
         self, title: str, idea_text: str, seed: str, target_duration: int, max_duration: int, audience: dict
     ) -> str:
-        """Create prompt for content generation using updated structure for local models.
+        """Create optimized prompt for Qwen3:32b model.
 
-        Input:
-        - Title (Titulek)
-        - Idea text
-        - Seed (one picked from 504 variations)
-        - Audience (age_range, gender, country)
+        Optimized for Qwen3's strengths:
+        - Clear role definition and instruction following
+        - Structured constraints and requirements
+        - Explicit output format specification
+        - Natural language generation focus
 
         Args:
             title: Content title
@@ -741,51 +842,63 @@ class AIContentGenerator:
             audience: Target audience dict
 
         Returns:
-            Engineered prompt for local AI model
+            Optimized prompt for Qwen3:32b model
         """
         # Calculate approximate word count (2.5 words per second for narration)
         target_words = int(target_duration * 2.5)
         max_words = int(max_duration * 2.5)
 
-        # Build the optimized prompt for local models
-        prompt = f"""SYSTEM INSTRUCTION:
-You are a professional video content writer.
-Follow instructions exactly. Do not add extra sections or explanations.
+        # Optimized prompt structure for Qwen3:32b
+        prompt = f"""You are an expert video content writer specializing in engaging short-form content for {audience.get('gender', 'Female')} audiences aged {audience.get('age_range', '13-23')} in {audience.get('country', 'United States')}.
 
-TASK:
-Generate a video content.
+# Your Task
+Write compelling video narration for: "{title}"
 
-INPUTS:
-TITLE: {title}
-IDEA: {idea_text}
-INSPIRATION SEED: {seed} (Single word used only as creative inspiration)
+# Context
+{idea_text}
 
-TARGET AUDIENCE:
-- Age: {audience.get('age_range', '13-23')}
-- Gender: {audience.get('gender', 'Female')}
-- Country: {audience.get('country', 'United States')}
+# Creative Direction
+Draw subtle inspiration from: {seed}
+(Use this thematically or symbolically—do not mention it directly)
 
-REQUIREMENTS:
-1. Hook must strongly capture attention within the first 5 seconds.
-2. Deliver the main idea clearly and coherently.
-3. End with a clear and natural call-to-action.
-4. Maintain consistent engaging tone throughout.
-5. Use the inspiration seed subtly (symbolic or thematic, not literal repetition).
-6. Target length: approximately {target_words} words (for {target_duration} seconds).
-7. Maximum length: {max_words} words ({max_duration} seconds).
+# Requirements
+**Structure**: Begin with an attention-grabbing hook, deliver the core message clearly, end with a natural call-to-action.
 
-OUTPUT RULES:
-- Output ONLY the content text.
-- No headings, no labels, no explanations.
-- Do not mention the word "hook", "CTA", or any structure explicitly.
-- Do not mention that this is a script.
+**Length**: {target_words} words (target) | {max_words} words (maximum)
 
-The first sentence must create immediate curiosity or tension."""
+**Style Guidelines**:
+- First sentence must create immediate curiosity or tension
+- Use conversational, engaging language throughout
+- Maintain consistent energy and pacing
+- Make every word count—no filler
+- End with a clear action for viewers
+
+**Critical Constraints**:
+- Write ONLY the narration text—no labels, headings, or meta-commentary
+- Never mention "hook", "CTA", "script", or structural elements
+- Never explain what you're doing—just deliver the content
+- Stay within word limit
+
+# Output Format
+Write the complete narration as a single, flowing text. Start immediately with the hook."""
 
         return prompt
 
     def _call_ollama(self, prompt: str) -> str:
-        """Call Ollama API to generate content."""
+        """Call Ollama API to generate content.
+        
+        Args:
+            prompt: The prompt to send to the AI
+            
+        Returns:
+            The AI-generated response text
+            
+        Raises:
+            RuntimeError: If the API call fails
+        """
+        logger.debug(f"Calling Ollama API at {self.config.api_base}")
+        logger.debug(f"Model: {self.config.model}, Temperature: {self.config.temperature}")
+        
         try:
             response = requests.post(
                 f"{self.config.api_base}/api/generate",
@@ -803,15 +916,50 @@ The first sentence must create immediate curiosity or tension."""
 
             response.raise_for_status()
             result = response.json()
-            return result.get("response", "").strip()
+            generated_text = result.get("response", "").strip()
+            
+            if not generated_text:
+                logger.error("Ollama returned empty response")
+                raise RuntimeError("Ollama returned empty response")
+            
+            logger.debug(f"Generated {len(generated_text)} characters")
+            return generated_text
 
+        except requests.exceptions.Timeout:
+            logger.error(f"Ollama API call timed out after {self.config.timeout}s")
+            raise RuntimeError(f"Ollama API timed out after {self.config.timeout} seconds")
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Failed to connect to Ollama: {e}")
+            raise RuntimeError(f"Failed to connect to Ollama at {self.config.api_base}: {e}")
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"Ollama API returned error: {e}")
+            raise RuntimeError(f"Ollama API error: {e}")
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama API call failed: {e}")
             raise RuntimeError(f"Failed to generate AI script: {e}")
+        except (KeyError, ValueError) as e:
+            logger.error(f"Failed to parse Ollama response: {e}")
+            raise RuntimeError(f"Invalid response from Ollama: {e}")
 
     def _extract_content_text(self, response: str) -> str:
-        """Extract content text from AI response."""
+        """Extract content text from AI response.
+        
+        Args:
+            response: Raw response from AI
+            
+        Returns:
+            Cleaned content text
+            
+        Raises:
+            RuntimeError: If response is empty or invalid
+        """
+        if not response:
+            raise RuntimeError("AI response is empty")
+        
         cleaned = response.strip()
+        
+        if not cleaned:
+            raise RuntimeError("AI response contains only whitespace")
 
         # Remove common prefixes
         prefixes = ["SCRIPT:", "Content:", "script:", "Here is the script:", "Output:", "Narration:"]
@@ -823,7 +971,15 @@ The first sentence must create immediate curiosity or tension."""
         if (cleaned.startswith('"') and cleaned.endswith('"')) or (
             cleaned.startswith("'") and cleaned.endswith("'")
         ):
-            cleaned = cleaned[1:-1]
+            cleaned = cleaned[1:-1].strip()
+        
+        # Final validation
+        if not cleaned:
+            raise RuntimeError("AI response is empty after cleaning")
+        
+        # Check for minimum reasonable length (at least 50 characters)
+        if len(cleaned) < 50:
+            logger.warning(f"Generated content is very short: {len(cleaned)} characters")
 
         return cleaned
 
