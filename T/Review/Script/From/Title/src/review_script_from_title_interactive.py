@@ -147,6 +147,26 @@ def format_score(score: int) -> str:
 # =============================================================================
 
 
+def validate_input_size(text: str, logger: Optional[logging.Logger] = None) -> None:
+    """Validate input text size.
+    
+    Args:
+        text: Input text to validate
+        logger: Optional logger for recording validation attempts
+        
+    Raises:
+        ValueError: If input exceeds MAX_INPUT_SIZE or is empty
+    """
+    if not text:
+        raise ValueError("Input text is empty")
+    
+    if len(text) > MAX_INPUT_SIZE:
+        error_msg = f"Input too large: {len(text)} chars (max {MAX_INPUT_SIZE})"
+        if logger:
+            logger.error(error_msg)
+        raise ValueError(error_msg)
+
+
 def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tuple:
     """Parse input text for script review.
 
@@ -162,15 +182,8 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
     """
     text = text.strip()
     
-    # Validate input size (prevent memory issues)
-    if len(text) > MAX_INPUT_SIZE:
-        error_msg = f"Input too large: {len(text)} chars (max {MAX_INPUT_SIZE})"
-        if logger:
-            logger.error(error_msg)
-        raise ValueError(error_msg)
-    
-    if not text:
-        raise ValueError("Input text is empty")
+    # Validate input size
+    validate_input_size(text, logger)
 
     if logger:
         logger.info(f"Parsing input text ({len(text)} chars)")
@@ -210,9 +223,10 @@ def parse_review_input(text: str, logger: Optional[logging.Logger] = None) -> tu
             return content_text, title_text, idea
 
         except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON input at line {e.lineno}, column {e.colno}: {e.msg}"
             if logger:
-                logger.warning(f"JSON parse failed: {e}")
-            raise ValueError(f"Invalid JSON input: {e}")
+                logger.warning(f"JSON parse failed: {error_msg}")
+            raise ValueError(error_msg)
 
     # Plain text - split by double newline
     parts = text.split("\n\n", 1)
@@ -329,18 +343,12 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 title_text = input().strip()
                 
                 # Validate inputs
-                if not content_text:
-                    print_error("Content cannot be empty")
-                    continue
-                if not title_text:
-                    print_error("Title cannot be empty")
-                    continue
-                
-                # Validate size limits
-                if len(content_text) > MAX_INPUT_SIZE:
-                    print_error(f"Content too large: {len(content_text)} chars (max {MAX_INPUT_SIZE})")
-                    if logger:
-                        logger.warning(f"Content size exceeded: {len(content_text)}")
+                try:
+                    validate_input_size(content_text, logger)
+                    if not title_text:
+                        raise ValueError("Title cannot be empty")
+                except ValueError as e:
+                    print_error(f"Validation error: {e}")
                     continue
                 
                 idea = (
