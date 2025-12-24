@@ -526,7 +526,7 @@ class TitleImprover:
         content_text: str,
         title_improvements: List[Dict[str, Any]],
         script_insights: List[Dict[str, Any]],
-        alignment_issues: Dict[str, Any]],
+        alignment_issues: Dict[str, Any],
         idea: Optional[Idea] = None,
     ) -> str:
         """Generate the improved title text.
