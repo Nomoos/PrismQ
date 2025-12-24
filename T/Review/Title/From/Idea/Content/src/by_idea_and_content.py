@@ -543,7 +543,7 @@ def analyze_seo(title_text: str, script_keywords: List[str]) -> Dict[str, Any]:
 
 def generate_improvement_points(
     title_text: str,
-    script_alignment: AlignmentAnalysis,
+    content_alignment: AlignmentAnalysis,
     idea_alignment: AlignmentAnalysis,
     engagement_data: Dict[str, Any],
     seo_data: Dict[str, Any],
@@ -552,7 +552,7 @@ def generate_improvement_points(
 
     Args:
         title_text: The title being reviewed
-        script_alignment: Content alignment analysis
+        content_alignment: Content alignment analysis
         idea_alignment: Idea alignment analysis
         engagement_data: Engagement metrics
         seo_data: SEO metrics
@@ -563,16 +563,16 @@ def generate_improvement_points(
     improvements = []
 
     # Content alignment improvements
-    if script_alignment.score < 75:
-        if script_alignment.mismatches:
+    if content_alignment.score < 75:
+        if content_alignment.mismatches:
             improvements.append(
                 TitleImprovementPoint(
                     category=TitleReviewCategory.CONTENT_ALIGNMENT,
                     title="Strengthen content alignment",
-                    description=f"Title keywords '{', '.join(script_alignment.mismatches[:2])}' don't appear in content",
+                    description=f"Title keywords '{', '.join(content_alignment.mismatches[:2])}' don't appear in content",
                     priority="high",
                     impact_score=25,
-                    suggested_fix=f"Consider incorporating content elements: {', '.join(script_alignment.key_elements[:3])}",
+                    suggested_fix=f"Consider incorporating content elements: {', '.join(content_alignment.key_elements[:3])}",
                 )
             )
         else:
@@ -583,7 +583,7 @@ def generate_improvement_points(
                     description="Title doesn't strongly reflect content",
                     priority="high",
                     impact_score=20,
-                    suggested_fix=f"Reference key content elements: {', '.join(script_alignment.key_elements[:3])}",
+                    suggested_fix=f"Reference key content elements: {', '.join(content_alignment.key_elements[:3])}",
                 )
             )
 
