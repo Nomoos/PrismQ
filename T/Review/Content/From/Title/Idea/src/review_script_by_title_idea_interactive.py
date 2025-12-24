@@ -344,6 +344,107 @@ def display_review(review: ScriptReview, logger: Optional[logging.Logger] = None
 # =============================================================================
 
 
+def format_review_as_text(review: ScriptReview) -> str:
+    """Format ScriptReview as human-readable text for AI prompts and database storage.
+    
+    This converts the structured ScriptReview into plain text that can be:
+    - Stored in the database Review.text field
+    - Used as input for subsequent AI prompts in the workflow
+    - Read and understood by humans and AI systems
+    
+    Args:
+        review: ScriptReview object to format
+    
+    Returns:
+        Formatted review text suitable for text-to-text AI workflows
+    """
+    lines = []
+    
+    # Header
+    lines.append(f"SCRIPT REVIEW: {review.script_title}")
+    lines.append("=" * 80)
+    lines.append("")
+    
+    # Overall Assessment
+    lines.append(f"OVERALL SCORE: {review.overall_score}%")
+    
+    # Alignment Scores
+    if "title_alignment_score" in review.metadata:
+        lines.append(f"Title Alignment: {review.metadata['title_alignment_score']}%")
+    if "idea_alignment_score" in review.metadata:
+        lines.append(f"Idea Alignment: {review.metadata['idea_alignment_score']}%")
+    
+    lines.append("")
+    
+    # Length Information
+    lines.append(f"CONTENT LENGTH:")
+    lines.append(f"  Current: {review.current_length_seconds}s")
+    if review.optimal_length_seconds:
+        lines.append(f"  Recommended: {review.optimal_length_seconds}s")
+    lines.append(f"  Category: {review.target_length.value}")
+    lines.append("")
+    
+    # Category Scores
+    if review.category_scores:
+        lines.append("CATEGORY SCORES:")
+        for cat_score in review.category_scores:
+            lines.append(f"  {cat_score.category.value.capitalize()}: {cat_score.score}%")
+            if cat_score.reasoning:
+                lines.append(f"    Reasoning: {cat_score.reasoning}")
+            if cat_score.strengths:
+                lines.append(f"    Strengths: {', '.join(cat_score.strengths)}")
+            if cat_score.weaknesses:
+                lines.append(f"    Weaknesses: {', '.join(cat_score.weaknesses)}")
+        lines.append("")
+    
+    # Primary Concern
+    if review.primary_concern:
+        lines.append("PRIMARY CONCERN:")
+        lines.append(f"  {review.primary_concern}")
+        lines.append("")
+    
+    # Strengths
+    if review.strengths:
+        lines.append("STRENGTHS:")
+        for strength in review.strengths:
+            lines.append(f"  • {strength}")
+        lines.append("")
+    
+    # Quick Wins
+    if review.quick_wins:
+        lines.append("QUICK WINS (High Impact, Easy to Fix):")
+        for win in review.quick_wins:
+            lines.append(f"  • {win}")
+        lines.append("")
+    
+    # Improvement Recommendations
+    if review.improvement_points:
+        lines.append("IMPROVEMENT RECOMMENDATIONS:")
+        for i, point in enumerate(review.improvement_points, 1):
+            lines.append(f"  {i}. [{point.priority.upper()}] {point.title}")
+            lines.append(f"     {point.description}")
+            if point.specific_example:
+                lines.append(f"     Example: {point.specific_example}")
+            if point.suggested_fix:
+                lines.append(f"     Suggestion: {point.suggested_fix}")
+            lines.append(f"     Expected Impact: +{point.impact_score}%")
+            lines.append("")
+    
+    # Revision Status
+    if review.needs_major_revision:
+        lines.append("STATUS: Major revision recommended")
+    else:
+        lines.append("STATUS: Ready to proceed with minor improvements")
+    
+    lines.append("")
+    lines.append("-" * 80)
+    lines.append(f"Reviewed by: {review.reviewer_id}")
+    lines.append(f"Review Date: {review.reviewed_at}")
+    lines.append(f"Confidence: {review.confidence_score}%")
+    
+    return "\n".join(lines)
+
+
 def save_review_to_database(
     review: ScriptReview,
     preview_mode: bool = False,
@@ -385,12 +486,12 @@ def save_review_to_database(
         if logger:
             logger.info(f"Saving review to database: {db_path}")
         
-        # Serialize the review to JSON for storage
-        review_json = json.dumps(review.to_dict(), indent=2)
+        # Format the review as human-readable text for AI workflows
+        review_text = format_review_as_text(review)
         
-        # Create Review entity
+        # Create Review entity with plain text (not JSON)
         review_entity = Review(
-            text=review_json,
+            text=review_text,
             score=review.overall_score
         )
         
