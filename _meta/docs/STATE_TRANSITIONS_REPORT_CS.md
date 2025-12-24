@@ -67,41 +67,41 @@ stateDiagram-v2
     
     IdeaCreation --> StoryFromIdea
     StoryFromIdea --> TitleFromIdea
-    TitleFromIdea --> ScriptFromTitleIdea
-    ScriptFromTitleIdea --> ReviewTitleByScriptIdea
+    TitleFromIdea --> ContentFromTitleIdea
+    ContentFromTitleIdea --> ReviewTitleByContentIdea
     
-    ReviewTitleByScriptIdea --> ReviewScriptByTitleIdea
-    ReviewScriptByTitleIdea --> ReviewTitleByScript
+    ReviewTitleByContentIdea --> ReviewContentByTitleIdea
+    ReviewContentByTitleIdea --> ReviewTitleByContent
     
-    ReviewTitleByScript --> TitleFromScriptReviewTitle
-    ReviewTitleByScript --> ReviewScriptByTitle
+    ReviewTitleByContent --> TitleFromContentReviewTitle
+    ReviewTitleByContent --> ReviewContentByTitle
     
-    TitleFromScriptReviewTitle --> ScriptFromTitleReviewScript
-    ScriptFromTitleReviewScript --> ReviewTitleByScript
+    TitleFromContentReviewTitle --> ContentFromTitleReviewContent
+    ContentFromTitleReviewContent --> ReviewTitleByContent
     
-    ReviewScriptByTitle --> ScriptFromTitleReviewScript
-    ReviewScriptByTitle --> ReviewScriptGrammar
+    ReviewContentByTitle --> ContentFromTitleReviewContent
+    ReviewContentByTitle --> ReviewContentGrammar
     
-    ReviewScriptGrammar --> ReviewScriptTone
-    ReviewScriptGrammar --> ScriptFromTitleReviewScript
+    ReviewContentGrammar --> ReviewContentTone
+    ReviewContentGrammar --> ContentFromTitleReviewContent
     
-    ReviewScriptTone --> ReviewScriptContent
-    ReviewScriptTone --> ScriptFromTitleReviewScript
+    ReviewContentTone --> ReviewContentContent
+    ReviewContentTone --> ContentFromTitleReviewContent
     
-    ReviewScriptContent --> ReviewScriptConsistency
-    ReviewScriptContent --> ScriptFromTitleReviewScript
+    ReviewContentContent --> ReviewContentConsistency
+    ReviewContentContent --> ContentFromTitleReviewContent
     
-    ReviewScriptConsistency --> ReviewScriptEditing
-    ReviewScriptConsistency --> ScriptFromTitleReviewScript
+    ReviewContentConsistency --> ReviewContentEditing
+    ReviewContentConsistency --> ContentFromTitleReviewContent
     
-    ReviewScriptEditing --> ReviewTitleReadability
-    ReviewScriptEditing --> ScriptFromTitleReviewScript
+    ReviewContentEditing --> ReviewTitleReadability
+    ReviewContentEditing --> ContentFromTitleReviewContent
     
-    ReviewTitleReadability --> ReviewScriptReadability
-    ReviewTitleReadability --> TitleFromScriptReviewTitle
+    ReviewTitleReadability --> ReviewContentReadability
+    ReviewTitleReadability --> TitleFromContentReviewTitle
     
-    ReviewScriptReadability --> StoryReview
-    ReviewScriptReadability --> ScriptFromTitleReviewScript
+    ReviewContentReadability --> StoryReview
+    ReviewContentReadability --> ContentFromTitleReviewContent
     
     StoryReview --> StoryPolish
     StoryReview --> Publishing
@@ -119,55 +119,55 @@ stateDiagram-v2
 |------|-------|------|----------|------------|
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ | StoryFromIdea |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ | TitleFromIdea |
-| TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ | ScriptFromTitleIdea |
-| ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/From/Idea/Title/ | ReviewTitleByScriptIdea |
+| TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ | ContentFromTitleIdea |
+| ContentFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ | ReviewTitleByContentIdea |
 
 **Popis přechodů:**
 - `IdeaCreation → StoryFromIdea`: Vytvoření 10 příběhů z jednoho nápadu
 - `StoryFromIdea → TitleFromIdea`: Generování titulku v1 z nápadu
-- `TitleFromIdea → ScriptFromTitleIdea`: Generování skriptu v1 z titulku a nápadu
-- `ScriptFromTitleIdea → ReviewTitleByScriptIdea`: Zahájení revizního cyklu
+- `TitleFromIdea → ContentFromTitleIdea`: Generování obsahu v1 z titulku a nápadu
+- `ContentFromTitleIdea → ReviewTitleByContentIdea`: Zahájení revizního cyklu
 
-#### Fáze 2: Revize titulku a skriptu
+#### Fáze 2: Revize titulku a obsahu
 
 | Stav | Název | Fáze | Přechod na (schváleno) | Přechod na (zamítnuto) |
 |------|-------|------|------------------------|------------------------|
-| ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | ReviewScriptByTitleIdea | - |
-| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 5 | ReviewTitleByScript | - |
-| ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 6 | ReviewScriptByTitle | TitleFromScriptReviewTitle |
-| TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | ScriptFromTitleReviewScript | - |
-| ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 8 | ReviewTitleByScript | - |
-| ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | ReviewScriptGrammar | ScriptFromTitleReviewScript |
+| ReviewTitleByContentIdea | PrismQ.T.Review.Title.From.Content.Idea | 4 | ReviewContentByTitleIdea | - |
+| ReviewContentByTitleIdea | PrismQ.T.Review.Content.From.Title.Idea | 5 | ReviewTitleByContent | - |
+| ReviewTitleByContent | PrismQ.T.Review.Title.From.Content | 6 | ReviewContentByTitle | TitleFromContentReviewTitle |
+| TitleFromContentReviewTitle | PrismQ.T.Title.From.Content.Review.Title | 7 | ContentFromTitleReviewContent | - |
+| ContentFromTitleReviewContent | PrismQ.T.Content.From.Title.Review.Content | 8 | ReviewTitleByContent | - |
+| ReviewContentByTitle | PrismQ.T.Review.Content.From.Title | 9 | ReviewContentGrammar | ContentFromTitleReviewContent |
 
 **Iterativní smyčka:**
 ```
-ReviewTitleByScript
-    ├─ schváleno → ReviewScriptByTitle
-    └─ zamítnuto → TitleFromScriptReviewTitle → ScriptFromTitleReviewScript → ReviewTitleByScript
+ReviewTitleByContent
+    ├─ schváleno → ReviewContentByTitle
+    └─ zamítnuto → TitleFromContentReviewTitle → ContentFromTitleReviewContent → ReviewTitleByContent
 ```
 
 #### Fáze 3: Kvalitní revize (lokální AI)
 
 | Stav | Název | Fáze | Přechod na (projde) | Přechod na (selže) |
 |------|-------|------|--------------------|--------------------|
-| ReviewScriptGrammar | PrismQ.T.Review.Script.Grammar | 10 | ReviewScriptTone | ScriptFromTitleReviewScript |
-| ReviewScriptTone | PrismQ.T.Review.Script.Tone | 11 | ReviewScriptContent | ScriptFromTitleReviewScript |
-| ReviewScriptContent | PrismQ.T.Review.Script.Content | 12 | ReviewScriptConsistency | ScriptFromTitleReviewScript |
-| ReviewScriptConsistency | PrismQ.T.Review.Script.Consistency | 13 | ReviewScriptEditing | ScriptFromTitleReviewScript |
-| ReviewScriptEditing | PrismQ.T.Review.Script.Editing | 14 | ReviewTitleReadability | ScriptFromTitleReviewScript |
-| ReviewTitleReadability | PrismQ.T.Review.Title.Readability | 15 | ReviewScriptReadability | TitleFromScriptReviewTitle |
-| ReviewScriptReadability | PrismQ.T.Review.Script.Readability | 16 | StoryReview | ScriptFromTitleReviewScript |
+| ReviewContentGrammar | PrismQ.T.Review.Content.Grammar | 10 | ReviewContentTone | ContentFromTitleReviewContent |
+| ReviewContentTone | PrismQ.T.Review.Content.Tone | 11 | ReviewContentContent | ContentFromTitleReviewContent |
+| ReviewContentContent | PrismQ.T.Review.Content.Content | 12 | ReviewContentConsistency | ContentFromTitleReviewContent |
+| ReviewContentConsistency | PrismQ.T.Review.Content.Consistency | 13 | ReviewContentEditing | ContentFromTitleReviewContent |
+| ReviewContentEditing | PrismQ.T.Review.Content.Editing | 14 | ReviewTitleReadability | ContentFromTitleReviewContent |
+| ReviewTitleReadability | PrismQ.T.Review.Title.Readability | 15 | ReviewContentReadability | TitleFromContentReviewTitle |
+| ReviewContentReadability | PrismQ.T.Review.Content.Readability | 16 | StoryReview | ContentFromTitleReviewContent |
 
 **Sekvenční kvalitní kontroly:**
 ```
-ReviewScriptGrammar
-    ├─ projde → ReviewScriptTone
-    │               ├─ projde → ReviewScriptContent
-    │               │               ├─ projde → ReviewScriptConsistency
-    │               │               │               └─ ... → ReviewScriptEditing → ReviewTitleReadability → ReviewScriptReadability
-    │               │               └─ selže → ScriptFromTitleReviewScript
-    │               └─ selže → ScriptFromTitleReviewScript
-    └─ selže → ScriptFromTitleReviewScript
+ReviewContentGrammar
+    ├─ projde → ReviewContentTone
+    │               ├─ projde → ReviewContentContent
+    │               │               ├─ projde → ReviewContentConsistency
+    │               │               │               └─ ... → ReviewContentEditing → ReviewTitleReadability → ReviewContentReadability
+    │               │               └─ selže → ContentFromTitleReviewContent
+    │               └─ selže → ContentFromTitleReviewContent
+    └─ selže → ContentFromTitleReviewContent
 ```
 
 #### Fáze 4: Expertní revize (GPT)
@@ -188,8 +188,8 @@ StoryReview
 
 | Kontrolní bod | Fáze | Popis |
 |---------------|------|-------|
-| Soulad titulek-skript (počáteční) | 4-6 | Zajištění počátečního souladu titulku a skriptu s nápadem |
-| Soulad titulek-skript (upřesněný) | 8-10 | Zajištění upřesněného souladu titulku a skriptu |
+| Soulad titulek-obsah (počáteční) | 4-6 | Zajištění počátečního souladu titulku a obsahu s nápadem |
+| Soulad titulek-obsah (upřesněný) | 8-10 | Zajištění upřesněného souladu titulku a obsahu |
 | Lokální AI kvalitní revize | 10-16 | Sedmidimenzionální hodnocení kvality |
 | Expertní revize | 17-18 | GPT-based holistická revize |
 
@@ -592,13 +592,13 @@ Poznatky z metrik informují budoucí obsah:
 │       ▼                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────────────┐    │
 │  │ T MODUL: 18 stavů                                                       │    │
-│  │ IdeaCreation → StoryFromIdea → TitleFromIdea → ScriptFromTitleIdea      │    │
-│  │     → ReviewTitleByScriptIdea → ReviewScriptByTitleIdea                 │    │
-│  │     → ReviewTitleByScript ↔ TitleFromScriptReviewTitle                  │    │
-│  │     → ScriptFromTitleReviewScript ↔ ReviewScriptByTitle                 │    │
-│  │     → ReviewScriptGrammar → ReviewScriptTone → ReviewScriptContent      │    │
-│  │     → ReviewScriptConsistency → ReviewScriptEditing                     │    │
-│  │     → ReviewTitleReadability → ReviewScriptReadability                  │    │
+│  │ IdeaCreation → StoryFromIdea → TitleFromIdea → ContentFromTitleIdea      │    │
+│  │     → ReviewTitleByContentIdea → ReviewContentByTitleIdea                 │    │
+│  │     → ReviewTitleByContent ↔ TitleFromContentReviewTitle                  │    │
+│  │     → ContentFromTitleReviewContent ↔ ReviewContentByTitle                 │    │
+│  │     → ReviewContentGrammar → ReviewContentTone → ReviewContentContent      │    │
+│  │     → ReviewContentConsistency → ReviewContentEditing                     │    │
+│  │     → ReviewTitleReadability → ReviewContentReadability                  │    │
 │  │     → StoryReview ↔ StoryPolish → Publishing                            │    │
 │  └─────────────────────────────────────────────────────────────────────────┘    │
 │       │ PublishedText                                                            │
@@ -651,8 +651,8 @@ Poznatky z metrik informují budoucí obsah:
 
 | Typ přechodu | Popis | Příklad |
 |--------------|-------|---------|
-| **Lineární** | Postup vpřed při splnění podmínek | ScriptDraft → ScriptReview |
-| **Zpětný** | Návrat na předchozí stav pro revizi | ScriptReview → ScriptDraft |
+| **Lineární** | Postup vpřed při splnění podmínek | ContentDraft → ContentReview |
+| **Zpětný** | Návrat na předchozí stav pro revizi | ContentReview → ContentDraft |
 | **Smyčka** | Iterativní cyklus do schválení | StoryReview ↔ StoryPolish |
 | **Archivace** | Předčasné ukončení | [Jakýkoli stav] → Archived |
 | **Zpětná vazba** | Informace pro budoucí obsah | Analytics → IdeaInspiration |
@@ -661,7 +661,7 @@ Poznatky z metrik informují budoucí obsah:
 
 | Modul | Kontrolní bod | Účel |
 |-------|---------------|------|
-| T | Soulad titulek-skript | Zajištění konzistence |
+| T | Soulad titulek-obsah | Zajištění konzistence |
 | T | Lokální AI revize (7x) | Automatizovaná kvalita |
 | T | Expertní GPT revize | Profesionální standard |
 | A | Revize nahrávky | Kvalita hlasu |
