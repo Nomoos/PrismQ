@@ -1,5 +1,5 @@
 @echo off
-REM Preview.bat - PrismQ.T.Script.From.Title.Idea
+REM Preview.bat - PrismQ.T.Content.From.Idea.Title
 REM Preview mode - does NOT save to database
 REM
 REM Usage: Preview.bat
@@ -10,13 +10,13 @@ call :setup_env
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Script.From.Title.Idea - PREVIEW MODE
+echo PrismQ.T.Content.From.Idea.Title - PREVIEW MODE
 echo ========================================
 echo.
-echo This mode is for TESTING. Scripts will NOT be saved.
+echo This mode is for TESTING. Content will NOT be saved.
 echo.
 
-python ..\..\..\T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py --preview --debug
+python ..\..\..\T\Content\From\Idea\Title\src\content_from_idea_title_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -26,7 +26,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Script\From\Idea\Title
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Content\From\Idea\Title
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg
