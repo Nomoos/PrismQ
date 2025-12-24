@@ -27,6 +27,7 @@ Usage:
 """
 
 import json
+import logging
 import sqlite3
 
 # Import Idea from Idea module
@@ -52,6 +53,8 @@ from .content_generator import (
     ContentTone,
     ContentV1,
 )
+
+logger = logging.getLogger(__name__)
 
 _current_file = Path(__file__)
 # Navigate: src -> Title -> Idea -> From -> Content -> T
@@ -226,6 +229,7 @@ class StoryContentService:
         """Generate script and transition state to PrismQ.T.Review.Title.From.Content.
 
         Internal method that handles the state-based workflow content generation.
+        Includes idempotency checks to prevent duplicate processing.
 
         Args:
             story: Story object with state PrismQ.T.Content.From.Idea.Title
@@ -235,30 +239,45 @@ class StoryContentService:
         """
         result = ContentGenerationResult(story_id=story.id)
 
+        # Idempotency check: If story already has content, don't regenerate
+        if story.has_content():
+            result.error = f"Story {story.id} already has content_id={story.content_id}. Skipping duplicate generation."
+            logger.warning(result.error)
+            return result
+
         # Validate story has required content
         if not story.has_idea():
             result.error = "Story does not have idea_json set"
+            logger.error(f"Story {story.id}: {result.error}")
             return result
 
         if not story.has_title():
             result.error = "Story does not have title_id set"
+            logger.error(f"Story {story.id}: {result.error}")
             return result
 
         try:
+            logger.info(f"Starting content generation for story {story.id}")
+            
             # Parse the Idea from JSON
             idea_data = json.loads(story.idea_json)
             idea = Idea.from_dict(idea_data)
+            logger.debug(f"Story {story.id}: Parsed idea successfully")
 
             # Get the Title text
             title = self.title_repo.find_by_id(story.title_id)
             if not title:
                 result.error = f"Title with id {story.title_id} not found"
+                logger.error(f"Story {story.id}: {result.error}")
                 return result
 
             title_text = title.text
+            logger.debug(f"Story {story.id}: Retrieved title '{title_text}'")
 
             # Generate the script
+            logger.info(f"Story {story.id}: Generating content with AI")
             script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
+            logger.info(f"Story {story.id}: Content generated successfully ({len(script_v1.full_text)} chars)")
 
             # Create Content model for database
             script_model = ScriptModel(
@@ -266,12 +285,15 @@ class StoryContentService:
             )
 
             # Save to database
+            logger.debug(f"Story {story.id}: Saving content to database")
             saved_content = self.content_repo.insert(script_model)
+            logger.info(f"Story {story.id}: Content saved with id={saved_content.id}")
 
             # Update the story with script reference and transition state
             story.content_id = saved_content.id
             story.update_state(StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA)
             self.story_repo.update(story)
+            logger.info(f"Story {story.id}: State updated to {StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA}")
 
             # Populate result
             result.success = True
@@ -280,10 +302,13 @@ class StoryContentService:
 
         except json.JSONDecodeError as e:
             result.error = f"Failed to parse idea_json: {str(e)}"
+            logger.error(f"Story {story.id}: {result.error}")
         except ValueError as e:
             result.error = f"Invalid idea or title: {str(e)}"
+            logger.error(f"Story {story.id}: {result.error}")
         except Exception as e:
             result.error = f"Content generation failed: {str(e)}"
+            logger.exception(f"Story {story.id}: Unexpected error during content generation")
 
         return result
 
@@ -559,6 +584,8 @@ class ContentFromIdeaTitleService:
         2. Generates a Content from the Story's Idea and Title
         3. Saves the Content to the database
         4. Updates the Story state to PrismQ.T.Review.Title.From.Content.Idea
+        
+        Includes idempotency checks and comprehensive logging.
 
         Returns:
             StateBasedContentResult with processing details.
@@ -571,35 +598,50 @@ class ContentFromIdeaTitleService:
 
         if story is None:
             result.error = "No stories found in state PrismQ.T.Content.From.Idea.Title"
+            logger.debug(result.error)
             return result
 
         result.story_id = story.id
         result.previous_state = story.state
+        logger.info(f"Processing story {story.id} in state {story.state}")
+
+        # Idempotency check: If story already has content, don't regenerate
+        if story.content_id:
+            result.error = f"Story {story.id} already has content_id={story.content_id}. Skipping duplicate generation."
+            logger.warning(result.error)
+            return result
 
         # Validate story has required data
         if not story.idea_json:
             result.error = f"Story {story.id} has no idea_json"
+            logger.error(result.error)
             return result
 
         if not story.title_id:
             result.error = f"Story {story.id} has no title_id"
+            logger.error(result.error)
             return result
 
         try:
+            logger.debug(f"Story {story.id}: Parsing idea from JSON")
             # Parse the Idea from JSON
             idea_data = json.loads(story.idea_json)
             idea = Idea.from_dict(idea_data)
 
             # Get the Title text
+            logger.debug(f"Story {story.id}: Fetching title with id={story.title_id}")
             title = self.title_repo.find_by_id(story.title_id)
             if not title:
                 result.error = f"Title with id {story.title_id} not found"
+                logger.error(f"Story {story.id}: {result.error}")
                 return result
 
             title_text = title.text
+            logger.info(f"Story {story.id}: Generating content for title '{title_text}'")
 
             # Generate the script
             script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
+            logger.info(f"Story {story.id}: Content generated successfully ({len(script_v1.full_text)} chars)")
 
             # Create Content model for database
             script_model = ScriptModel(
@@ -607,13 +649,16 @@ class ContentFromIdeaTitleService:
             )
 
             # Save to database
+            logger.debug(f"Story {story.id}: Saving content to database")
             saved_content = self.content_repo.insert(script_model)
+            logger.info(f"Story {story.id}: Content saved with id={saved_content.id}")
 
             # Update the story with the script reference and new state
             story.content_id = saved_content.id
             story.state = self.OUTPUT_STATE
             story.updated_at = datetime.now()
             self.story_repo.update(story)
+            logger.info(f"Story {story.id}: State updated to {self.OUTPUT_STATE}")
 
             # Populate result
             result.success = True
@@ -623,10 +668,13 @@ class ContentFromIdeaTitleService:
 
         except json.JSONDecodeError as e:
             result.error = f"Failed to parse idea_json: {str(e)}"
+            logger.error(f"Story {story.id}: {result.error}")
         except ValueError as e:
             result.error = f"Invalid idea or title: {str(e)}"
+            logger.error(f"Story {story.id}: {result.error}")
         except Exception as e:
             result.error = f"Content generation failed: {str(e)}"
+            logger.exception(f"Story {story.id}: Unexpected error during content generation")
 
         return result
 
