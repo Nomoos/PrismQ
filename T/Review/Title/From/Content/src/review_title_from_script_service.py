@@ -8,10 +8,11 @@ PrismQ.T.Review.Title.From.Content state by:
 4. Updating the Story state based on review result
 
 State Transitions:
-    - If review accepts title (score >= threshold) -> PrismQ.T.Review.Content.From.Title
+    - If review accepts title (score >= threshold) -> PrismQ.T.Review.Script.From.Title
     - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Content.Review.Title
 """
 
+import logging
 import os
 import sqlite3
 import sys
@@ -19,9 +20,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Tuple
 
+# Setup logging
+logger = logging.getLogger(__name__)
+
 # Setup paths for imports
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_module_root = os.path.dirname(_current_dir)  # T/Review/Title/From/Content
+_module_root = os.path.dirname(_current_dir)  # T/Review/Title/From/Script
 _t_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_module_root))))  # T
 _repo_root = os.path.dirname(_t_root)
 
@@ -313,58 +317,98 @@ class ReviewTitleFromScriptService:
         Returns:
             ReviewTitleFromScriptResult with processing outcome
         """
+        logger.info(f"Processing story {story.id} in state {story.state}")
+        
         # Validate story is in correct state
         if story.state != self.CURRENT_STATE:
+            error_msg = f"Story is in state '{story.state}', expected '{self.CURRENT_STATE}'"
+            logger.warning(f"Story {story.id}: {error_msg}")
             return ReviewTitleFromScriptResult(
                 success=False,
                 story_id=story.id,
-                error_message=f"Story is in state '{story.state}', expected '{self.CURRENT_STATE}'",
+                error_message=error_msg,
             )
 
-        # Get the latest title for the story
-        title = self.title_repo.find_latest_version(story.id)
-        if not title:
+        try:
+            # Get the latest title for the story
+            title = self.title_repo.find_latest_version(story.id)
+            if not title:
+                error_msg = "No title found for story"
+                logger.error(f"Story {story.id}: {error_msg}")
+                return ReviewTitleFromScriptResult(
+                    success=False, story_id=story.id, error_message=error_msg
+                )
+            
+            logger.debug(f"Story {story.id}: Found title v{title.version} ({len(title.text)} chars)")
+
+            # Get the latest script for the story
+            script = self.content_repo.find_latest_version(story.id)
+            if not script:
+                error_msg = "No script found for story"
+                logger.error(f"Story {story.id}: {error_msg}")
+                return ReviewTitleFromScriptResult(
+                    success=False, story_id=story.id, error_message=error_msg
+                )
+            
+            logger.debug(f"Story {story.id}: Found script v{script.version} ({len(script.text)} chars)")
+
+            # Generate the review
+            logger.info(f"Story {story.id}: Generating review for title v{title.version} against script v{script.version}")
+            review_text, review_score = self._generate_review(title, script)
+            logger.info(f"Story {story.id}: Review generated with score {review_score}")
+
+            # Create and save the Review record
+            review = Review(text=review_text, score=review_score, created_at=datetime.now())
+            saved_review = self.review_repo.insert(review)
+            logger.debug(f"Story {story.id}: Review saved with id {saved_review.id}")
+
+            # Determine next state based on score
+            title_accepted = review_score >= self.acceptance_threshold
+            new_state = self.STATE_ON_ACCEPT if title_accepted else self.STATE_ON_REJECT
+            
+            logger.info(
+                f"Story {story.id}: Title {'accepted' if title_accepted else 'rejected'} "
+                f"(score {review_score} vs threshold {self.acceptance_threshold}), "
+                f"transitioning to {new_state}"
+            )
+
+            # Update story state
+            story.state = new_state
+            story.updated_at = datetime.now()
+            self.story_repo.update(story)
+
+            # Note: The review_id could be linked to Title via FK but Title uses
+            # INSERT-only pattern (create new version instead of update). The review
+            # result is stored separately and the story state tracks progression.
+            # The StoryReview linking table could be used for formal linking if needed.
+
+            logger.info(f"Story {story.id}: Processing completed successfully")
             return ReviewTitleFromScriptResult(
-                success=False, story_id=story.id, error_message="No title found for story"
+                success=True,
+                story_id=story.id,
+                review_id=saved_review.id,
+                review_score=review_score,
+                review_text=review_text,
+                new_state=new_state,
+                title_accepted=title_accepted,
             )
-
-        # Get the latest script for the story
-        script = self.content_repo.find_latest_version(story.id)
-        if not script:
+        
+        except ValueError as e:
+            error_msg = f"Validation error: {str(e)}"
+            logger.error(f"Story {story.id}: {error_msg}")
             return ReviewTitleFromScriptResult(
-                success=False, story_id=story.id, error_message="No script found for story"
+                success=False,
+                story_id=story.id,
+                error_message=error_msg,
             )
-
-        # Generate the review
-        review_text, review_score = self._generate_review(title, script)
-
-        # Create and save the Review record
-        review = Review(text=review_text, score=review_score, created_at=datetime.now())
-        saved_review = self.review_repo.insert(review)
-
-        # Determine next state based on score
-        title_accepted = review_score >= self.acceptance_threshold
-        new_state = self.STATE_ON_ACCEPT if title_accepted else self.STATE_ON_REJECT
-
-        # Update story state
-        story.state = new_state
-        story.updated_at = datetime.now()
-        self.story_repo.update(story)
-
-        # Note: The review_id could be linked to Title via FK but Title uses
-        # INSERT-only pattern (create new version instead of update). The review
-        # result is stored separately and the story state tracks progression.
-        # The StoryReview linking table could be used for formal linking if needed.
-
-        return ReviewTitleFromScriptResult(
-            success=True,
-            story_id=story.id,
-            review_id=saved_review.id,
-            review_score=review_score,
-            review_text=review_text,
-            new_state=new_state,
-            title_accepted=title_accepted,
-        )
+        except Exception as e:
+            error_msg = f"Unexpected error during processing: {str(e)}"
+            logger.exception(f"Story {story.id}: {error_msg}")
+            return ReviewTitleFromScriptResult(
+                success=False,
+                story_id=story.id,
+                error_message=error_msg,
+            )
 
     def process_oldest_story(self) -> ReviewTitleFromScriptResult:
         """Process the oldest story in the Review.Title.From.Content state.
@@ -372,8 +416,10 @@ class ReviewTitleFromScriptService:
         Returns:
             ReviewTitleFromScriptResult with processing outcome
         """
+        logger.info(f"Looking for oldest story in state {self.CURRENT_STATE}")
         story = self.find_oldest_story_to_process()
         if not story:
+            logger.warning(f"No stories found in state '{self.CURRENT_STATE}'")
             return ReviewTitleFromScriptResult(
                 success=False, error_message=f"No stories found in state '{self.CURRENT_STATE}'"
             )

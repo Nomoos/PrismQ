@@ -19,7 +19,7 @@ Successfully implemented the AI-powered title review function for reviewing titl
 ### ✅ All Criteria Met
 
 1. **Review title v1 against script v1 and idea**
-   - ✓ Implemented in `review_title_by_script_and_idea()` function
+   - ✓ Implemented in `review_title_by_content_and_idea()` function
    - ✓ Analyzes title alignment with both script content and original idea
    - ✓ Supports version tracking (v1, v2, etc.)
 
@@ -59,8 +59,8 @@ Successfully implemented the AI-powered title review function for reviewing titl
 
 ### Files Created
 
-1. **by_script_and_idea.py** (700+ lines)
-   - Main review function: `review_title_by_script_and_idea()`
+1. **by_content_and_idea.py** (700+ lines)
+   - Main review function: `review_title_by_content_and_idea()`
    - Helper functions:
      - `extract_keywords()` - Keyword extraction with stopword filtering
      - `analyze_title_script_alignment()` - Script alignment analysis
@@ -70,7 +70,7 @@ Successfully implemented the AI-powered title review function for reviewing titl
      - `generate_improvement_points()` - Prioritized recommendations
    - Data class: `AlignmentAnalysis` for alignment results
 
-2. **test_by_script_and_idea.py** (550+ lines)
+2. **test_by_content_and_idea.py** (550+ lines)
    - 34 unit tests for review function
    - Tests for all helper functions
    - Integration tests
@@ -91,7 +91,7 @@ Successfully implemented the AI-powered title review function for reviewing titl
 ### Files Modified
 
 1. **__init__.py**
-   - Added exports for `review_title_by_script_and_idea` and `AlignmentAnalysis`
+   - Added exports for `review_title_by_content_and_idea` and `AlignmentAnalysis`
    - Maintains backward compatibility
 
 ---
@@ -207,9 +207,9 @@ Output: TitleReview object (JSON-compatible)
 ### Basic Usage
 
 ```python
-from T.Review.Title.ByScriptAndIdea import review_title_by_script_and_idea
+from T.Review.Title.ByScriptAndIdea import review_title_by_content_and_idea
 
-review = review_title_by_script_and_idea(
+review = review_title_by_content_and_idea(
     title_text="The Mysterious Echo",
     script_text="In the old house, echoes reveal secrets...",
     idea_summary="Mystery about echoes revealing secrets"

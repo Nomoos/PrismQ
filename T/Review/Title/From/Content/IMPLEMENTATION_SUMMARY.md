@@ -19,8 +19,8 @@ Successfully implemented MVP-008: Title Review v2 module that evaluates refined 
 
 ### Key Components
 
-1. **by_script_v2.py** (615 lines)
-   - `review_title_by_script_v2()`: Main review function
+1. **by_content_v2.py** (615 lines)
+   - `review_title_by_content_v2()`: Main review function
    - `compare_reviews()`: Detailed v1 vs v2 comparison
    - `get_improvement_summary()`: Summary with recommendations
    - `ImprovementComparison`: Data class for tracking changes
@@ -30,7 +30,7 @@ Successfully implemented MVP-008: Title Review v2 module that evaluates refined 
    - Module exports
    - Clean API surface
 
-3. **_meta/tests/test_by_script_v2.py** (580 lines)
+3. **_meta/tests/test_by_content_v2.py** (580 lines)
    - 31 comprehensive tests
    - 100% test coverage
    - All tests passing
@@ -187,20 +187,20 @@ v1 Score: 50% → v2 Score: 33% (Δ-17%)
 
 ```python
 from T.Review.Title import (
-    review_title_by_script_and_idea,
-    review_title_by_script_v2,
+    review_title_by_content_and_idea,
+    review_title_by_content_v2,
     get_improvement_summary
 )
 
 # Step 1: Review v1
-v1_review = review_title_by_script_and_idea(
+v1_review = review_title_by_content_and_idea(
     title_text="The Echo",
     script_text="Horror short about mysterious sounds...",
     idea_summary="Horror story"
 )
 
 # Step 2: Review v2 with comparison
-v2_review = review_title_by_script_v2(
+v2_review = review_title_by_content_v2(
     title_text="The Echo - A Haunting Discovery",
     script_text="Enhanced horror short...",
     previous_review=v1_review

@@ -1,7 +1,7 @@
-"""Tests for PrismQ.T.Review.Title.ByScript (v2) module.
+"""Tests for PrismQ.T.Review.Title.From.Content (v2) module.
 
 This test suite validates the v2 title review functionality including:
-- Review of v2 title against v2 script
+- Review of v2 title against v2 content
 - Comparison with v1 reviews
 - Improvement tracking
 - JSON output format
@@ -16,16 +16,16 @@ import pytest
 # Add parent directories to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
-from T.Review.Title.ByScript.by_content_v2 import (
+from T.Review.Title.From.Content.by_content_v2 import (
     ImprovementComparison,
     compare_reviews,
     get_improvement_summary,
     review_title_by_content_v2,
 )
-from T.Review.Title.ByScriptAndIdea.by_content_and_idea import (
+from T.Review.Title.From.Content.Idea.by_content_and_idea import (
     review_title_by_content_and_idea,
 )
-from T.Review.Title.ByScriptAndIdea.title_review import TitleReview
+from T.Review.Title.From.Content.Idea.title_review import TitleReview
 
 
 @pytest.fixture
@@ -172,12 +172,9 @@ class TestReviewTitleByScriptV2:
         assert "category_scores" in review_dict
 
     def test_v2_review_empty_content(self, sample_v2_title):
-        """Test v2 review with empty script."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text="")
-
-        assert review is not None
-        # Should still generate a review, but with lower scores
-        assert review.script_alignment_score >= 0
+        """Test v2 review with empty script raises ValueError."""
+        with pytest.raises(ValueError, match="content_text must be a non-empty string"):
+            review_title_by_content_v2(title_text=sample_v2_title, content_text="")
 
     def test_v2_review_very_long_title(self, sample_v2_content):
         """Test v2 review with very long title."""
@@ -195,6 +192,63 @@ class TestReviewTitleByScriptV2:
 
         assert review is not None
         assert review.current_length_chars < 30
+
+
+class TestParameterValidation:
+    """Test suite for parameter validation."""
+
+    def test_empty_title_raises_error(self, sample_v2_content):
+        """Test that empty title raises ValueError."""
+        with pytest.raises(ValueError, match="title_text must be a non-empty string"):
+            review_title_by_content_v2(title_text="", content_text=sample_v2_content)
+
+    def test_none_title_raises_error(self, sample_v2_content):
+        """Test that None title raises ValueError."""
+        with pytest.raises(ValueError, match="title_text must be a non-empty string"):
+            review_title_by_content_v2(title_text=None, content_text=sample_v2_content)
+
+    def test_whitespace_only_title_raises_error(self, sample_v2_content):
+        """Test that whitespace-only title raises ValueError."""
+        with pytest.raises(ValueError, match="title_text is too short"):
+            review_title_by_content_v2(title_text="   ", content_text=sample_v2_content)
+
+    def test_too_long_title_raises_error(self, sample_v2_content):
+        """Test that excessively long title raises ValueError."""
+        long_title = "A" * 250
+        with pytest.raises(ValueError, match="title_text exceeds maximum length"):
+            review_title_by_content_v2(title_text=long_title, content_text=sample_v2_content)
+
+    def test_too_short_title_raises_error(self, sample_v2_content):
+        """Test that title shorter than 3 chars raises ValueError."""
+        with pytest.raises(ValueError, match="title_text is too short"):
+            review_title_by_content_v2(title_text="Hi", content_text=sample_v2_content)
+
+    def test_empty_content_raises_error(self, sample_v2_title):
+        """Test that empty content raises ValueError."""
+        with pytest.raises(ValueError, match="content_text must be a non-empty string"):
+            review_title_by_content_v2(title_text=sample_v2_title, content_text="")
+
+    def test_too_short_content_raises_error(self, sample_v2_title):
+        """Test that content shorter than 10 chars raises ValueError."""
+        with pytest.raises(ValueError, match="content_text is too short"):
+            review_title_by_content_v2(title_text=sample_v2_title, content_text="Short")
+
+    def test_invalid_previous_review_type_raises_error(self, sample_v2_title, sample_v2_content):
+        """Test that invalid previous_review type raises TypeError."""
+        with pytest.raises(TypeError, match="previous_review must be a TitleReview instance"):
+            review_title_by_content_v2(
+                title_text=sample_v2_title, 
+                content_text=sample_v2_content, 
+                previous_review="not a review"
+            )
+
+    def test_whitespace_is_trimmed(self, sample_v2_content):
+        """Test that whitespace is properly trimmed from inputs."""
+        review = review_title_by_content_v2(
+            title_text="  The Echo  ",
+            content_text=f"  {sample_v2_content}  "
+        )
+        assert review.title_text == "The Echo"
 
 
 class TestCompareReviews:
