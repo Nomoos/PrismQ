@@ -3,15 +3,27 @@
 Tests MVP-005: Review script v1 against title v1 and idea.
 """
 
+import sys
+from pathlib import Path
+
 import pytest
 
+# Add paths to avoid Grammar module import issues
+REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT / "T" / "Review" / "Script"))
+sys.path.insert(0, str(REPO_ROOT / "T" / "Idea" / "Model"))  # This loads src.idea
+sys.path.insert(0, str(REPO_ROOT))
+
 from src.idea import ContentGenre, Idea
-from T.Review.Content import (
+# Direct imports to avoid __init__.py
+from by_title_and_idea import (
     AlignmentScore,
+    review_content_by_title_and_idea,
+)
+from script_review import (
     ContentLength,
     ReviewCategory,
     ScriptReview,
-    review_content_by_title_and_idea,
 )
 
 

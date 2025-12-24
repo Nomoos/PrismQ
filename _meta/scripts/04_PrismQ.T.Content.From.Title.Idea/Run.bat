@@ -1,6 +1,6 @@
 @echo off
-REM Run.bat - PrismQ.T.Script.From.Title.Idea
-REM Generate script from title and idea - saves to database
+REM Run.bat - PrismQ.T.Content.From.Idea.Title
+REM Generate content from title and idea - saves to database
 REM
 REM Usage: Run.bat
 
@@ -10,11 +10,11 @@ call :setup_env
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Script.From.Title.Idea - RUN MODE
+echo PrismQ.T.Content.From.Idea.Title - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Script\From\Idea\Title\src\script_from_idea_title_interactive.py
+python ..\..\..\T\Content\From\Idea\Title\src\content_from_idea_title_interactive.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
@@ -23,7 +23,7 @@ exit /b 0
 
 :setup_env
 setlocal enabledelayedexpansion
-set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Script\From\Idea\Title
+set MODULE_DIR=%SCRIPT_DIR%..\..\..\T\Content\From\Idea\Title
 set VENV_DIR=%MODULE_DIR%\.venv
 set REQUIREMENTS=%MODULE_DIR%\requirements.txt
 set VENV_MARKER=%VENV_DIR%\pyvenv.cfg

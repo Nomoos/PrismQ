@@ -164,15 +164,21 @@ class ContentGeneratorConfig:
     AI model and temperature are obtained from global configuration.
 
     Attributes:
+        platform_target: Target platform for content optimization
         target_duration_seconds: Target script duration (default: 120s)
         max_duration_seconds: Maximum script duration (default: 175s, 5s before platform limits)
+        structure_type: Content structure (hook_deliver_cta, three_act, etc.)
+        tone: Content tone (engaging, mysterious, educational, etc.)
         audience: Target audience dict with age_range, gender, country
         words_per_second: Narration speed (for duration estimation)
         include_cta: Whether to include call-to-action
     """
 
+    platform_target: PlatformTarget = PlatformTarget.YOUTUBE_MEDIUM
     target_duration_seconds: int = 120
     max_duration_seconds: int = 175
+    structure_type: ContentStructure = ContentStructure.HOOK_DELIVER_CTA
+    tone: ContentTone = ContentTone.ENGAGING
     audience: Dict[str, str] = field(
         default_factory=lambda: {
             "age_range": "13-23",
@@ -275,13 +281,37 @@ class ContentGenerator:
             ValueError: If idea or title is invalid
             RuntimeError: If AI generation is unavailable or fails
         """
+        # Validate inputs
         if not idea:
             raise ValueError("Idea cannot be None")
         if not title or not title.strip():
             raise ValueError("Title cannot be empty")
-
+        
+        # Validate title length (reasonable limits)
+        title = title.strip()
+        if len(title) > 500:
+            raise ValueError(f"Title too long ({len(title)} chars). Maximum: 500 characters")
+        
         # Override config with kwargs
         config = self._apply_config_overrides(kwargs)
+        
+        # Validate configuration parameters
+        if config.target_duration_seconds <= 0:
+            raise ValueError(f"target_duration_seconds must be positive, got: {config.target_duration_seconds}")
+        if config.max_duration_seconds <= 0:
+            raise ValueError(f"max_duration_seconds must be positive, got: {config.max_duration_seconds}")
+        if config.target_duration_seconds > config.max_duration_seconds:
+            raise ValueError(
+                f"target_duration_seconds ({config.target_duration_seconds}) cannot exceed "
+                f"max_duration_seconds ({config.max_duration_seconds})"
+            )
+        if config.words_per_second <= 0:
+            raise ValueError(f"words_per_second must be positive, got: {config.words_per_second}")
+        
+        # Validate audience if provided
+        if config.audience:
+            if not isinstance(config.audience, dict):
+                raise ValueError("audience must be a dictionary")
 
         # Check if AI is available
         if not self._ai_available:
@@ -306,7 +336,13 @@ class ContentGenerator:
             content_id = self._generate_content_id(idea, title)
 
         logger.info(f"Generating script with AI for '{title}'")
-        full_text, sections = self._generate_with_ai(idea, title, config)
+        
+        # Generate with AI - with timeout and error handling
+        try:
+            full_text, sections = self._generate_with_ai(idea, title, config)
+        except Exception as e:
+            logger.error(f"AI generation failed: {e}")
+            raise RuntimeError(f"AI content generation failed: {str(e)}")
 
         if full_text is None:
             # Get AI model from global config for error message
@@ -353,6 +389,9 @@ class ContentGenerator:
                     "max_duration": config.max_duration_seconds,
                     "words_per_second": config.words_per_second,
                     "ai_model": ai_model,
+                    "platform_target": config.platform_target.value,
+                    "structure_type": config.structure_type.value,
+                    "tone": config.tone.value,
                 },
                 "ai_generated": True,
             },
@@ -456,27 +495,34 @@ class ContentGenerator:
         body_duration = int(config.target_duration_seconds * body_ratio)
         conclusion_duration = int(config.target_duration_seconds * conclusion_ratio)
 
+        # Get AI model from global config for notes
+        try:
+            from .ai_config import get_local_ai_model
+            ai_model = get_local_ai_model()
+        except ImportError:
+            ai_model = "qwen3:32b"
+
         sections = [
             ContentSection(
                 section_type="introduction",
                 content=intro_text,
                 estimated_duration_seconds=intro_duration,
                 purpose="AI-generated hook to grab attention",
-                notes=f"Generated with {config.ai_model}",
+                notes=f"Generated with {ai_model}",
             ),
             ContentSection(
                 section_type="body",
                 content=body_text,
                 estimated_duration_seconds=body_duration,
                 purpose="AI-generated main content",
-                notes=f"Generated with {config.ai_model}",
+                notes=f"Generated with {ai_model}",
             ),
             ContentSection(
                 section_type="conclusion",
                 content=conclusion_text,
                 estimated_duration_seconds=conclusion_duration,
                 purpose="AI-generated conclusion",
-                notes=f"Generated with {config.ai_model}",
+                notes=f"Generated with {ai_model}",
             ),
         ]
 
@@ -489,15 +535,14 @@ class ContentGenerator:
             target_duration_seconds=kwargs.get(
                 "target_duration_seconds", self.config.target_duration_seconds
             ),
+            max_duration_seconds=kwargs.get(
+                "max_duration_seconds", self.config.max_duration_seconds
+            ),
             structure_type=kwargs.get("structure_type", self.config.structure_type),
+            tone=kwargs.get("tone", self.config.tone),
+            audience=kwargs.get("audience", self.config.audience),
             words_per_second=kwargs.get("words_per_second", self.config.words_per_second),
             include_cta=kwargs.get("include_cta", self.config.include_cta),
-            tone=kwargs.get("tone", self.config.tone),
-            # AI settings
-            ai_model=kwargs.get("ai_model", self.config.ai_model),
-            ai_api_base=kwargs.get("ai_api_base", self.config.ai_api_base),
-            ai_temperature=kwargs.get("ai_temperature", self.config.ai_temperature),
-            ai_timeout=kwargs.get("ai_timeout", self.config.ai_timeout),
         )
         return config
 
