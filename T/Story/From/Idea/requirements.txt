@@ -1,0 +1,7 @@
+# Requirements for PrismQ.T.Story.From.Idea module
+# All dependencies are either Python standard library or local PrismQ modules
+# No external packages needed beyond testing
+
+# Testing dependencies (optional, for running tests)
+pytest>=7.0.0
+pytest-cov>=4.0.0
