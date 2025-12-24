@@ -1,4 +1,8 @@
-# Requirements for T.Review.Script module
+# Requirements for T.Review.Content.From.Title.Idea module
+
+# Production dependencies
+python-dotenv>=1.0.0  # For config management
+
 # Testing dependencies - only needed for running tests
 pytest>=7.0.0
 pytest-cov>=4.0.0

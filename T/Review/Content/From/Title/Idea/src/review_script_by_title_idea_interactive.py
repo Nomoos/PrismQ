@@ -344,6 +344,107 @@ def display_review(review: ScriptReview, logger: Optional[logging.Logger] = None
 # =============================================================================
 
 
+def format_review_as_text(review: ScriptReview) -> str:
+    """Format ScriptReview as human-readable text for AI prompts and database storage.
+    
+    This converts the structured ScriptReview into plain text that can be:
+    - Stored in the database Review.text field
+    - Used as input for subsequent AI prompts in the workflow
+    - Read and understood by humans and AI systems
+    
+    Args:
+        review: ScriptReview object to format
+    
+    Returns:
+        Formatted review text suitable for text-to-text AI workflows
+    """
+    lines = []
+    
+    # Header
+    lines.append(f"SCRIPT REVIEW: {review.script_title}")
+    lines.append("=" * 80)
+    lines.append("")
+    
+    # Overall Assessment
+    lines.append(f"OVERALL SCORE: {review.overall_score}%")
+    
+    # Alignment Scores
+    if "title_alignment_score" in review.metadata:
+        lines.append(f"Title Alignment: {review.metadata['title_alignment_score']}%")
+    if "idea_alignment_score" in review.metadata:
+        lines.append(f"Idea Alignment: {review.metadata['idea_alignment_score']}%")
+    
+    lines.append("")
+    
+    # Length Information
+    lines.append(f"CONTENT LENGTH:")
+    lines.append(f"  Current: {review.current_length_seconds}s")
+    if review.optimal_length_seconds:
+        lines.append(f"  Recommended: {review.optimal_length_seconds}s")
+    lines.append(f"  Category: {review.target_length.value}")
+    lines.append("")
+    
+    # Category Scores
+    if review.category_scores:
+        lines.append("CATEGORY SCORES:")
+        for cat_score in review.category_scores:
+            lines.append(f"  {cat_score.category.value.capitalize()}: {cat_score.score}%")
+            if cat_score.reasoning:
+                lines.append(f"    Reasoning: {cat_score.reasoning}")
+            if cat_score.strengths:
+                lines.append(f"    Strengths: {', '.join(cat_score.strengths)}")
+            if cat_score.weaknesses:
+                lines.append(f"    Weaknesses: {', '.join(cat_score.weaknesses)}")
+        lines.append("")
+    
+    # Primary Concern
+    if review.primary_concern:
+        lines.append("PRIMARY CONCERN:")
+        lines.append(f"  {review.primary_concern}")
+        lines.append("")
+    
+    # Strengths
+    if review.strengths:
+        lines.append("STRENGTHS:")
+        for strength in review.strengths:
+            lines.append(f"  • {strength}")
+        lines.append("")
+    
+    # Quick Wins
+    if review.quick_wins:
+        lines.append("QUICK WINS (High Impact, Easy to Fix):")
+        for win in review.quick_wins:
+            lines.append(f"  • {win}")
+        lines.append("")
+    
+    # Improvement Recommendations
+    if review.improvement_points:
+        lines.append("IMPROVEMENT RECOMMENDATIONS:")
+        for i, point in enumerate(review.improvement_points, 1):
+            lines.append(f"  {i}. [{point.priority.upper()}] {point.title}")
+            lines.append(f"     {point.description}")
+            if point.specific_example:
+                lines.append(f"     Example: {point.specific_example}")
+            if point.suggested_fix:
+                lines.append(f"     Suggestion: {point.suggested_fix}")
+            lines.append(f"     Expected Impact: +{point.impact_score}%")
+            lines.append("")
+    
+    # Revision Status
+    if review.needs_major_revision:
+        lines.append("STATUS: Major revision recommended")
+    else:
+        lines.append("STATUS: Ready to proceed with minor improvements")
+    
+    lines.append("")
+    lines.append("-" * 80)
+    lines.append(f"Reviewed by: {review.reviewer_id}")
+    lines.append(f"Review Date: {review.reviewed_at}")
+    lines.append(f"Confidence: {review.confidence_score}%")
+    
+    return "\n".join(lines)
+
+
 def save_review_to_database(
     review: ScriptReview,
     preview_mode: bool = False,
@@ -365,13 +466,57 @@ def save_review_to_database(
             logger.info("Preview mode - skipping database save")
         return True  # Return True in preview mode (operation successful, just skipped)
 
-    # TODO: Implement database save functionality
-    # This would integrate with Model.Entities.review and appropriate repository
-    print_warning("Database save not yet implemented")
-    if logger:
-        logger.warning("Database save functionality not implemented")
-    
-    return False  # Return False when not implemented (operation not successful)
+    try:
+        # Import database dependencies
+        from Model.Infrastructure.connection import connection_context
+        from Model.Entities.review import Review
+        from Model.Repositories.review_repository import ReviewRepository
+        
+        # Import config to get database path
+        if not CONFIG_AVAILABLE:
+            print_error("Database configuration not available")
+            if logger:
+                logger.error("Cannot save review: Config module not available")
+            return False
+        
+        # Get database path from config
+        config = Config(interactive=False)
+        db_path = config.database_path
+        
+        if logger:
+            logger.info(f"Saving review to database: {db_path}")
+        
+        # Format the review as human-readable text for AI workflows
+        review_text = format_review_as_text(review)
+        
+        # Create Review entity with plain text (not JSON)
+        review_entity = Review(
+            text=review_text,
+            score=review.overall_score
+        )
+        
+        # Save to database
+        with connection_context(db_path) as conn:
+            repo = ReviewRepository(conn)
+            saved_review = repo.insert(review_entity)
+            conn.commit()
+            
+            if logger:
+                logger.info(f"Review saved successfully with ID: {saved_review.id}")
+            
+            print_success(f"Review saved to database with ID: {saved_review.id}")
+            return True
+            
+    except ImportError as e:
+        print_error(f"Database module import failed: {e}")
+        if logger:
+            logger.error(f"Cannot save review: Import error - {e}")
+        return False
+    except Exception as e:
+        print_error(f"Failed to save review to database: {e}")
+        if logger:
+            logger.error(f"Database save failed: {e}", exc_info=True)
+        return False
 
 
 # =============================================================================
