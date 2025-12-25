@@ -59,7 +59,7 @@ Idea (
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.From.User',  -- Next process name
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
@@ -177,7 +177,7 @@ Where:
 
 ```
                     ┌─────────────────────────────────────────────┐
-                    │   PrismQ.T.Idea.Creation (Initial)          │
+                    │   PrismQ.T.Idea.From.User (Initial)          │
                     └───────────────────┬─────────────────────────┘
                                         │ create_idea
                                         ▼
@@ -206,7 +206,7 @@ Where:
 ### Process State Values
 | State | Description | Next Action |
 |-------|-------------|-------------|
-| `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation | Create idea |
+| `PrismQ.T.Idea.From.User` | Initial state, awaiting idea creation | Create idea |
 | `PrismQ.T.Title.From.Idea` | Idea created, awaiting title | Generate title from idea |
 | `PrismQ.T.Content.From.Idea.Title` | Title generated, awaiting script | Generate script from idea + title |
 | `PrismQ.T.Review.Title.From.Script` | Generate title review from script | Review title |

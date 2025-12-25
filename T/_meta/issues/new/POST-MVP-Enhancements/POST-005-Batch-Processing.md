@@ -53,7 +53,7 @@ This enhancement enables bulk processing of ideas, dramatically increasing throu
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module must be complete
+- **MVP-001**: T.Idea.From.User module must be complete
 - Async processing infrastructure (asyncio or Celery)
 
 ---

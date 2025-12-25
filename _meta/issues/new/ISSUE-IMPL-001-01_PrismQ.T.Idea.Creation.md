@@ -1,9 +1,9 @@
-# ISSUE-IMPL-001 — Implementation check: `01_PrismQ.T.Idea.Creation`
+# ISSUE-IMPL-001 — Implementation check: `01_PrismQ.T.Idea.From.User`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/01_PrismQ.T.Idea.Creation`  
-**Module Path**: `T/Idea/Creation/`
+**Script Folder**: `PrismQ/_meta/scripts/01_PrismQ.T.Idea.From.User`  
+**Module Path**: `T/Idea/From/User/`
 
 ---
 
@@ -26,15 +26,15 @@ The script takes user text input, processes it through the idea variant system, 
 
 ### Environment Variables
 - Requires Ollama service running for AI-powered idea generation
-- Python virtual environment at `T/Idea/Creation/.venv`
+- Python virtual environment at `T/Idea/From/User/.venv`
 
 ### Configuration Files
-- `T/Idea/Creation/requirements.txt` - Python dependencies
+- `T/Idea/From/User/requirements.txt` - Python dependencies
 - AI configuration from `T/src/ai_config.py`
 
 ### Required Folders
-- `T/Idea/Creation/src/` - Source code
-- `T/Idea/Creation/.venv/` - Virtual environment (auto-created)
+- `T/Idea/From/User/src/` - Source code
+- `T/Idea/From/User/.venv/` - Virtual environment (auto-created)
 
 ---
 
@@ -42,7 +42,7 @@ The script takes user text input, processes it through the idea variant system, 
 
 ### Files Created/Modified
 - Database records in Ideas table (Run mode only)
-- Virtual environment at `T/Idea/Creation/.venv` (if not exists)
+- Virtual environment at `T/Idea/From/User/.venv` (if not exists)
 - `.requirements_installed` marker file in venv
 
 ### Network Calls
@@ -67,8 +67,8 @@ The script takes user text input, processes it through the idea variant system, 
 - **pip** - For dependency installation
 
 ### Python Modules
-- See `T/Idea/Creation/requirements.txt`
-- Custom modules: `T/Idea/Creation/src/idea_creation_interactive.py`
+- See `T/Idea/From/User/requirements.txt`
+- Custom modules: `T/Idea/From/User/src/idea_creation_interactive.py`
 
 ### Services Required
 - Ollama service (AI generation)

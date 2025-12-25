@@ -31,7 +31,7 @@ Each module has its own numbered directory with `Run.bat` and `Preview.bat` scri
 
 | # | Directory | Description |
 |---|-----------|-------------|
-| 01 | `01_PrismQ.T.Idea.Creation/` | Idea creation from inspiration |
+| 01 | `01_PrismQ.T.Idea.From.User/` | Idea creation from inspiration |
 | 02 | `02_PrismQ.T.Story.From.Idea/` | Generate stories from ideas |
 | 03 | `03_PrismQ.T.Title.From.Idea/` | Generate initial titles from ideas |
 | 04 | `04_PrismQ.T.Script.From.Title.Idea/` | Generate scripts from title + idea |
@@ -89,7 +89,7 @@ Each module has its own numbered directory with `Run.bat` and `Preview.bat` scri
 Navigate to any numbered module directory and run:
 
 ```batch
-cd _meta\scripts\01_PrismQ.T.Idea.Creation
+cd _meta\scripts\01_PrismQ.T.Idea.From.User
 Preview.bat   REM For testing (no database save)
 Run.bat       REM For production (saves to database)
 ```
@@ -98,7 +98,7 @@ Run.bat       REM For production (saves to database)
 
 ```batch
 REM Step 1: Create idea
-cd _meta\scripts\01_PrismQ.T.Idea.Creation
+cd _meta\scripts\01_PrismQ.T.Idea.From.User
 Preview.bat
 
 REM Step 2: Generate story from idea

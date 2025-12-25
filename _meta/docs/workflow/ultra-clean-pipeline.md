@@ -141,7 +141,7 @@ The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how
 
 | Ultra-Clean Stage | MVP Stages | Description |
 |-------------------|------------|-------------|
-| `Idea.Creation` | Stage 1 | PrismQ.T.Idea.Creation |
+| `Idea.Creation` | Stage 1 | PrismQ.T.Idea.From.User |
 | `Title.From.Idea` | Stage 2 | PrismQ.T.Title.From.Idea (v1) |
 | `Content.From.Idea.Title` | Stage 3 | PrismQ.T.Content.From.Idea.Title (v1) |
 | `Review.Title.From.Content.Idea` | Stage 4 | PrismQ.T.Review.Title.From.Content (v1) |

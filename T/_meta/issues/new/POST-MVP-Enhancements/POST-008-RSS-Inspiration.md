@@ -45,7 +45,7 @@ Monitor RSS feeds from blogs, news sites, and content platforms for content insp
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module
+- **MVP-001**: T.Idea.From.User module
 
 ---
 

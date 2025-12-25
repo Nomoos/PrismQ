@@ -286,7 +286,7 @@ Content: Detective Sarah investigates...
 - `PRODUCTION_READINESS_CHANGES.md` - Technical analysis
 
 ### Related Modules
-- Module 01: `T.Idea.Creation` - Logging pattern reference
+- Module 01: `T.Idea.From.User` - Logging pattern reference
 - Module 02: `T.Story.From.Idea` - Interactive CLI pattern
 - Module 03: `T.Title.From.Idea` - Structure reference
 

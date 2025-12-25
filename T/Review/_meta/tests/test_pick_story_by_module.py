@@ -29,7 +29,7 @@ def db_connection():
             
             
             
-            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
+            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.From.User',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );

@@ -17,7 +17,7 @@ This index tracks the implementation compliance checks for all 30 scripts in the
 
 ### Text Module Scripts (T.*)
 
-- [ ] [ISSUE-IMPL-001](ISSUE-IMPL-001-01_PrismQ.T.Idea.Creation.md) — **01_PrismQ.T.Idea.Creation**
+- [ ] [ISSUE-IMPL-001](ISSUE-IMPL-001-01_PrismQ.T.Idea.From.User.md) — **01_PrismQ.T.Idea.From.User**
 - [ ] [ISSUE-IMPL-002](ISSUE-IMPL-002-02_PrismQ.T.Story.From.Idea.md) — **02_PrismQ.T.Story.From.Idea**
 - [ ] [ISSUE-IMPL-003](ISSUE-IMPL-003-03_PrismQ.T.Title.From.Idea.md) — **03_PrismQ.T.Title.From.Idea**
 - [ ] [ISSUE-IMPL-004](ISSUE-IMPL-004-04_PrismQ.T.Content.From.Title.Idea.md) — **04_PrismQ.T.Content.From.Title.Idea**

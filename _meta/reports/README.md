@@ -9,7 +9,7 @@ Každý modul má vlastní soubor s kompletním popisem běhu:
 ### 🎯 Text Modules (T) - Moduly 01-20
 
 #### Generování obsahu (01-04)
-- **[01_PrismQ.T.Idea.Creation](01_PrismQ.T.Idea.Creation.md)** - Vytváření nápadů (Idea objektů) z textového vstupu pomocí AI
+- **[01_PrismQ.T.Idea.From.User](01_PrismQ.T.Idea.From.User.md)** - Vytváření nápadů (Idea objektů) z textového vstupu pomocí AI
 - **[02_PrismQ.T.Story.From.Idea](02_PrismQ.T.Story.From.Idea.md)** - Vytváření Story objektů z existujících Ideas
 - **[03_PrismQ.T.Title.From.Idea](03_PrismQ.T.Title.From.Idea.md)** - Generování titulků pro Story objekty na základě Ideas
 - **[04_PrismQ.T.Content.From.Idea.Title](04_PrismQ.T.Content.From.Idea.Title.md)** - Generování textového obsahu (Content v1 / Script) z titulku a nápadu

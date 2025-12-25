@@ -111,7 +111,7 @@ Výsledkem běhu modulu je:
 ## 🔗 Vazby a závislosti
 
 **Vstupní závislosti:**
-- Modul 01 (PrismQ.T.Idea.Creation) - musí být spuštěn první, vytváří Ideas
+- Modul 01 (PrismQ.T.Idea.From.User) - musí být spuštěn první, vytváří Ideas
 - SQLite databáze s tabulkou Idea
 - Python 3.x + virtual environment
 - Moduly:

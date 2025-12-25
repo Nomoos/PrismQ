@@ -38,9 +38,9 @@ See `mvp-reviews/` subdirectory for these detailed individual reviews.
 
 ### Stage 1: Initial Generation (MVP-001 to MVP-003)
 
-#### MVP-001: T.Idea.Creation ✅
+#### MVP-001: T.Idea.From.User ✅
 - **Worker**: Worker02
-- **Module**: `T/Idea/Creation/src/`
+- **Module**: `T/Idea/From/User/src/`
 - **Size**: ~40KB (creation.py, ai_generator.py)
 - **Status**: COMPLETED
 - **Key Features**:

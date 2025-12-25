@@ -1,4 +1,4 @@
-"""Integration tests for ISSUE-IMPL-001-01: PrismQ.T.Idea.Creation script verification.
+"""Integration tests for ISSUE-IMPL-001-01: PrismQ.T.Idea.From.User script verification.
 
 This test verifies the complete implementation of the idea creation scripts:
 - Run.bat and Preview.bat batch scripts
@@ -21,7 +21,7 @@ import pytest
 # Add paths for imports
 TESTS_DIR = Path(__file__).parent.absolute()
 REPO_ROOT = TESTS_DIR.parent.parent  # Repository root (up from _meta/tests)
-SCRIPT_DIR = REPO_ROOT / "_meta" / "scripts" / "01_PrismQ.T.Idea.Creation"
+SCRIPT_DIR = REPO_ROOT / "_meta" / "scripts" / "01_PrismQ.T.Idea.From.User"
 CREATION_ROOT = REPO_ROOT / "T" / "Idea" / "Creation"
 CREATION_SRC = CREATION_ROOT / "src"
 

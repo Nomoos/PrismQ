@@ -17,11 +17,11 @@ Každý modul je popsán ve formátu:
 
 ---
 
-# 🎯 Modul 01: PrismQ.T.Idea.Creation
+# 🎯 Modul 01: PrismQ.T.Idea.From.User
 
 **Účel:** Vytváření nápadů (Idea objektů) z textového vstupu pomocí AI  
-**Adresář:** `_meta/scripts/01_PrismQ.T.Idea.Creation/`  
-**Python moduly:** `T/Idea/Creation/src/`
+**Adresář:** `_meta/scripts/01_PrismQ.T.Idea.From.User/`  
+**Python moduly:** `T/Idea/From/User/src/`
 
 ---
 

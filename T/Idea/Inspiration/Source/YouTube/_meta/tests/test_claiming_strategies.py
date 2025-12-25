@@ -103,7 +103,7 @@ class TestOrderByClauses:
         order_by = strategy.get_order_by_clause()
 
         # Check that key workflow states are included
-        assert "PrismQ.T.Idea.Creation" in order_by
+        assert "PrismQ.T.Idea.From.User" in order_by
         assert "PrismQ.T.Title.From.Idea" in order_by
         assert "PrismQ.T.Publishing" in order_by
         assert "PrismQ.T.Story.Review" in order_by
@@ -283,7 +283,7 @@ class TestWorkflowStateOrder:
 
     def test_workflow_state_order_starts_with_idea_creation(self):
         """Test workflow starts with Idea.Creation as stage 1."""
-        assert WORKFLOW_STATE_ORDER["PrismQ.T.Idea.Creation"] == 1
+        assert WORKFLOW_STATE_ORDER["PrismQ.T.Idea.From.User"] == 1
 
     def test_workflow_state_order_ends_with_publishing(self):
         """Test workflow ends with Publishing as stage 19."""

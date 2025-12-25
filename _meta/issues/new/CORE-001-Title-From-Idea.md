@@ -10,7 +10,7 @@
 
 ## Problem Statement
 
-Implement and enhance the title generation module that creates initial title variants (v1) from an Idea object. This is Stage 2 of the core pipeline workflow, immediately following `PrismQ.T.Idea.Creation`.
+Implement and enhance the title generation module that creates initial title variants (v1) from an Idea object. This is Stage 2 of the core pipeline workflow, immediately following `PrismQ.T.Idea.From.User`.
 
 ## Current State
 

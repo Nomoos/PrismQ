@@ -52,7 +52,7 @@ CREATE INDEX idx_story_idea_id ON Story(idea_id);
 - `updated_at`: Last state change timestamp
 
 **States:** States represent the processing module and follow the pattern `PrismQ.T.<Module>.From.<Input>` or `PrismQ.T.<Action>.<Target>`. Valid states include:
-- `PrismQ.T.Idea.Creation` - Initial idea creation
+- `PrismQ.T.Idea.From.User` - Initial idea creation
 - `PrismQ.T.Title.From.Idea` - Title generation from idea
 - `PrismQ.T.Content.From.Idea.Title` - Content generation from idea and title
 - `PrismQ.T.Review.Title.ByContentAndIdea` - Title review using content and idea

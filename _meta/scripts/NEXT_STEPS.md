@@ -7,7 +7,7 @@
 
 ## ✅ Completed Stages
 
-1. ✅ **01_PrismQ.T.Idea.Creation** - Idea creation from inspiration
+1. ✅ **01_PrismQ.T.Idea.From.User** - Idea creation from inspiration
 2. ✅ **02_PrismQ.T.Story.From.Idea** - Generate stories from ideas
 
 ---
@@ -194,7 +194,7 @@ Each script directory contains:
 
 ### Module-Specific Documentation
 Each module has its own documentation:
-- **T/Idea/Creation/README.md** - Idea creation details
+- **T/Idea/From/User/README.md** - Idea creation details
 - **T/Story/From/Idea/README.md** - Story generation details
 - **T/Title/From/Idea/README.md** - Title generation details
 - And so on...

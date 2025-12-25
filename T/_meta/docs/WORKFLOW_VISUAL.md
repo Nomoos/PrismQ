@@ -11,7 +11,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     STAGE 1: Idea Creation                       │
-│                  PrismQ.T.Idea.Creation                          │
+│                  PrismQ.T.Idea.From.User                          │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼

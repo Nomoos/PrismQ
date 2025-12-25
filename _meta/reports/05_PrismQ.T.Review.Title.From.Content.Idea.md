@@ -103,7 +103,7 @@ Výsledkem běhu modulu je:
 **Vstupní závislosti:**
 - Modul 04 (PrismQ.T.Content.From.Idea.Title) - vytváří Content
 - Modul 03 (PrismQ.T.Title.From.Idea) - vytváří Title
-- Modul 01 (PrismQ.T.Idea.Creation) - source Idea
+- Modul 01 (PrismQ.T.Idea.From.User) - source Idea
 - Ollama server, AI model, databáze
 
 **Výstupní závislosti:**

@@ -81,7 +81,7 @@ Some Python components exist but are not connected to workflow:
 
 ```batch
 # Step 1: Create ideas
-cd _meta\scripts\01_PrismQ.T.Idea.Creation
+cd _meta\scripts\01_PrismQ.T.Idea.From.User
 Preview.bat  # Test mode
 Run.bat      # Production mode
 

@@ -1421,7 +1421,7 @@ Based on usefulness and effort, recommended implementation order:
 
 **Complete 20-step workflow following the exact structure in `_meta/scripts/`:**
 
-1. **Idea Creation** (`01_PrismQ.T.Idea.Creation`)
+1. **Idea Creation** (`01_PrismQ.T.Idea.From.User`)
 2. **Story from Idea** (`02_PrismQ.T.Story.From.Idea`) - Generate 10 story variations
 3. **Title from Idea** (`03_PrismQ.T.Title.From.Idea`) - Initial title generation (v1)
 4. **Content from Title & Idea** (`04_PrismQ.T.Content.From.Title.Idea`) - Initial content (v1)

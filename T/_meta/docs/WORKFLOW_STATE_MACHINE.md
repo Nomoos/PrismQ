@@ -57,7 +57,7 @@ stateDiagram-v2
 
     note right of IdeaCreation
         Stage 1: Initial idea capture
-        Location: T/Idea/Creation/
+        Location: T/Idea/From/User/
     end note
     
     note right of StoryFromIdea
@@ -104,7 +104,7 @@ stateDiagram-v2
 
 | State | Full Name | Stage | Location |
 |-------|-----------|-------|----------|
-| IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ |
+| IdeaCreation | PrismQ.T.Idea.From.User | 1 | T/Idea/From/User/ |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ |
 | ContentFromIdeaTitle | PrismQ.T.Content.From.Idea.Title | 3 | T/Content/From/Idea/Title/ |

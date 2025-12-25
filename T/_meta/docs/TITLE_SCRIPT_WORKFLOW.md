@@ -106,7 +106,7 @@ This document provides a clear, step-by-step workflow for creating titles and co
 ---
 
 ### Stage 0C: Idea.Creation (Entry Point - Manual Path)
-**Location:** `T/Idea/Creation`  
+**Location:** `T/Idea/From/User`  
 **Purpose:** Manually create idea concepts
 
 **Activities:**

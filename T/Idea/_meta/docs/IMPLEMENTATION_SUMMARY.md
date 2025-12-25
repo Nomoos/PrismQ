@@ -48,7 +48,7 @@ fused_ideas = fusion.batch_fuse(
 
 ---
 
-### 2. Creation Module (`T/Idea/Creation/`)
+### 2. Creation Module (`T/Idea/From/User/`)
 
 **Purpose**: Generate multiple Ideas from simple inputs like titles or descriptions with AI-powered content generation.
 
@@ -68,7 +68,7 @@ fused_ideas = fusion.batch_fuse(
 
 **API Example**:
 ```python
-from T.Idea.Creation.src import IdeaCreator
+from T.Idea.From.User.src import IdeaCreator
 
 creator = IdeaCreator()
 
@@ -172,7 +172,7 @@ print(czech_summary)
 1. **Modified**: `T/Idea/Model/pyproject.toml` - Updated Python version
 2. **Modified**: `T/Idea/Model/src/idea.py` - Added summary and translation methods
 3. **Added**: `T/Idea/Fusion/` - Complete Fusion module
-4. **Added**: `T/Idea/Creation/` - Complete Creation module
+4. **Added**: `T/Idea/From/User/` - Complete Creation module
 5. **Modified**: `T/Idea/README.md` - Updated documentation
 
 ---

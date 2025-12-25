@@ -157,7 +157,7 @@ class WeightedRandomStrategy(BaseClaimStrategy):
 # ORDER BY uses DESC, so higher numbers (later states) get processed first
 # Based on T/WORKFLOW_STATE_MACHINE.md stage numbers
 WORKFLOW_STATE_ORDER = {
-    "PrismQ.T.Idea.Creation": 1,
+    "PrismQ.T.Idea.From.User": 1,
     "PrismQ.T.Title.From.Idea": 2,
     "PrismQ.T.Content.From.Title.Idea": 3,
     "PrismQ.T.Review.Title.By.Content.Idea": 4,

@@ -133,7 +133,7 @@ class WorkflowStageValidator:
 
     # Define valid stage transitions for the workflow using module-based state names
     VALID_TRANSITIONS = {
-        "PrismQ.T.Idea.Creation": ["PrismQ.T.Title.From.Idea"],
+        "PrismQ.T.Idea.From.User": ["PrismQ.T.Title.From.Idea"],
         "PrismQ.T.Title.From.Idea": ["PrismQ.T.Script.From.Idea.Title"],
         "PrismQ.T.Script.From.Idea.Title": ["PrismQ.T.Review.Title.From.Script.Idea"],
         "PrismQ.T.Review.Title.From.Script.Idea": [
@@ -216,8 +216,8 @@ class WorkflowStageValidator:
             True if transition is valid, False otherwise
         """
         if self.current_stage is None:
-            # First stage must be PrismQ.T.Idea.Creation
-            if stage == "PrismQ.T.Idea.Creation":
+            # First stage must be PrismQ.T.Idea.From.User
+            if stage == "PrismQ.T.Idea.From.User":
                 self.current_stage = stage
                 self.stage_history.append(stage)
                 return True

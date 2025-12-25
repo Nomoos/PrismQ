@@ -19,7 +19,7 @@ The root `pytest.ini` provides unified configuration for all tests across the pr
 ```ini
 [pytest]
 minversion = 6.0
-testpaths = tests EnvLoad/_meta/tests T/Idea/Creation/_meta/tests ...
+testpaths = tests EnvLoad/_meta/tests T/Idea/From/User/_meta/tests ...
 python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
@@ -108,7 +108,7 @@ from tests.helpers import WorkflowStageValidator
 validator = WorkflowStageValidator()
 
 # Transition through stages using module-based state names
-validator.transition_to('PrismQ.T.Idea.Creation')      # True
+validator.transition_to('PrismQ.T.Idea.From.User')      # True
 validator.transition_to('PrismQ.T.Title.From.Idea')    # True
 validator.transition_to('PrismQ.T.Script.From.Idea.Title')  # True
 
@@ -117,11 +117,11 @@ validator.transition_to('PrismQ.T.Publishing')         # False (can't skip to en
 
 # Check workflow validity
 is_valid = validator.is_valid_path()      # True
-history = validator.get_stage_history()   # ['PrismQ.T.Idea.Creation', 'PrismQ.T.Title.From.Idea', 'PrismQ.T.Script.From.Idea.Title']
+history = validator.get_stage_history()   # ['PrismQ.T.Idea.From.User', 'PrismQ.T.Title.From.Idea', 'PrismQ.T.Script.From.Idea.Title']
 ```
 
 **Valid Stage Transitions:**
-- `PrismQ.T.Idea.Creation` → `PrismQ.T.Title.From.Idea`
+- `PrismQ.T.Idea.From.User` → `PrismQ.T.Title.From.Idea`
 - `PrismQ.T.Title.From.Idea` → `PrismQ.T.Script.From.Idea.Title`
 - `PrismQ.T.Script.From.Idea.Title` → `PrismQ.T.Review.Title.From.Script.And.Idea`
 - `PrismQ.T.Review.Title.From.Script.And.Idea` → `PrismQ.T.Review.Script.From.Title.And.Idea`, `PrismQ.T.Title.From.Title.Review.Script`
@@ -323,7 +323,7 @@ def test_idea_to_script_workflow():
     helper = IntegrationTestHelper()
     
     # Setup workflow
-    helper.stage_validator.transition_to('PrismQ.T.Idea.Creation')
+    helper.stage_validator.transition_to('PrismQ.T.Idea.From.User')
     idea_tracker = helper.start_workflow("Idea")
     idea_tracker.add_version(1)
     
@@ -467,7 +467,7 @@ class TestTitleScriptCoImprovement:
         helper = IntegrationTestHelper()
         
         # Initial setup
-        helper.stage_validator.transition_to('PrismQ.T.Idea.Creation')
+        helper.stage_validator.transition_to('PrismQ.T.Idea.From.User')
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1, {"status": "draft"})
         

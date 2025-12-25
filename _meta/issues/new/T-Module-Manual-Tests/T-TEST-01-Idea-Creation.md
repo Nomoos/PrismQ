@@ -1,7 +1,7 @@
-# T-TEST-01: PrismQ.T.Idea.Creation Manual Test
+# T-TEST-01: PrismQ.T.Idea.From.User Manual Test
 
-**Module**: PrismQ.T.Idea.Creation  
-**Script**: `_meta/scripts/01_PrismQ.T.Idea.Creation/`  
+**Module**: PrismQ.T.Idea.From.User  
+**Script**: `_meta/scripts/01_PrismQ.T.Idea.From.User/`  
 **Type**: Manual Testing  
 **Status**: 🧪 READY FOR TESTING
 
@@ -17,7 +17,7 @@ Create a new Idea from user-provided inspiration text. This is the first stage o
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Idea.Creation - RUN MODE"
+1. **Script starts** and displays header "PrismQ.T.Idea.From.User - RUN MODE"
 2. **Environment setup** occurs (creates/activates virtual environment if needed)
 3. **Prompt appears** asking user for idea input (text, title, concept, or JSON)
 4. **User enters text** and presses Enter twice to submit
@@ -41,7 +41,7 @@ Create a new Idea from user-provided inspiration text. This is the first stage o
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Idea.Creation - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Idea.From.User - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Ideas will NOT be saved to database."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Prompt appears** asking user for idea input (text, title, concept, or JSON)
@@ -71,7 +71,7 @@ Create a new Idea from user-provided inspiration text. This is the first stage o
 
 ```batch
 REM Navigate to script directory
-cd _meta\scripts\01_PrismQ.T.Idea.Creation
+cd _meta\scripts\01_PrismQ.T.Idea.From.User
 
 REM Run in Preview Mode (recommended for testing)
 Preview.bat

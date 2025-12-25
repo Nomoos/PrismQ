@@ -791,7 +791,7 @@ Moving Window technika se hodí do **specifických kroků** PrismQ pipeline:
 
 | Stage | Moving Window? | Důvod |
 |-------|----------------|-------|
-| **PrismQ.T.Idea.Creation** | ❌ Ne | Krátký výstup (koncept) |
+| **PrismQ.T.Idea.From.User** | ❌ Ne | Krátký výstup (koncept) |
 | **PrismQ.T.Story.From.Idea** | ⚠️ Volitelně | Pro detailnější Story Bible |
 | **PrismQ.T.Title.From.Idea** | ❌ Ne | Krátký výstup (titulky) |
 | **PrismQ.T.Content.From.Title.Idea** | ✅ **ANO** | 🏆 **HLAVNÍ USE CASE** |
@@ -870,7 +870,7 @@ class PrismQMovingWindowScript:
         Hlavní entry point pro PrismQ.T.Content.From.Title.Idea
         
         Args:
-            idea: Idea objekt z PrismQ.T.Idea.Creation
+            idea: Idea objekt z PrismQ.T.Idea.From.User
             title: Title z PrismQ.T.Title.From.Idea
             
         Returns:

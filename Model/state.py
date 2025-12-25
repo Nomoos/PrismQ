@@ -16,7 +16,7 @@ State Categories:
 Example Usage:
     >>> from Model import StateNames, StoryState
     >>> StateNames.IDEA_CREATION
-    'PrismQ.T.Idea.Creation'
+    'PrismQ.T.Idea.From.User'
     >>> StateNames.TITLE_FROM_IDEA
     'PrismQ.T.Title.From.Idea'
     >>> StoryState.TITLE_FROM_IDEA.value
@@ -65,7 +65,7 @@ class StoryState(str, Enum):
     CREATED = "CREATED"
 
     # Stage 1: Initial Creation
-    IDEA_CREATION = f"{_STATE_PREFIX}.Idea.Creation"
+    IDEA_CREATION = f"{_STATE_PREFIX}.Idea.From.User"
 
     # Stage 2-3: Initial Content Generation
     TITLE_FROM_IDEA = f"{_STATE_PREFIX}.Title.From.Idea"
@@ -126,7 +126,7 @@ class StateNames:
     # =========================================================================
     # Stage 1: Initial Creation
     # =========================================================================
-    IDEA_CREATION = f"{STATE_PREFIX}.Idea.Creation"
+    IDEA_CREATION = f"{STATE_PREFIX}.Idea.From.User"
 
     # =========================================================================
     # Stage 2-3: Initial Content Generation
@@ -219,7 +219,7 @@ class StateNames:
 
         Example:
             >>> states = StateNames.get_all_states()
-            >>> 'PrismQ.T.Idea.Creation' in states
+            >>> 'PrismQ.T.Idea.From.User' in states
             True
         """
         states = []
@@ -262,7 +262,7 @@ class StateNames:
             The StateCategory or None if not found.
 
         Example:
-            >>> StateNames.get_state_category('PrismQ.T.Idea.Creation')
+            >>> StateNames.get_state_category('PrismQ.T.Idea.From.User')
             <StateCategory.CREATION: 'creation'>
         """
         for category, states in cls._CATEGORY_MAPPINGS.items():
@@ -281,7 +281,7 @@ class StateNames:
             True if the state is defined, False otherwise.
 
         Example:
-            >>> StateNames.is_valid_state('PrismQ.T.Idea.Creation')
+            >>> StateNames.is_valid_state('PrismQ.T.Idea.From.User')
             True
             >>> StateNames.is_valid_state('PrismQ.T.Invalid.State')
             False

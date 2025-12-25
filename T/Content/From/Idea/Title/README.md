@@ -198,7 +198,7 @@ except RuntimeError as e:
 **Stage 3** in MVP workflow:
 
 ```
-Stage 1: PrismQ.T.Idea.Creation
+Stage 1: PrismQ.T.Idea.From.User
     ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓

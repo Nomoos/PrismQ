@@ -45,7 +45,7 @@ Monitor Twitter/X for trending topics and viral content in target niches using T
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module
+- **MVP-001**: T.Idea.From.User module
 - Twitter API v2 credentials
 
 ---

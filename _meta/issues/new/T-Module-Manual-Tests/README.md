@@ -15,7 +15,7 @@ This directory contains individual manual testing subissues for each stage of th
 ### Core Pipeline (Stages 1-4)
 | # | Issue | Module | Status |
 |---|-------|--------|--------|
-| 01 | [T-TEST-01-Idea-Creation.md](T-TEST-01-Idea-Creation.md) | PrismQ.T.Idea.Creation | 🧪 Ready |
+| 01 | [T-TEST-01-Idea-Creation.md](T-TEST-01-Idea-Creation.md) | PrismQ.T.Idea.From.User | 🧪 Ready |
 | 02 | [T-TEST-02-Story-From-Idea.md](T-TEST-02-Story-From-Idea.md) | PrismQ.T.Story.From.Idea | 🧪 Ready |
 | 03 | [T-TEST-03-Title-From-Idea.md](T-TEST-03-Title-From-Idea.md) | PrismQ.T.Title.From.Idea | 🧪 Ready |
 | 04 | [T-TEST-04-Script-From-Title-Idea.md](T-TEST-04-Script-From-Title-Idea.md) | PrismQ.T.Script.From.Title.Idea | 🧪 Ready |

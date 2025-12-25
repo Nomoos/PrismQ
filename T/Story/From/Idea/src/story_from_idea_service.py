@@ -9,7 +9,7 @@ The module:
 3. Stories are created with state TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea)
 
 Workflow Position: Early stage before Title generation
-    PrismQ.T.Idea.Creation
+    PrismQ.T.Idea.From.User
         ↓
     PrismQ.T.Story.From.Idea (creates Stories only) ← This module
         ↓

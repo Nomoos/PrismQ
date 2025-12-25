@@ -263,7 +263,7 @@ class TextClient:
     # Process state names following PrismQ naming convention (folder structure)
     # See T/WORKFLOW_STATE_MACHINE.md for full state machine documentation
     PROCESS_STATES = {
-        "initial": "PrismQ.T.Idea.Creation",  # Initial state - awaiting idea creation
+        "initial": "PrismQ.T.Idea.From.User",  # Initial state - awaiting idea creation
         "idea_created": "PrismQ.T.Title.From.Idea",  # After idea, next is title generation
         "title_generated": "PrismQ.T.Content.FromIdeaAndTitle",  # After title, next is content
         "content_generated": "PrismQ.T.Content.FromOriginalContentAndReviewAndTitle",  # Content iteration
@@ -311,7 +311,7 @@ class TextClient:
                 CREATE TABLE IF NOT EXISTS Story (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     idea_id INTEGER NULL,
-                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
+                    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.From.User',
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
                     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
                     FOREIGN KEY (idea_id) REFERENCES Idea(id)

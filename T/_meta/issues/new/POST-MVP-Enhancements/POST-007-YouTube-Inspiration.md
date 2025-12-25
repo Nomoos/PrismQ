@@ -47,7 +47,7 @@ Extract content ideas from trending YouTube videos in target niches using YouTub
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module
+- **MVP-001**: T.Idea.From.User module
 - YouTube Data API v3 credentials
 
 ---

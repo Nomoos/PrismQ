@@ -294,14 +294,14 @@ db.add_batch_item(
 - `resume()`: Resume processing
 - `get_progress()`: Get progress info
 
-## Integration with T.Idea.Creation
+## Integration with T.Idea.From.User
 
 To integrate with the existing IdeaCreator:
 
 ```python
 import asyncio
 from T.Idea.Batch import BatchProcessor, BatchConfig
-from T.Idea.Creation import IdeaCreator
+from T.Idea.From.User import IdeaCreator
 
 async def process_idea_with_creator(idea):
     """Process idea using IdeaCreator."""

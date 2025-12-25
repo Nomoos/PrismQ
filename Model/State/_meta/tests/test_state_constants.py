@@ -33,7 +33,7 @@ class TestStateNamesConstants:
     
     def test_idea_creation_state(self):
         """Test Idea Creation state constant."""
-        assert StateNames.IDEA_CREATION == "PrismQ.T.Idea.Creation"
+        assert StateNames.IDEA_CREATION == "PrismQ.T.Idea.From.User"
     
     def test_title_from_idea_state(self):
         """Test Title From Idea state constant."""
@@ -380,7 +380,7 @@ class TestStateMachineAlignment:
     
     def test_stage_1_exists(self):
         """Test Stage 1: IdeaCreation exists."""
-        assert StateNames.IDEA_CREATION == "PrismQ.T.Idea.Creation"
+        assert StateNames.IDEA_CREATION == "PrismQ.T.Idea.From.User"
     
     def test_stage_2_exists(self):
         """Test Stage 2: TitleFromIdea exists."""

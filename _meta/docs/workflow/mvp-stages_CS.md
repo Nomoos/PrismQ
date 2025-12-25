@@ -7,7 +7,7 @@
 ### Sekvence workflow (26 fází)
 
 ```
-Fáze 1: PrismQ.T.Idea.Creation
+Fáze 1: PrismQ.T.Idea.From.User
     ↓
 Fáze 2: PrismQ.T.Title.From.Idea (v1)
     ↓
@@ -86,11 +86,11 @@ Tyto fáze řeší počáteční vytváření obsahu, křížové recenze a iter
 
 ---
 
-### Fáze 1: PrismQ.T.Idea.Creation
+### Fáze 1: PrismQ.T.Idea.From.User
 
 **Účel**: Zachytit počáteční nápad na obsah
 
-**Složka**: `T/Idea/Creation/`  
+**Složka**: `T/Idea/From/User/`  
 **Pracovník**: Worker02  
 **Úsilí**: 2 dny
 
@@ -110,7 +110,7 @@ Tyto fáze řeší počáteční vytváření obsahu, křížové recenze a iter
 
 **API**:
 ```python
-from PrismQ.T.Idea.Creation import create_idea
+from PrismQ.T.Idea.From.User import create_idea
 
 idea = create_idea(
     description="Příběh o záhadných událostech v malém městě",
