@@ -381,7 +381,7 @@ class TestRealWorldStates:
         """Test parsing IDEA_CREATION state."""
         parts = parse_state("PrismQ.T.Idea.From.User")
         assert parts.output == "Idea"
-        assert parts.inputs == ("Creation",)
+        assert parts.inputs == ("User",)
     
     def test_title_from_idea(self):
         """Test parsing TITLE_FROM_IDEA state."""
