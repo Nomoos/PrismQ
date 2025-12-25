@@ -50,7 +50,7 @@ cd _meta/scripts/03_PrismQ.T.Title.From.Idea
 
 | # | Stage | Status | Description |
 |---|-------|--------|-------------|
-| 01 | Idea.Creation | ✅ COMPLETE | Create ideas from inspiration |
+| 01 | Idea.From.User | ✅ COMPLETE | Create ideas from inspiration |
 | 02 | Story.From.Idea | ✅ COMPLETE | Generate stories from ideas |
 | 03 | Title.From.Idea | ➡️ **NEXT** | Generate titles from ideas |
 | 04 | Script.From.Title.Idea | ⏳ Pending | Generate scripts from title + idea |

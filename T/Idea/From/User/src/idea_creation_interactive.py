@@ -290,7 +290,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
 
         # Create logger with DEBUG level to allow all messages through
         # Handler levels control what actually gets logged
-        logger = logging.getLogger("PrismQ.Idea.Creation")
+        logger = logging.getLogger("PrismQ.T.Idea.From.User")
         logger.setLevel(logging.DEBUG)
 
         # File handler - captures all DEBUG messages (including JSON data)

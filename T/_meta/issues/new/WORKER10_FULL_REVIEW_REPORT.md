@@ -123,14 +123,14 @@ return versions[0][0]
 
 **Answer: ✅ YES - Better Design**
 
-Inferring `Idea.Creation` vs `Idea.Fusion` from `idea_inspirations` relation is better because:
+Inferring `Idea.From.User` vs `Idea.Fusion` from `idea_inspirations` relation is better because:
 - **Single source of truth** - No risk of enum/relation mismatch
 - **No update anomalies** - Adding inspiration automatically means "fusion"
 - **Simpler data model** - One less field to maintain
 - **Query clarity** - `COUNT(idea_inspirations) > 0` is clear intent
 
 ```sql
--- Idea.Creation detection
+-- Idea.From.User detection
 SELECT * FROM Idea WHERE NOT EXISTS (
     SELECT 1 FROM idea_inspirations WHERE idea_id = Idea.id
 );

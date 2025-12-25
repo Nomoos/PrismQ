@@ -9,7 +9,7 @@ Ultra-Clean Pipeline je zjednodušená, čitelná reprezentace základního iter
 ## Struktura vzoru
 
 ```
-Idea.Creation 
+Idea.From.User 
 → Title.From.Idea 
 → Content.From.Idea.Title 
 → Review.Title.From.Content.Idea 
@@ -22,7 +22,7 @@ Idea.Creation
 
 ## Vysvětlení vzoru
 
-### Fáze 1: `Idea.Creation`
+### Fáze 1: `Idea.From.User`
 **Účel**: Počáteční vytvoření nápadu  
 **Vstupy**: Žádné (výchozí bod)  
 **Výstupy**: `Idea`
@@ -137,7 +137,7 @@ Ultra-Clean Pipeline je zjednodušený pohled na 9 koncepčních fází. Zde je 
 
 | Fáze Ultra-Clean | Fáze MVP | Popis |
 |------------------|----------|-------|
-| `Idea.Creation` | Fáze 1 | PrismQ.T.Idea.From.User |
+| `Idea.From.User` | Fáze 1 | PrismQ.T.Idea.From.User |
 | `Title.From.Idea` | Fáze 2 | PrismQ.T.Title.From.Idea (v1) |
 | `Content.From.Title.Idea` | Fáze 3 | PrismQ.T.Content.FromIdeaAndTitle (v1) |
 | `Review.Title.From.Content.Idea` | Fáze 4 | PrismQ.T.Review.Title.ByContent (v1) |

@@ -242,7 +242,7 @@ PrismQ implementuje **komplexní workflow stavového automatu** napříč pěti 
 1. **T (Generování textu)**
    - **Účel**: Transformace nápadů do vysoce kvalitního textového obsahu
    - **Stavový automat**: 16fázový iterativní workflow s cykly společného vylepšování
-   - **Klíčové stavy**: Idea.Creation → Title.Draft → Script.Draft → Revize → Vylepšení → Vybrušování → Publikování
+   - **Klíčové stavy**: Idea.From.User → Title.Draft → Script.Draft → Revize → Vylepšení → Vybrušování → Publikování
    - **Kvalitní kontrolní body**: Schválení titulku, schválení skriptu, validace čitelnosti
    - **Výstup**: SEO-optimalizovaný publikovaný text
    - **struktura uvnitř pracovního adresáře** T/{id}/{Platform}, T/{id}/Text (zde bude hotový text)

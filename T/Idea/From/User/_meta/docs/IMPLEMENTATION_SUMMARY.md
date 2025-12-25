@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully implemented **Path 2: Manual Creation** - Idea.Creation → List of Candidate Ideas with the following specifications:
+Successfully implemented **Path 2: Manual Creation** - Idea.From.User → List of Candidate Ideas with the following specifications:
 
 - **Default**: Creates 10 Ideas from user topic/description
 - **AI-Powered**: Uses local AI models via Ollama (RTX 5090 optimized)

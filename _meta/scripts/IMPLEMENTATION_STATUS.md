@@ -11,7 +11,7 @@ This directory contains **30 numbered workflow modules** and **validation tools*
 
 ### ✅ Fully Implemented (3 stages)
 
-1. **Stage 01: Idea.Creation** - ✅ COMPLETE
+1. **Stage 01: Idea.From.User** - ✅ COMPLETE
    - Interactive idea creation from inspiration
    - AI-powered generation using Ollama
    - Multiple content "flavors" (styles)

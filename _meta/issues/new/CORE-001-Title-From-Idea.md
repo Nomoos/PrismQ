@@ -3,7 +3,7 @@
 **Phase**: Core Pipeline  
 **Priority**: High  
 **Effort**: 2 days  
-**Dependencies**: Idea.Creation ✅ (Complete)  
+**Dependencies**: Idea.From.User ✅ (Complete)  
 **Stage**: Stage 2 in MVP Workflow
 
 ---
@@ -37,7 +37,7 @@ Implement and enhance the title generation module that creates initial title var
 - [ ] Generated titles meet length constraints (20-100 chars)
 - [ ] Titles include relevant keywords from source idea
 - [ ] Quality scores accurately reflect title engagement potential
-- [ ] Module integrates with Idea.Creation output format
+- [ ] Module integrates with Idea.From.User output format
 - [ ] Unit tests achieve >80% coverage
 - [ ] Integration with Stage 3 (Script.FromIdeaAndTitle) verified
 
@@ -101,7 +101,7 @@ class TitleVariant:
 cd /home/runner/work/PrismQ/PrismQ
 python -m pytest T/Title/From/Idea/_meta/tests/ -v
 
-# Test integration with Idea.Creation
+# Test integration with Idea.From.User
 python -m pytest tests/test_integration.py -k "title" -v
 ```
 
@@ -117,7 +117,7 @@ python -m pytest tests/test_integration.py -k "title" -v
 
 - [ ] All existing functionality preserved
 - [ ] Unit tests passing (>80% coverage)
-- [ ] Integration with Idea.Creation verified
+- [ ] Integration with Idea.From.User verified
 - [ ] Integration with Stage 3 verified
 - [ ] Documentation updated
 - [ ] Code reviewed by Worker10

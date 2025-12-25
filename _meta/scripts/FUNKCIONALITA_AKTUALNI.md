@@ -22,7 +22,7 @@ Všechny moduly **01-30** mají vytvořené adresáře s **Run.bat** a **Preview
 
 ### T Module - Text Generation Pipeline
 
-#### Stage 01: ✅ **Idea.Creation** - PLNĚ IMPLEMENTOVÁNO
+#### Stage 01: ✅ **Idea.From.User** - PLNĚ IMPLEMENTOVÁNO
 **Adresář:** `01_PrismQ.T.Idea.From.User/`  
 **Python moduly:** `T/Idea/From/User/src/`
 - ✅ `idea_creation_interactive.py` (20KB) - Hlavní interaktivní rozhraní

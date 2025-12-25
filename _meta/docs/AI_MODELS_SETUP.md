@@ -1090,7 +1090,7 @@ def script_from_idea_title_moving_window(idea: dict, title: str) -> str:
 │                    PrismQ.T Pipeline                        │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  1. Idea.Creation                                           │
+│  1. Idea.From.User                                           │
 │       ↓                                                     │
 │  2. Story.From.Idea (creates Story Bible)                   │
 │       ↓                                                     │
@@ -1602,7 +1602,7 @@ Rewrite = Léčba (aplikace změn na základě review)
 
 **2.1 Idea / Concept Generation**
 ```
-Idea.Inspiration / Idea.Fusion / Idea.Creation
+Idea.Inspiration / Idea.Fusion / Idea.From.User
     ↓
 Review (clarity, story arc potential, brand fit)
     ↓

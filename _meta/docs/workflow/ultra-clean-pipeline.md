@@ -13,7 +13,7 @@ The Ultra-Clean Pipeline is a simplified, readable representation of the core it
 ## Pattern Structure
 
 ```
-Idea.Creation 
+Idea.From.User 
 → Title.From.Idea 
 → Content.From.Idea.Title 
 → Review.Title.From.Content.Idea 
@@ -26,7 +26,7 @@ Idea.Creation
 
 ## Pattern Explanation
 
-### Stage 1: `Idea.Creation`
+### Stage 1: `Idea.From.User`
 **Purpose**: Initial idea creation  
 **Inputs**: None (starting point)  
 **Outputs**: `Idea`
@@ -141,7 +141,7 @@ The Ultra-Clean Pipeline is a simplified view of 9 conceptual stages. Here's how
 
 | Ultra-Clean Stage | MVP Stages | Description |
 |-------------------|------------|-------------|
-| `Idea.Creation` | Stage 1 | PrismQ.T.Idea.From.User |
+| `Idea.From.User` | Stage 1 | PrismQ.T.Idea.From.User |
 | `Title.From.Idea` | Stage 2 | PrismQ.T.Title.From.Idea (v1) |
 | `Content.From.Idea.Title` | Stage 3 | PrismQ.T.Content.From.Idea.Title (v1) |
 | `Review.Title.From.Content.Idea` | Stage 4 | PrismQ.T.Review.Title.From.Content (v1) |

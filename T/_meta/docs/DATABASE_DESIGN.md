@@ -361,7 +361,7 @@ IdeaInspiration (
 
 -- Junction table: Many-to-many relationship between Idea and IdeaInspiration
 -- Following naming convention: <Parent>_<Related> or <Subject>_<Object>
--- Empty when Idea created via Idea.Creation
+-- Empty when Idea created via Idea.From.User
 -- One or more entries when Idea created via Idea.Fusion
 idea_inspirations (
     id UUID PRIMARY KEY,
@@ -375,7 +375,7 @@ idea_inspirations (
 #### Idea Creation Methods (Inferred from Relation)
 | Method | idea_inspirations Entries | How to Detect |
 |--------|---------------------------|---------------|
-| `Idea.Creation` | None (empty) | `COUNT(idea_inspirations WHERE idea_id = ?) = 0` |
+| `Idea.From.User` | None (empty) | `COUNT(idea_inspirations WHERE idea_id = ?) = 0` |
 | `Idea.Fusion` | One or more | `COUNT(idea_inspirations WHERE idea_id = ?) > 0` |
 
 ### Relationship Naming Best Practices
@@ -510,7 +510,7 @@ StoryMetrics (
    - `idea_id` FK with CASCADE delete
    - `inspiration_id` FK with CASCADE delete
    - Unique constraint on (idea_id, inspiration_id)
-   - Note: Empty = Idea.Creation, populated = Idea.Fusion
+   - Note: Empty = Idea.From.User, populated = Idea.Fusion
 
 ---
 
