@@ -249,7 +249,7 @@ The `Story.state` field stores the **next process name** following PrismQ folder
 
 | State | Description |
 |-------|-------------|
-| `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation |
+| `PrismQ.T.Idea.From.User` | Initial state, awaiting idea creation |
 | `PrismQ.T.Title.From.Idea` | Idea created, awaiting title |
 | `PrismQ.T.Content.FromIdeaAndTitle` | Title generated, awaiting script |
 | `PrismQ.T.Content.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) |

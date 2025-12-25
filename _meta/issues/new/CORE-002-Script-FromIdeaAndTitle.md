@@ -113,7 +113,7 @@ class ScriptV1:
 
 ## Input Components
 
-### From Idea.Creation (Stage 1)
+### From Idea.From.User (Stage 1)
 - Core concept
 - Target audience
 - Content theme
@@ -178,7 +178,7 @@ git checkout -b core-002-script-from-idea-title
 
 ### Input Flow
 ```
-Stage 1: Idea.Creation
+Stage 1: Idea.From.User
     ↓
     Idea Object (concept, themes, keywords, hook, premise, synopsis)
     ↓

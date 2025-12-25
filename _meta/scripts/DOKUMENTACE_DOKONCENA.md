@@ -103,7 +103,7 @@
 ### Implementované stages:
 
 ```
-Stage 01: Idea.Creation          ✅ COMPLETE (Python: 9 files, ~100KB)
+Stage 01: Idea.From.User          ✅ COMPLETE (Python: 9 files, ~100KB)
 Stage 02: Story.From.Idea        ✅ COMPLETE (Python: 2 files, ~32KB)
 Stage 03: Title.From.Idea        ✅ COMPLETE (Python: 10 files, ~148KB)
 Stage 04: Script.From.Title.Idea ❌ CRITICAL GAP

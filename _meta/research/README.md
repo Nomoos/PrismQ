@@ -121,10 +121,10 @@ The main research document includes **40+ extractable mechanics** organized into
 
 **Focus:** Implement the foundational T (Text) module workflow from manual idea to optimized content following the exact numbered worker structure in `_meta/scripts/`.
 
-1. **Manual Idea Creation** (`01_PrismQ.T.Idea.Creation`)
+1. **Manual Idea Creation** (`01_PrismQ.T.Idea.From.User`)
    - Manual idea capture and initial inspiration
    - Foundation for all content generation
-   - Located: `T/Idea/Creation/`
+   - Located: `T/Idea/From/User/`
 
 2. **Story Generation from Idea** (`02_PrismQ.T.Story.From.Idea`)
    - Implement idea-to-story transformation using local LLM (Qwen/Ollama)
@@ -253,7 +253,7 @@ The main research document includes **40+ extractable mechanics** organized into
 
 ### Implementation Priority
 
-**Phase 0 (Top Priority)** focuses on the core text generation pipeline (`PrismQ.T.Idea.Creation` → `PrismQ.T.Story.From.Idea` → `PrismQ.T.Title.From.Idea` → etc.), establishing PrismQ's foundation before building audio/video capabilities. This aligns with the progressive enrichment model and ensures quality text content as the base for all subsequent formats.
+**Phase 0 (Top Priority)** focuses on the core text generation pipeline (`PrismQ.T.Idea.From.User` → `PrismQ.T.Story.From.Idea` → `PrismQ.T.Title.From.Idea` → etc.), establishing PrismQ's foundation before building audio/video capabilities. This aligns with the progressive enrichment model and ensures quality text content as the base for all subsequent formats.
 
 ### Market Gaps PrismQ Can Fill
 

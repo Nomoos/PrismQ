@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document provides a clear, step-by-step workflow for creating titles and content text in the PrismQ Text Generation Pipeline (T module). The workflow starts with **Idea.Creation** (initial idea formation) and ends with **Publishing** (text publication).
+This document provides a clear, step-by-step workflow for creating titles and content text in the PrismQ Text Generation Pipeline (T module). The workflow starts with **Idea.From.User** (initial idea formation) and ends with **Publishing** (text publication).
 
 > 💡 **Quick Reference**: For a simplified view of the core iterative workflow, see the **[Ultra-Clean Pipeline](../_meta/docs/workflow/ultra-clean-pipeline.md)** pattern.
 
@@ -20,7 +20,7 @@ This document provides a clear, step-by-step workflow for creating titles and co
 │  (combines multiple inspirations)                           │
 │                                                              │
 │  Path 2: Manual Creation                                    │
-│  Idea.Creation → List of Candidate Ideas                    │
+│  Idea.From.User → List of Candidate Ideas                    │
 │  (direct manual input)                                      │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
@@ -105,8 +105,8 @@ This document provides a clear, step-by-step workflow for creating titles and co
 
 ---
 
-### Stage 0C: Idea.Creation (Entry Point - Manual Path)
-**Location:** `T/Idea/Creation`  
+### Stage 0C: Idea.From.User (Entry Point - Manual Path)
+**Location:** `T/Idea/From/User`  
 **Purpose:** Manually create idea concepts
 
 **Activities:**
@@ -396,7 +396,7 @@ ContentReview → ContentApproved → TextPublishing → PublishedText ✓
 
 ### Manual Path (Direct Creation)
 ```
-Idea.Creation → [Candidate List] → AI Scoring → 
+Idea.From.User → [Candidate List] → AI Scoring → 
 Idea.Model → Idea.Outline → Title.FromIdea → 
 Content.FromIdeaAndTitle → ContentReview → ContentApproved → 
 TextPublishing → PublishedText ✓
@@ -421,7 +421,7 @@ ContentApproved → TextPublishing → PublishedText ✓
 
 ### Entry Points
 - **Idea.Inspiration** - Automated entry via inspiration collection (feeds into Fusion)
-- **Idea.Creation** - Manual entry via direct idea creation
+- **Idea.From.User** - Manual entry via direct idea creation
 
 ### Fusion & Selection
 - **Idea.Fusion** - Combines multiple inspirations into candidate list
@@ -472,7 +472,7 @@ ContentApproved → TextPublishing → PublishedText ✓
 
 ### Starting the Workflow
 1. **Automated Path**: Collect quality inspirations in **Idea.Inspiration**, let **Idea.Fusion** combine them
-2. **Manual Path**: Create well-defined ideas in **Idea.Creation**
+2. **Manual Path**: Create well-defined ideas in **Idea.From.User**
 3. Trust **AI Scoring** to select the best candidate from the list
 4. Develop comprehensive outline in **Idea.Outline**
 5. Create initial title in **Title.FromIdea** before moving to content

@@ -100,7 +100,7 @@ class TestStateBuilder:
     def test_build_simple_state(self):
         """Test building a simple state."""
         state = StateBuilder().output("Idea").component("Creation").build()
-        assert state == "PrismQ.T.Idea.Creation"
+        assert state == "PrismQ.T.Idea.From.User"
     
     def test_build_from_state(self):
         """Test building a From state."""
@@ -157,7 +157,7 @@ class TestBuildState:
     def test_build_state_simple(self):
         """Test building a simple state."""
         state = build_state("Idea", "Creation")
-        assert state == "PrismQ.T.Idea.Creation"
+        assert state == "PrismQ.T.Idea.From.User"
     
     def test_build_state_with_from(self):
         """Test building a From state."""
@@ -180,7 +180,7 @@ class TestParseState:
     
     def test_parse_simple_state(self):
         """Test parsing a simple state."""
-        parts = parse_state("PrismQ.T.Idea.Creation")
+        parts = parse_state("PrismQ.T.Idea.From.User")
         assert parts.prefix == "PrismQ.T"
         assert parts.output == "Idea"
         assert parts.action is None
@@ -248,7 +248,7 @@ class TestValidateStateFormat:
     
     def test_valid_simple_state(self):
         """Test validating a simple valid state."""
-        is_valid, error = validate_state_format("PrismQ.T.Idea.Creation")
+        is_valid, error = validate_state_format("PrismQ.T.Idea.From.User")
         assert is_valid is True
         assert error is None
     
@@ -379,9 +379,9 @@ class TestRealWorldStates:
     
     def test_idea_creation(self):
         """Test parsing IDEA_CREATION state."""
-        parts = parse_state("PrismQ.T.Idea.Creation")
+        parts = parse_state("PrismQ.T.Idea.From.User")
         assert parts.output == "Idea"
-        assert parts.inputs == ("Creation",)
+        assert parts.inputs == ("User",)
     
     def test_title_from_idea(self):
         """Test parsing TITLE_FROM_IDEA state."""

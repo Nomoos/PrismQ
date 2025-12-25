@@ -7,7 +7,7 @@
 ### Workflow Sequence (26 Stages)
 
 ```
-Stage 1: PrismQ.T.Idea.Creation
+Stage 1: PrismQ.T.Idea.From.User
     ↓
 Stage 1.5: PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
@@ -88,11 +88,11 @@ These stages handle initial content creation, cross-reviews, and iterative impro
 
 ---
 
-### Stage 1: PrismQ.T.Idea.Creation
+### Stage 1: PrismQ.T.Idea.From.User
 
 **Purpose**: Capture initial content idea
 
-**Folder**: `T/Idea/Creation/`  
+**Folder**: `T/Idea/From/User/`  
 **Worker**: Worker02  
 **Effort**: 2 days
 
@@ -112,7 +112,7 @@ These stages handle initial content creation, cross-reviews, and iterative impro
 
 **API**:
 ```python
-from PrismQ.T.Idea.Creation import create_idea
+from PrismQ.T.Idea.From.User import create_idea
 
 idea = create_idea(
     description="Story about mysterious events in a small town",

@@ -73,7 +73,7 @@ task_manager:
   api_key: "${TASKMANAGER_API_KEY}"
 
 workers:
-  - name: "PrismQ.T.Idea.Inspiration.Source.Video.YouTube.VideoScraper"
+  - name: "PrismQ.T.Idea.Inspiration.From.Video.YouTube.VideoScraper"
     project_path: "./Source/Video/YouTube/Video"
     venv_python: "./Source/Video/YouTube/Video/venv/bin/python"
     module: "src.workers.video_scraper"

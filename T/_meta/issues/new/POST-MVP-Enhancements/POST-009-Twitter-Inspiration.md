@@ -4,7 +4,7 @@
 **Worker**: Worker08 (AI/ML Specialist)  
 **Priority**: Medium  
 **Effort**: 1.5 days  
-**Module**: `PrismQ.T.Idea.Inspiration.Source.Twitter`  
+**Module**: `PrismQ.T.Idea.Inspiration.From.Twitter`  
 **Sprint**: Sprint 5 (Weeks 11-12)  
 **Status**: 🎯 PLANNED
 
@@ -45,7 +45,7 @@ Monitor Twitter/X for trending topics and viral content in target niches using T
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module
+- **MVP-001**: T.Idea.From.User module
 - Twitter API v2 credentials
 
 ---
@@ -67,9 +67,9 @@ class TwitterInspiration:
 ```
 
 ### Files to Create
-- `T/Idea/Inspiration/Source/Twitter/twitter_client.py` (new)
-- `T/Idea/Inspiration/Source/Twitter/trend_analyzer.py` (new)
-- `T/Idea/Inspiration/Source/Twitter/cluster_extractor.py` (new)
+- `T/Idea/Inspiration/From/Twitter/twitter_client.py` (new)
+- `T/Idea/Inspiration/From/Twitter/trend_analyzer.py` (new)
+- `T/Idea/Inspiration/From/Twitter/cluster_extractor.py` (new)
 
 ---
 

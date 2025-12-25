@@ -12,7 +12,7 @@ State Format:
     - Inputs: One or more input sources (e.g., "Idea", "Title", "Script")
 
 Examples:
-    - PrismQ.T.Idea.Creation - Initial state
+    - PrismQ.T.Idea.From.User - Initial state
     - PrismQ.T.Title.From.Idea - Generate title from idea
     - PrismQ.T.Script.From.Idea.Title - Generate script from idea and title
     - PrismQ.T.Review.Script.Grammar - Grammar review of script
@@ -246,7 +246,7 @@ def build_state(output: str, action: Optional[str] = None, *inputs: str) -> str:
         >>> build_state("Script", "From", "Idea", "Title")
         'PrismQ.T.Script.From.Idea.Title'
         >>> build_state("Idea", "Creation")
-        'PrismQ.T.Idea.Creation'
+        'PrismQ.T.Idea.From.User'
     """
     parts = [STATE_PREFIX, output]
     

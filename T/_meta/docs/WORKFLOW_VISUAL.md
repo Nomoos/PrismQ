@@ -11,7 +11,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     STAGE 1: Idea Creation                       │
-│                  PrismQ.T.Idea.Creation                          │
+│                  PrismQ.T.Idea.From.User                          │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
@@ -156,7 +156,7 @@ This document provides a visual guide to the PrismQ.T workflow, showing the main
 ### Creation Stages (1-3)
 | Stage | Name | Purpose |
 |-------|------|---------|
-| 1 | Idea.Creation | Initial idea capture |
+| 1 | Idea.From.User | Initial idea capture |
 | 1.5 | Story.From.Idea | Create 10 Story objects per Idea |
 | 2 | Title.From.Idea | Generate initial title (v1) |
 | 3 | Content.From.Idea.Title | Generate initial content (v1) |

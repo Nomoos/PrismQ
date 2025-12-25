@@ -9,7 +9,7 @@ This document describes the detailed, iterative workflow for the PrismQ.T (Text 
 ## Complete Workflow Sequence
 
 ```
-PrismQ.T.Idea.Creation
+PrismQ.T.Idea.From.User
     ↓
 PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
@@ -96,11 +96,11 @@ PrismQ.T.Story.Review
 
 ## Detailed Stage Descriptions
 
-### Stage 1: PrismQ.T.Idea.Creation
+### Stage 1: PrismQ.T.Idea.From.User
 
 **Purpose**: Initial idea creation and capture
 
-**Location**: `T/Idea/Creation/`
+**Location**: `T/Idea/From/User/`
 
 **Input**:
 - User-provided concept or inspiration

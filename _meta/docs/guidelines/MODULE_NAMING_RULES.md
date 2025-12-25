@@ -43,7 +43,7 @@ PrismQ.<ContentType>.<What>.<From>.<Source>.<Context>
 
 | Directory Path | Module/State Name |
 |----------------|-------------------|
-| `T/Idea/Creation/` | `PrismQ.T.Idea.Creation` |
+| `T/Idea/From/User/` | `PrismQ.T.Idea.From.User` |
 | `T/Story/From/Idea/` | `PrismQ.T.Story.From.Idea` |
 | `T/Title/From/Idea/` | `PrismQ.T.Title.From.Idea` |
 | `T/Content/From/Idea/Title/` | `PrismQ.T.Content.From.Idea.Title` |

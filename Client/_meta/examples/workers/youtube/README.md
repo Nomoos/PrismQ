@@ -2,7 +2,7 @@
 
 Production-ready Python worker implementation for processing YouTube shorts scraping tasks from the TaskManager API.
 
-This example demonstrates how to implement a worker in the [PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube) repository.
+This example demonstrates how to implement a worker in the [PrismQ.T.Idea.Inspiration.Froms.Content.Shorts.YouTube](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Froms.Content.Shorts.YouTube) repository.
 
 ## 🎯 Overview
 
@@ -282,7 +282,7 @@ beautifulsoup4>=4.12.0
 
 ## 🔗 Related
 
-- [Main Repository](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Sources.Content.Shorts.YouTube)
+- [Main Repository](https://github.com/Nomoos/PrismQ.T.Idea.Inspiration.Froms.Content.Shorts.YouTube)
 - [TaskManager System](../../../Backend/TaskManager/README.md)
 - [PHP Worker Example](../php/README.md)
 

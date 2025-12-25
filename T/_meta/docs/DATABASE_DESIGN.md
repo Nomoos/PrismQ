@@ -59,7 +59,7 @@ Idea (
 Story (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER FK NULL REFERENCES Idea(id),  -- Reference to Idea
-    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',  -- Next process name
+    state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.From.User',  -- Next process name
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (idea_id) REFERENCES Idea(id)
 )
@@ -177,7 +177,7 @@ Where:
 
 ```
                     ┌─────────────────────────────────────────────┐
-                    │   PrismQ.T.Idea.Creation (Initial)          │
+                    │   PrismQ.T.Idea.From.User (Initial)          │
                     └───────────────────┬─────────────────────────┘
                                         │ create_idea
                                         ▼
@@ -206,7 +206,7 @@ Where:
 ### Process State Values
 | State | Description | Next Action |
 |-------|-------------|-------------|
-| `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation | Create idea |
+| `PrismQ.T.Idea.From.User` | Initial state, awaiting idea creation | Create idea |
 | `PrismQ.T.Title.From.Idea` | Idea created, awaiting title | Generate title from idea |
 | `PrismQ.T.Content.From.Idea.Title` | Title generated, awaiting script | Generate script from idea + title |
 | `PrismQ.T.Review.Title.From.Script` | Generate title review from script | Review title |
@@ -361,7 +361,7 @@ IdeaInspiration (
 
 -- Junction table: Many-to-many relationship between Idea and IdeaInspiration
 -- Following naming convention: <Parent>_<Related> or <Subject>_<Object>
--- Empty when Idea created via Idea.Creation
+-- Empty when Idea created via Idea.From.User
 -- One or more entries when Idea created via Idea.Fusion
 idea_inspirations (
     id UUID PRIMARY KEY,
@@ -375,7 +375,7 @@ idea_inspirations (
 #### Idea Creation Methods (Inferred from Relation)
 | Method | idea_inspirations Entries | How to Detect |
 |--------|---------------------------|---------------|
-| `Idea.Creation` | None (empty) | `COUNT(idea_inspirations WHERE idea_id = ?) = 0` |
+| `Idea.From.User` | None (empty) | `COUNT(idea_inspirations WHERE idea_id = ?) = 0` |
 | `Idea.Fusion` | One or more | `COUNT(idea_inspirations WHERE idea_id = ?) > 0` |
 
 ### Relationship Naming Best Practices
@@ -510,7 +510,7 @@ StoryMetrics (
    - `idea_id` FK with CASCADE delete
    - `inspiration_id` FK with CASCADE delete
    - Unique constraint on (idea_id, inspiration_id)
-   - Note: Empty = Idea.Creation, populated = Idea.Fusion
+   - Note: Empty = Idea.From.User, populated = Idea.Fusion
 
 ---
 

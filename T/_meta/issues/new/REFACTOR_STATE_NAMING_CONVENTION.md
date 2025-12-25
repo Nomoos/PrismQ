@@ -5,7 +5,7 @@ Refactor the process state naming convention to better reflect the input/output 
 
 ## Current State
 The current state names follow folder structure but lack Review-related processes:
-- `PrismQ.T.Idea.Creation`
+- `PrismQ.T.Idea.From.User`
 - `PrismQ.T.Title.From.Idea`
 - `PrismQ.T.Title.From.Title.Review.Script`
 - `PrismQ.T.Content.FromIdeaAndTitle`
@@ -34,7 +34,7 @@ Where:
 ### New State Names (Proposed)
 | Process | Proposed State Name | Inputs → Output |
 |---------|---------------------|-----------------|
-| Create Idea | `PrismQ.T.Idea.Creation` | ∅ → Idea |
+| Create Idea | `PrismQ.T.Idea.From.User` | ∅ → Idea |
 | Create Title from Idea | `PrismQ.T.Title.From.Idea` | Idea → Title |
 | Create Script from Idea+Title | `PrismQ.T.Content.From.Idea.Title` | Idea, Title → Script |
 | Review Title (using Script) | `PrismQ.T.Review.Title.From.Script` | Script → TitleReview |

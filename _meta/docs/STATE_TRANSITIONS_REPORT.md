@@ -117,7 +117,7 @@ stateDiagram-v2
 
 | State | Name | Phase | Location | Transitions To |
 |-------|------|-------|----------|----------------|
-| IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ | StoryFromIdea |
+| IdeaCreation | PrismQ.T.Idea.From.User | 1 | T/Idea/From/User/ | StoryFromIdea |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ | TitleFromIdea |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ | ScriptFromTitleIdea |
 | ScriptFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ | ReviewTitleByScriptIdea |

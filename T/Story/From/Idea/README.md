@@ -14,7 +14,7 @@ Tento modul poskytuje funkcionalitu pro vytváření Story objektů z Idea objek
 ## Pozice ve workflow
 
 ```
-PrismQ.T.Idea.Creation
+PrismQ.T.Idea.From.User
        ↓
 PrismQ.T.Story.From.Idea (vytvoří pouze Stories) ← Tento modul
        ↓

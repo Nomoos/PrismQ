@@ -17,7 +17,7 @@ Implement title v2 generation module that creates improved title versions using 
 ## Dependencies
 
 **Requires**:
-- ✅ MVP-001: T.Idea.Creation (Complete)
+- ✅ MVP-001: T.Idea.From.User (Complete)
 - ✅ MVP-002: T.Title.From.Idea (Complete) - Provides title v1
 - ✅ MVP-003: T.Script.FromIdeaAndTitle (Complete) - Provides script v1
 - ✅ MVP-004: T.Review.Title.ByScript (Complete) - Provides title review feedback

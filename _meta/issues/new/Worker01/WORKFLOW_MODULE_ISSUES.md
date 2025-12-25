@@ -23,9 +23,9 @@ Scripts are organized into three folders:
 
 ---
 
-### ISSUE-001: PrismQ.T.Idea.Creation
+### ISSUE-001: PrismQ.T.Idea.From.User
 **Status**: ✅ Implemented  
-**Location**: `T/Idea/Creation/`  
+**Location**: `T/Idea/From/User/`  
 **Scripts**: `_meta/scripts/01_Idea/`
 
 **Description**:

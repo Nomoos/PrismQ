@@ -17,7 +17,7 @@ Create the first version (v0) of title options based solely on the original idea
 **Stage 2** in MVP workflow: `PrismQ.T.Title.Draft (v0)`
 
 ```
-PrismQ.T.Idea.Creation
+PrismQ.T.Idea.From.User
     ↓
 PrismQ.T.Title.From.Idea (v0) ← Creates Stories + Initial titles (AI-powered)
     ↓

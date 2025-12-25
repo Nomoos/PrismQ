@@ -153,7 +153,7 @@ class TestStoryRepositoryBasicOperations:
     def test_update_story_state(self, story_repo):
         """Test updating story state with valid transition."""
         # Use valid state from StateNames - IDEA_CREATION to TITLE_FROM_IDEA
-        story = Story(idea_id="1", state="PrismQ.T.Idea.Creation")
+        story = Story(idea_id="1", state="PrismQ.T.Idea.From.User")
         saved = story_repo.insert(story)
         
         # Valid transition from IDEA_CREATION to TITLE_FROM_IDEA
@@ -165,7 +165,7 @@ class TestStoryRepositoryBasicOperations:
     
     def test_update_story_invalid_transition_raises_error(self, story_repo, capsys):
         """Test that invalid state transition raises InvalidStateTransitionError with error message."""
-        story = Story(idea_id="1", state="PrismQ.T.Idea.Creation")
+        story = Story(idea_id="1", state="PrismQ.T.Idea.From.User")
         saved = story_repo.insert(story)
         
         # Invalid transition - IDEA_CREATION cannot go directly to PUBLISHING
@@ -177,7 +177,7 @@ class TestStoryRepositoryBasicOperations:
         
         # Check error message contains useful debugging info
         assert "Invalid state transition" in str(exc_info.value)
-        assert "PrismQ.T.Idea.Creation" in str(exc_info.value)
+        assert "PrismQ.T.Idea.From.User" in str(exc_info.value)
         assert "PrismQ.T.Publishing" in str(exc_info.value)
         
         # Check that detailed error was printed to stdout
@@ -785,7 +785,7 @@ class TestModuleTypeDetection:
     def test_unknown_module_types(self, story_repo):
         """Test detection of unknown module types."""
         assert story_repo._get_module_type("PrismQ.T.Publishing") == "unknown"
-        assert story_repo._get_module_type("PrismQ.T.Idea.Creation") == "unknown"
+        assert story_repo._get_module_type("PrismQ.T.Idea.From.User") == "unknown"
         assert story_repo._get_module_type("InvalidState") == "unknown"
 
 

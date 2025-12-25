@@ -147,7 +147,7 @@ Výsledkem běhu modulu je:
 
 **Vstupní závislosti:**
 - Modul 02 (PrismQ.T.Story.From.Idea) - vytváří Stories připravené k zpracování
-- Modul 01 (PrismQ.T.Idea.Creation) - source Idea textu
+- Modul 01 (PrismQ.T.Idea.From.User) - source Idea textu
 - Ollama server (AI model hosting)
 - AI model pro generování titulků (např. qwen3:30b)
 - SQLite databáze s tabulkami Story a Idea

@@ -132,7 +132,7 @@ Each issue file contains:
 ## Dependencies Graph
 
 ```
-MVP-001 (Idea.Creation) ──┐
+MVP-001 (Idea.From.User) ──┐
 MVP-002 (Title.FromIdea) ──┼──> POST-005 (Batch Processing)
 MVP-024 (Publishing) ──────┼──> POST-001 (SEO Keywords)
                            │     ├──> POST-002 (Tags & Categories)

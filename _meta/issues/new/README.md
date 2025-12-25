@@ -253,7 +253,7 @@ graph LR
 - Issue templates: In worker folders
 - Code standards: In _meta/docs/
 - Architecture docs: In _meta/docs/
-- Examples: See T/Idea/Inspiration/Source/YouTube/_meta/issues/new/
+- Examples: See T/Idea/Inspiration/From/YouTube/_meta/issues/new/
 
 ---
 

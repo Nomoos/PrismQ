@@ -1,7 +1,7 @@
 """Idea model and database support for PrismQ.
 
 This module provides the shared Idea model for storing prompt-based idea data
-that can be created by PrismQ.T.Idea.Creation or PrismQ.Idea.Fusion.
+that can be created by PrismQ.T.Idea.From.User or PrismQ.Idea.Fusion.
 
 The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 

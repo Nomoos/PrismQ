@@ -27,7 +27,7 @@ class TestIdeaTitleScriptWorkflow:
         helper = IntegrationTestHelper()
 
         # Start with idea creation
-        assert helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        assert helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1, {"stage": "creation"})
 
@@ -57,7 +57,7 @@ class TestIdeaTitleScriptWorkflow:
         helper = IntegrationTestHelper()
 
         # Initial versions
-        helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1)
 
@@ -96,7 +96,7 @@ class TestIdeaTitleScriptWorkflow:
         helper = IntegrationTestHelper()
 
         # Setup initial v1 versions
-        helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1)
 
@@ -230,7 +230,7 @@ class TestWorkflowStageTransitions:
 
         # Forward progression
         stages = [
-            "PrismQ.T.Idea.Creation",
+            "PrismQ.T.Idea.From.User",
             "PrismQ.T.Title.From.Idea",
             "PrismQ.T.Script.From.Idea.Title",
             "PrismQ.T.Review.Title.From.Script.Idea",
@@ -249,7 +249,7 @@ class TestWorkflowStageTransitions:
         validator = WorkflowStageValidator()
 
         # Initial creation
-        validator.transition_to("PrismQ.T.Idea.Creation")
+        validator.transition_to("PrismQ.T.Idea.From.User")
         validator.transition_to("PrismQ.T.Title.From.Idea")
         validator.transition_to("PrismQ.T.Script.From.Idea.Title")
 
@@ -266,7 +266,7 @@ class TestWorkflowStageTransitions:
 
         # Verify we went through all expected stages
         history = validator.get_stage_history()
-        assert "PrismQ.T.Idea.Creation" in history
+        assert "PrismQ.T.Idea.From.User" in history
         assert "PrismQ.T.Title.From.Idea" in history
         assert "PrismQ.T.Title.From.Title.Review.Script" in history
         assert "PrismQ.T.Review.Title.From.Script" in history
@@ -275,7 +275,7 @@ class TestWorkflowStageTransitions:
         """Test that skipping stages is not allowed."""
         validator = WorkflowStageValidator()
 
-        validator.transition_to("PrismQ.T.Idea.Creation")
+        validator.transition_to("PrismQ.T.Idea.From.User")
         validator.transition_to("PrismQ.T.Title.From.Idea")
 
         # Cannot skip directly to v3
@@ -379,7 +379,7 @@ class TestCompleteWorkflowScenario:
         helper = IntegrationTestHelper()
 
         # Stage 1: Idea Creation
-        assert helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        assert helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1, {"stage": "creation", "status": "draft"})
 
@@ -446,7 +446,7 @@ class TestCompleteWorkflowScenario:
         # Verify workflow stages
         stage_history = helper.stage_validator.get_stage_history()
         expected_stages = [
-            "PrismQ.T.Idea.Creation",
+            "PrismQ.T.Idea.From.User",
             "PrismQ.T.Title.From.Idea",
             "PrismQ.T.Script.From.Idea.Title",
             "PrismQ.T.Review.Title.From.Script.Idea",
@@ -484,7 +484,7 @@ class TestManualCreationPipeline:
 
         # Stage 1: Idea.Creation (manual entry point)
         assert helper.stage_validator.transition_to(
-            "PrismQ.T.Idea.Creation"
+            "PrismQ.T.Idea.From.User"
         ), "Failed to start with manual Idea.Creation"
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(
@@ -581,7 +581,7 @@ class TestManualCreationPipeline:
         # Verify the complete stage history matches expected sequence
         stage_history = helper.stage_validator.get_stage_history()
         expected_stages = [
-            "PrismQ.T.Idea.Creation",  # Idea.Creation
+            "PrismQ.T.Idea.From.User",  # Idea.Creation
             "PrismQ.T.Title.From.Idea",  # Title.From.Idea
             "PrismQ.T.Script.From.Idea.Title",  # Script.From.Title.Idea
             "PrismQ.T.Review.Title.From.Script.Idea",  # Review.Title.By.Script.Idea
@@ -605,7 +605,7 @@ class TestManualCreationPipeline:
         helper = IntegrationTestHelper()
 
         # Create workflow with detailed metadata
-        helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(
             1,
@@ -665,7 +665,7 @@ class TestManualCreationPipeline:
         helper = IntegrationTestHelper()
 
         # Initial creation (all at v1)
-        helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1)
 
@@ -724,7 +724,7 @@ class TestManualCreationPipeline:
 
         # === STAGE 1-7: Initial creation and first co-improvement cycle ===
         # Stage 1: Idea.Creation
-        assert helper.stage_validator.transition_to("PrismQ.T.Idea.Creation")
+        assert helper.stage_validator.transition_to("PrismQ.T.Idea.From.User")
         idea_tracker = helper.start_workflow("Idea")
         idea_tracker.add_version(1, {"stage": "creation", "method": "manual"})
 
@@ -810,7 +810,7 @@ class TestManualCreationPipeline:
         stage_history = helper.stage_validator.get_stage_history()
         expected_stages = [
             # Initial creation and first cycle (v1 → v2)
-            "PrismQ.T.Idea.Creation",
+            "PrismQ.T.Idea.From.User",
             "PrismQ.T.Title.From.Idea",
             "PrismQ.T.Script.From.Idea.Title",
             "PrismQ.T.Review.Title.From.Script.Idea",

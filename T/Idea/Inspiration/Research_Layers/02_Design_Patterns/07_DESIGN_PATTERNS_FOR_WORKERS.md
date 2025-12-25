@@ -22,11 +22,11 @@
 Workers in PrismQ.T.Idea.Inspiration follow a layered, modular architecture where specificity increases at each level:
 
 ```
-PrismQ.T.Idea.Inspiration.Source.Video             ← General (Video content handling)
+PrismQ.T.Idea.Inspiration.From.Video             ← General (Video content handling)
     ↓
-PrismQ.T.Idea.Inspiration.Source.Video.YouTube     ← Platform-specific (YouTube operations)
+PrismQ.T.Idea.Inspiration.From.Video.YouTube     ← Platform-specific (YouTube operations)
     ↓
-PrismQ.T.Idea.Inspiration.Source.Video.YouTube.Video ← Endpoint-specific (Video scraping)
+PrismQ.T.Idea.Inspiration.From.Video.YouTube.Video ← Endpoint-specific (Video scraping)
 ```
 
 This hierarchy enables:

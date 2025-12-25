@@ -241,7 +241,7 @@ fused_idea = fusion.fuse_ideas([idea1, idea2])
 ### Creation Example
 
 ```python
-from PrismQ.T.Idea.Creation.src import IdeaCreator
+from PrismQ.T.Idea.From.User.src import IdeaCreator
 
 # Create multiple ideas from title
 creator = IdeaCreator()

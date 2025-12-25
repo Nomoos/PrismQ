@@ -11,7 +11,7 @@ This directory contains **30 numbered workflow modules** and **validation tools*
 
 ### ✅ Fully Implemented (3 stages)
 
-1. **Stage 01: Idea.Creation** - ✅ COMPLETE
+1. **Stage 01: Idea.From.User** - ✅ COMPLETE
    - Interactive idea creation from inspiration
    - AI-powered generation using Ollama
    - Multiple content "flavors" (styles)
@@ -81,7 +81,7 @@ Some Python components exist but are not connected to workflow:
 
 ```batch
 # Step 1: Create ideas
-cd _meta\scripts\01_PrismQ.T.Idea.Creation
+cd _meta\scripts\01_PrismQ.T.Idea.From.User
 Preview.bat  # Test mode
 Run.bat      # Production mode
 

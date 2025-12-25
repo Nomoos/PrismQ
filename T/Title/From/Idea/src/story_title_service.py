@@ -5,7 +5,7 @@ that are ready for title generation (state = PrismQ.T.Title.From.Idea)
 and don't have Title or Content references yet.
 
 Workflow Position: Stage 2 in MVP workflow
-    PrismQ.T.Idea.Creation
+    PrismQ.T.Idea.From.User
         ↓
     PrismQ.T.Story.From.Idea (creates Stories)
         ↓

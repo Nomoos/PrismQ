@@ -109,7 +109,7 @@ Items selected for processing based on lowest version count (Idea → Title → 
 
 ### Decision 5: Idea Creation Method Inference
 
-`Idea.Creation` vs `Idea.Fusion` inferred from `idea_inspirations` relation (empty = Creation, populated = Fusion).
+`Idea.From.User` vs `Idea.Fusion` inferred from `idea_inspirations` relation (empty = Creation, populated = Fusion).
 
 **Question**: Is inferring from relation presence better than an explicit `creation_method` field?
 

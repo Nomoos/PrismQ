@@ -17,7 +17,7 @@ Scripts are organized into three folders:
 
 ## Module Implementation Status
 
-### PrismQ.T.Idea.Creation
+### PrismQ.T.Idea.From.User
 **Status**: ✅ COMPLETE  
 **Score**: 95/100  
 **Scripts Location**: `_meta/scripts/01_Idea/`
@@ -27,7 +27,7 @@ Scripts are organized into three folders:
 | Interactive CLI | ✅ Pass | `idea_creation_interactive.py` implemented |
 | Preview Mode | ✅ Pass | `--preview` flag functional |
 | Debug Mode | ✅ Pass | `--debug` flag with file logging |
-| Virtual Environment | ✅ Pass | `.venv` in `T/Idea/Creation/` |
+| Virtual Environment | ✅ Pass | `.venv` in `T/Idea/From/User/` |
 | Batch Files | ✅ Pass | Run + Preview batch files present |
 | Requirements.txt | ✅ Pass | Dependencies defined |
 | Code Quality | ✅ Pass | SOLID principles followed |
@@ -150,7 +150,7 @@ Scripts are organized into three folders:
 
 | Module | Status | Score | Scripts Location |
 |--------|--------|-------|------------------|
-| PrismQ.T.Idea.Creation | ✅ Complete | 95/100 | 01_Idea |
+| PrismQ.T.Idea.From.User | ✅ Complete | 95/100 | 01_Idea |
 | PrismQ.T.Title.From.Idea | ✅ Complete | 92/100 | 02_Story |
 | PrismQ.T.Script.From.Idea.Title | ✅ Complete | 90/100 | 02_Story |
 | PrismQ.T.Review.Title.From.Script | ✅ Complete | 88/100 | 03_Review |

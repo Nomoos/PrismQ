@@ -156,7 +156,7 @@ Similar implementation pattern for remaining review stages:
 ## 📊 WORKFLOW POSITION
 
 ```
-Stage 1: PrismQ.T.Idea.Creation ✅ COMPLETE
+Stage 1: PrismQ.T.Idea.From.User ✅ COMPLETE
     ↓
 Stage 1.5: PrismQ.T.Story.From.Idea ✅ COMPLETE
     ↓

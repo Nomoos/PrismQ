@@ -196,7 +196,7 @@ class Story(IModel[int]):
         CREATE TABLE IF NOT EXISTS Story (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idea_id INTEGER NULL,
-            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.Creation',
+            state TEXT NOT NULL DEFAULT 'PrismQ.T.Idea.From.User',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (idea_id) REFERENCES Idea(id)

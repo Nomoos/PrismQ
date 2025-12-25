@@ -117,7 +117,7 @@ stateDiagram-v2
 
 | Stav | Název | Fáze | Umístění | Přechod na |
 |------|-------|------|----------|------------|
-| IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ | StoryFromIdea |
+| IdeaCreation | PrismQ.T.Idea.From.User | 1 | T/Idea/From/User/ | StoryFromIdea |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ | TitleFromIdea |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ | ContentFromTitleIdea |
 | ContentFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ | ReviewTitleByContentIdea |

@@ -4,7 +4,7 @@
 **Worker**: Worker08 (AI/ML Specialist)  
 **Priority**: Medium  
 **Effort**: 1.5 days  
-**Module**: `PrismQ.T.Idea.Inspiration.Source.RSS`  
+**Module**: `PrismQ.T.Idea.Inspiration.From.RSS`  
 **Sprint**: Sprint 5 (Weeks 11-12)  
 **Status**: 🎯 PLANNED
 
@@ -45,7 +45,7 @@ Monitor RSS feeds from blogs, news sites, and content platforms for content insp
 
 ## Dependencies
 
-- **MVP-001**: T.Idea.Creation module
+- **MVP-001**: T.Idea.From.User module
 
 ---
 
@@ -67,9 +67,9 @@ def parse_feed(feed_url: str):
 ```
 
 ### Files to Create
-- `T/Idea/Inspiration/Source/RSS/feed_parser.py` (new)
-- `T/Idea/Inspiration/Source/RSS/deduplicator.py` (new)
-- `T/Idea/Inspiration/Source/RSS/scheduler.py` (new)
+- `T/Idea/Inspiration/From/RSS/feed_parser.py` (new)
+- `T/Idea/Inspiration/From/RSS/deduplicator.py` (new)
+- `T/Idea/Inspiration/From/RSS/scheduler.py` (new)
 
 ---
 
