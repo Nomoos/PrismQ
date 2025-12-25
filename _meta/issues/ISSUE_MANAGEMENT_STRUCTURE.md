@@ -91,12 +91,12 @@ _meta/issues/
 
 [Full documentation](./T/Idea/Inspiration/_meta/issues/archive/completed-work/README.md)
 
-### 4. T.Idea.Inspiration.Source Archive
+### 4. T.Idea.Inspiration.From Archive
 **5 archived files** including:
 - Developer implementation documentation
 - Integration completion reports
 
-[Full documentation](./T/Idea/Inspiration/Source/_meta/issues/archive/README.md)
+[Full documentation](./T/Idea/Inspiration/From/_meta/issues/archive/README.md)
 
 ---
 

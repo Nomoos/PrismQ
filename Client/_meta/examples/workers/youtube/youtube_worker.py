@@ -3,7 +3,7 @@
 YouTube Shorts Scraper Worker Example
 
 A complete worker implementation example for the
-PrismQ.IdeaInspiration.Sources.Content.Shorts.YouTube repository
+PrismQ.IdeaInspiration.Froms.Content.Shorts.YouTube repository
 demonstrating how to integrate with the TaskManager API for distributed task processing.
 
 This example shows:

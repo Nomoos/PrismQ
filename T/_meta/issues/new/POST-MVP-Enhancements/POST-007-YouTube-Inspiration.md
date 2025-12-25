@@ -4,7 +4,7 @@
 **Worker**: Worker08 (AI/ML Specialist)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Idea.Inspiration.Source.YouTube`  
+**Module**: `PrismQ.T.Idea.Inspiration.From.YouTube`  
 **Sprint**: Sprint 5 (Weeks 11-12)  
 **Status**: 🎯 PLANNED
 
@@ -80,9 +80,9 @@ class YouTubeInspiration:
 - Implement fallback strategies when quota exceeded
 
 ### Files to Create
-- `T/Idea/Inspiration/Source/YouTube/youtube_client.py` (new)
-- `T/Idea/Inspiration/Source/YouTube/idea_extractor.py` (new)
-- `T/Idea/Inspiration/Source/YouTube/cache_manager.py` (new)
+- `T/Idea/Inspiration/From/YouTube/youtube_client.py` (new)
+- `T/Idea/Inspiration/From/YouTube/idea_extractor.py` (new)
+- `T/Idea/Inspiration/From/YouTube/cache_manager.py` (new)
 
 ---
 

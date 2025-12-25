@@ -11,7 +11,7 @@ The repository has test directories in two patterns:
 2. **Non-_meta tests/** - 4 directories:
    - `tests/` (root) - 15 Python files ❌ NOT formatted previously
    - `src/tests/` - Already formatted in Phase 4 ✅
-   - `T/Idea/Inspiration/Source/YouTube/Video/tests/` - Already formatted in Phase 3 ✅
+   - `T/Idea/Inspiration/From/YouTube/Video/tests/` - Already formatted in Phase 3 ✅
    - `Client/Frontend/TaskManager/tests/` - No Python files
 
 ## Results
