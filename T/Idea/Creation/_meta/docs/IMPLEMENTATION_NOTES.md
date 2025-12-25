@@ -189,7 +189,7 @@ for idea in creator.create_from_title_stream("Topic", 50):
    - Will use created Ideas to generate titles
    - Integration point: `Idea` model
 
-2. **MVP-003**: T/Script/FromIdeaAndTitle (Worker02)
+2. **MVP-003**: T/Content/FromIdeaAndTitle (Worker02)
    - Will use created Ideas + titles to generate scripts
    - Integration point: `Idea` model + title field
 

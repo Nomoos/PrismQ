@@ -552,7 +552,7 @@ IdeaInspiration    ────────▶   T/Idea/Creation
 | Modul | Využití |
 |-------|---------|
 | **MVP-002** (T/Title/From/Idea) | Generuje tituly z vybraných Ideas |
-| **MVP-003** (T/Script/FromIdeaAndTitle) | Generuje skripty z Ideas + titulů |
+| **MVP-003** (T/Content/FromIdeaAndTitle) | Generuje skripty z Ideas + titulů |
 | **MVP-004** (T/Review/Title) | Reviewuje vygenerované tituly |
 
 ### Příklad integrace

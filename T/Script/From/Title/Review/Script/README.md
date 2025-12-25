@@ -1,4 +1,4 @@
-# PrismQ.T.Script.From.Title.Review.Script
+# PrismQ.T.Content.From.Title.Review.Script
 
 Module for generating improved script versions based on review feedback.
 
@@ -54,8 +54,8 @@ python script_from_review_interactive.py --preview --debug
 
 ### Using Batch Files (Windows)
 ```batch
-_meta/scripts/09_PrismQ.T.Script.From.Title.Review.Script/Run.bat
-_meta/scripts/09_PrismQ.T.Script.From.Title.Review.Script/Preview.bat
+_meta/scripts/09_PrismQ.T.Content.From.Title.Review.Script/Run.bat
+_meta/scripts/09_PrismQ.T.Content.From.Title.Review.Script/Preview.bat
 ```
 
 ### Programmatic Usage
@@ -92,12 +92,12 @@ print(f"Rationale: {result.rationale}")
 
 Run all tests:
 ```bash
-python -m pytest T/Script/From/Title/Review/Script/_meta/tests/ -v
+python -m pytest T/Content/From/Title/Review/Script/_meta/tests/ -v
 ```
 
 Run with coverage:
 ```bash
-python -m pytest T/Script/From/Title/Review/Script/_meta/tests/ --cov
+python -m pytest T/Content/From/Title/Review/Script/_meta/tests/ --cov
 ```
 
 **Test Coverage**: 42 tests covering validation, error handling, sanitization, and edge cases.

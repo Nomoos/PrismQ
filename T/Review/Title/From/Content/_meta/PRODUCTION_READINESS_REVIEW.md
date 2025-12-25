@@ -37,7 +37,7 @@ The `PrismQ.T.Review.Title.From.Content` module has been reviewed for production
 - Updated Idea submodule imports
 
 **Files Modified**:
-- `_meta/scripts/07_PrismQ.T.Review.Title.By.Script/Run.bat`
+- `_meta/scripts/07_PrismQ.T.Review.Title.From.Script/Run.bat`
 - `__init__.py`
 - `Idea/__init__.py`
 - `_meta/tests/test_by_content_v2.py`

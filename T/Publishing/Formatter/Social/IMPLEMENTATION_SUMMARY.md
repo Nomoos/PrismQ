@@ -16,24 +16,24 @@ Successfully implemented a social media formatter that transforms narrative scri
 ### Files Created
 
 1. **Core Module Files**:
-   - `T/Script/Formatter/Social/base_formatter.py` (344 lines) - Base formatter with common utilities
-   - `T/Script/Formatter/Social/twitter_formatter.py` (412 lines) - Twitter/X thread formatter
-   - `T/Script/Formatter/Social/linkedin_formatter.py` (336 lines) - LinkedIn post formatter
-   - `T/Script/Formatter/Social/instagram_formatter.py` (458 lines) - Instagram caption formatter
-   - `T/Script/Formatter/Social/facebook_formatter.py` (316 lines) - Facebook post formatter
-   - `T/Script/Formatter/Social/__init__.py` (84 lines) - Public API exports
+   - `T/Content/Formatter/Social/base_formatter.py` (344 lines) - Base formatter with common utilities
+   - `T/Content/Formatter/Social/twitter_formatter.py` (412 lines) - Twitter/X thread formatter
+   - `T/Content/Formatter/Social/linkedin_formatter.py` (336 lines) - LinkedIn post formatter
+   - `T/Content/Formatter/Social/instagram_formatter.py` (458 lines) - Instagram caption formatter
+   - `T/Content/Formatter/Social/facebook_formatter.py` (316 lines) - Facebook post formatter
+   - `T/Content/Formatter/Social/__init__.py` (84 lines) - Public API exports
 
 2. **Testing**:
-   - `T/Script/Formatter/Social/_meta/tests/test_social_formatter.py` (606 lines) - Comprehensive test suite
-   - `T/Script/Formatter/Social/_meta/tests/__init__.py` - Test package initialization
+   - `T/Content/Formatter/Social/_meta/tests/test_social_formatter.py` (606 lines) - Comprehensive test suite
+   - `T/Content/Formatter/Social/_meta/tests/__init__.py` - Test package initialization
 
 3. **Documentation & Examples**:
-   - `T/Script/Formatter/Social/README.md` (452 lines) - Complete module documentation
-   - `T/Script/Formatter/Social/_meta/examples/example_usage.py` (442 lines) - Usage examples
+   - `T/Content/Formatter/Social/README.md` (452 lines) - Complete module documentation
+   - `T/Content/Formatter/Social/_meta/examples/example_usage.py` (442 lines) - Usage examples
 
 4. **Configuration Updates**:
    - Updated `pytest.ini` to include new test path
-   - Updated `T/Script/Formatter/__init__.py` to include Social module
+   - Updated `T/Content/Formatter/__init__.py` to include Social module
 
 ### Total Lines of Code: ~3,450 lines
 

@@ -21,7 +21,7 @@ The module selects the Story whose Script has the **lowest current version numbe
 
 ## State Transitions
 
-- If review **doesn't accept** script → `PrismQ.T.Script.From.Title.Review.Script` (for rewrite)
+- If review **doesn't accept** script → `PrismQ.T.Content.From.Title.Review.Script` (for rewrite)
 - If review **accepts** script → `PrismQ.T.Review.Script.Editing` (proceed to editing review)
 
 ## Review Output

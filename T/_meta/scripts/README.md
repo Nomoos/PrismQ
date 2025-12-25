@@ -251,8 +251,8 @@ The `Story.state` field stores the **next process name** following PrismQ folder
 |-------|-------------|
 | `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation |
 | `PrismQ.T.Title.From.Idea` | Idea created, awaiting title |
-| `PrismQ.T.Script.FromIdeaAndTitle` | Title generated, awaiting script |
-| `PrismQ.T.Script.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) |
+| `PrismQ.T.Content.FromIdeaAndTitle` | Title generated, awaiting script |
+| `PrismQ.T.Content.FromOriginalScriptAndReviewAndTitle` | Script iteration (unlimited) |
 | `PrismQ.T.Publishing` | Content exported, ready for publishing |
 
 ### Review Types

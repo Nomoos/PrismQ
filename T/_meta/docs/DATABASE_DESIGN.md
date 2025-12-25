@@ -187,12 +187,12 @@ Where:
                                         │ generate_title
                                         ▼
                     ┌─────────────────────────────────────────────┐
-                    │ PrismQ.T.Script.From.Idea.Title             │
+                    │ PrismQ.T.Content.From.Idea.Title             │
                     └───────────────────┬─────────────────────────┘
                                         │ generate_script
                                         ▼
                     ┌─────────────────────────────────────────────────────────┐
-                    │ PrismQ.T.Script.From.Title.Review.Script               │◄──┐
+                    │ PrismQ.T.Content.From.Title.Review.Script               │◄──┐
                     └───────────────────┬─────────────────────────────────────┘   │ (unlimited)
                                         │                                          │
                                         └──────────────────────────────────────────┘
@@ -208,20 +208,20 @@ Where:
 |-------|-------------|-------------|
 | `PrismQ.T.Idea.Creation` | Initial state, awaiting idea creation | Create idea |
 | `PrismQ.T.Title.From.Idea` | Idea created, awaiting title | Generate title from idea |
-| `PrismQ.T.Script.From.Idea.Title` | Title generated, awaiting script | Generate script from idea + title |
+| `PrismQ.T.Content.From.Idea.Title` | Title generated, awaiting script | Generate script from idea + title |
 | `PrismQ.T.Review.Title.From.Script` | Generate title review from script | Review title |
 | `PrismQ.T.Review.Script.From.Title` | Generate script review from title | Review script |
 | `PrismQ.T.Title.From.Script.Review.Title` | Iterate title using review | Create new title version |
-| `PrismQ.T.Script.From.Title.Review.Script` | Script iteration (unlimited) | Continue iterating or export |
+| `PrismQ.T.Content.From.Title.Review.Script` | Script iteration (unlimited) | Continue iterating or export |
 | `PrismQ.T.Publishing` | Content exported, ready for publishing | Complete |
 
 ### Batch Script to Process State Mapping
 | Batch Script | State After Execution |
 |--------------|----------------------|
 | `step1_create_idea.bat` | `PrismQ.T.Title.From.Idea` |
-| `step2_generate_title.bat` | `PrismQ.T.Script.From.Idea.Title` |
-| `step3_generate_script.bat` | `PrismQ.T.Script.From.Title.Review.Script` |
-| `step4_iterate_script.bat` | `PrismQ.T.Script.From.Title.Review.Script` |
+| `step2_generate_title.bat` | `PrismQ.T.Content.From.Idea.Title` |
+| `step3_generate_script.bat` | `PrismQ.T.Content.From.Title.Review.Script` |
+| `step4_iterate_script.bat` | `PrismQ.T.Content.From.Title.Review.Script` |
 | `step5_export.bat` | `PrismQ.T.Publishing` |
 
 ### Persistence Between Processes

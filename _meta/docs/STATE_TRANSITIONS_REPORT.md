@@ -120,7 +120,7 @@ stateDiagram-v2
 | IdeaCreation | PrismQ.T.Idea.Creation | 1 | T/Idea/Creation/ | StoryFromIdea |
 | StoryFromIdea | PrismQ.T.Story.From.Idea | 1.5 | T/Story/From/Idea/ | TitleFromIdea |
 | TitleFromIdea | PrismQ.T.Title.From.Idea | 2 | T/Title/From/Idea/ | ScriptFromTitleIdea |
-| ScriptFromTitleIdea | PrismQ.T.Script.From.Title.Idea | 3 | T/Script/From/Idea/Title/ | ReviewTitleByScriptIdea |
+| ScriptFromTitleIdea | PrismQ.T.Content.From.Title.Idea | 3 | T/Content/From/Idea/Title/ | ReviewTitleByScriptIdea |
 
 **Transition descriptions:**
 - `IdeaCreation → StoryFromIdea`: Creates 10 stories from one idea
@@ -132,12 +132,12 @@ stateDiagram-v2
 
 | State | Name | Phase | Transitions To (approved) | Transitions To (rejected) |
 |-------|------|-------|---------------------------|---------------------------|
-| ReviewTitleByScriptIdea | PrismQ.T.Review.Title.By.Script.Idea | 4 | ReviewScriptByTitleIdea | - |
-| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.By.Title.Idea | 5 | ReviewTitleByScript | - |
-| ReviewTitleByScript | PrismQ.T.Review.Title.By.Script | 6 | ReviewScriptByTitle | TitleFromScriptReviewTitle |
+| ReviewTitleByScriptIdea | PrismQ.T.Review.Title.From.Script.Idea | 4 | ReviewScriptByTitleIdea | - |
+| ReviewScriptByTitleIdea | PrismQ.T.Review.Script.From.Title.Idea | 5 | ReviewTitleByScript | - |
+| ReviewTitleByScript | PrismQ.T.Review.Title.From.Script | 6 | ReviewScriptByTitle | TitleFromScriptReviewTitle |
 | TitleFromScriptReviewTitle | PrismQ.T.Title.From.Script.Review.Title | 7 | ScriptFromTitleReviewScript | - |
-| ScriptFromTitleReviewScript | PrismQ.T.Script.From.Title.Review.Script | 8 | ReviewTitleByScript | - |
-| ReviewScriptByTitle | PrismQ.T.Review.Script.By.Title | 9 | ReviewScriptGrammar | ScriptFromTitleReviewScript |
+| ScriptFromTitleReviewScript | PrismQ.T.Content.From.Title.Review.Script | 8 | ReviewTitleByScript | - |
+| ReviewScriptByTitle | PrismQ.T.Review.Script.From.Title | 9 | ReviewScriptGrammar | ScriptFromTitleReviewScript |
 
 **Iterative loop:**
 ```

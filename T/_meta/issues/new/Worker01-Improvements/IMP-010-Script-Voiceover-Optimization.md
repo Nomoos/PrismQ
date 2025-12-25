@@ -4,7 +4,7 @@
 **Worker**: Worker12 (Content Specialist)  
 **Priority**: High  
 **Effort**: 2 days  
-**Module**: `PrismQ.T.Script` (all submodules)  
+**Module**: `PrismQ.T.Content` (all submodules)  
 **Category**: Script Generation  
 **Status**: 🎯 PLANNED
 

@@ -153,7 +153,7 @@ Returns: ScriptReview object with:
 ## Integration with Workflow Stages
 
 ### Stage 3 → Stage 5 (Current)
-**Stage 3 Output**: Script v1 from `T/Script/FromIdeaAndTitle/`  
+**Stage 3 Output**: Script v1 from `T/Content/FromIdeaAndTitle/`  
 **Stage 5 Input**: Script v1, Title v1, Idea  
 **Status**: ✅ Compatible - Implementation accepts these inputs
 

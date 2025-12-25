@@ -1,10 +1,10 @@
-# Title and Script Creation Workflow
+# Title and Content Creation Workflow
 
 **Complete workflow from idea inception to text publishing**
 
 ## Overview
 
-This document provides a clear, step-by-step workflow for creating titles and script text in the PrismQ Text Generation Pipeline (T module). The workflow starts with **Idea.Creation** (initial idea formation) and ends with **Publishing** (text publication).
+This document provides a clear, step-by-step workflow for creating titles and content text in the PrismQ Text Generation Pipeline (T module). The workflow starts with **Idea.Creation** (initial idea formation) and ends with **Publishing** (text publication).
 
 > 💡 **Quick Reference**: For a simplified view of the core iterative workflow, see the **[Ultra-Clean Pipeline](../_meta/docs/workflow/ultra-clean-pipeline.md)** pattern.
 
@@ -41,11 +41,11 @@ This document provides a clear, step-by-step workflow for creating titles and sc
     │      └─→ Title creation           │
     └───────────────────────────────────┘
         ↓
-    ScriptDraft
+    ContentDraft
         ↓
-    ScriptReview
+    ContentReview
         ↓
-    ScriptApproved
+    ContentApproved
         ↓
     TextPublishing
         ↓
@@ -251,13 +251,13 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - SEO keywords integrated
 - Length appropriate for target platforms
 
-**Transitions to:** Script Creation (T/Script)
+**Transitions to:** Content Creation (T/Content)
 
 ---
 
-### Stage 4: Script Creation
-**Location:** `T/Script/FromIdeaAndTitle`  
-**Purpose:** Write initial script from structured idea
+### Stage 4: Content Creation
+**Location:** `T/Content/From/Idea/Title/`  
+**Purpose:** Write initial content from structured idea
 
 **Activities:**
 - Transform outline into full narrative
@@ -267,24 +267,24 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - Structure for audio/video delivery
 
 **Key Deliverables:**
-- Complete script draft
+- Complete content draft
 - Narrative structure
 - Dialogue text
 - Stage directions (if applicable)
 
 **Quality Gates:**
 - All outline points covered
-- Script flows naturally
+- Content flows naturally
 - Length appropriate for format
 - Tone matches target audience
 
-**Transitions to:** ScriptReview
+**Transitions to:** ContentReview
 
 ---
 
-### Stage 5: ScriptReview
+### Stage 5: ContentReview
 **Location:** `T/Review` (various review modules)  
-**Purpose:** Review and enhance script quality
+**Purpose:** Review and enhance content quality
 
 **Activities:**
 - Grammar and spelling review (Review/Grammar)
@@ -295,7 +295,7 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - Final editing pass (Review/Editing)
 
 **Key Deliverables:**
-- Reviewed script
+- Reviewed content
 - Correction notes
 - Quality assessment
 - Enhancement recommendations
@@ -308,15 +308,15 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - Style is cohesive
 
 **Transitions to:** 
-- ScriptApproved (if quality gates passed)
-- ScriptDraft (if major revisions needed)
+- ContentApproved (if quality gates passed)
+- ContentDraft (if major revisions needed)
 - Idea (if fundamental concept issues found)
 
 ---
 
-### Stage 6: ScriptApproved
-**Location:** `T/Script` (approved state)  
-**Purpose:** Lock approved script for publishing
+### Stage 6: ContentApproved
+**Location:** `T/Content` (approved state)  
+**Purpose:** Lock approved content for publishing
 
 **Activities:**
 - Final approval sign-off
@@ -325,7 +325,7 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 - Publishing preparation
 
 **Key Deliverables:**
-- Approved script (locked version)
+- Approved content (locked version)
 - Final metadata
 - Publishing checklist
 
@@ -390,31 +390,31 @@ This document provides a clear, step-by-step workflow for creating titles and sc
 ```
 Idea.Inspiration → Idea.Fusion → [Candidate List] → 
 AI Scoring → Idea.Model → Idea.Outline → 
-Title.FromIdea → Script.FromIdeaAndTitle → 
-ScriptReview → ScriptApproved → TextPublishing → PublishedText ✓
+Title.FromIdea → Content.FromIdeaAndTitle → 
+ContentReview → ContentApproved → TextPublishing → PublishedText ✓
 ```
 
 ### Manual Path (Direct Creation)
 ```
 Idea.Creation → [Candidate List] → AI Scoring → 
 Idea.Model → Idea.Outline → Title.FromIdea → 
-Script.FromIdeaAndTitle → ScriptReview → ScriptApproved → 
+Content.FromIdeaAndTitle → ContentReview → ContentApproved → 
 TextPublishing → PublishedText ✓
 ```
 
-### With Script Revisions
+### With Content Revisions
 ```
-... → Title.FromIdea → Script.FromIdeaAndTitle → 
-ScriptReview → Script.FromOriginalScriptAndReviewAndTitle (v2) → 
-ScriptReview → ScriptApproved → TextPublishing → PublishedText ✓
+... → Title.FromIdea → Content.FromIdeaAndTitle → 
+ContentReview → Content.FromOriginalContentAndReviewAndTitle (v2) → 
+ContentReview → ContentApproved → TextPublishing → PublishedText ✓
 ```
 
-### With Title & Script Improvements
+### With Title & Content Improvements
 ```
-... → Title.FromIdea (v1) → Script.FromIdeaAndTitle (v1) → 
-Reviews → Title.FromOriginalTitleAndReviewAndScript (v2) → 
-Script.FromOriginalScriptAndReviewAndTitle (v2) → 
-ScriptApproved → TextPublishing → PublishedText ✓
+... → Title.FromIdea (v1) → Content.FromIdeaAndTitle (v1) → 
+Reviews → Title.FromOriginalTitleAndReviewAndContent (v2) → 
+Content.FromOriginalContentAndReviewAndTitle (v2) → 
+ContentApproved → TextPublishing → PublishedText ✓
 ```
 
 ## State Characteristics
@@ -432,7 +432,7 @@ ScriptApproved → TextPublishing → PublishedText ✓
 - **Idea.Outline** - Content structure development
 
 ### Review Gates
-- **ScriptReview** - Major quality checkpoint with multiple review dimensions
+- **ContentReview** - Major quality checkpoint with multiple review dimensions
 
 ### Terminal State (for Text Pipeline)
 - **PublishedText** - End of text-only workflow
@@ -448,12 +448,12 @@ ScriptApproved → TextPublishing → PublishedText ✓
 
 ### T/Title Module
 - **FromIdea**: Initial title creation from idea (v1)
-- **FromOriginalTitleAndReviewAndScript**: Title improvements (v2+)
+- **FromOriginalTitleAndReviewAndContent**: Title improvements (v2+)
 
-### T/Script Module
-- **FromIdeaAndTitle**: Initial script creation from idea and title (v1)
-- **FromOriginalScriptAndReviewAndTitle**: Script improvements (v2+)
-- **Writer**: AI-powered script optimization support
+### T/Content Module
+- **From.Idea.Title**: Initial content creation from idea and title (v1)
+- **From.Title.Review.Content**: Content improvements (v2+)
+- **Writer**: AI-powered content optimization support
 
 ### T/Review Module
 - **Grammar**: Grammar and syntax review
@@ -475,10 +475,10 @@ ScriptApproved → TextPublishing → PublishedText ✓
 2. **Manual Path**: Create well-defined ideas in **Idea.Creation**
 3. Trust **AI Scoring** to select the best candidate from the list
 4. Develop comprehensive outline in **Idea.Outline**
-5. Create initial title in **Title.FromIdea** before moving to script
+5. Create initial title in **Title.FromIdea** before moving to content
 
-### During Script Development
-1. Use outline as guide for script structure
+### During Content Development
+1. Use outline as guide for content structure
 2. Write for spoken delivery, not just reading
 3. Review early and often
 4. Don't skip quality gates
@@ -499,12 +499,12 @@ ScriptApproved → TextPublishing → PublishedText ✓
 
 ### Audio Pipeline (A)
 - Uses **PublishedText** as source for voiceover
-- Script serves as narration foundation
+- Content serves as narration foundation
 - Title becomes episode/track title
 
 ### Video Pipeline (V)
 - Uses published audio from A pipeline
-- Script informs visual scene planning
+- Content informs visual scene planning
 - Title becomes video title
 
 ### Client/TaskManager
@@ -523,11 +523,11 @@ ScriptApproved → TextPublishing → PublishedText ✓
 - Publishing to PublishedText
 
 ### Manual Approvals Required
-- ScriptReview → ScriptApproved
-- ScriptApproved → TextPublishing
+- ContentReview → ContentApproved
+- ContentApproved → TextPublishing
 
 ### AI-Assisted Stages
-- Script/Writer (AI optimization)
+- Content/Writer (AI optimization)
 - Review modules (AI-powered review)
 - Publishing/SEO (keyword research)
 

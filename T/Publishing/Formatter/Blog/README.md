@@ -1,6 +1,6 @@
-# T/Script/Formatter/Blog - Blog Format Optimizer
+# T/Content/Formatter/Blog - Blog Format Optimizer
 
-**Namespace**: `PrismQ.T.Script.Formatter.Blog`
+**Namespace**: `PrismQ.T.Content.Formatter.Blog`
 
 Transform scripts into blog-optimized format with proper heading hierarchy, sections, and formatting suitable for various blog platforms.
 
@@ -295,7 +295,7 @@ result = export_for_platform(
 Run the test suite:
 
 ```bash
-pytest T/Script/Formatter/Blog/_meta/tests/test_blog_formatter.py -v
+pytest T/Content/Formatter/Blog/_meta/tests/test_blog_formatter.py -v
 ```
 
 Test coverage includes:
@@ -327,7 +327,7 @@ Platform Publishing
 ## Module Structure
 
 ```
-T/Script/Formatter/Blog/
+T/Content/Formatter/Blog/
 ├── __init__.py                      # Public API
 ├── blog_formatter.py                # Core formatter logic
 ├── platform_adapters.py             # Platform-specific adapters

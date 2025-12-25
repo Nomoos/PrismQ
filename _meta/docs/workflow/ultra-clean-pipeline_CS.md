@@ -11,13 +11,13 @@ Ultra-Clean Pipeline je zjednodušená, čitelná reprezentace základního iter
 ```
 Idea.Creation 
 → Title.From.Idea 
-→ Script.From.Title.Idea 
-→ Review.Title.By.Script.Idea 
-→ Title.From.Script.Review.Title 
-→ Review.Script.By.Title.Idea 
-→ Script.From.Title.Review.Script 
-→ Review.Idea.By.Title.Script 
-→ Idea.From.Title.Script.Review.Idea
+→ Content.From.Idea.Title 
+→ Review.Title.From.Content.Idea 
+→ Title.From.Title.Review.Content 
+→ Review.Content.From.Title.Idea 
+→ Content.From.Title.Content.Review 
+→ Review.Idea.From.Title.Content 
+→ Idea.From.Title.Content.Review.Idea
 ```
 
 ## Vysvětlení vzoru
@@ -40,66 +40,66 @@ Vytváří první verzi titulku založenou pouze na nápadu.
 
 ---
 
-### Fáze 3: `Script.From.Title.Idea`
-**Účel**: Generování počátečního skriptu  
+### Fáze 3: `Content.From.Idea.Title`
+**Účel**: Generování počátečního obsahu  
 **Vstupy**: `Title`, `Idea`  
-**Výstupy**: `Script` (v1)
+**Výstupy**: `Content` (v1)
 
-Vytváří první verzi skriptu s použitím titulku i původního nápadu jako kontextu.
+Vytváří první verzi obsahu s použitím titulku i původního nápadu jako kontextu.
 
 ---
 
-### Fáze 4: `Review.Title.By.Script.Idea`
-**Účel**: Recenze titulku proti skriptu a nápadu  
-**Vstupy**: `Title`, `Script`, `Idea`  
+### Fáze 4: `Review.Title.From.Content.Idea`
+**Účel**: Recenze titulku proti obsahu a nápadu  
+**Vstupy**: `Title`, `Content`, `Idea`  
 **Výstupy**: `Review.Title` (zpětná vazba)
 
-Vyhodnocuje, zda je titulek dobře sladěn s obsahem skriptu a původním nápadem.
+Vyhodnocuje, zda je titulek dobře sladěn s obsahem a původním nápadem.
 
 ---
 
-### Fáze 5: `Title.From.Script.Review.Title`
-**Účel**: Vylepšení titulku na základě skriptu a recenze  
-**Vstupy**: `Script`, `Review.Title`, (předchozí) `Title`  
+### Fáze 5: `Title.From.Title.Review.Content`
+**Účel**: Vylepšení titulku na základě obsahu a recenze  
+**Vstupy**: `Content`, `Review.Title`, (předchozí) `Title`  
 **Výstupy**: `Title` (v2)
 
-Generuje vylepšenou verzi titulku s využitím poznatků ze skriptu a zpětné vazby z recenze.
+Generuje vylepšenou verzi titulku s využitím poznatků z obsahu a zpětné vazby z recenze.
 
 ---
 
-### Fáze 6: `Review.Script.By.Title.Idea`
-**Účel**: Recenze skriptu proti titulku a nápadu  
-**Vstupy**: `Script`, `Title`, `Idea`  
-**Výstupy**: `Review.Script` (zpětná vazba)
+### Fáze 6: `Review.Content.From.Title.Idea`
+**Účel**: Recenze obsahu proti titulku a nápadu  
+**Vstupy**: `Content`, `Title`, `Idea`  
+**Výstupy**: `Review.Content` (zpětná vazba)
 
-Vyhodnocuje, zda je skript dobře sladěn s aktualizovaným titulkem a původním nápadem.
-
----
-
-### Fáze 7: `Script.From.Title.Review.Script`
-**Účel**: Vylepšení skriptu na základě titulku a recenze  
-**Vstupy**: `Title`, `Review.Script`, (předchozí) `Script`  
-**Výstupy**: `Script` (v2)
-
-Generuje vylepšenou verzi skriptu s využitím aktualizovaného titulku a zpětné vazby z recenze.
+Vyhodnocuje, zda je obsah dobře sladěn s aktualizovaným titulkem a původním nápadem.
 
 ---
 
-### Fáze 8: `Review.Idea.By.Title.Script`
+### Fáze 7: `Content.From.Title.Content.Review`
+**Účel**: Vylepšení obsahu na základě titulku a recenze  
+**Vstupy**: `Title`, `Review.Content`, (předchozí) `Content`  
+**Výstupy**: `Content` (v2)
+
+Generuje vylepšenou verzi obsahu s využitím aktualizovaného titulku a zpětné vazby z recenze.
+
+---
+
+### Fáze 8: `Review.Idea.From.Title.Content`
 **Účel**: Validace úplného sladění  
-**Vstupy**: `Idea`, `Title`, `Script`  
+**Vstupy**: `Idea`, `Title`, `Content`  
 **Výstupy**: `Review.Idea` (validace)
 
-Finální validace, že všechny komponenty (nápad, titulek, skript) jsou soudržně sladěny.
+Finální validace, že všechny komponenty (nápad, titulek, obsah) jsou soudržně sladěny.
 
 ---
 
-### Fáze 9: `Idea.From.Title.Script.Review.Idea`
+### Fáze 9: `Idea.From.Title.Content.Review.Idea`
 **Účel**: Finalizace nebo vylepšení reprezentace nápadu  
-**Vstupy**: `Title`, `Script`, `Review.Idea`  
+**Vstupy**: `Title`, `Content`, `Review.Idea`  
 **Výstupy**: `Idea` (vylepšený/finalizovaný)
 
-Aktualizuje nebo potvrzuje reprezentaci nápadu na základě plně vyvinutého titulku, skriptu a validační zpětné vazby.
+Aktualizuje nebo potvrzuje reprezentaci nápadu na základě plně vyvinutého titulku, obsahu a validační zpětné vazby.
 
 ---
 
@@ -107,26 +107,26 @@ Aktualizuje nebo potvrzuje reprezentaci nápadu na základě plně vyvinutého t
 
 ### 1. **Tečková notace**
 Každá fáze je reprezentována ve formátu `Entita.Akce.Kontext`:
-- **Entita**: Primární artefakt, který je vytvářen nebo modifikován (Idea, Title, Script, Review)
+- **Entita**: Primární artefakt, který je vytvářen nebo modifikován (Idea, Title, Content, Review)
 - **Akce**: Prováděná operace (Creation, From, By)
-- **Kontext**: Vstupy informující operaci (Idea, Title, Script, Review)
+- **Kontext**: Vstupy informující operaci (Idea, Title, Content, Review)
 
 ### 2. **Explicitní závislosti**
 Notace explicitně ukazuje, na čem každá fáze závisí:
 - `Title.From.Idea` → Titulek závisí na Nápadu
-- `Script.From.Title.Idea` → Skript závisí na Titulku i Nápadu
-- `Review.Title.By.Script.Idea` → Recenze vyhodnocuje Titulek pomocí Skriptu a Nápadu
+- `Content.From.Title.Idea` → Obsah závisí na Titulku i Nápadu
+- `Review.Title.From.Content.Idea` → Recenze vyhodnocuje Titulek pomocí Obsahu a Nápadu
 
 ### 3. **Iterativní vylepšování**
 Vzor ukazuje, jak jsou artefakty iterativně vylepšovány:
 - Titulek v1 → Recenze → Titulek v2
-- Skript v1 → Recenze → Skript v2
+- Obsah v1 → Recenze → Obsah v2
 - Vícenásobné křížové recenze zajišťují sladění
 
 ### 4. **Cyklus společného vylepšování**
 Vzor demonstruje metodologii vzájemně závislého vylepšování:
-- Titulek je recenzován proti Skriptu
-- Skript je recenzován proti Titulku
+- Titulek je recenzován proti Obsahu
+- Obsah je recenzován proti Titulku
 - Oba jsou kontinuálně vylepšovány na základě vzájemné zpětné vazby
 
 ## Mapování na kompletní workflow
@@ -139,13 +139,13 @@ Ultra-Clean Pipeline je zjednodušený pohled na 9 koncepčních fází. Zde je 
 |------------------|----------|-------|
 | `Idea.Creation` | Fáze 1 | PrismQ.T.Idea.Creation |
 | `Title.From.Idea` | Fáze 2 | PrismQ.T.Title.From.Idea (v1) |
-| `Script.From.Title.Idea` | Fáze 3 | PrismQ.T.Script.FromIdeaAndTitle (v1) |
-| `Review.Title.By.Script.Idea` | Fáze 4 | PrismQ.T.Review.Title.ByScript (v1) |
-| `Title.From.Script.Review.Title` | Fáze 6 | PrismQ.T.Title.From.Title.Review.Script (v2) |
-| `Review.Script.By.Title.Idea` | Fáze 5, 10 | PrismQ.T.Review.Script.ByTitle (v1, v2) |
-| `Script.From.Title.Review.Script` | Fáze 7, 11 | PrismQ.T.Script.Improvements (v2, v3) |
-| `Review.Idea.By.Title.Script` | Fáze 12-13 | Kontroly přijetí titulku a skriptu |
-| `Idea.From.Title.Script.Review.Idea` | Fáze 14-23 | Kvalitní recenze, expertní recenze, publikace |
+| `Content.From.Title.Idea` | Fáze 3 | PrismQ.T.Content.FromIdeaAndTitle (v1) |
+| `Review.Title.From.Content.Idea` | Fáze 4 | PrismQ.T.Review.Title.ByContent (v1) |
+| `Title.From.Content.Review.Title` | Fáze 6 | PrismQ.T.Title.From.Title.Review.Content (v2) |
+| `Review.Content.From.Title.Idea` | Fáze 5, 10 | PrismQ.T.Review.Content.ByTitle (v1, v2) |
+| `Content.From.Title.Review.Content` | Fáze 7, 11 | PrismQ.T.Content.Improvements (v2, v3) |
+| `Review.Idea.From.Title.Content` | Fáze 12-13 | Kontroly přijetí titulku a obsahu |
+| `Idea.From.Title.Content.Review.Idea` | Fáze 14-23 | Kvalitní recenze, expertní recenze, publikace |
 
 ## Výhody Ultra-Clean notace
 
@@ -183,7 +183,7 @@ Začleňte ji do high-level architektonických diagramů pro zobrazení základn
 - **[Fáze MVP](./mvp-stages_CS.md)** - Kompletní 26fázové workflow s detailní implementací
 - **[Stavový automat](./state-machine_CS.md)** - Kompletní dokumentace stavového automatu
 - **[Přechody](./transitions_CS.md)** - Pravidla a logika přechodů stavů
-- **[Workflow Titulku a Skriptu](../../T/TITLE_SCRIPT_WORKFLOW.md)** - Detailní workflow T modulu
+- **[Workflow Titulku a Obsahu](../../T/TITLE_SCRIPT_WORKFLOW.md)** - Detailní workflow T modulu
 
 ---
 

@@ -4,7 +4,7 @@
 **Worker**: Worker13 (Prompt Engineering Master)  
 **Priority**: Medium  
 **Effort**: 1.5 days  
-**Module**: `PrismQ.T.Script` (all submodules)  
+**Module**: `PrismQ.T.Content` (all submodules)  
 **Category**: Script Generation  
 **Status**: 🎯 PLANNED
 

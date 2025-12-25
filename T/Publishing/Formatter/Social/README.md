@@ -1,4 +1,4 @@
-# PrismQ.T.Script.Formatter.Social - Social Media Format Optimizer
+# PrismQ.T.Content.Formatter.Social - Social Media Format Optimizer
 
 Transform scripts into platform-optimized social media content for Twitter/X, LinkedIn, Instagram, and Facebook.
 
@@ -340,7 +340,7 @@ See `_meta/examples/example_usage.py` for comprehensive examples including:
 Run the test suite:
 
 ```bash
-pytest T/Script/Formatter/Social/_meta/tests/test_social_formatter.py -v
+pytest T/Content/Formatter/Social/_meta/tests/test_social_formatter.py -v
 ```
 
 **Test Coverage**: 43 tests covering:

@@ -1,6 +1,6 @@
 # Script Optimization Strategies
 
-**Module**: `PrismQ.T.Script.Optimization`
+**Module**: `PrismQ.T.Content.Optimization`
 
 ## Purpose
 
@@ -812,7 +812,7 @@ Focus optimization effort on:
 - [Script Draft Creation Guide](/_meta/research/script-draft-creation-guide.md)
 - [Script Draft Process](./SCRIPT_DRAFT_PROCESS.md)
 - [Review Checklist](./REVIEW_CHECKLIST.md)
-- [T/Script/Optimization Module](../Optimization/README.md)
+- [T/Content/Optimization Module](../Optimization/README.md)
 
 ---
 

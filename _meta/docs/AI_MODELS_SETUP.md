@@ -794,15 +794,15 @@ Moving Window technika se hodí do **specifických kroků** PrismQ pipeline:
 | **PrismQ.T.Idea.Creation** | ❌ Ne | Krátký výstup (koncept) |
 | **PrismQ.T.Story.From.Idea** | ⚠️ Volitelně | Pro detailnější Story Bible |
 | **PrismQ.T.Title.From.Idea** | ❌ Ne | Krátký výstup (titulky) |
-| **PrismQ.T.Script.From.Title.Idea** | ✅ **ANO** | 🏆 **HLAVNÍ USE CASE** |
-| **PrismQ.T.Script.From.Title.Review.Script** | ✅ **ANO** | Refinement dlouhého scriptu |
+| **PrismQ.T.Content.From.Title.Idea** | ✅ **ANO** | 🏆 **HLAVNÍ USE CASE** |
+| **PrismQ.T.Content.From.Title.Review.Script** | ✅ **ANO** | Refinement dlouhého scriptu |
 | **PrismQ.T.Story.Polish** | ✅ **ANO** | Finální polish dlouhého textu |
 | Review stages | ❌ Ne | Analytické, ne generativní |
 
 #### 🏆 Primární integrace: Script Generation
 
 ```
-PrismQ.T.Script.From.Title.Idea
+PrismQ.T.Content.From.Title.Idea
     ↓
 ┌─────────────────────────────────────────────────────┐
 │ 📖 MOVING WINDOW INTEGRATION                        │
@@ -818,15 +818,15 @@ PrismQ.T.Script.From.Title.Idea
 │ 4. Spojení bloků → Script v1                        │
 └─────────────────────────────────────────────────────┘
     ↓
-PrismQ.T.Review.Title.By.Script.Idea
+PrismQ.T.Review.Title.From.Script.Idea
 ```
 
-#### Návrh integrace do PrismQ.T.Script
+#### Návrh integrace do PrismQ.T.Content
 
-**Nový modul:** `T/Script/From/Idea/Title/MovingWindow/`
+**Nový modul:** `T/Content/From/Idea/Title/MovingWindow/`
 
 ```python
-# T/Script/From/Idea/Title/MovingWindow/generator.py
+# T/Content/From/Idea/Title/MovingWindow/generator.py
 
 from dataclasses import dataclass
 from typing import List, Optional
@@ -843,7 +843,7 @@ class StoryBeat:
 
 class PrismQMovingWindowScript:
     """
-    Moving Window Script Generator pro PrismQ.T.Script.From.Title.Idea
+    Moving Window Script Generator pro PrismQ.T.Content.From.Title.Idea
     
     Integrace do workflow:
     - Input: Idea + Title z předchozích stages
@@ -867,7 +867,7 @@ class PrismQMovingWindowScript:
     
     def from_idea_and_title(self, idea: dict, title: str) -> str:
         """
-        Hlavní entry point pro PrismQ.T.Script.From.Title.Idea
+        Hlavní entry point pro PrismQ.T.Content.From.Title.Idea
         
         Args:
             idea: Idea objekt z PrismQ.T.Idea.Creation
@@ -1059,7 +1059,7 @@ Facts:'''
 # Integrace do PrismQ workflow
 def script_from_idea_title_moving_window(idea: dict, title: str) -> str:
     """
-    Entry point pro PrismQ.T.Script.From.Title.Idea s Moving Window.
+    Entry point pro PrismQ.T.Content.From.Title.Idea s Moving Window.
     
     Použití:
         from T.Script.From.Idea.Title.MovingWindow import script_from_idea_title_moving_window
@@ -1112,7 +1112,7 @@ def script_from_idea_title_moving_window(idea: dict, title: str) -> str:
 │  │    └─────────────────────────────────────────────┘   │   │
 │  └─────────────────────────────────────────────────────┘   │
 │       ↓                                                     │
-│  5. Review.Title.By.Script.Idea                             │
+│  5. Review.Title.From.Script.Idea                             │
 │       ↓                                                     │
 │  6-16. Quality Reviews (Grammar, Tone, Content...)          │
 │       ↓                                                     │
@@ -1590,7 +1590,7 @@ script = Script.from_title_idea(
 | Typ modulu | Příklady | Funkce |
 |------------|----------|--------|
 | **Generation/Rewrite** | `Script.From.Title.Idea`, `Title.From.Script.Review.Title` | Produkují nebo přepisují text |
-| **Review** | `Review.Script.By.Title`, `Review.Title.By.Script.Idea` | Pouze analyzují, nikdy nemění text |
+| **Review** | `Review.Script.From.Title`, `Review.Title.From.Script.Idea` | Pouze analyzují, nikdy nemění text |
 
 **SOLID iterativní pipeline:**
 ```
@@ -1613,7 +1613,7 @@ Refine chosen idea (optional)
 ```
 Title.From.Idea
     ↓
-Review.Title.By.Script.Idea (SEO, VO-friendliness, tone)
+Review.Title.From.Script.Idea (SEO, VO-friendliness, tone)
     ↓
 Title.From.Script.Review.Title (refinement loop)
 ```

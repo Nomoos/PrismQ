@@ -13,58 +13,58 @@ Stage 1.5: PrismQ.T.Story.From.Idea (creates 10 Story objects per Idea)
     ↓
 Stage 2: PrismQ.T.Title.From.Idea (v1)
     ↓
-Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
+Stage 3: PrismQ.T.Content.From.Idea.Title (v1)
     ↓
-Stage 4: PrismQ.T.Review.Title.ByScript (v1)
+Stage 4: PrismQ.T.Review.Title.From.Content (v1)
     ↓
-Stage 5: PrismQ.T.Review.Script.ByTitle (v1)
+Stage 5: PrismQ.T.Review.Content.From.Title (v1)
     ↓
-Stage 6: PrismQ.T.Title.From.Title.Review.Script (v2)
+Stage 6: PrismQ.T.Title.From.Title.Review.Content (v2)
     ↓
-Stage 7: PrismQ.T.Script.Improvements (v2)
+Stage 7: PrismQ.T.Content.Improvements (v2)
     ↓
-Stage 8: PrismQ.T.Review.Title.ByScript (v2) ←──────────────┐
+Stage 8: PrismQ.T.Review.Title.From.Content (v2) ←──────────────┐
     ↓                                                       │
 Stage 9: PrismQ.T.Title.Refinement (v3)                    │
     ↓                                                       │
-Stage 10: PrismQ.T.Review.Script.ByTitle (v2) ←─────────┐  │
+Stage 10: PrismQ.T.Review.Content.From.Title (v2) ←─────────┐  │
     ↓                                                    │  │
-Stage 11: PrismQ.T.Script.Refinement (v3)               │  │
+Stage 11: PrismQ.T.Content.Refinement (v3)               │  │
     ↓                                                    │  │
 Stage 12: Title Acceptance Check ─NO────────────────────┘  │
     ↓ YES                                                   │
-Stage 13: Script Acceptance Check ─NO──────────────────────┘
+Stage 13: Content Acceptance Check ─NO──────────────────────┘
     ↓ YES
 
 ━━━━ Local AI Reviews (Stages 14-20) ━━━━
 
-Stage 14: PrismQ.T.Review.Script.Grammar ←──────────┐
+Stage 14: PrismQ.T.Review.Content.Grammar ←──────────┐
     ↓                                               │
-    ├─FAILS─→ Return to Script.Refinement ─────────┘
+    ├─FAILS─→ Return to Content.Refinement ─────────┘
     ↓ PASSES
-Stage 15: PrismQ.T.Review.Script.Tone ←────────────┐
+Stage 15: PrismQ.T.Review.Content.Tone ←────────────┐
     ↓                                              │
-    ├─FAILS─→ Return to Script.Refinement ────────┘
+    ├─FAILS─→ Return to Content.Refinement ────────┘
     ↓ PASSES
-Stage 16: PrismQ.T.Review.Script.Content ←─────────┐
+Stage 16: PrismQ.T.Review.Content.Content ←─────────┐
     ↓                                              │
-    ├─FAILS─→ Return to Script.Refinement ────────┘
+    ├─FAILS─→ Return to Content.Refinement ────────┘
     ↓ PASSES
-Stage 17: PrismQ.T.Review.Script.Consistency ←─────┐
+Stage 17: PrismQ.T.Review.Content.Consistency ←─────┐
     ↓                                              │
-    ├─FAILS─→ Return to Script.Refinement ────────┘
+    ├─FAILS─→ Return to Content.Refinement ────────┘
     ↓ PASSES
-Stage 18: PrismQ.T.Review.Script.Editing ←─────────┐
+Stage 18: PrismQ.T.Review.Content.Editing ←─────────┐
     ↓                                              │
-    ├─FAILS─→ Return to Script.Refinement ────────┘
+    ├─FAILS─→ Return to Content.Refinement ────────┘
     ↓ PASSES
 Stage 19: PrismQ.T.Review.Title.Readability ←──────┐
     ↓                                              │
     ├─FAILS─→ Return to Title.Refinement ─────────┘
     ↓ PASSES
-Stage 20: PrismQ.T.Review.Script.Readability ←─────┐
+Stage 20: PrismQ.T.Review.Content.Readability ←─────┐
     ↓                                              │
-    ├─FAILS─→ Return to Script.Refinement ────────┘
+    ├─FAILS─→ Return to Content.Refinement ────────┘
     ↓ PASSES
 
 ━━━━ GPT Expert Review Loop (Stages 21-22) ━━━━
@@ -238,15 +238,15 @@ titles_v1 = [
 selected_title_v1 = titles_v1[0]  # Best scored variant
 ```
 
-**Next Stage**: Stage 3 (Script.FromIdeaAndTitle)
+**Next Stage**: Stage 3 (Content.From.Idea.Title)
 
 ---
 
-### Stage 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
+### Stage 3: PrismQ.T.Content.From.Idea.Title (v1)
 
-**Purpose**: Generate first script from idea and title v1
+**Purpose**: Generate first content from idea and title v1
 
-**Folder**: `T/Script/FromIdeaAndTitle/`  
+**Folder**: `T/Content/From/Idea/Title/`  
 **Worker**: Worker02  
 **Effort**: 3 days
 
@@ -257,7 +257,7 @@ selected_title_v1 = titles_v1[0]  # Best scored variant
 - Structural requirements
 
 **Output**:
-- Initial script (v1)
+- Initial content (v1)
 - Structure: Intro, body, conclusion
 - Metadata: word count, reading time
 
@@ -268,33 +268,33 @@ selected_title_v1 = titles_v1[0]  # Best scored variant
 
 **API**:
 ```python
-from PrismQ.T.Script.FromIdeaAndTitle import generate_script_v1
+from PrismQ.T.Content.From.Idea.Title import generate_content_v1
 
-script = generate_script_v1(
+content = generate_content_v1(
     idea=idea,
     title=title_v1,
     target_words=1500,
     structure="intro-body-conclusion"
 )
-# Returns: Script object
+# Returns: Content object
 ```
 
-**Next Stage**: Stage 4 (Review.Title.ByScript)
+**Next Stage**: Stage 4 (Review.Title.From.Content)
 
 ---
 
 ### Stages 4-11: Cross-Review and Improvement Cycles
 
-These stages implement the co-dependent improvement methodology where title and script are reviewed against each other and iteratively refined. The complete workflow includes:
+These stages implement the co-dependent improvement methodology where title and content are reviewed against each other and iteratively refined. The complete workflow includes:
 
-**Stage 4**: PrismQ.T.Review.Title.ByScript (v1) - Review title v1 against script v1 and idea  
-**Stage 5**: PrismQ.T.Review.Script.ByTitle (v1) - Review script v1 against title v1 and idea  
-**Stage 6**: PrismQ.T.Title.From.Title.Review.Script (v2) - Generate improved title v2 using both reviews  
-**Stage 7**: PrismQ.T.Script.Improvements (v2) - Generate improved script v2 with new title v2  
-**Stage 8**: PrismQ.T.Review.Title.ByScript (v2) - Review title v2 against script v2  
+**Stage 4**: PrismQ.T.Review.Title.From.Content (v1) - Review title v1 against content v1 and idea  
+**Stage 5**: PrismQ.T.Review.Content.From.Title (v1) - Review content v1 against title v1 and idea  
+**Stage 6**: PrismQ.T.Title.From.Title.Review.Content (v2) - Generate improved title v2 using both reviews  
+**Stage 7**: PrismQ.T.Content.Improvements (v2) - Generate improved content v2 with new title v2  
+**Stage 8**: PrismQ.T.Review.Title.From.Content (v2) - Review title v2 against content v2  
 **Stage 9**: PrismQ.T.Title.Refinement (v3) - Refine title to v3 based on v2 review  
-**Stage 10**: PrismQ.T.Review.Script.ByTitle (v2) - Review script v2 against title v3  
-**Stage 11**: PrismQ.T.Script.Refinement (v3) - Refine script to v3 aligned with title v3
+**Stage 10**: PrismQ.T.Review.Content.From.Title (v2) - Review content v2 against title v3  
+**Stage 11**: PrismQ.T.Content.Refinement (v3) - Refine content to v3 aligned with title v3
 
 Each of these stages follows a similar API pattern. For the original detailed specification with complete examples for all stages, see the [MVP_WORKFLOW.md](./_meta/issues/MVP_WORKFLOW.md) source document.
 
@@ -321,11 +321,11 @@ acceptance = check_title_acceptance(title=title_v3)
 # Returns: {"accepted": True/False, "reason": "..."}
 ```
 
-**Stage 13: Script Acceptance Check**
+**Stage 13: Content Acceptance Check**
 
-**Purpose**: Verify script is ready to proceed
+**Purpose**: Verify content is ready to proceed
 
-**Input**: Script (latest version - v3, v4, v5, etc.), Title (accepted version)  
+**Input**: Content (latest version - v3, v4, v5, etc.), Title (accepted version)  
 **Output**: ACCEPTED or NOT ACCEPTED
 
 **Decision**:
@@ -334,9 +334,9 @@ acceptance = check_title_acceptance(title=title_v3)
 
 **API**:
 ```python
-from PrismQ.T.Review.Script import check_script_acceptance
+from PrismQ.T.Review.Content import check_content_acceptance
 
-acceptance = check_script_acceptance(script=script_v3, title=title_v3)
+acceptance = check_content_acceptance(content=content_v3, title=title_v3)
 # Returns: {"accepted": True/False, "reason": "..."}
 ```
 
@@ -352,7 +352,7 @@ These stages validate 7 quality dimensions using local AI reviews.
 **Stage 17**: Consistency Review - Internal continuity  
 **Stage 18**: Editing Review - Clarity and flow  
 **Stage 19**: Title Readability - Final title validation  
-**Stage 20**: Script Readability - Voiceover quality validation
+**Stage 20**: Content Readability - Voiceover quality validation
 
 Each quality review follows the same pattern:
 
@@ -360,7 +360,7 @@ Each quality review follows the same pattern:
 ```python
 from PrismQ.T.Review.<Dimension> import review_<dimension>
 
-result = review_<dimension>(script=script_v3)
+result = review_<dimension>(content=content_v3)
 # Returns: {"pass": True/False, "issues": [...], "suggestions": [...]}
 ```
 
@@ -378,7 +378,7 @@ result = review_<dimension>(script=script_v3)
 
 **Input**:
 - Title (final version)
-- Script (final version)
+- Content (final version)
 - Audience context
 - Original idea
 
@@ -392,7 +392,7 @@ from PrismQ.T.Story.ExpertReview import expert_review
 
 result = expert_review(
     title=title_final,
-    script=script_final,
+    content=content_final,
     idea=idea,
     audience="US female 14-29"
 )
@@ -402,8 +402,8 @@ result = expert_review(
 
 **Purpose**: Apply GPT-based expert improvements
 
-**Input**: Title, script, expert review feedback  
-**Output**: Polished title and script
+**Input**: Title, content, expert review feedback  
+**Output**: Polished title and content
 
 **Iteration Limit**: Maximum 2 polish iterations
 
@@ -411,14 +411,14 @@ result = expert_review(
 ```python
 from PrismQ.T.Story.Polish import polish_story_with_gpt
 
-polished = polish_story_with_gpt(story_id, title, script, expert_review_result)
+polished = polish_story_with_gpt(story_id, title, content, expert_review_result)
 ```
 
 **Stage 23: PrismQ.T.Publishing.Finalization**
 
 **Purpose**: Publish approved and validated content
 
-**Input**: Final title, final script, original idea  
+**Input**: Final title, final content, original idea  
 **Output**: Published content package
 
 **API**:
@@ -427,7 +427,7 @@ from PrismQ.T.Publishing.Finalization import publish_content
 
 published = publish_content(
     title=title_final,
-    script=script_final,
+    content=content_final,
     idea=idea,
     format="markdown"
 )

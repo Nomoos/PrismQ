@@ -11,7 +11,7 @@ Fáze 1: PrismQ.T.Idea.Creation
     ↓
 Fáze 2: PrismQ.T.Title.From.Idea (v1)
     ↓
-Fáze 3: PrismQ.T.Script.FromIdeaAndTitle (v1)
+Fáze 3: PrismQ.T.Content.FromIdeaAndTitle (v1)
     ↓
 Fáze 4: PrismQ.T.Review.Title.ByScript (v1)
     ↓
@@ -19,7 +19,7 @@ Fáze 5: PrismQ.T.Review.Script.ByTitle (v1)
     ↓
 Fáze 6: PrismQ.T.Title.From.Title.Review.Script (v2)
     ↓
-Fáze 7: PrismQ.T.Script.Improvements (v2)
+Fáze 7: PrismQ.T.Content.Improvements (v2)
     ↓
 Fáze 8: PrismQ.T.Review.Title.ByScript (v2) ←──────────────┐
     ↓                                                       │
@@ -27,7 +27,7 @@ Fáze 9: PrismQ.T.Title.Refinement (v3)                     │
     ↓                                                       │
 Fáze 10: PrismQ.T.Review.Script.ByTitle (v2) ←──────────┐  │
     ↓                                                    │  │
-Fáze 11: PrismQ.T.Script.Refinement (v3)                │  │
+Fáze 11: PrismQ.T.Content.Refinement (v3)                │  │
     ↓                                                    │  │
 Fáze 12: Kontrola přijetí titulku ─NE───────────────────┘  │
     ↓ ANO                                                   │
