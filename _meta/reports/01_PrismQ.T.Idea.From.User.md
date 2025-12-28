@@ -32,11 +32,10 @@ Průběh zpracování dat v modulu:
    - Instalace dependencies (pytest, requests)
    - Spuštění Ollama serveru
 
-2. **Načtení a validace vstupů:**
+2. **Načtení vstupů:**
    - Zobrazení uvítací obrazovky
    - Čtení multi-line vstupu od uživatele
-   - Parsování textu (extrakce title, description, metadata)
-   - Validace a čištění vstupního textu
+   - **Text je předán do AI šablony přesně tak, jak byl zadán uživatelem** (žádné parsování, extrakce, validace ani čištění)
 
 3. **Výběr flavor variant:**
    - FlavorSelector vybere 10 flavors (stylů obsahu)
