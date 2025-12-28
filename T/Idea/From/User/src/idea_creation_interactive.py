@@ -441,8 +441,8 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     
                     # Generate the variant using raw input text
                     idea = generator.generate_from_flavor(
-                        input_text=input_text,
                         flavor_name=flavor_name,
+                        input_text=input_text,
                         variation_index=i,
                     )
                     variants.append(idea)

@@ -69,10 +69,10 @@ class IdeaGenerator:
     
     def generate_from_flavor(
         self,
-        input_text: str,
         flavor_name: str,
         variation_index: int = 0,
         second_flavor_chance: float = 0.2,
+        input_text: str = "",
         # Backward compatibility - kept for legacy calls
         title: str = "",
         description: str = "",
@@ -80,10 +80,10 @@ class IdeaGenerator:
         """Generate an idea using a specific flavor.
         
         Args:
-            input_text: Raw input text from user (no parsing or processing)
             flavor_name: Name of the flavor to use
             variation_index: Variation number for uniqueness
             second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
+            input_text: Raw input text from user (no parsing or processing)
             title: (Deprecated) Legacy parameter for backward compatibility
             description: (Deprecated) Legacy parameter for backward compatibility
             
@@ -92,6 +92,7 @@ class IdeaGenerator:
             
         Raises:
             KeyError: If flavor not found
+            ValueError: If neither input_text nor title is provided
         """
         # Support legacy calls that use title/description
         if not input_text and title:
@@ -100,7 +101,7 @@ class IdeaGenerator:
                 input_text = f"{title}: {description}"
         
         if not input_text:
-            raise ValueError("input_text parameter is required")
+            raise ValueError("input_text or title parameter is required")
         
         flavor = self.loader.get_flavor(flavor_name)
         default_fields = self.loader.get_default_fields()
@@ -498,9 +499,9 @@ def create_ideas_from_input(
 
 
 def generate_idea_from_flavor(
-    input_text: str,
     flavor_name: str,
     variation_index: int = 0,
+    input_text: str = "",
     # Backward compatibility
     title: str = "",
     description: str = "",
@@ -508,9 +509,9 @@ def generate_idea_from_flavor(
     """Generate single idea from flavor - convenience function.
     
     Args:
-        input_text: Raw input text (no parsing)
         flavor_name: Flavor to use
         variation_index: Variation number
+        input_text: Raw input text (no parsing)
         title: (Deprecated) Legacy parameter
         description: (Deprecated) Legacy parameter
         
@@ -519,8 +520,8 @@ def generate_idea_from_flavor(
     """
     generator = _get_generator()
     return generator.generate_from_flavor(
-        input_text=input_text,
         flavor_name=flavor_name,
+        input_text=input_text,
         variation_index=variation_index,
         title=title,
         description=description
