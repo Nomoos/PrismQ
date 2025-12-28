@@ -514,6 +514,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     # Save raw AI-generated text directly to database (no formatting)
                     # AI output is stored in the 'hook' field as-is
                     idea_text = variant.get('hook', '')
+                    
+                    # Skip saving if text is empty (defensive programming)
+                    if not idea_text or not idea_text.strip():
+                        print_warning(f"Skipping variant {i+1}: empty content")
+                        if logger:
+                            logger.warning(f"Skipped saving variant {i+1}: empty hook field")
+                        continue
 
                     # Insert into database with version=1 (new ideas always start at version 1)
                     idea_id = db.insert_idea(text=idea_text, version=1)
