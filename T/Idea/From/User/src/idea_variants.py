@@ -105,7 +105,7 @@ class IdeaGenerator:
         
         flavor = self.loader.get_flavor(flavor_name)
         default_fields = self.loader.get_default_fields()
-        seed = self._generate_seed(input_text, "", variation_index)
+        seed = self._generate_seed(input_text, variation_index)
         
         # Determine if we should add a second flavor (small chance)
         rng = random.Random(seed)
@@ -236,16 +236,33 @@ class IdeaGenerator:
     # Helper methods
     
     @staticmethod
-    def _generate_seed(title: str, description: str, variation_index: int) -> int:
-        """Generate consistent seed from inputs."""
-        content = f"{title}{description}{variation_index}"
+    def _generate_seed(input_text: str, variation_index: int) -> int:
+        """Generate consistent seed from inputs.
+        
+        Args:
+            input_text: Raw input text
+            variation_index: Variation number
+            
+        Returns:
+            Seed value for random generation
+        """
+        content = f"{input_text}{variation_index}"
         hash_obj = hashlib.md5(content.encode())
         return int(hash_obj.hexdigest()[:8], 16)
     
     @staticmethod
-    def _generate_idea_hash(title: str, flavor_name: str, variation_index: int) -> str:
-        """Generate unique hash for the idea."""
-        content = f"{title}{flavor_name}{variation_index}{datetime.now().isoformat()}"
+    def _generate_idea_hash(input_text: str, flavor_name: str, variation_index: int) -> str:
+        """Generate unique hash for the idea.
+        
+        Args:
+            input_text: Raw input text
+            flavor_name: Flavor name
+            variation_index: Variation number
+            
+        Returns:
+            Unique hash string
+        """
+        content = f"{input_text}{flavor_name}{variation_index}{datetime.now().isoformat()}"
         return hashlib.sha256(content.encode()).hexdigest()[:16]
     
     @staticmethod

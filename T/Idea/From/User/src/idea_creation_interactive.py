@@ -162,12 +162,16 @@ def get_database_path() -> str:
 
 
 # =============================================================================
-# Input Parsing
+# Input Parsing (DEPRECATED - Kept for backward compatibility only)
 # =============================================================================
 
 
 def parse_input_text(text: str, logger: Optional[logging.Logger] = None) -> tuple:
     """Parse input text and extract title and description.
+    
+    DEPRECATED: This function is no longer used in the module.
+    Input text now flows directly to the AI template without parsing.
+    This function is kept for backward compatibility only.
 
     Handles:
     - Plain text (title, description, story snippet, keyword)
@@ -180,6 +184,13 @@ def parse_input_text(text: str, logger: Optional[logging.Logger] = None) -> tupl
     Returns:
         Tuple of (title, description, metadata)
     """
+    import warnings
+    warnings.warn(
+        "parse_input_text is deprecated. Input text now flows directly to AI without parsing.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
     import re
 
     text = text.strip()
