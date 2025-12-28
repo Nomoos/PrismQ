@@ -126,33 +126,6 @@ class TestNoParsing:
             # Verify the ENTIRE text was passed as-is, not split
             assert captured_input[0] == long_text
             assert idea['source_input'] == long_text
-    
-    def test_backward_compatibility_with_title_description(self):
-        """Test that legacy title/description parameters still work."""
-        with patch('idea_variants.AIIdeaGenerator') as mock_ai_gen_class:
-            mock_ai_instance = Mock()
-            mock_ai_instance.available = True
-            
-            captured_input = []
-            
-            def mock_generate(input_text, **kwargs):
-                captured_input.append(input_text)
-                return "Generated idea content " * 10
-            
-            mock_ai_instance.generate_with_custom_prompt = mock_generate
-            mock_ai_gen_class.return_value = mock_ai_instance
-            
-            generator = IdeaGenerator(use_ai=True)
-            
-            # Old-style call with title and description
-            idea = generator.generate_from_flavor(
-                flavor_name="Emotion-First Hook",
-                title="Mountain Adventure",
-                description="A thrilling journey",
-            )
-            
-            # Should combine title and description with ": " separator
-            assert captured_input[0] == "Mountain Adventure: A thrilling journey"
 
 
 if __name__ == '__main__':

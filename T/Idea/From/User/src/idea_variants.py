@@ -70,38 +70,27 @@ class IdeaGenerator:
     def generate_from_flavor(
         self,
         flavor_name: str,
+        input_text: str,
         variation_index: int = 0,
         second_flavor_chance: float = 0.2,
-        input_text: str = "",
-        # Backward compatibility - kept for legacy calls
-        title: str = "",
-        description: str = "",
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
         
         Args:
             flavor_name: Name of the flavor to use
+            input_text: Raw input text from user (no parsing or processing)
             variation_index: Variation number for uniqueness
             second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
-            input_text: Raw input text from user (no parsing or processing)
-            title: (Deprecated) Legacy parameter for backward compatibility
-            description: (Deprecated) Legacy parameter for backward compatibility
             
         Returns:
             Dictionary with generated idea content
             
         Raises:
             KeyError: If flavor not found
-            ValueError: If neither input_text nor title is provided
+            ValueError: If input_text is empty
         """
-        # Support legacy calls that use title/description
-        if not input_text and title:
-            input_text = title
-            if description:
-                input_text = f"{title}: {description}"
-        
         if not input_text:
-            raise ValueError("input_text or title parameter is required")
+            raise ValueError("input_text parameter is required and cannot be empty")
         
         flavor = self.loader.get_flavor(flavor_name)
         default_fields = self.loader.get_default_fields()
@@ -180,34 +169,26 @@ class IdeaGenerator:
     
     def generate_multiple(
         self,
+        input_text: str,
         count: int = 10,
-        input_text: str = "",
         specific_flavors: Optional[List[str]] = None,
-        # Backward compatibility
-        title: str = "",
-        description: str = "",
     ) -> List[Dict[str, Any]]:
         """Generate multiple ideas from input.
         
         Args:
-            count: Number of ideas to generate
             input_text: Raw input text (no parsing)
+            count: Number of ideas to generate
             specific_flavors: Optional list of specific flavors.
                             If None, uses weighted random selection.
-            title: (Deprecated) Legacy parameter for backward compatibility
-            description: (Deprecated) Legacy parameter for backward compatibility
                             
         Returns:
             List of generated ideas
+            
+        Raises:
+            ValueError: If input_text is empty
         """
-        # Support legacy calls
-        if not input_text and title:
-            input_text = title
-            if description:
-                input_text = f"{title}: {description}"
-        
         if not input_text:
-            raise ValueError("input_text parameter is required")
+            raise ValueError("input_text parameter is required and cannot be empty")
         
         ideas = []
         
@@ -222,8 +203,8 @@ class IdeaGenerator:
         for i, flavor_name in enumerate(selected_flavors):
             try:
                 idea = self.generate_from_flavor(
-                    input_text=input_text,
                     flavor_name=flavor_name,
+                    input_text=input_text,
                     variation_index=i,
                 )
                 ideas.append(idea)
@@ -489,48 +470,39 @@ def _get_generator() -> IdeaGenerator:
 
 
 def create_ideas_from_input(
-    title: str,
+    input_text: str,
     count: int = 10,
-    description: str = "",
     flavors: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]]:
     """Create multiple ideas from input - convenience function.
     
     Args:
-        title: Input title/topic (legacy - will be used as input_text)
+        input_text: Raw input text (no parsing)
         count: Number of ideas (default: 10)
-        description: Optional description (legacy - will be appended to input_text)
         flavors: Optional list of specific flavors
         
     Returns:
         List of generated ideas
     """
     generator = _get_generator()
-    # Use legacy parameters for backward compatibility
     return generator.generate_multiple(
+        input_text=input_text,
         count=count,
-        title=title,
-        description=description,
         specific_flavors=flavors
     )
 
 
 def generate_idea_from_flavor(
     flavor_name: str,
+    input_text: str,
     variation_index: int = 0,
-    input_text: str = "",
-    # Backward compatibility
-    title: str = "",
-    description: str = "",
 ) -> Dict[str, Any]:
     """Generate single idea from flavor - convenience function.
     
     Args:
         flavor_name: Flavor to use
-        variation_index: Variation number
         input_text: Raw input text (no parsing)
-        title: (Deprecated) Legacy parameter
-        description: (Deprecated) Legacy parameter
+        variation_index: Variation number
         
     Returns:
         Generated idea dictionary
@@ -540,8 +512,6 @@ def generate_idea_from_flavor(
         flavor_name=flavor_name,
         input_text=input_text,
         variation_index=variation_index,
-        title=title,
-        description=description
     )
 
 
