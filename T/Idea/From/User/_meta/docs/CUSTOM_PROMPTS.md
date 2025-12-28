@@ -1,5 +1,8 @@
 # Custom Prompt Templates Guide
 
+**Input Handling**: Input text is passed directly to prompt templates without any parsing, extraction, validation, or cleaning. The system uses exactly what you provide.
+
+
 ## Overview
 
 PrismQ's Idea Creation module now supports flexible custom prompt templates for AI-powered idea generation with thematic flavors. This allows you to create and use your own prompts with local AI models (via Ollama), guided by 93 different thematic orientations.

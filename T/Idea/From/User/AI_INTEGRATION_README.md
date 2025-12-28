@@ -47,7 +47,7 @@ Integrated AI generation into the `idea_variants.py` module to use Ollama for ge
 ### Architecture
 
 ```
-Input Title → IdeaGenerator
+Input Text (No Parsing) → IdeaGenerator
               ↓
     ┌─────────┴─────────┐
     ↓                   ↓
@@ -66,6 +66,8 @@ Store in 'hook' field
 Rich AI content
 ```
 
+
+**Note**: Input text flows directly to the AI prompt template without any parsing, extraction, validation, or cleaning. The system passes your exact input text to the prompt.
 ## Usage
 
 ### Normal Usage (Ollama Running)

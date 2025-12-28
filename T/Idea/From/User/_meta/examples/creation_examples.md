@@ -2,6 +2,9 @@
 
 Example usage of the Idea Creation module.
 
+**Note**: Input text is passed directly to AI prompts without any parsing, extraction, or validation. The system uses your exact input.
+
+
 ## Basic Creation from Title
 
 ```python

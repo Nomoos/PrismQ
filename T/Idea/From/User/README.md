@@ -31,6 +31,7 @@ Transform minimal input (title or description) into multiple, fully-formed Ideas
 
 - **Flavor-Based Generation**: 110 thematic flavors with weighted selection for target audiences
 - **AI-Powered Generation**: Uses local LLMs (Qwen 3.30b default, optimized for idea refinement) via Ollama
+- **Direct Input Passthrough**: Input text flows directly to AI prompt without parsing, extraction, or validation
 - **Audience Optimization**: Custom flavors for specific demographics (teen girls, US women, Maine youth, etc.)
 - **Flavor Scoring**: Rate flavors for audience fit with automated scoring system
 - **Custom Prompt Templates**: Flexible templating system with multiple placeholder formats
@@ -104,10 +105,12 @@ print(f"Created {len(ideas)} ideas")  # Output: Created 10 ideas
 ```
 Path 2: Manual Creation
     ↓
-Title/Description → AI Generation (Ollama) → 10 Candidate Ideas
+Title/Description → Direct to AI Prompt (No Parsing) → 10 Candidate Ideas
     ↓
 Multiple Ideas with full narrative structure
 ```
+
+**Note**: Input text is passed directly to the AI prompt template without any parsing, extraction, validation, or cleaning. The AI receives your exact input text as provided.
 
 ## Usage Examples
 

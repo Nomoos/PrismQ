@@ -7,6 +7,10 @@ It follows SOLID principles:
 - Dependency Inversion: Depends on FlavorLoader abstraction
 
 Flavors are loaded from external JSON configuration (data/flavors.json).
+
+**Input Handling**: Input text is passed directly to AI prompts without any 
+parsing, extraction, validation, or cleaning. The system uses exactly what 
+you provide, ensuring full flexibility in input format.
 """
 
 import hashlib

@@ -27,6 +27,8 @@ Modul `PrismQ.T.Idea.From.User` implementuje **Path 2: Manual Creation** v Prism
 
 ### Klíčové vlastnosti
 
+**Zpracování vstupu**: Vstupní text je předán přímo do AI promptu bez parsování, extrakce, validace nebo čištění. Systém používá přesně to, co uživatel poskytne.
+
 | Vlastnost | Hodnota |
 |-----------|---------|
 | **Výchozí počet Ideas** | 10 |
