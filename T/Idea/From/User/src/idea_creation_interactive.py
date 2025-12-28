@@ -162,12 +162,16 @@ def get_database_path() -> str:
 
 
 # =============================================================================
-# Input Parsing
+# Input Parsing (DEPRECATED - Kept for backward compatibility only)
 # =============================================================================
 
 
 def parse_input_text(text: str, logger: Optional[logging.Logger] = None) -> tuple:
     """Parse input text and extract title and description.
+    
+    DEPRECATED: This function is no longer used in the module.
+    Input text now flows directly to the AI template without parsing.
+    This function is kept for backward compatibility only.
 
     Handles:
     - Plain text (title, description, story snippet, keyword)
@@ -180,6 +184,13 @@ def parse_input_text(text: str, logger: Optional[logging.Logger] = None) -> tupl
     Returns:
         Tuple of (title, description, metadata)
     """
+    import warnings
+    warnings.warn(
+        "parse_input_text is deprecated. Input text now flows directly to AI without parsing.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
     import re
 
     text = text.strip()
@@ -404,16 +415,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             logger.info(f"Received input: {len(input_text)} chars")
             logger.debug(f"Input text:\n{input_text[:500]}...")
 
-        # Parse input
+        # Display input (no parsing or processing)
         print_section("Processing Input")
-        title, description, metadata = parse_input_text(input_text, logger)
-
-        print(f"  Title: {Colors.BOLD}{title}{Colors.END}")
-        if description:
-            desc_preview = description[:100] + "..." if len(description) > 100 else description
-            print(f"  Description: {desc_preview}")
-        if metadata:
-            print(f"  Metadata: {json.dumps(metadata, indent=2)[:200]}...")
+        
+        # Show input preview
+        input_preview = input_text[:100] + "..." if len(input_text) > 100 else input_text
+        print(f"  Input: {Colors.BOLD}{input_preview}{Colors.END}")
+        print(f"  Length: {len(input_text)} characters")
 
         # Generate variants with random template selection
         print_section("Generating Variants")
@@ -442,11 +450,10 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     # Show progress
                     print_info(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Generating with flavor: {flavor_name}...")
                     
-                    # Generate the variant
+                    # Generate the variant using raw input text
                     idea = generator.generate_from_flavor(
-                        title=title,
                         flavor_name=flavor_name,
-                        description=description,
+                        input_text=input_text,
                         variation_index=i,
                     )
                     variants.append(idea)

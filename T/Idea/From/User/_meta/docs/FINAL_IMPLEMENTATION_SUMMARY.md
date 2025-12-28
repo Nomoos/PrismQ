@@ -39,7 +39,7 @@
 ## Final Architecture
 
 ```
-Input Title
+Input Text (passed as-is, no parsing)
     ↓
 IdeaGenerator.generate_from_flavor()
     ↓
@@ -122,6 +122,17 @@ Return idea dictionary
 1. **No Template Fallback**: System requires Ollama - will error if unavailable
 2. **No Backward Compatibility**: Old placeholders ([INSERT TEXT HERE], [TEXT], etc.) no longer work
 3. **Output Format**: Ideas stored as single paragraph, not parsed into fields
+4. **Input Passthrough**: Input text flows directly to AI prompt without parsing, extraction, validation, or cleaning
+
+## Input Handling
+
+**Important**: The system passes input text directly to the AI prompt template without any processing:
+- ✅ No parsing of JSON or structured data
+- ✅ No extraction of title/description fields  
+- ✅ No validation or cleaning of input
+- ✅ Raw text is inserted directly into prompt template
+
+This ensures the AI receives exactly what you provide, allowing full flexibility in input format.
 
 ## Migration Guide
 

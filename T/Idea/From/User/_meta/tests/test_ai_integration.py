@@ -79,9 +79,8 @@ class TestAIIntegration:
             generator = IdeaGenerator(use_ai=True)
             
             idea = generator.generate_from_flavor(
-                title="Mountain Adventure",
                 flavor_name="Emotion-First Hook",
-                description="A thrilling journey"
+                input_text="Mountain Adventure: A thrilling journey",
             )
             
             assert idea is not None
@@ -105,8 +104,8 @@ class TestAIIntegration:
             generator = IdeaGenerator(use_ai=True)
             
             idea = generator.generate_from_flavor(
-                title="Acadia Night Hikers",
-                flavor_name="Light Mystery + Adventure"
+                flavor_name="Light Mystery + Adventure",
+                input_text="Acadia Night Hikers",
             )
             
             # Check that generated content doesn't have template patterns
@@ -148,8 +147,8 @@ class TestErrorHandling:
         # Should raise RuntimeError when trying to generate without AI
         with pytest.raises(RuntimeError, match="AI generator not available"):
             generator.generate_from_flavor(
-                title="Test Title",
-                flavor_name="Emotion-First Hook"
+                flavor_name="Emotion-First Hook",
+                input_text="Test Title",
             )
 
 

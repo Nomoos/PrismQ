@@ -36,14 +36,14 @@ def demonstrate_idea_generation():
     print("PrismQ Idea Generation - AI Required Demonstration")
     print("=" * 80)
     
-    title = "Acadia Night Hikers"
+    input_text = "Acadia Night Hikers"
     
-    print(f"\nInput: {title}")
+    print(f"\nInput: {input_text}")
     print(f"Attempting to generate 2 idea variants...\n")
     
     try:
         # Generate ideas - requires Ollama to be running
-        ideas = create_ideas_from_input(title, count=2)
+        ideas = create_ideas_from_input(input_text, count=2)
         
         print(f"Generated {len(ideas)} ideas:\n")
         
