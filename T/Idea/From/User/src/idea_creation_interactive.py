@@ -511,8 +511,9 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 # Save each variant to the database
                 saved_ids = []
                 for i, variant in enumerate(variants):
-                    # Convert variant to text using format_idea_as_text
-                    idea_text = format_idea_as_text(variant)
+                    # Save raw AI-generated text directly to database (no formatting)
+                    # AI output is stored in the 'hook' field as-is
+                    idea_text = variant.get('hook', '')
 
                     # Insert into database with version=1 (new ideas always start at version 1)
                     idea_id = db.insert_idea(text=idea_text, version=1)

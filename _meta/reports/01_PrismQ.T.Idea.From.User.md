@@ -54,16 +54,17 @@ Průběh zpracování dat v modulu:
      - Odeslání requestu na Ollama API
      - AI generuje odpověď pomocí `idea_improvement.txt` prompt template
      - Odpověď obsahuje 5-sentence paragraph jako kompletní refined idea
-     - Uložení do `hook` field (ostatní fields zůstávají prázdné)
-     - Vytvoření Idea objektu s metadaty:
+     - Text je uložen do `hook` field přesně tak, jak byl vygenerován AI
+     - Vytvoření dočasného objektu s metadaty pro účely zobrazení:
        - variant_name (flavor nebo dual-flavor kombinace)
        - source_input (původní vstupní text)
        - flavor_name, flavor_description
        - generated_at, idea_hash
        - keywords (z flavor definice)
+     - **Poznámka:** Metadata jsou pouze pro interní použití, do databáze se ukládá čistý AI výstup
 
 5. **Zobrazení výsledků:**
-   - Formátování každé varianty do čitelného textu
+   - Formátování každé varianty do čitelného textu pro konzolový výstup
    - Barevný výstup na terminál (ANSI colors)
    - Logování do souboru (v debug režimu)
 
@@ -71,8 +72,8 @@ Průběh zpracování dat v modulu:
    - Získání cesty k databázi (z Config nebo fallback)
    - Setup databáze pomocí setup_idea_database()
    - Pro každou variantu:
-     - Převod na text pomocí format_idea_as_text()
-     - Vložení do tabulky Idea (text, version=1, created_at)
+     - Přímé uložení AI výstupu z `hook` field do databáze (žádná transformace)
+     - Vložení do tabulky Idea (text=AI_output, version=1, created_at)
      - Získání idea_id (auto-increment)
    - Zobrazení potvrzení s ID
 
@@ -93,14 +94,17 @@ Průběh zpracování dat v modulu:
 Výsledkem běhu modulu je:
 
 - **Primární výstup:**
-  - 10 vygenerovaných Idea objektů (variant nápadů, výchozí počet)
-  - Každý obsahuje kompletní 5-sentence refined idea v `hook` field
-  - Ostatní fields jsou prázdné (žádné parsování výstupu)
+  - 10 vygenerovaných Idea záznamů v databázi (výchozí počet)
+  - Každý záznam obsahuje čistý AI výstup (5-sentence refined idea)
+  - **Do databáze se ukládá pouze text generovaný AI, žádná metadata**
   
 - **Formát výstupu:**
-  - Konzolový výstup: Barevně formátovaný text
+  - Konzolový výstup: Barevně formátovaný text (pouze pro zobrazení)
   - Databáze (production): 10 nových záznamů v tabulce `Idea`
-  - Log soubor (debug): Detailní log všech operací
+    - Pole `text`: Přímý výstup z AI (5 vět, bez formátování)
+    - Pole `version`: Vždy 1 pro nové nápady
+    - Pole `created_at`: Časová značka vytvoření
+  - Log soubor (debug): Detailní log všech operací včetně metadata
   
 - **Vedlejší efekty:**
   - Vytvoření virtual environment (.venv)
@@ -152,7 +156,8 @@ Výsledkem běhu modulu je:
 - **Vstupní text bez parsování**: Text jde přímo do AI promptu
 - **Žádné legacy parametry**: Pouze `input_text` (ne title/description)
 - **AI je povinné**: Žádný fallback mode - RuntimeError pokud Ollama není dostupný
-- **Single paragraph output**: Vše v `hook` field, ostatní fields prázdné
+- **Přímé uložení AI výstupu**: Text z AI se ukládá do databáze přesně tak, jak byl vygenerován (žádné formátování, žádná metadata)
+- **Metadata pouze pro zobrazení**: Objekty s metadaty (flavor_name, source_input, atd.) se používají pouze pro konzolový výstup, ne pro databázi
 - **Dual-flavor support**: 20% šance na kombinaci dvou flavors
 - **SOLID architektura**: Externalised configuration, service-oriented design
 
@@ -162,6 +167,7 @@ Výsledkem běhu modulu je:
 - Flavors jsou weighted - některé se objevují častěji (optimalizace pro cílové publikum)
 - AI model může být změněn v konfiguraci (AIConfig)
 - README.md je nyní pouze navigace - detaily v _meta/docs/
+- Databáze ukládá pouze čistý text z AI - žádné JSON objekty, struktury nebo formátování
 
 **Rizika:**
 - **AI nedostupnost**: Pokud Ollama server není spuštěn nebo model není nainstalován, modul vyhodí RuntimeError (žádný fallback)
