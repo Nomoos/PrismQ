@@ -105,7 +105,7 @@ print(f"Created {len(ideas)} ideas")  # Output: Created 10 ideas
 ```
 Path 2: Manual Creation
     ↓
-Title/Description → Direct to AI Prompt (No Parsing) → 10 Candidate Ideas
+Input Text → Direct to AI Prompt (No Parsing) → 10 Candidate Ideas
     ↓
 Multiple Ideas with full narrative structure
 ```

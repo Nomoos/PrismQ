@@ -284,7 +284,7 @@ pytest test_creation.py -v
 - ✅ Safe API communication (timeout, error handling)
 
 ### Security Best Practices Applied
-1. **Input passthrough**: Input text flows directly to AI prompt without parsing or validation (raw passthrough)
+1. **Raw input passthrough**: Input flows directly to AI without processing (no injection risk in text passthrough)
 2. **Timeout protection**: API calls have 120s timeout
 3. **Error handling**: Try-catch blocks for all external calls
 4. **Logging security**: No sensitive data in logs
