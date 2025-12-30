@@ -21,11 +21,19 @@ sys.path.insert(0, str(model_path))
 
 from idea import Idea
 
-# Import refactored components using relative imports for package consistency
-from .ollama_client import OllamaClient, OllamaConfig
-from .prompt_loader import PromptLoader
-from .title_scorer import TitleScorer, ScoringConfig
-from .title_variant import TitleVariant
+# Import refactored components
+# Try relative imports first (when used as package), fallback to absolute
+try:
+    from .ollama_client import OllamaClient, OllamaConfig
+    from .prompt_loader import PromptLoader
+    from .title_scorer import TitleScorer, ScoringConfig
+    from .title_variant import TitleVariant
+except ImportError:
+    # Fallback for when module is imported directly (e.g., in tests)
+    from ollama_client import OllamaClient, OllamaConfig
+    from prompt_loader import PromptLoader
+    from title_scorer import TitleScorer, ScoringConfig
+    from title_variant import TitleVariant
 
 logger = logging.getLogger(__name__)
 

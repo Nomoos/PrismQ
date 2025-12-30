@@ -47,9 +47,16 @@ class TestAITitleGeneratorRefactored:
         mock_get.return_value = Mock(status_code=200)
         
         with patch("ollama_client.requests.post") as mock_post:
+            # Mock response with multiple title lines (as returned by AI)
             mock_post.return_value = Mock(
                 status_code=200,
-                json=lambda: {"response": "The Mirror's Silent Message"}
+                json=lambda: {"response": 
+                    "The Mirror's Silent Message\n"
+                    "Reflections in the Dark\n"
+                    "When Light Meets Shadow\n"
+                    "The Echo of Glass\n"
+                    "Through the Looking Glass\n"
+                }
             )
             
             generator = AITitleGenerator()
