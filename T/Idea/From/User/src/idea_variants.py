@@ -77,8 +77,8 @@ class IdeaGenerator:
         input_text: str,
         variation_index: int = 0,
         second_flavor_chance: float = 0.2,
-        db = None,
-        logger = None,
+        db: Optional[Any] = None,
+        logger: Optional[logging.Logger] = None,
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
         
