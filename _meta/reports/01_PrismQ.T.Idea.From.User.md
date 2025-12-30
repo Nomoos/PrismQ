@@ -50,7 +50,9 @@ Průběh zpracování dat v modulu:
 3. **Příprava databáze (pouze production režim):**
    - Kontrola režimu (preview vs. production)
    - Získání cesty k databázi (z Config nebo fallback)
-   - Setup a připojení k databázi pomocí setup_idea_database()
+   - **Setup databázového spojení JEDNOU při inicializaci** pomocí setup_idea_database()
+   - **DŮLEŽITÉ**: PrismQ používá JEDNU sdílenou databázi (db.s3db) pro všechny moduly
+   - Spojení je znovu použito napříč všemi vstupy pro lepší výkon
    - Připravené spojení předáno do generátoru
 
 4. **Generování variant pomocí AI:**
@@ -61,7 +63,7 @@ Průběh zpracování dat v modulu:
      - AI generuje odpověď pomocí `idea_improvement.txt` prompt template
      - Odpověď obsahuje 5-sentence paragraph jako kompletní refined idea
      - **Okamžité uložení do databáze** (pokud není preview režim):
-       - Přímé volání `db.insert_idea(text=generated_idea, version=1)`
+       - Přímé volání `db.insert_idea(text=generated_idea, version=1)` na znovu použité spojení
        - Získání idea_id (auto-increment)
      - Vrácení minimálního objektu pro zobrazení:
        - `text`: raw AI výstup
@@ -77,17 +79,21 @@ Průběh zpracování dat v modulu:
 6. **Shrnutí operace:**
    - Zobrazení počtu uložených variant a jejich ID (production režim)
    - Zobrazení informace o preview režimu (preview režim)
-   - Uzavření databázového spojení
 
 7. **Loop pro další iterace:**
-   - Návrat na začátek pro další vstup
+   - Návrat na začátek pro další vstup (databázové spojení zůstává otevřené)
    - Možnost ukončení příkazem "quit"
 
-8. **Ošetření chybových stavů:**
+8. **Ukončení a cleanup:**
+   - Uzavření databázového spojení ve finally bloku
+   - Čisté ukončení aplikace
+
+9. **Ošetření chybových stavů:**
    - Import errors - graceful degradation, zobrazení chybové zprávy
    - Ollama nedostupný - RuntimeError s instrukcemi (AI je povinné)
-   - Databázové chyby - logování, zobrazení chyby uživateli
-   - Ctrl+C handling - čisté ukončení aplikace
+   - Databázové chyby při setup - fallback na preview režim
+   - Databázové chyby při save - logování, zobrazení chyby uživateli
+   - Ctrl+C handling - čisté ukončení aplikace s uzavřením DB
    - AI generování selhalo - skip varianty, pokračování s dalšími
 
 ---
@@ -109,10 +115,13 @@ Výsledkem běhu modulu je:
   - Log soubor (debug): Detailní log všech operací včetně ID
   
 - **Architektura uložení:**
+  - **Reusable DB connection**: Databázové spojení nastaveno JEDNOU při inicializaci
   - **Direct save**: AI generuje → okamžité uložení do DB → vrácení minimálních dat pro display
+  - **Single shared database**: PrismQ používá JEDNU databázi (db.s3db) pro všechny moduly
   - Žádné intermediate dictionary s metadaty
-  - Databázové spojení otevřeno před generováním, předáno do generátoru
+  - Databázové spojení znovu použito napříč všemi variantami a vstupy
   - Každá varianta je uložena ihned po vygenerování
+  - Spojení uzavřeno při ukončení v finally bloku
   
 - **Vedlejší efekty:**
   - Vytvoření virtual environment (.venv)
@@ -166,6 +175,8 @@ Výsledkem běhu modulu je:
 - **Žádné legacy parametry**: Pouze `input_text` (ne title/description)
 - **AI je povinné**: Žádný fallback mode - RuntimeError pokud Ollama není dostupný
 - **Direct save architektura**: AI generuje → okamžitě uloží do DB → vrátí minimální data pro display
+- **Reusable DB connection**: Spojení nastaveno JEDNOU při inicializaci, znovu použito pro všechny operace
+- **Single shared database**: PrismQ používá JEDNU databázi (db.s3db) pro VŠECHNY moduly
 - **Žádné intermediate storage**: Eliminovány dictionary objekty s metadaty
 - **Databázové spojení v generátoru**: DB připojení předáno do `generate_from_flavor()`
 - **Dual-flavor support**: 20% šance na kombinaci dvou flavors
@@ -174,6 +185,7 @@ Výsledkem běhu modulu je:
 **Poznámky:**
 - Modul podporuje batch processing přes `T/Idea/Batch/src/`
 - Preview režim je klíčový pro testování bez ovlivnění databáze
+- **VAROVÁNÍ**: Nikdy nevytvářejte vícenásobné databáze nebo oddělené DB soubory
 - Direct save znamená okamžité uložení po AI generování (žádné čekání na batch)
 - Flavors jsou weighted - některé se objevují častěji (optimalizace pro cílové publikum)
 - AI model může být změněn v konfiguraci (AIConfig)

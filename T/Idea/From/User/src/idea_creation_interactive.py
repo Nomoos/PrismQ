@@ -5,6 +5,14 @@ This script provides an interactive mode for creating ideas from text input.
 It waits for user input, processes it through the idea variant system, and
 optionally saves to the database.
 
+**IMPORTANT - Single Shared Database:**
+PrismQ uses ONE shared database (db.s3db) for ALL modules (T, A, V, P, M).
+All Idea, Story, Title, Content, and other tables are in this single database.
+DO NOT create multiple database connections or separate databases.
+
+The database connection is established once at initialization and reused
+across all operations for efficiency.
+
 Usage:
     python idea_creation_interactive.py                    # Interactive mode with DB save
     python idea_creation_interactive.py --preview          # Preview mode (no DB save)
@@ -336,12 +344,32 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     if logger:
         logger.info("Idea variants module loaded successfully")
 
+    # Setup database connection once at initialization (if not preview mode)
+    # IMPORTANT: PrismQ uses a SINGLE SHARED DATABASE (db.s3db) for all modules
+    # This connection is reused across all inputs for better performance
+    db = None
+    db_path = None
     if preview:
         print_warning("Preview mode - ideas will NOT be saved to database")
         print_info("This mode is for testing and tuning. Check logs for details.")
     else:
         if DB_AVAILABLE:
-            print_success("Database module available")
+            try:
+                db_path = get_database_path()
+                db = setup_idea_database(db_path)
+                print_success("Database module available")
+                print_info(f"Connected to shared database: {db_path}")
+                print_info("NOTE: PrismQ uses ONE shared database (db.s3db) for all modules")
+                if logger:
+                    logger.info(f"Database connected: {db_path}")
+                    logger.info("Using shared database - all modules write to same db.s3db")
+            except Exception as e:
+                print_error(f"Failed to setup database: {e}")
+                if logger:
+                    logger.exception("Database setup failed")
+                print_warning("Falling back to preview mode (no database save)")
+                preview = True
+                db = None
         else:
             print_warning("Database module not available - will run in preview mode")
             preview = True
@@ -385,159 +413,150 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
     print("Type or paste your text (title, description, story snippet, or JSON).")
     print("Press Enter to submit, or type 'quit' to exit.\n")
 
-    while True:
-        # Collect single-line input (or multi-line for JSON)
-        print(f"{Colors.CYAN}>>> {Colors.END}", end="")
+    try:
+        while True:
+            # Collect single-line input (or multi-line for JSON)
+            print(f"{Colors.CYAN}>>> {Colors.END}", end="")
 
-        try:
-            line = input().strip()
-            if line.lower() == "quit":
-                print_info("Exiting...")
-                if logger:
-                    logger.info("User requested exit")
-                return 0
-
-            if not line:
-                continue
-
-            input_text = line
-
-        except EOFError:
-            print_info("Exiting...")
-            return 0
-        except KeyboardInterrupt:
-            print("\n")
-            print_info("Interrupted. Type 'quit' to exit.")
-            continue
-
-        if logger:
-            logger.info(f"Received input: {len(input_text)} chars")
-            logger.debug(f"Input text:\n{input_text[:500]}...")
-
-        # Display input (no parsing or processing)
-        print_section("Processing Input")
-        
-        # Show input preview
-        input_preview = input_text[:100] + "..." if len(input_text) > 100 else input_text
-        print(f"  Input: {Colors.BOLD}{input_preview}{Colors.END}")
-        print(f"  Length: {len(input_text)} characters")
-
-        # Setup database connection before generation (if not preview mode)
-        db = None
-        db_path = None
-        if not preview and DB_AVAILABLE:
             try:
-                db_path = get_database_path()
-                db = setup_idea_database(db_path)
-                print_info(f"Database ready: {db_path}")
-                if logger:
-                    logger.info(f"Database connected: {db_path}")
-            except Exception as e:
-                print_error(f"Failed to setup database: {e}")
-                if logger:
-                    logger.exception("Database setup failed")
-                db = None
-
-        # Generate variants with random template selection
-        print_section("Generating Variants")
-
-        variants = []
-        saved_ids = []
-        try:
-            # Generate 10 variants with randomly selected templates (weighted)
-            mode_text = "preview mode" if preview else "save mode"
-            print_info(
-                f"Creating {DEFAULT_IDEA_COUNT} variants in {mode_text}..."
-            )
-            if logger:
-                logger.info(
-                    f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection (preview={preview})"
-                )
-            
-            # Create generator and selector instances
-            generator = IdeaGenerator()
-            selector = FlavorSelector()
-            
-            # Select flavors upfront
-            selected_flavors = selector.select_multiple(DEFAULT_IDEA_COUNT)
-            
-            # Generate variants one at a time with progress feedback
-            for i, flavor_name in enumerate(selected_flavors):
-                try:
-                    # Show progress
-                    print_info(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Generating with flavor: {flavor_name}...")
-                    
-                    # Generate the variant using raw input text
-                    # Pass database connection for direct save (if not preview)
-                    idea = generator.generate_from_flavor(
-                        flavor_name=flavor_name,
-                        input_text=input_text,
-                        variation_index=i,
-                        db=db,
-                        logger=logger,
-                    )
-                    
-                    # Track saved ID if returned
-                    if idea.get('idea_id'):
-                        saved_ids.append(idea['idea_id'])
-                    
-                    variants.append(idea)
-                    
+                line = input().strip()
+                if line.lower() == "quit":
+                    print_info("Exiting...")
                     if logger:
-                        logger.info(f"Generated variant {i+1}/{DEFAULT_IDEA_COUNT} with flavor: {flavor_name}")
-                
-                except Exception as e:
-                    print_warning(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Failed with flavor {flavor_name}: {e}")
-                    if logger:
-                        logger.warning(f"Failed to generate variant {i+1} with flavor {flavor_name}: {e}")
+                        logger.info("User requested exit")
+                    break
+
+                if not line:
                     continue
 
-        except Exception as e:
-            print_error(f"Error creating variants: {e}")
-            if logger:
-                logger.exception("Variant creation failed")
-            continue
-        finally:
-            # Close database connection
-            if db:
-                db.close()
+                input_text = line
 
-        # Display results
-        print_section(f"Generated {len(variants)} Variant(s)")
-
-        for i, variant in enumerate(variants):
-            print(f"\n{Colors.GREEN}{'─' * 50}{Colors.END}")
-            print(
-                f"{Colors.GREEN}{Colors.BOLD}  Variant {i+1}: {variant.get('variant_name', 'Unknown')}{Colors.END}"
-            )
-            print(f"{Colors.GREEN}{'─' * 50}{Colors.END}")
-
-            # Print the generated text
-            idea_text = variant.get('text', '')
-            print(f"  {idea_text}")
+            except EOFError:
+                print_info("Exiting...")
+                break
+            except KeyboardInterrupt:
+                print("\n")
+                print_info("Interrupted. Type 'quit' to exit.")
+                continue
 
             if logger:
-                logger.info(f"Variant {i+1}: {variant.get('variant_name')}")
-                if variant.get('idea_id'):
-                    logger.info(f"  Saved with ID: {variant['idea_id']}")
+                logger.info(f"Received input: {len(input_text)} chars")
+                logger.debug(f"Input text:\n{input_text[:500]}...")
 
-        # Show summary
-        if not preview and saved_ids:
-            print_section("Database Summary")
-            print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
-            if db_path:
-                print_info(f"Database: {db_path}")
-            print_info(f"Saved IDs: {saved_ids}")
-            if logger and db_path:
-                logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
-        elif preview:
-            print_section("Preview Mode - No Database Save")
-            print_info(f"Created {len(variants)} variant(s) - NOT saved to database")
+            # Display input (no parsing or processing)
+            print_section("Processing Input")
+            
+            # Show input preview
+            input_preview = input_text[:100] + "..." if len(input_text) > 100 else input_text
+            print(f"  Input: {Colors.BOLD}{input_preview}{Colors.END}")
+            print(f"  Length: {len(input_text)} characters")
+
+            # Generate variants with random template selection
+            print_section("Generating Variants")
+
+            variants = []
+            saved_ids = []
+            try:
+                # Generate 10 variants with randomly selected templates (weighted)
+                mode_text = "preview mode" if preview else "save mode"
+                print_info(
+                    f"Creating {DEFAULT_IDEA_COUNT} variants in {mode_text}..."
+                )
+                if logger:
+                    logger.info(
+                        f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection (preview={preview})"
+                    )
+                
+                # Create generator and selector instances
+                generator = IdeaGenerator()
+                selector = FlavorSelector()
+                
+                # Select flavors upfront
+                selected_flavors = selector.select_multiple(DEFAULT_IDEA_COUNT)
+                
+                # Generate variants one at a time with progress feedback
+                for i, flavor_name in enumerate(selected_flavors):
+                    try:
+                        # Show progress
+                        print_info(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Generating with flavor: {flavor_name}...")
+                        
+                        # Generate the variant using raw input text
+                        # Pass database connection for direct save (if not preview)
+                        # Database connection is reused across all variants for efficiency
+                        idea = generator.generate_from_flavor(
+                            flavor_name=flavor_name,
+                            input_text=input_text,
+                            variation_index=i,
+                            db=db,
+                            logger=logger,
+                        )
+                        
+                        # Track saved ID if returned
+                        if idea.get('idea_id'):
+                            saved_ids.append(idea['idea_id'])
+                        
+                        variants.append(idea)
+                        
+                        if logger:
+                            logger.info(f"Generated variant {i+1}/{DEFAULT_IDEA_COUNT} with flavor: {flavor_name}")
+                    
+                    except Exception as e:
+                        print_warning(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Failed with flavor {flavor_name}: {e}")
+                        if logger:
+                            logger.warning(f"Failed to generate variant {i+1} with flavor {flavor_name}: {e}")
+                        continue
+
+            except Exception as e:
+                print_error(f"Error creating variants: {e}")
+                if logger:
+                    logger.exception("Variant creation failed")
+                continue
+
+            # Display results
+            print_section(f"Generated {len(variants)} Variant(s)")
+
+            for i, variant in enumerate(variants):
+                print(f"\n{Colors.GREEN}{'─' * 50}{Colors.END}")
+                print(
+                    f"{Colors.GREEN}{Colors.BOLD}  Variant {i+1}: {variant.get('variant_name', 'Unknown')}{Colors.END}"
+                )
+                print(f"{Colors.GREEN}{'─' * 50}{Colors.END}")
+
+                # Print the generated text
+                idea_text = variant.get('text', '')
+                print(f"  {idea_text}")
+
+                if logger:
+                    logger.info(f"Variant {i+1}: {variant.get('variant_name')}")
+                    if variant.get('idea_id'):
+                        logger.info(f"  Saved with ID: {variant['idea_id']}")
+
+            # Show summary
+            if not preview and saved_ids:
+                print_section("Database Summary")
+                print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
+                if db_path:
+                    print_info(f"Database: {db_path}")
+                print_info(f"Saved IDs: {saved_ids}")
+                if logger and db_path:
+                    logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
+            elif preview:
+                print_section("Preview Mode - No Database Save")
+                print_info(f"Created {len(variants)} variant(s) - NOT saved to database")
+                if logger:
+                    logger.info(f"Preview mode: {len(variants)} variants created but not saved")
+
+            print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
+            print("Enter new text or type 'quit' to exit.\n")
+    
+    finally:
+        # Close database connection when exiting (reusable connection cleanup)
+        if db:
+            db.close()
             if logger:
-                logger.info(f"Preview mode: {len(variants)} variants created but not saved")
-
-        print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
-        print("Enter new text or type 'quit' to exit.\n")
+                logger.info("Database connection closed")
+    
+    return 0
 
 
 def main():
