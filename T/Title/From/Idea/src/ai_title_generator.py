@@ -274,18 +274,6 @@ class AITitleGenerator:
         except Exception as e:
             logger.error(f"Failed to parse AI response: {e}")
             return None
-            
-            return TitleVariant(
-                text=title_text,
-                style=style,
-                length=length,
-                keywords=keywords,
-                score=score
-            )
-            
-        except Exception as e:
-            logger.error(f"Failed to parse AI response: {e}")
-            return None
 
 
 def generate_titles_from_idea(
