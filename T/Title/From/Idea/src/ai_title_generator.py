@@ -248,7 +248,6 @@ class AITitleGenerator:
                 continue
             
             # Remove common prefixes (like numbering: "1. ", "1) ", etc.)
-            import re
             title_text = re.sub(r'^\d+[\.\)]\s*', '', title_text)
             
             # Remove quotes if present
