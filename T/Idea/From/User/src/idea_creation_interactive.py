@@ -525,9 +525,10 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         if not preview and saved_ids:
             print_section("Database Summary")
             print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
-            print_info(f"Database: {db_path}")
+            if db_path:
+                print_info(f"Database: {db_path}")
             print_info(f"Saved IDs: {saved_ids}")
-            if logger:
+            if logger and db_path:
                 logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
         elif preview:
             print_section("Preview Mode - No Database Save")
