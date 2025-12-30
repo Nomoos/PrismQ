@@ -47,6 +47,12 @@ Průběh zpracování dat v modulu:
    - Flavory definují: typ obsahu, tón, zaměření, cílové publikum
    - 20% šance na dual-flavor kombinaci pro bohatší tematiku
 
+3. **Příprava databáze (pouze production režim):**
+   - Kontrola režimu (preview vs. production)
+   - Získání cesty k databázi (z Config nebo fallback)
+   - Setup a připojení k databázi pomocí setup_idea_database()
+   - Připravené spojení předáno do generátoru
+
 4. **Generování variant pomocí AI:**
    - Pro každý vybraný flavor (výchozí: 10x iterace):
      - Načtení flavor definice z konfigurace
@@ -54,28 +60,24 @@ Průběh zpracování dat v modulu:
      - Odeslání requestu na Ollama API
      - AI generuje odpověď pomocí `idea_improvement.txt` prompt template
      - Odpověď obsahuje 5-sentence paragraph jako kompletní refined idea
-     - Text je uložen do `hook` field přesně tak, jak byl vygenerován AI
-     - Vytvoření dočasného objektu s metadaty pro účely zobrazení:
-       - variant_name (flavor nebo dual-flavor kombinace)
-       - source_input (původní vstupní text)
-       - flavor_name, flavor_description
-       - generated_at, idea_hash
-       - keywords (z flavor definice)
-     - **Poznámka:** Metadata jsou pouze pro interní použití, do databáze se ukládá čistý AI výstup
+     - **Okamžité uložení do databáze** (pokud není preview režim):
+       - Přímé volání `db.insert_idea(text=generated_idea, version=1)`
+       - Získání idea_id (auto-increment)
+     - Vrácení minimálního objektu pro zobrazení:
+       - `text`: raw AI výstup
+       - `variant_name`: jméno flavoru (nebo kombinace)
+       - `idea_id`: ID z databáze (pokud uloženo)
 
 5. **Zobrazení výsledků:**
-   - Formátování každé varianty do čitelného textu pro konzolový výstup
+   - Zobrazení každé varianty s názvem flavoru
+   - Přímé zobrazení raw AI textu (bez formátování)
    - Barevný výstup na terminál (ANSI colors)
    - Logování do souboru (v debug režimu)
 
-6. **Ukládání do databáze (pouze production režim):**
-   - Získání cesty k databázi (z Config nebo fallback)
-   - Setup databáze pomocí setup_idea_database()
-   - Pro každou variantu:
-     - Přímé uložení AI výstupu z `hook` field do databáze (žádná transformace)
-     - Vložení do tabulky Idea (text=AI_output, version=1, created_at)
-     - Získání idea_id (auto-increment)
-   - Zobrazení potvrzení s ID
+6. **Shrnutí operace:**
+   - Zobrazení počtu uložených variant a jejich ID (production režim)
+   - Zobrazení informace o preview režimu (preview režim)
+   - Uzavření databázového spojení
 
 7. **Loop pro další iterace:**
    - Návrat na začátek pro další vstup
@@ -94,17 +96,23 @@ Průběh zpracování dat v modulu:
 Výsledkem běhu modulu je:
 
 - **Primární výstup:**
-  - 10 vygenerovaných Idea záznamů v databázi (výchozí počet)
+  - 10 vygenerovaných Idea záznamů v databázi (výchozí počet, production režim)
   - Každý záznam obsahuje čistý AI výstup (5-sentence refined idea)
-  - **Do databáze se ukládá pouze text generovaný AI, žádná metadata**
+  - **Text je uložen okamžitě po vygenerování, bez intermediate storage**
   
 - **Formát výstupu:**
-  - Konzolový výstup: Barevně formátovaný text (pouze pro zobrazení)
+  - Konzolový výstup: Raw AI text s názvem flavoru
   - Databáze (production): 10 nových záznamů v tabulce `Idea`
     - Pole `text`: Přímý výstup z AI (5 vět, bez formátování)
     - Pole `version`: Vždy 1 pro nové nápady
-    - Pole `created_at`: Časová značka vytvoření
-  - Log soubor (debug): Detailní log všech operací včetně metadata
+    - Pole `created_at`: Časová značka vytvoření (auto-generated)
+  - Log soubor (debug): Detailní log všech operací včetně ID
+  
+- **Architektura uložení:**
+  - **Direct save**: AI generuje → okamžité uložení do DB → vrácení minimálních dat pro display
+  - Žádné intermediate dictionary s metadaty
+  - Databázové spojení otevřeno před generováním, předáno do generátoru
+  - Každá varianta je uložena ihned po vygenerování
   
 - **Vedlejší efekty:**
   - Vytvoření virtual environment (.venv)
@@ -116,7 +124,8 @@ Výsledkem běhu modulu je:
 - **Chování při chybě:**
   - Import error: Zobrazení chybové zprávy, ukončení
   - Ollama chyba: RuntimeError s návodem na instalaci/spuštění (AI je povinné)
-  - Databázová chyba: Logování, zobrazení chyby, možnost pokračovat v preview režimu
+  - Databázová chyba při setup: Logování, generování pokračuje v preview režimu
+  - Databázová chyba při save: RuntimeError, varianta je přeskočena
   - AI generování selhalo: Skip problematické varianty, pokračování s ostatními
 
 ---
@@ -156,14 +165,16 @@ Výsledkem běhu modulu je:
 - **Vstupní text bez parsování**: Text jde přímo do AI promptu
 - **Žádné legacy parametry**: Pouze `input_text` (ne title/description)
 - **AI je povinné**: Žádný fallback mode - RuntimeError pokud Ollama není dostupný
-- **Přímé uložení AI výstupu**: Text z AI se ukládá do databáze přesně tak, jak byl vygenerován (žádné formátování, žádná metadata)
-- **Metadata pouze pro zobrazení**: Objekty s metadaty (flavor_name, source_input, atd.) se používají pouze pro konzolový výstup, ne pro databázi
+- **Direct save architektura**: AI generuje → okamžitě uloží do DB → vrátí minimální data pro display
+- **Žádné intermediate storage**: Eliminovány dictionary objekty s metadaty
+- **Databázové spojení v generátoru**: DB připojení předáno do `generate_from_flavor()`
 - **Dual-flavor support**: 20% šance na kombinaci dvou flavors
 - **SOLID architektura**: Externalised configuration, service-oriented design
 
 **Poznámky:**
 - Modul podporuje batch processing přes `T/Idea/Batch/src/`
 - Preview režim je klíčový pro testování bez ovlivnění databáze
+- Direct save znamená okamžité uložení po AI generování (žádné čekání na batch)
 - Flavors jsou weighted - některé se objevují častěji (optimalizace pro cílové publikum)
 - AI model může být změněn v konfiguraci (AIConfig)
 - README.md je nyní pouze navigace - detaily v _meta/docs/

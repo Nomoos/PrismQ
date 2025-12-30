@@ -77,6 +77,8 @@ class IdeaGenerator:
         input_text: str,
         variation_index: int = 0,
         second_flavor_chance: float = 0.2,
+        db = None,
+        logger = None,
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
         
@@ -85,9 +87,11 @@ class IdeaGenerator:
             input_text: Raw input text from user (no parsing or processing)
             variation_index: Variation number for uniqueness
             second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
+            db: Optional database connection for direct save after generation
+            logger: Optional logger for tracking
             
         Returns:
-            Dictionary with generated idea content
+            Dictionary with minimal data (text + variant_name + optional idea_id)
             
         Raises:
             KeyError: If flavor not found
@@ -97,22 +101,14 @@ class IdeaGenerator:
             raise ValueError("input_text parameter is required and cannot be empty")
         
         flavor = self.loader.get_flavor(flavor_name)
-        default_fields = self.loader.get_default_fields()
         seed = self._generate_seed(input_text, variation_index)
         
         # Determine if we should add a second flavor (small chance)
         rng = random.Random(seed)
         use_second_flavor = rng.random() < second_flavor_chance
         
-        # Build idea dictionary
-        idea = {
-            'flavor_name': flavor_name,
-            'variant_name': flavor_name,  # For display compatibility (used by interactive UI)
-            'flavor_description': flavor['description'],
-            'source_input': input_text,  # Store raw input
-            'variation_index': variation_index,
-            'keywords': flavor.get('keywords', []),
-        }
+        # Build variant name for display
+        variant_name = flavor_name
         
         # If using second flavor, select one and update variant name
         second_flavor_name = None
@@ -123,10 +119,9 @@ class IdeaGenerator:
             available_flavors = [f for f in all_flavors if f != flavor_name]
             if available_flavors:
                 second_flavor_name = rng.choice(available_flavors)
-                # Update variant name to show both flavors
-                idea['variant_name'] = f"{flavor_name} + {second_flavor_name}"
-                idea['flavor_name'] = idea['variant_name']
-                logger.info(f"Using dual flavor: {idea['variant_name']}")
+                variant_name = f"{flavor_name} + {second_flavor_name}"
+                if logger:
+                    logger.info(f"Using dual flavor: {variant_name}")
         
         # Generate complete refined idea using idea_improvement prompt
         if not self.ai_generator:
@@ -157,19 +152,28 @@ class IdeaGenerator:
                 f"minimum required: {self.MIN_AI_CONTENT_LENGTH}."
             )
         
-        # Store the complete generated idea as a single paragraph in the hook field
-        # Other fields remain empty since output is one continuous paragraph, not parsed
-        idea['hook'] = generated_idea
-        # Leave other fields empty
-        for field_name in default_fields.keys():
-            if field_name != 'hook':
-                idea[field_name] = ""
+        # Save directly to database if provided (not preview mode)
+        idea_id = None
+        if db:
+            try:
+                idea_id = db.insert_idea(text=generated_idea, version=1)
+                if logger:
+                    logger.debug(f"Saved idea directly to database with ID: {idea_id}")
+            except Exception as e:
+                if logger:
+                    logger.error(f"Failed to save idea to database: {e}")
+                raise RuntimeError(f"Database save failed: {e}")
         
-        # Add metadata
-        idea['generated_at'] = datetime.now().isoformat()
-        idea['idea_hash'] = self._generate_idea_hash(input_text, flavor_name, variation_index)
+        # Return minimal data for display only
+        result = {
+            'text': generated_idea,
+            'variant_name': variant_name,
+        }
         
-        return idea
+        if idea_id:
+            result['idea_id'] = idea_id
+        
+        return result
     
     def generate_multiple(
         self,
