@@ -1,6 +1,7 @@
-"""Ollama API client for title generation.
+"""Ollama API client for local AI text generation.
 
 This module handles communication with the Ollama API service.
+It provides a general-purpose interface for interacting with local AI models.
 Follows Single Responsibility Principle - only responsible for API communication.
 """
 
@@ -34,7 +35,8 @@ class OllamaClient:
     """Client for communicating with Ollama API.
     
     This class encapsulates all HTTP communication with the Ollama service,
-    providing a clean interface for generating text completions.
+    providing a clean interface for generating text completions from local AI models.
+    Can be used for any text generation task (titles, content, summaries, etc.).
     """
     
     def __init__(self, config: Optional[OllamaConfig] = None):
@@ -83,7 +85,7 @@ class OllamaClient:
         if not self.is_available():
             raise RuntimeError(
                 f"Ollama not available at {self.config.api_base}. "
-                "Ensure Ollama is running before generating titles."
+                "Ensure Ollama is running before generating text."
             )
         
         logger.debug(f"Sending prompt to Ollama (temperature={temperature})")
