@@ -47,6 +47,14 @@ Průběh zpracování dat v modulu:
    - Flavory definují: typ obsahu, tón, zaměření, cílové publikum
    - 20% šance na dual-flavor kombinaci pro bohatší tematiku
 
+3. **Příprava databáze (pouze production režim):**
+   - Kontrola režimu (preview vs. production)
+   - Získání cesty k databázi (z Config nebo fallback)
+   - **Setup databázového spojení JEDNOU při inicializaci** pomocí setup_idea_database()
+   - **DŮLEŽITÉ**: PrismQ používá JEDNU sdílenou databázi (db.s3db) pro všechny moduly
+   - Spojení je znovu použito napříč všemi vstupy pro lepší výkon
+   - Připravené spojení předáno do generátoru
+
 4. **Generování variant pomocí AI:**
    - Pro každý vybraný flavor (výchozí: 10x iterace):
      - Načtení flavor definice z konfigurace
@@ -54,37 +62,38 @@ Průběh zpracování dat v modulu:
      - Odeslání requestu na Ollama API
      - AI generuje odpověď pomocí `idea_improvement.txt` prompt template
      - Odpověď obsahuje 5-sentence paragraph jako kompletní refined idea
-     - Uložení do `hook` field (ostatní fields zůstávají prázdné)
-     - Vytvoření Idea objektu s metadaty:
-       - variant_name (flavor nebo dual-flavor kombinace)
-       - source_input (původní vstupní text)
-       - flavor_name, flavor_description
-       - generated_at, idea_hash
-       - keywords (z flavor definice)
+     - **Okamžité uložení do databáze** (pokud není preview režim):
+       - Přímé volání `db.insert_idea(text=generated_idea, version=1)` na znovu použité spojení
+       - Získání idea_id (auto-increment)
+     - Vrácení minimálního objektu pro zobrazení:
+       - `text`: raw AI výstup
+       - `variant_name`: jméno flavoru (nebo kombinace)
+       - `idea_id`: ID z databáze (pokud uloženo)
 
 5. **Zobrazení výsledků:**
-   - Formátování každé varianty do čitelného textu
+   - Zobrazení každé varianty s názvem flavoru
+   - Přímé zobrazení raw AI textu (bez formátování)
    - Barevný výstup na terminál (ANSI colors)
    - Logování do souboru (v debug režimu)
 
-6. **Ukládání do databáze (pouze production režim):**
-   - Získání cesty k databázi (z Config nebo fallback)
-   - Setup databáze pomocí setup_idea_database()
-   - Pro každou variantu:
-     - Převod na text pomocí format_idea_as_text()
-     - Vložení do tabulky Idea (text, version=1, created_at)
-     - Získání idea_id (auto-increment)
-   - Zobrazení potvrzení s ID
+6. **Shrnutí operace:**
+   - Zobrazení počtu uložených variant a jejich ID (production režim)
+   - Zobrazení informace o preview režimu (preview režim)
 
 7. **Loop pro další iterace:**
-   - Návrat na začátek pro další vstup
+   - Návrat na začátek pro další vstup (databázové spojení zůstává otevřené)
    - Možnost ukončení příkazem "quit"
 
-8. **Ošetření chybových stavů:**
+8. **Ukončení a cleanup:**
+   - Uzavření databázového spojení ve finally bloku
+   - Čisté ukončení aplikace
+
+9. **Ošetření chybových stavů:**
    - Import errors - graceful degradation, zobrazení chybové zprávy
    - Ollama nedostupný - RuntimeError s instrukcemi (AI je povinné)
-   - Databázové chyby - logování, zobrazení chyby uživateli
-   - Ctrl+C handling - čisté ukončení aplikace
+   - Databázové chyby při setup - fallback na preview režim
+   - Databázové chyby při save - logování, zobrazení chyby uživateli
+   - Ctrl+C handling - čisté ukončení aplikace s uzavřením DB
    - AI generování selhalo - skip varianty, pokračování s dalšími
 
 ---
@@ -93,14 +102,26 @@ Průběh zpracování dat v modulu:
 Výsledkem běhu modulu je:
 
 - **Primární výstup:**
-  - 10 vygenerovaných Idea objektů (variant nápadů, výchozí počet)
-  - Každý obsahuje kompletní 5-sentence refined idea v `hook` field
-  - Ostatní fields jsou prázdné (žádné parsování výstupu)
+  - 10 vygenerovaných Idea záznamů v databázi (výchozí počet, production režim)
+  - Každý záznam obsahuje čistý AI výstup (5-sentence refined idea)
+  - **Text je uložen okamžitě po vygenerování, bez intermediate storage**
   
 - **Formát výstupu:**
-  - Konzolový výstup: Barevně formátovaný text
+  - Konzolový výstup: Raw AI text s názvem flavoru
   - Databáze (production): 10 nových záznamů v tabulce `Idea`
-  - Log soubor (debug): Detailní log všech operací
+    - Pole `text`: Přímý výstup z AI (5 vět, bez formátování)
+    - Pole `version`: Vždy 1 pro nové nápady
+    - Pole `created_at`: Časová značka vytvoření (auto-generated)
+  - Log soubor (debug): Detailní log všech operací včetně ID
+  
+- **Architektura uložení:**
+  - **Reusable DB connection**: Databázové spojení nastaveno JEDNOU při inicializaci
+  - **Direct save**: AI generuje → okamžité uložení do DB → vrácení minimálních dat pro display
+  - **Single shared database**: PrismQ používá JEDNU databázi (db.s3db) pro všechny moduly
+  - Žádné intermediate dictionary s metadaty
+  - Databázové spojení znovu použito napříč všemi variantami a vstupy
+  - Každá varianta je uložena ihned po vygenerování
+  - Spojení uzavřeno při ukončení v finally bloku
   
 - **Vedlejší efekty:**
   - Vytvoření virtual environment (.venv)
@@ -112,7 +133,8 @@ Výsledkem běhu modulu je:
 - **Chování při chybě:**
   - Import error: Zobrazení chybové zprávy, ukončení
   - Ollama chyba: RuntimeError s návodem na instalaci/spuštění (AI je povinné)
-  - Databázová chyba: Logování, zobrazení chyby, možnost pokračovat v preview režimu
+  - Databázová chyba při setup: Logování, generování pokračuje v preview režimu
+  - Databázová chyba při save: RuntimeError, varianta je přeskočena
   - AI generování selhalo: Skip problematické varianty, pokračování s ostatními
 
 ---
@@ -152,16 +174,23 @@ Výsledkem běhu modulu je:
 - **Vstupní text bez parsování**: Text jde přímo do AI promptu
 - **Žádné legacy parametry**: Pouze `input_text` (ne title/description)
 - **AI je povinné**: Žádný fallback mode - RuntimeError pokud Ollama není dostupný
-- **Single paragraph output**: Vše v `hook` field, ostatní fields prázdné
+- **Direct save architektura**: AI generuje → okamžitě uloží do DB → vrátí minimální data pro display
+- **Reusable DB connection**: Spojení nastaveno JEDNOU při inicializaci, znovu použito pro všechny operace
+- **Single shared database**: PrismQ používá JEDNU databázi (db.s3db) pro VŠECHNY moduly
+- **Žádné intermediate storage**: Eliminovány dictionary objekty s metadaty
+- **Databázové spojení v generátoru**: DB připojení předáno do `generate_from_flavor()`
 - **Dual-flavor support**: 20% šance na kombinaci dvou flavors
 - **SOLID architektura**: Externalised configuration, service-oriented design
 
 **Poznámky:**
 - Modul podporuje batch processing přes `T/Idea/Batch/src/`
 - Preview režim je klíčový pro testování bez ovlivnění databáze
+- **VAROVÁNÍ**: Nikdy nevytvářejte vícenásobné databáze nebo oddělené DB soubory
+- Direct save znamená okamžité uložení po AI generování (žádné čekání na batch)
 - Flavors jsou weighted - některé se objevují častěji (optimalizace pro cílové publikum)
 - AI model může být změněn v konfiguraci (AIConfig)
 - README.md je nyní pouze navigace - detaily v _meta/docs/
+- Databáze ukládá pouze čistý text z AI - žádné JSON objekty, struktury nebo formátování
 
 **Rizika:**
 - **AI nedostupnost**: Pokud Ollama server není spuštěn nebo model není nainstalován, modul vyhodí RuntimeError (žádný fallback)

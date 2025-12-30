@@ -1,5 +1,28 @@
 # GitHub Copilot Instructions for PrismQ
 
+## ⚠️ CRITICAL: Single Shared Database
+
+**PrismQ uses ONE shared database (db.s3db) for ALL modules.**
+
+- **Database File**: `C:/PrismQ/db.s3db` (or working directory)
+- **All Tables**: Idea, Story, Title, Content, Publishing, Analytics - ALL in ONE database
+- **DO NOT**: Create multiple databases or separate database files
+- **DO NOT**: Create new database connections per operation - reuse existing connections
+- **Connection Management**: Setup once at initialization, reuse across operations, close on exit
+
+This is documented in:
+- `src/__init__.py` (line 12): "Shared database (db.s3db) for all content storage"
+- `src/startup.py`: DatabaseConfig for single database path
+- Module docstrings: IMPORTANT warnings about single database
+
+When working with database code:
+1. Always check if a database connection already exists
+2. Reuse existing connections instead of creating new ones
+3. Document that the connection is to the shared db.s3db
+4. Never create separate databases for different modules
+
+---
+
 ## 🎯 Core Principles
 
 ### 1. Make Small, Surgical Changes
