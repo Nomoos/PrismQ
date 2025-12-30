@@ -6,8 +6,9 @@ Follows SOLID principles with dependency injection and single responsibility.
 """
 
 import logging
-import re
+import re  # Used for parsing multiline AI responses (removing numbering)
 import sys
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -281,9 +282,11 @@ class AITitleGenerator:
     def _parse_response(self, response_text: str, idea: Idea) -> Optional[TitleVariant]:
         """Parse AI response into a TitleVariant (legacy single-title parsing).
         
-        This method is kept for backward compatibility but is no longer used
-        by the main generate_from_idea method, which now uses
-        _parse_multiline_response instead.
+        .. deprecated::
+            This method is kept for backward compatibility but is no longer used
+            by the main generate_from_idea method, which now uses
+            _parse_multiline_response instead. This method may be removed in a
+            future version.
         
         Args:
             response_text: Raw text from AI
@@ -292,6 +295,13 @@ class AITitleGenerator:
         Returns:
             TitleVariant object or None if parsing fails
         """
+        warnings.warn(
+            "_parse_response is deprecated and will be removed in a future version. "
+            "Use _parse_multiline_response instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        
         try:
             # Clean the response
             title_text = response_text.strip()
