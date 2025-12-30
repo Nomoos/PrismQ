@@ -482,7 +482,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                         
                         # Generate the variant using raw input text
                         # Pass database connection for direct save (if not preview)
-                        # Database connection is reused across all variants for efficiency
                         idea = generator.generate_from_flavor(
                             flavor_name=flavor_name,
                             input_text=input_text,
