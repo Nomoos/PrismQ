@@ -6,7 +6,7 @@ Follows SOLID principles with dependency injection and single responsibility.
 """
 
 import logging
-import random
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -118,8 +118,8 @@ class AITitleGenerator:
     ) -> List[TitleVariant]:
         """Generate title variants from an Idea using AI.
         
-        This method generates multiple title options by calling the AI model
-        multiple times with randomized temperature for diversity.
+        This method generates multiple title options by calling the AI model once,
+        which returns all variants in a single response (one per line).
         
         Args:
             idea: Idea object to generate titles from
@@ -153,30 +153,30 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
         
-        # Create prompt with idea content
+        # Create prompt with idea content (directly inserted without analysis)
         prompt = self._create_prompt(idea)
         logger.info(f"Generating {n_variants} title variants")
         logger.debug(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
         
-        # Generate variants with random temperature for diversity
+        # Generate all variants in a single AI call
         variants = []
         try:
-            for i in range(n_variants):
-                # Random temperature in sweet spot for creative titles
-                temp = random.uniform(
-                    self.config.temperature_min,
-                    self.config.temperature_max
-                )
-                
-                # Generate title from AI
-                response_text = self.ollama_client.generate(prompt, temperature=temp)
-                
-                # Parse and score the response
-                variant = self._parse_response(response_text, idea)
-                if variant:
-                    variants.append(variant)
+            # Use a moderate temperature for balanced creativity
+            temp = (self.config.temperature_min + self.config.temperature_max) / 2
             
-            return variants
+            # Generate titles from AI (returns multiple lines)
+            response_text = self.ollama_client.generate(prompt, temperature=temp)
+            
+            # Parse all variants from the response (one per line)
+            variants = self._parse_multiline_response(response_text, idea)
+            
+            # If we didn't get enough variants, log a warning
+            if len(variants) < n_variants:
+                logger.warning(
+                    f"AI returned {len(variants)} variants, expected {n_variants}"
+                )
+            
+            return variants[:n_variants]  # Return up to n_variants
             
         except Exception as e:
             error_msg = f"AI title generation failed: {e}"
@@ -186,26 +186,97 @@ class AITitleGenerator:
     def _create_prompt(self, idea: Idea) -> str:
         """Create the title generation prompt.
         
+        This method directly inserts the Idea text into the prompt template
+        without any analysis or preprocessing. The complete Idea content
+        (concept or title) is passed as-is to the AI model.
+        
         Args:
             idea: Idea object
         
         Returns:
             Formatted prompt string with idea content
         """
-        # Extract the complete idea text (concept is the primary content)
+        # Extract the complete idea text without analysis
+        # Use concept as primary content, fallback to title
         idea_text = idea.concept or idea.title or "No idea provided"
         
         # Load the literary-focused prompt template
         template = self.prompt_loader.get_title_generation_prompt()
         
-        # Format with idea text
+        # Format with idea text (direct insertion without analysis)
         return template.format(IDEA=idea_text)
     
-    def _parse_response(self, response_text: str, idea: Idea) -> Optional[TitleVariant]:
-        """Parse AI response into a TitleVariant.
+    def _parse_multiline_response(
+        self, response_text: str, idea: Idea
+    ) -> List[TitleVariant]:
+        """Parse AI response containing multiple title variants (one per line).
         
-        The literary prompt generates a single title (plain text), so we
-        simply clean it and create a variant with scoring.
+        The AI model returns 10 title variants, each on a separate line.
+        This method parses them and creates TitleVariant objects with scoring.
+        
+        Args:
+            response_text: Raw text from AI (multiple lines)
+            idea: Original idea (for extracting keywords)
+        
+        Returns:
+            List of TitleVariant objects
+        """
+        variants = []
+        
+        # Extract keywords from idea (for all variants)
+        keywords = []
+        if hasattr(idea, "keywords") and idea.keywords:
+            keywords = idea.keywords[:3]
+        
+        # Split response into lines and parse each
+        lines = response_text.strip().split('\n')
+        
+        for line in lines:
+            # Clean the line
+            title_text = line.strip()
+            
+            # Skip empty lines
+            if not title_text:
+                continue
+            
+            # Remove common prefixes (like numbering: "1. ", "1) ", etc.)
+            import re
+            title_text = re.sub(r'^\d+[\.\)]\s*', '', title_text)
+            
+            # Remove quotes if present
+            if title_text.startswith('"') and title_text.endswith('"'):
+                title_text = title_text[1:-1]
+            if title_text.startswith("'") and title_text.endswith("'"):
+                title_text = title_text[1:-1]
+            
+            # Validate - skip invalid titles
+            if not title_text or len(title_text) < 3:
+                logger.debug(f"Skipping invalid title: '{title_text}'")
+                continue
+            
+            # Infer style and calculate score
+            style = self.scorer.infer_style(title_text)
+            score = self.scorer.score_by_length(title_text)
+            length = len(title_text)
+            
+            variant = TitleVariant(
+                text=title_text,
+                style=style,
+                length=length,
+                keywords=keywords,
+                score=score
+            )
+            variants.append(variant)
+        
+        logger.info(f"Parsed {len(variants)} title variants from AI response")
+        return variants
+    
+    def _parse_response(self, response_text: str, idea: Idea) -> Optional[TitleVariant]:
+        """Parse AI response into a TitleVariant (legacy single-title parsing).
+        
+        This method is kept for backward compatibility but is no longer used
+        by the main generate_from_idea method, which now uses
+        _parse_multiline_response instead.
         
         Args:
             response_text: Raw text from AI
