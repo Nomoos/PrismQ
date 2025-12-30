@@ -43,20 +43,14 @@ class TestAITitleGeneratorRefactored:
 
     @patch("ollama_client.requests.get")
     def test_generate_from_idea(self, mock_get):
-        """Test generating titles from an idea."""
+        """Test generating titles from an idea (one-by-one approach)."""
         mock_get.return_value = Mock(status_code=200)
         
         with patch("ollama_client.requests.post") as mock_post:
-            # Mock response with multiple title lines (as returned by AI)
+            # Mock response with single title per call (one-by-one generation)
             mock_post.return_value = Mock(
                 status_code=200,
-                json=lambda: {"response": 
-                    "The Mirror's Silent Message\n"
-                    "Reflections in the Dark\n"
-                    "When Light Meets Shadow\n"
-                    "The Echo of Glass\n"
-                    "Through the Looking Glass\n"
-                }
+                json=lambda: {"response": "The Mirror's Silent Message"}
             )
             
             generator = AITitleGenerator()
@@ -70,6 +64,8 @@ class TestAITitleGeneratorRefactored:
             
             assert len(variants) == 3
             assert all(isinstance(v, TitleVariant) for v in variants)
+            # Verify AI was called 3 times (once per variant)
+            assert mock_post.call_count == 3
 
     @patch("ollama_client.requests.get")
     def test_prompt_uses_literary_template(self, mock_get):

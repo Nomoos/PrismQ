@@ -36,12 +36,15 @@ PrismQ.T.Content.Draft (v0)
 
 1. Directly insert Idea concept into AI prompt template (no preprocessing or analysis)
 2. Create 10 Story objects, each referencing the source Idea (FK relationship)
-3. Call local AI (Ollama) once with the prompt to generate 10 title variants
-4. AI returns 10 title variants, one per line, ready for parsing
-5. Parse and score each variant based on length and style
-6. Create first Title (v0) for each Story using generated variants
+3. Generate 10 title variants one-by-one, each with randomized temperature (0.6-0.8) for creative diversity
+4. For each variant:
+   - Call local AI (Ollama) with the prompt
+   - AI returns one high-quality title
+   - Parse and score based on length (ideal: 40-60 characters) and readability
+5. Sort variants by quality score
+6. Create first Title (v0) for each Story using best-scored variants
 7. Update each Story's state to next workflow step
-8. Titles are optimized for emotional depth and book-style narrative (45-52 characters ideal)
+8. Titles are optimized for emotional depth, readability, and book-style narrative (40-60 characters ideal)
 9. Return Stories with their Titles
 
 ## Output
