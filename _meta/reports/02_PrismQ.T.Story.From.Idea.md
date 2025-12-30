@@ -72,8 +72,8 @@ Průběh zpracování dat v modulu:
    - Automatické zpracování nových Ideas
 
 8. **Ošetření chybových stavů:**
-   - Prázdná Idea tabulka - informační zpráva, ukončení
-   - Všechny Ideas už mají Stories - informační zpráva, ukončení
+   - Prázdná Idea tabulka - informační zpráva, čekání 30 sekund a opakování (continuous mode)
+   - Všechny Ideas už mají Stories - informační zpráva, čekání 30 sekund a opakování (continuous mode)
    - Databázové chyby - rollback, logování, zobrazení chyby
    - Import errors - graceful degradation
    - Ctrl+C handling - čisté ukončení s uzavřením DB
@@ -103,7 +103,7 @@ Výsledkem běhu modulu je:
 - **Chování při chybě:**
   - Import error: Zobrazení chybové zprávy, ukončení
   - Databázová chyba: Rollback transakce, logování, zobrazení chyby
-  - Žádné Ideas k zpracování: Informační zpráva, čisté ukončení
+  - Žádné Ideas k zpracování: Informační zpráva, čekání 30 sekund a opakování (continuous mode)
   - Partial failure: Zpracované Stories se commitnou, chyba se zaloguje
 
 ---
