@@ -21,11 +21,19 @@ sys.path.insert(0, str(model_path))
 
 from idea import Idea
 
-# Import refactored components using relative imports for package consistency
-from .ollama_client import OllamaClient, OllamaConfig
-from .prompt_loader import PromptLoader
-from .title_scorer import TitleScorer, ScoringConfig
-from .title_variant import TitleVariant
+# Import refactored components
+# Try relative imports first (when used as package), fallback to absolute
+try:
+    from .ollama_client import OllamaClient, OllamaConfig
+    from .prompt_loader import PromptLoader
+    from .title_scorer import TitleScorer, ScoringConfig
+    from .title_variant import TitleVariant
+except ImportError:
+    # Fallback for when module is imported directly (e.g., in tests)
+    from ollama_client import OllamaClient, OllamaConfig
+    from prompt_loader import PromptLoader
+    from title_scorer import TitleScorer, ScoringConfig
+    from title_variant import TitleVariant
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +127,9 @@ class AITitleGenerator:
         """Generate title variants from an Idea using AI.
         
         This method generates multiple title options by calling the AI model
-        multiple times with randomized temperature for diversity.
+        multiple times with randomized temperature for diversity. Each call
+        generates one high-quality title with varying temperature to ensure
+        creative diversity.
         
         Args:
             idea: Idea object to generate titles from
@@ -127,7 +137,7 @@ class AITitleGenerator:
                          Uses config default if not specified.
         
         Returns:
-            List of TitleVariant objects
+            List of TitleVariant objects sorted by quality score
         
         Raises:
             ValueError: If idea is invalid or num_variants out of range
@@ -153,12 +163,12 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
         
-        # Create prompt with idea content
+        # Create prompt with idea content (directly inserted without analysis)
         prompt = self._create_prompt(idea)
-        logger.info(f"Generating {n_variants} title variants")
+        logger.info(f"Generating {n_variants} title variants (one-by-one for quality)")
         logger.debug(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
         
-        # Generate variants with random temperature for diversity
+        # Generate variants one-by-one with random temperature for diversity
         variants = []
         try:
             for i in range(n_variants):
@@ -168,6 +178,8 @@ class AITitleGenerator:
                     self.config.temperature_max
                 )
                 
+                logger.debug(f"Generating title {i+1}/{n_variants} with temperature={temp:.2f}")
+                
                 # Generate title from AI
                 response_text = self.ollama_client.generate(prompt, temperature=temp)
                 
@@ -175,7 +187,14 @@ class AITitleGenerator:
                 variant = self._parse_response(response_text, idea)
                 if variant:
                     variants.append(variant)
+                    logger.debug(f"  Generated: '{variant.text}' (score={variant.score:.2f})")
+                else:
+                    logger.warning(f"  Failed to parse response for variant {i+1}")
             
+            # Sort by score (highest first) for better quality results
+            variants.sort(key=lambda v: v.score, reverse=True)
+            
+            logger.info(f"Successfully generated {len(variants)}/{n_variants} title variants")
             return variants
             
         except Exception as e:
@@ -186,26 +205,31 @@ class AITitleGenerator:
     def _create_prompt(self, idea: Idea) -> str:
         """Create the title generation prompt.
         
+        This method directly inserts the Idea text into the prompt template
+        without any analysis or preprocessing. The complete Idea content
+        (concept or title) is passed as-is to the AI model.
+        
         Args:
             idea: Idea object
         
         Returns:
             Formatted prompt string with idea content
         """
-        # Extract the complete idea text (concept is the primary content)
+        # Extract the complete idea text without analysis
+        # Use concept as primary content, fallback to title
         idea_text = idea.concept or idea.title or "No idea provided"
         
         # Load the literary-focused prompt template
         template = self.prompt_loader.get_title_generation_prompt()
         
-        # Format with idea text
+        # Format with idea text (direct insertion without analysis)
         return template.format(IDEA=idea_text)
     
     def _parse_response(self, response_text: str, idea: Idea) -> Optional[TitleVariant]:
         """Parse AI response into a TitleVariant.
         
-        The literary prompt generates a single title (plain text), so we
-        simply clean it and create a variant with scoring.
+        The AI prompt generates a single title (plain text), so we
+        clean it and create a variant with scoring.
         
         Args:
             response_text: Raw text from AI

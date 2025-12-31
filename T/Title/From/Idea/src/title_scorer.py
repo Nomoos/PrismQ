@@ -24,11 +24,11 @@ class ScoringConfig:
         long_score: Score for titles that are too long
     """
     
-    ideal_length_min: int = 45
-    ideal_length_max: int = 52
-    good_length_min: int = 40
-    good_length_max: int = 55
-    acceptable_length_max: int = 60
+    ideal_length_min: int = 40
+    ideal_length_max: int = 60
+    good_length_min: int = 35
+    good_length_max: int = 65
+    acceptable_length_max: int = 70
     ideal_score: float = 0.95
     good_score: float = 0.90
     short_score: float = 0.80
@@ -54,7 +54,7 @@ class TitleScorer:
     def score_by_length(self, title: str) -> float:
         """Score a title based on its character length.
         
-        Titles in the ideal range (45-52 chars) get the highest scores.
+        Titles in the ideal range (40-60 chars) get the highest scores.
         Scores decrease for titles that are too short or too long.
         
         Args:
@@ -66,13 +66,13 @@ class TitleScorer:
         length = len(title)
         
         if self.config.ideal_length_min <= length <= self.config.ideal_length_max:
-            return self.config.ideal_score  # Ideal length (45-52 chars)
+            return self.config.ideal_score  # Ideal length (40-60 chars)
         elif self.config.good_length_min <= length <= self.config.good_length_max:
-            return self.config.good_score  # Good length (40-55 chars)
+            return self.config.good_score  # Good length (35-65 chars)
         elif length < self.config.good_length_min:
             return self.config.short_score  # A bit short
         elif length <= self.config.acceptable_length_max:
-            return self.config.acceptable_score  # A bit long but acceptable (56-60 chars)
+            return self.config.acceptable_score  # A bit long but acceptable (66-70 chars)
         else:
             return self.config.long_score  # Too long
     
