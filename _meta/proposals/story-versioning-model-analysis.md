@@ -203,7 +203,7 @@ For 1000 stories: 250MB (vs. ~5MB with diff-based approach)
 
 ### 3.1 Current T/Script Versioning (Python)
 
-The existing system (documented in `T/Script/STRUCTURE_AND_VERSIONING.md`) uses a different approach:
+The existing system (documented in `T/Script/_meta/docs/STRUCTURE_AND_VERSIONING.md`) uses a different approach:
 
 ```python
 @dataclass
