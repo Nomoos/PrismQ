@@ -1,36 +1,16 @@
-"""T.Content - Content processing and generation utilities.
+"""PrismQ.T.Content - AI Content Writer with Feedback Loop
 
-This module provides generic functionality for handling content
-(processing, validation, transformation, AI generation).
+AI-powered script writer with iterative optimization based on review feedback.
 
-Module Hierarchy:
-- This is at PrismQ.T.Content level
-- Uses T foundation services (AI from T/src)
-- Independent of content origin (Idea, Story, etc.)
+Note: The ScriptWriter is located in T/Content/src/ but exported through
+the parent module for cleaner imports: `from PrismQ.T.Content import ScriptWriter`
 """
 
-import sys
-from pathlib import Path
-
-# Add T/src to path for import
-T_SRC = Path(__file__).parent.parent.parent / "src"  # T/src
-sys.path.insert(0, str(T_SRC))
-
-# Re-export AI config from T foundation level for convenience
-from ai_config import (
-    AISettings,
-    create_ai_config,
-    check_ollama_available,
-    DEFAULT_AI_MODEL,
-    AI_TEMPERATURE_MIN,
-    AI_TEMPERATURE_MAX,
+from .script_writer import (
+    FeedbackLoopIteration,
+    OptimizationResult,
+    OptimizationStrategy,
+    ScriptWriter,
 )
 
-__all__ = [
-    "AISettings",
-    "create_ai_config",
-    "check_ollama_available",
-    "DEFAULT_AI_MODEL",
-    "AI_TEMPERATURE_MIN",
-    "AI_TEMPERATURE_MAX",
-]
+__all__ = ["ScriptWriter", "OptimizationStrategy", "OptimizationResult", "FeedbackLoopIteration"]
