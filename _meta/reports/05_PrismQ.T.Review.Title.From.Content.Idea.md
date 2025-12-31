@@ -67,7 +67,12 @@ Průběh zpracování dat v modulu:
    - Rating score a issues
    - Rozhodnutí (pass/fail)
 
-7. **Ošetření chyb:**
+7. **Loop pro další Stories:**
+   - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
+   - Možnost ukončení
+
+8. **Ošetření chyb:**
+   - Žádné Stories k zpracování - informační zpráva, čekání 30 sekund a opakování (continuous mode)
    - AI nedostupný - error message, ukončení
    - Review parsing failed - retry, pak skip
    - DB errors - rollback, logování
