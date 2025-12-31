@@ -6,15 +6,17 @@
 
 All other modules must:
 1. Run in continuous mode (processing items from database)
-2. Wait 30 seconds when no items are available to process
-3. NOT have Manual.bat scripts
-4. Mark any --manual or --interactive flags as "[DEBUG ONLY]"
+2. Wait **1ms between iterations** when processing items
+3. Wait **30 seconds** when no items are available (to prevent busy-waiting)
+4. NOT have Manual.bat scripts
+5. Mark any --manual or --interactive flags as "[DEBUG ONLY]"
 
 ## Rationale
 
 - **From.User modules** accept direct user input and are inherently interactive
 - **All other modules** process data from previous pipeline steps and should run autonomously
-- The 30-second wait prevents busy-waiting while allowing responsive processing when items are available
+- **1ms wait between iterations** provides high throughput while preventing CPU saturation
+- **30-second wait when idle** prevents busy-waiting while allowing responsive processing when new items arrive
 
 ## Implementation Pattern
 
@@ -35,14 +37,16 @@ class SomeService:
 ### Workflow File (`*_workflow.py`)
 ```python
 def get_wait_interval(pending_count: int) -> float:
-    """Dynamic wait based on workload."""
+    """Calculate wait interval based on workload.
+    
+    Returns:
+        - 30.0 seconds when 0 items (wait for new items)
+        - 0.001 seconds (1 ms) when > 0 items (between iterations)
+    """
     if pending_count == 0:
         return 30.0  # 30 seconds when idle
-    elif pending_count >= 100:
-        return 0.001  # 1 ms when busy
     else:
-        # Linear interpolation
-        return 0.001 + 0.999 * (100 - pending_count) / 99
+        return 0.001  # 1 ms between iterations
 
 def main():
     while True:
@@ -58,9 +62,8 @@ def main():
         # Process oldest
         result = service.process_oldest_story()
         
-        # Wait before next
-        remaining = pending - 1
-        time.sleep(get_wait_interval(remaining))
+        # Wait 1ms before next iteration
+        time.sleep(0.001)
 ```
 
 ### Run.bat

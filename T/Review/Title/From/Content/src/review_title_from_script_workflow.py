@@ -84,17 +84,13 @@ def get_wait_interval(pending_count: int) -> float:
         
     Returns:
         Wait interval in seconds:
-        - 30.0 seconds when 0 stories
-        - 0.001 (1 ms) when >= 100 stories
-        - Gradually increasing from 1 ms to 1 second when 1-99 stories
+        - 30.0 seconds when 0 stories (wait for new items)
+        - 0.001 (1 ms) when > 0 stories (between iterations)
     """
     if pending_count == 0:
         return 30.0  # 30 seconds when nothing to process
-    elif pending_count >= 100:
-        return 0.001  # 1 ms when many stories
     else:
-        # Linear interpolation from 1 ms (at 100) to 1 second (at 1)
-        return 0.001 + 0.999 * (100 - pending_count) / 99
+        return 0.001  # 1 ms between iterations
 
 
 def format_wait_time(interval: float) -> str:

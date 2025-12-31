@@ -139,18 +139,13 @@ def get_wait_interval(unreferenced_count: int) -> float:
 
     Returns:
         Wait interval in seconds:
-        - 0.001 (1 ms) when >= 100 unreferenced ideas
-        - Gradually increasing from 1 ms to 1 second when 1-99 unreferenced ideas
-        - 30.0 seconds when 0 unreferenced ideas
+        - 30.0 seconds when 0 unreferenced ideas (wait for new items)
+        - 0.001 (1 ms) when > 0 unreferenced ideas (between iterations)
     """
     if unreferenced_count == 0:
         return 30.0  # 30 seconds when no ideas to process
-    elif unreferenced_count >= 100:
-        return 0.001  # 1 ms when plenty of ideas
     else:
-        # Linear interpolation from 1 ms (at 100) to 1 second (at 1)
-        # interval = 0.001 + (1.0 - 0.001) * (100 - count) / 99
-        return 0.001 + 0.999 * (100 - unreferenced_count) / 99
+        return 0.001  # 1 ms between iterations
 
 
 def format_wait_time(interval: float) -> str:

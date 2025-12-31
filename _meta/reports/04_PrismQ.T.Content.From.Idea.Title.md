@@ -107,7 +107,7 @@ Průběh zpracování dat v modulu:
     - Statistiky zpracování
 
 10. **Loop pro další Stories:**
-    - V continuous mode: pokračování na další Story, pokud není žádná, čekání 30 sekund a opakování dotazu
+    - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
     - Možnost ukončení
 
 11. **Ošetření chybových stavů:**

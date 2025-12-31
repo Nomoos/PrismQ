@@ -542,8 +542,8 @@ def run_state_workflow_mode(
     This mode automatically and continuously processes Stories with state PrismQ.T.Title.From.Idea,
     generates titles using AI with similarity checking, and transitions to the next state.
     
-    Runs continuously by default with 30-second wait between checks when no stories
-    are found, checking for new stories to process. Press Ctrl+C to stop.
+    Runs continuously by default with 1ms wait between iterations when processing items,
+    and 30-second wait when no stories are found. Press Ctrl+C to stop.
 
     IMPORTANT: This mode requires AI (Ollama) to be running. If AI is unavailable,
     the script will raise an error and stop - no fallback titles will be generated.
@@ -585,7 +585,7 @@ def run_state_workflow_mode(
 
     # Print header - CONTINUOUS MODE is now default
     print_header("PrismQ.T.Title.From.Idea - CONTINUOUS MODE")
-    print_info("Running continuously - waits 30 seconds when no Stories to process")
+    print_info("Running continuously - 1ms between iterations, 30s when no Stories")
     print_info("Press Ctrl+C to stop")
     print()
 
