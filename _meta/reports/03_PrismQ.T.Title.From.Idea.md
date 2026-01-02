@@ -1,7 +1,7 @@
 # Kontrola běhu modulu: PrismQ.T.Title.From.Idea
 
 ## 🎯 Účel modulu
-Generování titulků pro Story objekty na základě původních Ideas. Modul používá AI k vytvoření kvalitních, atraktivních titulků s hodnocením a výběrem nejlepší varianty. Podporuje continuous mode pro automatické zpracování a manuální režim pro jednotlivé Stories.
+Generování titulků pro Story objekty na základě původních Ideas. Modul používá AI k vytvoření kvalitních, atraktivních titulků s hodnocením a výběrem nejlepší varianty. Podporuje continuous mode pro automatické zpracování.
 
 ---
 
@@ -17,8 +17,7 @@ Modul přijímá následující vstupy:
 - **Nepovinné hodnoty:**
   - `--preview` flag - režim bez uložení do databáze
   - `--debug` flag - detailní logování
-  - `--manual` flag - manuální výběr Stories k zpracování
-  - Continuous mode parametr (1ms delay mezi běhy)
+  - Continuous mode parametr (čekání 30 sekund pokud nejsou Stories k zpracování)
 - **Očekávané předpoklady:**
   - Story záznamy vytvořené modulem 02
   - Běžící Ollama server (localhost:11434)
@@ -44,9 +43,9 @@ Průběh zpracování dat v modulu:
    - Načtení Idea textu pro každou Story (přes idea_id)
    - Filtrování pouze nezpracovaných Stories
 
-3. **Continuous mode vs Manual mode:**
-   - **Continuous mode**: Automatické zpracování všech Stories s 1ms delay
-   - **Manual mode**: Interaktivní výběr konkrétních Stories
+3. **Continuous mode:**
+   - **Continuous mode**: Automatické zpracování všech Stories
+   - Pokud nejsou Stories k zpracování: čekání 30 sekund a opakování dotazu
 
 4. **Generování variant titulků (pro každou Story):**
    - Načtení Idea textu z databáze
@@ -92,12 +91,11 @@ Průběh zpracování dat v modulu:
    - Barevný formátovaný výstup
 
 10. **Loop pro další Stories:**
-    - V continuous mode: 1ms delay, pokračování na další Story
-    - V manual mode: čekání na další výběr
+    - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
     - Možnost ukončení
 
 11. **Ošetření chybových stavů:**
-    - Žádné Stories k zpracování - informační zpráva
+    - Žádné Stories k zpracování - informační zpráva, čekání 30 sekund a opakování (continuous mode)
     - Ollama nedostupný - chybová zpráva, ukončení
     - AI generování selhalo - retry mechanismus (3x), pak skip
     - Databázové chyby - rollback, logování
@@ -172,11 +170,10 @@ Výsledkem běhu modulu je:
 ## 📝 Poznámky / Rizika
 
 **Poznámky:**
-- Modul podporuje tři režimy běhu: continuous, manual, preview
-- Continuous mode běží s 1ms delay pro vysokou propustnost
+- Modul podporuje dva režimy běhu: continuous, preview
+- Continuous mode běží s automatickým zpracováním - čeká 30 sekund pokud nejsou Stories k zpracování
 - Title scoring je komplexní - kombinuje délku, čitelnost, SEO, emocionální dopad
 - Modul cachuje AI prompts pro rychlejší běhy
-- Manual.bat umožňuje interaktivní zpracování jednotlivých Stories
 - Modul je nejvíce CPU-intensive v celém pipeline (AI generování)
 
 **Rizika:**

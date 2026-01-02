@@ -34,7 +34,18 @@ Průběh zpracování dat v modulu:
 3. **Vyhodnocení a rozhodnutí:**
    - Pass → Změna stavu na "PrismQ.T.Review.Title.From.Content" (modul 07)
    - Fail → Změna stavu na "PrismQ.T.Content.From.Title.Content.Review" (modul 09 - regenerace content)
-4. **Update Story a reportování**
+
+4. **Loop pro další Stories:**
+   - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
+   - Možnost ukončení
+
+5. **Update Story a reportování**
+
+6. **Ošetření chyb:**
+   - Žádné Stories k zpracování - informační zpráva, čekání 30 sekund a opakování (continuous mode)
+   - AI nedostupný - error message, ukončení
+   - Review parsing failed - retry, pak skip
+   - DB errors - rollback, logování
 
 ---
 

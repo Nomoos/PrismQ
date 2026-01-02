@@ -1,20 +1,25 @@
 @echo off
 REM Run.bat - PrismQ.T.Content.From.Idea.Title
-REM Generate content from title and idea - saves to database
+REM Continuous workflow - process stories from database
 REM
 REM Usage: Run.bat
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
+
+REM Start Ollama if not running
+call ..\common\start_ollama.bat
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
+
 call :setup_env
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Content.From.Idea.Title - RUN MODE
+echo PrismQ.T.Content.From.Idea.Title - CONTINUOUS MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Content\From\Idea\Title\src\content_from_idea_title_interactive.py
+python ..\..\..\T\Content\From\Idea\Title\src\content_from_idea_title_workflow.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

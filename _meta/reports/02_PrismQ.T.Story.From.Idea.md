@@ -68,6 +68,7 @@ Průběh zpracování dat v modulu:
    - Barevný formátovaný výstup
 
 7. **Loop pro continuous processing:**
+   - Čekání 1ms mezi iteracemi při zpracování Ideas
    - Možnost opakovaného spuštění
    - Automatické zpracování nových Ideas
 

@@ -100,14 +100,18 @@ Průběh zpracování dat v modulu:
    - Commit transakce
    - Zalogování úspěšného update
 
-10. **Reportování:**
+9. **Reportování:**
     - Zobrazení vygenerovaného obsahu (zkrácená verze)
     - Zobrazení word count a estimated duration
     - Progress indikace
     - Statistiky zpracování
 
+10. **Loop pro další Stories:**
+    - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
+    - Možnost ukončení
+
 11. **Ošetření chybových stavů:**
-    - Žádné Stories k zpracování - informační zpráva
+    - Žádné Stories k zpracování - informační zpráva, čekání 30 sekund a opakování (continuous mode)
     - Ollama nedostupný - chybová zpráva, ukončení
     - AI generování selhalo - retry (3x), pak skip
     - Content příliš dlouhý - re-generování s přísnějšími omezeními

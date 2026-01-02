@@ -7,16 +7,18 @@ AI is REQUIRED - no template-based fallback is available.
 Usage:
     python title_from_idea_interactive.py                    # Continuous mode (default)
     python title_from_idea_interactive.py --preview          # Preview mode (no DB save)
-    python title_from_idea_interactive.py --interactive      # Interactive mode (manual input)
 
 Modes:
     Default (Continuous): Auto-processes Stories from database without user input
-    Interactive: Manual input mode for testing single ideas
+                         Waits 30 seconds when no Stories are available
     Preview: Creates titles for testing without saving (extensive logging)
 
 Requirements:
     - Ollama must be running with qwen3:32b model
     - AI is required - script will fail if Ollama is unavailable
+
+Note: This module does NOT support manual/interactive modes in production workflow.
+      Manual mode is only for development/debugging purposes.
 """
 
 import json
@@ -540,8 +542,8 @@ def run_state_workflow_mode(
     This mode automatically and continuously processes Stories with state PrismQ.T.Title.From.Idea,
     generates titles using AI with similarity checking, and transitions to the next state.
     
-    Runs continuously by default with 1ms delay between runs, checking for new stories
-    to process. Press Ctrl+C to stop.
+    Runs continuously by default with 1ms wait between iterations when processing items,
+    and 30-second wait when no stories are found. Press Ctrl+C to stop.
 
     IMPORTANT: This mode requires AI (Ollama) to be running. If AI is unavailable,
     the script will raise an error and stop - no fallback titles will be generated.
@@ -583,7 +585,7 @@ def run_state_workflow_mode(
 
     # Print header - CONTINUOUS MODE is now default
     print_header("PrismQ.T.Title.From.Idea - CONTINUOUS MODE")
-    print_info("Running continuously with 1ms delay between runs")
+    print_info("Running continuously - 1ms between iterations, 30s when no Stories")
     print_info("Press Ctrl+C to stop")
     print()
 
@@ -667,9 +669,9 @@ def run_state_workflow_mode(
                 if run_count == 1:
                     print_info("No Stories found with state PrismQ.T.Title.From.Idea")
                     print_info("Make sure Stories are created using PrismQ.T.Story.From.Idea first")
-                    print_info("Waiting for new stories...")
-                # Wait and check again
-                time.sleep(0.001)  # 1ms delay
+                    print_info("Waiting 30 seconds before checking again...")
+                # Wait 30 seconds and check again
+                time.sleep(30)
                 continue
 
             if run_count == 1:
@@ -847,15 +849,10 @@ Examples:
   python title_from_idea_interactive.py --db /path/to/db.s3db  # Use custom DB
   python title_from_idea_interactive.py --preview          # Preview without saving
   
-  # Interactive mode (manual input)
-  python title_from_idea_interactive.py --interactive      # Interactive mode with DB save
-  python title_from_idea_interactive.py --interactive --preview  # Preview mode (no DB save)
-  python title_from_idea_interactive.py --interactive --debug    # Debug mode with extensive logging
-  
-  # Manual mode (manual AI interaction)
-  python title_from_idea_interactive.py --manual --debug   # Show prompts and manually enter responses
-
-Note: AI (Ollama) is REQUIRED for title generation. No template fallback available.
+Note: 
+  - AI (Ollama) is REQUIRED for title generation. No template fallback available.
+  - This module should run in continuous mode only (no manual/interactive mode in production).
+  - Manual/interactive modes are available for debugging but NOT part of standard workflow.
         """,
     )
 
@@ -869,13 +866,13 @@ Note: AI (Ollama) is REQUIRED for title generation. No template fallback availab
         "--interactive",
         "-i",
         action="store_true",
-        help="Run interactive mode (manual input instead of continuous)",
+        help="[DEBUG ONLY] Run interactive mode - not for production workflow",
     )
     parser.add_argument(
         "--manual",
         "-m",
         action="store_true",
-        help="Manual mode - display prompts and manually enter AI responses",
+        help="[DEBUG ONLY] Manual mode - not for production workflow",
     )
     parser.add_argument(
         "--db",
