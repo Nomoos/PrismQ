@@ -70,6 +70,14 @@ Každý modul má vlastní soubor s kompletním popisem běhu:
 
 ## 📖 Formát dokumentace
 
+Všechny reporty používají standardizovaný template pro konzistenci.
+
+**Template soubory:**
+- **[_template.md](_template.md)** - Základní template pro nové reporty
+- **[TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md)** - Detailní návod pro psaní reportů
+- **[EXAMPLE_REPORT.md](EXAMPLE_REPORT.md)** - Kompletní příklad použití template
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Rychlá referenční příručka
+
 Každý report obsahuje:
 
 - **🎯 Účel modulu** - Proč modul existuje a jakou roli má v systému
@@ -78,6 +86,8 @@ Každý report obsahuje:
 - **📤 Výstupy (Outputs)** - Primární výstup, formát, vedlejší efekty, chování při chybě
 - **🔗 Vazby a závislosti** - Vstupní a výstupní závislosti na jiné moduly
 - **📝 Poznámky / Rizika** - Implementační poznámky, rizika, doporučení
+
+Při vytváření nového reportu použijte `_template.md` jako výchozí bod a postupujte podle `TEMPLATE_GUIDE.md`.
 
 ---
 
