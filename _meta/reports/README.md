@@ -75,6 +75,8 @@ Všechny reporty používají standardizovaný template pro konzistenci.
 **Template soubory:**
 - **[_template.md](_template.md)** - Základní template pro nové reporty
 - **[TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md)** - Detailní návod pro psaní reportů
+- **[EXAMPLE_REPORT.md](EXAMPLE_REPORT.md)** - Kompletní příklad použití template
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Rychlá referenční příručka
 
 Každý report obsahuje:
 

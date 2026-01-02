@@ -178,7 +178,10 @@ When updating an existing report:
 
 ## 📚 Examples
 
-See existing reports for examples:
+**Template Example:**
+- **`EXAMPLE_REPORT.md`** - Complete example using the template with all sections filled
+
+**Real Module Reports:**
 - `01_PrismQ.T.Idea.From.User.md` - Complex module with AI integration
 - `02_PrismQ.T.Story.From.Idea.md` - Simple transformation module
 - `20_PrismQ.T.Publishing.md` - Multi-output publishing module
