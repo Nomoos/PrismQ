@@ -13,10 +13,12 @@ Schema:
     -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
     -- Text field contains prompt-like content for content generation
     -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
+    -- Note: review_id is optional FK to Review table for idea quality assessment
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
+        review_id INTEGER,                              -- Optional FK to Review table
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
@@ -96,24 +98,42 @@ class IdeaTable:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
             - text: TEXT (prompt-like content for content generation)
             - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
+            - review_id: INTEGER (optional FK to Review table)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
 
         Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
+        Note: review_id is optional FK to Review table for idea quality assessment.
+        Note: Review table must exist before creating Idea table due to FK constraint.
         """
         if not self.conn:
             self.connect()
 
         cursor = self.conn.cursor()
 
+        # Create Review table first (required for Idea FK constraint)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
+
         # Create Idea table
         # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
+        # Note: review_id is optional FK to Review table
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS Idea (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                review_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (review_id) REFERENCES Review(id)
             )
         """
         )
@@ -134,12 +154,21 @@ class IdeaTable:
         """
         )
 
+        # Create index on review_id for efficient FK lookups
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
+            ON Idea(review_id)
+        """
+        )
+
         self.conn.commit()
 
     def insert_idea(
         self,
         text: str,
         version: int = 1,
+        review_id: Optional[int] = None,
         created_at: Optional[str] = None,
     ) -> int:
         """Insert a new Idea into the database.
@@ -147,6 +176,7 @@ class IdeaTable:
         Args:
             text: Prompt-like text content for content generation
             version: Version number (default: 1, must be >= 0)
+            review_id: Optional FK to Review table for idea quality assessment
             created_at: Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -154,6 +184,7 @@ class IdeaTable:
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
+                                   or if review_id references non-existent Review
         """
         if not self.conn:
             self.connect()
@@ -163,18 +194,18 @@ class IdeaTable:
         if created_at:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version, created_at)
-                VALUES (?, ?, ?)
+                INSERT INTO Idea (text, version, review_id, created_at)
+                VALUES (?, ?, ?, ?)
             """,
-                (text, version, created_at),
+                (text, version, review_id, created_at),
             )
         else:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version)
-                VALUES (?, ?)
+                INSERT INTO Idea (text, version, review_id)
+                VALUES (?, ?, ?)
             """,
-                (text, version),
+                (text, version, review_id),
             )
 
         idea_id = cursor.lastrowid
@@ -189,6 +220,7 @@ class IdeaTable:
             idea_dict: Dictionary with the following keys:
                 - text (str): Prompt-like text content (required, defaults to "" if missing)
                 - version (int): Version number (optional, defaults to 1 if missing)
+                - review_id (int): Optional FK to Review table (optional, defaults to None)
                 - created_at (str): Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -197,6 +229,7 @@ class IdeaTable:
         return self.insert_idea(
             text=idea_dict.get("text", ""),
             version=idea_dict.get("version", 1),
+            review_id=idea_dict.get("review_id"),
             created_at=idea_dict.get("created_at"),
         )
 
@@ -274,6 +307,7 @@ class IdeaTable:
         idea_id: int,
         text: Optional[str] = None,
         version: Optional[int] = None,
+        review_id: Optional[int] = None,
     ) -> bool:
         """Update an existing Idea.
 
@@ -281,12 +315,14 @@ class IdeaTable:
             idea_id: ID of the idea to update
             text: New text content (optional)
             version: New version number (optional, must be >= 0)
+            review_id: New review_id (optional FK to Review table, or None to clear)
 
         Returns:
             True if successful, False otherwise
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
+                                   or if review_id references non-existent Review
         """
         if not self.conn:
             self.connect()
@@ -305,6 +341,10 @@ class IdeaTable:
         if version is not None:
             updates.append("version = ?")
             params.append(version)
+
+        if review_id is not None:
+            updates.append("review_id = ?")
+            params.append(review_id)
 
         if not updates:
             return False
