@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Interactive Idea Creation CLI for PrismQ.
 
-This script provides an interactive mode for creating ideas from text input.
+This script provides continuous interactive mode for creating ideas from text input.
 It waits for user input, processes it through the idea variant system, and
-optionally saves to the database.
+saves to the database.
 
 **IMPORTANT - Single Shared Database:**
 PrismQ uses ONE shared database (db.s3db) for ALL modules (T, A, V, P, M).
@@ -14,13 +14,10 @@ The database connection is established once at initialization and reused
 across all operations for efficiency.
 
 Usage:
-    python idea_creation_interactive.py                    # Interactive mode with DB save
-    python idea_creation_interactive.py --preview          # Preview mode (no DB save)
-    python idea_creation_interactive.py --preview --debug  # Debug mode with extensive logging
+    python idea_creation_interactive.py    # Continuous mode - creates and saves ideas
 
-Modes:
-    Default: Creates ideas and saves to database
-    Preview: Creates ideas for testing without saving (extensive logging)
+The tool runs in continuous mode, accepting multiple inputs until 'quit' is entered.
+Database connection is required - the tool will exit with error if database is unavailable.
 """
 
 import json
@@ -72,22 +69,14 @@ try:
 except ImportError:
     IDEA_MODEL_AVAILABLE = False
 
-# Try to import database from shared src module
+# Import database from shared src module - REQUIRED
 try:
     from src import Config, IdeaDatabase, setup_idea_database
 
     DB_AVAILABLE = True
-except ImportError:
-    # Fallback: try local simple_idea_db
-    try:
-        from simple_idea_db import SimpleIdeaDatabase as IdeaDatabase
-        from simple_idea_db import setup_simple_idea_database as setup_idea_database
-
-        Config = None
-        DB_AVAILABLE = True
-    except ImportError:
-        DB_AVAILABLE = False
-        Config = None
+except ImportError as e:
+    DB_AVAILABLE = False
+    DB_IMPORT_ERROR = str(e)
 
 
 # =============================================================================
@@ -293,89 +282,47 @@ def parse_input_text(text: str, logger: Optional[logging.Logger] = None) -> tupl
 # =============================================================================
 
 
-def run_interactive_mode(preview: bool = False, debug: bool = False):
-    """Run the interactive idea creation mode.
-
-    Args:
-        preview: If True, don't save to database (preview/test mode)
-        debug: If True, enable extensive debug logging
+def run_interactive_mode():
+    """Run the continuous interactive idea creation mode.
+    
+    This mode continuously accepts user input and saves ideas to the database.
+    Database connection is required - exits with error if unavailable.
     """
-    # Setup logging
-    logger = None
-    if debug or preview:
-        log_filename = f"idea_creation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-        log_path = SCRIPT_DIR / log_filename
-
-        # Create logger with DEBUG level to allow all messages through
-        # Handler levels control what actually gets logged
-        logger = logging.getLogger("PrismQ.T.Idea.From.User")
-        logger.setLevel(logging.DEBUG)
-
-        # File handler - captures all DEBUG messages (including JSON data)
-        file_handler = logging.FileHandler(log_path)
-        file_handler.setLevel(logging.DEBUG if debug else logging.INFO)
-        file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-        logger.addHandler(file_handler)
-
-        # Console handler - only INFO and above (no JSON dumps to console)
-        if debug:
-            console_handler = logging.StreamHandler()
-            console_handler.setLevel(logging.INFO)
-            console_handler.setFormatter(
-                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-            )
-            logger.addHandler(console_handler)
-
-        logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
-        print_info(f"Logging to: {log_path}")
-
     # Print header
-    mode_text = "PREVIEW MODE" if preview else "INTERACTIVE MODE"
-    print_header(f"PrismQ Idea Creation - {mode_text}")
+    print_header(f"PrismQ Idea Creation - Continuous Mode")
 
     # Check module availability
     if not VARIANTS_AVAILABLE:
         print_error(f"Idea variants module not available: {IMPORT_ERROR}")
-        if logger:
-            logger.error(f"Module import failed: {IMPORT_ERROR}")
         return 1
 
     print_success("Idea variants module loaded")
-    if logger:
-        logger.info("Idea variants module loaded successfully")
 
-    # Setup database connection once at initialization (if not preview mode)
+    # Check database availability - REQUIRED for operation
+    if not DB_AVAILABLE:
+        print_error(f"Database module not available: {DB_IMPORT_ERROR}")
+        print_error("Database connection is required for operation.")
+        print_info("Please ensure python-dotenv is installed: pip install python-dotenv")
+        return 1
+
+    # Setup database connection once at initialization
     # IMPORTANT: PrismQ uses a SINGLE SHARED DATABASE (db.s3db) for all modules
     # This connection is reused across all inputs for better performance
     db = None
     db_path = None
-    if preview:
-        print_warning("Preview mode - ideas will NOT be saved to database")
-        print_info("This mode is for testing and tuning. Check logs for details.")
-    else:
-        if DB_AVAILABLE:
-            try:
-                db_path = get_database_path()
-                db = setup_idea_database(db_path)
-                print_success("Database module available")
-                print_info(f"Connected to shared database: {db_path}")
-                print_info("NOTE: PrismQ uses ONE shared database (db.s3db) for all modules")
-                if logger:
-                    logger.info(f"Database connected: {db_path}")
-                    logger.info("Using shared database - all modules write to same db.s3db")
-            except Exception as e:
-                print_error(f"Failed to setup database: {e}")
-                if logger:
-                    logger.exception("Database setup failed")
-                print_warning("Falling back to preview mode (no database save)")
-                preview = True
-                db = None
-        else:
-            print_warning("Database module not available - will run in preview mode")
-            preview = True
+    
+    try:
+        db_path = get_database_path()
+        db = setup_idea_database(db_path)
+        print_success("Database connected")
+        print_info(f"Database: {db_path}")
+        print_info("NOTE: PrismQ uses ONE shared database (db.s3db) for all modules")
+    except Exception as e:
+        print_error(f"Failed to setup database: {e}")
+        print_error("Database connection is required for operation.")
+        return 1
 
-    # Show available flavors (not variant templates)
-    # Flavors are now the primary interface - variants are implementation details
+    # Show available flavors
     print_section("Available Flavors")
     
     # Import flavor functions
@@ -392,10 +339,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         for cat_name in list(categories.keys())[:5]:
             flavors_in_cat = categories[cat_name]
             print(f"    • {Colors.CYAN}{cat_name}{Colors.END}: {len(flavors_in_cat)} flavors")
-        
-        if logger:
-            logger.info(f"Available flavors: {total_flavors}")
-            logger.info(f"Flavor categories: {list(categories.keys())}")
     except ImportError:
         # Fallback to showing templates if flavors not available
         print_warning("Flavor module not available, showing variant templates")
@@ -404,9 +347,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             template = get_template(name)
             print(f"  {i:2}. {Colors.BOLD}{name:15}{Colors.END} - {template['name']}")
         print(f"  ... and {len(templates) - 10} more")
-        
-        if logger:
-            logger.info(f"Available templates: {len(templates)}")
 
     # Interactive loop
     print_section("Enter Text Input")
@@ -422,8 +362,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 line = input().strip()
                 if line.lower() == "quit":
                     print_info("Exiting...")
-                    if logger:
-                        logger.info("User requested exit")
                     break
 
                 if not line:
@@ -438,10 +376,6 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 print("\n")
                 print_info("Interrupted. Type 'quit' to exit.")
                 continue
-
-            if logger:
-                logger.info(f"Received input: {len(input_text)} chars")
-                logger.debug(f"Input text:\n{input_text[:500]}...")
 
             # Display input (no parsing or processing)
             print_section("Processing Input")
@@ -458,14 +392,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             saved_ids = []
             try:
                 # Generate 10 variants with randomly selected templates (weighted)
-                mode_text = "preview mode" if preview else "save mode"
-                print_info(
-                    f"Creating {DEFAULT_IDEA_COUNT} variants in {mode_text}..."
-                )
-                if logger:
-                    logger.info(
-                        f"Creating {DEFAULT_IDEA_COUNT} variants with weighted random template selection (preview={preview})"
-                    )
+                print_info(f"Creating {DEFAULT_IDEA_COUNT} variants and saving to database...")
                 
                 # Create generator and selector instances
                 generator = IdeaGenerator()
@@ -481,13 +408,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                         print_info(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Generating with flavor: {flavor_name}...")
                         
                         # Generate the variant using raw input text
-                        # Pass database connection for direct save (if not preview)
+                        # Pass database connection for direct save
                         idea = generator.generate_from_flavor(
                             flavor_name=flavor_name,
                             input_text=input_text,
                             variation_index=i,
                             db=db,
-                            logger=logger,
+                            logger=None,
                         )
                         
                         # Track saved ID if returned
@@ -495,20 +422,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                             saved_ids.append(idea['idea_id'])
                         
                         variants.append(idea)
-                        
-                        if logger:
-                            logger.info(f"Generated variant {i+1}/{DEFAULT_IDEA_COUNT} with flavor: {flavor_name}")
                     
                     except Exception as e:
                         print_warning(f"  [{i+1}/{DEFAULT_IDEA_COUNT}] Failed with flavor {flavor_name}: {e}")
-                        if logger:
-                            logger.warning(f"Failed to generate variant {i+1} with flavor {flavor_name}: {e}")
                         continue
 
             except Exception as e:
                 print_error(f"Error creating variants: {e}")
-                if logger:
-                    logger.exception("Variant creation failed")
                 continue
 
             # Display results
@@ -525,25 +445,12 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                 idea_text = variant.get('text', '')
                 print(f"  {idea_text}")
 
-                if logger:
-                    logger.info(f"Variant {i+1}: {variant.get('variant_name')}")
-                    if variant.get('idea_id'):
-                        logger.info(f"  Saved with ID: {variant['idea_id']}")
-
             # Show summary
-            if not preview and saved_ids:
-                print_section("Database Summary")
-                print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
-                if db_path:
-                    print_info(f"Database: {db_path}")
-                print_info(f"Saved IDs: {saved_ids}")
-                if logger and db_path:
-                    logger.info(f"Saved {len(saved_ids)} variants to {db_path}: IDs={saved_ids}")
-            elif preview:
-                print_section("Preview Mode - No Database Save")
-                print_info(f"Created {len(variants)} variant(s) - NOT saved to database")
-                if logger:
-                    logger.info(f"Preview mode: {len(variants)} variants created but not saved")
+            print_section("Database Summary")
+            print_success(f"Successfully saved {len(saved_ids)} variant(s) to database")
+            if db_path:
+                print_info(f"Database: {db_path}")
+            print_info(f"Saved IDs: {saved_ids}")
 
             print(f"\n{Colors.CYAN}{'─' * 60}{Colors.END}")
             print("Enter new text or type 'quit' to exit.\n")
@@ -552,37 +459,13 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         # Close database connection when exiting (reusable connection cleanup)
         if db:
             db.close()
-            if logger:
-                logger.info("Database connection closed")
     
     return 0
 
 
 def main():
     """Main entry point."""
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Interactive Idea Creation for PrismQ",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python idea_creation_interactive.py                    # Interactive mode with DB save
-  python idea_creation_interactive.py --preview          # Preview mode (no DB save)
-  python idea_creation_interactive.py --preview --debug  # Debug mode with extensive logging
-        """,
-    )
-
-    parser.add_argument(
-        "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
-    )
-    parser.add_argument(
-        "--debug", "-d", action="store_true", help="Enable debug logging (extensive output)"
-    )
-
-    args = parser.parse_args()
-
-    return run_interactive_mode(preview=args.preview, debug=args.debug)
+    return run_interactive_mode()
 
 
 if __name__ == "__main__":

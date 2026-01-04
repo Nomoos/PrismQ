@@ -176,7 +176,7 @@ for i, f in enumerate(get_top_flavors_for_audience(count=10), 1):
 "
 
 # Test interactive mode
-python3 T/Idea/From/User/src/idea_creation_interactive.py --preview
+python3 T/Idea/From/User/src/idea_creation_interactive.py
 ```
 
 ## Migration Complete
