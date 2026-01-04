@@ -44,7 +44,7 @@ from idea import ContentGenre, Idea, IdeaStatus
 
 # Try to import Config for database path
 try:
-    from src import Config
+    from src.config import Config
 
     CONFIG_AVAILABLE = True
 except ImportError:

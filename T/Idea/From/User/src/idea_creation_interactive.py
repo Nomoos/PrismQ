@@ -72,7 +72,8 @@ except ImportError:
 
 # Import database from shared src module - REQUIRED
 try:
-    from src import Config, IdeaDatabase, setup_idea_database
+    from src.config import Config
+    from src.idea import IdeaDatabase, setup_idea_database
 
     DB_AVAILABLE = True
 except ImportError as e:
