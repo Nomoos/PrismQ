@@ -4,4 +4,6 @@ pytest-cov>=4.0.0
 
 # Runtime dependencies
 requests>=2.28.0  # For Ollama API calls
-python-dotenv>=1.0.0  # Required for src.config.Config
+
+# Required for src module (Config, database connections)
+python-dotenv>=1.0.0
