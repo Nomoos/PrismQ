@@ -6,18 +6,18 @@ import tempfile
 
 import pytest
 
-from src import IdeaDatabase, StoryDatabase, setup_story_database
+from src import IdeaTable, StoryTable, setup_story_table
 from src.story import CLEAR_IDEA_ID
 
 
-class TestStoryDatabaseSetup:
+class TestStoryTableSetup:
     """Test database setup and connection."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
-        self.db = StoryDatabase(self.db_path)
+        self.db = StoryTable(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -56,8 +56,8 @@ class TestStoryDatabaseSetup:
         assert result[0] == "Story"
 
     def test_setup_function(self):
-        """Test the setup_story_database helper function."""
-        db = setup_story_database(self.db_path)
+        """Test the setup_story_table helper function."""
+        db = setup_story_table(self.db_path)
 
         assert db is not None
         assert db.conn is not None
@@ -76,14 +76,14 @@ class TestStoryDatabaseSetup:
         db.close()
 
 
-class TestStoryDatabaseCRUD:
+class TestStoryTableCRUD:
     """Test CRUD operations on Story database."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
-        self.db = setup_story_database(self.db_path)
+        self.db = setup_story_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -237,14 +237,14 @@ class TestStoryDatabaseCRUD:
         assert success is False
 
 
-class TestStoryDatabaseDefaultState:
+class TestStoryTableDefaultState:
     """Test default state constraint."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
-        self.db = setup_story_database(self.db_path)
+        self.db = setup_story_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -283,14 +283,14 @@ class TestStoryDatabaseDefaultState:
         assert story["state"] == "PrismQ.T.Title.From.Idea"
 
 
-class TestStoryDatabaseSearch:
+class TestStoryTableSearch:
     """Test search and query operations."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
-        self.db = setup_story_database(self.db_path)
+        self.db = setup_story_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -357,7 +357,7 @@ class TestStoryDatabaseSearch:
         assert "PrismQ.T.Review.From.Script" in states
 
 
-class TestStoryDatabaseForeignKey:
+class TestStoryTableForeignKey:
     """Test foreign key relationship with Idea table."""
 
     def setup_method(self):
@@ -366,12 +366,12 @@ class TestStoryDatabaseForeignKey:
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
 
         # Create Idea table first (required for FK)
-        self.idea_db = IdeaDatabase(self.db_path)
+        self.idea_db = IdeaTable(self.db_path)
         self.idea_db.connect()
         self.idea_db.create_tables()
 
         # Now create Story table (will use same connection for FK)
-        self.story_db = StoryDatabase(self.db_path)
+        self.story_db = StoryTable(self.db_path)
         self.story_db.conn = self.idea_db.conn  # Share connection
         self.story_db.create_tables()
 
@@ -451,14 +451,14 @@ class TestStoryDatabaseForeignKey:
         assert story["idea_id"] is None
 
 
-class TestStoryDatabaseTimestamps:
+class TestStoryTableTimestamps:
     """Test timestamp handling."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
-        self.db = setup_story_database(self.db_path)
+        self.db = setup_story_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
