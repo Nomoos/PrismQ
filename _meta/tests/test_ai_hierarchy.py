@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-PROJECT_ROOT = Path(__file__).parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent  # Go up to PrismQ root
 sys.path.insert(0, str(PROJECT_ROOT))
 
 def test_ai_at_foundation_level():

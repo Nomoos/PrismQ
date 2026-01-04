@@ -22,19 +22,25 @@ logger = logging.getLogger(__name__)
 # Add T/src to path
 SCRIPT_DIR = Path(__file__).parent
 T_SRC = SCRIPT_DIR.parent.parent.parent.parent.parent / "src"  # T/src
-sys.path.insert(0, str(T_SRC))
+if str(T_SRC) not in sys.path:
+    sys.path.insert(0, str(T_SRC))
 
 try:
     # Import from T foundation level (correct hierarchy)
-    from ai_config import (
-        DEFAULT_AI_MODEL,
-        DEFAULT_AI_API_BASE,
-        AI_TEMPERATURE_MIN,
-        AI_TEMPERATURE_MAX,
-        AISettings,
-        create_ai_config,
-        check_ollama_available,
-    )
+    # Use importlib to avoid circular import with ai_config module name
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("t_ai_config", T_SRC / "ai_config.py")
+    t_ai_config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(t_ai_config)
+    
+    # Extract needed items
+    DEFAULT_AI_MODEL = t_ai_config.DEFAULT_AI_MODEL
+    DEFAULT_AI_API_BASE = t_ai_config.DEFAULT_AI_API_BASE
+    AI_TEMPERATURE_MIN = t_ai_config.AI_TEMPERATURE_MIN
+    AI_TEMPERATURE_MAX = t_ai_config.AI_TEMPERATURE_MAX
+    AISettings = t_ai_config.AISettings
+    create_ai_config = t_ai_config.create_ai_config
+    check_ollama_available = t_ai_config.check_ollama_available
     
     # Backward compatibility wrapper functions
     def get_local_ai_model() -> str:
