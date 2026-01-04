@@ -1,0 +1,40 @@
+
+Task: Compare title {current_version} against title {previous_version} and assess improvements.
+
+Requirements:
+
+Length: Maximum 250 words.
+
+Evaluation Criteria:
+
+1. Improvement Detection:
+   - Which scores increased from {previous_version} to {current_version}?
+   - Which scores decreased (regressions)?
+   - Which scores stayed approximately the same?
+
+2. Overall Assessment:
+   - Is the title getting better or worse?
+   - Are the changes addressing {previous_version} feedback?
+   - What still needs improvement?
+
+3. Next Steps:
+   - What should be prioritized for {next_version}?
+   - Are there new issues introduced in {current_version}?
+   - Is the title ready for acceptance (score ≥ 80%)?
+
+Provide:
+
+- Comparison Table: category, {previous_version}_score, {current_version}_score, delta, status (improved/regressed/maintained)
+- Overall Assessment: "improved", "regressed", or "maintained"
+- Key Improvements: list of 2-3 main improvements
+- Remaining Issues: list of 2-3 areas needing work
+- Recommendation: "ready for {next_version}", "needs minor adjustments", or "significant work needed"
+- Next Steps: 2-3 specific actionable recommendations
+
+Title {previous_version}: {title_previous}
+Title {previous_version} Score: {score_previous}%
+
+Title {current_version}: {title_current}
+Title {current_version} Score: {score_current}%
+
+Previous Feedback: {feedback_previous}
