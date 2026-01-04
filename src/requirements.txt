@@ -1,0 +1,5 @@
+# src - PrismQ Environment Configuration Module
+# Core dependencies for centralized configuration management
+
+# Environment variable management (.env file support)
+python-dotenv>=1.0.0
