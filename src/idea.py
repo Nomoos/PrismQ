@@ -9,21 +9,16 @@ The Idea table is one of many tables in this shared database.
 
 The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 
-Score Field:
-    Local AI evaluates each idea and assigns a score from 0-100:
-    - 0: Incoherent or nonsensical idea
-    - 100: Excellent story idea - coherent, complete, best for audience 13-30
-
 Schema:
     -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
     -- Text field contains prompt-like content for content generation
     -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-    -- Note: score uses INTEGER with CHECK >= 0 and <= 100 for Local AI scoring
+    -- Note: review_id is optional FK to Review table for idea quality assessment
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-        score INTEGER CHECK (score >= 0 AND score <= 100),  -- Local AI score (0-100)
+        review_id INTEGER,                              -- Optional FK to Review table
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
@@ -103,28 +98,42 @@ class IdeaTable:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
             - text: TEXT (prompt-like content for content generation)
             - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
-            - score: INTEGER CHECK (score >= 0 AND score <= 100)
+            - review_id: INTEGER (optional FK to Review table)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
 
         Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
-        Note: score uses INTEGER with CHECK >= 0 and <= 100 for Local AI scoring.
+        Note: review_id is optional FK to Review table for idea quality assessment.
+        Note: Review table must exist before creating Idea table due to FK constraint.
         """
         if not self.conn:
             self.connect()
 
         cursor = self.conn.cursor()
 
+        # Create Review table first (required for Idea FK constraint)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
+
         # Create Idea table
         # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-        # Note: score uses INTEGER with CHECK >= 0 and <= 100 for Local AI scoring
+        # Note: review_id is optional FK to Review table
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS Idea (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-                score INTEGER CHECK (score >= 0 AND score <= 100),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                review_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (review_id) REFERENCES Review(id)
             )
         """
         )
@@ -145,11 +154,11 @@ class IdeaTable:
         """
         )
 
-        # Create index on score for score-based queries
+        # Create index on review_id for efficient FK lookups
         cursor.execute(
             """
-            CREATE INDEX IF NOT EXISTS idx_idea_score 
-            ON Idea(score)
+            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
+            ON Idea(review_id)
         """
         )
 
@@ -159,7 +168,7 @@ class IdeaTable:
         self,
         text: str,
         version: int = 1,
-        score: Optional[int] = None,
+        review_id: Optional[int] = None,
         created_at: Optional[str] = None,
     ) -> int:
         """Insert a new Idea into the database.
@@ -167,8 +176,7 @@ class IdeaTable:
         Args:
             text: Prompt-like text content for content generation
             version: Version number (default: 1, must be >= 0)
-            score: Local AI score (0-100, optional). 0 = incoherent/nonsensical,
-                   100 = excellent story idea, coherent, complete, best for audience 13-30
+            review_id: Optional FK to Review table for idea quality assessment
             created_at: Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -176,7 +184,7 @@ class IdeaTable:
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
-                                   or if score is not between 0 and 100
+                                   or if review_id references non-existent Review
         """
         if not self.conn:
             self.connect()
@@ -186,18 +194,18 @@ class IdeaTable:
         if created_at:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version, score, created_at)
+                INSERT INTO Idea (text, version, review_id, created_at)
                 VALUES (?, ?, ?, ?)
             """,
-                (text, version, score, created_at),
+                (text, version, review_id, created_at),
             )
         else:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version, score)
+                INSERT INTO Idea (text, version, review_id)
                 VALUES (?, ?, ?)
             """,
-                (text, version, score),
+                (text, version, review_id),
             )
 
         idea_id = cursor.lastrowid
@@ -209,7 +217,11 @@ class IdeaTable:
         """Insert an Idea from dictionary representation.
 
         Args:
-            idea_dict: Dictionary with text, version, score, and optional created_at
+            idea_dict: Dictionary with the following keys:
+                - text (str): Prompt-like text content (required, defaults to "" if missing)
+                - version (int): Version number (optional, defaults to 1 if missing)
+                - review_id (int): Optional FK to Review table (optional, defaults to None)
+                - created_at (str): Optional timestamp (auto-generated if not provided)
 
         Returns:
             ID of inserted idea
@@ -217,7 +229,7 @@ class IdeaTable:
         return self.insert_idea(
             text=idea_dict.get("text", ""),
             version=idea_dict.get("version", 1),
-            score=idea_dict.get("score"),
+            review_id=idea_dict.get("review_id"),
             created_at=idea_dict.get("created_at"),
         )
 
@@ -290,88 +302,31 @@ class IdeaTable:
 
         return [dict(row) for row in cursor.fetchall()]
 
-    def get_ideas_by_score_range(
-        self, min_score: int = 0, max_score: int = 100
-    ) -> List[Dict[str, Any]]:
-        """Retrieve all Ideas with scores in a specified range.
-
-        Args:
-            min_score: Minimum score (inclusive, default: 0)
-            max_score: Maximum score (inclusive, default: 100)
-
-        Returns:
-            List of Idea dictionaries ordered by score descending
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            """SELECT * FROM Idea 
-               WHERE score IS NOT NULL AND score >= ? AND score <= ? 
-               ORDER BY score DESC""",
-            (min_score, max_score),
-        )
-
-        return [dict(row) for row in cursor.fetchall()]
-
-    def get_top_scored_ideas(self, limit: int = 10) -> List[Dict[str, Any]]:
-        """Retrieve the highest scored Ideas.
-
-        Args:
-            limit: Maximum number of ideas to return
-
-        Returns:
-            List of Idea dictionaries ordered by score descending
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            """SELECT * FROM Idea 
-               WHERE score IS NOT NULL 
-               ORDER BY score DESC LIMIT ?""",
-            (limit,),
-        )
-
-        return [dict(row) for row in cursor.fetchall()]
-
-    def get_unscored_ideas(self) -> List[Dict[str, Any]]:
-        """Retrieve all Ideas that have not been scored.
-
-        Returns:
-            List of Idea dictionaries where score is NULL
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM Idea WHERE score IS NULL ORDER BY created_at DESC")
-
-        return [dict(row) for row in cursor.fetchall()]
-
     def update_idea(
         self,
         idea_id: int,
         text: Optional[str] = None,
         version: Optional[int] = None,
-        score: Optional[int] = None,
+        review_id: Optional[int] = None,
     ) -> bool:
         """Update an existing Idea.
 
         Args:
             idea_id: ID of the idea to update
-            text: New text content (optional)
-            version: New version number (optional, must be >= 0)
-            score: New score (optional, must be 0-100 or None to clear)
+            text: New text content (optional, not updated if None)
+            version: New version number (optional, must be >= 0, not updated if None)
+            review_id: New review_id (optional FK to Review table, not updated if None)
 
         Returns:
             True if successful, False otherwise
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
-                                   or if score is not between 0 and 100
+                                   or if review_id references non-existent Review
+        
+        Note:
+            To clear review_id, you need to pass a valid integer value or update directly via SQL.
+            Passing None for any parameter means "don't update this field".
         """
         if not self.conn:
             self.connect()
@@ -391,9 +346,9 @@ class IdeaTable:
             updates.append("version = ?")
             params.append(version)
 
-        if score is not None:
-            updates.append("score = ?")
-            params.append(score)
+        if review_id is not None:
+            updates.append("review_id = ?")
+            params.append(review_id)
 
         if not updates:
             return False

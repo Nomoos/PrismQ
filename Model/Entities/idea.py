@@ -13,11 +13,13 @@ Schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
+        review_id INTEGER,                              -- Optional FK to Review table
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
 The Idea table stores simple prompt-based idea data for content generation.
 Story references Idea via FK in Story.idea_id.
+Review can be optionally linked via review_id for idea quality assessment.
 """
 
 
@@ -53,8 +55,9 @@ class IdeaSchema:
             for idempotent operations.
         
         Note:
-            - The table is a base table with no foreign key dependencies
+            - The table is a base table with FK dependency on Review table
             - version uses INTEGER with CHECK >= 0 to simulate unsigned integer
+            - review_id is optional FK to Review table for idea quality assessment
             - Story references this table via Story.idea_id FK
         """
         return """
@@ -62,11 +65,14 @@ class IdeaSchema:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,
             version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            review_id INTEGER,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
         -- Performance indexes for common query patterns
         CREATE INDEX IF NOT EXISTS idx_idea_created_at ON Idea(created_at);
+        CREATE INDEX IF NOT EXISTS idx_idea_review_id ON Idea(review_id);
         """
 
 
