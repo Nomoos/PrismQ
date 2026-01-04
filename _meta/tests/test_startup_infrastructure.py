@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Add repo root to path
-REPO_ROOT = Path(__file__).parent
+REPO_ROOT = Path(__file__).parent.parent.parent  # Go up to PrismQ root
 sys.path.insert(0, str(REPO_ROOT))
 
 def test_general_startup_module():
