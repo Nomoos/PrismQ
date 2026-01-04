@@ -313,9 +313,9 @@ class IdeaTable:
 
         Args:
             idea_id: ID of the idea to update
-            text: New text content (optional)
-            version: New version number (optional, must be >= 0)
-            review_id: New review_id (optional FK to Review table, or None to clear)
+            text: New text content (optional, not updated if None)
+            version: New version number (optional, must be >= 0, not updated if None)
+            review_id: New review_id (optional FK to Review table, not updated if None)
 
         Returns:
             True if successful, False otherwise
@@ -323,6 +323,10 @@ class IdeaTable:
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
                                    or if review_id references non-existent Review
+        
+        Note:
+            To clear review_id, you need to pass a valid integer value or update directly via SQL.
+            Passing None for any parameter means "don't update this field".
         """
         if not self.conn:
             self.connect()

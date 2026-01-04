@@ -77,11 +77,24 @@ class SimpleIdeaDatabase:
 
         Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
         Note: review_id is optional FK to Review table for idea quality assessment.
+        Note: Review table is created first to satisfy FK constraint.
         """
         if not self.conn:
             self.connect()
 
         cursor = self.conn.cursor()
+
+        # Create Review table first (required for Idea FK constraint)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
 
         # Create simple Idea table
         # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer

@@ -40,8 +40,15 @@ def db_connection():
     conn.row_factory = sqlite3.Row
 
     # Create required tables
-    conn.executecontent(
+    conn.executescript(
         """
+        CREATE TABLE IF NOT EXISTS Review (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT NOT NULL,
+            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        
         CREATE TABLE IF NOT EXISTS Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,
@@ -76,13 +83,6 @@ def db_connection():
         );
         
         CREATE INDEX IF NOT EXISTS idx_content_story_id ON Content(story_id);
-        
-        CREATE TABLE IF NOT EXISTS Review (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            text TEXT NOT NULL,
-            score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
     """
     )
     conn.commit()
