@@ -31,7 +31,8 @@ from typing import Any, Dict, List, Optional
 # Setup paths - Now in T/Idea/From/User/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
 CREATION_ROOT = SCRIPT_DIR.parent  # T/Idea/From/User
-IDEA_ROOT = CREATION_ROOT.parent  # T/Idea
+FROM_ROOT = CREATION_ROOT.parent  # T/Idea/From
+IDEA_ROOT = FROM_ROOT.parent  # T/Idea
 T_ROOT = IDEA_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 

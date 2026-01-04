@@ -30,7 +30,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 src_dir = current_dir
 model_dir = os.path.join(current_dir, "../../Model/src")
 model_base = os.path.join(current_dir, "../../Model")
-repo_root = os.path.join(current_dir, "../../../../")
+repo_root = os.path.join(current_dir, "../../../../../")  # 5 levels up: src -> User -> From -> Idea -> T -> repo
 
 sys.path.insert(0, src_dir)
 sys.path.insert(0, model_dir)
