@@ -503,9 +503,3 @@ __all__ = [
     "IdeaTable",
     "setup_idea_table",
 ]
-
-
-__all__ = [
-    "IdeaDatabase",
-    "setup_idea_database",
-]

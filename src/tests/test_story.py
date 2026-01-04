@@ -6,7 +6,7 @@ import tempfile
 
 import pytest
 
-from src import IdeaDatabase, StoryTable, setup_story_table
+from src import IdeaTable, StoryTable, setup_story_table
 from src.story import CLEAR_IDEA_ID
 
 
@@ -366,7 +366,7 @@ class TestStoryTableForeignKey:
         self.db_path = os.path.join(self.temp_dir, "test_stories.db")
 
         # Create Idea table first (required for FK)
-        self.idea_db = IdeaDatabase(self.db_path)
+        self.idea_db = IdeaTable(self.db_path)
         self.idea_db.connect()
         self.idea_db.create_tables()
 

@@ -525,10 +525,3 @@ __all__ = [
     "StoryTable",
     "setup_story_table",
 ]
-
-
-__all__ = [
-    "CLEAR_IDEA_ID",
-    "StoryDatabase",
-    "setup_story_database",
-]
