@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Idea.From.User
-REM Interactive idea creation - saves to database
+REM Continuous interactive idea creation - saves to database
 REM
 REM Usage: Run.bat
 REM
@@ -26,10 +26,10 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo ========================================
-echo PrismQ.T.Idea.From.User - RUN MODE
+echo PrismQ.T.Idea.From.User - Continuous Mode
 echo ========================================
 echo.
-echo This mode saves ideas to the database.
+echo This mode continuously accepts input and saves ideas to the database.
 echo.
 
 REM Run Python module
