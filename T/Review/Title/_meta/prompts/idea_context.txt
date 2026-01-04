@@ -1,0 +1,15 @@
+
+4. Idea Alignment ({idea_weight}% weight):
+   - Does the title capture the core idea/concept?
+   - Is the intent clear?
+   - Does it align with the target audience?
+
+Additional Context:
+
+Core Idea: {idea_summary}
+
+Target Audience: {target_audience}
+
+Provide:
+
+- Idea Alignment Score: 0-100%

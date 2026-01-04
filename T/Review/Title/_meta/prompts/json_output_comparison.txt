@@ -1,0 +1,2 @@
+
+Provide your analysis in JSON format with fields: comparisons (list), overall_assessment, key_improvements (list), remaining_issues (list), recommendation, next_steps (list).

@@ -1,0 +1,2 @@
+
+Provide your analysis in JSON format with fields: overall_score, script_alignment_score, engagement_score, seo_score, strengths (list), weaknesses (list), improvement_points (list of objects with: category, title, description, priority, suggested_fix).
