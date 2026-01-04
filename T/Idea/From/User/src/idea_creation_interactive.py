@@ -73,7 +73,7 @@ except ImportError:
 # Import database from shared src module - REQUIRED
 try:
     from src.config import Config
-    from src.idea import IdeaDatabase, setup_idea_database
+    from src.idea import IdeaTable, setup_idea_table
 
     DB_AVAILABLE = True
 except ImportError as e:
@@ -315,7 +315,7 @@ def run_interactive_mode():
     
     try:
         db_path = get_database_path()
-        db = setup_idea_database(db_path)
+        db = setup_idea_table(db_path)
         print_success("Database connected")
         print_info(f"Database: {db_path}")
         print_info("NOTE: PrismQ uses ONE shared database (db.s3db) for all modules")

@@ -1,7 +1,11 @@
-"""Idea model and database support for PrismQ.
+"""Idea table manager for PrismQ's shared database.
 
-This module provides the shared Idea model for storing prompt-based idea data
-that can be created by PrismQ.T.Idea.From.User or PrismQ.Idea.Fusion.
+This module provides the IdeaTable class for managing the Idea table in PrismQ's
+shared database (db.s3db). The Idea table stores prompt-based idea data that can
+be created by PrismQ.T.Idea.From.User or PrismQ.Idea.Fusion.
+
+IMPORTANT: PrismQ uses ONE shared database (db.s3db) for ALL modules.
+The Idea table is one of many tables in this shared database.
 
 The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 
@@ -24,10 +28,10 @@ Schema:
     )
 
 Usage:
-    from src import IdeaDatabase, setup_idea_database
+    from src.idea import IdeaTable, setup_idea_table
 
-    # Setup database (default: db.s3db)
-    db = setup_idea_database()
+    # Setup table manager for shared database (default: db.s3db)
+    db = setup_idea_table()
 
     # Insert an idea
     idea_id = db.insert_idea("Write a horror story about...")
@@ -44,17 +48,19 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 
-class IdeaDatabase:
-    """Database manager for Idea model.
+class IdeaTable:
+    """Table manager for the Idea table in PrismQ's shared database.
 
     Provides CRUD operations for the Idea table that stores
     prompt-like text content with versioning support.
 
+    IMPORTANT: This manages the Idea table in the shared database (db.s3db),
+    not a separate database. PrismQ uses ONE shared database for all tables.
+
     The Idea table is designed to be referenced by Story via foreign key.
-    This is shared database logic used across all PrismQ modules.
 
     Example:
-        >>> db = IdeaDatabase("ideas.db")
+        >>> db = IdeaTable("db.s3db")
         >>> db.connect()
         >>> db.create_tables()
         >>>
@@ -467,19 +473,35 @@ class IdeaDatabase:
         return result if result is not None else 0
 
 
-def setup_idea_database(db_path: str = "db.s3db") -> IdeaDatabase:
-    """Initialize and setup the Idea database.
+def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:
+    """Setup and initialize the Idea table manager for the shared database.
+
+    Creates a table manager, connects to the shared database, and ensures
+    the Idea table exists with proper schema and indexes.
+
+    IMPORTANT: This manages the Idea table in the shared database (db.s3db),
+    not a separate database. All PrismQ modules use this same database.
 
     Args:
-        db_path: Path to the database file (default: db.s3db)
+        db_path: Path to shared SQLite database file (default: db.s3db)
 
     Returns:
-        Configured IdeaDatabase instance with tables created
+        Connected and initialized IdeaTable instance
+
+    Example:
+        >>> db = setup_idea_table()
+        >>> idea_id = db.insert_idea("Write a story about...")
+        >>> db.close()
     """
-    db = IdeaDatabase(db_path)
+    db = IdeaTable(db_path)
     db.connect()
     db.create_tables()
     return db
+
+
+# Backward compatibility aliases - DEPRECATED
+IdeaDatabase = IdeaTable
+setup_idea_database = setup_idea_table
 
 
 __all__ = [

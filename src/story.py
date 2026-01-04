@@ -1,7 +1,11 @@
-"""Story model and database support for PrismQ.
+"""Story table manager for PrismQ's shared database.
 
-This module provides the Story model for tracking story progress through
-the PrismQ workflow pipeline.
+This module provides the StoryTable class for managing the Story table in PrismQ's
+shared database (db.s3db). The Story table tracks story progress through the
+PrismQ workflow pipeline.
+
+IMPORTANT: PrismQ uses ONE shared database (db.s3db) for ALL modules.
+The Story table is one of many tables in this shared database.
 
 The Story table tracks the state of a story as it moves through different
 processing steps. State is stored as a string following the pattern:
@@ -25,10 +29,10 @@ Schema:
     )
 
 Usage:
-    from src import StoryDatabase, setup_story_database
+    from src.story import StoryTable, setup_story_table
 
-    # Setup database
-    db = setup_story_database("stories.db")
+    # Setup table manager for shared database
+    db = setup_story_table("db.s3db")
 
     # Insert a story
     story_id = db.insert_story(idea_id=1)
@@ -50,17 +54,20 @@ from typing import Any, Dict, List, Optional
 CLEAR_IDEA_ID = -1
 
 
-class StoryDatabase:
-    """Database manager for Story model.
+class StoryTable:
+    """Table manager for the Story table in PrismQ's shared database.
 
     Provides CRUD operations for the Story table that tracks
     story progress through the PrismQ workflow pipeline.
+
+    IMPORTANT: This manages the Story table in the shared database (db.s3db),
+    not a separate database. PrismQ uses ONE shared database for all tables.
 
     The Story table references Idea via foreign key.
     State tracks the next process to be applied to the story.
 
     Example:
-        >>> db = StoryDatabase("stories.db")
+        >>> db = StoryTable("db.s3db")
         >>> db.connect()
         >>> db.create_tables()
         >>>
@@ -487,19 +494,35 @@ class StoryDatabase:
         return [row[0] for row in cursor.fetchall()]
 
 
-def setup_story_database(db_path: str = "story.db") -> StoryDatabase:
-    """Initialize and setup the Story database.
+def setup_story_table(db_path: str = "db.s3db") -> StoryTable:
+    """Setup and initialize the Story table manager for the shared database.
+
+    Creates a table manager, connects to the shared database, and ensures
+    the Story table exists with proper schema and indexes.
+
+    IMPORTANT: This manages the Story table in the shared database (db.s3db),
+    not a separate database. All PrismQ modules use this same database.
 
     Args:
-        db_path: Path to the database file
+        db_path: Path to shared SQLite database file (default: db.s3db)
 
     Returns:
-        Configured StoryDatabase instance with tables created
+        Connected and initialized StoryTable instance
+
+    Example:
+        >>> db = setup_story_table()
+        >>> story_id = db.insert_story(idea_id=1)
+        >>> db.close()
     """
-    db = StoryDatabase(db_path)
+    db = StoryTable(db_path)
     db.connect()
     db.create_tables()
     return db
+
+
+# Backward compatibility aliases - DEPRECATED
+StoryDatabase = StoryTable
+setup_story_database = setup_story_table
 
 
 __all__ = [
