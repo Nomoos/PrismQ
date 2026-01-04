@@ -186,7 +186,10 @@ class IdeaTable:
         """Insert an Idea from dictionary representation.
 
         Args:
-            idea_dict: Dictionary with text, version, and optional created_at
+            idea_dict: Dictionary with the following keys:
+                - text (str): Prompt-like text content (required, defaults to "" if missing)
+                - version (int): Version number (optional, defaults to 1 if missing)
+                - created_at (str): Optional timestamp (auto-generated if not provided)
 
         Returns:
             ID of inserted idea
