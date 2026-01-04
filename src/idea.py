@@ -499,9 +499,10 @@ def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:
     return db
 
 
-# Backward compatibility aliases - DEPRECATED
-IdeaDatabase = IdeaTable
-setup_idea_database = setup_idea_table
+__all__ = [
+    "IdeaTable",
+    "setup_idea_table",
+]
 
 
 __all__ = [

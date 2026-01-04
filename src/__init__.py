@@ -47,23 +47,12 @@ from .startup import (
 )
 from .story import StoryTable, setup_story_table
 
-# Backward compatibility aliases - DEPRECATED
-# Use IdeaTable and StoryTable instead
-from .idea import IdeaDatabase, setup_idea_database
-from .story import StoryDatabase, setup_story_database
-
 __all__ = [
     "Config",
-    # New names (preferred)
     "IdeaTable",
     "setup_idea_table",
     "StoryTable",
     "setup_story_table",
-    # Backward compatibility (deprecated)
-    "IdeaDatabase",
-    "setup_idea_database",
-    "StoryDatabase",
-    "setup_story_database",
     # Database configuration
     "DatabaseConfig",
     "create_database_config",

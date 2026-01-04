@@ -18,7 +18,7 @@ sys.path.insert(0, str(CREATION_SRC))
 sys.path.insert(0, str(REPO_ROOT))
 
 # Import shared database module
-from src import IdeaDatabase, setup_idea_database
+from src import IdeaTable, setup_idea_table
 
 
 class TestDatabaseSaveIntegration:
@@ -36,8 +36,8 @@ class TestDatabaseSaveIntegration:
         os.rmdir(self.temp_dir)
 
     def test_setup_database_creates_idea_table(self):
-        """Test that setup_idea_database creates the Idea table."""
-        db = setup_idea_database(self.db_path)
+        """Test that setup_idea_table creates the Idea table."""
+        db = setup_idea_table(self.db_path)
 
         # Verify table exists
         cursor = db.conn.cursor()
@@ -56,7 +56,7 @@ class TestDatabaseSaveIntegration:
 
     def test_idea_table_has_correct_schema(self):
         """Test that the Idea table has the schema from the problem statement."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # Verify table columns
         cursor = db.conn.cursor()
@@ -78,7 +78,7 @@ class TestDatabaseSaveIntegration:
 
     def test_insert_idea_text(self):
         """Test inserting idea text into the database."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         idea_text = "My online family around can 2000s fashion help you escape social exclusion"
         idea_id = db.insert_idea(text=idea_text, version=1)
@@ -97,7 +97,7 @@ class TestDatabaseSaveIntegration:
 
     def test_insert_multiple_ideas(self):
         """Test inserting multiple ideas like variant generation does."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # Simulate saving 10 variants
         variant_texts = [
@@ -129,7 +129,7 @@ class TestDatabaseSaveIntegration:
 
     def test_version_constraint_enforced(self):
         """Test that the version CHECK constraint is enforced."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # Negative version should fail due to CHECK constraint
         with pytest.raises(sqlite3.IntegrityError):
@@ -144,7 +144,7 @@ class TestDatabaseSaveIntegration:
 
     def test_default_version_is_one(self):
         """Test that version defaults to 1 when using raw SQL insert."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # Insert using raw SQL without version
         cursor = db.conn.cursor()
@@ -159,7 +159,7 @@ class TestDatabaseSaveIntegration:
 
     def test_created_at_auto_generated(self):
         """Test that created_at is auto-generated."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         idea_id = db.insert_idea(text="Auto timestamp test", version=1)
         idea = db.get_idea(idea_id)
@@ -188,7 +188,7 @@ class TestDatabaseSaveWithFormatIdeaAsText:
 
     def test_save_formatted_idea_text(self):
         """Test saving a formatted idea text like the interactive script does."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # Simulated output from format_idea_as_text
         formatted_text = """Variant 10: Chosen Family + Online Connection Blend
@@ -210,7 +210,7 @@ What's missing in offline relationships"""
 
     def test_save_long_text(self):
         """Test saving longer formatted idea text."""
-        db = setup_idea_database(self.db_path)
+        db = setup_idea_table(self.db_path)
 
         # A longer text that might come from format_idea_as_text
         long_text = """This is a story about finding belonging in unexpected places.
@@ -237,7 +237,7 @@ class TestDatabaseSearchAndRetrieve:
         """Create a temporary database with test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_idea_database(self.db_path)
+        self.db = setup_idea_table(self.db_path)
 
         # Insert test ideas
         self.db.insert_idea("Online community story about gaming", version=1)

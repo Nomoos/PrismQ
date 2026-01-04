@@ -520,9 +520,11 @@ def setup_story_table(db_path: str = "db.s3db") -> StoryTable:
     return db
 
 
-# Backward compatibility aliases - DEPRECATED
-StoryDatabase = StoryTable
-setup_story_database = setup_story_table
+__all__ = [
+    "CLEAR_IDEA_ID",
+    "StoryTable",
+    "setup_story_table",
+]
 
 
 __all__ = [

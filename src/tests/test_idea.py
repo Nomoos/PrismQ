@@ -6,17 +6,17 @@ import tempfile
 
 import pytest
 
-from src import IdeaDatabase, setup_idea_database
+from src import IdeaTable, setup_idea_table
 
 
-class TestIdeaDatabaseSetup:
+class TestIdeaTableSetup:
     """Test database setup and connection."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = IdeaDatabase(self.db_path)
+        self.db = IdeaTable(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -55,8 +55,8 @@ class TestIdeaDatabaseSetup:
         assert result[0] == "Idea"
 
     def test_setup_function(self):
-        """Test the setup_idea_database helper function."""
-        db = setup_idea_database(self.db_path)
+        """Test the setup_idea_table helper function."""
+        db = setup_idea_table(self.db_path)
 
         assert db is not None
         assert db.conn is not None
@@ -75,14 +75,14 @@ class TestIdeaDatabaseSetup:
         db.close()
 
 
-class TestIdeaDatabaseCRUD:
+class TestIdeaTableCRUD:
     """Test CRUD operations on Idea database."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_idea_database(self.db_path)
+        self.db = setup_idea_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -213,14 +213,14 @@ class TestIdeaDatabaseCRUD:
         assert success is False
 
 
-class TestIdeaDatabaseVersionConstraint:
+class TestIdeaTableVersionConstraint:
     """Test version constraint enforcement (CHECK >= 0)."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_idea_database(self.db_path)
+        self.db = setup_idea_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -271,14 +271,14 @@ class TestIdeaDatabaseVersionConstraint:
         assert idea["version"] == 1
 
 
-class TestIdeaDatabaseSearch:
+class TestIdeaTableSearch:
     """Test search and query operations."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_idea_database(self.db_path)
+        self.db = setup_idea_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
@@ -341,14 +341,14 @@ class TestIdeaDatabaseSearch:
         assert self.db.get_max_version() == 3  # Still 3
 
 
-class TestIdeaDatabaseScore:
+class TestIdeaTableScore:
     """Test score field functionality."""
 
     def setup_method(self):
         """Create a temporary database for each test."""
         self.temp_dir = tempfile.mkdtemp()
         self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
-        self.db = setup_idea_database(self.db_path)
+        self.db = setup_idea_table(self.db_path)
 
     def teardown_method(self):
         """Clean up the temporary database."""
