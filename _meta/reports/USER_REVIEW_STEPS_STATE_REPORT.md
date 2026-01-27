@@ -544,5 +544,181 @@ If action is required based on this investigation:
 ---
 
 **Report Status:** ✅ Complete  
-**Last Updated:** 2026-01-26  
+**Last Updated:** 2026-01-27  
 **Next Review:** After addressing compliance issues
+
+---
+
+## 13. NEW: Guided Review Tools
+
+Following user feedback, we've created interactive guided review tools for systematic validation of each workflow stage.
+
+### Comprehensive Guided Review
+
+**Location:** `_meta/docs/guidelines/GUIDED_SCRIPT_REVIEW.md`
+
+**Purpose:** Complete step-by-step checklist for validating all 30 workflow stages
+
+**Features:**
+- Detailed pre-execution checks for each stage
+- Script execution validation (Preview and Run modes)
+- Quality assessment criteria per stage
+- Output verification checklists
+- Decision gates (Pass/Fail/Iterate)
+- Issue tracking sections
+- Final sign-off template
+
+**Use Cases:**
+- Manual quality assurance testing
+- New team member onboarding
+- Workflow validation after changes
+- Documentation of review process
+- Issue identification and tracking
+
+**Example Section Structure:**
+```markdown
+## Stage 03: Title Generation
+
+### Pre-Execution Checks
+- [ ] Stage 02 completed (Stories exist)
+- [ ] AI model accessible
+
+### Script Execution (Preview Mode)
+- [ ] Script identifies Stories needing titles
+- [ ] Title generation completes
+
+### Title Quality Validation
+- [ ] Title reflects story content
+- [ ] Appropriate length
+- [ ] No grammatical errors
+
+### Issues Found
+[Documentation space]
+```
+
+---
+
+### Interactive Script Questionnaire
+
+**Location:** `_meta/docs/guidelines/INTERACTIVE_SCRIPT_QUESTIONNAIRE.md`
+
+**Purpose:** Quick Q&A format for interactive validation, optimized for agent task UI
+
+**Features:**
+- Concise Yes/No questions with detail fields
+- 3-6 questions per stage (quick review)
+- Easy to copy stage-specific sections
+- Quick status summary template
+- Perfect for conversational agents
+- Suitable for automated testing
+
+**Use Cases:**
+- Agent task UI interactions
+- Quick validation sessions
+- Automated test script generation
+- Fast quality checks
+- Status reporting
+
+**Example Format:**
+```markdown
+## Stage 03: Title Generation
+
+**Q1:** Does the script find Stories to process?  
+**A:** [ ] Yes / [ ] No - Details: ___________
+
+**Q2:** Are titles generated successfully?  
+**A:** [ ] Yes / [ ] No - Details: ___________
+
+**Q3:** Are titles engaging and relevant?  
+**A:** [ ] Yes / [ ] No - Example: ___________
+
+**Ready for next stage?** [ ] Yes / [ ] No
+```
+
+---
+
+### Usage Examples
+
+#### For Manual Review
+```bash
+# Print or use digitally as checklist
+# Work through each stage systematically
+# Mark checkboxes as verification completes
+# Document issues in provided sections
+```
+
+#### For Agent Task UI
+```
+Prompt: "Please review Stage 03 using the questionnaire:
+Q1: Does the script find Stories to process?
+Q2: Are titles generated successfully?
+[etc.]"
+
+Agent responds with answers and details.
+```
+
+#### For Automated Testing
+```python
+# Parse questionnaire format
+# Automate verification where possible
+# Generate test reports
+# Track pass/fail rates per stage
+```
+
+---
+
+### Integration with Existing Documentation
+
+These guided review tools complement existing documentation:
+
+- **[PR Review Checklist](../docs/guidelines/PR_CODE_REVIEW_CHECKLIST.md)** - For code changes
+- **[Script Compliance Audit](../docs/guidelines/SCRIPT_COMPLIANCE_AUDIT.md)** - Known issues
+- **[Workflow Documentation](../WORKFLOW.md)** - Stage definitions
+- **[MVP Stages](../docs/workflow/mvp-stages.md)** - Detailed stage specs
+
+---
+
+### Workflow Coverage
+
+**All 30 stages covered:**
+
+1-13: Text creation and iteration loops  
+14-20: Quality review dimensions (Grammar, Tone, Content, etc.)  
+21-22: Expert review (optional)  
+23: Publishing finalization  
+21-24: Audio production  
+26-28: Video production  
+30: Analytics tracking
+
+Each stage includes:
+- Functionality validation
+- Quality assessment
+- Output verification
+- Pass/fail criteria
+- Issue tracking
+
+---
+
+### Benefits
+
+**For Users:**
+- Clear validation process
+- Systematic quality assurance
+- Issue identification
+- Progress tracking
+
+**For Developers:**
+- Testing framework foundation
+- Documentation of expected behavior
+- Bug reporting structure
+- Quality gates definition
+
+**For QA Teams:**
+- Standardized review process
+- Repeatable validation
+- Comprehensive coverage
+- Issue tracking integration
+
+---
+
+**Status:** ✅ Guided review tools complete and ready for use

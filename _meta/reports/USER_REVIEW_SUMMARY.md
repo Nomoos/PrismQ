@@ -283,3 +283,31 @@ PrismQ has a **robust and well-designed review infrastructure**. The identified 
 **Status:** ✅ Investigation Complete  
 **Next Steps:** Address compliance issues from audit  
 **Full Report:** [USER_REVIEW_STEPS_STATE_REPORT.md](./USER_REVIEW_STEPS_STATE_REPORT.md)
+
+---
+
+## 🎯 NEW: Guided Review Tools
+
+**Interactive validation tools for each workflow stage:**
+
+### Comprehensive Guided Review
+**[GUIDED_SCRIPT_REVIEW.md](..docs/guidelines/GUIDED_SCRIPT_REVIEW.md)**
+- Complete checklist for all 30 stages
+- Detailed validation criteria per stage
+- Quality assessment questions
+- Issue tracking sections
+- Sign-off template
+
+### Quick Interactive Questionnaire
+**[INTERACTIVE_SCRIPT_QUESTIONNAIRE.md](../docs/guidelines/INTERACTIVE_SCRIPT_QUESTIONNAIRE.md)**
+- Concise Q&A format for each stage
+- Yes/No questions with detail fields
+- Perfect for agent task UI
+- Quick status summary
+- Easy to copy per-stage sections
+
+**Usage:**
+- **Manual Review:** Use as checklist when validating scripts
+- **Agent Task UI:** Copy stage-specific questions into prompts
+- **Automated Testing:** Parse format for test automation
+- **Quality Assurance:** Systematic validation of entire workflow
