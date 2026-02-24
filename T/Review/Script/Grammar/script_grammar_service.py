@@ -51,10 +51,10 @@ from .script_grammar_review import (
 )
 
 # State constants for this module
-INPUT_STATE = StateNames.REVIEW_SCRIPT_GRAMMAR  # PrismQ.T.Review.Content.Grammar
-OUTPUT_STATE_PASS = StateNames.REVIEW_SCRIPT_CONSISTENCY  # PrismQ.T.Review.Content.Consistency
+INPUT_STATE = StateNames.REVIEW_CONTENT_GRAMMAR  # PrismQ.T.Review.Content.Grammar
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_CONSISTENCY  # PrismQ.T.Review.Content.Consistency
 OUTPUT_STATE_FAIL = (
-    StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
+    StateNames.CONTENT_FROM_TITLE_REVIEW_CONTENT
 )  # PrismQ.T.Content.From.Title.Review.Content
 
 # Default pass threshold for grammar review
