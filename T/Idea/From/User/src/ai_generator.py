@@ -90,6 +90,10 @@ def apply_template(template: str, **kwargs) -> str:
     if 'input' in kwargs:
         input_value = kwargs['input']
         result = result.replace('[INPUT]', str(input_value))
+        # Also handle legacy INSERTTEXTHERE / INSERT_TEXT_HERE / INSERT TEXT HERE formats
+        result = result.replace('INSERTTEXTHERE', str(input_value))
+        result = result.replace('INSERT_TEXT_HERE', str(input_value))
+        result = result.replace('INSERT TEXT HERE', str(input_value))
     
     # Handle [FLAVOR] placeholder
     if 'flavor' in kwargs:
