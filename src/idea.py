@@ -1,40 +1,35 @@
 """Idea table manager for PrismQ's shared database.
 
-This module provides the IdeaTable class for managing the Idea table in PrismQ's
-shared database (db.s3db). The Idea table stores prompt-based idea data that can
-be created by PrismQ.T.Idea.From.User or PrismQ.Idea.Fusion.
+This module provides the IdeaTable class for managing the Idea and
+IdeaInspiration tables in PrismQ's shared database (db.s3db).
 
 IMPORTANT: PrismQ uses ONE shared database (db.s3db) for ALL modules.
-The Idea table is one of many tables in this shared database.
-
-The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 
 Schema:
-    -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
-    -- Text field contains prompt-like content for content generation
-    -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-    -- Note: review_id is optional FK to Review table for idea quality assessment
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT,                                      -- Prompt-like text describing the idea
-        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-        review_id INTEGER,                              -- Optional FK to Review table
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        text TEXT,
+        version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
+        review_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
+    )
+
+    IdeaInspiration (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        idea_id INTEGER NOT NULL,
+        inspiration_id TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+        UNIQUE(idea_id, inspiration_id)
     )
 
 Usage:
     from src.idea import IdeaTable, setup_idea_table
 
-    # Setup table manager for shared database (default: db.s3db)
     db = setup_idea_table()
-
-    # Insert an idea
     idea_id = db.insert_idea("Write a horror story about...")
-
-    # Retrieve it
-    idea = db.get_idea(idea_id)
-    print(idea["text"])
-
+    db.add_inspiration(idea_id, "user-input-1")
     db.close()
 """
 
@@ -92,19 +87,7 @@ class IdeaTable:
             self.conn = None
 
     def create_tables(self) -> None:
-        """Create database schema for Idea.
-
-        Creates the Idea table with the schema:
-            - id: INTEGER PRIMARY KEY AUTOINCREMENT
-            - text: TEXT (prompt-like content for content generation)
-            - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
-            - review_id: INTEGER (optional FK to Review table)
-            - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
-
-        Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
-        Note: review_id is optional FK to Review table for idea quality assessment.
-        Note: Review table must exist before creating Idea table due to FK constraint.
-        """
+        """Create Idea and IdeaInspiration tables."""
         if not self.conn:
             self.connect()
 
@@ -123,8 +106,6 @@ class IdeaTable:
         )
 
         # Create Idea table
-        # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-        # Note: review_id is optional FK to Review table
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS Idea (
@@ -138,28 +119,35 @@ class IdeaTable:
         """
         )
 
-        # Create index on version for efficient queries
+        # Create IdeaInspiration junction table
         cursor.execute(
             """
-            CREATE INDEX IF NOT EXISTS idx_idea_version 
-            ON Idea(version)
+            CREATE TABLE IF NOT EXISTS IdeaInspiration (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                idea_id INTEGER NOT NULL,
+                inspiration_id TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+                UNIQUE(idea_id, inspiration_id)
+            )
         """
         )
 
-        # Create index on created_at for chronological queries
+        # Indexes
         cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_idea_created_at 
-            ON Idea(created_at)
-        """
+            "CREATE INDEX IF NOT EXISTS idx_idea_version ON Idea(version)"
         )
-
-        # Create index on review_id for efficient FK lookups
         cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
-            ON Idea(review_id)
-        """
+            "CREATE INDEX IF NOT EXISTS idx_idea_created_at ON Idea(created_at)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_idea_review_id ON Idea(review_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_idea_inspiration_idea_id ON IdeaInspiration(idea_id)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_idea_inspiration_inspiration_id ON IdeaInspiration(inspiration_id)"
         )
 
         self.conn.commit()
@@ -184,7 +172,6 @@ class IdeaTable:
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
-                                   or if review_id references non-existent Review
         """
         if not self.conn:
             self.connect()
@@ -220,7 +207,7 @@ class IdeaTable:
             idea_dict: Dictionary with the following keys:
                 - text (str): Prompt-like text content (required, defaults to "" if missing)
                 - version (int): Version number (optional, defaults to 1 if missing)
-                - review_id (int): Optional FK to Review table (optional, defaults to None)
+                - review_id (int): Optional FK to Review table (optional)
                 - created_at (str): Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -315,18 +302,13 @@ class IdeaTable:
             idea_id: ID of the idea to update
             text: New text content (optional, not updated if None)
             version: New version number (optional, must be >= 0, not updated if None)
-            review_id: New review_id (optional FK to Review table, not updated if None)
+            review_id: New review_id FK to Review table (optional, not updated if None)
 
         Returns:
             True if successful, False otherwise
 
         Raises:
             sqlite3.IntegrityError: If version is negative (CHECK constraint violation)
-                                   or if review_id references non-existent Review
-        
-        Note:
-            To clear review_id, you need to pass a valid integer value or update directly via SQL.
-            Passing None for any parameter means "don't update this field".
         """
         if not self.conn:
             self.connect()
@@ -349,6 +331,7 @@ class IdeaTable:
         if review_id is not None:
             updates.append("review_id = ?")
             params.append(review_id)
+            params.append(version)
 
         if not updates:
             return False
@@ -426,6 +409,93 @@ class IdeaTable:
         result = cursor.fetchone()[0]
 
         return result if result is not None else 0
+
+    # =========================================================================
+    # IdeaInspiration CRUD
+    # =========================================================================
+
+    def add_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
+        """Link an inspiration source to an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+            inspiration_id: Text identifier of the inspiration source
+
+        Returns:
+            True if added, False if already exists
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO IdeaInspiration (idea_id, inspiration_id) VALUES (?, ?)",
+                (idea_id, inspiration_id),
+            )
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def get_inspirations(self, idea_id: int) -> List[str]:
+        """Get all inspiration IDs linked to an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+
+        Returns:
+            List of inspiration ID strings (empty if none)
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT inspiration_id FROM IdeaInspiration WHERE idea_id = ?",
+            (idea_id,),
+        )
+        return [row[0] for row in cursor.fetchall()]
+
+    def get_ideas_by_inspiration(self, inspiration_id: str) -> List[Dict[str, Any]]:
+        """Get all Ideas linked to a specific inspiration source.
+
+        Args:
+            inspiration_id: Text identifier of the inspiration source
+
+        Returns:
+            List of Idea dictionaries
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT DISTINCT idea_id FROM IdeaInspiration WHERE inspiration_id = ?",
+            (inspiration_id,),
+        )
+        return [self.get_idea(row[0]) for row in cursor.fetchall()]
+
+    def remove_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
+        """Remove an inspiration link from an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+            inspiration_id: Text identifier of the inspiration source
+
+        Returns:
+            True if removed, False if not found
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "DELETE FROM IdeaInspiration WHERE idea_id = ? AND inspiration_id = ?",
+            (idea_id, inspiration_id),
+        )
+        self.conn.commit()
+        return cursor.rowcount > 0
 
 
 def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:

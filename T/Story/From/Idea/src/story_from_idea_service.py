@@ -50,6 +50,9 @@ idea_model_path = t_module_dir / "Idea" / "Model"
 database_path = t_module_dir / "Database"
 
 # Ensure paths are available
+_src_root = str(t_module_dir / ".." / "src")
+if _src_root not in sys.path:
+    sys.path.insert(0, _src_root)
 if str(idea_model_path / "src") not in sys.path:
     sys.path.insert(0, str(idea_model_path / "src"))
 if str(idea_model_path) not in sys.path:
@@ -59,9 +62,9 @@ if str(database_path) not in sys.path:
 if str(t_module_dir) not in sys.path:
     sys.path.insert(0, str(t_module_dir))
 
-# Import SimpleIdea model and database
+# Import Idea model and database
 from simple_idea import SimpleIdea
-from simple_idea_db import SimpleIdeaDatabase
+from idea import IdeaTable as SimpleIdeaDatabase
 
 # Import database models and repositories
 from Model.Database.models.story import Story, StoryState

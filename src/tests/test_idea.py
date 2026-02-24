@@ -340,3 +340,98 @@ class TestIdeaTableSearch:
         self.db.insert_idea("v2", version=2)
         assert self.db.get_max_version() == 3  # Still 3
 
+
+class TestIdeaTableInspirations:
+    """Test inspiration reference operations (M:N, nullable)."""
+
+    def setup_method(self):
+        """Create a temporary database for each test."""
+        self.temp_dir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.temp_dir, "test_ideas.db")
+        self.db = setup_idea_table(self.db_path)
+
+    def teardown_method(self):
+        """Clean up the temporary database."""
+        if self.db.conn:
+            self.db.close()
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+        os.rmdir(self.temp_dir)
+
+    def test_add_inspiration(self):
+        """Test linking an inspiration source to an idea."""
+        idea_id = self.db.insert_idea("Horror story idea", version=1)
+        result = self.db.add_inspiration(idea_id, "user-input-1")
+        assert result is True
+
+    def test_add_duplicate_inspiration_returns_false(self):
+        """Test that adding duplicate inspiration returns False."""
+        idea_id = self.db.insert_idea("Horror story idea", version=1)
+        self.db.add_inspiration(idea_id, "user-input-1")
+        result = self.db.add_inspiration(idea_id, "user-input-1")
+        assert result is False
+
+    def test_get_inspirations(self):
+        """Test getting all inspirations for an idea."""
+        idea_id = self.db.insert_idea("Fusion idea", version=1)
+        self.db.add_inspiration(idea_id, "source-1")
+        self.db.add_inspiration(idea_id, "source-2")
+        self.db.add_inspiration(idea_id, "source-3")
+
+        inspirations = self.db.get_inspirations(idea_id)
+        assert len(inspirations) == 3
+        assert "source-1" in inspirations
+        assert "source-2" in inspirations
+        assert "source-3" in inspirations
+
+    def test_get_inspirations_empty(self):
+        """Test that idea without inspirations returns empty list."""
+        idea_id = self.db.insert_idea("No inspirations", version=1)
+        inspirations = self.db.get_inspirations(idea_id)
+        assert inspirations == []
+
+    def test_get_ideas_by_inspiration(self):
+        """Test getting all ideas from a specific inspiration source."""
+        id1 = self.db.insert_idea("Idea from source A", version=1)
+        id2 = self.db.insert_idea("Another idea from source A", version=1)
+        id3 = self.db.insert_idea("Idea from source B", version=1)
+
+        self.db.add_inspiration(id1, "source-A")
+        self.db.add_inspiration(id2, "source-A")
+        self.db.add_inspiration(id3, "source-B")
+
+        ideas = self.db.get_ideas_by_inspiration("source-A")
+        assert len(ideas) == 2
+
+    def test_remove_inspiration(self):
+        """Test removing an inspiration link."""
+        idea_id = self.db.insert_idea("Test idea", version=1)
+        self.db.add_inspiration(idea_id, "source-1")
+        self.db.add_inspiration(idea_id, "source-2")
+
+        result = self.db.remove_inspiration(idea_id, "source-1")
+        assert result is True
+
+        inspirations = self.db.get_inspirations(idea_id)
+        assert len(inspirations) == 1
+        assert "source-2" in inspirations
+
+    def test_remove_nonexistent_inspiration(self):
+        """Test removing non-existent inspiration returns False."""
+        idea_id = self.db.insert_idea("Test idea", version=1)
+        result = self.db.remove_inspiration(idea_id, "nonexistent")
+        assert result is False
+
+    def test_idea_inspirations_table_created(self):
+        """Test that IdeaInspiration table exists."""
+        cursor = self.db.conn.cursor()
+        cursor.execute(
+            """
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name='IdeaInspiration'
+        """
+        )
+        result = cursor.fetchone()
+        assert result is not None
+        assert result[0] == "IdeaInspiration"
+

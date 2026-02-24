@@ -23,6 +23,69 @@ The database file is stored in the PrismQ working directory:
 
 All database models are located in the **[T/Database/](../../T/Database/)** module.
 
+### Idea
+
+**File**: `Model/Entities/idea.py`
+
+Simple prompt-based idea data. Story references Idea via FK in `Story.idea_id`.
+
+```sql
+Idea (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,
+    version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
+    review_id INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (review_id) REFERENCES Review(id)
+)
+
+-- Performance indexes
+CREATE INDEX idx_idea_created_at ON Idea(created_at);
+CREATE INDEX idx_idea_review_id ON Idea(review_id);
+```
+
+**Fields:**
+- `id`: Primary key (auto-generated)
+- `text`: Prompt-like text describing the idea
+- `version`: Version number (>= 0, simulates unsigned integer)
+- `review_id`: FK to Review (optional, for idea quality assessment)
+- `created_at`: Timestamp of creation
+
+---
+
+### IdeaInspiration
+
+**File**: `Model/Entities/idea.py`
+
+Links Idea to its inspiration sources (M:N, nullable). One from user input, or multiple from fusion/other modules.
+
+```sql
+IdeaInspiration (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idea_id INTEGER NOT NULL,
+    inspiration_id TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+    UNIQUE(idea_id, inspiration_id)
+)
+
+-- Performance indexes
+CREATE INDEX idx_idea_inspiration_idea_id ON IdeaInspiration(idea_id);
+CREATE INDEX idx_idea_inspiration_inspiration_id ON IdeaInspiration(inspiration_id);
+```
+
+**Fields:**
+- `id`: Primary key (auto-generated)
+- `idea_id`: FK to Idea (cascade delete)
+- `inspiration_id`: Source ID (user input, fusion, etc.)
+- `created_at`: Timestamp of creation
+
+**Constraints:**
+- `UNIQUE(idea_id, inspiration_id)` - prevents duplicate links
+- Nullable relationship: an Idea can have zero or more inspirations
+
+---
+
 ### Story
 
 **File**: `T/Database/models/story.py`
@@ -210,10 +273,17 @@ CREATE INDEX idx_storyreview_story_version ON StoryReview(story_id, version);
 │                    Entity Relationship Diagram                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│   Idea (external)                                               │
-│      │                                                          │
-│      │ 1:N (one idea spawns 10 stories)                        │
-│      ▼                                                          │
+│   ┌──────────────────┐                                          │
+│   │ IdeaInspiration  │                                          │
+│   └────────┬─────────┘                                          │
+│            │ M:N (nullable)                                      │
+│            ▼                                                     │
+│   ┌────────┐                                                    │
+│   │  Idea  │                                                    │
+│   └────┬───┘                                                    │
+│        │                                                        │
+│        │ 1:N (one idea spawns 10 stories)                       │
+│        ▼                                                        │
 │   ┌─────────┐                                                   │
 │   │  Story  │                                                   │
 │   └────┬────┘                                                   │

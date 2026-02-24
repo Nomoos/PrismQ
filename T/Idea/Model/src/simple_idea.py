@@ -24,15 +24,18 @@ class SimpleIdea:
     It is designed to be referenced by Story via foreign key relationship.
 
     Schema:
-        -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
-        -- Text field contains prompt-like content for content generation
-        -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
         Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,                                      -- Prompt-like text describing the idea
             version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            review_id INTEGER,                              -- Optional FK to Review table
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
+
+    Note: Inspiration references (M:N via IdeaInspiration junction table) are
+    defined in Model/Entities/ but currently unused. They will be activated
+    when T/Idea/Inspiration module is implemented for external idea sources.
 
     Attributes:
         id: Unique identifier (auto-generated in database)

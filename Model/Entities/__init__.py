@@ -8,7 +8,7 @@ Entities:
     - Title: Versioned title content with review FK
     - Script: Versioned script content with review FK
     - Review: Content review scores and feedback
-    - IdeaSchema: SQL schema definition for Idea table
+    - IdeaSchema: SQL schema definition for Idea and IdeaInspiration tables
     - StoryReviewModel: Linking table for Story reviews
 
 Interfaces:

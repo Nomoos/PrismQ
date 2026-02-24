@@ -48,8 +48,8 @@ from Model.State.constants.state_names import StateNames
 
 # Try to import Idea database for fetching idea context
 try:
-    sys.path.insert(0, os.path.join(_t_root, "Idea", "Model", "src"))
-    from simple_idea_db import SimpleIdeaDatabase
+    sys.path.insert(0, os.path.join(_t_root, "..", "src"))
+    from idea import IdeaTable as SimpleIdeaDatabase
     IDEA_DB_AVAILABLE = True
 except ImportError:
     IDEA_DB_AVAILABLE = False

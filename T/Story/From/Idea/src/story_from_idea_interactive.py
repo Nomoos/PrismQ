@@ -55,7 +55,7 @@ except ImportError as e:
 # Try to import SimpleIdea model and database
 try:
     from simple_idea import SimpleIdea
-    from simple_idea_db import SimpleIdeaDatabase
+    from idea import IdeaTable as SimpleIdeaDatabase
 
     IDEA_MODEL_AVAILABLE = True
 except ImportError:

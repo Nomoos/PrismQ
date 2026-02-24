@@ -1,89 +1,27 @@
 # Kontrola běhu modulu: PrismQ.T.Review.Content.From.Title.Idea
 
-## 🎯 Účel modulu
-Review vygenerovaného obsahu (Content) proti titulku a původnímu nápadu. Modul validuje, zda Content odpovídá titulku a original Idea, kontroluje kvalitu, relevanci a konzistenci.
+**Účel:** AI review obsahu proti titulku a původní Idea pro validaci kvality, relevance a konzistence content.
 
 ---
 
-## 📥 Vstupy (Inputs)
-Modul přijímá následující vstupy:
-
-- **Zdroj vstupu:** Databáze (tabulka Story)
-- **Typ dat:** Story objekty ve stavu "PrismQ.T.Review.Content.From.Title.Idea"
-- **Povinné hodnoty:**
-  - Story s title a content fieldy
-  - Platná idea_id reference
-- **Nepovinné hodnoty:**
-  - `--preview`, `--debug` flags
-- **Očekávané předpoklady:**
-  - Stories prošlé modulem 05 (title review passed)
-  - Běžící Ollama server
-  - Přístup k databázi
+## 📥 Vstup
+- **Zdroj:** Databáze (tabulka `Story`)
+- **Data:** Story ve stavu `PrismQ.T.Review.Content.From.Title.Idea` s title, content a idea_id
+- **Předpoklady:** Stories prošlé title review (modul 05), běžící Ollama server
 
 ---
 
-## ⚙️ Zpracování (Processing)
-Průběh zpracování dat v modulu:
-
-1. **Načtení Stories k review** - dotaz na stav "PrismQ.T.Review.Content.From.Title.Idea"
-2. **AI content review:**
-   - Hodnocení relevance content k titulku
-   - Kontrola consistency s Idea
-   - Hodnocení kvality a struktury content
-   - Identifikace problémů
-3. **Vyhodnocení a rozhodnutí:**
-   - Pass → Změna stavu na "PrismQ.T.Review.Title.From.Content" (modul 07)
-   - Fail → Změna stavu na "PrismQ.T.Content.From.Title.Content.Review" (modul 09 - regenerace content)
-
-4. **Loop pro další Stories:**
-   - V continuous mode: čekání 1ms mezi iteracemi, pokud není žádná Story, čekání 30 sekund a opakování dotazu
-   - Možnost ukončení
-
-5. **Update Story a reportování**
-
-6. **Ošetření chyb:**
-   - Žádné Stories k zpracování - informační zpráva, čekání 30 sekund a opakování (continuous mode)
-   - AI nedostupný - error message, ukončení
-   - Review parsing failed - retry, pak skip
-   - DB errors - rollback, logování
+## ⚙️ Zpracování
+1. [Inicializace](shared/inicializace_prostredi.md)
+2. Načtení Stories ve stavu `PrismQ.T.Review.Content.From.Title.Idea`
+3. [AI content review](shared/ollama_ai_integrace.md) — relevance k titulku, konzistence s Idea, kvalita a struktura
+4. Vyhodnocení: pass/fail rozhodnutí
+5. [Uložení výsledků](shared/databazova_integrace.md) — update Story state
+6. [Continuous loop](shared/continuous_mode.md)
 
 ---
 
-## 📤 Výstupy (Outputs)
-Výsledkem běhu modulu je:
-
-- **Primární výstup:** Story objekty s content review metadaty, přesunuty do příslušného stavu
-- **Formát výstupu:** Databáze (updated Stories), konzolový výstup (review results)
-- **Vedlejší efekty:** Review metrics, logs
-- **Chování při chybě:** Retry, skip nebo fail podle typu chyby
-
----
-
-## 🔗 Vazby a závislosti
-
-**Vstupní závislosti:**
-- Modul 05 (PrismQ.T.Review.Title.From.Content.Idea) - předchozí review
-- Ollama server, databáze
-
-**Výstupní závislosti:**
-- Modul 07 (PrismQ.T.Review.Title.From.Content) - pokud pass
-- Modul 09 (PrismQ.T.Content.From.Title.Content.Review) - pokud fail
-
----
-
-## 📝 Poznámky / Rizika
-
-**Poznámky:**
-- Druhý review krok v multi-stage review
-- Fokus na kvalitu a relevanci content
-- Může identifikovat potřebu content regenerace
-
-**Rizika:**
-- AI subjektivita v hodnocení kvality
-- False positives/negatives možné
-- Performance overhead z AI volání
-
-**Doporučení:**
-- Human sampling pro calibraci review kritérií
-- Tracking content quality trends
-- Implementovat kvalitativní metriky
+## 📤 Výstup
+- **Primární:** Content review report s hodnocením
+- **DB změny:** Tabulka `Story` — review metadata, state: Pass → `PrismQ.T.Review.Title.From.Content`, Fail → `PrismQ.T.Content.From.Title.Content.Review`
+- **Další krok:** Pass → Modul 07, Fail → Modul 09 (regenerace content)
