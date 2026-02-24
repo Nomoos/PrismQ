@@ -22,14 +22,16 @@ Schema:
     IdeaInspiration (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         idea_id INTEGER NOT NULL,                       -- FK to Idea
-        inspiration_id TEXT NOT NULL,                    -- Source ID (user input, fusion, etc.)
+        inspiration_id INTEGER NOT NULL,                -- FK to Inspiration
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+        FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id) ON DELETE CASCADE,
         UNIQUE(idea_id, inspiration_id)
     )
 
 The Idea table stores simple prompt-based idea data for content generation.
 Story references Idea via FK in Story.idea_id.
-IdeaInspiration links Ideas to their inspiration sources (nullable M:N).
+IdeaInspiration is a junction table between Idea and Inspiration (M:N).
 """
 
 
@@ -47,6 +49,7 @@ class IdeaSchema:
     Note:
         This class contains ONLY DDL operations - no business logic.
         Version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
+        IdeaInspiration is a junction table between Idea and Inspiration.
     
     Attributes:
         None - this is a schema-only class
@@ -68,7 +71,8 @@ class IdeaSchema:
         Note:
             - version uses INTEGER with CHECK >= 0 to simulate unsigned integer
             - Story references this table via Story.idea_id FK
-            - IdeaInspiration links Ideas to inspiration sources (nullable M:N)
+            - IdeaInspiration is a junction table between Idea and Inspiration (M:N)
+            - Requires Inspiration table to exist (see InspirationSchema)
         """
         return """
         CREATE TABLE IF NOT EXISTS Idea (
@@ -80,13 +84,14 @@ class IdeaSchema:
             FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
-        -- IdeaInspiration: Links Idea to inspiration sources (M:N, nullable)
+        -- IdeaInspiration: Junction table between Idea and Inspiration (M:N)
         CREATE TABLE IF NOT EXISTS IdeaInspiration (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idea_id INTEGER NOT NULL,
-            inspiration_id TEXT NOT NULL,
+            inspiration_id INTEGER NOT NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+            FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id) ON DELETE CASCADE,
             UNIQUE(idea_id, inspiration_id)
         );
         

@@ -3,6 +3,12 @@
 This module provides SQLite database utilities for storing SimpleIdea
 instances with the simplified schema:
 
+    Inspiration (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        text TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
@@ -15,14 +21,16 @@ instances with the simplified schema:
     IdeaInspiration (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         idea_id INTEGER NOT NULL,
-        inspiration_id TEXT NOT NULL,
+        inspiration_id INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+        FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id) ON DELETE CASCADE,
         UNIQUE(idea_id, inspiration_id)
     )
 
 Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
 Note: review_id is optional FK to Review table for idea quality assessment.
-Note: IdeaInspiration links Ideas to inspiration sources (nullable M:N).
+Note: IdeaInspiration is a junction table between Idea and Inspiration (M:N).
 The SimpleIdea table is designed to be referenced by Story via foreign key.
 """
 
