@@ -23,10 +23,6 @@ from .simple_idea import (
     IdeaPromptTemplates,
     SimpleIdea,
 )
-from .simple_idea_db import (
-    SimpleIdeaDatabase,
-    setup_simple_idea_database,
-)
 from .story_translation import (
     MEANING_SCORE_THRESHOLD,
     StoryTranslation,
@@ -50,8 +46,6 @@ __all__ = [
     "SimpleIdea",
     "IdeaPromptTemplates",
     "EXAMPLE_IDEAS",
-    "SimpleIdeaDatabase",
-    "setup_simple_idea_database",
 ]
 
 __version__ = "0.1.0"

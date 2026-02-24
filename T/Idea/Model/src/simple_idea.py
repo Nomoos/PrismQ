@@ -88,7 +88,6 @@ class SimpleIdea:
             text=data.get("text", ""),
             version=data.get("version", 1),
             created_at=data.get("created_at"),
-            inspiration_ids=data.get("inspiration_ids", []),
         )
 
     def create_new_version(self, text: Optional[str] = None) -> "SimpleIdea":
@@ -105,7 +104,6 @@ class SimpleIdea:
             text=text if text is not None else self.text,
             version=self.version + 1,
             created_at=None,  # New timestamp will be generated
-            inspiration_ids=list(self.inspiration_ids),  # Carry over inspirations
         )
 
     @classmethod

@@ -8,8 +8,7 @@ Entities:
     - Title: Versioned title content with review FK
     - Script: Versioned script content with review FK
     - Review: Content review scores and feedback
-    - IdeaSchema: SQL schema definition for Idea table
-    - InspirationSchema: SQL schema definition for Inspiration table
+    - IdeaSchema: SQL schema definition for Idea and IdeaInspiration tables
     - StoryReviewModel: Linking table for Story reviews
 
 Interfaces:
@@ -27,7 +26,6 @@ from Model.Entities.title import Title
 from Model.Entities.script import Script
 from Model.Entities.review import Review
 from Model.Entities.idea import IdeaSchema
-from Model.Entities.inspiration import InspirationSchema
 
 try:
     from Model.Entities.story_review import StoryReviewModel, ReviewType
@@ -45,7 +43,6 @@ __all__ = [
     "Script",
     "Review",
     "IdeaSchema",
-    "InspirationSchema",
     "StoryReviewModel",
     "ReviewType",
 ]

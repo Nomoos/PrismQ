@@ -115,7 +115,7 @@ except ImportError:
 
 # Try to import SimpleIdeaDatabase for fetching Idea content
 try:
-    from simple_idea_db import SimpleIdeaDatabase
+    from idea import IdeaTable as SimpleIdeaDatabase
 
     SIMPLE_IDEA_DB_AVAILABLE = True
 except ImportError:
