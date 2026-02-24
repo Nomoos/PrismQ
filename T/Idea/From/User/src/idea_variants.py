@@ -76,17 +76,31 @@ class IdeaGenerator:
         flavor_name: str,
         input_text: str,
         variation_index: int = 0,
-        second_flavor_chance: float = 0.2,
+        second_flavor_chance: float = 0.3,
         db: Optional[Any] = None,
         logger: Optional[logging.Logger] = None,
     ) -> Dict[str, Any]:
         """Generate an idea using a specific flavor.
-        
+
+        Starting from ``flavor_name`` the method uses
+        :meth:`FlavorSelector.select_flavor_combination` to recursively add
+        extra flavors.  Each additional flavor is appended with
+        ``second_flavor_chance`` probability (matches
+        ``FlavorSelector.MULTI_FLAVOR_CHANCE`` = 0.3 by default), producing:
+
+            2nd flavor   30 %
+            3rd flavor    9 %  (0.3²)
+            4th flavor  2.7 %  (0.3³)  … and so on
+
+        No flavor is also handled gracefully: when the combination is empty
+        the idea is generated without any flavor guidance.
+
         Args:
-            flavor_name: Name of the flavor to use
+            flavor_name: Name of the primary flavor to use
             input_text: Raw input text from user (no parsing or processing)
             variation_index: Variation number for uniqueness
-            second_flavor_chance: Probability (0.0-1.0) of adding a second flavor (default: 0.2)
+            second_flavor_chance: Probability (0.0-1.0) of adding each extra
+                                  flavor recursively (default: 0.3)
             db: Optional database connection for direct save after generation
             logger: Optional logger for tracking
             
@@ -99,42 +113,34 @@ class IdeaGenerator:
         """
         if not input_text:
             raise ValueError("input_text parameter is required and cannot be empty")
-        
-        flavor = self.loader.get_flavor(flavor_name)
+
+        # Validate primary flavor exists
+        self.loader.get_flavor(flavor_name)
         seed = self._generate_seed(input_text, variation_index)
-        
-        # Determine if we should add a second flavor (small chance)
-        rng = random.Random(seed)
-        use_second_flavor = rng.random() < second_flavor_chance
-        
-        # Build variant name for display
-        variant_name = flavor_name
-        
-        # If using second flavor, select one and update variant name
-        second_flavor_name = None
-        if use_second_flavor:
-            # Get all available flavors
-            all_flavors = self.loader.list_flavor_names()
-            # Remove the first flavor from the list to avoid duplicates
-            available_flavors = [f for f in all_flavors if f != flavor_name]
-            if available_flavors:
-                second_flavor_name = rng.choice(available_flavors)
-                variant_name = f"{flavor_name} + {second_flavor_name}"
-                if logger:
-                    logger.info(f"Using dual flavor: {variant_name}")
-        
+
+        # Build a recursive flavor combination starting from flavor_name
+        selector = FlavorSelector(self.loader)
+        combination = selector.select_flavor_combination(
+            primary_flavor=flavor_name,
+            seed=seed,
+            multi_chance=second_flavor_chance,
+        )
+
+        # combination is always non-empty here (primary_flavor is always kept)
+        variant_name = " + ".join(combination)
+        if len(combination) > 1 and logger:
+            logger.info(f"Using multi-flavor combination: {variant_name}")
+
         # Generate complete refined idea using idea_improvement prompt
         if not self.ai_generator:
             raise RuntimeError(
                 "AI generator not available. Cannot generate ideas without AI. "
                 "Please ensure Ollama is installed and running."
             )
-        
-        # Combine flavors for the prompt
-        flavor_text = flavor_name
-        if second_flavor_name:
-            flavor_text = f"{flavor_name} and {second_flavor_name}"
-        
+
+        # Build flavor text: joined names, or empty string when no flavor
+        flavor_text = " and ".join(combination) if combination else ""
+
         # Use idea_improvement prompt to generate complete refined idea
         # Pass input_text directly without any parsing or transformation
         generated_idea = self.ai_generator.generate_with_custom_prompt(
@@ -361,7 +367,19 @@ class FlavorSelector:
     
     Single Responsibility: Flavor selection logic only.
     """
-    
+
+    # Default number of ideas (slots) to generate
+    DEFAULT_COUNT = 10
+
+    # Base probability that each additional flavor is appended to a combination.
+    # Produces the following per-level probabilities:
+    #   1st flavor  100 %   (always)
+    #   2nd flavor   30 %   (MULTI_FLAVOR_CHANCE)
+    #   3rd flavor    9 %   (0.3²)
+    #   4th flavor  2.7 %   (0.3³)
+    #   5th flavor  0.81 %  (0.3⁴)  … and so on
+    MULTI_FLAVOR_CHANCE: float = 0.3
+
     def __init__(self, flavor_loader=None):
         """Initialize flavor selector.
         
@@ -387,17 +405,79 @@ class FlavorSelector:
         flavor_weights = [weights.get(f, 50) for f in flavors]
         
         return rng.choices(flavors, weights=flavor_weights, k=1)[0]
-    
+
+    def select_flavor_combination(
+        self,
+        primary_flavor: Optional[str] = None,
+        seed: Optional[int] = None,
+        multi_chance: float = MULTI_FLAVOR_CHANCE,
+        no_flavor_chance: float = 0.0,
+    ) -> List[str]:
+        """Select a flavor combination using recursive multi-flavor probability.
+
+        Returns an empty list (no flavor) with ``no_flavor_chance`` probability,
+        which is a perfectly valid case that produces unguided, neutral generation.
+
+        Otherwise always selects at least one flavor, then each additional flavor
+        is appended with ``multi_chance`` (default 30%), giving:
+
+            1st flavor  100 %
+            2nd flavor   30 %   (multi_chance)
+            3rd flavor    9 %   (multi_chance²)
+            4th flavor  2.7 %   (multi_chance³)
+            5th flavor  0.81%   (multi_chance⁴)  … and so on
+
+        All selections use weighted random so high-weight flavors appear more
+        often.  Duplicates within a single combination are never produced.
+
+        Args:
+            primary_flavor: First flavor to include.  If None a weighted-random
+                            flavor is chosen automatically.
+            seed: Optional seed for reproducible results.
+            multi_chance: Probability (0–1) of appending each extra flavor.
+                          Default: ``MULTI_FLAVOR_CHANCE`` (0.3).
+            no_flavor_chance: Probability (0–1) of returning an empty list,
+                              i.e. no flavor at all.  Default: 0.0 (never).
+
+        Returns:
+            List of unique flavor names (may be empty when no_flavor_chance > 0).
+        """
+        rng = random.Random(seed) if seed is not None else random.Random()
+
+        # Possibly return no flavors (valid case for unguided generation)
+        if no_flavor_chance > 0.0 and rng.random() < no_flavor_chance:
+            return []
+
+        flavors = self.loader.list_flavor_names()
+        weights = self.loader.get_weights()
+
+        # --- first flavor ---
+        if primary_flavor is not None:
+            selected = [primary_flavor]
+        else:
+            flavor_weights = [weights.get(f, 50) for f in flavors]
+            selected = [rng.choices(flavors, weights=flavor_weights, k=1)[0]]
+
+        # --- recursively add more flavors ---
+        remaining = [f for f in flavors if f not in selected]
+        while remaining and rng.random() < multi_chance:
+            remaining_weights = [weights.get(f, 50) for f in remaining]
+            next_flavor = rng.choices(remaining, weights=remaining_weights, k=1)[0]
+            selected.append(next_flavor)
+            remaining = [f for f in remaining if f != next_flavor]
+
+        return selected
+
     def select_multiple(
         self,
-        count: int,
+        count: int = DEFAULT_COUNT,
         seed: Optional[int] = None,
         allow_duplicates: bool = False,
     ) -> List[str]:
         """Select multiple flavors using weighted random selection.
         
         Args:
-            count: Number of flavors to select
+            count: Number of flavors to select (default: DEFAULT_COUNT = 10)
             seed: Optional seed for reproducibility
             allow_duplicates: If False, ensures unique flavors
             
@@ -554,14 +634,14 @@ def pick_weighted_flavor(seed: Optional[int] = None) -> str:
 
 
 def pick_multiple_weighted_flavors(
-    count: int,
+    count: int = FlavorSelector.DEFAULT_COUNT,
     seed: Optional[int] = None,
     allow_duplicates: bool = False,
 ) -> List[str]:
     """Pick multiple flavors - convenience function.
     
     Args:
-        count: Number to select
+        count: Number to select (default: FlavorSelector.DEFAULT_COUNT = 10)
         seed: Optional seed
         allow_duplicates: Allow duplicate flavors
         
@@ -572,6 +652,37 @@ def pick_multiple_weighted_flavors(
     if _global_selector is None:
         _global_selector = FlavorSelector()
     return _global_selector.select_multiple(count, seed, allow_duplicates)
+
+
+def pick_flavor_combination(
+    primary_flavor: Optional[str] = None,
+    seed: Optional[int] = None,
+    multi_chance: float = FlavorSelector.MULTI_FLAVOR_CHANCE,
+    no_flavor_chance: float = 0.0,
+) -> List[str]:
+    """Pick a recursive flavor combination - convenience function.
+
+    Returns one or more flavors (or an empty list when no_flavor_chance > 0).
+    See :meth:`FlavorSelector.select_flavor_combination` for full details.
+
+    Args:
+        primary_flavor: First flavor name; None for weighted-random selection.
+        seed: Optional seed for reproducibility.
+        multi_chance: Probability of adding each extra flavor (default: 0.3).
+        no_flavor_chance: Probability of returning no flavor (default: 0.0).
+
+    Returns:
+        List of unique flavor names (possibly empty).
+    """
+    global _global_selector
+    if _global_selector is None:
+        _global_selector = FlavorSelector()
+    return _global_selector.select_flavor_combination(
+        primary_flavor=primary_flavor,
+        seed=seed,
+        multi_chance=multi_chance,
+        no_flavor_chance=no_flavor_chance,
+    )
 
 
 def list_flavors() -> List[str]:
@@ -619,4 +730,6 @@ __all__ = [
     # Backward compatibility
     'list_templates',
     'get_template',
+    # FlavorSelector helpers
+    'pick_flavor_combination',
 ]
