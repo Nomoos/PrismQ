@@ -1,6 +1,7 @@
 """Idea database model for PrismQ Database Schema.
 
-This module provides the SQL DDL schema definition for the Idea table.
+This module provides the SQL DDL schema definition for the Idea table
+and IdeaInspiration junction table.
 It follows the same pattern as other database models in PrismQ, with a
 get_sql_schema() method that returns the CREATE TABLE statement.
 
@@ -13,20 +14,28 @@ Schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-        review_id INTEGER,                              -- Optional FK to Review table
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+
+    IdeaInspiration (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        idea_id INTEGER NOT NULL,                       -- FK to Idea
+        inspiration_id TEXT NOT NULL,                    -- Source ID (user input, fusion, etc.)
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(idea_id, inspiration_id)
     )
 
 The Idea table stores simple prompt-based idea data for content generation.
 Story references Idea via FK in Story.idea_id.
-Review can be optionally linked via review_id for idea quality assessment.
+IdeaInspiration links Ideas to their inspiration sources (nullable M:N).
 """
 
 
 class IdeaSchema:
     """Schema definition for Idea table.
     
-    This class provides the SQL CREATE TABLE statement for the Idea table.
+    This class provides the SQL CREATE TABLE statement for the Idea table
+    and the IdeaInspiration junction table.
     It is designed to be used by SchemaManager for database initialization.
     
     The Idea table stores simple prompt-based idea data that serves as
@@ -50,29 +59,37 @@ class IdeaSchema:
         """Get the SQL CREATE TABLE statement for the Idea table.
         
         Returns:
-            SQL statement to create the Idea table with all constraints
-            and performance indexes using CREATE TABLE IF NOT EXISTS
-            for idempotent operations.
+            SQL statement to create the Idea and IdeaInspiration tables
+            with all constraints and performance indexes using
+            CREATE TABLE IF NOT EXISTS for idempotent operations.
         
         Note:
-            - The table is a base table with FK dependency on Review table
             - version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-            - review_id is optional FK to Review table for idea quality assessment
             - Story references this table via Story.idea_id FK
+            - IdeaInspiration links Ideas to inspiration sources (nullable M:N)
         """
         return """
         CREATE TABLE IF NOT EXISTS Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,
             version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-            review_id INTEGER,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        
+        -- IdeaInspiration: Links Idea to inspiration sources (M:N, nullable)
+        CREATE TABLE IF NOT EXISTS IdeaInspiration (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idea_id INTEGER NOT NULL,
+            inspiration_id TEXT NOT NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (review_id) REFERENCES Review(id)
+            FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+            UNIQUE(idea_id, inspiration_id)
         );
         
         -- Performance indexes for common query patterns
         CREATE INDEX IF NOT EXISTS idx_idea_created_at ON Idea(created_at);
-        CREATE INDEX IF NOT EXISTS idx_idea_review_id ON Idea(review_id);
+        CREATE INDEX IF NOT EXISTS idx_idea_inspiration_idea_id ON IdeaInspiration(idea_id);
+        CREATE INDEX IF NOT EXISTS idx_idea_inspiration_inspiration_id ON IdeaInspiration(inspiration_id);
         """
 
 

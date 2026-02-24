@@ -7,12 +7,19 @@ instances with the simplified schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-        review_id INTEGER,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
 
+    IdeaInspiration (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        idea_id INTEGER NOT NULL,
+        inspiration_id TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(idea_id, inspiration_id)
+    )
+
 Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
-Note: review_id is optional FK to Review table for idea quality assessment.
+Note: IdeaInspiration links Ideas to inspiration sources (nullable M:N).
 The SimpleIdea table is designed to be referenced by Story via foreign key.
 """
 
@@ -72,42 +79,25 @@ class SimpleIdeaDatabase:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
             - text: TEXT (prompt-like content)
             - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
-            - review_id: INTEGER (optional FK to Review table)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
 
+        Also creates IdeaInspiration junction table for M:N inspiration links.
+
         Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
-        Note: review_id is optional FK to Review table for idea quality assessment.
-        Note: Review table is created first to satisfy FK constraint.
         """
         if not self.conn:
             self.connect()
 
         cursor = self.conn.cursor()
 
-        # Create Review table first (required for Idea FK constraint)
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS Review (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
-            )
-        """
-        )
-
         # Create simple Idea table
-        # Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
-        # Note: review_id is optional FK to Review table
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS Idea (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-                review_id INTEGER,
-                created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                FOREIGN KEY (review_id) REFERENCES Review(id)
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         """
         )
@@ -128,11 +118,32 @@ class SimpleIdeaDatabase:
         """
         )
 
-        # Create index on review_id for efficient FK lookups
+        # Create IdeaInspiration junction table (M:N: Idea ↔ inspiration sources, nullable)
         cursor.execute(
             """
-            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
-            ON Idea(review_id)
+            CREATE TABLE IF NOT EXISTS IdeaInspiration (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                idea_id INTEGER NOT NULL,
+                inspiration_id TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+                UNIQUE(idea_id, inspiration_id)
+            )
+        """
+        )
+
+        # Create indexes for IdeaInspiration
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_idea_inspiration_idea_id 
+            ON IdeaInspiration(idea_id)
+        """
+        )
+
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_idea_inspiration_inspiration_id 
+            ON IdeaInspiration(inspiration_id)
         """
         )
 
@@ -360,6 +371,96 @@ class SimpleIdeaDatabase:
         result = cursor.fetchone()[0]
 
         return result if result is not None else 0
+
+    # =========================================================================
+    # Inspiration References (M:N: Idea ↔ inspiration sources, nullable)
+    # =========================================================================
+
+    def add_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
+        """Link an inspiration source to an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+            inspiration_id: ID of the inspiration source (user input, fusion, etc.)
+
+        Returns:
+            True if added, False if already exists
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                """
+                INSERT INTO IdeaInspiration (idea_id, inspiration_id)
+                VALUES (?, ?)
+            """,
+                (idea_id, inspiration_id),
+            )
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def get_inspirations(self, idea_id: int) -> List[str]:
+        """Get all inspiration source IDs linked to an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+
+        Returns:
+            List of inspiration IDs (empty if none)
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT inspiration_id FROM IdeaInspiration WHERE idea_id = ?",
+            (idea_id,),
+        )
+        return [row[0] for row in cursor.fetchall()]
+
+    def get_ideas_by_inspiration(self, inspiration_id: str) -> List[Dict[str, Any]]:
+        """Get all Ideas derived from a specific inspiration source.
+
+        Args:
+            inspiration_id: ID of the inspiration source
+
+        Returns:
+            List of Idea dictionaries
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT DISTINCT idea_id FROM IdeaInspiration WHERE inspiration_id = ?",
+            (inspiration_id,),
+        )
+        return [self.get_idea(row[0]) for row in cursor.fetchall()]
+
+    def remove_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
+        """Remove a specific inspiration link from an Idea.
+
+        Args:
+            idea_id: ID of the Idea
+            inspiration_id: ID of the inspiration source to unlink
+
+        Returns:
+            True if removed, False if not found
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "DELETE FROM IdeaInspiration WHERE idea_id = ? AND inspiration_id = ?",
+            (idea_id, inspiration_id),
+        )
+        self.conn.commit()
+        return cursor.rowcount > 0
 
 
 def setup_simple_idea_database(db_path: str = "simple_idea.db") -> SimpleIdeaDatabase:
