@@ -55,7 +55,7 @@ All 12 issues (#101-#112) were successfully completed:
 ## Reference
 
 For current development status, see:
-- [DEVELOPMENT_PLAN.md](../../../DEVELOPMENT_PLAN.md) - Current development plan
+- [DEVELOPMENT_PLAN.md](../../docs/development/DEVELOPMENT_PLAN.md) - Current development plan
 - [ROADMAP.md](../../issues/ROADMAP.md) - Long-term roadmap
 
 ---

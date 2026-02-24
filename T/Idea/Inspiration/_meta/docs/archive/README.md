@@ -41,7 +41,7 @@ Documents are moved to archive when:
 ## Active Documentation
 
 For current planning and development status, see:
-- [DEVELOPMENT_PLAN.md](../../../DEVELOPMENT_PLAN.md) - Unified development plan
+- [DEVELOPMENT_PLAN.md](../../docs/development/DEVELOPMENT_PLAN.md) - Unified development plan
 - [_meta/issues/ROADMAP.md](../../issues/ROADMAP.md) - Long-term roadmap
 - [_meta/issues/INDEX.md](../../issues/INDEX.md) - Current issue tracking
 
