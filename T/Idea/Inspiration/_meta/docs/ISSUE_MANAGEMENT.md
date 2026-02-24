@@ -699,7 +699,7 @@ echo "Done: $(find Source/_meta/issues/done -name "*.md" -type f | wc -l)"
 
 ## 📚 Related Documentation
 
-- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Overall development plan
+- **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** - Overall development plan
 - **[ROADMAP.md](../issues/ROADMAP.md)** - Long-term roadmap
 - **[INDEX.md](../issues/INDEX.md)** - Issue tracking index
 - **[Source Module Index](../../Source/_meta/issues/new/INDEX.md)** - Module planning

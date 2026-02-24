@@ -4,7 +4,7 @@
 **Updated**: 2025-11-17 (Documentation cleanup and SOLID restructure)
 **Purpose**: Master index for issue tracking and workflow
 
-> **Important**: For current development status and overall plan, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> **Important**: For current development status and overall plan, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 
 > **Note**: The Client/Backend module for web-based control panel (Phase 0) has been completed and moved to a separate repository.
 > See [_meta/docs/archive/phase-0/](../_meta/docs/archive/phase-0/) for historical context.
@@ -14,7 +14,7 @@
 ## 🎯 Quick Navigation
 
 ### "I want to understand the overall project status"
-👉 **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** (Unified development plan)
+👉 **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** (Unified development plan)
 - Current phase and progress
 - Team structure and roles
 - Completed and planned work
@@ -66,7 +66,7 @@ _meta/issues/
 
 ### Current Status
 
-See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) for:
+See [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) for:
 - Current phase status
 - Available issues
 - Team assignments
@@ -77,7 +77,7 @@ See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) for:
 ## 🎓 Legacy Planning Documents
 
 The following comprehensive planning documents were created for Phase 0 (Web Client).
-They are preserved for reference but have been superseded by [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md).
+They are preserved for reference but have been superseded by [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md).
 
 ### Phase 0 Planning (Archived)
 - **QUICK_START.md** - One-page action guide
@@ -91,7 +91,7 @@ They are preserved for reference but have been superseded by [DEVELOPMENT_PLAN.m
 
 ### Current Planning
 All current planning is now consolidated in:
-- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Unified plan covering all phases
+- **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** - Unified plan covering all phases
 - **[ROADMAP.md](ROADMAP.md)** - Long-term vision
 - **[Source Module Planning](../../Source/_meta/issues/new/INDEX.md)** - Source module details
 
@@ -116,14 +116,14 @@ All current planning is now consolidated in:
 2. Assign issues from `new/` folders
 3. Track progress via `wip/` and `done/` folders
 
-For detailed status, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+For detailed status, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 
 ---
 
 ## 🔗 Quick Links
 
 ### Primary Documentation
-- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Start here for complete overview
+- **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** - Start here for complete overview
 - **[ROADMAP.md](ROADMAP.md)** - Long-term vision and phases
 - **[KNOWN_ISSUES.md](KNOWN_ISSUES.md)** - Current limitations and bugs
 
@@ -147,12 +147,12 @@ For detailed status, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
 ## 📞 For More Information
 
 ### By Role
-- **Contributors**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For New Contributors"
-- **Team Leads**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For Team Leads"
-- **Project Managers**: See [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "For Project Managers"
+- **Contributors**: See [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) → "For New Contributors"
+- **Team Leads**: See [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) → "For Team Leads"
+- **Project Managers**: See [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) → "For Project Managers"
 
 ### By Need
-- **Current Status**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "Progress Tracking"
+- **Current Status**: [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) → "Progress Tracking"
 - **What to Work On**: Check `_meta/issues/new/` or `Source/_meta/issues/new/`
 - **Historical Context**: See `_meta/docs/archive/`
 

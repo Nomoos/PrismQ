@@ -2,7 +2,7 @@
 
 > ℹ️ **For issue workflow and management, see**: [ISSUE_MANAGEMENT.md](../../docs/ISSUE_MANAGEMENT.md)
 > 
-> **For current planning and priorities, see**: [DEVELOPMENT_PLAN.md](../../../DEVELOPMENT_PLAN.md)
+> **For current planning and priorities, see**: [DEVELOPMENT_PLAN.md](../../docs/development/DEVELOPMENT_PLAN.md)
 
 ---
 

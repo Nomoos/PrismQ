@@ -1,6 +1,6 @@
 # Quick Reference - What To Do Next
 
-> ⚠️ **NOTICE**: This document is **superseded** by [QUICK_REFERENCE.md](../docs/QUICK_REFERENCE.md) and [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> ⚠️ **NOTICE**: This document is **superseded** by [QUICK_REFERENCE.md](../docs/QUICK_REFERENCE.md) and [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
 > **For current quick reference, see**: [QUICK_REFERENCE.md](../docs/QUICK_REFERENCE.md)
 > 
@@ -12,7 +12,7 @@
 **Status**: ⚠️ ARCHIVED - See QUICK_REFERENCE.md for current guide
 
 > **Note**: This document reflects the original Phase 0 plan (now complete). These references are preserved for historical context.
-> For current work items, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) for comprehensive planning.
+> For current work items, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) for comprehensive planning.
 
 ---
 

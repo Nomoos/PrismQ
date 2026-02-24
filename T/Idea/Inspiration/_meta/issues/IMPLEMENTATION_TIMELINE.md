@@ -1,8 +1,8 @@
 # Implementation Timeline - Visual Guide
 
-> ⚠️ **NOTICE**: This document is **superseded** by [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> ⚠️ **NOTICE**: This document is **superseded** by [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
-> **For current timeline and planning, see**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> **For current timeline and planning, see**: [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
 > This document is preserved for historical reference only.
 
@@ -13,7 +13,7 @@
 
 This document provides visual representations of the implementation plan with parallel work streams.
 
-**Note**: The timeline below reflects the original Phase 0 plan (now complete). For current planning, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md).
+**Note**: The timeline below reflects the original Phase 0 plan (now complete). For current planning, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md).
 
 ## Timeline Overview (12 Weeks)
 

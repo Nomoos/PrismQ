@@ -30,7 +30,7 @@ PrismQ.T.Idea.Inspiration is a comprehensive ecosystem for AI-powered content id
   - ✅ Phase 1B: Module Infrastructure (Video & Text)
 - 🔄 Phase 2 Active: Source Module Implementations (Batch 1 complete, Batch 2 starting)
 
-**For detailed current status, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)**
+**For detailed current status, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)**
 
 ### ✅ Completed Components
 
@@ -168,7 +168,7 @@ Systematic implementation of all source modules with TaskManager integration, fo
 - [ ] >80% test coverage
 - [ ] Complete documentation
 
-**For detailed Phase 2 planning, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)**
+**For detailed Phase 2 planning, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)**
 
 ---
 
@@ -276,7 +276,7 @@ Expand source coverage, add experimentation capabilities, and enhance ML feature
 | **Medium** | Phase 3-4: Analytics & Performance | Q2-Q3 2025 (Planned) |
 | **Low** | Phase 5+: Advanced features | 2026+ (Future) |
 
-**For detailed planning, see [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)**
+**For detailed planning, see [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)**
 
 ---
 

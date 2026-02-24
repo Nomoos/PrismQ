@@ -1,8 +1,8 @@
 # Progress Tracking Checklist
 
-> ⚠️ **NOTICE**: This document is **superseded** by [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> ⚠️ **NOTICE**: This document is **superseded** by [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
-> **For current progress tracking, see**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) → "Progress Tracking" section
+> **For current progress tracking, see**: [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) → "Progress Tracking" section
 > 
 > This document is preserved for historical reference only.
 
