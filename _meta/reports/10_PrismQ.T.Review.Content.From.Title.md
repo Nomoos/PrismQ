@@ -1,78 +1,27 @@
 # Kontrola běhu modulu: PrismQ.T.Review.Content.From.Title
 
-## 🎯 Účel modulu
-Finální review obsahu (Content) proti titulku bez závislosti na Idea. Modul validuje title-content pair jako standalone entitu, připravuje pro detailní quality reviews (grammar, tone, content quality).
+**Účel:** Finální AI review content proti titulku jako quality gate před detailními reviews (grammar, tone, content quality).
 
 ---
 
-## 📥 Vstupy (Inputs)
-Modul přijímá následující vstupy:
-
-- **Zdroj vstupu:** Databáze (tabulka Story)
-- **Typ dat:** Story objekty ve stavu "PrismQ.T.Review.Content.From.Title"
-- **Povinné hodnoty:**
-  - Story s title a content fieldy
-- **Nepovinné hodnoty:**
-  - `--preview`, `--debug` flags
-- **Očekávané předpoklady:**
-  - Stories prošlé modulem 07 nebo 09
-  - Běžící Ollama server
-  - Přístup k databázi
+## 📥 Vstup
+- **Zdroj:** Databáze (tabulka `Story`)
+- **Data:** Story ve stavu `PrismQ.T.Review.Content.From.Title` s title a content
+- **Předpoklady:** Stories prošlé modulem 07 nebo 09, běžící Ollama server
 
 ---
 
-## ⚙️ Zpracování (Processing)
-Průběh zpracování dat v modulu:
-
-1. **Načtení Stories k final review** - Stories ve stavu "PrismQ.T.Review.Content.From.Title"
-2. **Comprehensive AI review:**
-   - Hodnocení content-title alignment
-   - Celková kvalita content
-   - Readability a flow
-   - Target audience fit
-   - Engagement potential
-3. **Vyhodnocení:**
-   - Pass → "PrismQ.T.Review.Content.Grammar" (modul 11 - začátek detailed reviews)
-   - Conditional pass → Pokračování s poznámkami
-   - Fail → Návrat k regeneraci (modul 09)
-4. **Update Story a přechod do detail review phase**
+## ⚙️ Zpracování
+1. [Inicializace](shared/inicializace_prostredi.md)
+2. Načtení Stories ve stavu `PrismQ.T.Review.Content.From.Title`
+3. [AI comprehensive review](shared/ollama_ai_integrace.md) — content-title alignment, celková kvalita, readability, target audience fit, engagement potential
+4. Vyhodnocení: pass / conditional pass / fail
+5. [Uložení výsledků](shared/databazova_integrace.md) — update Story state
+6. [Continuous loop](shared/continuous_mode.md)
 
 ---
 
-## 📤 Výstupy (Outputs)
-Výsledkem běhu modulu je:
-
-- **Primární výstup:** Story objekty připravené pro detailed quality reviews
-- **Formát výstupu:** Databáze (updated Stories), final review reports
-- **Vedlejší efekty:** Quality gate metrics, overall story quality score
-- **Chování při chybě:** Retry nebo return to regeneration
-
----
-
-## 🔗 Vazby a závislosti
-
-**Vstupní závislosti:**
-- Modul 07 nebo 09 - předchozí review/regeneration
-- Ollama server, databáze
-
-**Výstupní závislosti:**
-- Modul 11 (PrismQ.T.Review.Content.Grammar) - start detailed reviews
-- Případně modul 09 - pokud fail
-
----
-
-## 📝 Poznámky / Rizika
-
-**Poznámky:**
-- Poslední "big picture" review před detailed checks
-- Quality gate před expensive detailed reviews
-- Může ušetřit čas skipnutím bad content z detailed reviews
-
-**Rizika:**
-- False passes mohou propustit low-quality content do detailed reviews
-- False fails mohou zahazovat good content
-
-**Doporučení:**
-- Calibrovat review thresholds based na downstream feedback
-- Tracking pass/fail rates a downstream quality scores
-- Human sampling pro quality assurance
+## 📤 Výstup
+- **Primární:** Story s final review assessment — quality gate pro detailed reviews
+- **DB změny:** Tabulka `Story` — review metadata, state: Pass → `PrismQ.T.Review.Content.Grammar`, Fail → `PrismQ.T.Content.From.Title.Content.Review`
+- **Další krok:** Pass → Modul 11, Fail → Modul 09 (regenerace content)
