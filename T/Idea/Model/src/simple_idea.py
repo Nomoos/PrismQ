@@ -11,7 +11,7 @@ It focuses on storing idea prompts/text in a clean, minimal structure.
 """
 
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -22,6 +22,7 @@ class SimpleIdea:
 
     This model represents a simple idea with just text content in prompt format.
     It is designed to be referenced by Story via foreign key relationship.
+    Inspiration references track where the idea came from (user input, fusion, etc.).
 
     Schema:
         -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
@@ -34,17 +35,28 @@ class SimpleIdea:
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
 
+        -- IdeaInspiration: Links Idea to its inspiration sources (M:N)
+        IdeaInspiration (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idea_id INTEGER NOT NULL,
+            inspiration_id TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            UNIQUE(idea_id, inspiration_id)
+        )
+
     Attributes:
         id: Unique identifier (auto-generated in database)
         text: Prompt-like text describing the idea
         version: Version number for tracking iterations (>= 0, defaults to 1)
         created_at: Timestamp of creation
+        inspiration_ids: List of inspiration source IDs (user input, fusion, etc.)
 
     Example:
         >>> idea = SimpleIdea(
         ...     text="Write a horror story about a girl who hears her own voice "
         ...          "warning her about the future, only to discover she's already dead.",
-        ...     version=1
+        ...     version=1,
+        ...     inspiration_ids=["user-input-1"]
         ... )
         >>> print(idea.text)
         Write a horror story about a girl who hears her own voice...
@@ -54,6 +66,7 @@ class SimpleIdea:
     version: int = 1
     id: Optional[int] = None
     created_at: Optional[str] = None
+    inspiration_ids: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         """Initialize timestamps if not provided."""
@@ -85,6 +98,7 @@ class SimpleIdea:
             text=data.get("text", ""),
             version=data.get("version", 1),
             created_at=data.get("created_at"),
+            inspiration_ids=data.get("inspiration_ids", []),
         )
 
     def create_new_version(self, text: Optional[str] = None) -> "SimpleIdea":
@@ -101,6 +115,7 @@ class SimpleIdea:
             text=text if text is not None else self.text,
             version=self.version + 1,
             created_at=None,  # New timestamp will be generated
+            inspiration_ids=list(self.inspiration_ids),  # Carry over inspirations
         )
 
     @classmethod
