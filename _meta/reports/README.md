@@ -74,27 +74,24 @@ Každý modul má vlastní soubor s kompletním popisem běhu:
 
 ## 📖 Formát dokumentace
 
-Všechny reporty používají standardizovaný template pro konzistenci.
-
-**Stav dokumentace:**
-- **[COMPLETION_STATUS.md](COMPLETION_STATUS.md)** - ✅ Kompletní přehled stavu všech 30 modulů (100% dokončeno)
+Všechny reporty používají zjednodušený technický template.
 
 **Template soubory:**
-- **[_template.md](_template.md)** - Základní template pro nové reporty
-- **[TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md)** - Detailní návod pro psaní reportů
-- **[EXAMPLE_REPORT.md](EXAMPLE_REPORT.md)** - Kompletní příklad použití template
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Rychlá referenční příručka
+- **[_template.md](_template.md)** - Template pro nové reporty
+
+**Sdílené sekce:**
+- **[shared/inicializace_prostredi.md](shared/inicializace_prostredi.md)** - Inicializace prostředí
+- **[shared/databazova_integrace.md](shared/databazova_integrace.md)** - Databázová integrace
+- **[shared/ollama_ai_integrace.md](shared/ollama_ai_integrace.md)** - Ollama AI integrace
+- **[shared/continuous_mode.md](shared/continuous_mode.md)** - Continuous mode
+- **[shared/zpracovani_chyb.md](shared/zpracovani_chyb.md)** - Zpracování chyb
 
 Každý report obsahuje:
 
-- **🎯 Účel modulu** - Proč modul existuje a jakou roli má v systému
-- **📥 Vstupy (Inputs)** - Zdroj dat, typy, povinné/nepovinné hodnoty, předpoklady
-- **⚙️ Zpracování (Processing)** - Průběh zpracování dat krok za krokem
-- **📤 Výstupy (Outputs)** - Primární výstup, formát, vedlejší efekty, chování při chybě
-- **🔗 Vazby a závislosti** - Vstupní a výstupní závislosti na jiné moduly
-- **📝 Poznámky / Rizika** - Implementační poznámky, rizika, doporučení
-
-Při vytváření nového reportu použijte `_template.md` jako výchozí bod a postupujte podle `TEMPLATE_GUIDE.md`.
+- **Účel** - Jedna věta popisující účel modulu
+- **📥 Vstup** - Zdroj dat, typ, předpoklady
+- **⚙️ Zpracování** - Kroky zpracování s odkazy na sdílené sekce
+- **📤 Výstup** - Primární výstup, DB změny, další krok
 
 ---
 
@@ -131,15 +128,13 @@ Při vytváření nového reportu použijte `_template.md` jako výchozí bod a 
 ## 📈 Statistiky
 
 - **Celkem modulů**: 30 (✅ všechny zdokumentovány)
-- **Text pipeline**: 20 modulů (✅ kompletní)
-- **Audio pipeline**: 5 modulů (✅ kompletní)
-- **Video pipeline**: 3 moduly (✅ kompletní)
-- **Publishing**: 1 modul (✅ kompletní)
-- **Analytics**: 1 modul (✅ kompletní)
-- **Celkem dokumentace**: ~6,300 řádků
-- **Stav**: 🎉 **100% dokončeno** - viz [COMPLETION_STATUS.md](COMPLETION_STATUS.md)
+- **Text pipeline**: 20 modulů
+- **Audio pipeline**: 5 modulů
+- **Video pipeline**: 3 moduly
+- **Publishing**: 1 modul
+- **Analytics**: 1 modul
+- **Režim:** Pouze run mode (žádný preview/debug)
 
 ---
 
-*Dokumentace vytvořena: 2025-12-25*
-*Stav aktualizován: 2026-01-04*
+*Dokumentace aktualizována: 2026-02-24*
