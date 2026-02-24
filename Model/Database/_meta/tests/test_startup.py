@@ -137,7 +137,7 @@ class TestInitializeApplicationDatabase:
         mock_conn.execute.side_effect = sqlite3.Error("Mock error")
         
         # Create a mock SchemaManager that fails
-        with patch('Model.Database.startup.SchemaManager') as mock_manager_class:
+        with patch('Model.Infrastructure.startup.SchemaManager') as mock_manager_class:
             mock_manager = MagicMock()
             mock_manager.verify_schema.return_value = False
             mock_manager.get_missing_tables.return_value = ["Table1"]
