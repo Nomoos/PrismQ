@@ -1,11 +1,29 @@
 """Idea table manager for PrismQ's shared database.
 
-This module provides the IdeaTable class for managing the Idea and
-IdeaInspiration tables in PrismQ's shared database (db.s3db).
+This module provides the IdeaTable class for managing the Inspiration,
+Idea, and IdeaInspiration tables in PrismQ's shared database (db.s3db).
 
 IMPORTANT: PrismQ uses ONE shared database (db.s3db) for ALL modules.
 
+Best Practice — Inspiration references:
+    IdeaInspiration.inspiration_id is an INTEGER FK to Inspiration(id).
+    Every inspiration source (user input, YouTube, Reddit, etc.) must first be
+    registered in the Inspiration table. IdeaInspiration then links an Idea to
+    one or more Inspiration records via integer keys, giving full referential
+    integrity. Use the `source` + `source_id` unique pair in Inspiration to
+    avoid duplicates across calls.
+
 Schema:
+    Inspiration (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        title TEXT,
+        url TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(source, source_id)
+    )
+
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
@@ -18,9 +36,10 @@ Schema:
     IdeaInspiration (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         idea_id INTEGER NOT NULL,
-        inspiration_id TEXT NOT NULL,
+        inspiration_id INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+        FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id),
         UNIQUE(idea_id, inspiration_id)
     )
 
@@ -28,8 +47,9 @@ Usage:
     from src.idea import IdeaTable, setup_idea_table
 
     db = setup_idea_table()
+    insp_id = db.insert_inspiration(source="user", source_id="user-input-1")
     idea_id = db.insert_idea("Write a horror story about...")
-    db.add_inspiration(idea_id, "user-input-1")
+    db.add_inspiration(idea_id, insp_id)
     db.close()
 """
 
@@ -87,7 +107,7 @@ class IdeaTable:
             self.conn = None
 
     def create_tables(self) -> None:
-        """Create Idea and IdeaInspiration tables."""
+        """Create Inspiration, Idea, and IdeaInspiration tables."""
         if not self.conn:
             self.connect()
 
@@ -101,6 +121,21 @@ class IdeaTable:
                 text TEXT NOT NULL,
                 score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
                 created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
+
+        # Create Inspiration table (registry for all inspiration sources)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Inspiration (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source TEXT NOT NULL,
+                source_id TEXT NOT NULL,
+                title TEXT,
+                url TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                UNIQUE(source, source_id)
             )
         """
         )
@@ -120,20 +155,29 @@ class IdeaTable:
         )
 
         # Create IdeaInspiration junction table
+        # inspiration_id is an INTEGER FK to Inspiration(id) — register an
+        # Inspiration record first, then link it here.
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS IdeaInspiration (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 idea_id INTEGER NOT NULL,
-                inspiration_id TEXT NOT NULL,
+                inspiration_id INTEGER NOT NULL,
                 created_at TEXT NOT NULL DEFAULT (datetime('now')),
                 FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+                FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id),
                 UNIQUE(idea_id, inspiration_id)
             )
         """
         )
 
         # Indexes
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_inspiration_source ON Inspiration(source)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_inspiration_source_id ON Inspiration(source_id)"
+        )
         cursor.execute(
             "CREATE INDEX IF NOT EXISTS idx_idea_version ON Idea(version)"
         )
@@ -411,18 +455,90 @@ class IdeaTable:
         return result if result is not None else 0
 
     # =========================================================================
+    # Inspiration CRUD
+    # =========================================================================
+
+    def insert_inspiration(
+        self,
+        source: str,
+        source_id: str,
+        title: Optional[str] = None,
+        url: Optional[str] = None,
+    ) -> int:
+        """Register an inspiration source, returning its integer ID.
+
+        Uses INSERT OR IGNORE so calling this multiple times with the same
+        (source, source_id) pair is safe — the existing record's ID is
+        returned on duplicates.
+
+        Args:
+            source: Origin platform (e.g. 'user', 'youtube', 'reddit')
+            source_id: Unique identifier within that platform
+            title: Optional human-readable label
+            url: Optional URL to the source content
+
+        Returns:
+            ID of the (new or existing) Inspiration record
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO Inspiration (source, source_id, title, url)
+            VALUES (?, ?, ?, ?)
+            """,
+            (source, source_id, title, url),
+        )
+        self.conn.commit()
+
+        # Fetch the ID whether just inserted or already existed
+        cursor.execute(
+            "SELECT id FROM Inspiration WHERE source = ? AND source_id = ?",
+            (source, source_id),
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise RuntimeError(
+                f"Failed to retrieve Inspiration after insert for source={source!r}, "
+                f"source_id={source_id!r}"
+            )
+        return row[0]
+
+    def get_inspiration(self, inspiration_id: int) -> Optional[Dict[str, Any]]:
+        """Retrieve an Inspiration record by ID.
+
+        Args:
+            inspiration_id: Primary key of the Inspiration record
+
+        Returns:
+            Dictionary representation or None if not found
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM Inspiration WHERE id = ?", (inspiration_id,))
+        row = cursor.fetchone()
+        return dict(row) if row else None
+
+    # =========================================================================
     # IdeaInspiration CRUD
     # =========================================================================
 
-    def add_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
-        """Link an inspiration source to an Idea.
+    def add_inspiration(self, idea_id: int, inspiration_id: int) -> bool:
+        """Link an Inspiration record to an Idea.
+
+        Best practice: call insert_inspiration() first to obtain the integer
+        inspiration_id, then pass it here.
 
         Args:
             idea_id: ID of the Idea
-            inspiration_id: Text identifier of the inspiration source
+            inspiration_id: Integer ID of an existing Inspiration record
 
         Returns:
-            True if added, False if already exists
+            True if added, False if the link already exists
         """
         if not self.conn:
             self.connect()
@@ -438,30 +554,34 @@ class IdeaTable:
         except sqlite3.IntegrityError:
             return False
 
-    def get_inspirations(self, idea_id: int) -> List[str]:
-        """Get all inspiration IDs linked to an Idea.
+    def get_inspirations(self, idea_id: int) -> List[Dict[str, Any]]:
+        """Get all Inspiration records linked to an Idea.
 
         Args:
             idea_id: ID of the Idea
 
         Returns:
-            List of inspiration ID strings (empty if none)
+            List of Inspiration dictionaries (empty if none)
         """
         if not self.conn:
             self.connect()
 
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT inspiration_id FROM IdeaInspiration WHERE idea_id = ?",
+            """
+            SELECT i.* FROM Inspiration i
+            JOIN IdeaInspiration ii ON ii.inspiration_id = i.id
+            WHERE ii.idea_id = ?
+            """,
             (idea_id,),
         )
-        return [row[0] for row in cursor.fetchall()]
+        return [dict(row) for row in cursor.fetchall()]
 
-    def get_ideas_by_inspiration(self, inspiration_id: str) -> List[Dict[str, Any]]:
-        """Get all Ideas linked to a specific inspiration source.
+    def get_ideas_by_inspiration(self, inspiration_id: int) -> List[Dict[str, Any]]:
+        """Get all Ideas linked to a specific Inspiration record.
 
         Args:
-            inspiration_id: Text identifier of the inspiration source
+            inspiration_id: Integer ID of the Inspiration record
 
         Returns:
             List of Idea dictionaries
@@ -476,12 +596,12 @@ class IdeaTable:
         )
         return [self.get_idea(row[0]) for row in cursor.fetchall()]
 
-    def remove_inspiration(self, idea_id: int, inspiration_id: str) -> bool:
+    def remove_inspiration(self, idea_id: int, inspiration_id: int) -> bool:
         """Remove an inspiration link from an Idea.
 
         Args:
             idea_id: ID of the Idea
-            inspiration_id: Text identifier of the inspiration source
+            inspiration_id: Integer ID of the Inspiration record
 
         Returns:
             True if removed, False if not found
@@ -499,12 +619,13 @@ class IdeaTable:
 
 
 def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:
-    """Setup and initialize the Idea table manager for the shared database.
+    """Setup and initialize the Inspiration/Idea table managers for the shared database.
 
     Creates a table manager, connects to the shared database, and ensures
-    the Idea table exists with proper schema and indexes.
+    the Inspiration, Idea, and IdeaInspiration tables exist with proper schema
+    and indexes.
 
-    IMPORTANT: This manages the Idea table in the shared database (db.s3db),
+    IMPORTANT: This manages tables in the shared database (db.s3db),
     not a separate database. All PrismQ modules use this same database.
 
     Args:
@@ -515,7 +636,9 @@ def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:
 
     Example:
         >>> db = setup_idea_table()
+        >>> insp_id = db.insert_inspiration(source="user", source_id="my-input-1")
         >>> idea_id = db.insert_idea("Write a story about...")
+        >>> db.add_inspiration(idea_id, insp_id)
         >>> db.close()
     """
     db = IdeaTable(db_path)
