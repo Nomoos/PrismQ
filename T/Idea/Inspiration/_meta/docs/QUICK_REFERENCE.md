@@ -9,11 +9,11 @@
 
 ### New to the Project?
 1. Read [README.md](../../README.md) - Project overview
-2. Read [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md) - Current status and plan
+2. Read [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md) - Current status and plan
 3. Check available issues in `_meta/issues/new/` or `Source/_meta/issues/new/`
 
 ### Looking for Current Status?
-👉 **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)**
+👉 **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)**
 
 ### Want to Start Working?
 1. Check `_meta/issues/new/WorkerXX/` or `Source/_meta/issues/new/DeveloperXX/`
@@ -158,7 +158,7 @@ echo "  Done: $(find Source/_meta/issues/done -name "*.md" -type f | wc -l)"
 ## 📚 Essential Documentation
 
 ### Planning & Status
-- **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** ⭐ START HERE
+- **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** ⭐ START HERE
 - **[ROADMAP.md](../issues/ROADMAP.md)** - Long-term vision
 - **[INDEX.md](../issues/INDEX.md)** - Issue tracking
 
@@ -215,7 +215,7 @@ echo "  Done: $(find Source/_meta/issues/done -name "*.md" -type f | wc -l)"
 Phase 2 - Source Module Implementations (Batch 2 starting)
 
 ### Where's the overall plan?
-**[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - The single source of truth
+**[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** - The single source of truth
 
 ---
 
@@ -224,7 +224,7 @@ Phase 2 - Source Module Implementations (Batch 2 starting)
 1. **Documentation not clear?** → Ask Worker09 or Developer09
 2. **Architecture questions?** → Ask Worker10 or Developer10  
 3. **Can't find something?** → Check [INDEX.md](../issues/INDEX.md)
-4. **General questions?** → Check [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+4. **General questions?** → Check [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 
 ---
 

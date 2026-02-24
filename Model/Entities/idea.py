@@ -20,15 +20,17 @@ Schema:
     IdeaInspiration (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         idea_id INTEGER NOT NULL,
-        inspiration_id TEXT NOT NULL,
+        inspiration_id INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+        FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id),
         UNIQUE(idea_id, inspiration_id)
     )
 
 The Idea table stores simple prompt-based idea data for content generation.
 Story references Idea via FK in Story.idea_id.
-IdeaInspiration links Ideas to their inspiration sources (M:N).
+IdeaInspiration links Ideas to their Inspiration sources (M:N) using integer FKs.
+Register an Inspiration record first, then link via IdeaInspiration.
 """
 
 
@@ -59,9 +61,10 @@ class IdeaSchema:
         CREATE TABLE IF NOT EXISTS IdeaInspiration (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             idea_id INTEGER NOT NULL,
-            inspiration_id TEXT NOT NULL,
+            inspiration_id INTEGER NOT NULL,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+            FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id),
             UNIQUE(idea_id, inspiration_id)
         );
         

@@ -93,7 +93,7 @@ External TaskManager API (PHP Backend)
 ## Reference
 
 For current development status, see:
-- [DEVELOPMENT_PLAN.md](../../../DEVELOPMENT_PLAN.md) - Current development plan
+- [DEVELOPMENT_PLAN.md](../../docs/development/DEVELOPMENT_PLAN.md) - Current development plan
 - [Source Module Planning](../../../../Source/_meta/issues/new/INDEX.md) - Source module details
 
 ---

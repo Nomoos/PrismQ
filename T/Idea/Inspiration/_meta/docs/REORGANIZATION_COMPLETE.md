@@ -244,7 +244,7 @@ Source/_meta/issues/
 
 ### Start Here
 1. **[README.md](../../README.md)** - Project overview
-2. **[DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)** - Current status and plan ⭐
+2. **[DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)** - Current status and plan ⭐
 
 ### Guides
 3. **[QUICK_REFERENCE.md](_meta/docs/QUICK_REFERENCE.md)** - Quick navigation

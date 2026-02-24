@@ -1,8 +1,8 @@
 # PrismQ.T.Idea.Inspiration - Next Steps Summary
 
-> ⚠️ **NOTICE**: This document is **superseded** by the unified [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> ⚠️ **NOTICE**: This document is **superseded** by the unified [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
-> **For current status and planning, see**: [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md)
+> **For current status and planning, see**: [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md)
 > 
 > This document is preserved for historical reference only.
 
@@ -15,7 +15,7 @@
 
 > **Note**: This document contains historical references to the Client/Backend module which has been moved to a separate repository.
 
-> **Superseded (2025-11-13)**: All planning consolidated into [DEVELOPMENT_PLAN.md](../../DEVELOPMENT_PLAN.md). See that document for current status, phases, and next steps.
+> **Superseded (2025-11-13)**: All planning consolidated into [DEVELOPMENT_PLAN.md](../docs/development/DEVELOPMENT_PLAN.md). See that document for current status, phases, and next steps.
 
 ---
 
