@@ -76,7 +76,7 @@ class IdeaGenerator:
         flavor_name: str,
         input_text: str,
         variation_index: int = 0,
-        second_flavor_chance: float = 0.3,
+        second_flavor_chance: float = 0.4,
         db: Optional[Any] = None,
         logger: Optional[logging.Logger] = None,
     ) -> Dict[str, Any]:
@@ -86,21 +86,22 @@ class IdeaGenerator:
         :meth:`FlavorSelector.select_flavor_combination` to recursively add
         extra flavors.  Each additional flavor is appended with
         ``second_flavor_chance`` probability (matches
-        ``FlavorSelector.MULTI_FLAVOR_CHANCE`` = 0.3 by default), producing:
+        ``FlavorSelector.MULTI_FLAVOR_CHANCE`` = 0.4 by default), producing:
 
-            2nd flavor   30 %
-            3rd flavor    9 %  (0.3²)
-            4th flavor  2.7 %  (0.3³)  … and so on
+            2nd flavor   40 %
+            3rd flavor   16 %  (0.4²)
+            4th flavor  6.4 %  (0.4³)  … and so on
 
-        No flavor is also handled gracefully: when the combination is empty
-        the idea is generated without any flavor guidance.
+        ``FlavorSelector.NO_FLAVOR_CHANCE`` (5 %) is also applied so that
+        roughly 1 in 20 ideas is generated without any flavor, adding
+        surprise variety to a batch.
 
         Args:
             flavor_name: Name of the primary flavor to use
             input_text: Raw input text from user (no parsing or processing)
             variation_index: Variation number for uniqueness
             second_flavor_chance: Probability (0.0-1.0) of adding each extra
-                                  flavor recursively (default: 0.3)
+                                  flavor recursively (default: 0.4)
             db: Optional database connection for direct save after generation
             logger: Optional logger for tracking
             
@@ -124,12 +125,15 @@ class IdeaGenerator:
             primary_flavor=flavor_name,
             seed=seed,
             multi_chance=second_flavor_chance,
+            no_flavor_chance=FlavorSelector.NO_FLAVOR_CHANCE,
         )
 
-        # combination is always non-empty here (primary_flavor is always kept)
-        variant_name = " + ".join(combination)
+        # combination may be empty (no-flavor wild card) or contain 1+ flavors
+        variant_name = " + ".join(combination) if combination else "(no flavor)"
         if len(combination) > 1 and logger:
             logger.info(f"Using multi-flavor combination: {variant_name}")
+        elif not combination and logger:
+            logger.info("Using no-flavor (unguided) generation")
 
         # Generate complete refined idea using idea_improvement prompt
         if not self.ai_generator:
@@ -374,11 +378,19 @@ class FlavorSelector:
     # Base probability that each additional flavor is appended to a combination.
     # Produces the following per-level probabilities:
     #   1st flavor  100 %   (always)
-    #   2nd flavor   30 %   (MULTI_FLAVOR_CHANCE)
-    #   3rd flavor    9 %   (0.3²)
-    #   4th flavor  2.7 %   (0.3³)
-    #   5th flavor  0.81 %  (0.3⁴)  … and so on
-    MULTI_FLAVOR_CHANCE: float = 0.3
+    #   2nd flavor   40 %   (MULTI_FLAVOR_CHANCE)
+    #   3rd flavor   16 %   (0.4²)
+    #   4th flavor  6.4 %   (0.4³)
+    #   5th flavor  2.56 %  (0.4⁴)  … and so on
+    #
+    # 0.4 keeps single-flavor as the plurality (~60 %) while making dual/triple
+    # combinations meaningfully more common than the previous 0.3 setting.
+    MULTI_FLAVOR_CHANCE: float = 0.4
+
+    # Probability that a generation uses *no* flavor at all (unguided "wild card").
+    # 5 % means roughly one unguided idea every other 10-idea batch — noticeable
+    # but not dominant, adding surprise variety without overwhelming the output.
+    NO_FLAVOR_CHANCE: float = 0.05
 
     def __init__(self, flavor_loader=None):
         """Initialize flavor selector.
@@ -411,7 +423,7 @@ class FlavorSelector:
         primary_flavor: Optional[str] = None,
         seed: Optional[int] = None,
         multi_chance: float = MULTI_FLAVOR_CHANCE,
-        no_flavor_chance: float = 0.0,
+        no_flavor_chance: float = NO_FLAVOR_CHANCE,
     ) -> List[str]:
         """Select a flavor combination using recursive multi-flavor probability.
 
@@ -419,13 +431,13 @@ class FlavorSelector:
         which is a perfectly valid case that produces unguided, neutral generation.
 
         Otherwise always selects at least one flavor, then each additional flavor
-        is appended with ``multi_chance`` (default 30%), giving:
+        is appended with ``multi_chance`` (default 40%), giving:
 
             1st flavor  100 %
-            2nd flavor   30 %   (multi_chance)
-            3rd flavor    9 %   (multi_chance²)
-            4th flavor  2.7 %   (multi_chance³)
-            5th flavor  0.81%   (multi_chance⁴)  … and so on
+            2nd flavor   40 %   (multi_chance)
+            3rd flavor   16 %   (multi_chance²)
+            4th flavor  6.4 %   (multi_chance³)
+            5th flavor  2.56%   (multi_chance⁴)  … and so on
 
         All selections use weighted random so high-weight flavors appear more
         often.  Duplicates within a single combination are never produced.
@@ -435,9 +447,10 @@ class FlavorSelector:
                             flavor is chosen automatically.
             seed: Optional seed for reproducible results.
             multi_chance: Probability (0–1) of appending each extra flavor.
-                          Default: ``MULTI_FLAVOR_CHANCE`` (0.3).
+                          Default: ``MULTI_FLAVOR_CHANCE`` (0.4).
             no_flavor_chance: Probability (0–1) of returning an empty list,
-                              i.e. no flavor at all.  Default: 0.0 (never).
+                              i.e. no flavor at all.
+                              Default: ``NO_FLAVOR_CHANCE`` (0.05).
 
         Returns:
             List of unique flavor names (may be empty when no_flavor_chance > 0).
@@ -658,18 +671,18 @@ def pick_flavor_combination(
     primary_flavor: Optional[str] = None,
     seed: Optional[int] = None,
     multi_chance: float = FlavorSelector.MULTI_FLAVOR_CHANCE,
-    no_flavor_chance: float = 0.0,
+    no_flavor_chance: float = FlavorSelector.NO_FLAVOR_CHANCE,
 ) -> List[str]:
     """Pick a recursive flavor combination - convenience function.
 
-    Returns one or more flavors (or an empty list when no_flavor_chance > 0).
+    Returns one or more flavors (or an empty list when no_flavor_chance fires).
     See :meth:`FlavorSelector.select_flavor_combination` for full details.
 
     Args:
         primary_flavor: First flavor name; None for weighted-random selection.
         seed: Optional seed for reproducibility.
-        multi_chance: Probability of adding each extra flavor (default: 0.3).
-        no_flavor_chance: Probability of returning no flavor (default: 0.0).
+        multi_chance: Probability of adding each extra flavor (default: 0.4).
+        no_flavor_chance: Probability of returning no flavor (default: 0.05).
 
     Returns:
         List of unique flavor names (possibly empty).

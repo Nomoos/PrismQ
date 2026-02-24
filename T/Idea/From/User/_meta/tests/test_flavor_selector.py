@@ -22,8 +22,11 @@ from idea_variants import (
 class TestFlavorSelectorConstants:
     """FlavorSelector exposes the tuning constants as class attributes."""
 
-    def test_multi_flavor_chance_is_0_3(self):
-        assert FlavorSelector.MULTI_FLAVOR_CHANCE == 0.3
+    def test_multi_flavor_chance_is_0_4(self):
+        assert FlavorSelector.MULTI_FLAVOR_CHANCE == 0.4
+
+    def test_no_flavor_chance_is_0_05(self):
+        assert FlavorSelector.NO_FLAVOR_CHANCE == 0.05
 
     def test_default_count_is_10(self):
         assert FlavorSelector.DEFAULT_COUNT == 10
@@ -49,18 +52,24 @@ class TestSelectFlavorCombinationBasic:
 
     def test_returns_at_least_one_flavor_by_default(self):
         for seed in range(50):
-            combo = self.selector.select_flavor_combination(seed=seed)
+            combo = self.selector.select_flavor_combination(
+                seed=seed, no_flavor_chance=0.0
+            )
             assert len(combo) >= 1, f"Expected ≥1 flavor, got {combo} at seed={seed}"
 
     def test_all_items_are_known_flavors(self):
         known = set(self.selector.loader.list_flavor_names())
         for seed in range(30):
-            for flavor in self.selector.select_flavor_combination(seed=seed):
+            for flavor in self.selector.select_flavor_combination(
+                seed=seed, no_flavor_chance=0.0
+            ):
                 assert flavor in known, f"Unknown flavor '{flavor}' at seed={seed}"
 
     def test_no_duplicates_within_combination(self):
         for seed in range(50):
-            combo = self.selector.select_flavor_combination(seed=seed)
+            combo = self.selector.select_flavor_combination(
+                seed=seed, no_flavor_chance=0.0
+            )
             assert len(combo) == len(set(combo)), f"Duplicate flavors in combo at seed={seed}"
 
     def test_deterministic_with_same_seed(self):
@@ -89,7 +98,7 @@ class TestSelectFlavorCombinationPrimaryFlavor:
         primary = "Emotional Drama + Growth"
         for seed in range(20):
             combo = self.selector.select_flavor_combination(
-                primary_flavor=primary, seed=seed
+                primary_flavor=primary, seed=seed, no_flavor_chance=0.0
             )
             assert combo[0] == primary, (
                 f"Expected first element to be primary flavor, got {combo}"
@@ -99,7 +108,7 @@ class TestSelectFlavorCombinationPrimaryFlavor:
         primary = "Emotional Drama + Growth"
         for seed in range(20):
             combo = self.selector.select_flavor_combination(
-                primary_flavor=primary, seed=seed
+                primary_flavor=primary, seed=seed, no_flavor_chance=0.0
             )
             assert combo.count(primary) == 1
 
@@ -146,6 +155,22 @@ class TestNoFlavorCase:
             f"No-flavor rate {rate:.3f} too far from target {target:.3f}"
         )
 
+    def test_class_default_no_flavor_chance_statistical(self):
+        """The class-default NO_FLAVOR_CHANCE (0.05) fires at ~5% when used."""
+        samples = 2000
+        target = FlavorSelector.NO_FLAVOR_CHANCE
+        empty_count = sum(
+            1
+            for i in range(samples)
+            if self.selector.select_flavor_combination(seed=i) == []
+        )
+        rate = empty_count / samples
+        sigma = (target * (1 - target) / samples) ** 0.5
+        assert abs(rate - target) <= 3 * sigma, (
+            f"Default no-flavor rate {rate:.3f} too far from "
+            f"NO_FLAVOR_CHANCE={target}"
+        )
+
     def test_empty_list_is_valid_result(self):
         combo = self.selector.select_flavor_combination(
             seed=0, no_flavor_chance=1.0
@@ -159,17 +184,17 @@ class TestNoFlavorCase:
 # ---------------------------------------------------------------------------
 
 class TestRecursiveProbabilityDistribution:
-    """Statistical tests for the recursive 30% probability chain."""
+    """Statistical tests for the recursive 40% probability chain."""
 
     def setup_method(self):
         self.selector = FlavorSelector()
         self.samples = 5000
 
-    def _distribution(self, multi_chance=0.3):
+    def _distribution(self, multi_chance=0.4):
         counts = {}
         for i in range(self.samples):
             n = len(self.selector.select_flavor_combination(
-                seed=i, multi_chance=multi_chance
+                seed=i, multi_chance=multi_chance, no_flavor_chance=0.0
             ))
             counts[n] = counts.get(n, 0) + 1
         return counts
@@ -178,33 +203,33 @@ class TestRecursiveProbabilityDistribution:
         counts = self._distribution()
         assert counts.get(1, 0) > counts.get(2, 0)
 
-    def test_second_flavor_rate_approx_30_pct(self):
-        """P(≥2 flavors) should be ~30%."""
+    def test_second_flavor_rate_approx_40_pct(self):
+        """P(≥2 flavors) should be ~40%."""
         counts = self._distribution()
         multi = sum(v for k, v in counts.items() if k >= 2)
         rate = multi / self.samples
-        assert 0.22 <= rate <= 0.38, f"P(≥2 flavors) = {rate:.3f}, expected ~0.30"
+        assert 0.32 <= rate <= 0.48, f"P(≥2 flavors) = {rate:.3f}, expected ~0.40"
 
-    def test_third_flavor_rate_approx_9_pct(self):
-        """P(≥3 flavors) should be ~9% (0.3²)."""
+    def test_third_flavor_rate_approx_16_pct(self):
+        """P(≥3 flavors) should be ~16% (0.4²)."""
         counts = self._distribution()
         triple = sum(v for k, v in counts.items() if k >= 3)
         rate = triple / self.samples
-        assert 0.05 <= rate <= 0.14, f"P(≥3 flavors) = {rate:.3f}, expected ~0.09"
+        assert 0.10 <= rate <= 0.22, f"P(≥3 flavors) = {rate:.3f}, expected ~0.16"
 
-    def test_fourth_flavor_rate_approx_2_7_pct(self):
-        """P(≥4 flavors) should be ~2.7% (0.3³)."""
+    def test_fourth_flavor_rate_approx_6_4_pct(self):
+        """P(≥4 flavors) should be ~6.4% (0.4³)."""
         counts = self._distribution()
         quad = sum(v for k, v in counts.items() if k >= 4)
         rate = quad / self.samples
-        assert 0.005 <= rate <= 0.06, f"P(≥4 flavors) = {rate:.3f}, expected ~0.027"
+        assert 0.02 <= rate <= 0.12, f"P(≥4 flavors) = {rate:.3f}, expected ~0.064"
 
-    def test_fifth_flavor_rate_approx_0_81_pct(self):
-        """P(≥5 flavors) should be ~0.81% (0.3⁴)."""
+    def test_fifth_flavor_rate_approx_2_56_pct(self):
+        """P(≥5 flavors) should be ~2.56% (0.4⁴)."""
         counts = self._distribution()
         quint = sum(v for k, v in counts.items() if k >= 5)
         rate = quint / self.samples
-        assert rate <= 0.03, f"P(≥5 flavors) = {rate:.3f}, expected ~0.0081"
+        assert rate <= 0.07, f"P(≥5 flavors) = {rate:.3f}, expected ~0.0256"
 
     def test_custom_multi_chance(self):
         """Passing a custom multi_chance shifts the distribution accordingly."""
