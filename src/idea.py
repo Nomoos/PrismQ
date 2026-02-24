@@ -205,6 +205,7 @@ class IdeaTable:
         self,
         text: str,
         version: int = 1,
+        review_id: Optional[int] = None,
         created_at: Optional[str] = None,
     ) -> int:
         """Insert a new Idea into the database.
@@ -212,6 +213,7 @@ class IdeaTable:
         Args:
             text: Prompt-like text content for content generation
             version: Version number (default: 1, must be >= 0)
+            review_id: Optional FK to Review table for idea quality assessment
             created_at: Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -228,18 +230,18 @@ class IdeaTable:
         if created_at:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version, created_at)
-                VALUES (?, ?, ?)
+                INSERT INTO Idea (text, version, review_id, created_at)
+                VALUES (?, ?, ?, ?)
             """,
-                (text, version, created_at),
+                (text, version, review_id, created_at),
             )
         else:
             cursor.execute(
                 """
-                INSERT INTO Idea (text, version)
-                VALUES (?, ?)
+                INSERT INTO Idea (text, version, review_id)
+                VALUES (?, ?, ?)
             """,
-                (text, version),
+                (text, version, review_id),
             )
 
         idea_id = cursor.lastrowid
@@ -254,6 +256,7 @@ class IdeaTable:
             idea_dict: Dictionary with the following keys:
                 - text (str): Prompt-like text content (required, defaults to "" if missing)
                 - version (int): Version number (optional, defaults to 1 if missing)
+                - review_id (int): Optional FK to Review table (optional)
                 - created_at (str): Optional timestamp (auto-generated if not provided)
 
         Returns:
@@ -262,6 +265,7 @@ class IdeaTable:
         return self.insert_idea(
             text=idea_dict.get("text", ""),
             version=idea_dict.get("version", 1),
+            review_id=idea_dict.get("review_id"),
             created_at=idea_dict.get("created_at"),
         )
 
@@ -339,6 +343,7 @@ class IdeaTable:
         idea_id: int,
         text: Optional[str] = None,
         version: Optional[int] = None,
+        review_id: Optional[int] = None,
     ) -> bool:
         """Update an existing Idea.
 
@@ -346,6 +351,7 @@ class IdeaTable:
             idea_id: ID of the idea to update
             text: New text content (optional, not updated if None)
             version: New version number (optional, must be >= 0, not updated if None)
+            review_id: New review_id FK to Review table (optional, not updated if None)
 
         Returns:
             True if successful, False otherwise
@@ -369,6 +375,11 @@ class IdeaTable:
 
         if version is not None:
             updates.append("version = ?")
+            params.append(version)
+
+        if review_id is not None:
+            updates.append("review_id = ?")
+            params.append(review_id)
             params.append(version)
 
         if not updates:
