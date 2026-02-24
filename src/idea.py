@@ -10,12 +10,6 @@ The Idea table is one of many tables in this shared database.
 The Idea table is designed to be referenced by Story via foreign key (Story.idea_id).
 
 Schema:
-    Inspiration (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT NOT NULL,                             -- Source text / description
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
-
     Idea (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
@@ -25,16 +19,9 @@ Schema:
         FOREIGN KEY (review_id) REFERENCES Review(id)
     )
 
-    -- IdeaInspiration: Junction table between Idea and Inspiration (M:N)
-    IdeaInspiration (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        idea_id INTEGER NOT NULL,                       -- FK to Idea
-        inspiration_id INTEGER NOT NULL,                -- FK to Inspiration
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
-        FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id) ON DELETE CASCADE,
-        UNIQUE(idea_id, inspiration_id)
-    )
+Note: Inspiration and IdeaInspiration (junction table between Idea and Inspiration)
+are defined in Model/Entities/ but currently unused. They will be activated when
+T/Idea/Inspiration module is implemented for external idea sources.
 
 Usage:
     from src.idea import IdeaTable, setup_idea_table
@@ -42,14 +29,8 @@ Usage:
     # Setup table manager for shared database (default: db.s3db)
     db = setup_idea_table()
 
-    # Insert an inspiration source
-    insp_id = db.insert_inspiration("User typed: write a horror story")
-
     # Insert an idea
     idea_id = db.insert_idea("Write a horror story about...")
-
-    # Link them
-    db.add_inspiration(idea_id, insp_id)
 
     # Retrieve it
     idea = db.get_idea(idea_id)
@@ -112,15 +93,15 @@ class IdeaTable:
             self.conn = None
 
     def create_tables(self) -> None:
-        """Create database schema for Idea, Inspiration, and IdeaInspiration.
+        """Create database schema for Idea.
 
         Creates:
             - Review table (dependency for Idea FK)
-            - Inspiration table (source texts for ideas)
             - Idea table (prompt-like content with versioning)
-            - IdeaInspiration junction table (M:N between Idea and Inspiration)
 
         Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
+        Note: Inspiration and IdeaInspiration tables are defined in Model/Entities/
+              but not created here — they will be activated by T/Idea/Inspiration.
         """
         if not self.conn:
             self.connect()
@@ -134,17 +115,6 @@ class IdeaTable:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT NOT NULL,
                 score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
-            )
-        """
-        )
-
-        # Create Inspiration table (source texts for ideas)
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS Inspiration (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
                 created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         """
@@ -185,44 +155,6 @@ class IdeaTable:
             """
             CREATE INDEX IF NOT EXISTS idx_idea_review_id 
             ON Idea(review_id)
-        """
-        )
-
-        # Create Inspiration index
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_inspiration_created_at
-            ON Inspiration(created_at)
-        """
-        )
-
-        # Create IdeaInspiration junction table (M:N between Idea and Inspiration)
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS IdeaInspiration (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                idea_id INTEGER NOT NULL,
-                inspiration_id INTEGER NOT NULL,
-                created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
-                FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id) ON DELETE CASCADE,
-                UNIQUE(idea_id, inspiration_id)
-            )
-        """
-        )
-
-        # Create indexes for IdeaInspiration
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_idea_inspiration_idea_id 
-            ON IdeaInspiration(idea_id)
-        """
-        )
-
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_idea_inspiration_inspiration_id 
-            ON IdeaInspiration(inspiration_id)
         """
         )
 
@@ -485,137 +417,6 @@ class IdeaTable:
         result = cursor.fetchone()[0]
 
         return result if result is not None else 0
-
-    # =========================================================================
-    # Inspiration CRUD
-    # =========================================================================
-
-    def insert_inspiration(self, text: str) -> int:
-        """Insert a new Inspiration into the database.
-
-        Args:
-            text: Source text / description of the inspiration
-
-        Returns:
-            ID of inserted inspiration
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "INSERT INTO Inspiration (text) VALUES (?)",
-            (text,),
-        )
-        self.conn.commit()
-        return cursor.lastrowid
-
-    def get_inspiration(self, inspiration_id: int) -> Optional[Dict[str, Any]]:
-        """Retrieve an Inspiration by ID.
-
-        Args:
-            inspiration_id: ID of the inspiration
-
-        Returns:
-            Dictionary representation of Inspiration or None
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM Inspiration WHERE id = ?", (inspiration_id,))
-        row = cursor.fetchone()
-        return dict(row) if row else None
-
-    # =========================================================================
-    # IdeaInspiration junction (M:N between Idea and Inspiration)
-    # =========================================================================
-
-    def add_inspiration(self, idea_id: int, inspiration_id: int) -> bool:
-        """Link an Inspiration to an Idea via the junction table.
-
-        Args:
-            idea_id: ID of the Idea
-            inspiration_id: ID of the Inspiration
-
-        Returns:
-            True if added, False if already exists
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        try:
-            cursor.execute(
-                """
-                INSERT INTO IdeaInspiration (idea_id, inspiration_id)
-                VALUES (?, ?)
-            """,
-                (idea_id, inspiration_id),
-            )
-            self.conn.commit()
-            return True
-        except sqlite3.IntegrityError:
-            return False
-
-    def get_inspirations(self, idea_id: int) -> List[int]:
-        """Get all Inspiration IDs linked to an Idea.
-
-        Args:
-            idea_id: ID of the Idea
-
-        Returns:
-            List of Inspiration IDs
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "SELECT inspiration_id FROM IdeaInspiration WHERE idea_id = ?",
-            (idea_id,),
-        )
-        return [row[0] for row in cursor.fetchall()]
-
-    def get_ideas_by_inspiration(self, inspiration_id: int) -> List[Dict[str, Any]]:
-        """Get all Ideas linked to a specific Inspiration.
-
-        Args:
-            inspiration_id: ID of the Inspiration
-
-        Returns:
-            List of Idea dictionaries
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "SELECT DISTINCT idea_id FROM IdeaInspiration WHERE inspiration_id = ?",
-            (inspiration_id,),
-        )
-        return [self.get_idea(row[0]) for row in cursor.fetchall()]
-
-    def remove_inspiration(self, idea_id: int, inspiration_id: int) -> bool:
-        """Remove a specific Idea-Inspiration link.
-
-        Args:
-            idea_id: ID of the Idea
-            inspiration_id: ID of the Inspiration to unlink
-
-        Returns:
-            True if removed, False if not found
-        """
-        if not self.conn:
-            self.connect()
-
-        cursor = self.conn.cursor()
-        cursor.execute(
-            "DELETE FROM IdeaInspiration WHERE idea_id = ? AND inspiration_id = ?",
-            (idea_id, inspiration_id),
-        )
-        self.conn.commit()
-        return cursor.rowcount > 0
 
 
 def setup_idea_table(db_path: str = "db.s3db") -> IdeaTable:

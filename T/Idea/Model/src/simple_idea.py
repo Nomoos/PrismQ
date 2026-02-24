@@ -11,7 +11,7 @@ It focuses on storing idea prompts/text in a clean, minimal structure.
 """
 
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -22,41 +22,32 @@ class SimpleIdea:
 
     This model represents a simple idea with just text content in prompt format.
     It is designed to be referenced by Story via foreign key relationship.
-    Inspiration references track where the idea came from (user input, fusion, etc.).
 
     Schema:
-        -- Idea: Simple prompt-based idea data (Story references Idea via FK in Story.idea_id)
-        -- Text field contains prompt-like content for content generation
-        -- Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer
         Idea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,                                      -- Prompt-like text describing the idea
             version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            review_id INTEGER,                              -- Optional FK to Review table
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         )
 
-        -- IdeaInspiration: Links Idea to its inspiration sources (M:N)
-        IdeaInspiration (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idea_id INTEGER NOT NULL,
-            inspiration_id TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(idea_id, inspiration_id)
-        )
+    Note: Inspiration references (M:N via IdeaInspiration junction table) are
+    defined in Model/Entities/ but currently unused. They will be activated
+    when T/Idea/Inspiration module is implemented for external idea sources.
 
     Attributes:
         id: Unique identifier (auto-generated in database)
         text: Prompt-like text describing the idea
         version: Version number for tracking iterations (>= 0, defaults to 1)
         created_at: Timestamp of creation
-        inspiration_ids: List of inspiration source IDs (user input, fusion, etc.)
 
     Example:
         >>> idea = SimpleIdea(
         ...     text="Write a horror story about a girl who hears her own voice "
         ...          "warning her about the future, only to discover she's already dead.",
-        ...     version=1,
-        ...     inspiration_ids=["user-input-1"]
+        ...     version=1
         ... )
         >>> print(idea.text)
         Write a horror story about a girl who hears her own voice...
@@ -66,7 +57,6 @@ class SimpleIdea:
     version: int = 1
     id: Optional[int] = None
     created_at: Optional[str] = None
-    inspiration_ids: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         """Initialize timestamps if not provided."""
