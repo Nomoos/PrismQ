@@ -7,7 +7,9 @@ instances with the simplified schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        review_id INTEGER,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
     )
 
     IdeaInspiration (
@@ -19,6 +21,7 @@ instances with the simplified schema:
     )
 
 Note: version uses INTEGER with CHECK >= 0 to simulate unsigned integer.
+Note: review_id is optional FK to Review table for idea quality assessment.
 Note: IdeaInspiration links Ideas to inspiration sources (nullable M:N).
 The SimpleIdea table is designed to be referenced by Story via foreign key.
 """
@@ -90,6 +93,18 @@ class SimpleIdeaDatabase:
 
         cursor = self.conn.cursor()
 
+        # Create Review table first (required for Idea FK constraint)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
+
         # Create simple Idea table
         cursor.execute(
             """
@@ -97,7 +112,9 @@ class SimpleIdeaDatabase:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                review_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (review_id) REFERENCES Review(id)
             )
         """
         )
@@ -115,6 +132,14 @@ class SimpleIdeaDatabase:
             """
             CREATE INDEX IF NOT EXISTS idx_idea_created_at 
             ON Idea(created_at)
+        """
+        )
+
+        # Create index on review_id for efficient FK lookups
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
+            ON Idea(review_id)
         """
         )
 

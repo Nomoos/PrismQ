@@ -14,7 +14,9 @@ Schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        review_id INTEGER,                              -- Optional FK to Review table
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
     )
 
     -- IdeaInspiration: Links Idea to its inspiration sources (M:N, nullable)
@@ -106,6 +108,7 @@ class IdeaTable:
             - id: INTEGER PRIMARY KEY AUTOINCREMENT
             - text: TEXT (prompt-like content for content generation)
             - version: INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0)
+            - review_id: INTEGER (optional FK to Review table)
             - created_at: TEXT NOT NULL DEFAULT (datetime('now'))
 
         Also creates IdeaInspiration junction table for M:N inspiration links.
@@ -117,6 +120,18 @@ class IdeaTable:
 
         cursor = self.conn.cursor()
 
+        # Create Review table first (required for Idea FK constraint)
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Review (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """
+        )
+
         # Create Idea table
         cursor.execute(
             """
@@ -124,7 +139,9 @@ class IdeaTable:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT,
                 version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                review_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (review_id) REFERENCES Review(id)
             )
         """
         )
@@ -142,6 +159,14 @@ class IdeaTable:
             """
             CREATE INDEX IF NOT EXISTS idx_idea_created_at 
             ON Idea(created_at)
+        """
+        )
+
+        # Create index on review_id for efficient FK lookups
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_idea_review_id 
+            ON Idea(review_id)
         """
         )
 

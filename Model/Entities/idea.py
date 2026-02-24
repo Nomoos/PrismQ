@@ -14,7 +14,9 @@ Schema:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,                                      -- Prompt-like text describing the idea
         version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),  -- Version tracking (UINT simulation)
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        review_id INTEGER,                              -- Optional FK to Review table
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (review_id) REFERENCES Review(id)
     )
 
     IdeaInspiration (
@@ -73,7 +75,9 @@ class IdeaSchema:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT,
             version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            review_id INTEGER,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (review_id) REFERENCES Review(id)
         );
         
         -- IdeaInspiration: Links Idea to inspiration sources (M:N, nullable)
@@ -88,6 +92,7 @@ class IdeaSchema:
         
         -- Performance indexes for common query patterns
         CREATE INDEX IF NOT EXISTS idx_idea_created_at ON Idea(created_at);
+        CREATE INDEX IF NOT EXISTS idx_idea_review_id ON Idea(review_id);
         CREATE INDEX IF NOT EXISTS idx_idea_inspiration_idea_id ON IdeaInspiration(idea_id);
         CREATE INDEX IF NOT EXISTS idx_idea_inspiration_inspiration_id ON IdeaInspiration(inspiration_id);
         """
