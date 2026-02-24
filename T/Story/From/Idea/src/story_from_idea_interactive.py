@@ -184,10 +184,9 @@ def get_database_paths() -> tuple:
 def run_continuous_mode(preview: bool = False):
     """Run story creation from idea continuously until cancelled.
 
-    This mode processes ideas repeatedly with dynamic pauses between iterations:
-    - 1 ms when >= 100 unreferenced ideas
-    - Gradually increasing when < 100 unreferenced ideas
-    - 30 seconds when 0 unreferenced ideas
+    This mode processes ideas repeatedly with binary pauses between iterations:
+    - 1 ms when unreferenced ideas > 0 (keep processing immediately)
+    - 30 seconds when 0 unreferenced ideas (wait for new items)
 
     It continues until the user cancels with Ctrl+C or closes the window.
 
@@ -254,9 +253,8 @@ def run_continuous_mode(preview: bool = False):
         logger.info(f"Idea database path: {idea_db_path}")
 
     print_section("Continuous Mode")
-    print("Processing ideas continuously with dynamic wait times:")
-    print("  - 1 ms when >= 100 unreferenced ideas")
-    print("  - Gradually increasing when < 100 unreferenced ideas")
+    print("Processing ideas continuously:")
+    print("  - 1 ms when unreferenced ideas > 0")
     print("  - 30 seconds when 0 unreferenced ideas")
     print("Press Ctrl+C or close the window to stop.\n")
 
@@ -464,7 +462,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Story Creation from Idea for PrismQ - runs continuously with dynamic wait times",
+        description="Story Creation from Idea for PrismQ - runs continuously",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -472,9 +470,8 @@ Examples:
   python story_from_idea_interactive.py --preview # Preview mode (no DB save)
   python story_from_idea_interactive.py --debug   # Same as --preview (no DB save)
 
-Wait times are dynamic based on remaining unreferenced ideas:
-  - 1 ms when >= 100 unreferenced ideas
-  - Gradually increasing when < 100 unreferenced ideas
+Wait times:
+  - 1 ms when unreferenced ideas > 0
   - 30 seconds when 0 unreferenced ideas
 
 Press Ctrl+C or close the window to stop.

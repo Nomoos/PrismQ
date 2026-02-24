@@ -13,10 +13,10 @@
 
 ## ⚙️ Zpracování
 1. [Inicializace](shared/inicializace_prostredi.md)
-2. Načtení nezpracovaných Ideas (bez Story referencí)
-3. Pro každou Idea: vytvoření 10 Story objektů s `idea_id` referencí a `state="PrismQ.T.Title.From.Idea"`
+2. Načtení nejstarší nezpracované Idea (bez Story referencí) — jedna za iteraci
+3. Vytvoření 10 Story objektů s `idea_id` referencí a `state="PrismQ.T.Title.From.Idea"`
 4. [Uložení výsledků](shared/databazova_integrace.md) — insert do tabulky `Story`, commit transakce
-5. [Continuous loop](shared/continuous_mode.md) — čekání 30s pokud žádné nové Ideas
+5. [Continuous loop](shared/continuous_mode.md) — čekání 30s pokud žádné nové Ideas, jinak 1ms
 
 ---
 
