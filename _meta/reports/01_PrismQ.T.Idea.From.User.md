@@ -1,6 +1,6 @@
 # Kontrola běhu modulu: PrismQ.T.Idea.From.User
 
-**Účel:** Generování strukturovaných Idea záznamů z uživatelského textového vstupu pomocí AI s flavor variantami (weighted random selection, 20% dual-flavor).
+**Účel:** Generování strukturovaných Idea záznamů z uživatelského textového vstupu pomocí AI s flavor variantami (weighted random selection, 40% dual-flavor).
 
 ---
 
