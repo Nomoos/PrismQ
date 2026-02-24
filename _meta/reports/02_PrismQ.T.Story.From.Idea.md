@@ -6,7 +6,7 @@
 
 ## 📥 Vstup
 - **Zdroj:** Databáze (tabulka `Idea`)
-- **Data:** SimpleIdea objekty — Ideas bez reference v tabulce `Story`
+- **Data:** Idea dicts (`id`, `text`, `version`, `created_at`) — Ideas bez reference v tabulce `Story`
 - **Předpoklady:** Existující Idea záznamy (modul 01), přístup k DB (read + write)
 
 ---
