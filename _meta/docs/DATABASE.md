@@ -12,6 +12,7 @@ PrismQ uses SQLite for data persistence following a dual-pattern architecture:
 |---------|--------|------------|----------|
 | **INSERT+READ Only** | Title, Content, Review, StoryReview | Insert, Read | Immutable versioned content |
 | **Full CRUD** | Story | Create, Read, Update | State machine transitions |
+| **Registry + Junction** | Inspiration, IdeaInspiration | Insert, Read, Delete | Deduplicated inspiration sources linked to Ideas |
 
 ## Database Location
 
@@ -22,6 +23,57 @@ The database file is stored in the PrismQ working directory:
 ## Database Models
 
 All database models are located in the **[T/Database/](../../T/Database/)** module.
+
+### Inspiration
+
+**File**: `Model/Entities/inspiration.py`
+
+Central registry for all inspiration sources. Every inspiration — regardless of
+origin (user input, YouTube, Reddit, HackerNews, etc.) — is registered here
+first. `IdeaInspiration` then references `Inspiration(id)` as an integer FK,
+providing full referential integrity without coupling to source-specific string
+identifiers.
+
+```sql
+Inspiration (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    title TEXT,
+    url TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(source, source_id)
+)
+
+-- Performance indexes
+CREATE INDEX idx_inspiration_source ON Inspiration(source);
+CREATE INDEX idx_inspiration_source_id ON Inspiration(source_id);
+```
+
+**Fields:**
+- `id`: Primary key (auto-generated)
+- `source`: Origin platform — e.g. `'user'`, `'youtube'`, `'reddit'`, `'hackernews'`
+- `source_id`: Unique identifier within that platform (e.g. YouTube video ID)
+- `title`: Optional human-readable label
+- `url`: Optional URL to the source content
+- `created_at`: Timestamp of registration
+
+**Constraints:**
+- `UNIQUE(source, source_id)` — deduplicates across repeated registrations
+
+**Best Practice — INT FK vs plain text:**
+
+> Use `insert_inspiration(source, source_id)` to register a source first, then
+> link its integer ID via `IdeaInspiration`. This separates the *identity* of
+> an inspiration (integer PK) from its *origin metadata* (`source`+`source_id`),
+> keeps `IdeaInspiration` clean (integer FK, referential integrity enforced by
+> SQLite), and avoids duplicating source strings across many junction rows.
+>
+> Calling `insert_inspiration` with the same `(source, source_id)` pair is
+> idempotent — it always returns the same integer ID, so callers do not need
+> to check whether a record already exists.
+
+---
 
 ### Idea
 
@@ -63,9 +115,10 @@ Links Idea to its inspiration sources (M:N, nullable). One from user input, or m
 IdeaInspiration (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idea_id INTEGER NOT NULL,
-    inspiration_id TEXT NOT NULL,
+    inspiration_id INTEGER NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (idea_id) REFERENCES Idea(id) ON DELETE CASCADE,
+    FOREIGN KEY (inspiration_id) REFERENCES Inspiration(id),
     UNIQUE(idea_id, inspiration_id)
 )
 
@@ -77,7 +130,7 @@ CREATE INDEX idx_idea_inspiration_inspiration_id ON IdeaInspiration(inspiration_
 **Fields:**
 - `id`: Primary key (auto-generated)
 - `idea_id`: FK to Idea (cascade delete)
-- `inspiration_id`: Source ID (user input, fusion, etc.)
+- `inspiration_id`: FK to Inspiration (integer — register source in Inspiration first)
 - `created_at`: Timestamp of creation
 
 **Constraints:**
@@ -274,9 +327,9 @@ CREATE INDEX idx_storyreview_story_version ON StoryReview(story_id, version);
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   ┌──────────────────┐                                          │
-│   │ IdeaInspiration  │                                          │
-│   └────────┬─────────┘                                          │
-│            │ M:N (nullable)                                      │
+│   │   Inspiration    │◄────────────────────────────────────────│
+│   └────────┬─────────┘           (source + source_id unique)   │
+│            │ via IdeaInspiration (M:N)                          │
 │            ▼                                                     │
 │   ┌────────┐                                                    │
 │   │  Idea  │                                                    │
