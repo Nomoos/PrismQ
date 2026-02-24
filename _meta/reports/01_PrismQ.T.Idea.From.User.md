@@ -5,9 +5,9 @@
 ---
 
 ## 📥 Vstup
-- **Zdroj:** Uživatel (terminálový vstup nebo API)
-- **Data:** Libovolný text (`input_text`), předán do AI bez parsování/validace
-- **Předpoklady:** Běžící Ollama server (localhost:11434), dostupný AI model, aktivní DB spojení
+- **Zdroj:** Terminálový vstup (uživatel)
+- **Data:** Text (`input_text`), předán do AI bez parsování/validace
+- **Předpoklady:** Běžící Ollama server, aktivní DB spojení
 
 ---
 
