@@ -12,7 +12,7 @@ The module takes:
 - Original title (any version: v1, v2, v3, etc.)
 - Content (corresponding version)
 - Title review feedback (from T.Review.Title.From.Content.Idea)
-- Content review feedback (from ByTitle)
+- Content review feedback (from T.Review.Script.From.Title)
 - Original idea (for context)
 
 And generates:

@@ -1,4 +1,4 @@
-"""Tests for PrismQ.T.Review.Content.ByTitle module."""
+"""Tests for PrismQ.T.Review.Script.From.Title module."""
 
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ project_root = Path(__file__).parent.parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Content.ByTitle import AlignmentScore, review_script_from_title
+from T.Review.Script.From.Title import AlignmentScore, review_script_from_title
 from T.Review.Content.script_review import ContentLength, ReviewCategory
 
 
@@ -47,8 +47,8 @@ def sample_content():
     """
 
 
-class TestReviewScriptByTitle:
-    """Test cases for review_content_by_title function."""
+class TestReviewScriptFromTitle:
+    """Test cases for review_script_from_title function."""
 
     def test_basic_review(self, sample_content, sample_idea):
         """Test basic script review functionality."""
@@ -59,7 +59,7 @@ class TestReviewScriptByTitle:
         assert review.script_title == title
         assert 0 <= review.overall_score <= 100
         assert len(review.category_scores) > 0
-        assert review.reviewer_id == "AI-ScriptReviewer-ByTitle-001"
+        assert review.reviewer_id == "AI-ScriptReviewer-FromTitle-001"
 
     def test_review_with_strong_alignment(self, sample_idea):
         """Test review with strong title-script alignment."""

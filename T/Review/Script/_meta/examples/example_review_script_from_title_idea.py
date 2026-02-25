@@ -1,4 +1,4 @@
-"""Example usage of review_content_by_title_and_idea module.
+"""Example usage of review_script_from_title_idea module.
 
 This example demonstrates MVP-005: Reviewing script v1 against title v1 and idea.
 """

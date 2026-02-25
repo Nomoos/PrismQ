@@ -1,4 +1,4 @@
-"""Tests for PrismQ.T.Review.Content.ByTitle v2 module."""
+"""Tests for PrismQ.T.Review.Script.From.Title v2 module."""
 
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ project_root = Path(__file__).parent.parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Content.ByTitle import (
+from T.Review.Script.From.Title import (
     ImprovementComparison,
     compare_reviews,
     extract_improvements_from_review,
@@ -76,8 +76,8 @@ def title_v3():
     return "The Voice That Knows Tomorrow - An Echo from the Future"
 
 
-class TestReviewScriptByTitleV2:
-    """Test cases for review_content_by_title_v2 function."""
+class TestReviewScriptFromTitleV2:
+    """Test cases for review_script_from_title_v2 function."""
 
     def test_basic_v2_review(self, script_v2, title_v3, sample_idea):
         """Test basic v2 script review functionality."""
@@ -87,7 +87,7 @@ class TestReviewScriptByTitleV2:
         assert review.script_title == title_v3
         assert 0 <= review.overall_score <= 100
         assert len(review.category_scores) > 0
-        assert review.reviewer_id == "AI-ScriptReviewer-ByTitle-v2-001"
+        assert review.reviewer_id == "AI-ScriptReviewer-FromTitle-v2-001"
 
     def test_v2_review_includes_version_metadata(self, script_v2, title_v3, sample_idea):
         """Test that v2 review includes version information in metadata."""

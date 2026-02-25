@@ -1,4 +1,4 @@
-"""Tests for review_content_by_title_and_idea module.
+"""Tests for review_content_from_title_idea module.
 
 Tests MVP-005: Review script v1 against title v1 and idea.
 """
@@ -27,7 +27,7 @@ from script_review import (
 )
 
 
-class TestReviewScriptByTitleAndIdea:
+class TestReviewContentFromTitleIdea:
     """Test main review function."""
 
     def test_basic_review(self):
@@ -60,7 +60,7 @@ class TestReviewScriptByTitleAndIdea:
         assert isinstance(review, ScriptReview)
         assert review.script_title == title
         assert 0 <= review.overall_score <= 100
-        assert review.reviewer_id == "AI-ScriptReviewer-ByTitleAndIdea-001"
+        assert review.reviewer_id == "AI-ContentReviewer-FromTitleIdea-001"
         assert review.metadata["idea_genre"] == "horror"
 
         # Should have category scores

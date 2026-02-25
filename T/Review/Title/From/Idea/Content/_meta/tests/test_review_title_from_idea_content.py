@@ -1,4 +1,4 @@
-"""Tests for title review function - review_title_by_idea_and_content."""
+"""Tests for title review function - review_title_from_idea_content."""
 
 import sys
 from pathlib import Path
@@ -318,7 +318,7 @@ class TestGenerateImprovementPoints:
             assert improvements[i].impact_score >= improvements[i + 1].impact_score
 
 
-class TestReviewTitleByScriptAndIdea:
+class TestReviewTitleFromContentIdea:
     """Test the main review function."""
 
     def test_basic_review(self):

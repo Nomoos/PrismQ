@@ -86,8 +86,8 @@ def v1_review(sample_v1_title, sample_v1_content, sample_idea):
     )
 
 
-class TestReviewTitleByScriptV2:
-    """Test suite for review_title_by_content_v2 function."""
+class TestReviewTitleFromContentV2:
+    """Test suite for review_title_from_content_v2 function."""
 
     def test_basic_v2_review(self, sample_v2_title, sample_v2_content):
         """Test basic v2 review without previous review."""

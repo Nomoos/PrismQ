@@ -1,4 +1,4 @@
-"""PrismQ.T.Review.Content.ByTitle - Content Review Against Title and Idea
+"""PrismQ.T.Review.Script.From.Title - Content Review Against Title and Idea
 
 AI-powered script evaluation that reviews scripts against titles and ideas.
 Provides structured feedback on alignment, flow, completeness, and gaps.

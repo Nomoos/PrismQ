@@ -17,7 +17,7 @@ try:
 except ImportError:
     _has_v1 = False
 
-# Import v2 review (ByScript - located at From.Content)
+# Import v2 review (FromContent - located at From.Content)
 try:
     from .From.Content import (
         ImprovementComparison,

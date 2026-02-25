@@ -6,9 +6,9 @@ It evaluates titles based on Idea (intent) and Content (delivery), producing
 narrative review text.
 
 Usage:
-    python review_title_by_idea_content_interactive.py                    # Interactive mode
-    python review_title_by_idea_content_interactive.py --preview          # Preview mode (extensive logging)
-    python review_title_by_idea_content_interactive.py --preview --debug  # Debug mode with full logging
+    python review_title_from_idea_content_interactive.py                    # Interactive mode
+    python review_title_from_idea_content_interactive.py --preview          # Preview mode (extensive logging)
+    python review_title_from_idea_content_interactive.py --preview --debug  # Debug mode with full logging
 
 Modes:
     Default: Generates reviews (ready for production integration)
@@ -43,7 +43,7 @@ sys.path.insert(0, str(REPO_ROOT))  # Add repo root
 
 # Try to import our review module
 try:
-    from by_idea_and_content import review_title_by_idea_and_content
+    from review_title_from_idea_content import review_title_from_idea_content
     from title_review import TitleReview
 
     REVIEW_MODULE_AVAILABLE = True

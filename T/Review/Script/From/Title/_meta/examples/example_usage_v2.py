@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Content.ByTitle v2 module.
+"""Example usage of PrismQ.T.Review.Script.From.Title v2 module.
 
 This example demonstrates how to use the v2 review functionality to:
 1. Review script v2 against title v3
@@ -20,23 +20,23 @@ sys.path.insert(0, str(_repo_root))
 sys.path.insert(0, str(_idea_model))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Content.ByTitle.by_title_v2 import (
+from T.Review.Script.From.Title import (
     compare_reviews,
     extract_improvements_from_review,
     get_next_steps,
     is_ready_to_proceed,
-    review_content_by_title_v2,
+    review_script_from_title_v2,
 )
 
 # Now we can import
-from T.Review.Content.ByTitle.script_review_by_title import review_content_by_title
+from T.Review.Script.From.Title import review_script_from_title
 
 
 def main():
     """Demonstrate v2 review workflow."""
 
     print("=" * 80)
-    print("PrismQ.T.Review.Content.ByTitle v2 - Example Usage")
+    print("PrismQ.T.Review.Script.From.Title v2 - Example Usage")
     print("=" * 80)
     print()
 
@@ -72,7 +72,7 @@ def main():
     # Step 3: Review v1
     print("Step 3: Review script v1 against title v1")
     print("-" * 80)
-    v1_review = review_content_by_title(script_v1, title_v1, idea)
+    v1_review = review_script_from_title(script_v1, title_v1, idea)
     print(f"V1 Overall Score: {v1_review.overall_score}%")
     print(f"V1 Title Alignment: {v1_review.metadata['title_alignment_score']}%")
     print(f"V1 Idea Alignment: {v1_review.metadata['idea_alignment_score']}%")
@@ -103,7 +103,7 @@ def main():
     # Step 5: Review v2
     print("Step 5: Review script v2 against title v3 (with comparison)")
     print("-" * 80)
-    v2_review = review_content_by_title_v2(
+    v2_review = review_script_from_title_v2(
         content_text=script_v2,
         title=title_v3,
         idea=idea,

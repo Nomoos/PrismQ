@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Title.ByScript (v2) module.
+"""Example usage of PrismQ.T.Review.Title.From.Content (v2) module.
 
 This example demonstrates how to use the v2 title review functionality
 to evaluate refined titles against refined scripts with improvement tracking.
@@ -11,8 +11,8 @@ import sys
 # Add parent directories to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
-from T.Review.Title.ByScript import get_improvement_summary, review_title_by_content_v2
-from T.Review.Title.From.Content.Idea import review_title_by_content_and_idea
+from T.Review.Title.From.Content import get_improvement_summary, review_title_from_content_v2
+from T.Review.Title.From.Content.Idea import review_title_from_content_idea
 
 
 def example_basic_v2_review():
@@ -32,7 +32,7 @@ def example_basic_v2_review():
     to a shocking revelation about the true nature of the phenomena.
     """
 
-    review = review_title_by_content_v2(
+    review = review_title_from_content_v2(
         title_text=title_v2, content_text=script_v2, title_version="v2", script_version="v2"
     )
 
@@ -63,7 +63,7 @@ def example_v1_to_v2_comparison():
     idea = "A psychological horror story about mysterious sounds in an abandoned hospital"
 
     # Create v1 review
-    v1_review = review_title_by_content_and_idea(
+    v1_review = review_title_from_content_idea(
         title_text=title_v1,
         content_text=script_v1,
         idea_summary=idea,
@@ -88,7 +88,7 @@ def example_v1_to_v2_comparison():
     """
 
     # Create v2 review with v1 comparison
-    v2_review = review_title_by_content_v2(
+    v2_review = review_title_from_content_v2(
         title_text=title_v2,
         content_text=script_v2,
         title_version="v2",
@@ -140,7 +140,7 @@ def example_json_export():
     her thoughts. A suspenseful journey into the paranormal.
     """
 
-    review = review_title_by_content_v2(title_text=title_v2, content_text=script_v2)
+    review = review_title_from_content_v2(title_text=title_v2, content_text=script_v2)
 
     # Convert to JSON
     review_dict = review.to_dict()
@@ -163,7 +163,7 @@ def example_multiple_iterations():
     title_v1 = "The Echo"
     script_v1 = "A horror short about mysterious sounds in an abandoned hospital."
 
-    v1_review = review_title_by_content_and_idea(
+    v1_review = review_title_from_content_idea(
         title_text=title_v1, content_text=script_v1, idea_summary=idea
     )
 
@@ -174,7 +174,7 @@ def example_multiple_iterations():
     title_v2 = "The Echo - A Haunting Discovery"
     script_v2 = "The Echo follows Sarah as she explores an abandoned hospital, uncovering mysterious echoes and haunting discoveries."
 
-    v2_review = review_title_by_content_v2(
+    v2_review = review_title_from_content_v2(
         title_text=title_v2, content_text=script_v2, title_version="v2", previous_review=v1_review
     )
 
@@ -187,7 +187,7 @@ def example_multiple_iterations():
     title_v3 = "The Echo - Uncovering Dark Secrets in the Abandoned Hospital"
     script_v3 = "The Echo - A suspenseful horror journey as Sarah investigates paranormal echoes in the abandoned Mercy Hospital, uncovering dark secrets and haunting discoveries."
 
-    v3_review = review_title_by_content_v2(
+    v3_review = review_title_from_content_v2(
         title_text=title_v3, content_text=script_v3, title_version="v3", previous_review=v2_review
     )
 
@@ -217,7 +217,7 @@ def example_regression_detection():
 
     # Good v1
     title_v1 = "The Echo - Mysterious Sounds in the Abandoned Hospital"
-    v1_review = review_title_by_content_and_idea(
+    v1_review = review_title_from_content_idea(
         title_text=title_v1, content_text=script_v1, idea_summary=idea
     )
 
@@ -230,7 +230,7 @@ def example_regression_detection():
         "A horror short about mysterious sounds in an abandoned hospital with haunting echoes."
     )
 
-    v2_review = review_title_by_content_v2(
+    v2_review = review_title_from_content_v2(
         title_text=title_v2, content_text=script_v2, previous_review=v1_review
     )
 

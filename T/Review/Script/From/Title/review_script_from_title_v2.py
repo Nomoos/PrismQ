@@ -12,7 +12,7 @@ The v2 reviewer provides:
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Content v2 + Title v3 + v1 Review → ByTitle v2 Review → ScriptReview Feedback → Content v3
+    Content v2 + Title v3 + v1 Review → FromTitle v2 Review → ScriptReview Feedback → Content v3
 """
 
 import os
@@ -35,7 +35,7 @@ from T.Review.Script.From.Title.review_script_from_title import (
     _generate_improvement_points,
     _identify_primary_concern,
     _identify_quick_wins,
-    review_content_by_title,
+    review_script_from_title,
 )
 from T.Review.Content.script_review import (
     CategoryScore,

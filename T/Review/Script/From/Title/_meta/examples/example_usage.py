@@ -1,4 +1,4 @@
-"""Example usage of PrismQ.T.Review.Content.ByTitle module.
+"""Example usage of PrismQ.T.Review.Script.From.Title module.
 
 This example demonstrates how to review scripts against titles and ideas
 to get structured feedback with JSON output.
@@ -19,7 +19,7 @@ sys.path.insert(0, str(_idea_model))
 from src.idea import ContentGenre, Idea
 
 # Now we can import
-from T.Review.Content.ByTitle.script_review_by_title import review_content_by_title
+from T.Review.Script.From.Title import review_script_from_title
 
 
 def example_basic_review():
@@ -57,7 +57,7 @@ def example_basic_review():
     """
 
     # Review the script
-    review = review_content_by_title(
+    review = review_script_from_title(
         content_text=script, title=title, idea=idea, target_length_seconds=90
     )
 
@@ -105,7 +105,7 @@ def example_gap_identification():
     """
 
     # Review
-    review = review_content_by_title(script, title, idea, target_length_seconds=60)
+    review = review_script_from_title(script, title, idea, target_length_seconds=60)
 
     print(f"\nScript: {review.script_title}")
     print(f"Overall Score: {review.overall_score}%")
@@ -141,7 +141,7 @@ def example_json_output():
     """
 
     # Review
-    review = review_content_by_title(script, title, idea)
+    review = review_script_from_title(script, title, idea)
 
     # Convert to JSON
     review_dict = review.to_dict()
@@ -196,7 +196,7 @@ def example_category_scores():
     """
 
     # Review
-    review = review_content_by_title(script, title, idea)
+    review = review_script_from_title(script, title, idea)
 
     print(f"\nScript: {review.script_title}")
     print(f"Overall Score: {review.overall_score}%")
@@ -235,7 +235,7 @@ def example_iterative_improvement():
     """
 
     print("\n--- ITERATION 1 ---")
-    review_v1 = review_content_by_title(script_v1, title, idea)
+    review_v1 = review_script_from_title(script_v1, title, idea)
     print(f"Score: {review_v1.overall_score}%")
     print(f"Needs Major Revision: {review_v1.needs_major_revision}")
     print("\nTop Improvement:")
@@ -257,7 +257,7 @@ def example_iterative_improvement():
     """
 
     print("\n--- ITERATION 2 ---")
-    review_v2 = review_content_by_title(script_v2, title, idea)
+    review_v2 = review_script_from_title(script_v2, title, idea)
     print(f"Score: {review_v2.overall_score}%")
     print(f"Needs Major Revision: {review_v2.needs_major_revision}")
     print(f"Improvement: +{review_v2.overall_score - review_v1.overall_score}%")
@@ -269,7 +269,7 @@ def main():
     """Run all examples."""
     print("\n")
     print("*" * 60)
-    print("PrismQ.T.Review.Content.ByTitle - Usage Examples")
+    print("PrismQ.T.Review.Script.From.Title - Usage Examples")
     print("*" * 60)
     print("\n")
 

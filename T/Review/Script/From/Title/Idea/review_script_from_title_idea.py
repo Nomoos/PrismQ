@@ -10,7 +10,7 @@ The reviewer provides:
 - Actionable improvement recommendations
 
 Workflow Position:
-    Idea + Title v1 → Content v1 → ByTitleAndIdea Review → Feedback/Approval
+    Idea + Title v1 → Content v1 → FromTitleIdea Review → Feedback/Approval
 """
 
 import re
