@@ -14,12 +14,9 @@ The database connection is established once at initialization and reused
 across all operations for efficiency.
 
 Usage:
-    python idea_creation_interactive.py              # Run mode - saves to database
-    python idea_creation_interactive.py --preview    # Preview mode - no database save
-    python idea_creation_interactive.py --debug      # Run mode with debug logging
+    python idea_creation_interactive.py
 """
 
-import argparse
 import json
 import logging
 import re
@@ -155,22 +152,13 @@ def parse_input_text(
     return title, text, metadata
 
 
-def run_interactive_mode(preview: bool = False, debug: bool = False) -> int:
+def run_interactive_mode() -> int:
     """Run the continuous interactive idea creation mode.
-
-    Args:
-        preview: If True, run in preview mode without saving to the database.
-        debug: If True, enable debug-level logging.
 
     Returns:
         Exit code (0 for success, non-zero for failure).
     """
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
-        logger.debug("Debug logging enabled")
-
-    mode_label = "Preview Mode (no database save)" if preview else "Run Mode"
-    logger.info(f"Starting interactive mode: {mode_label}")
+    logger.info("Starting interactive mode")
 
     # Delegate to the backend implementation in T/Idea/From/User/src/
     try:
@@ -193,24 +181,8 @@ def run_interactive_mode(preview: bool = False, debug: bool = False) -> int:
 
 
 def main() -> int:
-    """Main entry point with argument parsing."""
-    parser = argparse.ArgumentParser(
-        description="PrismQ interactive idea creation",
-    )
-    parser.add_argument(
-        "--preview",
-        "-p",
-        action="store_true",
-        help="Preview mode: generate ideas but do NOT save to database",
-    )
-    parser.add_argument(
-        "--debug",
-        "-d",
-        action="store_true",
-        help="Enable debug logging",
-    )
-    args = parser.parse_args()
-    return run_interactive_mode(preview=args.preview, debug=args.debug)
+    """Main entry point."""
+    return run_interactive_mode()
 
 
 if __name__ == "__main__":
