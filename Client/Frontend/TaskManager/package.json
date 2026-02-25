@@ -10,7 +10,6 @@
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "build:analyze": "ANALYZE=true npm run build",
-    "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
@@ -27,7 +26,7 @@
     "baseline:capture": "node scripts/baseline.js capture",
     "baseline:compare": "node scripts/baseline.js compare",
     "baseline:report": "node scripts/baseline.js report",
-    "lighthouse": "npm run build && npm run preview & lhci autorun --config=lighthouserc.cjs",
+    "lighthouse": "npm run build && lhci autorun --config=lighthouserc.cjs",
     "lighthouse:ci": "lhci autorun --config=lighthouserc.cjs",
     "perf:test": "npm run bundle:check && npm run lighthouse"
   },
