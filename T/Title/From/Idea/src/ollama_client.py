@@ -6,6 +6,7 @@ Follows Single Responsibility Principle - only responsible for API communication
 """
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -91,6 +92,7 @@ class OllamaClient:
         logger.debug(f"Sending prompt to Ollama (temperature={temperature})")
         
         try:
+            t0 = time.monotonic()
             response = requests.post(
                 f"{self.config.api_base}/api/generate",
                 json={
@@ -104,9 +106,11 @@ class OllamaClient:
                 },
                 timeout=self.config.timeout,
             )
+            elapsed = time.monotonic() - t0
             
             response.raise_for_status()
             result = response.json()
+            logger.info(f"Ollama response received in {elapsed:.1f}s (model={self.config.model})")
             return result.get("response", "")
             
         except requests.exceptions.RequestException as e:

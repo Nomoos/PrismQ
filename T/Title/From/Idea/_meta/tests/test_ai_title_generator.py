@@ -334,3 +334,76 @@ class TestConvenienceFunction:
         variants = generate_ai_titles_from_idea(idea, num_variants=3)
 
         assert len(variants) >= 0  # May be empty if parsing fails
+
+
+class TestParseResponseThinkBlocks:
+    """Tests for <think> block stripping in _parse_response."""
+
+    def _make_generator(self):
+        """Create an AITitleGenerator with mocked OllamaClient."""
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        return AITitleGenerator(ollama_client=mock_client)
+
+    def test_parse_response_strips_think_block(self):
+        """Response with <think>...</think> block yields the title after the block."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
+
+        response = "<think>\nSome internal reasoning here.\n</think>\nSilence Spoke Loudest"
+        variant = generator._parse_response(response, idea)
+
+        assert variant is not None
+        assert variant.text == "Silence Spoke Loudest"
+
+    def test_parse_response_multiline_think_block(self):
+        """Multi-line <think> block is fully stripped before extracting the title."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A family story", status=IdeaStatus.DRAFT)
+
+        response = (
+            "<think>\n"
+            "Line one of thinking.\n"
+            "Line two of thinking.\n"
+            "</think>\n"
+            "The Weight of Unspoken Words"
+        )
+        variant = generator._parse_response(response, idea)
+
+        assert variant is not None
+        assert variant.text == "The Weight of Unspoken Words"
+
+    def test_parse_response_think_block_leaves_empty_title(self):
+        """<think>-only response with no title after the block returns None."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+
+        response = "<think>\nOnly thinking, no title.\n</think>\n"
+        variant = generator._parse_response(response, idea)
+
+        assert variant is None
+
+    def test_parse_response_without_think_block(self):
+        """Plain response without <think> block is parsed as-is."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+
+        response = "The Quiet Alchemy"
+        variant = generator._parse_response(response, idea)
+
+        assert variant is not None
+        assert variant.text == "The Quiet Alchemy"
+
+
+class TestTitleGeneratorConfigMinLength:
+    """Tests for min_length_for_scoring in TitleGeneratorConfig."""
+
+    def test_default_min_length_for_scoring(self):
+        """Default min_length_for_scoring is 20."""
+        config = TitleGeneratorConfig()
+        assert config.min_length_for_scoring == 20
+
+    def test_custom_min_length_for_scoring(self):
+        """Custom min_length_for_scoring is respected."""
+        config = TitleGeneratorConfig(min_length_for_scoring=35)
+        assert config.min_length_for_scoring == 35

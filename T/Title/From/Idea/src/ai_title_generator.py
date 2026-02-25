@@ -9,6 +9,7 @@ import logging
 import re
 import random
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -56,11 +57,15 @@ class TitleGeneratorConfig:
         num_variants: Number of title variants to generate (3-10)
         temperature_min: Minimum temperature for randomization
         temperature_max: Maximum temperature for randomization
+        min_length_for_scoring: Minimum title length (characters) required for
+            AI scoring. Variants shorter than this are accepted but not
+            AI-scored, avoiding unnecessary AI calls for low-quality responses.
     """
     
     num_variants: int = 10
     temperature_min: float = 0.6
     temperature_max: float = 0.8
+    min_length_for_scoring: int = 20
 
 
 class AITitleGenerator:
@@ -171,6 +176,7 @@ class AITitleGenerator:
         
         # Generate variants one-by-one with random temperature for diversity
         variants = []
+        gen_start = time.monotonic()
         try:
             for i in range(n_variants):
                 # Random temperature in sweet spot for creative titles
@@ -182,7 +188,10 @@ class AITitleGenerator:
                 logger.debug(f"Generating title {i+1}/{n_variants} with temperature={temp:.2f}")
                 
                 # Generate title from AI
+                t0 = time.monotonic()
                 response_text = self.ollama_client.generate(prompt, temperature=temp)
+                elapsed = time.monotonic() - t0
+                logger.debug(f"  AI response received in {elapsed:.1f}s for variant {i+1}")
                 
                 # Parse and score the response
                 variant = self._parse_response(response_text, idea)
@@ -192,12 +201,27 @@ class AITitleGenerator:
                 else:
                     logger.warning(f"  Failed to parse response for variant {i+1}")
             
+            gen_elapsed = time.monotonic() - gen_start
+            logger.info(
+                f"Generated {len(variants)}/{n_variants} title variants in {gen_elapsed:.1f}s"
+            )
+
             # Sort by score (highest first) for better quality results
             variants.sort(key=lambda v: v.score, reverse=True)
             
-            # Apply AI scoring to each variant and combine with rule-based score
-            logger.info(f"Scoring {len(variants)} title variants with AI")
-            for variant in variants:
+            # Apply AI scoring only to variants that pass the minimum length gate.
+            # This avoids wasting AI calls on very short or low-quality responses.
+            scoreable = [v for v in variants if v.length >= self.config.min_length_for_scoring]
+            skipped = len(variants) - len(scoreable)
+            if skipped:
+                logger.info(
+                    f"Skipping AI scoring for {skipped} variant(s) below "
+                    f"min_length_for_scoring={self.config.min_length_for_scoring}"
+                )
+
+            logger.info(f"Scoring {len(scoreable)} title variant(s) with AI")
+            score_start = time.monotonic()
+            for variant in scoreable:
                 ai_score = self._ai_score_title(variant.text, idea)
                 if ai_score > 0.0:
                     # Combine rule-based score (50%) with AI score (50%)
@@ -205,11 +229,17 @@ class AITitleGenerator:
                     logger.debug(
                         f"  Combined score for '{variant.text}': {variant.score:.2f}"
                     )
+            score_elapsed = time.monotonic() - score_start
+            logger.info(f"AI scoring completed in {score_elapsed:.1f}s")
             
             # Re-sort by combined scores
             variants.sort(key=lambda v: v.score, reverse=True)
             
-            logger.info(f"Successfully generated {len(variants)}/{n_variants} title variants")
+            total_elapsed = time.monotonic() - gen_start
+            logger.info(
+                f"Successfully generated {len(variants)}/{n_variants} title variants "
+                f"(total time: {total_elapsed:.1f}s)"
+            )
             return variants
             
         except Exception as e:
@@ -291,6 +321,9 @@ class AITitleGenerator:
             TitleVariant object or None if parsing fails
         """
         try:
+            # Strip <think>...</think> blocks (used by qwen3 thinking mode)
+            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+
             # Clean the response
             title_text = response_text.strip()
             
