@@ -6,6 +6,7 @@ Follows SOLID principles with dependency injection and single responsibility.
 """
 
 import logging
+import re
 import random
 import sys
 from dataclasses import dataclass
@@ -194,6 +195,20 @@ class AITitleGenerator:
             # Sort by score (highest first) for better quality results
             variants.sort(key=lambda v: v.score, reverse=True)
             
+            # Apply AI scoring to each variant and combine with rule-based score
+            logger.info(f"Scoring {len(variants)} title variants with AI")
+            for variant in variants:
+                ai_score = self._ai_score_title(variant.text, idea)
+                if ai_score > 0.0:
+                    # Combine rule-based score (50%) with AI score (50%)
+                    variant.score = (variant.score + ai_score) / 2.0
+                    logger.debug(
+                        f"  Combined score for '{variant.text}': {variant.score:.2f}"
+                    )
+            
+            # Re-sort by combined scores
+            variants.sort(key=lambda v: v.score, reverse=True)
+            
             logger.info(f"Successfully generated {len(variants)}/{n_variants} title variants")
             return variants
             
@@ -201,6 +216,43 @@ class AITitleGenerator:
             error_msg = f"AI title generation failed: {e}"
             logger.error(error_msg)
             raise AIUnavailableError(error_msg) from e
+    
+    def _ai_score_title(self, title_text: str, idea: Idea) -> float:
+        """Score a title using AI based on readability, keywords, emotional impact and SEO.
+        
+        Uses the title_scoring.txt prompt template to evaluate each title.
+        Returns 0.0 if AI scoring fails so the rule-based score is preserved.
+        
+        Args:
+            title_text: The title to evaluate
+            idea: Original idea for context
+        
+        Returns:
+            Score between 0.0 and 1.0 (normalized from AI's 0-100 response),
+            or 0.0 if scoring fails
+        """
+        try:
+            template = self.prompt_loader.get_title_scoring_prompt()
+            idea_text = idea.concept or idea.title or ""
+            prompt = template.format(IDEA=idea_text, TITLE=title_text)
+            
+            # Use low temperature for consistent, deterministic scoring
+            response_text = self.ollama_client.generate(prompt, temperature=0.1)
+            
+            # Extract the first integer (0-100) from the response
+            numbers = re.findall(r'\b(\d{1,3})\b', response_text.strip())
+            if numbers:
+                score_int = int(numbers[0])
+                # Clamp to valid 0-100 range
+                score_int = max(0, min(100, score_int))
+                return score_int / 100.0
+            
+            logger.warning(f"AI scoring returned no parseable score for '{title_text}'")
+            return 0.0
+            
+        except Exception as e:
+            logger.warning(f"AI scoring failed for '{title_text}': {e}")
+            return 0.0
     
     def _create_prompt(self, idea: Idea) -> str:
         """Create the title generation prompt.

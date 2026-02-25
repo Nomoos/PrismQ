@@ -43,11 +43,11 @@ class TestAITitleGeneratorRefactored:
 
     @patch("ollama_client.requests.get")
     def test_generate_from_idea(self, mock_get):
-        """Test generating titles from an idea (one-by-one approach)."""
+        """Test generating titles from an idea (one-by-one approach with AI scoring)."""
         mock_get.return_value = Mock(status_code=200)
         
         with patch("ollama_client.requests.post") as mock_post:
-            # Mock response with single title per call (one-by-one generation)
+            # Mock response with single title per generation call and score for scoring calls
             mock_post.return_value = Mock(
                 status_code=200,
                 json=lambda: {"response": "The Mirror's Silent Message"}
@@ -64,8 +64,8 @@ class TestAITitleGeneratorRefactored:
             
             assert len(variants) == 3
             assert all(isinstance(v, TitleVariant) for v in variants)
-            # Verify AI was called 3 times (once per variant)
-            assert mock_post.call_count == 3
+            # Verify AI was called for generation (3) + scoring (3) = 6 times
+            assert mock_post.call_count == 6
 
     @patch("ollama_client.requests.get")
     def test_prompt_uses_literary_template(self, mock_get):
@@ -99,6 +99,34 @@ class TestAITitleGeneratorRefactored:
         with pytest.raises(AIUnavailableError):
             generator.generate_from_idea(idea, num_variants=3)
 
+    @patch("ollama_client.requests.get")
+    @patch("ollama_client.requests.post")
+    def test_ai_scores_each_variant(self, mock_post, mock_get):
+        """Test that AI scoring is applied to each generated variant."""
+        mock_get.return_value = Mock(status_code=200)
+        
+        call_count = [0]
+        
+        def mock_response(*args, **kwargs):
+            call_count[0] += 1
+            # Generation calls return a title; scoring calls return a score
+            if call_count[0] <= 3:
+                return Mock(status_code=200, json=lambda: {"response": "The Mirror's Silent Message"})
+            else:
+                return Mock(status_code=200, json=lambda: {"response": "85"})
+        
+        mock_post.side_effect = mock_response
+        
+        generator = AITitleGenerator()
+        idea = Idea(title="Test", concept="A story about reflection", status=IdeaStatus.DRAFT)
+        
+        variants = generator.generate_from_idea(idea, num_variants=3)
+        
+        assert len(variants) == 3
+        # Scoring calls returned "85" → ai_score=0.85, combined with rule score
+        for variant in variants:
+            assert variant.score > 0.0
+
 
 class TestPromptLoader:
     """Tests for PromptLoader."""
@@ -111,6 +139,15 @@ class TestPromptLoader:
         assert len(prompt) > 0
         assert "{IDEA}" in prompt
         assert "creative title architect" in prompt
+
+    def test_loads_title_scoring_prompt(self):
+        """Test loading the title scoring prompt."""
+        loader = PromptLoader()
+        prompt = loader.get_title_scoring_prompt()
+        
+        assert len(prompt) > 0
+        assert "{IDEA}" in prompt
+        assert "{TITLE}" in prompt
 
 
 class TestOllamaClient:
