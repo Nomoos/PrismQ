@@ -47,15 +47,27 @@ class PromptLoader:
         return prompt_path.read_text(encoding="utf-8")
     
     def get_title_generation_prompt(self) -> str:
-        """Load the literary-focused title generation prompt.
+        """Load the literary-focused title generation prompt (single title).
         
-        This is the canonical prompt for generating titles from Ideas.
+        This is the canonical prompt for generating one title from an Idea.
         It emphasizes emotional essence, symbolism, and book-style titles.
         
         Returns:
             The title generation prompt template with {IDEA} placeholder
         """
         return self.load("title_generation.txt")
+    
+    def get_title_generation_batch_prompt(self) -> str:
+        """Load the batch title generation prompt (multiple titles in one call).
+        
+        This prompt requests {COUNT} diverse titles in a single AI call,
+        each exploring a different emotional angle. Produces a numbered list
+        that can be parsed by AITitleGenerator._parse_batch_response().
+        
+        Returns:
+            The batch prompt template with {IDEA} and {COUNT} placeholders
+        """
+        return self.load("title_generation_batch.txt")
     
     def get_title_scoring_prompt(self) -> str:
         """Load the title scoring prompt.

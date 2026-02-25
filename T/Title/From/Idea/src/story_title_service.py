@@ -159,7 +159,7 @@ class StoryTitleService:
     CURRENT_STATE = StateNames.TITLE_FROM_IDEA
     
     NUM_STORIES = 10  # Number of stories to create from each Idea (legacy)
-    NUM_VARIANTS = 10  # Number of title variants to generate
+    NUM_VARIANTS = 5  # Number of title variants to generate
     DEFAULT_SIMILARITY_THRESHOLD = 0.7  # Threshold for similarity detection
 
     def __init__(
