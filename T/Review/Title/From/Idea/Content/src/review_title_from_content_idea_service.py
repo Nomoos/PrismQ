@@ -56,9 +56,9 @@ except ImportError:
 
 # Try to import the review function (reuse from step 07)
 try:
-    from T.Review.Title.From.Content.by_content_v2 import (
+    from T.Review.Title.From.Content.review_title_from_content_v2 import (
         SCORE_THRESHOLD_HIGH,
-        review_title_by_content_v2,
+        review_title_from_content_v2,
     )
     REVIEW_AVAILABLE = True
 except ImportError:
@@ -197,7 +197,7 @@ class ReviewTitleFromContentIdeaService:
                 return result
 
             # Review includes idea context in the prompt/reasoning
-            review_result = review_title_by_content_v2(
+            review_result = review_title_from_content_v2(
                 title_text=title.text,
                 content_text=content.text,
                 title_id=title.id,

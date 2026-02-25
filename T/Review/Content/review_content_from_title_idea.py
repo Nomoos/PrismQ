@@ -10,14 +10,14 @@ The reviewer provides:
 - Actionable improvement recommendations
 
 Workflow Position:
-    Idea + Title v1 → Content v1 → ByTitleAndIdea Review → Feedback/Approval
+    Idea + Title v1 → Content v1 → FromTitleIdea Review → Feedback/Approval
 """
 
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .script_review import (
+from script_review import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
@@ -124,13 +124,13 @@ class AlignmentScore:
     reasoning: str
 
 
-def review_content_by_title_and_idea(
+def review_content_from_title_idea(
     content_text: str,
     title: str,
     idea: Idea,
     content_id: Optional[str] = None,
     target_length_seconds: Optional[int] = None,
-    reviewer_id: str = "AI-ScriptReviewer-ByTitleAndIdea-001",
+    reviewer_id: str = "AI-ContentReviewer-FromTitleIdea-001",
 ) -> ScriptReview:
     """Review script v1 against title v1 and idea.
 
@@ -162,7 +162,7 @@ def review_content_by_title_and_idea(
         ... )
         >>> title = "The Voice That Knows Tomorrow"
         >>> script = "Last night I heard a whisper..."
-        >>> review = review_content_by_title_and_idea(script, title, idea)
+        >>> review = review_content_from_title_idea(script, title, idea)
         >>> print(f"Overall score: {review.overall_score}%")
     """
     # Generate script ID if not provided

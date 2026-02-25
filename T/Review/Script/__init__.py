@@ -8,7 +8,7 @@ from . import Grammar
 
 # Import Acceptance module (MVP-013)
 from .Acceptance import ScriptAcceptanceResult, check_content_acceptance
-from .by_title_and_idea import AlignmentScore, review_content_by_title_and_idea
+from .review_script_from_title_idea import AlignmentScore, review_script_from_title_idea
 from .script_review import (
     CategoryScore,
     ContentLength,
@@ -25,7 +25,7 @@ __all__ = [
     "ContentLength",
     "ImprovementPoint",
     "CategoryScore",
-    "review_content_by_title_and_idea",
+    "review_script_from_title_idea",
     "AlignmentScore",
     "Grammar",
     "check_content_acceptance",

@@ -660,7 +660,7 @@ def generate_improvement_points(
     return improvements
 
 
-def review_title_by_idea_and_content(
+def review_title_from_idea_content(
     title_text: str,
     idea_summary: str,
     content_text: str,
@@ -706,7 +706,7 @@ def review_title_by_idea_and_content(
         ValueError: If inputs are invalid (empty, too short, too long)
 
     Example:
-        >>> review = review_title_by_idea_and_content(
+        >>> review = review_title_from_idea_content(
         ...     title_text="The Echo - A Haunting Discovery",
         ...     idea_summary="Horror story about mysterious echoes",
         ...     content_text="In the abandoned house, echoes reveal dark secrets...",

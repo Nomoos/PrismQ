@@ -39,10 +39,10 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 
 # Import review modules
 try:
-    from by_content_v2 import (
+    from review_title_from_content_v2 import (
         compare_reviews,
         get_improvement_summary,
-        review_title_by_content_v2,
+        review_title_from_content_v2,
     )
 
     REVIEW_V2_AVAILABLE = True
@@ -51,12 +51,12 @@ except ImportError as e:
     IMPORT_ERROR_V2 = str(e)
 
 try:
-    from Idea.by_content_and_idea import (
+    from Idea.review_title_from_content_idea import (
         analyze_engagement,
         analyze_seo,
         analyze_title_content_alignment,
         extract_keywords,
-        review_title_by_content_and_idea,
+        review_title_from_content_idea,
     )
     from Idea.title_review import TitleReview, TitleReviewCategory
 
@@ -298,7 +298,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
         try:
             # Use basic review if idea not available
             review = (
-                review_title_by_content_v2(
+                review_title_from_content_v2(
                     title_text=title_text,
                     content_text=content_text,
                     title_version="v1",

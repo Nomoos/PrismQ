@@ -16,14 +16,14 @@ import pytest
 # Add parent directories to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
-from T.Review.Title.From.Content.by_content_v2 import (
+from T.Review.Title.From.Content.review_title_from_content_v2 import (
     ImprovementComparison,
     compare_reviews,
     get_improvement_summary,
-    review_title_by_content_v2,
+    review_title_from_content_v2,
 )
-from T.Review.Title.From.Content.Idea.by_content_and_idea import (
-    review_title_by_content_and_idea,
+from T.Review.Title.From.Content.Idea.review_title_from_content_idea import (
+    review_title_from_content_idea,
 )
 from T.Review.Title.From.Content.Idea.title_review import TitleReview
 
@@ -77,7 +77,7 @@ def sample_idea():
 @pytest.fixture
 def v1_review(sample_v1_title, sample_v1_content, sample_idea):
     """Create a v1 review for comparison testing."""
-    return review_title_by_content_and_idea(
+    return review_title_from_content_idea(
         title_text=sample_v1_title,
         content_text=sample_v1_content,
         idea_summary=sample_idea,
@@ -86,12 +86,12 @@ def v1_review(sample_v1_title, sample_v1_content, sample_idea):
     )
 
 
-class TestReviewTitleByScriptV2:
-    """Test suite for review_title_by_content_v2 function."""
+class TestReviewTitleFromContentV2:
+    """Test suite for review_title_from_content_v2 function."""
 
     def test_basic_v2_review(self, sample_v2_title, sample_v2_content):
         """Test basic v2 review without previous review."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         assert review is not None
         assert review.title_text == sample_v2_title
@@ -103,7 +103,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_with_previous(self, sample_v2_title, sample_v2_content, v1_review):
         """Test v2 review with previous review for comparison."""
-        review = review_title_by_content_v2(
+        review = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -114,7 +114,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_generates_ids(self, sample_v2_title, sample_v2_content):
         """Test that v2 review generates IDs when not provided."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         assert review.title_id is not None
         assert review.title_id.startswith("title-")
@@ -123,7 +123,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_with_custom_ids(self, sample_v2_title, sample_v2_content):
         """Test v2 review with custom IDs."""
-        review = review_title_by_content_v2(
+        review = review_title_from_content_v2(
             title_text=sample_v2_title,
             content_text=sample_v2_content,
             title_id="custom-title-v2",
@@ -135,7 +135,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_has_category_scores(self, sample_v2_title, sample_v2_content):
         """Test that v2 review includes category scores."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         assert len(review.category_scores) > 0
         # Should have script_alignment, engagement, seo, length
@@ -143,7 +143,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_has_improvement_points(self, sample_v2_title, sample_v2_content):
         """Test that v2 review generates improvement points."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         # May or may not have improvements depending on quality
         assert isinstance(review.improvement_points, list)
@@ -152,7 +152,7 @@ class TestReviewTitleByScriptV2:
         """Test that improvement points are sorted by impact."""
         # Use a poor title to ensure improvement points
         poor_title = "Video"
-        review = review_title_by_content_v2(title_text=poor_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=poor_title, content_text=sample_v2_content)
 
         if len(review.improvement_points) > 1:
             for i in range(len(review.improvement_points) - 1):
@@ -163,7 +163,7 @@ class TestReviewTitleByScriptV2:
 
     def test_v2_review_to_dict_compatibility(self, sample_v2_title, sample_v2_content):
         """Test that v2 review can be converted to dict (JSON compatible)."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         review_dict = review.to_dict()
         assert isinstance(review_dict, dict)
@@ -174,12 +174,12 @@ class TestReviewTitleByScriptV2:
     def test_v2_review_empty_content(self, sample_v2_title):
         """Test v2 review with empty script raises ValueError."""
         with pytest.raises(ValueError, match="content_text must be a non-empty string"):
-            review_title_by_content_v2(title_text=sample_v2_title, content_text="")
+            review_title_from_content_v2(title_text=sample_v2_title, content_text="")
 
     def test_v2_review_very_long_title(self, sample_v2_content):
         """Test v2 review with very long title."""
         long_title = "The Echo - A Haunting Discovery of Mysterious Sounds and Hidden Secrets in the Abandoned Hospital"
-        review = review_title_by_content_v2(title_text=long_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=long_title, content_text=sample_v2_content)
 
         assert review is not None
         # Should note length issue
@@ -188,7 +188,7 @@ class TestReviewTitleByScriptV2:
     def test_v2_review_very_short_title(self, sample_v2_content):
         """Test v2 review with very short title."""
         short_title = "Echo"
-        review = review_title_by_content_v2(title_text=short_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=short_title, content_text=sample_v2_content)
 
         assert review is not None
         assert review.current_length_chars < 30
@@ -200,43 +200,43 @@ class TestParameterValidation:
     def test_empty_title_raises_error(self, sample_v2_content):
         """Test that empty title raises ValueError."""
         with pytest.raises(ValueError, match="title_text must be a non-empty string"):
-            review_title_by_content_v2(title_text="", content_text=sample_v2_content)
+            review_title_from_content_v2(title_text="", content_text=sample_v2_content)
 
     def test_none_title_raises_error(self, sample_v2_content):
         """Test that None title raises ValueError."""
         with pytest.raises(ValueError, match="title_text must be a non-empty string"):
-            review_title_by_content_v2(title_text=None, content_text=sample_v2_content)
+            review_title_from_content_v2(title_text=None, content_text=sample_v2_content)
 
     def test_whitespace_only_title_raises_error(self, sample_v2_content):
         """Test that whitespace-only title raises ValueError."""
         with pytest.raises(ValueError, match="title_text is too short"):
-            review_title_by_content_v2(title_text="   ", content_text=sample_v2_content)
+            review_title_from_content_v2(title_text="   ", content_text=sample_v2_content)
 
     def test_too_long_title_raises_error(self, sample_v2_content):
         """Test that excessively long title raises ValueError."""
         long_title = "A" * 250
         with pytest.raises(ValueError, match="title_text exceeds maximum length"):
-            review_title_by_content_v2(title_text=long_title, content_text=sample_v2_content)
+            review_title_from_content_v2(title_text=long_title, content_text=sample_v2_content)
 
     def test_too_short_title_raises_error(self, sample_v2_content):
         """Test that title shorter than 3 chars raises ValueError."""
         with pytest.raises(ValueError, match="title_text is too short"):
-            review_title_by_content_v2(title_text="Hi", content_text=sample_v2_content)
+            review_title_from_content_v2(title_text="Hi", content_text=sample_v2_content)
 
     def test_empty_content_raises_error(self, sample_v2_title):
         """Test that empty content raises ValueError."""
         with pytest.raises(ValueError, match="content_text must be a non-empty string"):
-            review_title_by_content_v2(title_text=sample_v2_title, content_text="")
+            review_title_from_content_v2(title_text=sample_v2_title, content_text="")
 
     def test_too_short_content_raises_error(self, sample_v2_title):
         """Test that content shorter than 10 chars raises ValueError."""
         with pytest.raises(ValueError, match="content_text is too short"):
-            review_title_by_content_v2(title_text=sample_v2_title, content_text="Short")
+            review_title_from_content_v2(title_text=sample_v2_title, content_text="Short")
 
     def test_invalid_previous_review_type_raises_error(self, sample_v2_title, sample_v2_content):
         """Test that invalid previous_review type raises TypeError."""
         with pytest.raises(TypeError, match="previous_review must be a TitleReview instance"):
-            review_title_by_content_v2(
+            review_title_from_content_v2(
                 title_text=sample_v2_title, 
                 content_text=sample_v2_content, 
                 previous_review="not a review"
@@ -244,7 +244,7 @@ class TestParameterValidation:
 
     def test_whitespace_is_trimmed(self, sample_v2_content):
         """Test that whitespace is properly trimmed from inputs."""
-        review = review_title_by_content_v2(
+        review = review_title_from_content_v2(
             title_text="  The Echo  ",
             content_text=f"  {sample_v2_content}  "
         )
@@ -256,7 +256,7 @@ class TestCompareReviews:
 
     def test_compare_with_improvement(self, v1_review, sample_v2_title, sample_v2_content):
         """Test comparison when v2 is improved."""
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -269,7 +269,7 @@ class TestCompareReviews:
 
     def test_compare_no_previous_review(self, sample_v2_title, sample_v2_content):
         """Test comparison with no previous review."""
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content
         )
 
@@ -281,11 +281,11 @@ class TestCompareReviews:
         self, sample_v1_title, sample_v1_content, sample_v2_title, sample_v2_content, sample_idea
     ):
         """Test that comparison detects improvements."""
-        v1 = review_title_by_content_and_idea(
+        v1 = review_title_from_content_idea(
             title_text=sample_v1_title, content_text=sample_v1_content, idea_summary=sample_idea
         )
 
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1
         )
 
@@ -301,7 +301,7 @@ class TestCompareReviews:
         # Use a worse title to force regression
         worse_title = "Video"
 
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=worse_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -313,7 +313,7 @@ class TestCompareReviews:
 
     def test_comparison_includes_deltas(self, v1_review, sample_v2_title, sample_v2_content):
         """Test that comparisons include score deltas."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -327,7 +327,7 @@ class TestCompareReviews:
 
     def test_comparison_includes_feedback(self, v1_review, sample_v2_title, sample_v2_content):
         """Test that comparisons include feedback messages."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -344,7 +344,7 @@ class TestGetImprovementSummary:
 
     def test_summary_without_previous(self, sample_v2_title, sample_v2_content):
         """Test summary without previous review."""
-        v2 = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        v2 = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         summary = get_improvement_summary(None, v2)
 
@@ -354,7 +354,7 @@ class TestGetImprovementSummary:
 
     def test_summary_with_previous(self, v1_review, sample_v2_title, sample_v2_content):
         """Test summary with previous review."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -370,7 +370,7 @@ class TestGetImprovementSummary:
 
     def test_summary_includes_improvements(self, v1_review, sample_v2_title, sample_v2_content):
         """Test that summary includes list of improvements."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -382,7 +382,7 @@ class TestGetImprovementSummary:
     def test_summary_includes_regressions(self, v1_review, sample_v2_content):
         """Test that summary includes list of regressions."""
         worse_title = "Test"
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=worse_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -393,7 +393,7 @@ class TestGetImprovementSummary:
 
     def test_summary_includes_recommendation(self, v1_review, sample_v2_title, sample_v2_content):
         """Test that summary includes recommendation."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -405,7 +405,7 @@ class TestGetImprovementSummary:
 
     def test_summary_includes_next_steps(self, v1_review, sample_v2_title, sample_v2_content):
         """Test that summary includes next steps."""
-        v2 = review_title_by_content_v2(
+        v2 = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -421,7 +421,7 @@ class TestAcceptanceCriteria:
 
     def test_ac1_review_v2_title_against_v2_content(self, sample_v2_title, sample_v2_content):
         """AC: Review title v2 against script v2."""
-        review = review_title_by_content_v2(
+        review = review_title_from_content_v2(
             title_text=sample_v2_title,
             content_text=sample_v2_content,
             title_version="v2",
@@ -434,7 +434,7 @@ class TestAcceptanceCriteria:
 
     def test_ac2_generate_feedback_for_refinement(self, sample_v2_title, sample_v2_content):
         """AC: Generate feedback for refinement."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         assert len(review.category_scores) > 0
         assert isinstance(review.improvement_points, list)
@@ -443,7 +443,7 @@ class TestAcceptanceCriteria:
 
     def test_ac3_compare_improvements_v1_to_v2(self, v1_review, sample_v2_title, sample_v2_content):
         """AC: Compare improvements from v1 to v2."""
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title, content_text=sample_v2_content, previous_review=v1_review
         )
 
@@ -456,7 +456,7 @@ class TestAcceptanceCriteria:
 
     def test_ac4_output_json_format(self, sample_v2_title, sample_v2_content):
         """AC: Output JSON format with feedback."""
-        review = review_title_by_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
+        review = review_title_from_content_v2(title_text=sample_v2_title, content_text=sample_v2_content)
 
         # Test to_dict method
         review_dict = review.to_dict()
@@ -472,7 +472,7 @@ class TestAcceptanceCriteria:
     def test_ac5_review_sample_v2_pairs(self):
         """AC: Tests review sample v2 title/script pairs."""
         # Sample 1: Good alignment
-        review1 = review_title_by_content_v2(
+        review1 = review_title_from_content_v2(
             title_text="The Mystery of the Abandoned Hospital",
             content_text="An abandoned hospital holds dark secrets and mysteries waiting to be uncovered.",
             title_version="v2",
@@ -481,7 +481,7 @@ class TestAcceptanceCriteria:
         assert review1.script_alignment_score > 50
 
         # Sample 2: Poor alignment
-        review2 = review_title_by_content_v2(
+        review2 = review_title_from_content_v2(
             title_text="Cooking with Fire",
             content_text="An abandoned hospital holds dark secrets and mysteries waiting to be uncovered.",
             title_version="v2",
@@ -498,7 +498,7 @@ class TestWorkflowIntegration:
     ):
         """Test complete v1 to v2 workflow."""
         # Step 1: Review v1
-        v1_review = review_title_by_content_and_idea(
+        v1_review = review_title_from_content_idea(
             title_text=sample_v1_title,
             content_text=sample_v1_content,
             idea_summary=sample_idea,
@@ -507,7 +507,7 @@ class TestWorkflowIntegration:
         )
 
         # Step 2: Review v2 with v1 comparison
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title,
             content_text=sample_v2_content,
             title_version="v2",
@@ -523,7 +523,7 @@ class TestWorkflowIntegration:
 
     def test_v2_ready_for_v3(self, sample_v2_title, sample_v2_content):
         """Test that v2 review can inform v3 refinement."""
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title,
             content_text=sample_v2_content,
             title_version="v2",
@@ -540,12 +540,12 @@ class TestWorkflowIntegration:
     ):
         """Test multiple iteration tracking (v1 -> v2 -> v3)."""
         # v1
-        v1_review = review_title_by_content_and_idea(
+        v1_review = review_title_from_content_idea(
             title_text=sample_v1_title, content_text=sample_v1_content, idea_summary=sample_idea
         )
 
         # v2
-        v2_review = review_title_by_content_v2(
+        v2_review = review_title_from_content_v2(
             title_text=sample_v2_title,
             content_text=sample_v2_content,
             previous_review=v1_review,
@@ -554,7 +554,7 @@ class TestWorkflowIntegration:
 
         # v3
         v3_title = "The Echo - A Haunting Discovery of Dark Secrets"
-        v3_review = review_title_by_content_v2(
+        v3_review = review_title_from_content_v2(
             title_text=v3_title,
             content_text=sample_v2_content,
             previous_review=v2_review,

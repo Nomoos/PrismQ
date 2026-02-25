@@ -10,7 +10,7 @@ The reviewer provides:
 - Actionable improvement recommendations
 
 Workflow Position:
-    Idea + Title v1 → Content v1 → ByTitle Review → Feedback/Approval
+    Idea + Title v1 → Content v1 → FromTitle Review → Feedback/Approval
 """
 
 import re
@@ -124,13 +124,13 @@ class AlignmentScore:
     reasoning: str
 
 
-def review_content_by_title(
+def review_script_from_title(
     content_text: str,
     title: str,
     idea: Idea,
     content_id: Optional[str] = None,
     target_length_seconds: Optional[int] = None,
-    reviewer_id: str = "AI-ScriptReviewer-ByTitle-001",
+    reviewer_id: str = "AI-ScriptReviewer-FromTitle-001",
 ) -> ScriptReview:
     """Review script v1 against title v1 and idea.
 
@@ -162,7 +162,7 @@ def review_content_by_title(
         ... )
         >>> title = "The Voice That Knows Tomorrow"
         >>> script = "Last night I heard a whisper..."
-        >>> review = review_content_by_title(script, title, idea)
+        >>> review = review_script_from_title(script, title, idea)
         >>> print(f"Overall score: {review.overall_score}%")
     """
     # Generate script ID if not provided

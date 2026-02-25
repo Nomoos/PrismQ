@@ -1,4 +1,4 @@
-"""Tests for title review function - review_title_by_idea_and_content."""
+"""Tests for title review function - review_title_from_idea_content."""
 
 import sys
 from pathlib import Path
@@ -13,9 +13,9 @@ from T.Review.Title.From.Idea.Content import (
     AlignmentAnalysis,
     TitleReview,
     TitleReviewCategory,
-    review_title_by_idea_and_content,
+    review_title_from_idea_content,
 )
-from T.Review.Title.From.Idea.Content.src.by_idea_and_content import (
+from T.Review.Title.From.Idea.Content.src.review_title_from_idea_content import (
     analyze_engagement,
     analyze_seo,
     analyze_title_idea_alignment,
@@ -318,7 +318,7 @@ class TestGenerateImprovementPoints:
             assert improvements[i].impact_score >= improvements[i + 1].impact_score
 
 
-class TestReviewTitleByScriptAndIdea:
+class TestReviewTitleFromContentIdea:
     """Test the main review function."""
 
     def test_basic_review(self):
@@ -331,7 +331,7 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Horror story about mysterious echoes in a haunted house"
 
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text=title, content_text=script, idea_summary=idea
         )
 
@@ -346,7 +346,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_with_all_parameters(self):
         """Test review with all optional parameters."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo Mystery",
             content_text="A story about echoes and mysteries in a house",
             idea_summary="Mystery story with echoes",
@@ -369,7 +369,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_generates_ids(self):
         """Test that review generates IDs if not provided."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="Title", content_text="Content", idea_summary="Idea"
         )
 
@@ -389,7 +389,7 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Mystery horror about echoes and shadows revealing secrets in a haunted house"
 
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text=title,
             content_text=script,
             idea_summary=idea,
@@ -410,7 +410,7 @@ class TestReviewTitleByScriptAndIdea:
         """
         idea = "Horror mystery about echoes and shadows"
 
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text=title, content_text=script, idea_summary=idea
         )
 
@@ -421,7 +421,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_has_category_scores(self):
         """Test that review includes all major categories."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo",
             content_text="A story about echoes",
             idea_summary="Story about echoes",
@@ -436,7 +436,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_improvement_points_prioritized(self):
         """Test that improvement points are prioritized."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="A Story",
             content_text="This is a long story about completely different things",
             idea_summary="Different concept entirely",
@@ -452,7 +452,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_review_to_dict_compatibility(self):
         """Test that review can be converted to dict (JSON compatible)."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo", content_text="Story about echoes", idea_summary="Echo story"
         )
 
@@ -466,7 +466,7 @@ class TestReviewTitleByScriptAndIdea:
 
     def test_empty_content(self):
         """Test handling of empty script."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo", content_text="", idea_summary="Story about echoes"
         )
 
@@ -476,7 +476,7 @@ class TestReviewTitleByScriptAndIdea:
     def test_very_long_title(self):
         """Test handling of very long title."""
         long_title = "A" * 150
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text=long_title, content_text="Some script", idea_summary="Some idea"
         )
 
@@ -486,7 +486,7 @@ class TestReviewTitleByScriptAndIdea:
     def test_very_short_title(self):
         """Test handling of very short title."""
         short_title = "A"
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text=short_title, content_text="Some script", idea_summary="Some idea"
         )
 
@@ -499,7 +499,7 @@ class TestWorkflowIntegration:
 
     def test_review_ready_for_improvement(self):
         """Test that review is ready for improvement stage."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo Mystery",
             content_text="A mysterious echo haunts the house",
             idea_summary="Mystery about haunting echoes",
@@ -510,7 +510,7 @@ class TestWorkflowIntegration:
 
     def test_iterative_improvement_tracking(self):
         """Test that review tracks iteration number."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             title_text="The Echo", content_text="Echo story", idea_summary="Echo idea"
         )
 

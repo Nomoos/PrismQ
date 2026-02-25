@@ -6,9 +6,9 @@ title and the originating idea. It evaluates title-script alignment,
 idea-script alignment, and provides comprehensive improvement recommendations.
 
 Usage:
-    python review_script_by_title_idea_interactive.py                    # Interactive mode
-    python review_script_by_title_idea_interactive.py --preview          # Preview mode
-    python review_script_by_title_idea_interactive.py --preview --debug  # Debug mode
+    python review_content_from_title_idea_interactive.py                    # Interactive mode
+    python review_content_from_title_idea_interactive.py --preview          # Preview mode
+    python review_content_from_title_idea_interactive.py --preview --debug  # Debug mode
 
 Modes:
     Default: Reviews scripts and saves results to database
@@ -43,7 +43,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 # Import review modules
 try:
-    from by_title_and_idea import review_content_by_title_and_idea
+    from review_content_from_title_idea import review_content_from_title_idea
     REVIEW_AVAILABLE = True
 except ImportError as e:
     REVIEW_AVAILABLE = False
@@ -538,7 +538,7 @@ def setup_logging(debug: bool = False) -> logging.Logger:
     log_dir.mkdir(parents=True, exist_ok=True)
 
     # Create logger
-    logger = logging.getLogger("review_script_by_title_idea")
+    logger = logging.getLogger("review_content_from_title_idea")
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
     # Clear existing handlers
@@ -637,7 +637,7 @@ def run_interactive_mode(preview_mode: bool = False, debug: bool = False) -> Non
 
             # Perform review
             print_info("Analyzing script...")
-            review = review_content_by_title_and_idea(
+            review = review_content_from_title_idea(
                 content_text=content_text,
                 title=title_text,
                 idea=idea,

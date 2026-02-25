@@ -1,4 +1,4 @@
-"""Example usage of review_content_by_title_and_idea module.
+"""Example usage of review_script_from_title_idea module.
 
 This example demonstrates MVP-005: Reviewing script v1 against title v1 and idea.
 """
@@ -13,7 +13,7 @@ if str(_idea_model_path) not in sys.path:
     sys.path.insert(0, str(_idea_model_path))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Content import review_content_by_title_and_idea
+from T.Review.Content import review_content_from_title_idea
 
 
 def example_horror_short():
@@ -55,7 +55,7 @@ def example_horror_short():
     """
 
     # Review the script
-    review = review_content_by_title_and_idea(
+    review = review_script_from_title_idea(
         content_text=script, title=title, idea=idea, target_length_seconds=60
     )
 
@@ -135,7 +135,7 @@ def example_educational_content():
     """
 
     # Review the script
-    review = review_content_by_title_and_idea(content_text=script, title=title, idea=idea)
+    review = review_script_from_title_idea(content_text=script, title=title, idea=idea)
 
     # Display results
     print(f"\nScript ID: {review.content_id}")
@@ -188,7 +188,7 @@ def example_poor_alignment():
     Finally, add your toppings and bake until the crust is golden brown.
     """
 
-    review = review_content_by_title_and_idea(script, title, idea)
+    review = review_script_from_title_idea(script, title, idea)
 
     print(f"\nOverall Score: {review.overall_score}%")
     print(f"Title Alignment: {review.metadata['title_alignment_score']}%")

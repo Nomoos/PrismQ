@@ -59,7 +59,7 @@ except ImportError:
 
 # Try to import the review function (direct import from T/Review/Content directory)
 try:
-    from by_title_and_idea import review_content_by_title_and_idea
+    from T.Review.Content.review_content_from_title_idea import review_content_from_title_idea
     REVIEW_AVAILABLE = True
 except ImportError:
     REVIEW_AVAILABLE = False
@@ -192,7 +192,7 @@ class ReviewContentFromTitleIdeaService:
                 result.error = "Review function not available"
                 return result
 
-            # Create a context object compatible with review_content_by_title_and_idea
+            # Create a context object compatible with review_content_from_title_idea
             class _GenreContext:
                 def __init__(self):
                     self.value = "other"
@@ -212,7 +212,7 @@ class ReviewContentFromTitleIdeaService:
             idea_obj = _IdeaContext(idea_text)
 
             # Review content against title and idea
-            review_result = review_content_by_title_and_idea(
+            review_result = review_content_from_title_idea(
                 content_text=content.text,
                 title=title.text,
                 idea=idea_obj,
@@ -266,7 +266,7 @@ def _format_review_text(review_result, title: str) -> str:
     """Format a ScriptReview result as human-readable text.
 
     Args:
-        review_result: ScriptReview object from review_content_by_title_and_idea
+        review_result: ScriptReview object from review_content_from_title_idea
         title: The title being reviewed against
 
     Returns:

@@ -5,8 +5,8 @@ and handles errors gracefully without crashing.
 """
 
 import pytest
-from T.Review.Title.From.Idea.Content.src.by_idea_and_content import (
-    review_title_by_idea_and_content,
+from T.Review.Title.From.Idea.Content.src.review_title_from_idea_content import (
+    review_title_from_idea_content,
     _sanitize_text_input,
     _validate_text_input,
 )
@@ -18,65 +18,65 @@ class TestInputValidation:
     def test_empty_title_raises_error(self):
         """Test that empty title raises ValueError."""
         with pytest.raises(ValueError, match="title_text cannot be empty"):
-            review_title_by_idea_and_content("", "valid idea", "valid content text")
+            review_title_from_idea_content("", "valid idea", "valid content text")
 
     def test_empty_idea_raises_error(self):
         """Test that empty idea raises ValueError."""
         with pytest.raises(ValueError, match="idea_summary cannot be empty"):
-            review_title_by_idea_and_content("valid title", "", "valid content text")
+            review_title_from_idea_content("valid title", "", "valid content text")
 
     def test_empty_content_raises_error(self):
         """Test that empty content raises ValueError."""
         with pytest.raises(ValueError, match="content_text cannot be empty"):
-            review_title_by_idea_and_content("valid title", "valid idea", "")
+            review_title_from_idea_content("valid title", "valid idea", "")
 
     def test_whitespace_only_title_raises_error(self):
         """Test that whitespace-only title raises ValueError."""
         with pytest.raises(ValueError, match="title_text cannot be empty"):
-            review_title_by_idea_and_content("   ", "valid idea", "valid content text")
+            review_title_from_idea_content("   ", "valid idea", "valid content text")
 
     def test_title_too_long_raises_error(self):
         """Test that title exceeding max length raises ValueError."""
         long_title = "x" * 201  # MAX_TITLE_LENGTH is 200
         with pytest.raises(ValueError, match="title_text is too long"):
-            review_title_by_idea_and_content(long_title, "valid idea", "valid content text")
+            review_title_from_idea_content(long_title, "valid idea", "valid content text")
 
     def test_idea_too_long_raises_error(self):
         """Test that idea exceeding max length raises ValueError."""
         long_idea = "x" * 5001  # MAX_IDEA_LENGTH is 5000
         with pytest.raises(ValueError, match="idea_summary is too long"):
-            review_title_by_idea_and_content("valid title", long_idea, "valid content text")
+            review_title_from_idea_content("valid title", long_idea, "valid content text")
 
     def test_content_too_long_raises_error(self):
         """Test that content exceeding max length raises ValueError."""
         long_content = "x" * 100001  # MAX_CONTENT_LENGTH is 100000
         with pytest.raises(ValueError, match="content_text is too long"):
-            review_title_by_idea_and_content("valid title", "valid idea", long_content)
+            review_title_from_idea_content("valid title", "valid idea", long_content)
 
     def test_content_too_short_raises_error(self):
         """Test that content shorter than minimum raises ValueError."""
         with pytest.raises(ValueError, match="content_text is too short"):
-            review_title_by_idea_and_content("valid title", "valid idea", "short")
+            review_title_from_idea_content("valid title", "valid idea", "short")
 
     def test_non_string_title_raises_error(self):
         """Test that non-string title raises TypeError."""
         with pytest.raises(TypeError, match="title_text must be a string"):
-            review_title_by_idea_and_content(123, "valid idea", "valid content text")
+            review_title_from_idea_content(123, "valid idea", "valid content text")
 
     def test_non_string_idea_raises_error(self):
         """Test that non-string idea raises TypeError."""
         with pytest.raises(TypeError, match="idea_summary must be a string"):
-            review_title_by_idea_and_content("valid title", 123, "valid content text")
+            review_title_from_idea_content("valid title", 123, "valid content text")
 
     def test_non_string_content_raises_error(self):
         """Test that non-string content raises TypeError."""
         with pytest.raises(TypeError, match="content_text must be a string"):
-            review_title_by_idea_and_content("valid title", "valid idea", 123)
+            review_title_from_idea_content("valid title", "valid idea", 123)
 
     def test_none_title_raises_error(self):
         """Test that None title raises TypeError."""
         with pytest.raises(TypeError, match="title_text must be a string"):
-            review_title_by_idea_and_content(None, "valid idea", "valid content text")
+            review_title_from_idea_content(None, "valid idea", "valid content text")
 
 
 class TestInputSanitization:
@@ -119,7 +119,7 @@ class TestSecurityIssues:
     def test_null_bytes_handled_safely(self):
         """Test that null bytes in input are handled safely."""
         # Should not crash, null bytes should be removed
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "title\x00test",
             "idea\x00test",
             "content text\x00with null bytes that should be removed"
@@ -129,7 +129,7 @@ class TestSecurityIssues:
 
     def test_unicode_characters_handled(self):
         """Test that Unicode characters are handled correctly."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "The Mystery of 神秘",
             "A story about ancient artifacts 🏺",
             "Deep in the jungle, explorers find ancient treasures with mysterious symbols 象形文字"
@@ -139,7 +139,7 @@ class TestSecurityIssues:
 
     def test_special_characters_handled(self):
         """Test that special characters don't cause issues."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "Title with special chars: <>&\"'",
             "Idea with symbols: @#$%^&*()",
             "Content with various characters: !@#$%^&*(){}[]|\\:;<>?,./~`"
@@ -149,7 +149,7 @@ class TestSecurityIssues:
 
     def test_newlines_and_tabs_handled(self):
         """Test that newlines and tabs don't break processing."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "Title\nwith\nnewlines",
             "Idea\twith\ttabs",
             "Content\n\twith\n\tmixed\n\twhitespace characters everywhere"
@@ -163,7 +163,7 @@ class TestErrorRecovery:
 
     def test_valid_inputs_return_review(self):
         """Test that valid inputs return a review object."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "The Haunted Mansion",
             "A horror story about a haunted house",
             "Deep in the forest stands an old mansion. Local legends speak of strange sounds and ghostly apparitions."
@@ -177,7 +177,7 @@ class TestErrorRecovery:
 
     def test_minimal_valid_content(self):
         """Test that minimal valid content works."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "T",
             "I",
             "Content xx"  # Exactly 10 chars minimum
@@ -187,7 +187,7 @@ class TestErrorRecovery:
 
     def test_maximum_valid_lengths(self):
         """Test that maximum valid lengths work."""
-        review = review_title_by_idea_and_content(
+        review = review_title_from_idea_content(
             "x" * 200,  # MAX_TITLE_LENGTH
             "y" * 5000,  # MAX_IDEA_LENGTH
             "z" * 1000  # Well within MAX_CONTENT_LENGTH
@@ -201,12 +201,12 @@ class TestIdempotency:
 
     def test_same_inputs_produce_same_ids(self):
         """Test that identical inputs produce identical IDs."""
-        review1 = review_title_by_idea_and_content(
+        review1 = review_title_from_idea_content(
             "Consistent Title",
             "Consistent Idea",
             "Consistent content that should produce the same ID every time"
         )
-        review2 = review_title_by_idea_and_content(
+        review2 = review_title_from_idea_content(
             "Consistent Title",
             "Consistent Idea",
             "Consistent content that should produce the same ID every time"
@@ -218,12 +218,12 @@ class TestIdempotency:
 
     def test_different_inputs_produce_different_ids(self):
         """Test that different inputs produce different IDs."""
-        review1 = review_title_by_idea_and_content(
+        review1 = review_title_from_idea_content(
             "Title One",
             "Idea One",
             "Content one with specific text"
         )
-        review2 = review_title_by_idea_and_content(
+        review2 = review_title_from_idea_content(
             "Title Two",
             "Idea Two",
             "Content two with different text"
@@ -235,12 +235,12 @@ class TestIdempotency:
 
     def test_whitespace_normalized_produces_same_id(self):
         """Test that whitespace differences are normalized for ID generation."""
-        review1 = review_title_by_idea_and_content(
+        review1 = review_title_from_idea_content(
             "Title  with   spaces",
             "Idea  with   spaces",
             "Content  with   extra   spaces"
         )
-        review2 = review_title_by_idea_and_content(
+        review2 = review_title_from_idea_content(
             "Title with spaces",
             "Idea with spaces",
             "Content with extra spaces"

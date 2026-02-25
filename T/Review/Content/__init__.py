@@ -4,7 +4,7 @@ AI-powered content evaluation with scoring and improvement recommendations.
 """
 
 try:
-    from .by_title_and_idea import AlignmentScore, review_content_by_title_and_idea
+    from .review_content_from_title_idea import AlignmentScore, review_content_from_title_idea
     from .script_review import (
         CategoryScore,
         ContentLength,
@@ -21,10 +21,10 @@ try:
         "ContentLength",
         "ImprovementPoint",
         "CategoryScore",
-        "review_content_by_title_and_idea",
+        "review_content_from_title_idea",
         "AlignmentScore",
     ]
 except ImportError:
-    # Imports may fail when by_title_and_idea.py uses non-relative imports
+    # Imports may fail when review_content_from_title_idea.py uses non-relative imports
     # (requires T/Review/Content in sys.path). This is safe to ignore.
     pass

@@ -45,9 +45,9 @@ from Model.State.constants.state_names import StateNames
 
 # Try to import the review function
 try:
-    from T.Review.Title.From.Content.by_content_v2 import (
+    from T.Review.Title.From.Content.review_title_from_content_v2 import (
         SCORE_THRESHOLD_HIGH,
-        review_title_by_content_v2,
+        review_title_from_content_v2,
     )
 
     REVIEW_AVAILABLE = True
@@ -211,7 +211,7 @@ class ReviewTitleFromScriptService:
         """
         if REVIEW_AVAILABLE:
             # Use the full review module
-            review_result = review_title_by_content_v2(
+            review_result = review_title_from_content_v2(
                 title_text=title.text,
                 content_text=script.text,
                 title_id=str(title.id),

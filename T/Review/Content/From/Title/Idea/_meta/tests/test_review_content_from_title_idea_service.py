@@ -407,7 +407,7 @@ class TestFormatReviewText:
 
     def test_format_includes_title(self):
         """Test that formatted review includes the title."""
-        from by_title_and_idea import review_content_by_title_and_idea
+        from review_content_from_title_idea import review_content_from_title_idea
 
         class _Genre:
             value = "other"
@@ -423,7 +423,7 @@ class TestFormatReviewText:
             length_target = None
             version = 1
 
-        review = review_content_by_title_and_idea(
+        review = review_content_from_title_idea(
             content_text="Test content for review.",
             title="My Amazing Title",
             idea=_Idea(),
@@ -436,7 +436,7 @@ class TestFormatReviewText:
 
     def test_format_includes_score(self):
         """Test that formatted review includes the score."""
-        from by_title_and_idea import review_content_by_title_and_idea
+        from review_content_from_title_idea import review_content_from_title_idea
 
         class _Genre:
             value = "other"
@@ -452,7 +452,7 @@ class TestFormatReviewText:
             length_target = None
             version = 1
 
-        review = review_content_by_title_and_idea(
+        review = review_content_from_title_idea(
             content_text="Test content.",
             title="Title",
             idea=_Idea(),
@@ -464,7 +464,7 @@ class TestFormatReviewText:
 
     def test_format_shows_accepted_status(self):
         """Test that accepted content shows correct status."""
-        from by_title_and_idea import review_content_by_title_and_idea
+        from review_content_from_title_idea import review_content_from_title_idea
 
         class _Genre:
             value = "horror"
@@ -481,7 +481,7 @@ class TestFormatReviewText:
             version = 1
 
         # Content that should score well
-        review = review_content_by_title_and_idea(
+        review = review_content_from_title_idea(
             content_text=(
                 "What if you woke up and everyone was gone? Terror fills your heart as fear "
                 "grips your mind in the darkness. The horror is just beginning... "

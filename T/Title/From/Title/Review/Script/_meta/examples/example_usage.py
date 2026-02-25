@@ -17,7 +17,7 @@ sys.path.insert(
     0, str(project_root / "T" / "Title" / "FromOriginalTitleAndReviewAndScript" / "src")
 )
 sys.path.insert(0, str(project_root / "T" / "Review" / "Title" / "From" / "Content" / "Idea"))
-sys.path.insert(0, str(project_root / "T" / "Review" / "Content" / "ByTitle"))
+sys.path.insert(0, str(project_root / "T" / "Review" / "Script" / "From" / "Title"))
 sys.path.insert(0, str(project_root / "T" / "Review" / "Content"))
 sys.path.insert(0, str(project_root / "T" / "Idea" / "Model" / "src"))
 
