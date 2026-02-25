@@ -672,6 +672,22 @@ class ContentFromIdeaTitleService:
             result.word_count = len(script_v1.full_text.split())
             result.duration = float(script_v1.total_duration_seconds)
 
+            # Validate content quality (report step 8)
+            # Expected: ~300 words and max 175 s; log warnings but do not abort
+            max_duration = float(getattr(script_v1, "max_duration_seconds", 175))
+            if result.duration > max_duration:
+                logger.warning(
+                    f"Story {story.id}: Generated content duration {result.duration:.1f}s "
+                    f"exceeds max {max_duration:.0f}s"
+                )
+            expected_words_min = 200
+            expected_words_max = int(max_duration * 2.5)  # 2.5 words/s narration rate
+            if not (expected_words_min <= result.word_count <= expected_words_max):
+                logger.warning(
+                    f"Story {story.id}: Word count {result.word_count} is outside "
+                    f"expected range {expected_words_min}–{expected_words_max}"
+                )
+
             if self._preview_mode:
                 logger.info(f"Story {story.id}: Preview mode — skipping database save")
                 result.success = True

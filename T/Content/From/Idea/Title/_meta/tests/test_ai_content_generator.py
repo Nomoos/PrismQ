@@ -238,11 +238,9 @@ class TestScriptGeneratorAIIntegration:
         assert config.max_duration_seconds == 175
 
     def test_config_has_audience_defaults(self):
-        """Test that ContentGeneratorConfig has audience defaults."""
+        """Test that ContentGeneratorConfig.audience defaults to None (audience is optional)."""
         config = ContentGeneratorConfig()
-        assert config.audience["age_range"] == "13-23"
-        assert config.audience["gender"] == "Female"
-        assert config.audience["country"] == "United States"
+        assert config.audience is None
 
     def test_generator_has_is_ai_available_method(self):
         """Test that ContentGenerator has is_ai_available method."""

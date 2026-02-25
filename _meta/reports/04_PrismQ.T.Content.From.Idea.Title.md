@@ -37,7 +37,7 @@ Soubor `_meta/scripts/04_PrismQ.T.Content.From.Idea.Title/workflow.json` leží 
 { "audience": null }
 
 // s audience — přidáno do AI promptu
-{ "audience": { "age_range": "13-23", "gender": "Female", "country": "United States" } }
+{ "audience": { "age_range": "10-25", "gender": "Female", "country": "United States" } }
 ```
 
 ---

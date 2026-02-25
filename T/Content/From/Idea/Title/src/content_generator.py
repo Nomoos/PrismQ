@@ -179,13 +179,7 @@ class ContentGeneratorConfig:
     max_duration_seconds: int = 175
     structure_type: ContentStructure = ContentStructure.HOOK_DELIVER_CTA
     tone: ContentTone = ContentTone.ENGAGING
-    audience: Dict[str, str] = field(
-        default_factory=lambda: {
-            "age_range": "13-23",
-            "gender": "Female",
-            "country": "United States",
-        }
-    )
+    audience: Optional[Dict[str, str]] = None
     words_per_second: float = 2.5  # Average speaking rate
     include_cta: bool = True
 
