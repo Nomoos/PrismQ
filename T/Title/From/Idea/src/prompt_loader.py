@@ -56,3 +56,14 @@ class PromptLoader:
             The title generation prompt template with {IDEA} placeholder
         """
         return self.load("title_generation.txt")
+    
+    def get_title_scoring_prompt(self) -> str:
+        """Load the title scoring prompt.
+        
+        This prompt evaluates a title based on readability, keyword relevance,
+        emotional impact, SEO quality, and literary quality.
+        
+        Returns:
+            The title scoring prompt template with {IDEA} and {TITLE} placeholders
+        """
+        return self.load("title_scoring.txt")

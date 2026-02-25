@@ -71,10 +71,10 @@ class TitleScorer:
             return self.config.good_score  # Good length (35-65 chars)
         elif length < self.config.good_length_min:
             return self.config.short_score  # A bit short
-        elif length <= self.config.acceptable_length_max:
-            return self.config.acceptable_score  # A bit long but acceptable (66-70 chars)
+        elif length < self.config.acceptable_length_max:
+            return self.config.acceptable_score  # A bit long but acceptable (66-69 chars)
         else:
-            return self.config.long_score  # Too long
+            return self.config.long_score  # Too long (70+ chars)
     
     def infer_style(self, title: str) -> str:
         """Infer the style of a title based on its characteristics.
@@ -87,13 +87,14 @@ class TitleScorer:
         """
         title_lower = title.lower()
         
+        # Check for how-to (must come before question check to prevent
+        # "How to..." from being classified as a question)
+        if title_lower.startswith("how to"):
+            return "how-to"
+        
         # Check for question
         if "?" in title or title_lower.startswith(("what", "why", "how", "when", "where", "who")):
             return "question"
-        
-        # Check for how-to
-        if title_lower.startswith("how to"):
-            return "how-to"
         
         # Check for listicle (numbers in first 10 characters)
         if any(char.isdigit() for char in title[:10]):
