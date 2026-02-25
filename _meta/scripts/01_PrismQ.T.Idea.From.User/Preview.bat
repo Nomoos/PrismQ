@@ -1,8 +1,8 @@
 @echo off
-REM Run.bat - PrismQ.T.Idea.From.User
-REM RUN MODE: Continuous interactive idea creation - saves to database
+REM Preview.bat - PrismQ.T.Idea.From.User
+REM PREVIEW MODE: Generate idea variants without saving to database
 REM
-REM Usage: Run.bat
+REM Usage: Preview.bat
 REM
 REM Requires: Python and Ollama must be available
 REM
@@ -30,14 +30,15 @@ call :setup_env
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Idea.From.User - Run Mode
+echo PrismQ.T.Idea.From.User - Preview Mode
 echo ========================================
 echo.
-echo This mode continuously accepts input and saves ideas to the database.
+echo PREVIEW MODE: Generates ideas but will NOT save to database.
+echo Use Run.bat to save results to the database.
 echo.
 
-REM Run Python module
-python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py
+REM Run Python module with preview and debug flags
+python ..\..\..\T\Idea\Creation\src\idea_creation_interactive.py --preview --debug
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
