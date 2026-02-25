@@ -57,21 +57,25 @@ class TitleGeneratorConfig:
         num_variants: Number of title variants to generate (3-10)
         temperature_min: Minimum temperature for randomization
         temperature_max: Maximum temperature for randomization
-        min_length_for_scoring: Minimum title length (characters) required for
-            AI scoring. Variants shorter than this are accepted but not
-            AI-scored, avoiding unnecessary AI calls for low-quality responses.
-        use_batch_generation: When True (default), all variants are requested
-            in a single AI call using the batch prompt. This is much faster
-            than the one-by-one mode (1 call vs N calls) at the cost of not
-            being able to vary temperature per variant. When False, falls back
-            to the original one-by-one generation mode.
+        length_gate_min: Hard minimum title length (characters). Variants
+            shorter than this are discarded before AI scoring.
+        length_gate_max: Hard maximum title length (characters). Variants
+            longer than this are discarded before AI scoring.
+        score_threshold: Minimum combined score (0.0-1.0) a variant must
+            reach to be included in the final result. Variants below this
+            threshold are dropped after AI scoring.
+        use_batch_generation: When True, all variants are requested in a
+            single AI call. When False (default), each variant is generated
+            with an individual call at a randomised temperature.
     """
     
-    num_variants: int = 10
+    num_variants: int = 5
     temperature_min: float = 0.6
     temperature_max: float = 0.8
-    min_length_for_scoring: int = 20
-    use_batch_generation: bool = True
+    length_gate_min: int = 20
+    length_gate_max: int = 80
+    score_threshold: float = 0.90
+    use_batch_generation: bool = False
 
 
 class AITitleGenerator:
@@ -175,35 +179,36 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
         
-        # Create prompt and generate variants
+        # Generate raw variants
         gen_start = time.monotonic()
         try:
             if self.config.use_batch_generation:
-                variants = self._generate_batch_variants(idea, n_variants)
+                raw_variants = self._generate_batch_variants(idea, n_variants)
             else:
-                variants = self._generate_one_by_one_variants(idea, n_variants)
+                raw_variants = self._generate_one_by_one_variants(idea, n_variants)
 
             gen_elapsed = time.monotonic() - gen_start
             logger.info(
-                f"Generated {len(variants)}/{n_variants} title variants in {gen_elapsed:.1f}s"
+                f"Generated {len(raw_variants)}/{n_variants} raw variants in {gen_elapsed:.1f}s"
             )
 
-            # Sort by score (highest first) for better quality results
-            variants.sort(key=lambda v: v.score, reverse=True)
-            
-            # Apply AI scoring only to variants that pass the minimum length gate.
-            # This avoids wasting AI calls on very short or low-quality responses.
-            scoreable = [v for v in variants if v.length >= self.config.min_length_for_scoring]
-            skipped = len(variants) - len(scoreable)
-            if skipped:
+            # Gate 1: Hard length filter — discard variants outside [length_gate_min, length_gate_max]
+            length_passed = [
+                v for v in raw_variants
+                if self.config.length_gate_min <= v.length <= self.config.length_gate_max
+            ]
+            length_dropped = len(raw_variants) - len(length_passed)
+            if length_dropped:
                 logger.info(
-                    f"Skipping AI scoring for {skipped} variant(s) below "
-                    f"min_length_for_scoring={self.config.min_length_for_scoring}"
+                    f"Length gate [{self.config.length_gate_min}-{self.config.length_gate_max} chars]: "
+                    f"dropped {length_dropped} variant(s)"
                 )
+            logger.info(f"{len(length_passed)} variant(s) passed length gate")
 
-            logger.info(f"Scoring {len(scoreable)} title variant(s) with AI")
+            # Gate 2: AI scoring of length-passing variants
             score_start = time.monotonic()
-            for variant in scoreable:
+            logger.info(f"AI-scoring {len(length_passed)} variant(s)")
+            for variant in length_passed:
                 ai_score = self._ai_score_title(variant.text, idea)
                 if ai_score > 0.0:
                     # Combine rule-based score (50%) with AI score (50%)
@@ -213,17 +218,28 @@ class AITitleGenerator:
                     )
             score_elapsed = time.monotonic() - score_start
             logger.info(f"AI scoring completed in {score_elapsed:.1f}s")
-            
-            # Re-sort by combined scores
+
+            # Gate 3: Score threshold — accept only variants at or above threshold
+            variants = [
+                v for v in length_passed if v.score >= self.config.score_threshold
+            ]
+            below_threshold = len(length_passed) - len(variants)
+            if below_threshold:
+                logger.info(
+                    f"Score threshold {self.config.score_threshold:.2f}: "
+                    f"dropped {below_threshold} variant(s)"
+                )
+
+            # Sort accepted variants by score (highest first)
             variants.sort(key=lambda v: v.score, reverse=True)
-            
+
             total_elapsed = time.monotonic() - gen_start
             logger.info(
-                f"Successfully generated {len(variants)}/{n_variants} title variants "
-                f"(total time: {total_elapsed:.1f}s)"
+                f"Accepted {len(variants)}/{n_variants} title variants "
+                f"(score >= {self.config.score_threshold:.2f}, total time: {total_elapsed:.1f}s)"
             )
             return variants
-            
+
         except Exception as e:
             error_msg = f"AI title generation failed: {e}"
             logger.error(error_msg)
@@ -466,7 +482,7 @@ class AITitleGenerator:
 
 def generate_titles_from_idea(
     idea: Idea,
-    num_variants: int = 10
+    num_variants: int = 5
 ) -> List[TitleVariant]:
     """Convenience function to generate titles from an Idea.
     
