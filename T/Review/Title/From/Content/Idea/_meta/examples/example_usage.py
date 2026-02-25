@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(project_root))
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Content.Idea import (
     TitleCategoryScore,
     TitleImprovementPoint,
     TitleReview,

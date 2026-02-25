@@ -11,7 +11,7 @@ test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir / "../../src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model/src"))
 sys.path.insert(0, str(test_dir / "../../../../Idea/Model"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Title/ByScriptAndIdea"))
+sys.path.insert(0, str(test_dir / "../../../../Review/Title/From/Content/Idea"))
 sys.path.insert(0, str(test_dir / "../../../../Review/Content/ByTitle"))
 sys.path.insert(0, str(test_dir / "../../../../Review/Content"))
 

@@ -11,7 +11,7 @@ from datetime import datetime
 
 import pytest
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Content.Idea import (
     TitleCategoryScore,
     TitleImprovementPoint,
     TitleReview,

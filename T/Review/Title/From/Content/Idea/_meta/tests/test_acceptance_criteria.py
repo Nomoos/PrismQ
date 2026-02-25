@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Content.Idea import (
     TitleReview,
     TitleReviewCategory,
     review_title_by_content_and_idea,
