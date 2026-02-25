@@ -15,7 +15,6 @@ Workflow:
 
 Usage:
     python run.py                   # Continuous mode (default)
-    python run.py --preview         # Preview mode (no DB changes)
     python run.py --db PATH         # Custom database path
     python run.py --debug           # Enable debug logging
 
