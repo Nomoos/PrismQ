@@ -6,7 +6,7 @@ REM Usage: Run.bat
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
-call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Readability"
+call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Readability"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
@@ -14,7 +14,7 @@ echo PrismQ.T.Review.Script.Readability - RUN MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Readability\src\review_script_readability_interactive.py
+python ..\..\..\T\Review\Script\Readability\src\review_script_readability_service.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
