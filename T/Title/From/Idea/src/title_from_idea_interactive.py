@@ -43,6 +43,26 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
 sys.path.insert(0, str(REPO_ROOT))  # Repository root for T.Database, T.State imports
 
+# Try to import IdeaTable for fetching Idea content
+# Must be imported here, before other imports (story_title_service, ai_title_generator)
+# that insert T/Idea/Model at sys.path[0], which would shadow REPO_ROOT/src with
+# T/Idea/Model/src (a different package that does not contain IdeaTable).
+try:
+    from src.idea import IdeaTable
+
+    IDEA_TABLE_AVAILABLE = True
+except ImportError:
+    IDEA_TABLE_AVAILABLE = False
+
+# Try to import Config for database path management
+# Must be imported here for the same reason as IdeaTable above.
+try:
+    from src.config import Config
+
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
+
 # Import title generator
 try:
     from title_generator import (
@@ -111,23 +131,6 @@ except ImportError:
     # Define a placeholder exception if import fails
     class AIGenUnavailableError(Exception):
         pass
-
-
-# Try to import IdeaTable for fetching Idea content
-try:
-    from src.idea import IdeaTable
-
-    IDEA_TABLE_AVAILABLE = True
-except ImportError:
-    IDEA_TABLE_AVAILABLE = False
-
-# Try to import Config for database path management
-try:
-    from src.config import Config
-
-    CONFIG_AVAILABLE = True
-except ImportError:
-    CONFIG_AVAILABLE = False
 
 
 def get_database_paths() -> tuple:
