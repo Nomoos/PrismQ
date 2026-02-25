@@ -43,24 +43,18 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
 sys.path.insert(0, str(REPO_ROOT))  # Repository root for T.Database, T.State imports
 
-# Try to import IdeaTable for fetching Idea content
+# Import Config and IdeaTable from shared src module - same pattern as Script 01
 # Must be imported here, before other imports (story_title_service, ai_title_generator)
-# that insert T/Idea/Model at sys.path[0], which would shadow REPO_ROOT/src with
-# T/Idea/Model/src (a different package that does not contain IdeaTable).
-try:
-    from src.idea import IdeaTable
-
-    IDEA_TABLE_AVAILABLE = True
-except ImportError:
-    IDEA_TABLE_AVAILABLE = False
-
-# Try to import Config for database path management
-# Must be imported here for the same reason as IdeaTable above.
+# that insert T at sys.path[0], which would shadow REPO_ROOT/src with T/src
+# (a different package that does not contain IdeaTable).
 try:
     from src.config import Config
+    from src.idea import IdeaTable, setup_idea_table
 
+    IDEA_TABLE_AVAILABLE = True
     CONFIG_AVAILABLE = True
 except ImportError:
+    IDEA_TABLE_AVAILABLE = False
     CONFIG_AVAILABLE = False
 
 # Import title generator
@@ -642,8 +636,7 @@ def run_state_workflow_mode(
 
     # Connect to Idea database to fetch Idea content
     # Use the same database path for Idea table (it's in the same database)
-    idea_db = IdeaTable(db_path)
-    idea_db.connect()
+    idea_db = setup_idea_table(db_path)
     print_success("Connected to Idea database")
 
     # Continuous mode loop (default behavior)

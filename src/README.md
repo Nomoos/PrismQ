@@ -19,11 +19,13 @@ src provides a standardized way to load and manage environment variables and con
 
 ## Installation
 
-src requires the `python-dotenv` package:
+src requires the `python-dotenv` package for `.env` file reading and writing:
 
 ```bash
 pip install python-dotenv
 ```
+
+> **Note:** `python-dotenv` is an optional dependency. If it is not installed, `src.config.Config` and all other `src` modules (`src.idea.IdeaTable`, `src.story.StoryTable`, etc.) remain importable and functional. `.env` file operations (`load_dotenv`, `set_key`) silently become no-ops — the module falls back to reading values from actual environment variables and OS defaults only.
 
 ## Usage
 
