@@ -4,8 +4,8 @@ This directory contains project-wide documentation, research, proposals, and iss
 
 ## 📖 Core Documentation
 
-- **[WORKFLOW.md](./WORKFLOW.md)** - Complete state machine documentation
-- **[MVP_WORKFLOW_DOCUMENTATION.md](./MVP_WORKFLOW_DOCUMENTATION.md)** - MVP workflow guide
+- **[WORKFLOW.md](./docs/workflow/WORKFLOW.md)** - Complete state machine documentation
+- **[MVP_WORKFLOW_DOCUMENTATION.md](./docs/workflow/MVP_WORKFLOW_DOCUMENTATION.md)** - MVP workflow guide
 
 ## 📚 Documentation
 
