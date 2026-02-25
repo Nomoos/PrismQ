@@ -617,21 +617,6 @@ def generate_idea_from_flavor(
     )
 
 
-def format_idea_as_text(idea: Dict[str, Any]) -> str:
-    """Format idea as text - convenience function.
-    
-    Args:
-        idea: Generated idea
-        
-    Returns:
-        Formatted text
-    """
-    global _global_formatter
-    if _global_formatter is None:
-        _global_formatter = IdeaFormatter()
-    return _global_formatter.format_as_text(idea)
-
-
 def pick_weighted_flavor(seed: Optional[int] = None) -> str:
     """Pick single flavor - convenience function.
     
@@ -720,9 +705,41 @@ def get_flavor_count() -> int:
     return loader.get_flavor_count()
 
 
-# Backward compatibility aliases
-list_templates = list_flavors
-get_template = get_flavor
+# =============================================================================
+# TEMPLATE-BASED GENERATION (not replaced by AI — flavor is one variable in AI template)
+# =============================================================================
+
+# Import the template-based generation system from the templates module.
+# These are distinct from the AI/flavor-based system above:
+#   - Templates define structured idea dictionaries (deterministic, no AI required)
+#   - Flavor is one variable injected into AI prompts (see ai_generator.py)
+from idea_variants_OLD_BACKUP import (  # noqa: E402
+    VARIANT_TEMPLATES,
+    VARIANT_EMOTION_FIRST,
+    VARIANT_MYSTERY,
+    VARIANT_SKELETON,
+    VARIANT_SHORTFORM,
+    VARIANT_NICHE_BLEND,
+    VARIANT_MINIMAL,
+    VARIANT_4POINT,
+    VARIANT_HOOK_FRAME,
+    VARIANT_SHORTFORM2,
+    VARIANT_GENRE,
+    VARIANT_SCENE_SEED,
+    create_idea_variant,
+    create_all_variants,
+    create_selected_variants,
+    create_multiple_of_same_variant,
+    create_idea_text,
+    create_ideas_as_text,
+    format_idea_as_text,
+    get_template,
+    get_template_fields,
+    get_template_example,
+    list_templates,
+    MIN_IDEA_TEXT_LENGTH,
+)
+
 DEFAULT_IDEA_COUNT = 10
 
 __all__ = [
@@ -730,20 +747,41 @@ __all__ = [
     'IdeaGenerator',
     'FlavorSelector',
     'IdeaFormatter',
-    # Main convenience functions
+    # AI/flavor convenience functions
     'create_ideas_from_input',
     'generate_idea_from_flavor',
-    'format_idea_as_text',
     'pick_weighted_flavor',
     'pick_multiple_weighted_flavors',
     'list_flavors',
     'get_flavor',
     'get_flavor_count',
-    # Constants
-    'DEFAULT_IDEA_COUNT',
-    # Backward compatibility
-    'list_templates',
-    'get_template',
     # FlavorSelector helpers
     'pick_flavor_combination',
+    # Constants
+    'DEFAULT_IDEA_COUNT',
+    # Template-based generation (not replaced by AI)
+    'VARIANT_TEMPLATES',
+    'VARIANT_EMOTION_FIRST',
+    'VARIANT_MYSTERY',
+    'VARIANT_SKELETON',
+    'VARIANT_SHORTFORM',
+    'VARIANT_NICHE_BLEND',
+    'VARIANT_MINIMAL',
+    'VARIANT_4POINT',
+    'VARIANT_HOOK_FRAME',
+    'VARIANT_SHORTFORM2',
+    'VARIANT_GENRE',
+    'VARIANT_SCENE_SEED',
+    'create_idea_variant',
+    'create_all_variants',
+    'create_selected_variants',
+    'create_multiple_of_same_variant',
+    'create_idea_text',
+    'create_ideas_as_text',
+    'format_idea_as_text',
+    'get_template',
+    'get_template_fields',
+    'get_template_example',
+    'list_templates',
+    'MIN_IDEA_TEXT_LENGTH',
 ]

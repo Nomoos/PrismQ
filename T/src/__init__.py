@@ -4,6 +4,7 @@ This module provides foundation-level functionality shared across all Text domai
 
 Exports:
 - AI configuration (used by Content, Publishing, Story, etc.)
+- Prompt utilities (template variable substitution for all AI modules)
 """
 
 from .ai_config import (
@@ -15,6 +16,7 @@ from .ai_config import (
     AI_TEMPERATURE_MIN,
     AI_TEMPERATURE_MAX,
 )
+from .prompt_utils import apply_template
 
 __all__ = [
     "AISettings",
@@ -24,4 +26,5 @@ __all__ = [
     "DEFAULT_AI_API_BASE",
     "AI_TEMPERATURE_MIN",
     "AI_TEMPERATURE_MAX",
+    "apply_template",
 ]

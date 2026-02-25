@@ -21,6 +21,103 @@ logger = logging.getLogger(__name__)
 
 
 # =============================================================================
+# TEMPLATE VARIABLE SUBSTITUTION
+# Canonical definition is in T/src/prompt_utils (T foundation level).
+# We import from there so all pipeline modules (steps 3-10) share the same
+# implementation.  A local fallback is kept for standalone / test execution
+# where T/src may not be on the Python path.
+# =============================================================================
+
+_T_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"  # T/src
+
+_apply_template_imported = False
+try:
+    import importlib.util as _ilu
+
+    _spec = _ilu.spec_from_file_location("t_prompt_utils", _T_SRC / "prompt_utils.py")
+    _tmod = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_tmod)
+    apply_template = _tmod.apply_template
+    _apply_template_imported = True
+    logger.debug("apply_template imported from T/src/prompt_utils")
+except Exception:
+    pass  # fallback defined below
+
+
+if not _apply_template_imported:
+    logger.debug("T/src/prompt_utils not accessible; using local apply_template fallback")
+
+    def apply_template(template: str, **kwargs) -> str:  # noqa: F811
+        """Apply variable substitution to a template string.
+
+        Fallback implementation — canonical version lives in T/src/prompt_utils.
+
+        Supports standard placeholder formats:
+        - {variable} - Standard Python format strings
+        - [INPUT] - Source text/idea placeholder
+        - [FLAVOR] - Thematic flavor placeholder
+        - [VARIABLE] - Generic bracket notation for other variables
+
+        Args:
+            template: The template string with placeholders
+            **kwargs: Variable values to substitute
+
+        Returns:
+            Template with variables substituted
+
+        Examples:
+            >>> apply_template("Hello {name}!", name="World")
+            'Hello World!'
+            >>> apply_template("Text: [INPUT]", input="My text")
+            'Text: My text'
+            >>> apply_template("Flavor: [FLAVOR]", flavor="Mystery")
+            'Flavor: Mystery'
+        """
+        result = template
+
+        # Handle [INPUT] placeholder for text input
+        if 'input' in kwargs:
+            input_value = kwargs['input']
+            result = result.replace('[INPUT]', str(input_value))
+            # Also handle legacy INSERTTEXTHERE / INSERT_TEXT_HERE / INSERT TEXT HERE formats
+            result = result.replace('INSERTTEXTHERE', str(input_value))
+            result = result.replace('INSERT_TEXT_HERE', str(input_value))
+            result = result.replace('INSERT TEXT HERE', str(input_value))
+
+        # Handle [FLAVOR] placeholder
+        if 'flavor' in kwargs:
+            flavor_value = kwargs['flavor']
+            result = result.replace('[FLAVOR]', str(flavor_value))
+
+        # Handle generic [VARIABLE] bracket notation for other variables
+        bracket_placeholders = re.findall(r'\[(\w+(?:\s+\w+)*)\]', result)
+        for placeholder in bracket_placeholders:
+            # Skip INPUT and FLAVOR as they're already handled
+            if placeholder in ['INPUT', 'FLAVOR']:
+                continue
+            # Try to find matching key (case-insensitive)
+            key = placeholder.lower().replace(' ', '_')
+            if key in kwargs:
+                result = result.replace(f'[{placeholder}]', str(kwargs[key]))
+
+        # Then apply standard Python format string substitution
+        # Use a safe approach that only substitutes available keys
+        try:
+            # Build a dict with only the placeholders that exist in the template
+            # Find all {variable} patterns
+            placeholders = re.findall(r'\{(\w+)\}', result)
+            safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
+
+            # Apply standard format substitution
+            if safe_kwargs:
+                result = result.format(**safe_kwargs)
+        except (KeyError, ValueError) as e:
+            logger.warning(f"Template substitution warning: {e}")
+
+        return result
+
+
+# =============================================================================
 # PROMPT FILE LOADING
 # =============================================================================
 
@@ -59,73 +156,6 @@ def list_available_prompts() -> List[str]:
     return sorted(prompts)
 
 
-def apply_template(template: str, **kwargs) -> str:
-    """Apply variable substitution to a template string.
-    
-    Supports standard placeholder formats:
-    - {variable} - Standard Python format strings
-    - [INPUT] - Source text/idea placeholder
-    - [FLAVOR] - Thematic flavor placeholder
-    - [VARIABLE] - Generic bracket notation for other variables
-    
-    Args:
-        template: The template string with placeholders
-        **kwargs: Variable values to substitute
-        
-    Returns:
-        Template with variables substituted
-        
-    Examples:
-        >>> apply_template("Hello {name}!", name="World")
-        'Hello World!'
-        >>> apply_template("Text: [INPUT]", input="My text")
-        'Text: My text'
-        >>> apply_template("Flavor: [FLAVOR]", flavor="Mystery")
-        'Flavor: Mystery'
-    """
-    # Handle placeholders - use only standard versions
-    result = template
-    
-    # Handle [INPUT] placeholder for text input
-    if 'input' in kwargs:
-        input_value = kwargs['input']
-        result = result.replace('[INPUT]', str(input_value))
-        # Also handle legacy INSERTTEXTHERE / INSERT_TEXT_HERE / INSERT TEXT HERE formats
-        result = result.replace('INSERTTEXTHERE', str(input_value))
-        result = result.replace('INSERT_TEXT_HERE', str(input_value))
-        result = result.replace('INSERT TEXT HERE', str(input_value))
-    
-    # Handle [FLAVOR] placeholder
-    if 'flavor' in kwargs:
-        flavor_value = kwargs['flavor']
-        result = result.replace('[FLAVOR]', str(flavor_value))
-    
-    # Handle generic [VARIABLE] bracket notation for other variables
-    bracket_placeholders = re.findall(r'\[(\w+(?:\s+\w+)*)\]', result)
-    for placeholder in bracket_placeholders:
-        # Skip INPUT and FLAVOR as they're already handled
-        if placeholder in ['INPUT', 'FLAVOR']:
-            continue
-        # Try to find matching key (case-insensitive)
-        key = placeholder.lower().replace(' ', '_')
-        if key in kwargs:
-            result = result.replace(f'[{placeholder}]', str(kwargs[key]))
-    
-    # Then apply standard Python format string substitution
-    # Use a safe approach that only substitutes available keys
-    try:
-        # Build a dict with only the placeholders that exist in the template
-        # Find all {variable} patterns
-        placeholders = re.findall(r'\{(\w+)\}', result)
-        safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
-        
-        # Apply standard format substitution
-        if safe_kwargs:
-            result = result.format(**safe_kwargs)
-    except (KeyError, ValueError) as e:
-        logger.warning(f"Template substitution warning: {e}")
-    
-    return result
 
 
 @dataclass
