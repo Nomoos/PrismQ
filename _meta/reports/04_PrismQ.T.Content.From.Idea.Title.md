@@ -20,9 +20,10 @@
 5. Načtení posledního titulku z tabulky `Title` (`TitleRepository.find_latest_version`)
 6. Příprava generování: seed word (náhodně z 504 slov), volitelně audience z konfigurace
 7. [AI generování obsahu](shared/ollama_ai_integrace.md) — prompt: title + Idea + seed word (+ audience, pokud nastavena) → strukturovaný skript (hook / deliver / CTA)
-8. Validace obsahu (délka ~300 slov / max 175 s, struktura, kvalita)
-9. [Uložení výsledků](shared/databazova_integrace.md) — insert `Content` (verze 0), update `Story`: stav → `PrismQ.T.Review.Title.From.Content.Idea`
-10. [Continuous loop](shared/continuous_mode.md)
+8. [Uložení výsledků](shared/databazova_integrace.md) — insert `Content` (verze 0), update `Story`: stav → `PrismQ.T.Review.Title.From.Content.Idea`
+9. [Continuous loop](shared/continuous_mode.md)
+
+> **Validace obsahu** (délka, struktura, kvalita) je odpovědností review modulu (modul 05), ne tohoto kroku.
 
 > **Preview mode:** spuštění s `--preview` (nebo přes `Preview.bat`) vygeneruje obsah, ale **neprovede žádné DB zápisy** ani změnu stavu.
 
