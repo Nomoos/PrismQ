@@ -147,12 +147,16 @@ class StoryFromIdeaService:
             Set of Idea IDs (integers) that have at least one Story.
         """
         cursor = self._story_conn.execute("SELECT DISTINCT idea_id FROM Story")
-        # idea_id is stored as INTEGER in Story
+        # idea_id is stored as TEXT in Story but compared against INTEGER ids from IdeaTable,
+        # so convert to int for correct set membership checks.
         referenced_ids = set()
         for row in cursor.fetchall():
             idea_id = row[0]
             if idea_id is not None:
-                referenced_ids.add(idea_id)
+                try:
+                    referenced_ids.add(int(idea_id))
+                except (ValueError, TypeError):
+                    referenced_ids.add(idea_id)
         return referenced_ids
 
     def get_unreferenced_ideas(self) -> List[Dict[str, Any]]:
