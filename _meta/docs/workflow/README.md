@@ -80,8 +80,8 @@ For the detailed 26-stage MVP implementation of the text production phase, see:
 
 For a comprehensive report on state transitions for each module, see:
 
-- **[State Transitions Report](../STATE_TRANSITIONS_REPORT.md)** - Complete report on state transitions for all modules (English)
-- **[State Transitions Report (CS)](../STATE_TRANSITIONS_REPORT_CS.md)** - Complete report on state transitions for all modules (Czech)
+- **[State Transitions Report](./STATE_TRANSITIONS_REPORT.md)** - Complete report on state transitions for all modules (English)
+- **[State Transitions Report (CS)](./STATE_TRANSITIONS_REPORT_CS.md)** - Complete report on state transitions for all modules (Czech)
 
 These reports provide:
 - Detailed state transition diagrams for each module (T, A, V, P, M)
@@ -91,9 +91,9 @@ These reports provide:
 
 ## Related Documentation
 
-- [ARCHITECTURE.md](../ARCHITECTURE.md) - Overall platform architecture
-- [PROGRESSIVE_ENRICHMENT.md](../PROGRESSIVE_ENRICHMENT.md) - Multi-format content strategy
-- [QUALITY_GATES.md](../QUALITY_GATES.md) - Quality assurance framework
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) - Overall platform architecture
+- [PROGRESSIVE_ENRICHMENT.md](../architecture/PROGRESSIVE_ENRICHMENT.md) - Multi-format content strategy
+- [QUALITY_GATES.md](../guidelines/QUALITY_GATES.md) - Quality assurance framework
 
 ---
 
