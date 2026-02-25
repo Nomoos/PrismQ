@@ -3,7 +3,7 @@
 AI-powered title evaluation modules.
 """
 
-# Import v1 review (ByScriptAndIdea - located at From.Content.Idea)
+# Import v1 review (located at From.Content.Idea)
 try:
     from .From.Content.Idea import (
         TitleCategoryScore,
