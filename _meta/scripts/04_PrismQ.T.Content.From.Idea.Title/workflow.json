@@ -1,0 +1,4 @@
+{
+  "_comment": "PrismQ.T.Content.From.Idea.Title workflow configuration. Set audience to define target audience for AI content generation, or leave null to run without audience context.",
+  "audience": null
+}

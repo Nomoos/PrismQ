@@ -236,7 +236,6 @@ class ContentGenerator:
                 api_base=ai_api_base,
                 temperature=ai_temperature,
                 timeout=ai_timeout,
-                enable_ai=True,
             )
             self._ai_generator = ai_module.AIContentGenerator(config=ai_config)
             self._ai_available = self._ai_generator.is_available()
