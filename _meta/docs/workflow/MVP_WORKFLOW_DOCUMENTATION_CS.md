@@ -6,27 +6,27 @@
 
 ## Kompletní dokumentace
 
-Veškerá dokumentace MVP workflow je nyní organizována v adresáři [`docs/workflow/`](./docs/workflow/):
+Veškerá dokumentace MVP workflow je nyní organizována v adresáři [`docs/workflow/`](./):
 
 ### Dokumentace MVP
 
-- **[Přehled MVP](./docs/workflow/mvp-overview_CS.md)** - Principy, filosofie a klíčové inovace
-- **[Fáze MVP](./docs/workflow/mvp-stages_CS.md)** - Kompletní implementace 26fázového workflow
-- **[API Reference MVP](./docs/workflow/mvp-api_CS.md)** - Použití API, příklady a integrace
-- **[Osvědčené postupy MVP](./docs/workflow/mvp-best-practices_CS.md)** - Osvědčené postupy a řešení problémů
+- **[Přehled MVP](./mvp-overview_CS.md)** - Principy, filosofie a klíčové inovace
+- **[Fáze MVP](./mvp-stages_CS.md)** - Kompletní implementace 26fázového workflow
+- **[API Reference MVP](./mvp-api_CS.md)** - Použití API, příklady a integrace
+- **[Osvědčené postupy MVP](./mvp-best-practices_CS.md)** - Osvědčené postupy a řešení problémů
 
 ### Související základní workflow
 
-- **[Stavový automat](./docs/workflow/state-machine_CS.md)** - Kompletní stavový automat PrismQ
-- **[Fáze workflow](./docs/workflow/phases_CS.md)** - 9 hlavních fází tvorby obsahu
-- **[Strategie publikace](./docs/workflow/publishing-strategy_CS.md)** - Postupný víceformátový přístup
+- **[Stavový automat](./state-machine_CS.md)** - Kompletní stavový automat PrismQ
+- **[Fáze workflow](./phases_CS.md)** - 9 hlavních fází tvorby obsahu
+- **[Strategie publikace](./publishing-strategy_CS.md)** - Postupný víceformátový přístup
 
 ## Rychlý start
 
-1. **Pochopte přístup**: Přečtěte si [Přehled MVP](./docs/workflow/mvp-overview_CS.md)
-2. **Naučte se fáze**: Projděte [Fáze MVP](./docs/workflow/mvp-stages_CS.md)
-3. **Integrace**: Použijte [API Reference MVP](./docs/workflow/mvp-api_CS.md)
-4. **Optimalizace**: Následujte [Osvědčené postupy MVP](./docs/workflow/mvp-best-practices_CS.md)
+1. **Pochopte přístup**: Přečtěte si [Přehled MVP](./mvp-overview_CS.md)
+2. **Naučte se fáze**: Projděte [Fáze MVP](./mvp-stages_CS.md)
+3. **Integrace**: Použijte [API Reference MVP](./mvp-api_CS.md)
+4. **Optimalizace**: Následujte [Osvědčené postupy MVP](./mvp-best-practices_CS.md)
 
 ## Klíčové funkce
 
@@ -44,7 +44,7 @@ Postupné vylepšování prostřednictvím několika verzí (v1, v2, v3, v4+) s 
 
 ## Navigace
 
-Pro kompletní index a průvodce navigací viz [Index dokumentace workflow](./docs/workflow/README.md).
+Pro kompletní index a průvodce navigací viz [Index dokumentace workflow](./README.md).
 
 ## Související dokumentace
 
