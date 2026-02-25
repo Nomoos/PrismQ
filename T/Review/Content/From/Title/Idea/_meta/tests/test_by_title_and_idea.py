@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 # Add paths to avoid Grammar module import issues
-REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent.parent.parent.parent
+REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent.parent.parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "T" / "Review" / "Content"))
 sys.path.insert(0, str(REPO_ROOT / "T" / "Idea" / "Model"))  # This loads src.idea
-sys.path.insert(0, str(REPO_ROOT))
 
 from src.idea import ContentGenre, Idea
 # Direct imports to avoid __init__.py
