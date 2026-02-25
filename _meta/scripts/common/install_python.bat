@@ -78,6 +78,15 @@ if !ERRORLEVEL! NEQ 0 (
 )
 del /q "%GET_PIP%" 2>nul
 
+REM Install virtualenv (embedded Python does not include the built-in venv module)
+echo [INFO] Installing virtualenv...
+"%PYTHON_DIR%\python.exe" -m pip install virtualenv --quiet
+if !ERRORLEVEL! NEQ 0 (
+    echo ERROR: Failed to install virtualenv.
+    rmdir /s /q "%PYTHON_DIR%" 2>nul
+    exit /b 1
+)
+
 echo [INFO] Python %PYTHON_VERSION% installed successfully.
 endlocal & set "PYTHON_EXE=%PYTHON_EXE_PATH%"
 exit /b 0
