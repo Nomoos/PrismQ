@@ -1,17 +1,15 @@
 @echo off
 REM PrismQ.T.Title.From.Idea - Preview Mode
-REM Shows what Ideas would be processed without making changes
+REM Shows what Stories would be processed and what titles would be generated
+REM without making any database changes
 REM
 REM Usage:
-REM   Preview.bat                               Use default .env (C:/PrismQ/.env)
-REM   Preview.bat --env path\to\.env            Use custom .env file
-REM   Preview.bat --idea-id 123                 Preview specific Idea
-REM   Preview.bat --limit 5                     Preview max 5 Ideas
-REM   Preview.bat --json                        Output as JSON
+REM   Preview.bat                               Use default database
+REM   Preview.bat --db C:\path\to\db.s3db       Use specific database
+REM   Preview.bat --debug                       Enable debug logging
 REM
-REM Environment:
-REM   .env file defines WORKING_DIRECTORY where db.s3db is located
-REM   Default .env location: C:/PrismQ/.env
+REM Requirements:
+REM   Ollama must be running with qwen3:32b model
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
@@ -29,7 +27,7 @@ echo ========================================
 echo PrismQ.T.Title.From.Idea - Preview
 echo ========================================
 
-REM Run Python script with all arguments plus --preview
+REM Run Python script with --preview flag plus any additional arguments
 python run.py --preview %*
 
 if %ERRORLEVEL% NEQ 0 (

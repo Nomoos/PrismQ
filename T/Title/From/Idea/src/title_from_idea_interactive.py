@@ -778,13 +778,16 @@ def run_state_workflow_mode(
 
                     if preview:
                         print_warning("PREVIEW MODE - Title NOT saved to database")
-                        print_info(f"Would transition state: TITLE_FROM_IDEA → SCRIPT_FROM_IDEA_TITLE")
+                        print_info(f"Would transition state: TITLE_FROM_IDEA → CONTENT_FROM_IDEA_TITLE")
                         processed_count += 1
                     else:
-                        # Save title and update state
+                        # Save title and update state, reusing the already-generated variants
+                        # to avoid regenerating AI content for the same story.
                         print_section("Database Operations")
                         try:
-                            title = service.generate_title_for_story(story, idea)
+                            title = service.generate_title_for_story(
+                                story, idea, precomputed_variants=variants
+                            )
                             if title:
                                 print_success(f"Title saved with ID: {title.id}")
                                 print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
