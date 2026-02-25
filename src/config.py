@@ -8,7 +8,17 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from dotenv import load_dotenv, set_key
+try:
+    from dotenv import load_dotenv, set_key
+except ImportError:
+
+    def load_dotenv(*args, **kwargs):
+        """No-op fallback when python-dotenv is not installed."""
+        return False
+
+    def set_key(*args, **kwargs):
+        """No-op fallback when python-dotenv is not installed."""
+        return (None, None, None)
 
 
 class Config:
