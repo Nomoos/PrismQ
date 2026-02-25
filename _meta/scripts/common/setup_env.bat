@@ -23,7 +23,7 @@ if !ERRORLEVEL! NEQ 0 exit /b 1
 REM Create virtual environment if it does not exist
 if not exist "%VENV_MARKER%" (
     echo [INFO] Creating virtual environment...
-    "!PYTHON_EXE!" -m venv "%VENV_DIR%"
+    "!PYTHON_EXE!" -m virtualenv "%VENV_DIR%"
     if !ERRORLEVEL! NEQ 0 exit /b 1
 )
 
