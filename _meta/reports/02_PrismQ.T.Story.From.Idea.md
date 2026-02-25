@@ -22,5 +22,5 @@
 
 ## 📤 Výstup
 - **Primární:** 10 Story záznamů na každou zpracovanou Idea
-- **DB změny:** Tabulka `Story` — `idea_id`, `state=StoryState.TITLE_FROM_IDEA`, `created_at`, `updated_at`
+- **DB změny:** Tabulka `Story` — `idea_id`, `state="PrismQ.T.Title.From.Idea"`, `created_at`, `updated_at`
 - **Další krok:** Modul 03 (PrismQ.T.Title.From.Idea)
