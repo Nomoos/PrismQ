@@ -23,5 +23,5 @@
 
 ## 📤 Výstup
 - **Primární:** Review report s rating a feedback
-- **DB změny:** Tabulka `Story` — review metadata, state: Pass → `PrismQ.T.Review.Content.From.Title.Idea`, Fail → `PrismQ.T.Title.From.Title.Review.Content`
+- **DB změny:** Tabulka `Review` — nový záznam s textem a skóre; tabulka `Story` — state: Pass → `PrismQ.T.Review.Content.From.Title.Idea`, Fail → `PrismQ.T.Title.From.Title.Review.Content`
 - **Další krok:** Pass → Modul 06, Fail → Modul 08 (regenerace titulku)
