@@ -482,12 +482,14 @@ class StateBasedContentResult:
 
     Attributes:
         story_id: ID of the processed story
-        content_id: ID of the generated script (if successful)
+        content_id: ID of the generated content (if successful)
         previous_state: The state before processing
         new_state: The state after processing
         success: Whether the operation succeeded
         error: Error message if failed
         script_v1: Generated ContentV1 object (if successful)
+        word_count: Word count of the generated content (if successful)
+        duration: Estimated duration in seconds (if successful)
     """
 
     story_id: Optional[int] = None
@@ -497,6 +499,8 @@ class StateBasedContentResult:
     success: bool = False
     error: Optional[str] = None
     script_v1: Optional[ContentV1] = None
+    word_count: Optional[int] = None
+    duration: Optional[float] = None
 
 
 class ContentFromIdeaTitleService:
@@ -538,14 +542,22 @@ class ContentFromIdeaTitleService:
         self,
         connection: sqlite3.Connection,
         content_generator_config: Optional[ContentGeneratorConfig] = None,
+        audience: Optional[dict] = None,
+        preview_mode: bool = False,
     ):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection with row_factory = sqlite3.Row
             content_generator_config: Optional configuration for content generation
+            audience: Optional target audience dict (age_range, gender, country).
+                If None the AI prompt is generated without audience context.
+            preview_mode: If True, generate content but skip all database writes
+                and state transitions.
         """
         self._conn = connection
+        self._audience = audience
+        self._preview_mode = preview_mode
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.title_repo = TitleRepository(connection)
@@ -581,11 +593,12 @@ class ContentFromIdeaTitleService:
 
         This method:
         1. Finds the oldest Story with state PrismQ.T.Content.From.Idea.Title
-        2. Generates a Content from the Story's Idea and Title
-        3. Saves the Content to the database
-        4. Updates the Story state to PrismQ.T.Review.Title.From.Content.Idea
-        
-        Includes idempotency checks and comprehensive logging.
+        2. Loads the Idea record from the Idea table via story.idea_id
+        3. Loads the latest Title record for the story from the Title table
+        4. Generates Content using the Idea and Title (with optional audience)
+        5. Saves the Content to the database (skipped in preview_mode)
+        6. Updates the Story state to PrismQ.T.Review.Title.From.Content.Idea
+           (skipped in preview_mode)
 
         Returns:
             StateBasedContentResult with processing details.
@@ -605,58 +618,76 @@ class ContentFromIdeaTitleService:
         result.previous_state = story.state
         logger.info(f"Processing story {story.id} in state {story.state}")
 
-        # Idempotency check: If story already has content, don't regenerate
-        if story.content_id:
-            result.error = f"Story {story.id} already has content_id={story.content_id}. Skipping duplicate generation."
+        # Idempotency check: skip if content already exists for this story
+        existing_content = self.content_repo.find_latest_version(story.id)
+        if existing_content:
+            result.error = (
+                f"Story {story.id} already has content (id={existing_content.id}). "
+                "Skipping duplicate generation."
+            )
             logger.warning(result.error)
             return result
 
-        # Validate story has required data
-        if not story.idea_json:
-            result.error = f"Story {story.id} has no idea_json"
-            logger.error(result.error)
-            return result
-
-        if not story.title_id:
-            result.error = f"Story {story.id} has no title_id"
+        # Validate story has an idea reference
+        if not story.idea_id:
+            result.error = f"Story {story.id} has no idea_id"
             logger.error(result.error)
             return result
 
         try:
-            logger.debug(f"Story {story.id}: Parsing idea from JSON")
-            # Parse the Idea from JSON
-            idea_data = json.loads(story.idea_json)
-            idea = Idea.from_dict(idea_data)
-
-            # Get the Title text
-            logger.debug(f"Story {story.id}: Fetching title with id={story.title_id}")
-            title = self.title_repo.find_by_id(story.title_id)
-            if not title:
-                result.error = f"Title with id {story.title_id} not found"
+            # Load Idea text from the Idea table
+            logger.debug(f"Story {story.id}: Loading idea id={story.idea_id}")
+            cursor = self._conn.execute(
+                "SELECT text FROM Idea WHERE id = ?", (story.idea_id,)
+            )
+            idea_row = cursor.fetchone()
+            if not idea_row:
+                result.error = f"Idea with id={story.idea_id} not found"
                 logger.error(f"Story {story.id}: {result.error}")
                 return result
+            idea_text = (idea_row["text"] or "").strip()
+            idea = Idea(title=idea_text, concept=idea_text)
+            logger.debug(f"Story {story.id}: Idea loaded ({len(idea_text)} chars)")
 
+            # Load the latest Title for this story
+            logger.debug(f"Story {story.id}: Fetching latest title")
+            title = self.title_repo.find_latest_version(story.id)
+            if not title:
+                result.error = f"No title found for story {story.id}"
+                logger.error(f"Story {story.id}: {result.error}")
+                return result
             title_text = title.text
             logger.info(f"Story {story.id}: Generating content for title '{title_text}'")
 
-            # Generate the script
-            script_v1 = self.content_generator.generate_content_v1(idea=idea, title=title_text)
-            logger.info(f"Story {story.id}: Content generated successfully ({len(script_v1.full_text)} chars)")
-
-            # Create Content model for database
-            script_model = ScriptModel(
-                story_id=story.id, version=INITIAL_CONTENT_VERSION, text=script_v1.full_text
+            # Generate content (pass audience if configured; None means no audience context)
+            script_v1 = self.content_generator.generate_content_v1(
+                idea=idea, title=title_text, audience=self._audience
+            )
+            logger.info(
+                f"Story {story.id}: Content generated successfully "
+                f"({len(script_v1.full_text)} chars)"
             )
 
-            # Save to database
+            # Populate word count and duration from the generated content
+            result.word_count = len(script_v1.full_text.split())
+            result.duration = float(script_v1.total_duration_seconds)
+
+            if self._preview_mode:
+                logger.info(f"Story {story.id}: Preview mode — skipping database save")
+                result.success = True
+                result.script_v1 = script_v1
+                return result
+
+            # Save Content to database
             logger.debug(f"Story {story.id}: Saving content to database")
-            saved_content = self.content_repo.insert(script_model)
+            content_model = ScriptModel(
+                story_id=story.id, version=INITIAL_CONTENT_VERSION, text=script_v1.full_text
+            )
+            saved_content = self.content_repo.insert(content_model)
             logger.info(f"Story {story.id}: Content saved with id={saved_content.id}")
 
-            # Update the story with the script reference and new state
-            story.content_id = saved_content.id
-            story.state = self.OUTPUT_STATE
-            story.updated_at = datetime.now()
+            # Update Story state
+            story.update_state(self.OUTPUT_STATE)
             self.story_repo.update(story)
             logger.info(f"Story {story.id}: State updated to {self.OUTPUT_STATE}")
 
@@ -666,9 +697,6 @@ class ContentFromIdeaTitleService:
             result.new_state = self.OUTPUT_STATE
             result.script_v1 = script_v1
 
-        except json.JSONDecodeError as e:
-            result.error = f"Failed to parse idea_json: {str(e)}"
-            logger.error(f"Story {story.id}: {result.error}")
         except ValueError as e:
             result.error = f"Invalid idea or title: {str(e)}"
             logger.error(f"Story {story.id}: {result.error}")
@@ -759,3 +787,7 @@ def process_oldest_from_idea_title(connection: sqlite3.Connection) -> StateBased
     """
     service = ContentFromIdeaTitleService(connection)
     return service.process_oldest_story()
+
+
+# Alias used by content_from_idea_title_workflow.py
+StateBasedContentService = ContentFromIdeaTitleService
