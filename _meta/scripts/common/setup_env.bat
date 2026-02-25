@@ -23,6 +23,13 @@ if !ERRORLEVEL! NEQ 0 exit /b 1
 REM Create virtual environment if it does not exist
 if not exist "%VENV_MARKER%" (
     echo [INFO] Creating virtual environment...
+    REM Ensure virtualenv is installed (may be missing if Python was installed before PR345)
+    "!PYTHON_EXE!" -m virtualenv --version >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo [INFO] Installing virtualenv...
+        "!PYTHON_EXE!" -m pip install virtualenv --quiet
+        if !ERRORLEVEL! NEQ 0 exit /b 1
+    )
     "!PYTHON_EXE!" -m virtualenv "%VENV_DIR%"
     if !ERRORLEVEL! NEQ 0 exit /b 1
 )
