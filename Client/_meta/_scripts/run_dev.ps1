@@ -52,27 +52,22 @@ if (Test-Path $VenvPath) {
 } else {
     Write-Host "⚠️  Virtual environment not found at Backend\venv" -ForegroundColor Yellow
     
-    # Check if Python is available before creating venv
-    Write-Host "   Checking Python availability..." -ForegroundColor Cyan
-    $PythonAvailable = $false
-    try {
-        $null = python --version 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            $PythonAvailable = $true
+    # Check for project Python, install if missing
+    Write-Host "   Checking project Python..." -ForegroundColor Cyan
+    $RepoPythonExe = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) ".python\python.exe"
+    if (-not (Test-Path $RepoPythonExe)) {
+        Write-Host "   Project Python not found. Installing..." -ForegroundColor Yellow
+        $InstallScript = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "_meta\scripts\common\install_python.bat"
+        cmd /c "`"$InstallScript`""
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "❌ Failed to install project Python." -ForegroundColor Red
+            exit 1
         }
-    } catch {
-        $PythonAvailable = $false
     }
-    
-    if (-not $PythonAvailable) {
-        Write-Host "❌ Python is not installed or not in PATH" -ForegroundColor Red
-        Write-Host "   Please ensure Python 3.10+ is installed and added to PATH" -ForegroundColor Yellow
-        Write-Host "   Download from: https://www.python.org/downloads/" -ForegroundColor Cyan
-        exit 1
-    }
-    
+    $PythonExe = $RepoPythonExe
+
     Write-Host "   Creating virtual environment..." -ForegroundColor Cyan
-    python -m venv venv
+    & $PythonExe -m venv venv
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ Virtual environment created successfully" -ForegroundColor Green
         & "$VenvPath\Scripts\Activate.ps1"

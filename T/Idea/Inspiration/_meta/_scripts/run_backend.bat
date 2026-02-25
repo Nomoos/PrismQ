@@ -29,13 +29,12 @@ echo.
 
 cd /d "%BACKEND_DIR%"
 
-REM Check if Python is available
-python --version >nul 2>&1
+REM Find project Python (install if needed - installs to <repo_root>\.python\)
+set "SCRIPT_DIR=%~dp0"
+call "%SCRIPT_DIR%..\..\..\..\..\_meta\scripts\common\find_python.bat"
 if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
     echo.
-    echo Please ensure Python 3.10+ is installed and added to PATH
-    echo Download from: https://www.python.org/downloads/
+    echo Please check your internet connection and try again.
     echo.
     pause
     exit /b 1
@@ -58,7 +57,7 @@ if not exist "venv" (
 REM Create virtual environment if needed
 if "%VENV_NEEDS_CREATION%"=="1" (
     echo Creating virtual environment...
-    python -m venv venv
+    "%PYTHON_EXE%" -m venv venv
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment
         pause

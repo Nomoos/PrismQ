@@ -22,19 +22,13 @@ echo PrismQ - Python Environment Setup
 echo ========================================
 echo.
 
-REM Check Python availability
-where python >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Python is not installed or not in PATH
-    echo.
-    echo Please install Python from https://www.python.org/downloads/
-    echo and ensure it is added to your PATH.
-    exit /b 1
-)
+REM Find project Python (install if needed - installs to <repo_root>\.python\)
+call "%SCRIPT_DIR%..\..\..\..\..\..\_meta\scripts\common\find_python.bat"
+if !ERRORLEVEL! NEQ 0 exit /b 1
 
 REM Show Python version
-for /f "delims=" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
-echo [INFO] Python version: %PYTHON_VERSION%
+for /f "delims=" %%i in ('"!PYTHON_EXE!" --version 2^>^&1') do set PYTHON_VERSION=%%i
+echo [INFO] Python version: !PYTHON_VERSION!
 
 REM Check if virtual environment exists
 if exist "%VENV_MARKER%" (
@@ -47,7 +41,7 @@ REM Create virtual environment
 echo [INFO] Virtual environment not found
 echo [INFO] Creating virtual environment at: %VENV_DIR%
 echo.
-python -m venv "%VENV_DIR%"
+"!PYTHON_EXE!" -m venv "%VENV_DIR%"
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Failed to create virtual environment
     echo.

@@ -29,6 +29,9 @@ env/
 ENV/
 .venv
 
+# Project-managed Python installation (auto-downloaded, not committed)
+.python/
+
 # IDE
 .vscode/
 .idea/
