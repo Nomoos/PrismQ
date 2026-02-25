@@ -1,0 +1,8 @@
+{
+  "_comment": "PrismQ.T.Content.From.Idea.Title workflow configuration. Set audience to define target audience for AI content generation, or leave null to run without audience context.",
+  "audience": {
+    "age_range": "10-25",
+    "gender": "Female",
+    "country": "United States"
+  }
+}

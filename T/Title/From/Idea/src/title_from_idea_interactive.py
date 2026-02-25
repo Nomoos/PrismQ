@@ -6,12 +6,12 @@ AI is REQUIRED - no template-based fallback is available.
 
 Usage:
     python title_from_idea_interactive.py                    # Continuous mode (default)
-    python title_from_idea_interactive.py --preview          # Preview mode (no DB save)
+    python title_from_idea_interactive.py --db /path/db.s3db # Custom database path
 
 Modes:
     Default (Continuous): Auto-processes Stories from database without user input
                          Waits 30 seconds when no Stories are available
-    Preview: Creates titles for testing without saving (extensive logging)
+                         No interactivity in the processing cycle
 
 Requirements:
     - Ollama must be running with qwen3:32b model
@@ -535,14 +535,14 @@ def run_interactive_mode(preview: bool = False, debug: bool = False, manual: boo
 
 
 def run_state_workflow_mode(
-    db_path: Optional[str] = None, preview: bool = False, debug: bool = False
+    db_path: Optional[str] = None, debug: bool = False
 ):
     """Run the state-based workflow mode for title generation in continuous mode.
 
     This mode automatically and continuously processes Stories with state PrismQ.T.Title.From.Idea,
     generates titles using AI with similarity checking, and transitions to the next state.
     
-    Runs continuously by default with 1ms wait between iterations when processing items,
+    Runs continuously with 1ms wait between iterations when processing items,
     and 30-second wait when no stories are found. Press Ctrl+C to stop.
 
     IMPORTANT: This mode requires AI (Ollama) to be running. If AI is unavailable,
@@ -551,7 +551,6 @@ def run_state_workflow_mode(
     Args:
         db_path: Path to the SQLite database file. If None, uses default from
                  Config (C:/PrismQ/db.s3db).
-        preview: If True, don't save to database (preview/test mode).
         debug: If True, enable extensive debug logging.
 
     Raises:
@@ -567,7 +566,7 @@ def run_state_workflow_mode(
 
     # Setup logging
     logger = None
-    if debug or preview:
+    if debug:
         log_filename = f"title_from_idea_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         log_path = SCRIPT_DIR / log_filename
 
@@ -580,7 +579,7 @@ def run_state_workflow_mode(
             ],
         )
         logger = logging.getLogger("PrismQ.Title.From.Idea")
-        logger.info(f"Session started - Preview: {preview}, Debug: {debug}")
+        logger.info(f"Session started - Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
     # Print header - CONTINUOUS MODE is now default
@@ -776,26 +775,24 @@ def run_state_workflow_mode(
                     print(f"    {best_variant.text}")
                     print(f"    Style: {best_variant.style} | Score: {best_variant.score:.2f}")
 
-                    if preview:
-                        print_warning("PREVIEW MODE - Title NOT saved to database")
-                        print_info(f"Would transition state: TITLE_FROM_IDEA → SCRIPT_FROM_IDEA_TITLE")
-                        processed_count += 1
-                    else:
-                        # Save title and update state
-                        print_section("Database Operations")
-                        try:
-                            title = service.generate_title_for_story(story, idea)
-                            if title:
-                                print_success(f"Title saved with ID: {title.id}")
-                                print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
-                                processed_count += 1
-                            else:
-                                print_warning("Story already has a title, skipped")
-                        except Exception as e:
-                            print_error(f"Failed to save title: {e}")
-                            if logger:
-                                logger.exception("Database save failed")
-                            error_count += 1
+                    # Save title and update state, reusing the already-generated variants
+                    # to avoid regenerating AI content for the same story.
+                    print_section("Database Operations")
+                    try:
+                        title = service.generate_title_for_story(
+                            story, idea, precomputed_variants=variants
+                        )
+                        if title:
+                            print_success(f"Title saved with ID: {title.id}")
+                            print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
+                            processed_count += 1
+                        else:
+                            print_warning("Story already has a title, skipped")
+                    except Exception as e:
+                        print_error(f"Failed to save title: {e}")
+                        if logger:
+                            logger.exception("Database save failed")
+                        error_count += 1
 
                 except AIUnavailableError as e:
                     print_error(f"AI title generation failed: {e}")
@@ -814,7 +811,6 @@ def run_state_workflow_mode(
                 print_section(f"Run #{run_count} Summary")
                 print(f"  Stories processed in this run: {processed_count}")
                 print(f"  Errors in this run: {error_count}")
-                print(f"  Mode: {'PREVIEW (no changes saved)' if preview else 'RUN (changes saved)'}")
                 print(f"  Next state: {StateNames.CONTENT_FROM_IDEA_TITLE}")
             
             # Wait 1ms before next check
@@ -847,18 +843,13 @@ Examples:
   # Continuous mode (default - automatic processing without user input)
   python title_from_idea_interactive.py                    # Process Stories from default DB
   python title_from_idea_interactive.py --db /path/to/db.s3db  # Use custom DB
-  python title_from_idea_interactive.py --preview          # Preview without saving
   
 Note: 
   - AI (Ollama) is REQUIRED for title generation. No template fallback available.
-  - This module should run in continuous mode only (no manual/interactive mode in production).
-  - Manual/interactive modes are available for debugging but NOT part of standard workflow.
+  - This module runs in continuous mode only (no interactivity in the cycle).
         """,
     )
 
-    parser.add_argument(
-        "--preview", "-p", action="store_true", help="Preview mode - do not save to database"
-    )
     parser.add_argument(
         "--debug", "-d", action="store_true", help="Enable debug logging (extensive output)"
     )
@@ -884,10 +875,10 @@ Note:
     args = parser.parse_args()
 
     if args.interactive or args.manual:
-        return run_interactive_mode(preview=args.preview, debug=args.debug, manual=args.manual)
+        return run_interactive_mode(debug=args.debug, manual=args.manual)
     else:
         # Default: continuous mode (auto-process Stories without user input)
-        return run_state_workflow_mode(args.db, preview=args.preview, debug=args.debug)
+        return run_state_workflow_mode(args.db, debug=args.debug)
 
 
 if __name__ == "__main__":

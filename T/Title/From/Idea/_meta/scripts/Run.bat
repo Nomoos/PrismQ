@@ -1,17 +1,16 @@
 @echo off
-REM PrismQ.T.Title.From.Idea - Create Stories from Ideas
-REM Loads Ideas from database and creates 10 Stories with Titles for each
+REM PrismQ.T.Title.From.Idea - Generate AI Titles for Stories
+REM Processes Stories with state PrismQ.T.Title.From.Idea and generates titles
+REM Runs in continuous mode - press Ctrl+C to stop
 REM
 REM Usage:
-REM   Run.bat                                   Use default .env (C:/PrismQ/.env)
-REM   Run.bat --env path\to\.env                Use custom .env file
-REM   Run.bat --idea-id 123                     Process specific Idea
-REM   Run.bat --limit 5                         Process max 5 Ideas
-REM   Run.bat --json                            Output as JSON
+REM   Run.bat                                   Use default database
+REM   Run.bat --db C:\path\to\db.s3db           Use specific database
+REM   Run.bat --debug                           Enable debug logging
 REM
-REM Environment:
-REM   .env file defines WORKING_DIRECTORY where db.s3db is located
-REM   Default .env location: C:/PrismQ/.env
+REM Requirements:
+REM   Ollama must be running with qwen3:32b model
+REM   Stories must exist in state PrismQ.T.Title.From.Idea (created by module 02)
 
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
@@ -26,15 +25,17 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo ========================================
-echo PrismQ.T.Title.From.Idea - Create Stories
+echo PrismQ.T.Title.From.Idea - Continuous Mode
 echo ========================================
+echo Press Ctrl+C to stop
+echo.
 
 REM Run Python script with all arguments
 python run.py %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo ERROR: Story creation failed
+    echo ERROR: Title generation failed
     pause
     exit /b 1
 )

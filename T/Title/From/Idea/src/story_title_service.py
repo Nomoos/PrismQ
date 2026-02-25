@@ -450,7 +450,10 @@ class StoryTitleService:
         return fallback_variant, fallback_similar_titles
 
     def generate_title_for_story(
-        self, story: Story, idea: Optional[Idea] = None
+        self,
+        story: Story,
+        idea: Optional[Idea] = None,
+        precomputed_variants: Optional[List[TitleVariant]] = None,
     ) -> Optional[Title]:
         """Generate a Title (v0) for a single Story using AI.
 
@@ -459,7 +462,12 @@ class StoryTitleService:
 
         Args:
             story: The Story to generate a title for.
-            idea: Idea object for context. Required for AI title generation.
+            idea: Idea object for context. Required when precomputed_variants
+                is not provided.
+            precomputed_variants: Optional list of already-generated TitleVariant
+                objects to use instead of regenerating. When provided, ``idea``
+                is only required if variants must still be generated (i.e. this
+                list is empty or None).
 
         Returns:
             Created Title object, or None if story already has a title.
@@ -467,7 +475,7 @@ class StoryTitleService:
         Raises:
             RuntimeError: If no database connection is available.
             AIUnavailableError: If AI title generation is not available.
-            ValueError: If no Idea is provided for title generation.
+            ValueError: If no Idea is provided and variants need to be generated.
         """
         if not self._title_repo or not self._story_repo:
             raise RuntimeError("Database connection required for this operation")
@@ -476,21 +484,25 @@ class StoryTitleService:
         if self.story_has_title(story.id):
             return None
 
-        # Idea is required for AI title generation - no fallback
-        if not idea:
-            raise ValueError(
-                f"Idea object is required for AI title generation (Story ID: {story.id}). "
-                "The caller must provide a valid Idea object."
-            )
+        if precomputed_variants:
+            # Use caller-supplied variants — no AI call needed
+            variants = precomputed_variants
+        else:
+            # Idea is required for AI title generation - no fallback
+            if not idea:
+                raise ValueError(
+                    f"Idea object is required for AI title generation (Story ID: {story.id}). "
+                    "The caller must provide a valid Idea object."
+                )
 
-        # Generate title variants using AI (will raise AIUnavailableError if AI is unavailable)
-        variants = self.generate_title_variants(idea, num_variants=self.NUM_VARIANTS)
+            # Generate title variants using AI (will raise AIUnavailableError if unavailable)
+            variants = self.generate_title_variants(idea, num_variants=self.NUM_VARIANTS)
 
-        if not variants:
-            raise AIUnavailableError(
-                "AI title generation returned no variants. "
-                "Ensure Ollama is running and the model is available."
-            )
+            if not variants:
+                raise AIUnavailableError(
+                    "AI title generation returned no variants. "
+                    "Ensure Ollama is running and the model is available."
+                )
 
         # Select best title considering similarity to sibling titles
         best_variant, similar_titles = self.select_best_title(variants, story)

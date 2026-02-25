@@ -22,10 +22,10 @@ from pathlib import Path
 from typing import Optional
 
 # Setup paths
-SCRIPT_DIR = Path(__file__).parent.absolute()
-CONTENT_FROM_IDEA_TITLE_ROOT = SCRIPT_DIR.parent
-T_ROOT = CONTENT_FROM_IDEA_TITLE_ROOT.parent.parent.parent
-REPO_ROOT = T_ROOT.parent
+SCRIPT_DIR = Path(__file__).parent.absolute()             # .../T/Content/From/Idea/Title/src
+CONTENT_FROM_IDEA_TITLE_ROOT = SCRIPT_DIR.parent          # .../T/Content/From/Idea/Title
+T_ROOT = CONTENT_FROM_IDEA_TITLE_ROOT.parent.parent.parent.parent  # .../T
+REPO_ROOT = T_ROOT.parent                                 # repo root
 
 # Add paths for imports
 sys.path.insert(0, str(SCRIPT_DIR))
@@ -101,6 +101,65 @@ def format_wait_time(interval: float) -> str:
         return f"{interval * 1000:.0f} ms"
 
 
+def _load_workflow_config() -> Optional[dict]:
+    """Load audience settings from workflow.json next to Run.bat.
+
+    The config file is located at:
+        _meta/scripts/04_PrismQ.T.Content.From.Idea.Title/workflow.json
+
+    Expected format (all keys optional)::
+
+        {
+            "audience": {
+                "age_range": "13-23",
+                "gender": "Female",
+                "country": "United States"
+            }
+        }
+
+    If the file does not exist, is empty, or has no ``audience`` key the
+    workflow runs without audience context — audience will not be added to
+    the AI prompt.
+
+    Returns:
+        Dict with age_range, gender, country keys if all three are present
+        in the config file, else None.
+    """
+    import json as _json
+
+    config_path = (
+        REPO_ROOT
+        / "_meta"
+        / "scripts"
+        / "04_PrismQ.T.Content.From.Idea.Title"
+        / "workflow.json"
+    )
+    if not config_path.exists():
+        return None
+
+    try:
+        raw = config_path.read_text(encoding="utf-8").strip()
+        if not raw:
+            return None
+        data = _json.loads(raw)
+    except Exception as e:
+        print_warning(f"Could not read workflow.json: {e}")
+        return None
+
+    audience = data.get("audience")
+    if not audience or not isinstance(audience, dict):
+        return None
+
+    age_range = audience.get("age_range", "").strip()
+    gender = audience.get("gender", "").strip()
+    country = audience.get("country", "").strip()
+
+    if age_range and gender and country:
+        return {"age_range": age_range, "gender": gender, "country": country}
+
+    return None
+
+
 def main():
     """Main continuous workflow runner."""
     import argparse
@@ -154,6 +213,16 @@ Examples:
         print_error(f"Service module not available: {IMPORT_ERROR}")
         return 1
 
+    # Load audience from workflow.json config file (before entering the loop)
+    audience = _load_workflow_config()
+    if audience:
+        print_success(
+            f"Audience loaded from workflow.json: "
+            f"{audience['gender']}, ages {audience['age_range']}, {audience['country']}"
+        )
+    else:
+        print_info("No audience configured in workflow.json — running without audience context.")
+
     # Get database path
     try:
         db_path = Config.get_database_path()
@@ -172,7 +241,7 @@ Examples:
         return 1
 
     # Initialize service
-    service = StateBasedContentService(conn, preview_mode=args.preview)
+    service = StateBasedContentService(conn, preview_mode=args.preview, audience=audience)
     
     if args.preview:
         print_warning("PREVIEW MODE - Changes will not be saved to database")

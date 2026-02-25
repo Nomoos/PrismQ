@@ -769,13 +769,7 @@ class AIContentGenerator:
             logger.error(error_msg)
             raise RuntimeError(error_msg)
 
-        # Set default audience if not provided
-        if audience is None:
-            audience = {
-                "age_range": "13-23",
-                "gender": "Female",
-                "country": "United States",
-            }
+        # Audience is optional - if not provided, generate without audience context
 
         # Validate or pick seed
         if seed is not None:
@@ -848,8 +842,20 @@ class AIContentGenerator:
         target_words = int(target_duration * 2.5)
         max_words = int(max_duration * 2.5)
 
+        # Build role line - include audience context only if provided
+        if audience:
+            role_line = (
+                f"You are an expert video content writer specializing in engaging short-form content "
+                f"for {audience.get('gender', 'Female')} audiences aged {audience.get('age_range', '13-23')} "
+                f"in {audience.get('country', 'United States')}."
+            )
+        else:
+            role_line = (
+                "You are an expert video content writer specializing in engaging short-form content."
+            )
+
         # Optimized prompt structure for Qwen3:32b
-        prompt = f"""You are an expert video content writer specializing in engaging short-form content for {audience.get('gender', 'Female')} audiences aged {audience.get('age_range', '13-23')} in {audience.get('country', 'United States')}.
+        prompt = f"""{role_line}
 
 # Your Task
 Write compelling video narration for: "{title}"
