@@ -95,6 +95,53 @@ The Weather Girl: A coming-of-age story about a 16-year-old who wakes up one day
 
 ---
 
+## SQL Verification (db.s3db)
+
+Run these queries after the script to confirm records were written to the correct tables.
+
+### Ověření – naposledy přidané záznamy Idea
+```sql
+SELECT id, version, created_at, substr(text, 1, 80) AS text_preview
+FROM Idea
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+### Ověření – naposledy přidané záznamy Inspiration (zdroj: user)
+```sql
+SELECT id, source, source_id, title, created_at
+FROM Inspiration
+WHERE source = 'user'
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+### Ověření – propojení IdeaInspiration (naposledy přidané)
+```sql
+SELECT ii.id, ii.idea_id, ii.inspiration_id, ii.created_at
+FROM IdeaInspiration ii
+ORDER BY ii.created_at DESC
+LIMIT 10;
+```
+
+### Ověření – kompletní přehled (Idea + Inspiration dohromady)
+```sql
+SELECT
+    i.id        AS idea_id,
+    i.version,
+    i.created_at AS idea_created_at,
+    insp.source,
+    insp.source_id,
+    substr(i.text, 1, 80) AS text_preview
+FROM Idea i
+JOIN IdeaInspiration ii ON ii.idea_id = i.id
+JOIN Inspiration insp ON insp.id = ii.inspiration_id
+ORDER BY i.created_at DESC
+LIMIT 10;
+```
+
+---
+
 ## Success Criteria
 
 - [ ] 10 Idea objects are generated from a single input (one per flavor variant)
@@ -126,7 +173,12 @@ Sample Idea ID: [id]
 Sample Idea Text: [first sentence of generated idea]
 
 ### Database Written:
-[confirm ideas were saved, e.g. "10 rows inserted into Idea table"]
+Idea rows inserted:        [count, expected 10]
+Inspiration rows inserted: [count, expected 1]
+IdeaInspiration rows:      [count, expected 10]
+
+### SQL Verification Results:
+[paste output of the "kompletní přehled" query above]
 
 ### Status: [PASS/FAIL]
 ### Notes:
