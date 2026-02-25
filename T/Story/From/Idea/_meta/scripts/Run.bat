@@ -15,7 +15,7 @@ set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
 REM Setup Python virtual environment
-call "%SCRIPT_DIR%setup_env.bat"
+call "%SCRIPT_DIR%..\..\..\..\..\..\\_meta\scripts\common\setup_env.bat" "%SCRIPT_DIR%..\.."
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo ERROR: Failed to setup Python environment
