@@ -39,12 +39,12 @@ sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 
 # Import review modules
 try:
-    from by_title_v2 import (
+    from review_script_from_title_v2 import (
         compare_reviews,
         extract_improvements_from_review,
         get_next_steps,
         is_ready_to_proceed,
-        review_content_by_title_v2,
+        review_script_from_title_v2,
     )
 
     REVIEW_V2_AVAILABLE = True
@@ -53,7 +53,7 @@ except ImportError as e:
     IMPORT_ERROR_V2 = str(e)
 
 try:
-    from script_review_by_title import review_content_by_title
+    from review_script_from_title import review_script_from_title
 
     REVIEW_AVAILABLE = True
 except ImportError as e:
@@ -385,7 +385,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
             review = None
 
             if REVIEW_V2_AVAILABLE and idea:
-                review = review_content_by_title_v2(
+                review = review_script_from_title_v2(
                     content_text=content_text,
                     title=title_text,
                     idea=idea,
@@ -393,7 +393,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False):
                     title_version="v1",
                 )
             elif REVIEW_AVAILABLE and idea:
-                review = review_content_by_title(
+                review = review_script_from_title(
                     content_text=content_text, title=title_text, idea=idea
                 )
 

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from T.Review.Title.From.Content.Idea.by_content_and_idea import (
+from T.Review.Title.From.Content.Idea.review_title_from_content_idea import (
     AlignmentAnalysis,
     analyze_engagement,
     analyze_seo,
@@ -208,7 +208,7 @@ def _generate_seo_feedback(delta: int) -> str:
         return "SEO optimization significantly worse"
 
 
-def review_title_by_content_v2(
+def review_title_from_content_v2(
     title_text: str,
     content_text: str,
     title_id: Optional[str] = None,
@@ -249,12 +249,12 @@ def review_title_by_content_v2(
         TypeError: If parameters are of incorrect type
 
     Example:
-        >>> v1_review = review_title_by_content_and_idea(
+        >>> v1_review = review_title_from_content_idea(
         ...     title_text="The Echo",
         ...     content_text="A horror short...",
         ...     idea_summary="Horror story"
         ... )
-        >>> v2_review = review_title_by_content_v2(
+        >>> v2_review = review_title_from_content_v2(
         ...     title_text="The Echo - A Haunting Discovery",
         ...     content_text="Enhanced horror short...",
         ...     previous_review=v1_review

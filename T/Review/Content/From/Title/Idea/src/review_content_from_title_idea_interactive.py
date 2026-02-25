@@ -43,7 +43,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 # Import review modules
 try:
-    from by_title_and_idea import review_content_by_title_and_idea
+    from review_content_from_title_idea import review_content_from_title_idea
     REVIEW_AVAILABLE = True
 except ImportError as e:
     REVIEW_AVAILABLE = False
@@ -637,7 +637,7 @@ def run_interactive_mode(preview_mode: bool = False, debug: bool = False) -> Non
 
             # Perform review
             print_info("Analyzing script...")
-            review = review_content_by_title_and_idea(
+            review = review_content_from_title_idea(
                 content_text=content_text,
                 title=title_text,
                 idea=idea,

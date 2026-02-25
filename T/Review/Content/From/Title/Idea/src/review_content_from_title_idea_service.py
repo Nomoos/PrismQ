@@ -56,7 +56,7 @@ except ImportError:
 
 # Try to import the review function
 try:
-    from T.Review.Content.by_title_and_idea import review_content_by_title_and_idea
+    from T.Review.Content.review_content_from_title_idea import review_content_from_title_idea
     REVIEW_AVAILABLE = True
 except ImportError:
     REVIEW_AVAILABLE = False
@@ -206,7 +206,7 @@ class ReviewContentFromTitleIdeaService:
             idea_obj = _IdeaContext(idea_text) if idea_text else None
 
             # Review includes idea context
-            review_result = review_content_by_title_and_idea(
+            review_result = review_content_from_title_idea(
                 script_text=content.text,
                 title_text=title.text,
                 idea=idea_obj,

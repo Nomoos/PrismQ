@@ -8,20 +8,20 @@ Supports:
 - v2+ reviews: Refined scripts against refined titles with improvement tracking
 """
 
-from .by_title_v2 import (
+from .review_script_from_title_v2 import (
     ImprovementComparison,
     compare_reviews,
     extract_improvements_from_review,
     get_next_steps,
     is_ready_to_proceed,
-    review_content_by_title_v2,
+    review_script_from_title_v2,
 )
-from .script_review_by_title import AlignmentScore, review_content_by_title
+from .review_script_from_title import AlignmentScore, review_script_from_title
 
 __all__ = [
-    "review_content_by_title",
+    "review_script_from_title",
     "AlignmentScore",
-    "review_content_by_title_v2",
+    "review_script_from_title_v2",
     "ImprovementComparison",
     "compare_reviews",
     "extract_improvements_from_review",

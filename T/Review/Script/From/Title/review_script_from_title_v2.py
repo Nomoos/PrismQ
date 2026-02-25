@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from T.Review.Content.ByTitle.script_review_by_title import (
+from T.Review.Script.From.Title.review_script_from_title import (
     AlignmentScore,
     _analyze_idea_alignment,
     _analyze_title_alignment,
@@ -207,7 +207,7 @@ def _generate_category_feedback(category: str, delta: int) -> str:
         return f"{category.capitalize()} significantly worse - review needed"
 
 
-def review_content_by_title_v2(
+def review_script_from_title_v2(
     content_text: str,
     title: str,
     idea: Idea,
@@ -216,7 +216,7 @@ def review_content_by_title_v2(
     title_version: str = "v3",
     target_length_seconds: Optional[int] = None,
     previous_review: Optional[ScriptReview] = None,
-    reviewer_id: str = "AI-ScriptReviewer-ByTitle-v2-001",
+    reviewer_id: str = "AI-ScriptReviewer-FromTitle-v2-001",
 ) -> ScriptReview:
     """Review script v2 against title v3 with improvement tracking.
 
@@ -251,10 +251,10 @@ def review_content_by_title_v2(
         ...     genre=ContentGenre.HORROR
         ... )
         >>> # First review (v1)
-        >>> v1_review = review_content_by_title(script_v1, title_v1, idea)
+        >>> v1_review = review_script_from_title(script_v1, title_v1, idea)
         >>>
         >>> # Second review (v2 script against v3 title)
-        >>> v2_review = review_content_by_title_v2(
+        >>> v2_review = review_script_from_title_v2(
         ...     content_text=script_v2,
         ...     title=title_v3,
         ...     idea=idea,
@@ -268,7 +268,7 @@ def review_content_by_title_v2(
         content_id = f"script-{idea.title.lower().replace(' ', '-')}-{script_version}"
 
     # Perform base review using existing logic
-    base_review = review_content_by_title(
+    base_review = review_script_from_title(
         content_text=content_text,
         title=title,
         idea=idea,

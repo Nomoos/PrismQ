@@ -10,14 +10,14 @@ The reviewer provides:
 - Actionable improvement recommendations
 
 Workflow Position:
-    Idea + Title v1 → Content v1 → ByTitle Review → Feedback/Approval
+    Idea + Title v1 → Content v1 → ByTitleAndIdea Review → Feedback/Approval
 """
 
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from T.Review.Content.script_review import (
+from .script_review import (
     CategoryScore,
     ContentLength,
     ImprovementPoint,
@@ -27,7 +27,7 @@ from T.Review.Content.script_review import (
 
 # Use TYPE_CHECKING to avoid runtime import issues
 if TYPE_CHECKING:
-    from T.Idea.Model.src.idea import Idea
+    from src.idea import Idea
 else:
     # At runtime, we'll accept any object with the right attributes
     Idea = Any
@@ -124,13 +124,13 @@ class AlignmentScore:
     reasoning: str
 
 
-def review_content_by_title(
+def review_script_from_title_idea(
     content_text: str,
     title: str,
     idea: Idea,
     content_id: Optional[str] = None,
     target_length_seconds: Optional[int] = None,
-    reviewer_id: str = "AI-ScriptReviewer-ByTitle-001",
+    reviewer_id: str = "AI-ScriptReviewer-FromTitleIdea-001",
 ) -> ScriptReview:
     """Review script v1 against title v1 and idea.
 
@@ -153,7 +153,7 @@ def review_content_by_title(
         ScriptReview object with scores, feedback, and improvement points
 
     Example:
-        >>> from T.Idea.Model.src.idea import Idea, ContentGenre
+        >>> from T.Idea.Model import Idea, ContentGenre
         >>> idea = Idea(
         ...     title="The Echo",
         ...     concept="A girl hears her own future voice warning her",
@@ -162,7 +162,7 @@ def review_content_by_title(
         ... )
         >>> title = "The Voice That Knows Tomorrow"
         >>> script = "Last night I heard a whisper..."
-        >>> review = review_content_by_title(script, title, idea)
+        >>> review = review_script_from_title_idea(script, title, idea)
         >>> print(f"Overall score: {review.overall_score}%")
     """
     # Generate script ID if not provided

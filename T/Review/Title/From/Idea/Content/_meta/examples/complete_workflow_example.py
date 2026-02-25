@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root))
 from T.Review.Title.From.Content.Idea import (
     TitleReview,
     TitleReviewCategory,
-    review_title_by_content_and_idea,
+    review_title_from_content_idea,
 )
 
 
@@ -52,7 +52,7 @@ def example_complete_workflow():
 
     # Perform AI review
     print("\n[AI REVIEWER ANALYZING TITLE...]")
-    review = review_title_by_content_and_idea(
+    review = review_title_from_content_idea(
         title_text=title,
         content_text=script,
         idea_summary=idea_summary,
@@ -181,7 +181,7 @@ def example_json_output():
     print("=" * 80)
 
     # Perform review
-    review = review_title_by_content_and_idea(
+    review = review_title_from_content_idea(
         title_text="The Echo",
         content_text="A mysterious echo haunts an abandoned house, revealing dark secrets.",
         idea_summary="Horror story about echoes revealing secrets",
@@ -228,7 +228,7 @@ def example_comparison():
 
     results = []
     for title in titles:
-        review = review_title_by_content_and_idea(
+        review = review_title_from_content_idea(
             title_text=title, content_text=script, idea_summary=idea
         )
         results.append((title, review))
@@ -265,7 +265,7 @@ def example_iterative_improvement():
     # Iteration 1
     print("\n[Iteration 1: Initial Title]")
     title_v1 = "A House Story"
-    review_v1 = review_title_by_content_and_idea(
+    review_v1 = review_title_from_content_idea(
         title_text=title_v1, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v1}'")
@@ -275,7 +275,7 @@ def example_iterative_improvement():
     # Iteration 2 (hypothetical improvement based on feedback)
     print("\n[Iteration 2: After Improvements]")
     title_v2 = "The Echo Mystery"
-    review_v2 = review_title_by_content_and_idea(
+    review_v2 = review_title_from_content_idea(
         title_text=title_v2, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v2}'")
@@ -285,7 +285,7 @@ def example_iterative_improvement():
     # Iteration 3
     print("\n[Iteration 3: Further Refinement]")
     title_v3 = "The Echoing Secrets: Mystery in the Abandoned House"
-    review_v3 = review_title_by_content_and_idea(
+    review_v3 = review_title_from_content_idea(
         title_text=title_v3, content_text=script, idea_summary=idea
     )
     print(f"Title: '{title_v3}'")

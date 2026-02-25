@@ -495,7 +495,7 @@ def generate_improvement_points(
     return improvements
 
 
-def review_title_by_content_and_idea(
+def review_title_from_content_idea(
     title_text: str,
     content_text: str,
     idea_summary: str,
@@ -507,7 +507,7 @@ def review_title_by_content_and_idea(
     target_audience: Optional[str] = None,
     title_version: str = "v1",
     script_version: str = "v1",
-    reviewer_id: str = "AI-TitleReviewer-001",
+    reviewer_id: str = "AI-TitleReviewer-FromContentIdea-001",
 ) -> TitleReview:
     """Review title v1 against script v1 and idea.
 
@@ -537,7 +537,7 @@ def review_title_by_content_and_idea(
         TitleReview object with comprehensive scores, feedback, and improvement points
 
     Example:
-        >>> review = review_title_by_content_and_idea(
+        >>> review = review_title_from_content_idea(
         ...     title_text="The Echo - A Haunting Discovery",
         ...     content_text="In the abandoned house, echoes reveal dark secrets...",
         ...     idea_summary="Horror story about mysterious echoes",

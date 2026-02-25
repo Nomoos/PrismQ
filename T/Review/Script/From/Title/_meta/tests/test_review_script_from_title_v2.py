@@ -16,8 +16,8 @@ from T.Review.Content.ByTitle import (
     extract_improvements_from_review,
     get_next_steps,
     is_ready_to_proceed,
-    review_content_by_title,
-    review_content_by_title_v2,
+    review_script_from_title,
+    review_script_from_title_v2,
 )
 from T.Review.Content.script_review import ContentLength, ReviewCategory
 
@@ -81,7 +81,7 @@ class TestReviewScriptByTitleV2:
 
     def test_basic_v2_review(self, script_v2, title_v3, sample_idea):
         """Test basic v2 script review functionality."""
-        review = review_content_by_title_v2(content_text=script_v2, title=title_v3, idea=sample_idea)
+        review = review_script_from_title_v2(content_text=script_v2, title=title_v3, idea=sample_idea)
 
         assert review is not None
         assert review.script_title == title_v3
@@ -91,7 +91,7 @@ class TestReviewScriptByTitleV2:
 
     def test_v2_review_includes_version_metadata(self, script_v2, title_v3, sample_idea):
         """Test that v2 review includes version information in metadata."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             content_text=script_v2,
             title=title_v3,
             idea=sample_idea,
@@ -108,10 +108,10 @@ class TestReviewScriptByTitleV2:
     ):
         """Test v2 review with comparison to v1 review."""
         # Create v1 review
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
 
         # Create v2 review with comparison
-        v2_review = review_content_by_title_v2(
+        v2_review = review_script_from_title_v2(
             content_text=script_v2, title=title_v3, idea=sample_idea, previous_review=v1_review
         )
 
@@ -121,7 +121,7 @@ class TestReviewScriptByTitleV2:
 
     def test_v2_review_without_previous_review(self, script_v2, title_v3, sample_idea):
         """Test v2 review without previous review for comparison."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             content_text=script_v2, title=title_v3, idea=sample_idea, previous_review=None
         )
 
@@ -130,7 +130,7 @@ class TestReviewScriptByTitleV2:
 
     def test_v2_review_with_custom_versions(self, script_v2, title_v3, sample_idea):
         """Test v2 review with custom version strings."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             content_text=script_v2,
             title=title_v3,
             idea=sample_idea,
@@ -143,7 +143,7 @@ class TestReviewScriptByTitleV2:
 
     def test_v2_review_generates_version_specific_content_id(self, script_v2, title_v3, sample_idea):
         """Test that v2 review generates script ID with version."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             content_text=script_v2, title=title_v3, idea=sample_idea, script_version="v2"
         )
 
@@ -151,7 +151,7 @@ class TestReviewScriptByTitleV2:
 
     def test_v2_review_with_target_length(self, script_v2, title_v3, sample_idea):
         """Test v2 review with target length specified."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             content_text=script_v2, title=title_v3, idea=sample_idea, target_length_seconds=60
         )
 
@@ -164,8 +164,8 @@ class TestImprovementComparison:
 
     def test_compare_reviews_basic(self, script_v1, script_v2, title_v1, title_v3, sample_idea):
         """Test basic review comparison."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title(script_v2, title_v3, sample_idea)
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title(script_v2, title_v3, sample_idea)
 
         comparisons = compare_reviews(v1_review, v2_review)
 
@@ -174,7 +174,7 @@ class TestImprovementComparison:
 
     def test_compare_reviews_with_none(self, script_v2, title_v3, sample_idea):
         """Test comparison with None as v1 review."""
-        v2_review = review_content_by_title(script_v2, title_v3, sample_idea)
+        v2_review = review_script_from_title(script_v2, title_v3, sample_idea)
 
         comparisons = compare_reviews(None, v2_review)
 
@@ -184,8 +184,8 @@ class TestImprovementComparison:
         self, script_v1, script_v2, title_v1, title_v3, sample_idea
     ):
         """Test that improvement comparisons have expected structure."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title(script_v2, title_v3, sample_idea)
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title(script_v2, title_v3, sample_idea)
 
         comparisons = compare_reviews(v1_review, v2_review)
 
@@ -202,8 +202,8 @@ class TestImprovementComparison:
 
     def test_improvement_detection(self, script_v1, script_v2, title_v1, title_v3, sample_idea):
         """Test detection of improvements."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title(script_v2, title_v3, sample_idea)
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title(script_v2, title_v3, sample_idea)
 
         comparisons = compare_reviews(v1_review, v2_review)
 
@@ -227,8 +227,8 @@ class TestImprovementComparison:
 
         poor_content = "Short."
 
-        v1_review = review_content_by_title(good_content, "The Echo Voice", sample_idea)
-        v2_review = review_content_by_title(poor_content, "Title", sample_idea)
+        v1_review = review_script_from_title(good_content, "The Echo Voice", sample_idea)
+        v2_review = review_script_from_title(poor_content, "Title", sample_idea)
 
         comparisons = compare_reviews(v1_review, v2_review)
 
@@ -238,8 +238,8 @@ class TestImprovementComparison:
 
     def test_maintained_score_detection(self, script_v2, title_v3, sample_idea):
         """Test detection of maintained scores."""
-        v1_review = review_content_by_title(script_v2, title_v3, sample_idea)
-        v2_review = review_content_by_title(script_v2, title_v3, sample_idea)
+        v1_review = review_script_from_title(script_v2, title_v3, sample_idea)
+        v2_review = review_script_from_title(script_v2, title_v3, sample_idea)
 
         comparisons = compare_reviews(v1_review, v2_review)
 
@@ -255,8 +255,8 @@ class TestComparisonMetadata:
         self, script_v1, script_v2, title_v1, title_v3, sample_idea
     ):
         """Test that improvements count is tracked in metadata."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title_v2(
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title_v2(
             script_v2, title_v3, sample_idea, previous_review=v1_review
         )
 
@@ -267,8 +267,8 @@ class TestComparisonMetadata:
         self, script_v1, script_v2, title_v1, title_v3, sample_idea
     ):
         """Test that improvement summary is included in metadata."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title_v2(
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title_v2(
             script_v2, title_v3, sample_idea, previous_review=v1_review
         )
 
@@ -291,8 +291,8 @@ class TestComparisonMetadata:
 
         poor_content = "Test."
 
-        v1_review = review_content_by_title(good_content, "The Echo Voice Future", sample_idea)
-        v2_review = review_content_by_title_v2(
+        v1_review = review_script_from_title(good_content, "The Echo Voice Future", sample_idea)
+        v2_review = review_script_from_title_v2(
             poor_content, "Title", sample_idea, previous_review=v1_review
         )
 
@@ -309,7 +309,7 @@ class TestHelperFunctions:
 
     def test_extract_improvements_from_review(self, script_v2, title_v3, sample_idea):
         """Test extraction of improvements from review."""
-        review = review_content_by_title_v2(script_v2, title_v3, sample_idea)
+        review = review_script_from_title_v2(script_v2, title_v3, sample_idea)
 
         improvements = extract_improvements_from_review(review)
 
@@ -334,7 +334,7 @@ class TestHelperFunctions:
 
         title = "The Voice That Knows Tomorrow"
 
-        review = review_content_by_title_v2(good_content, title, sample_idea)
+        review = review_script_from_title_v2(good_content, title, sample_idea)
 
         # Should be ready if score is high enough
         ready = is_ready_to_proceed(review, threshold=60)
@@ -345,14 +345,14 @@ class TestHelperFunctions:
         poor_content = "Short."
         title = "Random Title"
 
-        review = review_content_by_title_v2(poor_content, title, sample_idea)
+        review = review_script_from_title_v2(poor_content, title, sample_idea)
 
         ready = is_ready_to_proceed(review, threshold=80)
         assert ready == False
 
     def test_get_next_steps_basic(self, script_v2, title_v3, sample_idea):
         """Test generation of next steps."""
-        review = review_content_by_title_v2(script_v2, title_v3, sample_idea)
+        review = review_script_from_title_v2(script_v2, title_v3, sample_idea)
 
         steps = get_next_steps(review)
 
@@ -377,7 +377,7 @@ class TestHelperFunctions:
 
         title = "The Voice That Knows Tomorrow - An Echo from the Future"
 
-        review = review_content_by_title_v2(excellent_content, title, sample_idea)
+        review = review_script_from_title_v2(excellent_content, title, sample_idea)
         steps = get_next_steps(review)
 
         # Should suggest proceeding if quality is high
@@ -389,7 +389,7 @@ class TestHelperFunctions:
         poor_content = "Test."
         title = "Title"
 
-        review = review_content_by_title_v2(poor_content, title, sample_idea)
+        review = review_script_from_title_v2(poor_content, title, sample_idea)
         steps = get_next_steps(review)
 
         # Should suggest improvements
@@ -401,7 +401,7 @@ class TestJSONOutput:
 
     def test_v2_review_can_be_converted_to_dict(self, script_v2, title_v3, sample_idea):
         """Test that v2 review can be converted to dictionary."""
-        review = review_content_by_title_v2(script_v2, title_v3, sample_idea)
+        review = review_script_from_title_v2(script_v2, title_v3, sample_idea)
 
         review_dict = review.to_dict()
 
@@ -414,7 +414,7 @@ class TestJSONOutput:
 
     def test_v2_json_output_includes_version_info(self, script_v2, title_v3, sample_idea):
         """Test that JSON output includes version information."""
-        review = review_content_by_title_v2(
+        review = review_script_from_title_v2(
             script_v2, title_v3, sample_idea, script_version="v2", title_version="v3"
         )
 
@@ -428,8 +428,8 @@ class TestJSONOutput:
         self, script_v1, script_v2, title_v1, title_v3, sample_idea
     ):
         """Test that JSON output includes comparison data when available."""
-        v1_review = review_content_by_title(script_v1, title_v1, sample_idea)
-        v2_review = review_content_by_title_v2(
+        v1_review = review_script_from_title(script_v1, title_v1, sample_idea)
+        v2_review = review_script_from_title_v2(
             script_v2, title_v3, sample_idea, previous_review=v1_review
         )
 
@@ -444,7 +444,7 @@ class TestEdgeCases:
 
     def test_v2_review_handles_empty_content(self, title_v3, sample_idea):
         """Test v2 review handling of empty script."""
-        review = review_content_by_title_v2("", title_v3, sample_idea)
+        review = review_script_from_title_v2("", title_v3, sample_idea)
 
         assert review is not None
         assert review.needs_major_revision == True
@@ -453,7 +453,7 @@ class TestEdgeCases:
         """Test v2 review handling of very long script."""
         long_content = "This is a test sentence. " * 1000
 
-        review = review_content_by_title_v2(long_content, title_v3, sample_idea)
+        review = review_script_from_title_v2(long_content, title_v3, sample_idea)
 
         assert review is not None
         assert review.current_length_seconds > 100
@@ -462,7 +462,7 @@ class TestEdgeCases:
         """Test v2 review with minimal idea object."""
         idea = Idea(title="Minimal", concept="", genre=ContentGenre.HORROR)
 
-        review = review_content_by_title_v2("Test script.", "Title", idea)
+        review = review_script_from_title_v2("Test script.", "Title", idea)
 
         assert review is not None
         assert review.overall_score >= 0
@@ -476,7 +476,7 @@ class TestEdgeCases:
         """
         title = "Special @#$ Characters!"
 
-        review = review_content_by_title_v2(script, title, sample_idea)
+        review = review_script_from_title_v2(script, title, sample_idea)
 
         assert review is not None
         assert review.overall_score >= 0

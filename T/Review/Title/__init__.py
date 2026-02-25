@@ -10,7 +10,7 @@ try:
         TitleImprovementPoint,
         TitleReview,
         TitleReviewCategory,
-        review_title_by_content_and_idea,
+        review_title_from_content_idea,
     )
 
     _has_v1 = True
@@ -23,7 +23,7 @@ try:
         ImprovementComparison,
         compare_reviews,
         get_improvement_summary,
-        review_title_by_content_v2,
+        review_title_from_content_v2,
     )
 
     _has_v2 = True
@@ -35,7 +35,7 @@ __all__ = []
 if _has_v1:
     __all__.extend(
         [
-            "review_title_by_content_and_idea",
+            "review_title_from_content_idea",
             "TitleReview",
             "TitleReviewCategory",
             "TitleImprovementPoint",
@@ -46,7 +46,7 @@ if _has_v1:
 if _has_v2:
     __all__.extend(
         [
-            "review_title_by_content_v2",
+            "review_title_from_content_v2",
             "compare_reviews",
             "get_improvement_summary",
             "ImprovementComparison",

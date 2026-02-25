@@ -10,7 +10,7 @@ project_root = Path(__file__).parent.parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.idea import ContentGenre, Idea
-from T.Review.Content.ByTitle import AlignmentScore, review_content_by_title
+from T.Review.Content.ByTitle import AlignmentScore, review_script_from_title
 from T.Review.Content.script_review import ContentLength, ReviewCategory
 
 
@@ -53,7 +53,7 @@ class TestReviewScriptByTitle:
     def test_basic_review(self, sample_content, sample_idea):
         """Test basic script review functionality."""
         title = "The Voice That Knows Tomorrow"
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         assert review is not None
         assert review.script_title == title
@@ -70,7 +70,7 @@ class TestReviewScriptByTitle:
         The echo is my only hope. The echo, the echo, the echo...
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         # Should have good alignment since "echo" appears multiple times
         assert review.overall_score >= 60
@@ -85,7 +85,7 @@ class TestReviewScriptByTitle:
         He would run in the park every day and chase butterflies.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         # Should have lower score due to poor alignment
         assert review.overall_score < 80
@@ -96,7 +96,7 @@ class TestReviewScriptByTitle:
         title = "The Voice That Knows Tomorrow"
         custom_id = "my-custom-script-123"
 
-        review = review_content_by_title(sample_content, title, sample_idea, content_id=custom_id)
+        review = review_script_from_title(sample_content, title, sample_idea, content_id=custom_id)
 
         assert review.content_id == custom_id
 
@@ -104,7 +104,7 @@ class TestReviewScriptByTitle:
         """Test that default script ID is generated."""
         title = "The Voice That Knows Tomorrow"
 
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         assert review.content_id is not None
         assert "script-" in review.content_id
@@ -115,7 +115,7 @@ class TestReviewScriptByTitle:
         title = "The Voice That Knows Tomorrow"
 
         # Note: sample_idea has length_target="90 seconds" which takes priority
-        review = review_content_by_title(sample_content, title, sample_idea, target_length_seconds=60)
+        review = review_script_from_title(sample_content, title, sample_idea, target_length_seconds=60)
 
         # Idea's length_target takes priority, so we get YOUTUBE_SHORT_EXTENDED
         assert review.target_length == ContentLength.YOUTUBE_SHORT_EXTENDED
@@ -126,7 +126,7 @@ class TestReviewScriptByTitle:
         """Test that script length is estimated."""
         title = "The Voice That Knows Tomorrow"
 
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         assert review.current_length_seconds is not None
         assert review.current_length_seconds > 0
@@ -144,7 +144,7 @@ class TestAlignmentAnalysis:
         Echo, echo, echo... the voice wouldn't stop.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
         title_score = int(review.metadata.get("title_alignment_score", "0"))
 
         assert title_score >= 70
@@ -158,7 +158,7 @@ class TestAlignmentAnalysis:
         They enjoyed the sunshine and the fresh air very much.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
         title_score = int(review.metadata.get("title_alignment_score", "0"))
 
         assert title_score < 60
@@ -172,7 +172,7 @@ class TestAlignmentAnalysis:
         The voice knows what will happen tomorrow and tries to warn me.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
         idea_score = int(review.metadata.get("idea_alignment_score", "0"))
 
         # Should have decent idea alignment
@@ -186,7 +186,7 @@ class TestAlignmentAnalysis:
         my heart. The nightmare was real, and I was scared beyond belief.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         # Horror genre words should boost alignment
         assert review.overall_score > 0
@@ -203,7 +203,7 @@ class TestContentScoring:
         before you make it. Last night, everything changed suddenly!
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         # Should have good engagement due to questions and strong words
         engagement = review.get_category_score(ReviewCategory.ENGAGEMENT)
@@ -224,7 +224,7 @@ class TestContentScoring:
         to provide satisfying conclusion without dragging on too long here.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         pacing = review.get_category_score(ReviewCategory.PACING)
         assert pacing is not None
@@ -238,7 +238,7 @@ class TestContentScoring:
         Each sentence is concise. The meaning is obvious. Good clarity here.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         clarity = review.get_category_score(ReviewCategory.CLARITY)
         assert clarity is not None
@@ -253,7 +253,7 @@ class TestContentScoring:
         But then joy returned, and I felt grateful and proud of my journey.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         impact = review.get_category_score(ReviewCategory.IMPACT)
         assert impact is not None
@@ -268,7 +268,7 @@ class TestImprovementGeneration:
         title = "Quantum Physics"
         script = "Short text."
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert len(review.improvement_points) > 0
         assert review.needs_major_revision == True
@@ -278,7 +278,7 @@ class TestImprovementGeneration:
         title = "Test Title"
         script = "Very short script that needs improvement overall here."
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         for improvement in review.improvement_points:
             assert improvement.impact_score > 0
@@ -290,7 +290,7 @@ class TestImprovementGeneration:
         title = "Poor Content"
         script = "Needs work."
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         if len(review.improvement_points) > 1:
             for i in range(len(review.improvement_points) - 1):
@@ -304,7 +304,7 @@ class TestImprovementGeneration:
         title = "Needs Improvement"
         script = "Short script."
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         # Should have some quick wins if there are high-impact improvements
         if any(imp.impact_score >= 15 for imp in review.improvement_points[:3]):
@@ -323,7 +323,7 @@ class TestTargetLengthDetermination:
             length_target="60 seconds",
         )
 
-        review = review_content_by_title("Test script here.", "Title", idea)
+        review = review_script_from_title("Test script here.", "Title", idea)
 
         assert review.target_length in [
             ContentLength.YOUTUBE_SHORT,
@@ -334,7 +334,7 @@ class TestTargetLengthDetermination:
         """Test YouTube short detection from target_length_seconds."""
         idea = Idea(title="Video", concept="Content", genre=ContentGenre.EDUCATIONAL)
 
-        review = review_content_by_title("Test script.", "Title", idea, target_length_seconds=45)
+        review = review_script_from_title("Test script.", "Title", idea, target_length_seconds=45)
 
         assert review.target_length == ContentLength.YOUTUBE_SHORT
         assert review.is_youtube_short == True
@@ -348,7 +348,7 @@ class TestTargetLengthDetermination:
             length_target="3 minutes",
         )
 
-        review = review_content_by_title("Test script content.", "Title", idea)
+        review = review_script_from_title("Test script content.", "Title", idea)
 
         assert review.target_length == ContentLength.SHORT_FORM
 
@@ -361,7 +361,7 @@ class TestTargetLengthDetermination:
             target_platforms=["tiktok"],
         )
 
-        review = review_content_by_title("Test script.", "Title", idea)
+        review = review_script_from_title("Test script.", "Title", idea)
 
         assert review.target_length == ContentLength.YOUTUBE_SHORT
 
@@ -372,7 +372,7 @@ class TestMetadataAndTracking:
     def test_includes_alignment_scores_in_metadata(self, sample_content, sample_idea):
         """Test that alignment scores are included in metadata."""
         title = "The Voice"
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         assert "title_alignment_score" in review.metadata
         assert "idea_alignment_score" in review.metadata
@@ -387,7 +387,7 @@ class TestMetadataAndTracking:
         The echo and the voice became one, echoing through the voice of time.
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert len(review.strengths) > 0
 
@@ -396,7 +396,7 @@ class TestMetadataAndTracking:
         title = "Random Title"
         script = "Short."
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert review.primary_concern != ""
         assert len(review.primary_concern) > 10
@@ -410,7 +410,7 @@ class TestEdgeCases:
         title = "Title"
         script = ""
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert review is not None
         assert review.needs_major_revision == True
@@ -420,7 +420,7 @@ class TestEdgeCases:
         title = "Long Story"
         script = "This is a test sentence. " * 1000
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert review is not None
         assert review.current_length_seconds > 100
@@ -429,7 +429,7 @@ class TestEdgeCases:
         """Test handling of minimal idea object."""
         idea = Idea(title="Minimal", concept="", genre=ContentGenre.HORROR)
 
-        review = review_content_by_title("Test script.", "Title", idea)
+        review = review_script_from_title("Test script.", "Title", idea)
 
         assert review is not None
         assert review.overall_score >= 0
@@ -443,7 +443,7 @@ class TestEdgeCases:
         Symbols: © ® ™ € £ ¥
         """
 
-        review = review_content_by_title(script, title, sample_idea)
+        review = review_script_from_title(script, title, sample_idea)
 
         assert review is not None
         assert review.overall_score >= 0
@@ -455,7 +455,7 @@ class TestJSONOutput:
     def test_review_can_be_converted_to_dict(self, sample_content, sample_idea):
         """Test that review can be converted to dictionary."""
         title = "The Voice"
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         review_dict = review.to_dict()
 
@@ -468,7 +468,7 @@ class TestJSONOutput:
     def test_json_output_has_required_fields(self, sample_content, sample_idea):
         """Test that JSON output has all required fields."""
         title = "The Voice"
-        review = review_content_by_title(sample_content, title, sample_idea)
+        review = review_script_from_title(sample_content, title, sample_idea)
 
         review_dict = review.to_dict()
 

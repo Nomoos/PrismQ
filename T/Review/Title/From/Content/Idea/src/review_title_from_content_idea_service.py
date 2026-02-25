@@ -47,8 +47,8 @@ from Model.State.constants.state_names import StateNames
 
 # Try to import the review function
 try:
-    from T.Review.Title.From.Content.Idea.by_content_and_idea import (
-        review_title_by_content_and_idea,
+    from T.Review.Title.From.Content.Idea.review_title_from_content_idea import (
+        review_title_from_content_idea,
     )
 
     REVIEW_AVAILABLE = True
@@ -165,7 +165,7 @@ class ReviewTitleFromContentIdeaService:
         if not REVIEW_AVAILABLE:
             return self._simple_review(title_text, content_text, idea_text)
 
-        review_result = review_title_by_content_and_idea(
+        review_result = review_title_from_content_idea(
             title_text=title_text,
             content_text=content_text,
             idea_summary=idea_text,
