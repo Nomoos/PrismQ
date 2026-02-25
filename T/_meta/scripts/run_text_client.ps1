@@ -18,16 +18,19 @@ Write-Host "║                    PrismQ.T - Interactive Text Client           
 Write-Host "╚══════════════════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
-# Check Python availability
-$PythonCmd = $null
-if (Get-Command python3 -ErrorAction SilentlyContinue) {
-    $PythonCmd = "python3"
-} elseif (Get-Command python -ErrorAction SilentlyContinue) {
-    $PythonCmd = "python"
-} else {
-    Write-Host "Error: Python is not installed or not in PATH" -ForegroundColor Red
-    exit 1
+# Check for project Python, install if missing
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
+$RepoPythonExe = Join-Path $RepoRoot ".python\python.exe"
+if (-not (Test-Path $RepoPythonExe)) {
+    Write-Host "Project Python not found. Installing..." -ForegroundColor Yellow
+    $InstallScript = Join-Path $RepoRoot "_meta\scripts\common\install_python.bat"
+    cmd /c "`"$InstallScript`""
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Error: Failed to install project Python." -ForegroundColor Red
+        exit 1
+    }
 }
+$PythonCmd = $RepoPythonExe
 
 # Build arguments
 $args = @()

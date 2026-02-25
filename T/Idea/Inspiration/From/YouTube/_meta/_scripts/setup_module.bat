@@ -10,24 +10,24 @@ echo.
 REM Navigate to the YouTube module directory (two levels up from _meta/_scripts)
 cd /d "%~dp0..\.."
 
-REM Check Python installation
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
-    echo Please install Python 3.10 or higher
-    echo.
+REM Find project Python (install if needed - installs to <repo_root>\.python\)
+setlocal enabledelayedexpansion
+set "SCRIPT_DIR=%~dp0"
+call "%SCRIPT_DIR%..\..\..\..\..\..\..\_meta\scripts\common\find_python.bat"
+if !ERRORLEVEL! NEQ 0 (
+    endlocal
     pause
     exit /b 1
 )
 
 echo Python found!
-python --version
+"!PYTHON_EXE!" --version
 echo.
 
 REM Create virtual environment
 echo Creating virtual environment...
 if not exist "venv" (
-    python -m venv venv
+    "!PYTHON_EXE!" -m venv venv
     echo Virtual environment created.
 ) else (
     echo Virtual environment already exists.
@@ -90,4 +90,5 @@ echo Or directly:
 echo   python -m src.cli --help
 echo.
 
+endlocal
 pause

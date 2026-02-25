@@ -14,25 +14,21 @@ cd /d "%~dp0..\..\Backend"
 echo Current directory: %CD%
 echo.
 
-REM Check if Python is available
-python --version >nul 2>&1
+REM Find project Python (install if needed - installs to <repo_root>\.python\)
+call "%~dp0..\..\..\_meta\scripts\common\find_python.bat"
 if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
-    echo Please install Python 3.10 from https://www.python.org/downloads/
+    echo.
+    echo Please check your internet connection and try again.
+    echo.
     pause
     exit /b 1
 )
-
-REM Display Python version
-echo Python version:
-python --version
-echo.
 
 REM Check if virtual environment exists
 if not exist "venv\" (
     echo WARNING: Virtual environment not found at Backend\venv
     echo Creating virtual environment...
-    python -m venv venv
+    "%PYTHON_EXE%" -m venv venv
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment
         pause

@@ -10,40 +10,30 @@ Write-Host ""
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location (Join-Path $ScriptDir "..\..") -ErrorAction Stop
 
-# Check Python installation
-Write-Host "Checking Python installation..." -ForegroundColor Yellow
-try {
-    $PythonVersion = python --version 2>&1 | Out-String
-    Write-Host "✅ Python found!" -ForegroundColor Green
-    Write-Host "   $($PythonVersion.Trim())" -ForegroundColor Gray
-    Write-Host ""
-} catch {
-    Write-Host "❌ ERROR: Python is not installed or not in PATH" -ForegroundColor Red
-    Write-Host "   Please install Python 3.8 or higher" -ForegroundColor Yellow
-    Write-Host ""
-    Read-Host "Press Enter to exit"
-    exit 1
-}
-
-# Verify Python version is 3.8+
-$VersionMatch = $PythonVersion -match "Python (\d+)\.(\d+)"
-if ($VersionMatch) {
-    $MajorVersion = [int]$Matches[1]
-    $MinorVersion = [int]$Matches[2]
-    if ($MajorVersion -lt 3 -or ($MajorVersion -eq 3 -and $MinorVersion -lt 8)) {
-        Write-Host "❌ ERROR: Python 3.8 or higher is required" -ForegroundColor Red
-        Write-Host "   Current version: Python $MajorVersion.$MinorVersion" -ForegroundColor Yellow
+# Check for project Python, install if missing
+$RepoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $ScriptDir))))))
+$RepoPythonExe = Join-Path $RepoRoot ".python\python.exe"
+if (-not (Test-Path $RepoPythonExe)) {
+    Write-Host "Project Python not found. Installing..." -ForegroundColor Yellow
+    $InstallScript = Join-Path $RepoRoot "_meta\scripts\common\install_python.bat"
+    cmd /c "`"$InstallScript`""
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ ERROR: Failed to install project Python." -ForegroundColor Red
         Read-Host "Press Enter to exit"
         exit 1
     }
 }
+
+Write-Host "✅ Python found!" -ForegroundColor Green
+& $RepoPythonExe --version
+Write-Host ""
 
 # Create virtual environment
 Write-Host "Creating virtual environment..." -ForegroundColor Yellow
 if (Test-Path "venv") {
     Write-Host "✅ Virtual environment already exists." -ForegroundColor Green
 } else {
-    python -m venv venv
+    & $RepoPythonExe -m venv venv
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ ERROR: Failed to create virtual environment" -ForegroundColor Red
         Read-Host "Press Enter to exit"

@@ -11,34 +11,14 @@ cd /d "%~dp0"
 echo Current directory: %CD%
 echo.
 
-REM Check for Python
-set PYTHON_CMD=
-where py >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    py -3.10 --version >nul 2>&1
-    if %ERRORLEVEL% EQU 0 (
-        set PYTHON_CMD=py -3.10
-        echo Using Python Launcher: py -3.10
-    )
-)
-
-if "%PYTHON_CMD%"=="" (
-    where python3.10 >nul 2>&1
-    if %ERRORLEVEL% EQU 0 (
-        set PYTHON_CMD=python3.10
-    ) else (
-        where python >nul 2>&1
-        if %ERRORLEVEL% EQU 0 (
-            set PYTHON_CMD=python
-        )
-    )
-)
-
-if "%PYTHON_CMD%"=="" (
-    echo Error: Python not found!
-    echo Please install Python 3.10.x from https://www.python.org/downloads/
+REM Find project Python (install if needed - installs to <repo_root>\.python\)
+set "PYTHON_CMD="
+call "%~dp0..\..\..\_meta\scripts\common\find_python.bat"
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: Could not find or install Python.
     exit /b 1
 )
+set "PYTHON_CMD=%PYTHON_EXE%"
 
 echo Using: %PYTHON_CMD%
 %PYTHON_CMD% --version
