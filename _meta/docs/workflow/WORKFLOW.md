@@ -7,8 +7,8 @@
 ## State Transitions Report
 
 📊 **New Report!** For a comprehensive overview of state transitions for each module, see:
-- **[State Transitions Report](../STATE_TRANSITIONS_REPORT.md)** - Complete state transitions documentation for all modules (English)
-- **[Report přechodů stavů (CS)](../STATE_TRANSITIONS_REPORT_CS.md)** - Complete state transitions report for all modules (Czech)
+- **[State Transitions Report](./STATE_TRANSITIONS_REPORT.md)** - Complete state transitions documentation for all modules (English)
+- **[Report přechodů stavů (CS)](./STATE_TRANSITIONS_REPORT_CS.md)** - Complete state transitions report for all modules (Czech)
 
 ## Complete Documentation
 
@@ -42,9 +42,9 @@ For a complete index and navigation guide, see the [Workflow Documentation Index
 
 ## Related Documentation
 
-- [ARCHITECTURE.md](../ARCHITECTURE.md) - Overall platform architecture
-- [PROGRESSIVE_ENRICHMENT.md](../PROGRESSIVE_ENRICHMENT.md) - Multi-format content strategy
-- [QUALITY_GATES.md](../QUALITY_GATES.md) - Quality assurance framework
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) - Overall platform architecture
+- [PROGRESSIVE_ENRICHMENT.md](../architecture/PROGRESSIVE_ENRICHMENT.md) - Multi-format content strategy
+- [QUALITY_GATES.md](../guidelines/QUALITY_GATES.md) - Quality assurance framework
 
 ---
 

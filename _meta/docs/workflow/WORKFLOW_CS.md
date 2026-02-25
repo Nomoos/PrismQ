@@ -7,8 +7,8 @@
 ## Report přechodů stavů
 
 📊 **Nový report!** Pro komplexní přehled přechodů stavů pro každý modul viz:
-- **[Report přechodů stavů (CS)](../STATE_TRANSITIONS_REPORT_CS.md)** - Kompletní dokumentace přechodů stavů pro všechny moduly (česky)
-- **[State Transitions Report](../STATE_TRANSITIONS_REPORT.md)** - Complete state transitions report for all modules (English)
+- **[Report přechodů stavů (CS)](./STATE_TRANSITIONS_REPORT_CS.md)** - Kompletní dokumentace přechodů stavů pro všechny moduly (česky)
+- **[State Transitions Report](./STATE_TRANSITIONS_REPORT.md)** - Complete state transitions report for all modules (English)
 
 ## Kompletní dokumentace
 
@@ -42,9 +42,9 @@ Pro kompletní index a průvodce navigací viz [Index dokumentace workflow](./RE
 
 ## Související dokumentace
 
-- [ARCHITECTURE.md](../ARCHITECTURE.md) - Celková architektura platformy
-- [PROGRESSIVE_ENRICHMENT.md](../PROGRESSIVE_ENRICHMENT.md) - Strategie víceformátového obsahu
-- [QUALITY_GATES.md](../QUALITY_GATES.md) - Rámec zajištění kvality
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) - Celková architektura platformy
+- [PROGRESSIVE_ENRICHMENT.md](../architecture/PROGRESSIVE_ENRICHMENT.md) - Strategie víceformátového obsahu
+- [QUALITY_GATES.md](../guidelines/QUALITY_GATES.md) - Rámec zajištění kvality
 
 ---
 

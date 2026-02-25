@@ -11,9 +11,9 @@ This directory contains project-wide documentation, research, proposals, and iss
 
 ### Technical Documentation
 - **[docs/](./docs/)** - Technical guides and setup instructions
-  - [AI Models Setup](./docs/AI_MODELS_SETUP.md) - Ollama and AI configuration
+  - [AI Models Setup](./docs/setup/AI_MODELS_SETUP.md) - Ollama and AI configuration
   - [Database Objects](./docs/DATABASE.md) - Database schema reference
-  - [Storytelling Guide](./docs/STORYTELLING_GUIDE.md) - Content creation guide
+  - [Storytelling Guide](./docs/guidelines/STORYTELLING_GUIDE.md) - Content creation guide
 
 ### Research & Strategy
 - **[research/](./research/)** - Research documents and analysis
