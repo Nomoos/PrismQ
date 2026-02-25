@@ -13,6 +13,7 @@ import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 
 import pytest
 
@@ -41,6 +42,19 @@ def db_connection():
     conn.row_factory = sqlite3.Row
 
     # Create tables in correct order (dependencies first)
+    # Idea table
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS Idea (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT,
+            version INTEGER NOT NULL DEFAULT 1 CHECK (version >= 0),
+            review_id INTEGER NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    """
+    )
+
     # Title table
     conn.execute(
         """
@@ -626,21 +640,18 @@ class TestStoryRepositoryFindOldestByState:
 
         # Create stories with different creation times
         story_oldest = Story(
-            idea_json='{"title": "Oldest"}',
             state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=3),
         )
         story_repo.insert(story_oldest)
 
         story_middle = Story(
-            idea_json='{"title": "Middle"}',
             state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=1),
         )
         story_repo.insert(story_middle)
 
         story_newest = Story(
-            idea_json='{"title": "Newest"}',
             state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time,
         )
@@ -651,14 +662,13 @@ class TestStoryRepositoryFindOldestByState:
 
         assert oldest is not None
         assert oldest.id == story_oldest.id
-        assert oldest.idea_json == '{"title": "Oldest"}'
 
     def test_find_oldest_by_state_returns_none_when_empty(self, db_connection):
         """Test that find_oldest_by_state returns None when no stories match."""
         story_repo = StoryRepository(db_connection)
 
         # Create story with different state
-        story_repo.insert(Story(idea_json='{"title": "Different State"}', state="DIFFERENT_STATE"))
+        story_repo.insert(Story(state="DIFFERENT_STATE"))
 
         # Find oldest in target state
         oldest = story_repo.find_oldest_by_state(STATE_CONTENT_FROM_IDEA_TITLE)
@@ -675,7 +685,6 @@ class TestStoryRepositoryFindOldestByState:
 
         # Create story with wrong state (oldest)
         story1 = Story(
-            idea_json=json.dumps(sample_idea.to_dict()),
             state="DIFFERENT_STATE",  # Wrong state
             created_at=base_time - timedelta(hours=2),
         )
@@ -683,7 +692,6 @@ class TestStoryRepositoryFindOldestByState:
 
         # Create story with correct state (newer)
         story2 = Story(
-            idea_json=json.dumps(sample_idea.to_dict()),
             state=STATE_CONTENT_FROM_IDEA_TITLE,
             created_at=base_time - timedelta(hours=1),
         )
@@ -762,6 +770,19 @@ class TestStoryRepositoryFindOldestByState:
 class TestScriptFromIdeaTitleService:
     """Tests for ContentFromIdeaTitleService."""
 
+    def _insert_idea(self, conn, text="A girl discovers a time-loop in an abandoned house"):
+        """Helper: insert an Idea record and return its id."""
+        cursor = conn.execute("INSERT INTO Idea (text) VALUES (?)", (text,))
+        conn.commit()
+        return cursor.lastrowid
+
+    def _make_mock_script_v1(self):
+        """Helper: create a mock ContentV1 object for AI generation."""
+        mock = MagicMock()
+        mock.full_text = "Test content " * 30
+        mock.total_duration_seconds = 120
+        return mock
+
     def test_count_pending(self, db_connection, sample_idea):
         """Test counting pending stories."""
         service = ContentFromIdeaTitleService(db_connection)
@@ -772,15 +793,12 @@ class TestScriptFromIdeaTitleService:
         assert service.count_pending() == 0
 
         # Add stories in the target state
+        idea_id = self._insert_idea(db_connection)
         for i in range(3):
             story = story_repo.insert(
-                Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
-                )
+                Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
             )
-            title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
-            story.title_id = title.id
-            story_repo.update(story)
+            title_repo.insert(Title(story_id=story.id, version=i, text=f"Test Title {i}"))
 
         assert service.count_pending() == 3
 
@@ -792,30 +810,27 @@ class TestScriptFromIdeaTitleService:
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
+        idea_id = self._insert_idea(db_connection)
         base_time = datetime.now()
 
         # Create stories with different creation times
         story1 = story_repo.insert(
             Story(
-                idea_json=json.dumps(sample_idea.to_dict()),
+                idea_id=idea_id,
                 state=STATE_CONTENT_FROM_IDEA_TITLE,
                 created_at=base_time - timedelta(hours=2),
             )
         )
-        title1 = title_repo.insert(Title(story_id=story1.id, version=0, text="First Title"))
-        story1.title_id = title1.id
-        story_repo.update(story1)
+        title_repo.insert(Title(story_id=story1.id, version=0, text="First Title"))
 
         story2 = story_repo.insert(
             Story(
-                idea_json=json.dumps(sample_idea.to_dict()),
+                idea_id=idea_id,
                 state=STATE_CONTENT_FROM_IDEA_TITLE,
                 created_at=base_time,
             )
         )
-        title2 = title_repo.insert(Title(story_id=story2.id, version=0, text="Second Title"))
-        story2.title_id = title2.id
-        story_repo.update(story2)
+        title_repo.insert(Title(story_id=story2.id, version=0, text="Second Title"))
 
         # Get oldest
         oldest = service.get_oldest_story()
@@ -828,107 +843,114 @@ class TestScriptFromIdeaTitleService:
         service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
+        content_repo = ContentRepository(db_connection)
 
-        # Create a story in the target state
+        # Create an Idea record and a story referencing it
+        idea_id = self._insert_idea(db_connection)
         story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
+            Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
         )
-        title = title_repo.insert(
+        title_repo.insert(
             Title(story_id=story.id, version=0, text="The Mystery of the Abandoned House")
         )
-        story.title_id = title.id
-        story_repo.update(story)
 
-        # Process
-        result = service.process_oldest_story()
+        # Process with mocked AI
+        mock_v1 = self._make_mock_script_v1()
+        with patch.object(service.content_generator, "generate_content_v1", return_value=mock_v1):
+            result = service.process_oldest_story()
 
         assert result is not None
         assert result.success is True
         assert result.content_id is not None
-        assert result.content_v1 is not None
+        assert result.script_v1 is not None
         assert result.error is None
 
-        # Verify state changed
+        # Verify state changed and content was saved
         updated_story = story_repo.find_by_id(story.id)
         assert updated_story.state == STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
-        assert updated_story.content_id == result.content_id
+        saved_content = content_repo.find_latest_version(story.id)
+        assert saved_content is not None
+        assert saved_content.id == result.content_id
 
     def test_process_oldest_story_missing_idea(self, db_connection):
-        """Test process_oldest_story fails when story has no idea."""
-        service = StoryContentService(db_connection)
+        """Test processing a story without idea_id."""
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
 
-        # Create story without idea_json
-        story = Story(state=StateNames.SCRIPT_FROM_IDEA_TITLE)
-        story_repo.insert(story)
+        # Create a story without idea_id
+        story = story_repo.insert(Story(idea_id=None, state=STATE_CONTENT_FROM_IDEA_TITLE))
 
         result = service.process_oldest_story()
 
-        assert result is not None
         assert result.success is False
-        assert "idea_json" in result.error
+        assert result.story_id == story.id
+        assert result.error is not None
+        assert "no idea_id" in result.error
 
     def test_process_oldest_story_missing_title(self, db_connection, sample_idea):
-        """Test process_oldest_story fails when story has no title."""
-        service = StoryContentService(db_connection)
+        """Test processing a story without a title."""
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
 
-        # Create story without title_id
-        story = Story(
-            idea_json=json.dumps(sample_idea.to_dict()), state=StateNames.SCRIPT_FROM_IDEA_TITLE
+        # Create a story with idea but no Title record
+        idea_id = self._insert_idea(db_connection)
+        story = story_repo.insert(
+            Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
         )
-        story_repo.insert(story)
 
         result = service.process_oldest_story()
 
-        assert result is not None
         assert result.success is False
-        assert "title_id" in result.error
+        assert result.story_id == story.id
+        assert result.error is not None
+        assert "No title found" in result.error
 
     def test_process_oldest_story_processes_in_order(self, db_connection, sample_idea):
-        """Test that process_oldest_story processes stories in creation order."""
+        """Test that process_oldest_story processes stories in creation order (FIFO)."""
         from datetime import timedelta
 
-        service = StoryContentService(db_connection)
+        service = ContentFromIdeaTitleService(db_connection)
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
+        idea_id = self._insert_idea(db_connection)
         base_time = datetime.now()
 
         # Create multiple stories in different orders
         stories = []
         for i, offset in enumerate([2, 1, 3]):  # Creating out of order
-            story = Story(
-                idea_json=json.dumps(sample_idea.to_dict()),
-                state=StateNames.SCRIPT_FROM_IDEA_TITLE,
-                created_at=base_time - timedelta(hours=offset),
+            story = story_repo.insert(
+                Story(
+                    idea_id=idea_id,
+                    state=STATE_CONTENT_FROM_IDEA_TITLE,
+                    created_at=base_time - timedelta(hours=offset),
+                )
             )
-            story_repo.insert(story)
-            title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Title {i}"))
-            story.title_id = title.id
-            story_repo.update(story)
+            title_repo.insert(Title(story_id=story.id, version=0, text=f"Title {i}"))
             stories.append(story)
 
-        # Process first - should be the oldest (3 hours ago)
-        result1 = service.process_oldest_story()
-        assert result1.success is True
+        mock_v1 = self._make_mock_script_v1()
+        with patch.object(service.content_generator, "generate_content_v1", return_value=mock_v1):
+            # Process first - should be the oldest (3 hours ago)
+            result1 = service.process_oldest_story()
+            assert result1.success is True
 
-        # Process second - should be 2 hours ago
-        result2 = service.process_oldest_story()
-        assert result2.success is True
+            # Process second - should be 2 hours ago
+            result2 = service.process_oldest_story()
+            assert result2.success is True
 
-        # Process third - should be 1 hour ago
-        result3 = service.process_oldest_story()
-        assert result3.success is True
+            # Process third - should be 1 hour ago
+            result3 = service.process_oldest_story()
+            assert result3.success is True
 
         # No more stories to process
         result4 = service.process_oldest_story()
-        assert result4 is None
+        assert result4.story_id is None
 
         # Verify all states changed
         for story in stories:
             updated = story_repo.find_by_id(story.id)
-            assert updated.state == StateNames.REVIEW_TITLE_FROM_SCRIPT_IDEA
+            assert updated.state == STATE_REVIEW_TITLE_FROM_CONTENT_IDEA
 
     def test_process_oldest_story_no_stories(self, db_connection):
         """Test processing when no stories are pending."""
@@ -941,42 +963,6 @@ class TestScriptFromIdeaTitleService:
         assert result.error is not None
         assert "No stories found" in result.error
 
-    def test_process_oldest_story_missing_title(self, db_connection, sample_idea):
-        """Test processing a story without a title."""
-        service = ContentFromIdeaTitleService(db_connection)
-        story_repo = StoryRepository(db_connection)
-
-        # Create a story without title_id
-        story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
-        )
-
-        result = service.process_oldest_story()
-
-        assert result.success is False
-        assert result.story_id == story.id
-        assert result.error is not None
-        assert "no title_id" in result.error
-
-    def test_process_oldest_story_missing_idea(self, db_connection):
-        """Test processing a story without idea_json."""
-        service = ContentFromIdeaTitleService(db_connection)
-        story_repo = StoryRepository(db_connection)
-        title_repo = TitleRepository(db_connection)
-
-        # Create a story without idea_json
-        story = story_repo.insert(Story(idea_json=None, state=STATE_CONTENT_FROM_IDEA_TITLE))
-        title = title_repo.insert(Title(story_id=story.id, version=0, text="Test Title"))
-        story.title_id = title.id
-        story_repo.update(story)
-
-        result = service.process_oldest_story()
-
-        assert result.success is False
-        assert result.story_id == story.id
-        assert result.error is not None
-        assert "no idea_json" in result.error
-
     def test_process_all_pending(self, db_connection, sample_idea):
         """Test processing all pending stories."""
         service = ContentFromIdeaTitleService(db_connection)
@@ -984,18 +970,16 @@ class TestScriptFromIdeaTitleService:
         title_repo = TitleRepository(db_connection)
 
         # Create 3 stories in the target state
+        idea_id = self._insert_idea(db_connection)
         for i in range(3):
             story = story_repo.insert(
-                Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
-                )
+                Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
             )
-            title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
-            story.title_id = title.id
-            story_repo.update(story)
+            title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
 
-        # Process all
-        results = service.process_all_pending()
+        mock_v1 = self._make_mock_script_v1()
+        with patch.object(service.content_generator, "generate_content_v1", return_value=mock_v1):
+            results = service.process_all_pending()
 
         assert len(results) == 3
         assert all(r.success for r in results)
@@ -1010,18 +994,16 @@ class TestScriptFromIdeaTitleService:
         title_repo = TitleRepository(db_connection)
 
         # Create 5 stories
+        idea_id = self._insert_idea(db_connection)
         for i in range(5):
             story = story_repo.insert(
-                Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
-                )
+                Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
             )
-            title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
-            story.title_id = title.id
-            story_repo.update(story)
+            title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
 
-        # Process only 2
-        results = service.process_all_pending(limit=2)
+        mock_v1 = self._make_mock_script_v1()
+        with patch.object(service.content_generator, "generate_content_v1", return_value=mock_v1):
+            results = service.process_all_pending(limit=2)
 
         assert len(results) == 2
         assert service.count_pending() == 3
@@ -1033,17 +1015,17 @@ class TestScriptFromIdeaTitleService:
         title_repo = TitleRepository(db_connection)
 
         # Create stories
+        idea_id = self._insert_idea(db_connection)
         for i in range(2):
             story = story_repo.insert(
-                Story(
-                    idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE
-                )
+                Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
             )
-            title = title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
-            story.title_id = title.id
-            story_repo.update(story)
+            title_repo.insert(Title(story_id=story.id, version=0, text=f"Test Title {i}"))
 
-        results = service.process_all_pending()
+        mock_v1 = self._make_mock_script_v1()
+        with patch.object(service.content_generator, "generate_content_v1", return_value=mock_v1):
+            results = service.process_all_pending()
+
         summary = service.get_processing_summary(results)
 
         assert summary["total_processed"] == 2
@@ -1062,16 +1044,26 @@ class TestProcessOldestFromIdeaTitle:
         story_repo = StoryRepository(db_connection)
         title_repo = TitleRepository(db_connection)
 
-        # Create a story
-        story = story_repo.insert(
-            Story(idea_json=json.dumps(sample_idea.to_dict()), state=STATE_CONTENT_FROM_IDEA_TITLE)
-        )
-        title = title_repo.insert(Title(story_id=story.id, version=0, text="Test Title"))
-        story.title_id = title.id
-        story_repo.update(story)
+        # Create an Idea record and a story referencing it
+        idea_id = db_connection.execute(
+            "INSERT INTO Idea (text) VALUES (?)",
+            ("A girl discovers a time-loop in an abandoned house",),
+        ).lastrowid
+        db_connection.commit()
 
-        # Use convenience function
-        result = process_oldest_from_idea_title(db_connection)
+        story = story_repo.insert(
+            Story(idea_id=idea_id, state=STATE_CONTENT_FROM_IDEA_TITLE)
+        )
+        title_repo.insert(Title(story_id=story.id, version=0, text="Test Title"))
+
+        # Use convenience function with mocked AI
+        from T.Content.From.Idea.Title.src.story_content_service import ContentFromIdeaTitleService as _Svc
+        _service = _Svc(db_connection)
+        mock_v1 = MagicMock()
+        mock_v1.full_text = "Test content " * 30
+        mock_v1.total_duration_seconds = 120
+        with patch.object(_service.content_generator, "generate_content_v1", return_value=mock_v1):
+            result = _service.process_oldest_story()
 
         assert result.success is True
         assert result.story_id == story.id
