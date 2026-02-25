@@ -84,10 +84,12 @@ class TestAIIntegration:
             )
             
             assert idea is not None
-            assert 'hook' in idea
+            assert 'text' in idea
+            assert 'variant_name' in idea
+            assert 'source_input' in idea
             # Should contain AI-generated content, not template text
-            assert 'AI-generated content' in idea['hook']
-            assert 'How' not in idea['hook'] or 'relates to' not in idea['hook'].lower()
+            assert 'AI-generated content' in idea['text']
+            assert idea['source_input'] == "Mountain Adventure: A thrilling journey"
     
     def test_no_template_phrases_in_ai_content(self):
         """Verify that AI-generated content doesn't contain template phrases."""

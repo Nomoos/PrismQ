@@ -49,7 +49,7 @@ from Model.State.constants.state_names import StateNames
 # Try to import Idea database for fetching idea context
 try:
     sys.path.insert(0, os.path.join(_t_root, "..", "src"))
-    from idea import IdeaTable as SimpleIdeaDatabase
+    from idea import IdeaTable
     IDEA_DB_AVAILABLE = True
 except ImportError:
     IDEA_DB_AVAILABLE = False
@@ -182,7 +182,7 @@ class ReviewTitleFromContentIdeaService:
             idea_text = ""
             if story.idea_id and IDEA_DB_AVAILABLE:
                 try:
-                    idea_db = SimpleIdeaDatabase(self._conn.execute("PRAGMA database_list").fetchone()[2])
+                    idea_db = IdeaTable(self._conn.execute("PRAGMA database_list").fetchone()[2])
                     idea_db.connect()
                     idea = idea_db.get_idea(story.idea_id)
                     if idea:

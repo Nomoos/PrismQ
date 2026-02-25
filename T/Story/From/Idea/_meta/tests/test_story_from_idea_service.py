@@ -37,8 +37,7 @@ _src_root = str(t_module_dir / ".." / "src")
 if _src_root not in sys.path:
     sys.path.insert(0, _src_root)
 
-from simple_idea import SimpleIdea
-from idea import IdeaTable as SimpleIdeaDatabase
+from idea import IdeaTable
 
 from Model.Database.models.story import Story, StoryState
 from Model.Database.repositories.story_repository import StoryRepository
@@ -66,7 +65,7 @@ class TestStoryFromIdeaService:
     def idea_db(self, tmp_path):
         """Create a temporary Idea database with test ideas."""
         db_path = tmp_path / "idea.db"
-        db = SimpleIdeaDatabase(str(db_path))
+        db = IdeaTable(str(db_path))
         db.connect()
         db.create_tables()
 
@@ -91,7 +90,7 @@ class TestStoryFromIdeaService:
         unreferenced = service.get_unreferenced_ideas()
 
         assert len(unreferenced) == 3
-        assert all(isinstance(idea, SimpleIdea) for idea in unreferenced)
+        assert all(isinstance(idea, dict) for idea in unreferenced)
 
     def test_get_unreferenced_ideas_some_referenced(self, service, idea_db, story_db):
         """Test that only unreferenced ideas are returned."""
@@ -103,7 +102,7 @@ class TestStoryFromIdeaService:
         unreferenced = service.get_unreferenced_ideas()
 
         assert len(unreferenced) == 2
-        idea_ids = [idea.id for idea in unreferenced]
+        idea_ids = [idea["id"] for idea in unreferenced]
         assert 1 not in idea_ids
         assert 2 in idea_ids
         assert 3 in idea_ids
@@ -232,7 +231,7 @@ class TestStoryFromIdeaService:
 
         # First idea inserted should be the oldest
         assert oldest is not None
-        assert oldest.id == 1
+        assert oldest["id"] == 1
 
     def test_get_oldest_unreferenced_idea_with_some_referenced(self, service, story_db):
         """Test get_oldest_unreferenced_idea skips referenced ideas."""
@@ -245,7 +244,7 @@ class TestStoryFromIdeaService:
 
         # Should return idea 2 (the next oldest unreferenced)
         assert oldest is not None
-        assert oldest.id == 2
+        assert oldest["id"] == 2
 
     def test_get_oldest_unreferenced_idea_none_available(self, service, story_db):
         """Test get_oldest_unreferenced_idea returns None when all referenced."""
@@ -323,7 +322,7 @@ class TestConvenienceFunctions:
     def idea_db(self, tmp_path):
         """Create a temporary Idea database with test ideas."""
         db_path = tmp_path / "idea.db"
-        db = SimpleIdeaDatabase(str(db_path))
+        db = IdeaTable(str(db_path))
         db.connect()
         db.create_tables()
 
@@ -404,10 +403,10 @@ class TestWaitIntervalFunctions:
         assert get_wait_interval(0) == 30.0
 
     def test_get_wait_interval_one_idea(self):
-        """Test that 1 unreferenced idea returns ~1 second."""
+        """Test that 1 unreferenced idea returns 1 ms."""
         from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
 
-        assert get_wait_interval(1) == 1.0
+        assert get_wait_interval(1) == 0.001
 
     def test_get_wait_interval_hundred_ideas(self):
         """Test that 100 unreferenced ideas returns 1 ms."""
@@ -422,21 +421,12 @@ class TestWaitIntervalFunctions:
         assert get_wait_interval(1000) == 0.001
         assert get_wait_interval(500) == 0.001
 
-    def test_get_wait_interval_fifty_ideas(self):
-        """Test that 50 unreferenced ideas returns ~0.5 seconds."""
+    def test_get_wait_interval_any_positive_count(self):
+        """Test that any positive count returns 1 ms (binary: 0 → 30s, >0 → 1ms)."""
         from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
 
-        interval = get_wait_interval(50)
-        assert 0.4 < interval < 0.6  # Approximately 0.5 seconds
-
-    def test_get_wait_interval_gradual_increase(self):
-        """Test that interval increases as count decreases."""
-        from T.Story.From.Idea.src.story_from_idea_interactive import get_wait_interval
-
-        # Interval should increase as count decreases
-        assert get_wait_interval(99) < get_wait_interval(50)
-        assert get_wait_interval(50) < get_wait_interval(25)
-        assert get_wait_interval(25) < get_wait_interval(1)
+        for count in [1, 5, 25, 50, 99, 100, 200]:
+            assert get_wait_interval(count) == 0.001, f"Expected 0.001 for count={count}"
 
     def test_format_wait_time_seconds(self):
         """Test format_wait_time for values >= 1 second."""

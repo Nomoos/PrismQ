@@ -12,7 +12,7 @@ import pytest
 TESTS_DIR = Path(__file__).parent.absolute()
 CREATION_ROOT = TESTS_DIR.parent.parent  # T/Idea/From/User
 CREATION_SRC = CREATION_ROOT / "src"
-REPO_ROOT = CREATION_ROOT.parent.parent.parent  # Repository root
+REPO_ROOT = CREATION_ROOT.parent.parent.parent.parent  # Repository root
 
 sys.path.insert(0, str(CREATION_SRC))
 sys.path.insert(0, str(REPO_ROOT))

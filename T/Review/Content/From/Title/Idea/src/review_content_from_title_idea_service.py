@@ -49,7 +49,7 @@ from Model.State.constants.state_names import StateNames
 # Try to import Idea database for fetching idea context
 try:
     sys.path.insert(0, os.path.join(_t_root, "..", "src"))
-    from idea import IdeaTable as SimpleIdeaDatabase
+    from idea import IdeaTable
     IDEA_DB_AVAILABLE = True
 except ImportError:
     IDEA_DB_AVAILABLE = False
@@ -183,7 +183,7 @@ class ReviewContentFromTitleIdeaService:
                     cursor = self._conn.execute("PRAGMA database_list")
                     db_file = cursor.fetchone()[2]
                     
-                    idea_db = SimpleIdeaDatabase(db_file)
+                    idea_db = IdeaTable(db_file)
                     idea_db.connect()
                     idea_data = idea_db.get_idea(story.idea_id)
                     if idea_data:
@@ -197,13 +197,13 @@ class ReviewContentFromTitleIdeaService:
                 result.error = "Review function not available"
                 return result
 
-            # Create simple idea object for review function
-            class SimpleIdea:
+            # Create a minimal context object for the review function
+            class _IdeaContext:
                 def __init__(self, text):
                     self.concept = text
                     self.title = text[:100] if text else ""
                     
-            idea_obj = SimpleIdea(idea_text) if idea_text else None
+            idea_obj = _IdeaContext(idea_text) if idea_text else None
 
             # Review includes idea context
             review_result = review_content_by_title_and_idea(

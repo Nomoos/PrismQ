@@ -113,13 +113,13 @@ except ImportError:
         pass
 
 
-# Try to import SimpleIdeaDatabase for fetching Idea content
+# Try to import IdeaTable for fetching Idea content
 try:
-    from idea import IdeaTable as SimpleIdeaDatabase
+    from idea import IdeaTable
 
-    SIMPLE_IDEA_DB_AVAILABLE = True
+    IDEA_TABLE_AVAILABLE = True
 except ImportError:
-    SIMPLE_IDEA_DB_AVAILABLE = False
+    IDEA_TABLE_AVAILABLE = False
 
 # Try to import Config for database path management
 try:
@@ -602,8 +602,8 @@ def run_state_workflow_mode(
         print_error("Database modules not available")
         return 1
 
-    if not SIMPLE_IDEA_DB_AVAILABLE:
-        print_error("SimpleIdeaDatabase not available - cannot fetch Idea content")
+    if not IDEA_TABLE_AVAILABLE:
+        print_error("IdeaTable not available - cannot fetch Idea content")
         return 1
 
     print_success("All modules loaded successfully")
@@ -640,7 +640,7 @@ def run_state_workflow_mode(
 
     # Connect to Idea database to fetch Idea content
     # Use the same database path for Idea table (it's in the same database)
-    idea_db = SimpleIdeaDatabase(db_path)
+    idea_db = IdeaTable(db_path)
     idea_db.connect()
     print_success("Connected to Idea database")
 
@@ -709,7 +709,7 @@ def run_state_workflow_mode(
                         idea_id = int(story.idea_id)
                         idea_dict = idea_db.get_idea(idea_id)
                         if idea_dict:
-                            # Create Idea object from SimpleIdea data
+                            # Get idea text from dict
                             idea_text = idea_dict.get("text", "")
                             if idea_text and IDEA_MODEL_AVAILABLE:
                                 # Truncate title to reasonable length (max 100 chars)

@@ -519,7 +519,7 @@ class StoryTitleService:
         3. Updates each Story's state to CONTENT_FROM_IDEA_TITLE (next workflow step)
 
         Args:
-            idea_db: Optional SimpleIdeaDatabase to fetch Idea content.
+            idea_db: Optional IdeaTable to fetch Idea content.
                     If provided, titles will be generated from Idea content.
 
         Returns:
@@ -784,7 +784,7 @@ def process_stories_without_titles(
 
     Args:
         connection: SQLite connection for persistence.
-        idea_db: Optional SimpleIdeaDatabase for fetching Idea content.
+        idea_db: Optional IdeaTable for fetching Idea content.
         title_config: Optional configuration for title generation (not used).
 
     Returns:

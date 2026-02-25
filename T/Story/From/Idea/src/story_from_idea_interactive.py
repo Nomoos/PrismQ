@@ -52,10 +52,9 @@ except ImportError as e:
     SERVICE_AVAILABLE = False
     IMPORT_ERROR = str(e)
 
-# Try to import SimpleIdea model and database
+# Try to import Idea database
 try:
-    from simple_idea import SimpleIdea
-    from idea import IdeaTable as SimpleIdeaDatabase
+    from idea import IdeaTable
 
     IDEA_MODEL_AVAILABLE = True
 except ImportError:
@@ -185,10 +184,9 @@ def get_database_paths() -> tuple:
 def run_continuous_mode(preview: bool = False):
     """Run story creation from idea continuously until cancelled.
 
-    This mode processes ideas repeatedly with dynamic pauses between iterations:
-    - 1 ms when >= 100 unreferenced ideas
-    - Gradually increasing when < 100 unreferenced ideas
-    - 30 seconds when 0 unreferenced ideas
+    This mode processes ideas repeatedly with binary pauses between iterations:
+    - 1 ms when unreferenced ideas > 0 (keep processing immediately)
+    - 30 seconds when 0 unreferenced ideas (wait for new items)
 
     It continues until the user cancels with Ctrl+C or closes the window.
 
@@ -255,9 +253,8 @@ def run_continuous_mode(preview: bool = False):
         logger.info(f"Idea database path: {idea_db_path}")
 
     print_section("Continuous Mode")
-    print("Processing ideas continuously with dynamic wait times:")
-    print("  - 1 ms when >= 100 unreferenced ideas")
-    print("  - Gradually increasing when < 100 unreferenced ideas")
+    print("Processing ideas continuously:")
+    print("  - 1 ms when unreferenced ideas > 0")
     print("  - 30 seconds when 0 unreferenced ideas")
     print("Press Ctrl+C or close the window to stop.\n")
 
@@ -298,7 +295,7 @@ def run_continuous_mode(preview: bool = False):
                 story_conn.row_factory = sqlite3.Row
 
                 # Connect to Idea database
-                idea_db = SimpleIdeaDatabase(idea_db_path)
+                idea_db = IdeaTable(idea_db_path)
                 idea_db.connect()
 
                 print_success("Connected to databases")
@@ -354,18 +351,19 @@ def run_continuous_mode(preview: bool = False):
                     continue
 
                 # Display idea info
-                print_success(f"Found oldest unreferenced Idea: ID {oldest_idea.id}")
+                idea_text = oldest_idea.get("text", "")
+                print_success(f"Found oldest unreferenced Idea: ID {oldest_idea.get('id')}")
                 print(
-                    f"  Text: {oldest_idea.text[:100]}..."
-                    if len(oldest_idea.text) > 100
-                    else f"  Text: {oldest_idea.text}"
+                    f"  Text: {idea_text[:100]}..."
+                    if len(idea_text) > 100
+                    else f"  Text: {idea_text}"
                 )
-                print(f"  Version: {oldest_idea.version}")
-                print(f"  Created: {oldest_idea.created_at}")
+                print(f"  Version: {oldest_idea.get('version')}")
+                print(f"  Created: {oldest_idea.get('created_at')}")
 
                 if logger:
-                    logger.info(f"Processing Idea ID {oldest_idea.id}")
-                    logger.debug(f"Idea text: {oldest_idea.text}")
+                    logger.info(f"Processing Idea ID {oldest_idea.get('id')}")
+                    logger.debug(f"Idea text: {idea_text}")
 
                 # Show unreferenced count
                 unreferenced = service.get_unreferenced_ideas()
@@ -374,7 +372,7 @@ def run_continuous_mode(preview: bool = False):
 
                 if preview:
                     # Preview mode - don't save
-                    print_info(f"Would create 10 Stories for Idea ID {oldest_idea.id}")
+                    print_info(f"Would create 10 Stories for Idea ID {oldest_idea.get('id')}")
                     print_info(
                         "Stories would have state: TITLE_FROM_IDEA (PrismQ.T.Title.From.Idea)"
                     )
@@ -382,7 +380,7 @@ def run_continuous_mode(preview: bool = False):
 
                     if logger:
                         logger.info(
-                            f"Preview: Would create 10 Stories for Idea ID {oldest_idea.id}"
+                            f"Preview: Would create 10 Stories for Idea ID {oldest_idea.get('id')}"
                         )
 
                     print_info(f"Remaining unreferenced Ideas (unchanged): {remaining_count}")
@@ -390,13 +388,13 @@ def run_continuous_mode(preview: bool = False):
                 else:
                     # Run mode - save to database
                     result = service.create_stories_from_idea(
-                        idea_id=oldest_idea.id, skip_if_exists=True
+                        idea_id=oldest_idea["id"], skip_if_exists=True
                     )
 
                     if result is None:
-                        print_warning(f"Idea ID {oldest_idea.id} already has Stories")
+                        print_warning(f"Idea ID {oldest_idea.get('id')} already has Stories")
                         if logger:
-                            logger.info(f"Idea ID {oldest_idea.id} already has Stories - skipped")
+                            logger.info(f"Idea ID {oldest_idea.get('id')} already has Stories - skipped")
                     else:
                         print_success(
                             f"Created {result.count} Stories for Idea ID {result.idea_id}"
@@ -464,7 +462,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Story Creation from Idea for PrismQ - runs continuously with dynamic wait times",
+        description="Story Creation from Idea for PrismQ - runs continuously",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -472,9 +470,8 @@ Examples:
   python story_from_idea_interactive.py --preview # Preview mode (no DB save)
   python story_from_idea_interactive.py --debug   # Same as --preview (no DB save)
 
-Wait times are dynamic based on remaining unreferenced ideas:
-  - 1 ms when >= 100 unreferenced ideas
-  - Gradually increasing when < 100 unreferenced ideas
+Wait times:
+  - 1 ms when unreferenced ideas > 0
   - 30 seconds when 0 unreferenced ideas
 
 Press Ctrl+C or close the window to stop.

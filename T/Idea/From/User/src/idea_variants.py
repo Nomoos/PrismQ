@@ -178,6 +178,7 @@ class IdeaGenerator:
         result = {
             'text': generated_idea,
             'variant_name': variant_name,
+            'source_input': input_text,
         }
         
         if idea_id:
