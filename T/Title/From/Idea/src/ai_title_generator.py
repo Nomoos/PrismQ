@@ -60,12 +60,18 @@ class TitleGeneratorConfig:
         min_length_for_scoring: Minimum title length (characters) required for
             AI scoring. Variants shorter than this are accepted but not
             AI-scored, avoiding unnecessary AI calls for low-quality responses.
+        use_batch_generation: When True (default), all variants are requested
+            in a single AI call using the batch prompt. This is much faster
+            than the one-by-one mode (1 call vs N calls) at the cost of not
+            being able to vary temperature per variant. When False, falls back
+            to the original one-by-one generation mode.
     """
     
     num_variants: int = 10
     temperature_min: float = 0.6
     temperature_max: float = 0.8
     min_length_for_scoring: int = 20
+    use_batch_generation: bool = True
 
 
 class AITitleGenerator:
@@ -169,38 +175,14 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
         
-        # Create prompt with idea content (directly inserted without analysis)
-        prompt = self._create_prompt(idea)
-        logger.info(f"Generating {n_variants} title variants (one-by-one for quality)")
-        logger.debug(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
-        
-        # Generate variants one-by-one with random temperature for diversity
-        variants = []
+        # Create prompt and generate variants
         gen_start = time.monotonic()
         try:
-            for i in range(n_variants):
-                # Random temperature in sweet spot for creative titles
-                temp = random.uniform(
-                    self.config.temperature_min,
-                    self.config.temperature_max
-                )
-                
-                logger.debug(f"Generating title {i+1}/{n_variants} with temperature={temp:.2f}")
-                
-                # Generate title from AI
-                t0 = time.monotonic()
-                response_text = self.ollama_client.generate(prompt, temperature=temp)
-                elapsed = time.monotonic() - t0
-                logger.debug(f"  AI response received in {elapsed:.1f}s for variant {i+1}")
-                
-                # Parse and score the response
-                variant = self._parse_response(response_text, idea)
-                if variant:
-                    variants.append(variant)
-                    logger.debug(f"  Generated: '{variant.text}' (score={variant.score:.2f})")
-                else:
-                    logger.warning(f"  Failed to parse response for variant {i+1}")
-            
+            if self.config.use_batch_generation:
+                variants = self._generate_batch_variants(idea, n_variants)
+            else:
+                variants = self._generate_one_by_one_variants(idea, n_variants)
+
             gen_elapsed = time.monotonic() - gen_start
             logger.info(
                 f"Generated {len(variants)}/{n_variants} title variants in {gen_elapsed:.1f}s"
@@ -246,6 +228,127 @@ class AITitleGenerator:
             error_msg = f"AI title generation failed: {e}"
             logger.error(error_msg)
             raise AIUnavailableError(error_msg) from e
+    
+    def _generate_batch_variants(self, idea: Idea, n_variants: int) -> List[TitleVariant]:
+        """Generate all title variants in a single AI call.
+        
+        Sends one prompt that asks the model for N titled variants at once,
+        then parses the numbered-list response. Reduces total AI call count
+        from N to 1 compared to one-by-one generation.
+        
+        Args:
+            idea: Idea object to generate titles from
+            n_variants: Number of titles to request
+        
+        Returns:
+            List of parsed TitleVariant objects (may be fewer than n_variants
+            if the model returns some unparseable lines)
+        """
+        template = self.prompt_loader.get_title_generation_batch_prompt()
+        idea_text = idea.concept or idea.title or "No idea provided"
+        prompt = template.format(IDEA=idea_text, COUNT=n_variants)
+        
+        logger.info(f"Generating {n_variants} title variants (batch mode, 1 AI call)")
+        logger.debug(f"Batch prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
+        
+        # Use midpoint temperature — diversity comes from the prompt instructions
+        temp = (self.config.temperature_min + self.config.temperature_max) / 2.0
+        t0 = time.monotonic()
+        response_text = self.ollama_client.generate(prompt, temperature=temp)
+        elapsed = time.monotonic() - t0
+        logger.debug(f"Batch AI response received in {elapsed:.1f}s")
+        
+        variants = self._parse_batch_response(response_text, idea)
+        logger.info(f"Parsed {len(variants)}/{n_variants} variants from batch response")
+        return variants
+    
+    def _generate_one_by_one_variants(self, idea: Idea, n_variants: int) -> List[TitleVariant]:
+        """Generate title variants with individual AI calls (one per variant).
+        
+        Each call uses a randomly varied temperature for diversity. Slower
+        than batch mode but allows per-variant temperature control.
+        
+        Args:
+            idea: Idea object to generate titles from
+            n_variants: Number of titles to generate
+        
+        Returns:
+            List of parsed TitleVariant objects
+        """
+        prompt = self._create_prompt(idea)
+        logger.info(f"Generating {n_variants} title variants (one-by-one mode, {n_variants} AI calls)")
+        logger.debug(f"Prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
+        
+        variants = []
+        for i in range(n_variants):
+            temp = random.uniform(self.config.temperature_min, self.config.temperature_max)
+            logger.debug(f"Generating title {i+1}/{n_variants} with temperature={temp:.2f}")
+            
+            t0 = time.monotonic()
+            response_text = self.ollama_client.generate(prompt, temperature=temp)
+            elapsed = time.monotonic() - t0
+            logger.debug(f"  AI response received in {elapsed:.1f}s for variant {i+1}")
+            
+            variant = self._parse_response(response_text, idea)
+            if variant:
+                variants.append(variant)
+                logger.debug(f"  Generated: '{variant.text}' (score={variant.score:.2f})")
+            else:
+                logger.warning(f"  Failed to parse response for variant {i+1}")
+        return variants
+    
+    def _parse_batch_response(self, response_text: str, idea: Idea) -> List[TitleVariant]:
+        """Parse a batch AI response containing multiple numbered titles.
+        
+        Expects the model to have returned a numbered list such as:
+            1. The Weight of Unspoken Words
+            2. Silence Spoke Loudest
+            ...
+        
+        Also strips <think>...</think> blocks before parsing.
+        
+        Args:
+            response_text: Raw text from AI containing a numbered list of titles
+            idea: Original idea (for keyword extraction and scoring)
+        
+        Returns:
+            List of TitleVariant objects; lines that cannot be parsed are skipped
+        """
+        # Strip <think>...</think> blocks
+        response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+        
+        keywords = []
+        if hasattr(idea, "keywords") and idea.keywords:
+            keywords = idea.keywords[:3]
+        
+        variants: List[TitleVariant] = []
+        for line in response_text.splitlines():
+            # Strip whitespace and leading numbering like "1.", "1)", "1 -", etc.
+            line = line.strip()
+            if not line:
+                continue
+            title_text = re.sub(r'^\d+[\.\)\-]\s*', '', line).strip()
+            
+            # Remove surrounding quotes if present
+            if title_text.startswith('"') and title_text.endswith('"'):
+                title_text = title_text[1:-1]
+            if title_text.startswith("'") and title_text.endswith("'"):
+                title_text = title_text[1:-1]
+            
+            if not title_text:
+                continue
+            
+            style = self.scorer.infer_style(title_text)
+            score = self.scorer.score_by_length(title_text)
+            variants.append(TitleVariant(
+                text=title_text,
+                style=style,
+                length=len(title_text),
+                keywords=keywords,
+                score=score,
+            ))
+        
+        return variants
     
     def _ai_score_title(self, title_text: str, idea: Idea) -> float:
         """Score a title using AI based on readability, keywords, emotional impact and SEO.

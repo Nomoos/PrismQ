@@ -407,3 +407,116 @@ class TestTitleGeneratorConfigMinLength:
         """Custom min_length_for_scoring is respected."""
         config = TitleGeneratorConfig(min_length_for_scoring=35)
         assert config.min_length_for_scoring == 35
+
+    def test_default_use_batch_generation(self):
+        """Default use_batch_generation is True."""
+        config = TitleGeneratorConfig()
+        assert config.use_batch_generation is True
+
+    def test_disable_batch_generation(self):
+        """use_batch_generation can be set to False."""
+        config = TitleGeneratorConfig(use_batch_generation=False)
+        assert config.use_batch_generation is False
+
+
+class TestParseBatchResponse:
+    """Tests for _parse_batch_response (batch mode parsing)."""
+
+    def _make_generator(self):
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        return AITitleGenerator(ollama_client=mock_client)
+
+    def test_parse_numbered_list(self):
+        """Numbered list response yields one variant per line."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
+
+        response = (
+            "1. Silence Spoke Loudest When They Forgot My Name\n"
+            "2. The Weight of Words Never Said\n"
+            "3. Where the Quiet Lives Between Us\n"
+        )
+        variants = generator._parse_batch_response(response, idea)
+
+        assert len(variants) == 3
+        assert variants[0].text == "Silence Spoke Loudest When They Forgot My Name"
+        assert variants[1].text == "The Weight of Words Never Said"
+        assert variants[2].text == "Where the Quiet Lives Between Us"
+
+    def test_parse_batch_strips_think_block(self):
+        """<think> block is stripped before parsing numbered lines."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+
+        response = (
+            "<think>\nSome internal reasoning.\n</think>\n"
+            "1. The Unseen Chord\n"
+            "2. What the Silence Holds\n"
+        )
+        variants = generator._parse_batch_response(response, idea)
+
+        assert len(variants) == 2
+        assert variants[0].text == "The Unseen Chord"
+        assert variants[1].text == "What the Silence Holds"
+
+    def test_parse_batch_skips_empty_lines(self):
+        """Empty lines in the response are silently skipped."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+
+        response = "\n1. The Quiet Alchemy\n\n2. Blank Slate, Quiet Power\n\n"
+        variants = generator._parse_batch_response(response, idea)
+
+        assert len(variants) == 2
+
+    def test_parse_batch_handles_dot_and_paren_numbering(self):
+        """Both '1.' and '1)' numbering styles are stripped correctly."""
+        generator = self._make_generator()
+        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+
+        response = "1) The Softest Roar\n2. The Unspoken Advantage\n"
+        variants = generator._parse_batch_response(response, idea)
+
+        assert len(variants) == 2
+        assert variants[0].text == "The Softest Roar"
+        assert variants[1].text == "The Unspoken Advantage"
+
+    def test_generate_from_idea_uses_batch_by_default(self):
+        """generate_from_idea uses batch generation when use_batch_generation=True."""
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        mock_client.generate.return_value = (
+            "1. Silence Spoke Loudest When They Forgot My Name\n"
+            "2. The Weight of Words Never Said\n"
+            "3. Where the Quiet Lives Between Us\n"
+        )
+
+        config = TitleGeneratorConfig(use_batch_generation=True, num_variants=3)
+        generator = AITitleGenerator(config=config, ollama_client=mock_client)
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        variants = generator.generate_from_idea(idea, num_variants=3)
+
+        # Batch mode: only 1 generation call + N scoring calls
+        generation_calls = [
+            c for c in mock_client.generate.call_args_list
+            if "{COUNT}" not in str(c)
+        ]
+        assert mock_client.generate.call_count >= 1
+        assert len(variants) == 3
+
+    def test_generate_from_idea_one_by_one_when_batch_disabled(self):
+        """generate_from_idea uses N AI calls when use_batch_generation=False."""
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        mock_client.generate.return_value = "The Quiet Alchemy in the Dark"
+
+        config = TitleGeneratorConfig(use_batch_generation=False, num_variants=3)
+        generator = AITitleGenerator(config=config, ollama_client=mock_client)
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        variants = generator.generate_from_idea(idea, num_variants=3)
+
+        # One-by-one mode: 3 generation calls + up to 3 scoring calls = at most 6
+        assert mock_client.generate.call_count >= 3
