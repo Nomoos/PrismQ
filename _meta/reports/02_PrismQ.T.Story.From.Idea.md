@@ -6,7 +6,7 @@
 
 ## 📥 Vstup
 - **Zdroj:** Databáze (tabulka `Idea`)
-- **Data:** Idea dicts (`id`, `text`, `version`, `created_at`) — Ideas bez reference v tabulce `Story`
+- **Data:** Idea objekty (`id`, `text`, `version`, `review_id`, `created_at`) — Ideas bez reference v tabulce `Story`
 - **Předpoklady:** Existující Idea záznamy (modul 01), přístup k DB (read + write)
 
 ---
@@ -14,7 +14,7 @@
 ## ⚙️ Zpracování
 1. [Inicializace](shared/inicializace_prostredi.md)
 2. Načtení nejstarší nezpracované Idea (bez Story referencí) — jedna za iteraci
-3. Vytvoření 10 Story objektů s `idea_id` referencí a `state="PrismQ.T.Title.From.Idea"`
+3. Vytvoření 10 Story objektů s `idea_id` referencí a `state=StoryState.TITLE_FROM_IDEA`
 4. [Uložení výsledků](shared/databazova_integrace.md) — insert do tabulky `Story`, commit transakce
 5. [Continuous loop](shared/continuous_mode.md) — čekání 30s pokud žádné nové Ideas, jinak 1ms
 
@@ -22,5 +22,5 @@
 
 ## 📤 Výstup
 - **Primární:** 10 Story záznamů na každou zpracovanou Idea
-- **DB změny:** Tabulka `Story` — `idea_id`, `state="PrismQ.T.Title.From.Idea"`, `created_at`
+- **DB změny:** Tabulka `Story` — `idea_id`, `state=StoryState.TITLE_FROM_IDEA`, `created_at`, `updated_at`
 - **Další krok:** Modul 03 (PrismQ.T.Title.From.Idea)
