@@ -38,10 +38,10 @@ T_ROOT = TITLE_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
-sys.path.insert(0, str(REPO_ROOT))  # Repository root for T.Database, T.State imports
 sys.path.insert(0, str(SCRIPT_DIR))  # Current directory for local imports
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model" / "src"))
 sys.path.insert(0, str(T_ROOT / "Idea" / "Model"))
+sys.path.insert(0, str(REPO_ROOT))  # Repository root for T.Database, T.State imports
 
 # Import title generator
 try:
@@ -115,7 +115,7 @@ except ImportError:
 
 # Try to import IdeaTable for fetching Idea content
 try:
-    from idea import IdeaTable
+    from src.idea import IdeaTable
 
     IDEA_TABLE_AVAILABLE = True
 except ImportError:
