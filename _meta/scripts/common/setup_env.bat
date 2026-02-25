@@ -30,11 +30,21 @@ if not exist "%VENV_MARKER%" (
 REM Activate the virtual environment
 call "%VENV_DIR%\Scripts\activate.bat"
 
-REM Install dependencies if not yet installed
-if exist "%REQUIREMENTS%" if not exist "%VENV_DIR%\.requirements_installed" (
+REM Install (or reinstall) dependencies when requirements.txt has changed
+set "NEEDS_INSTALL=0"
+if exist "%REQUIREMENTS%" (
+    if not exist "%VENV_DIR%\.requirements_installed" (
+        set "NEEDS_INSTALL=1"
+    ) else (
+        fc "%REQUIREMENTS%" "%VENV_DIR%\.requirements_installed" >nul 2>&1
+        if !ERRORLEVEL! NEQ 0 set "NEEDS_INSTALL=1"
+    )
+)
+if "!NEEDS_INSTALL!"=="1" (
     echo [INFO] Installing dependencies...
     pip install -r "%REQUIREMENTS%" --quiet
-    echo Installed > "%VENV_DIR%\.requirements_installed"
+    if !ERRORLEVEL! NEQ 0 exit /b 1
+    copy /y "%REQUIREMENTS%" "%VENV_DIR%\.requirements_installed" >nul
 )
 
 echo [INFO] Environment ready
