@@ -9,13 +9,13 @@ sys.path.insert(0, str(project_root))
 
 import pytest
 
-from T.Review.Title.ByScriptAndIdea import (
+from T.Review.Title.From.Content.Idea import (
     AlignmentAnalysis,
     TitleReview,
     TitleReviewCategory,
     review_title_by_content_and_idea,
 )
-from T.Review.Title.ByScriptAndIdea.by_content_and_idea import (
+from T.Review.Title.From.Content.Idea.by_content_and_idea import (
     analyze_engagement,
     analyze_seo,
     analyze_title_idea_alignment,

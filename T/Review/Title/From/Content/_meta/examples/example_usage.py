@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../..")))
 
 from T.Review.Title.ByScript import get_improvement_summary, review_title_by_content_v2
-from T.Review.Title.ByScriptAndIdea import review_title_by_content_and_idea
+from T.Review.Title.From.Content.Idea import review_title_by_content_and_idea
 
 
 def example_basic_v2_review():

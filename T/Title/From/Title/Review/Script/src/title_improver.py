@@ -11,7 +11,7 @@ that incorporate review suggestions, keywords, and content elements.
 The module takes:
 - Original title (any version: v1, v2, v3, etc.)
 - Content (corresponding version)
-- Title review feedback (from ByScriptAndIdea)
+- Title review feedback (from T.Review.Title.From.Content.Idea)
 - Content review feedback (from ByTitle)
 - Original idea (for context)
 
@@ -44,7 +44,7 @@ current_file = Path(__file__)
 t_module_dir = current_file.parent.parent.parent.parent
 
 # Import review models
-review_title_path = t_module_dir / "Review" / "Title" / "ByScriptAndIdea"
+review_title_path = t_module_dir / "Review" / "Title" / "From" / "Content" / "Idea"
 review_content_path = t_module_dir / "Review" / "Content"
 idea_model_path = t_module_dir / "Idea" / "Model" / "src"
 
