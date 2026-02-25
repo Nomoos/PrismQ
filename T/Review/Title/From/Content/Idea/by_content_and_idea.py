@@ -11,7 +11,7 @@ The reviewer provides:
 - Structured JSON-compatible feedback
 
 Workflow Position:
-    Idea + Title v1 + Content v1 → ByScriptAndIdea Review → TitleReview Feedback → Title v2
+    Idea + Title v1 + Content v1 → TitleReview (AI Reviewer) → Title v2 (with feedback)
 """
 
 import re
