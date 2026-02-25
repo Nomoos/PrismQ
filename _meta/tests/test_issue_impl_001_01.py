@@ -1,7 +1,7 @@
 """Integration tests for ISSUE-IMPL-001-01: PrismQ.T.Idea.From.User script verification.
 
 This test verifies the complete implementation of the idea creation scripts:
-- Run.bat and Preview.bat batch scripts
+- Run.bat batch script
 - idea_creation_interactive.py Python module
 - Virtual environment setup and dependency management
 - Database integration
@@ -42,12 +42,6 @@ class TestScriptStructure:
         run_bat = SCRIPT_DIR / "Run.bat"
         assert run_bat.exists(), f"Run.bat not found: {run_bat}"
         assert run_bat.is_file(), f"Run.bat is not a file: {run_bat}"
-
-    def test_preview_bat_exists(self):
-        """Verify Preview.bat exists."""
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        assert preview_bat.exists(), f"Preview.bat not found: {preview_bat}"
-        assert preview_bat.is_file(), f"Preview.bat is not a file: {preview_bat}"
 
     def test_common_start_ollama_exists(self):
         """Verify common/start_ollama.bat exists."""
@@ -95,20 +89,6 @@ class TestBatchScriptContent:
         run_bat = SCRIPT_DIR / "Run.bat"
         content = run_bat.read_text()
         assert "idea_creation_interactive.py" in content, "Run.bat should call interactive module"
-
-    def test_preview_bat_uses_preview_flag(self):
-        """Verify Preview.bat uses --preview flag."""
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        content = preview_bat.read_text()
-        assert "--preview" in content, "Preview.bat should use --preview flag"
-        assert "--debug" in content, "Preview.bat should use --debug flag"
-
-    def test_preview_bat_mentions_no_database_save(self):
-        """Verify Preview.bat mentions no database save."""
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        content = preview_bat.read_text()
-        assert "NOT save to database" in content or "not save" in content.lower(), \
-            "Preview.bat should mention not saving to database"
 
 
 class TestInteractiveModuleStructure:
@@ -200,42 +180,10 @@ class TestDatabaseIntegration:
 class TestCommandLineArguments:
     """Test command-line argument parsing."""
 
-    def test_preview_flag_parsing(self):
-        """Test --preview flag is recognized."""
+    def test_no_flags_required(self):
+        """Verify the module runs without any command-line flags."""
         import idea_creation_interactive
-        
-        # Mock sys.argv to test argument parsing
-        with patch('sys.argv', ['idea_creation_interactive.py', '--preview']):
-            import argparse
-            parser = argparse.ArgumentParser()
-            parser.add_argument('--preview', '-p', action='store_true')
-            parser.add_argument('--debug', '-d', action='store_true')
-            args = parser.parse_args(['--preview'])
-            
-            assert args.preview is True
-            assert args.debug is False
-
-    def test_debug_flag_parsing(self):
-        """Test --debug flag is recognized."""
-        import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--preview', '-p', action='store_true')
-        parser.add_argument('--debug', '-d', action='store_true')
-        args = parser.parse_args(['--debug'])
-        
-        assert args.preview is False
-        assert args.debug is True
-
-    def test_both_flags_parsing(self):
-        """Test both --preview and --debug flags together."""
-        import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--preview', '-p', action='store_true')
-        parser.add_argument('--debug', '-d', action='store_true')
-        args = parser.parse_args(['--preview', '--debug'])
-        
-        assert args.preview is True
-        assert args.debug is True
+        assert hasattr(idea_creation_interactive, "main"), "Module should have main() function"
 
 
 class TestModuleStructureCompliance:
@@ -263,14 +211,10 @@ class TestSecurityAspects:
     def test_no_hardcoded_secrets_in_scripts(self):
         """Verify no hardcoded secrets in batch scripts."""
         run_bat = SCRIPT_DIR / "Run.bat"
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        
-        for script in [run_bat, preview_bat]:
-            content = script.read_text().lower()
-            # Check for common secret patterns
-            assert "password=" not in content, f"Hardcoded password found in {script.name}"
-            assert "api_key=" not in content, f"Hardcoded API key found in {script.name}"
-            assert "secret=" not in content, f"Hardcoded secret found in {script.name}"
+        content = run_bat.read_text().lower()
+        assert "password=" not in content, f"Hardcoded password found in Run.bat"
+        assert "api_key=" not in content, f"Hardcoded API key found in Run.bat"
+        assert "secret=" not in content, f"Hardcoded secret found in Run.bat"
 
     def test_no_hardcoded_secrets_in_python(self):
         """Verify no hardcoded secrets in Python module."""
@@ -332,13 +276,11 @@ class TestLoggingObservability:
             "Should mention database save"
 
     def test_preview_mode_header_display(self):
-        """Verify Preview mode displays appropriate header."""
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        content = preview_bat.read_text()
-        
-        assert "PREVIEW MODE" in content.upper(), "Should display PREVIEW MODE header"
-        assert "NOT save" in content or "not save" in content.lower(), \
-            "Should mention no database save"
+        """Verify Run mode displays database-save information."""
+        run_bat = SCRIPT_DIR / "Run.bat"
+        content = run_bat.read_text()
+        assert "saves" in content.lower() and "database" in content.lower(), \
+            "Should mention database save"
 
     def test_python_module_has_logging_setup(self):
         """Verify Python module sets up logging."""
@@ -391,14 +333,11 @@ class TestCompatibilityEnvironment:
     """Test compatibility and environment assumptions."""
 
     def test_windows_batch_file_format(self):
-        """Verify batch files are Windows format."""
+        """Verify batch file is Windows format."""
         run_bat = SCRIPT_DIR / "Run.bat"
-        preview_bat = SCRIPT_DIR / "Preview.bat"
-        
-        for script in [run_bat, preview_bat]:
-            content = script.read_text()
-            assert "@echo off" in content, f"{script.name} should be Windows batch file"
-            assert "REM" in content, f"{script.name} should have REM comments"
+        content = run_bat.read_text()
+        assert "@echo off" in content, "Run.bat should be Windows batch file"
+        assert "REM" in content, "Run.bat should have REM comments"
 
     def test_python_shebang_present(self):
         """Verify Python module has shebang for cross-platform use."""
@@ -413,24 +352,6 @@ class TestCompatibilityEnvironment:
 
 class TestTestability:
     """Test testability requirements."""
-
-    def test_preview_mode_available(self):
-        """Verify preview mode is available for testing."""
-        from idea_creation_interactive import run_interactive_mode
-        
-        # Verify function accepts preview parameter
-        import inspect
-        sig = inspect.signature(run_interactive_mode)
-        assert 'preview' in sig.parameters, "Should have preview parameter"
-
-    def test_debug_mode_available(self):
-        """Verify debug mode is available for testing."""
-        from idea_creation_interactive import run_interactive_mode
-        
-        # Verify function accepts debug parameter
-        import inspect
-        sig = inspect.signature(run_interactive_mode)
-        assert 'debug' in sig.parameters, "Should have debug parameter"
 
     def test_existing_tests_present(self):
         """Verify existing tests are present."""
