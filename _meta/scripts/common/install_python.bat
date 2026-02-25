@@ -15,7 +15,7 @@ popd
 
 set "PYTHON_DIR=%REPO_ROOT%\.python"
 set "PYTHON_EXE_PATH=%PYTHON_DIR%\python.exe"
-set "PYTHON_VERSION=3.11.11"
+set "PYTHON_VERSION=3.10.9"
 set "PYTHON_URL=https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip"
 set "GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py"
 set "PYTHON_ZIP=%TEMP%\prismq_python_embed.zip"
