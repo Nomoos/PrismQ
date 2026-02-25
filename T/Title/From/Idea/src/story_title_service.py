@@ -65,12 +65,21 @@ if str(src_dir) not in sys.path:
     sys.path.insert(0, str(src_dir))
 
 # Import title generation components from refactored modules using relative imports
-from .title_variant import TitleVariant
-from .ai_title_generator import (
-    AITitleGenerator,
-    TitleGeneratorConfig,
-    AIUnavailableError as _AIUnavailableError,
-)
+# Try relative imports first (when used as package), fallback to absolute
+try:
+    from .title_variant import TitleVariant
+    from .ai_title_generator import (
+        AITitleGenerator,
+        TitleGeneratorConfig,
+        AIUnavailableError as _AIUnavailableError,
+    )
+except ImportError:
+    from title_variant import TitleVariant
+    from ai_title_generator import (
+        AITitleGenerator,
+        TitleGeneratorConfig,
+        AIUnavailableError as _AIUnavailableError,
+    )
 
 # Use the AI module's exception
 AIUnavailableError = _AIUnavailableError
