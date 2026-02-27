@@ -319,6 +319,22 @@ class AITitleGenerator:
                 logger.warning(f"  Failed to parse response for variant {i+1}")
         return variants
     
+    @staticmethod
+    def _strip_think_blocks(text: str) -> str:
+        """Remove all <think>...</think> blocks from AI response text.
+
+        Qwen3 (and similar thinking models) emit internal reasoning inside
+        ``<think>`` tags before the actual answer. This helper strips those
+        blocks so callers only see the clean output.
+
+        Args:
+            text: Raw AI response text, potentially containing think blocks.
+
+        Returns:
+            Text with all ``<think>...</think>`` sections removed.
+        """
+        return re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
+
     def _parse_batch_response(self, response_text: str, idea: Idea) -> List[TitleVariant]:
         """Parse a batch AI response containing multiple numbered titles.
         
@@ -336,8 +352,7 @@ class AITitleGenerator:
         Returns:
             List of TitleVariant objects; lines that cannot be parsed are skipped
         """
-        # Strip <think>...</think> blocks
-        response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+        response_text = self._strip_think_blocks(response_text)
         
         keywords = []
         if hasattr(idea, "keywords") and idea.keywords:
@@ -396,7 +411,7 @@ class AITitleGenerator:
             response_text = self.ollama_client.generate(prompt, temperature=0.1)
 
             # Strip <think>...</think> blocks
-            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+            response_text = self._strip_think_blocks(response_text)
 
             # Parse each numbered line into a 0-1 float score
             scores: List[float] = []
@@ -509,7 +524,7 @@ class AITitleGenerator:
         """
         try:
             # Strip <think>...</think> blocks (used by qwen3 thinking mode)
-            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+            response_text = self._strip_think_blocks(response_text)
 
             # Clean the response
             title_text = response_text.strip()
