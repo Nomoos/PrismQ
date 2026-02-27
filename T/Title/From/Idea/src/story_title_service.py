@@ -252,8 +252,14 @@ class StoryTitleService:
         1. state = TITLE_FROM_IDEA (ready for title generation)
         2. No Title records exist for the story_id
 
+        The returned list is sorted so that stories from Ideas with fewer
+        existing titles are processed first (giving less-covered Ideas
+        priority). Within the same sibling-title count, newer Stories
+        (higher created_at) come first.
+
         Returns:
-            List of Story objects without Title references.
+            List of Story objects without Title references, sorted by
+            (sibling_title_count ASC, created_at DESC).
 
         Raises:
             RuntimeError: If no database connection is available.
@@ -270,6 +276,21 @@ class StoryTitleService:
             titles = self._title_repo.find_by_story_id(story.id)
             if not titles:
                 stories_without_titles.append(story)
+
+        # Pre-compute sibling title counts once to keep the sort
+        # O(N) in query count rather than re-querying inside each comparison.
+        sibling_title_counts = {
+            story.id: len(self.get_sibling_titles(story))
+            for story in stories_without_titles
+        }
+
+        # Sort: fewest sibling titles first (Ideas with less coverage first),
+        # then newest story first (created_at descending) as a tiebreaker.
+        def _sort_key(story: Story):
+            created_ts = story.created_at.timestamp() if story.created_at else 0.0
+            return (sibling_title_counts[story.id], -created_ts)
+
+        stories_without_titles.sort(key=_sort_key)
 
         return stories_without_titles
 

@@ -662,3 +662,116 @@ class TestTitleUniquenessWithDatabase:
 
         # Should fall back to highest scored since all are similar
         assert best.score == 0.9
+
+
+class TestGetStoriesWithoutTitlesSortOrder:
+    """Tests for the sort order of get_stories_without_titles().
+
+    Stories should be returned sorted by:
+    1. Number of sibling titles (titles from other stories with the same
+       idea_id) — ascending (Ideas with fewest existing titles first).
+    2. created_at — descending (newest Story first) as a tiebreaker.
+    """
+
+    @pytest.fixture
+    def db_connection(self):
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        yield conn
+        conn.close()
+
+    @pytest.fixture
+    def service(self, db_connection):
+        svc = StoryTitleService(db_connection, use_ai=False)
+        svc.ensure_tables_exist()
+        return svc
+
+    def _insert_story(self, service, idea_id: str, created_at=None):
+        from datetime import datetime
+        from Model.Database.repositories.story_repository import StoryRepository
+        from Model.Entities.story import Story, StoryState as _SS
+        story = Story(
+            idea_id=idea_id,
+            state=_SS.TITLE_FROM_IDEA.value,
+            created_at=created_at or datetime.now(),
+        )
+        return service._story_repo.insert(story)
+
+    def _insert_title(self, service, story_id: int, text: str):
+        from Model.Database.models.title import Title
+        title = Title(story_id=story_id, version=0, text=text)
+        return service._title_repo.insert(title)
+
+    def test_idea_with_zero_sibling_titles_comes_before_idea_with_some(self, service):
+        """A story from an Idea with 0 sibling titles precedes one with 2."""
+        # Idea A: story_a1 and story_a2 already have titles; story_a3 does not.
+        story_a1 = self._insert_story(service, "idea-a")
+        story_a2 = self._insert_story(service, "idea-a")
+        story_a3 = self._insert_story(service, "idea-a")
+        self._insert_title(service, story_a1.id, "Title for Story A1")
+        self._insert_title(service, story_a2.id, "Title for Story A2")
+
+        # Idea B: no sibling titles at all.
+        story_b1 = self._insert_story(service, "idea-b")
+
+        stories = service.get_stories_without_titles()
+
+        ids = [s.id for s in stories]
+        # story_b1 (0 sibling titles) must appear before story_a3 (2 sibling titles)
+        assert story_b1.id in ids
+        assert story_a3.id in ids
+        assert ids.index(story_b1.id) < ids.index(story_a3.id)
+
+    def test_stories_with_titles_are_excluded(self, service):
+        """Stories that already have a title are never returned."""
+        story_with = self._insert_story(service, "idea-x")
+        story_without = self._insert_story(service, "idea-x")
+        self._insert_title(service, story_with.id, "Existing Title")
+
+        stories = service.get_stories_without_titles()
+        ids = [s.id for s in stories]
+
+        assert story_with.id not in ids
+        assert story_without.id in ids
+
+    def test_newer_story_comes_first_when_sibling_count_equal(self, service):
+        """Among stories with the same sibling-title count, newest comes first."""
+        from datetime import datetime, timedelta
+
+        older_time = datetime(2025, 1, 1, 10, 0, 0)
+        newer_time = datetime(2025, 1, 1, 11, 0, 0)
+
+        story_older = self._insert_story(service, "idea-c", created_at=older_time)
+        story_newer = self._insert_story(service, "idea-c", created_at=newer_time)
+
+        stories = service.get_stories_without_titles()
+        ids = [s.id for s in stories]
+
+        # Both have 0 sibling titles; newer should come first
+        assert ids.index(story_newer.id) < ids.index(story_older.id)
+
+    def test_sort_combines_sibling_count_and_recency(self, service):
+        """Full sort: sibling count is the primary key, recency the secondary key."""
+        from datetime import datetime
+
+        t1 = datetime(2025, 1, 1, 9, 0, 0)
+        t2 = datetime(2025, 1, 1, 10, 0, 0)
+        t3 = datetime(2025, 1, 1, 11, 0, 0)
+
+        # Idea A: 1 sibling title; two candidate stories (older and newer)
+        story_a_titled = self._insert_story(service, "idea-a", created_at=t1)
+        self._insert_title(service, story_a_titled.id, "Sibling title")
+        story_a_newer = self._insert_story(service, "idea-a", created_at=t3)
+        story_a_older = self._insert_story(service, "idea-a", created_at=t1)
+
+        # Idea B: 0 sibling titles
+        story_b = self._insert_story(service, "idea-b", created_at=t2)
+
+        stories = service.get_stories_without_titles()
+        ids = [s.id for s in stories]
+
+        # 1. story_b (0 sibling titles) before both Idea A stories
+        assert ids.index(story_b.id) < ids.index(story_a_newer.id)
+        assert ids.index(story_b.id) < ids.index(story_a_older.id)
+        # 2. Among Idea A stories (1 sibling title each), newer comes first
+        assert ids.index(story_a_newer.id) < ids.index(story_a_older.id)
