@@ -775,3 +775,33 @@ class TestGetStoriesWithoutTitlesSortOrder:
         assert ids.index(story_b.id) < ids.index(story_a_older.id)
         # 2. Among Idea A stories (1 sibling title each), newer comes first
         assert ids.index(story_a_newer.id) < ids.index(story_a_older.id)
+
+    def test_no_consecutive_stories_from_same_idea(self, service):
+        """Stories from the same Idea are never consecutive in the result."""
+        from datetime import datetime
+
+        t1 = datetime(2025, 1, 1, 9, 0, 0)
+        t2 = datetime(2025, 1, 1, 10, 0, 0)
+        t3 = datetime(2025, 1, 1, 11, 0, 0)
+
+        # Idea A: 2 untitled stories (no sibling titles)
+        story_a1 = self._insert_story(service, "idea-a", created_at=t3)
+        story_a2 = self._insert_story(service, "idea-a", created_at=t2)
+
+        # Idea B: 1 untitled story (no sibling titles)
+        story_b1 = self._insert_story(service, "idea-b", created_at=t1)
+
+        stories = service.get_stories_without_titles()
+
+        # Consecutive pairs must not share the same idea_id
+        for prev, curr in zip(stories, stories[1:]):
+            assert prev.idea_id != curr.idea_id, (
+                f"Consecutive stories share idea_id={prev.idea_id}: "
+                f"story {prev.id} followed by story {curr.id}"
+            )
+
+        # All stories must still be present
+        ids = [s.id for s in stories]
+        assert story_a1.id in ids
+        assert story_a2.id in ids
+        assert story_b1.id in ids

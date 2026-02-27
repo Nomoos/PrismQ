@@ -252,14 +252,18 @@ class StoryTitleService:
         1. state = TITLE_FROM_IDEA (ready for title generation)
         2. No Title records exist for the story_id
 
-        The returned list is sorted so that stories from Ideas with fewer
+        The returned list is ordered so that stories from Ideas with fewer
         existing titles are processed first (giving less-covered Ideas
         priority). Within the same sibling-title count, newer Stories
-        (higher created_at) come first.
+        (higher created_at) come first.  Stories are then interleaved by
+        idea_id so that no two consecutive entries share the same Idea,
+        ensuring all Ideas get a turn before any Idea receives a second
+        story in the same processing run.
 
         Returns:
-            List of Story objects without Title references, sorted by
-            (sibling_title_count ASC, created_at DESC).
+            List of Story objects without Title references, ordered by
+            (sibling_title_count ASC, created_at DESC) and interleaved
+            across Ideas.
 
         Raises:
             RuntimeError: If no database connection is available.
@@ -292,7 +296,25 @@ class StoryTitleService:
 
         stories_without_titles.sort(key=_sort_key)
 
-        return stories_without_titles
+        # Interleave stories from different ideas so that no two consecutive
+        # stories share the same idea_id.  This prevents a run from processing
+        # all stories of one idea back-to-back before other ideas get a turn,
+        # even when sibling-title counts are equal across ideas.
+        interleaved: List[Story] = []
+        seen_idea_ids: set = set()
+        remaining = list(stories_without_titles)
+        while remaining:
+            next_remaining: List[Story] = []
+            for story in remaining:
+                if story.idea_id not in seen_idea_ids:
+                    interleaved.append(story)
+                    seen_idea_ids.add(story.idea_id)
+                else:
+                    next_remaining.append(story)
+            seen_idea_ids.clear()
+            remaining = next_remaining
+
+        return interleaved
 
     def story_has_title(self, story_id: int) -> bool:
         """Check if a Story already has a Title.

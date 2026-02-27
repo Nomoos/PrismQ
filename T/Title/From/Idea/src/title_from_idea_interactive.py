@@ -745,10 +745,23 @@ def run_state_workflow_mode(
                     # Generate variants using AI through the service
                     variants = service.generate_title_variants(idea, num_variants=num_variants)
 
-                    if not variants:
-                        raise AIUnavailableError("AI returned no title variants")
+                except AIUnavailableError as e:
+                    print_error(f"AI unavailable: {e}")
+                    print_error("Stopping processing - AI is required for title generation")
+                    if logger:
+                        logger.error(f"AI unavailable: {e}")
+                    idea_db.close()
+                    conn.close()
+                    raise  # Re-raise to stop processing
 
-                    # Select best title using similarity check
+                if not variants:
+                    print_warning(f"AI could not generate valid variants for Story {story.id}, skipping")
+                    if logger:
+                        logger.warning(f"No variants generated for Story {story.id}")
+                    error_count += 1
+                    continue
+
+                try:
                     print_section("Selecting Best Title (with Similarity Check)")
                     best_variant, similar_titles = service.select_best_title(variants, story)
 
