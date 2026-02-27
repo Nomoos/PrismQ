@@ -395,6 +395,11 @@ def get_top_flavors_for_audience(
 # WEIGHTED SELECTION
 # =============================================================================
 
+# Engagement goals that matter for the primary audience (girls 15-20, US/Canada)
+# targeting interactions, rewatch, and sharing.
+_PRIMARY_ENGAGEMENT_GOALS: frozenset = frozenset({"rewatch", "comment", "share"})
+
+
 def get_flavor_weights() -> Dict[str, int]:
     """Get the flavor weight mappings.
     
@@ -408,10 +413,11 @@ def get_flavor_weights() -> Dict[str, int]:
 def pick_weighted_flavor(seed: Optional[int] = None) -> str:
     """Pick a flavor using weighted random selection.
 
-    Selects by default from the engagement-optimised flavor pool
-    (flavors that carry an ``engagement_goal``). Use
-    :func:`list_flavors` directly if you need unrestricted selection
-    across all flavors.
+    Uses the full flavor pool minus any flavors that carry ``risk_flags``
+    (restricted variants). Each flavor's base weight is boosted by 0.5× for
+    every ``engagement_goal`` that aligns with the primary audience goals
+    (rewatch, comment, share) — reflecting the content strategy for girls
+    15–20 in the US/Canada targeting interactions, rewatch, and sharing.
 
     Args:
         seed: Optional seed for reproducible selection
@@ -424,10 +430,21 @@ def pick_weighted_flavor(seed: Optional[int] = None) -> str:
     else:
         rng = random.Random()
 
-    flavors = get_engagement_flavors()
-    weights_dict = get_flavor_weights()
-    weights = [weights_dict.get(f, 50) for f in flavors]
-    
+    loader = get_flavor_loader()
+    all_flavor_data = loader.get_all_flavors()
+    base_weights = get_flavor_weights()
+
+    flavors = []
+    weights = []
+    for name, info in all_flavor_data.items():
+        if info.get("risk_flags"):
+            continue  # skip restricted variants
+        base = base_weights.get(name, 50)
+        goal_overlap = len(_PRIMARY_ENGAGEMENT_GOALS & set(info.get("engagement_goal", [])))
+        effective = base * (1.0 + 0.5 * goal_overlap)
+        flavors.append(name)
+        weights.append(effective)
+
     return rng.choices(flavors, weights=weights, k=1)[0]
 
 
