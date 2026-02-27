@@ -139,6 +139,44 @@ class FlavorLoader:
         
         return sorted(matching)
     
+    def get_flavors_by_engagement_goal(self, goal: str) -> List[str]:
+        """Get flavors that include a specific engagement goal.
+
+        Args:
+            goal: Engagement goal to filter by (e.g. "rewatch", "comment",
+                  "share", "save", "follow", "watch_more")
+
+        Returns:
+            Sorted list of matching flavor names
+        """
+        self.ensure_loaded()
+        goal_lower = goal.lower()
+        matching = []
+        for name, flavor in self._flavors.items():
+            goals = flavor.get('engagement_goal', [])
+            if any(goal_lower == g.lower() for g in goals):
+                matching.append(name)
+        return sorted(matching)
+
+    def get_flavors_by_format(self, format_name: str) -> List[str]:
+        """Get flavors that fit a specific content format.
+
+        Args:
+            format_name: Format to filter by (e.g. "reels", "shorts",
+                         "tiktok", "stories")
+
+        Returns:
+            Sorted list of matching flavor names
+        """
+        self.ensure_loaded()
+        fmt_lower = format_name.lower()
+        matching = []
+        for name, flavor in self._flavors.items():
+            formats = flavor.get('format_fit', [])
+            if any(fmt_lower == f.lower() for f in formats):
+                matching.append(name)
+        return sorted(matching)
+
     def get_flavor_count(self) -> int:
         """Get total number of flavors.
         

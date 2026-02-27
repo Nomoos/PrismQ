@@ -77,6 +77,108 @@ FLAVOR_CATEGORIES = {
         'Online Connection + Teen Voice',
         'Mirror Moment + Identity Power',
     ],
+    'Engagement Flawors': [
+        'Infinity Loop Close',
+        'Hidden Detail Hunt',
+        'Before/After Reveal',
+        'Micro-Mystery (8\u201312s)',
+        'Chat Screenshot Story',
+        '"Wait for it" Payoff',
+        'Checklist Replay',
+        '"POV: Girl Math"',
+        'Green/Red Flag Radar',
+        'Soft Hot Take',
+        'Mini-Series Hook',
+        '"I Wish I Knew" Confessional',
+        '"Rate My Outfit/Plan"',
+        'Aesthetic Satisfying Loop',
+        '"2 Endings" Replay',
+        '"Spot the Difference"',
+        '"One Line Twist"',
+        '"Teach Me, Babe"',
+    ],
+    'Geo-Embedded Story Flavors': [
+        'The Morning Train Confession in Halifax',
+        'The Girl Who Noticed Something Off in Toronto at 8 AM',
+        'The Text I Received Before School in New York',
+        'The Silent Walk Through Boston That Changed Everything',
+        'The Message I Opened Too Late in Montreal',
+        'The Coffee Shop Encounter in Philadelphia',
+        'The Routine Morning That Felt Different in Toronto',
+        'The Stranger Who Sat Next to Me in New York Subway',
+        'The Snowy Morning Secret in Montreal',
+        'The Sunrise Realization in Halifax',
+        'The Voice Note I Listened to on My Way to School in Boston',
+        'The Day Started Normally in Philadelphia\u2026 Until It Didn\u2019t',
+        'The Girl Watching Me on the Train to New York',
+        'The Feeling I Had Walking Alone in Toronto',
+        'The Friend Who Texted Me at 8:03 AM in Boston',
+        'The Last Normal Morning in Montreal',
+        'The Uneasy Silence in a Halifax Classroom',
+        'The Call I Missed in Philadelphia Morning',
+        'The Eye Contact That Felt Wrong in New York',
+        'The Moment I Knew Something Was About to Happen in Toronto',
+    ],
+    'Comment-Trigger Flavors': [
+        '"This Happened to Me Before School in Boston"',
+        'The Girl Who Seemed Perfect in New York',
+        'The Friend Group Shift in Toronto Morning',
+        'The Subtle Red Flag I Ignored in Philadelphia',
+        'The Gut Feeling I Had in Montreal',
+        'The Story I Never Told Anyone in Halifax',
+        'The Overthinking Spiral on a New York Morning',
+        'The Quiet Girl Sitting Behind Me in Boston',
+        'The One Detail Nobody Noticed in Toronto',
+        'The Morning That Felt Scripted in Montreal',
+    ],
+    'Rewatch Loop Flavors': [
+        'The Clue Hidden in the First Scene (New York)',
+        'What You Miss on First Watch in Toronto',
+        'The Detail in the Background (Boston Morning)',
+        'The Timeline That Doesn\u2019t Add Up in Philadelphia',
+        'The Story That Makes Sense Only at the End (Montreal)',
+        'The Second Watch Changes Everything in Halifax',
+        'The Girl Who Was There the Whole Time (New York)',
+        'The Subtle Foreshadowing in Toronto Sunrise',
+        'The Scene That Feels Different After the Reveal (Boston)',
+        'The Memory That Doesn\u2019t Match Reality (Montreal)',
+    ],
+    'Psychological & Soft Dark Flavors': [
+        'The Girl Who Pretended Everything Was Fine in New York',
+        'The Quiet Breakdown on a Toronto Morning',
+        'The Smile That Hid Something in Boston',
+        'The Safe Place That Suddenly Felt Unsafe in Montreal',
+        'The Thought I Couldn\u2019t Ignore in Philadelphia',
+        'The Feeling of Being Watched in Halifax',
+        'The Version of Me No One Saw in New York',
+        'The Secret I Realized Too Late in Toronto',
+        'The Emotional Shift During a Normal Morning in Boston',
+        'The Story That Gets Darker Each Part (Montreal Setting)',
+    ],
+    'Hybrid Viral Flavors': [
+        'Soft Morning Routine \u2192 Sudden Disturbance (Toronto)',
+        'Innocent Beginning \u2192 Creepy Realization (New York)',
+        'Comfort Aesthetic \u2192 Psychological Twist (Boston)',
+        'Relatable POV \u2192 Dark Reveal (Montreal)',
+        'Nostalgic School Morning \u2192 Hidden Truth (Halifax)',
+        'Cozy Coffee Scene \u2192 Unsettling Ending (Philadelphia)',
+        'Slice of Life \u2192 Suspense Escalation (Toronto)',
+        'Emotional Confession \u2192 Unexpected Clue (New York)',
+        'Calm Sunrise \u2192 Anxiety Shift (Boston)',
+        'Ordinary Day \u2192 Disturbing Pattern (Montreal)',
+    ],
+    'Ultra-Optimized Meta Flavors': [
+        '"I Shouldn\u2019t Be Telling This (Happened in New York)"',
+        '"Nobody Believed Me That Morning in Toronto"',
+        '"This Still Feels Unreal (Boston Story)"',
+        '"I Never Talk About What Happened in Montreal"',
+        '"You Won\u2019t Notice It at First (Philadelphia)"',
+        '"This Happened at 8:07 AM in Halifax"',
+        '"It Started Like Any Normal Morning in New York"',
+        '"Something Felt Off in Toronto and I Ignored It"',
+        '"The Moment Everything Changed in Boston"',
+        '"The Story I Wish I Could Forget (Montreal)"',
+    ],
 }
 
 
@@ -387,6 +489,50 @@ def search_flavors_by_keyword(keyword: str) -> List[str]:
     return sorted(matches)
 
 
+# =============================================================================
+# ENGAGEMENT FLAWORS
+# =============================================================================
+
+def get_engagement_flavors(goal: Optional[str] = None) -> List[str]:
+    """Get engagement flavors, optionally filtered by engagement goal.
+
+    Engagement flavors are flavors that carry the ``engagement_goal`` field,
+    meaning they are specifically designed to drive rewatch, comments, shares,
+    saves, follows or watch-more.
+
+    Args:
+        goal: Optional engagement goal to filter by.  Supported values:
+              ``"rewatch"``, ``"comment"``, ``"share"``, ``"save"``,
+              ``"follow"``, ``"watch_more"``.
+              If *None*, all flavors that have any ``engagement_goal`` are
+              returned.
+
+    Returns:
+        Sorted list of matching flavor names
+    """
+    loader = get_flavor_loader()
+    if goal:
+        return loader.get_flavors_by_engagement_goal(goal)
+    all_flavors = loader.get_all_flavors()
+    return sorted(
+        name for name, info in all_flavors.items() if 'engagement_goal' in info
+    )
+
+
+def get_flavors_by_format(format_name: str) -> List[str]:
+    """Get flavors that fit a specific content format.
+
+    Args:
+        format_name: Platform format, e.g. ``"reels"``, ``"shorts"``,
+                     ``"tiktok"``, ``"stories"``.
+
+    Returns:
+        Sorted list of matching flavor names
+    """
+    loader = get_flavor_loader()
+    return loader.get_flavors_by_format(format_name)
+
+
 __all__ = [
     # Categories
     'FLAVOR_CATEGORIES',
@@ -410,4 +556,7 @@ __all__ = [
     'get_default_flavor',
     # Search
     'search_flavors_by_keyword',
+    # Engagement flavors
+    'get_engagement_flavors',
+    'get_flavors_by_format',
 ]

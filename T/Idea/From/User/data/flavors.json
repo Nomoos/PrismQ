@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "version": "1.0",
+    "version": "2.0",
     "description": "Flavor definitions for PrismQ Idea Creation system",
-    "last_updated": "2025-12-09",
-    "total_flavors": 39
+    "last_updated": "2026-02-27",
+    "total_flavors": 127
   },
   "default_fields": {
     "hook": "The attention-grabbing opening or central question",
@@ -16,237 +16,385 @@
   "flavors": {
     "Emotion-First Hook": {
       "description": "Emotion as the primary driver",
-      "keywords": ["emotional", "hook", "feeling"],
+      "keywords": [
+        "emotional",
+        "hook",
+        "feeling"
+      ],
       "focus": "emotional_core",
       "weight": 70
     },
     "Mystery/Curiosity Gap": {
       "description": "Central mystery or unanswered question",
-      "keywords": ["mystery", "curiosity", "question"],
+      "keywords": [
+        "mystery",
+        "curiosity",
+        "question"
+      ],
       "focus": "hook",
       "weight": 68
     },
     "Story Skeleton": {
       "description": "Complete story structure framework",
-      "keywords": ["structure", "framework", "narrative"],
+      "keywords": [
+        "structure",
+        "framework",
+        "narrative"
+      ],
       "focus": "key_elements",
       "weight": 60
     },
     "Short-Form Viral": {
       "description": "Optimized for short-form viral platforms",
-      "keywords": ["viral", "short", "engaging"],
+      "keywords": [
+        "viral",
+        "short",
+        "engaging"
+      ],
       "focus": "hook",
       "weight": 65
     },
     "Niche-Blend": {
       "description": "Combines multiple niches",
-      "keywords": ["blend", "niche", "unique"],
+      "keywords": [
+        "blend",
+        "niche",
+        "unique"
+      ],
       "focus": "core_concept",
       "weight": 55
     },
     "Soft Supernatural + Friendship": {
       "description": "Gentle supernatural with friendship and emotional growth",
-      "keywords": ["supernatural", "friendship", "wonder"],
+      "keywords": [
+        "supernatural",
+        "friendship",
+        "wonder"
+      ],
       "focus": "emotional_core",
       "weight": 70
     },
     "Light Mystery + Adventure": {
       "description": "Puzzles and adventure without dark themes",
-      "keywords": ["mystery", "adventure", "light"],
+      "keywords": [
+        "mystery",
+        "adventure",
+        "light"
+      ],
       "focus": "key_elements",
       "weight": 68
     },
     "Sci-Fi + School Realism": {
       "description": "Near-future tech meets real school life",
-      "keywords": ["scifi", "school", "identity"],
+      "keywords": [
+        "scifi",
+        "school",
+        "identity"
+      ],
       "focus": "core_concept",
       "weight": 60
     },
     "Emotional Drama + Growth": {
       "description": "Character-driven feelings and transformation",
-      "keywords": ["emotional", "drama", "growth"],
+      "keywords": [
+        "emotional",
+        "drama",
+        "growth"
+      ],
       "focus": "emotional_core",
       "weight": 90
     },
     "Identity + Empowerment": {
       "description": "Finding voice and embracing difference",
-      "keywords": ["identity", "empowerment", "voice"],
+      "keywords": [
+        "identity",
+        "empowerment",
+        "voice"
+      ],
       "focus": "emotional_core",
       "weight": 85
     },
     "Confession Story Seed": {
       "description": "First-person confession revealing hidden truth",
-      "keywords": ["confession", "vulnerable", "honest"],
+      "keywords": [
+        "confession",
+        "vulnerable",
+        "honest"
+      ],
       "focus": "emotional_core",
       "weight": 88
     },
     "Before/After Transformation Seed": {
       "description": "Pivotal moment that changed everything",
-      "keywords": ["transformation", "change", "moment"],
+      "keywords": [
+        "transformation",
+        "change",
+        "moment"
+      ],
       "focus": "key_elements",
       "weight": 75
     },
     "Overheard Truth Seed": {
       "description": "Accidentally hearing something not meant for them",
-      "keywords": ["overheard", "secret", "discovery"],
+      "keywords": [
+        "overheard",
+        "secret",
+        "discovery"
+      ],
       "focus": "hook",
       "weight": 75
     },
     "Mirror Moment Seed": {
       "description": "Self-recognition or confrontation with self-image",
-      "keywords": ["mirror", "self", "realization"],
+      "keywords": [
+        "mirror",
+        "self",
+        "realization"
+      ],
       "focus": "emotional_core",
       "weight": 85
     },
     "Chosen Family Seed": {
       "description": "Finding belonging outside blood ties",
-      "keywords": ["family", "chosen", "belonging"],
+      "keywords": [
+        "family",
+        "chosen",
+        "belonging"
+      ],
       "focus": "emotional_core",
       "weight": 83
     },
     "Growing Apart Seed": {
       "description": "Recognizing a connection is changing or fading",
-      "keywords": ["relationship", "change", "grief"],
+      "keywords": [
+        "relationship",
+        "change",
+        "grief"
+      ],
       "focus": "emotional_core",
       "weight": 83
     },
     "First Butterflies Seed": {
       "description": "First crush and attraction experiences",
-      "keywords": ["crush", "butterflies", "attraction"],
+      "keywords": [
+        "crush",
+        "butterflies",
+        "attraction"
+      ],
       "focus": "emotional_core",
       "weight": 85
     },
     "Body Acceptance Seed": {
       "description": "Journey toward body acceptance and self-love",
-      "keywords": ["body", "acceptance", "self-love"],
+      "keywords": [
+        "body",
+        "acceptance",
+        "self-love"
+      ],
       "focus": "emotional_core",
       "weight": 85
     },
     "Fitting In Seed": {
       "description": "Navigating social belonging and acceptance",
-      "keywords": ["fitting", "belonging", "social"],
+      "keywords": [
+        "fitting",
+        "belonging",
+        "social"
+      ],
       "focus": "audience_connection",
       "weight": 80
     },
     "Online Connection Seed": {
       "description": "Digital life and online relationships",
-      "keywords": ["online", "digital", "connection"],
+      "keywords": [
+        "online",
+        "digital",
+        "connection"
+      ],
       "focus": "audience_connection",
       "weight": 80
     },
     "Future Anxiety Seed": {
       "description": "Fears and uncertainty about the future",
-      "keywords": ["future", "anxiety", "uncertainty"],
+      "keywords": [
+        "future",
+        "anxiety",
+        "uncertainty"
+      ],
       "focus": "emotional_core",
       "weight": 78
     },
     "Comparison Trap Seed": {
       "description": "Struggles with social comparison",
-      "keywords": ["comparison", "social", "self-worth"],
+      "keywords": [
+        "comparison",
+        "social",
+        "self-worth"
+      ],
       "focus": "emotional_core",
       "weight": 78
     },
     "Youth Adventure Quest": {
       "description": "Adventure-focused coming-of-age for ages 10-22",
-      "keywords": ["adventure", "growth", "discovery"],
+      "keywords": [
+        "adventure",
+        "growth",
+        "discovery"
+      ],
       "focus": "key_elements",
       "weight": 85,
       "audience": "10-22 years"
     },
     "Teen Identity Journey": {
       "description": "Identity exploration for ages 10-22",
-      "keywords": ["identity", "self-discovery", "transformation"],
+      "keywords": [
+        "identity",
+        "self-discovery",
+        "transformation"
+      ],
       "focus": "emotional_core",
       "weight": 90,
       "audience": "10-22 years"
     },
     "Modern Woman's Voice": {
       "description": "Contemporary women's experiences",
-      "keywords": ["identity", "empowerment", "authentic"],
+      "keywords": [
+        "identity",
+        "empowerment",
+        "authentic"
+      ],
       "focus": "emotional_core",
       "weight": 85,
       "audience": "US women"
     },
     "Women's Real Talk": {
       "description": "Honest stories about real-life challenges",
-      "keywords": ["honest", "relational", "vulnerable"],
+      "keywords": [
+        "honest",
+        "relational",
+        "vulnerable"
+      ],
       "focus": "emotional_core",
       "weight": 80,
       "audience": "US women"
     },
     "Maine Youth Stories": {
       "description": "Regional stories for Maine youth",
-      "keywords": ["regional", "community", "nature"],
+      "keywords": [
+        "regional",
+        "community",
+        "nature"
+      ],
       "focus": "audience_connection",
       "weight": 75,
       "audience": "Maine residents 10-25"
     },
     "Teen Girl Confessional": {
       "description": "First-person confessional for girls 13-16",
-      "keywords": ["confession", "emotional", "authentic"],
+      "keywords": [
+        "confession",
+        "emotional",
+        "authentic"
+      ],
       "focus": "emotional_core",
       "weight": 95,
       "audience": "US women 13-16"
     },
     "Young Woman's Moment": {
       "description": "Snapshot moments of teenage girlhood",
-      "keywords": ["moment", "growth", "relational"],
+      "keywords": [
+        "moment",
+        "growth",
+        "relational"
+      ],
       "focus": "emotional_core",
       "weight": 95,
       "audience": "US women 13-16"
     },
     "Teen Girl Drama": {
       "description": "Relatable dramatic stories for teen girls",
-      "keywords": ["drama", "relational", "friendship"],
+      "keywords": [
+        "drama",
+        "relational",
+        "friendship"
+      ],
       "focus": "emotional_core",
       "weight": 92,
       "audience": "teen girls"
     },
     "Girl Squad Chronicles": {
       "description": "Friendship and group dynamics",
-      "keywords": ["friendship", "group", "loyalty"],
+      "keywords": [
+        "friendship",
+        "group",
+        "loyalty"
+      ],
       "focus": "audience_connection",
       "weight": 88,
       "audience": "teen girls"
     },
     "Confession + Teen Identity": {
       "description": "Confessional moments with identity exploration",
-      "keywords": ["confession", "identity", "transformation"],
+      "keywords": [
+        "confession",
+        "identity",
+        "transformation"
+      ],
       "focus": "emotional_core",
       "weight": 100,
       "audience": "13-17 young women US/Canada"
     },
     "Body Acceptance + Real Talk": {
       "description": "Body image with honest emotional depth",
-      "keywords": ["body", "honest", "transformation"],
+      "keywords": [
+        "body",
+        "honest",
+        "transformation"
+      ],
       "focus": "emotional_core",
       "weight": 98,
       "audience": "13-17 young women US/Canada"
     },
     "Friend Drama + Girl Squad": {
       "description": "Friendship dynamics with group complexity",
-      "keywords": ["friendship", "drama", "loyalty"],
+      "keywords": [
+        "friendship",
+        "drama",
+        "loyalty"
+      ],
       "focus": "emotional_core",
       "weight": 96,
       "audience": "13-17 young women US/Canada"
     },
     "Online Connection + Teen Voice": {
       "description": "Digital life meets authentic teen expression",
-      "keywords": ["online", "authentic", "identity"],
+      "keywords": [
+        "online",
+        "authentic",
+        "identity"
+      ],
       "focus": "audience_connection",
       "weight": 94,
       "audience": "13-17 young women US/Canada"
     },
     "Mirror Moment + Identity Power": {
       "description": "Self-recognition leading to empowerment",
-      "keywords": ["mirror", "identity", "empowerment"],
+      "keywords": [
+        "mirror",
+        "identity",
+        "empowerment"
+      ],
       "focus": "emotional_core",
       "weight": 97,
       "audience": "13-17 young women US/Canada"
     },
     "Teen Girl Heart": {
       "description": "Emotional core stories for 13-17 young women",
-      "keywords": ["emotional", "authentic", "relational"],
+      "keywords": [
+        "emotional",
+        "authentic",
+        "relational"
+      ],
       "focus": "emotional_core",
       "weight": 100,
       "audience": "13-17 young women US/Canada",
@@ -254,7 +402,11 @@
     },
     "Young Woman's Truth": {
       "description": "Honest first-person narratives",
-      "keywords": ["honest", "confession", "vulnerable"],
+      "keywords": [
+        "honest",
+        "confession",
+        "vulnerable"
+      ],
       "focus": "emotional_core",
       "weight": 100,
       "audience": "13-17 young women US/Canada",
@@ -262,11 +414,3225 @@
     },
     "Teen Moment Magic": {
       "description": "Small moments with big meaning",
-      "keywords": ["moment", "meaning", "growth"],
+      "keywords": [
+        "moment",
+        "meaning",
+        "growth"
+      ],
       "focus": "emotional_core",
       "weight": 98,
       "audience": "13-17 young women US/Canada",
       "score": 9.5
+    },
+    "Infinity Loop Close": {
+      "description": "Video closes where it opens – last frame or phrase flows seamlessly into the first, triggering automatic replay",
+      "keywords": [
+        "loop",
+        "rewatch",
+        "seamless",
+        "retention"
+      ],
+      "focus": "hook",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "watch_more"
+      ],
+      "mechanics": [
+        "loop",
+        "seamless_end"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 7,
+        "max": 30
+      },
+      "cta_templates": [
+        "Did you catch how it looped back?",
+        "Watch again – notice the connection between first and last second?",
+        "Verbal or visual loop – which felt more satisfying? 👇"
+      ],
+      "ab_variants": [
+        "verbal loop vs motion loop"
+      ]
+    },
+    "Hidden Detail Hunt": {
+      "description": "1–3 intentionally planted easter eggs in the frame that reward a second viewing and spark comments",
+      "keywords": [
+        "hidden",
+        "easter egg",
+        "detail",
+        "rewatch",
+        "game"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_detail",
+        "discovery",
+        "game"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 60
+      },
+      "cta_templates": [
+        "Find all 3 things that are 'off' – drop what you found 👇",
+        "Did you spot the hidden detail? Comment below",
+        "What did you catch on your second watch?"
+      ],
+      "ab_variants": [
+        "1 detail (easy) vs 3 details (hard)"
+      ]
+    },
+    "Before/After Reveal": {
+      "description": "Transformation story with the payoff held until the very end, maximising completion and saves for reference",
+      "keywords": [
+        "transformation",
+        "reveal",
+        "payoff",
+        "completion",
+        "save"
+      ],
+      "focus": "key_elements",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "watch_more"
+      ],
+      "mechanics": [
+        "reveal",
+        "transformation",
+        "payoff"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 15,
+        "max": 90
+      },
+      "cta_templates": [
+        "Save this for inspo 🔖",
+        "Which part surprised you most?",
+        "Did you see that coming? 👀"
+      ],
+      "ab_variants": [
+        "reveal at 70% vs 90% of video length"
+      ]
+    },
+    "Micro-Mystery (8–12s)": {
+      "description": "Extremely short riddle that only makes full sense after a second viewing, driving rewatch and tip comments",
+      "keywords": [
+        "mystery",
+        "riddle",
+        "rewatch",
+        "short",
+        "puzzle"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "mystery",
+        "cliffhanger",
+        "riddle"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 8,
+        "max": 12
+      },
+      "cta_templates": [
+        "What do you think happened? Drop your theory 👇",
+        "Watch it twice – does it change your answer?",
+        "Can you figure it out before the end?"
+      ],
+      "ab_variants": [
+        "\"what happened?\" vs \"why did it happen?\""
+      ]
+    },
+    "Chat Screenshot Story": {
+      "description": "Story told through chat-window screenshots with a twist – reading pace forces a replay to catch all details",
+      "keywords": [
+        "chat",
+        "screenshot",
+        "twist",
+        "reading",
+        "shares"
+      ],
+      "focus": "hook",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "chat_story",
+        "twist",
+        "reading_pace"
+      ],
+      "format_fit": [
+        "reels",
+        "stories"
+      ],
+      "length_bucket_seconds": {
+        "min": 15,
+        "max": 60
+      },
+      "cta_templates": [
+        "Send this to someone who needs to see it",
+        "Did you catch the twist? 👀",
+        "Tag a friend this reminds you of"
+      ],
+      "ab_variants": [
+        "2 chat windows vs 4 chat windows"
+      ]
+    },
+    "\"Wait for it\" Payoff": {
+      "description": "Structure promises a payoff and delivers it right at the end, maximising watch-through via delayed reward",
+      "keywords": [
+        "payoff",
+        "wait",
+        "delayed reward",
+        "retention",
+        "completion"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "rewatch"
+      ],
+      "mechanics": [
+        "delayed_reward",
+        "cliffhanger",
+        "payoff"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 6,
+        "max": 30
+      },
+      "cta_templates": [
+        "Did the payoff hit? Let me know 👇",
+        "Worth the wait? 😅",
+        "Drop a ⭐ if you stayed till the end"
+      ],
+      "ab_variants": [
+        "payoff at 6s vs 10s"
+      ]
+    },
+    "Checklist Replay": {
+      "description": "Dense checklist intentionally too fast for one viewing, driving saves and replays through information density",
+      "keywords": [
+        "checklist",
+        "save",
+        "list",
+        "replay",
+        "dense",
+        "useful"
+      ],
+      "focus": "key_elements",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "rewatch"
+      ],
+      "mechanics": [
+        "checklist",
+        "information_density",
+        "utility"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 15,
+        "max": 60
+      },
+      "cta_templates": [
+        "Save this – you'll need it later 🔖",
+        "How many can you memorise in one watch?",
+        "Screenshot the one that resonates most 📸"
+      ],
+      "ab_variants": [
+        "low text density vs high text density"
+      ]
+    },
+    "\"POV: Girl Math\"": {
+      "description": "Inside-joke or 'girl logic' framing that sparks comments of agreement, disagreement or personal additions",
+      "keywords": [
+        "pov",
+        "relatability",
+        "girl math",
+        "inside joke",
+        "comment"
+      ],
+      "focus": "audience_connection",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "relatability",
+        "inside_joke",
+        "normative_debate"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 7,
+        "max": 30
+      },
+      "cta_templates": [
+        "Ok which one of us is this? 🙋‍♀️",
+        "Agree or disagree – explain yourself 👇",
+        "Add yours in the comments"
+      ],
+      "ab_variants": [
+        "soft/cute version vs hot take version"
+      ]
+    },
+    "Green/Red Flag Radar": {
+      "description": "Green-flag / red-flag framing invites normative debate and long explanatory comments by asking audiences to rate or justify",
+      "keywords": [
+        "green flag",
+        "red flag",
+        "debate",
+        "rating",
+        "relationship"
+      ],
+      "focus": "audience_connection",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "rating",
+        "normative_debate",
+        "binary_frame"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 15,
+        "max": 60
+      },
+      "cta_templates": [
+        "Green or red flag? Explain WHY 👇",
+        "Rate it 1–10 and tell me your reason",
+        "Which one would you add to this list?"
+      ],
+      "ab_variants": [
+        "3 examples vs 7 examples"
+      ]
+    },
+    "Soft Hot Take": {
+      "description": "Polarising statement in a safe, non-toxic tone that motivates audiences to share their opinion without conflict",
+      "keywords": [
+        "hot take",
+        "polarising",
+        "opinion",
+        "safe",
+        "debate"
+      ],
+      "focus": "hook",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "share",
+        "comment"
+      ],
+      "mechanics": [
+        "polarisation",
+        "soft_controversy",
+        "opinion"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 45
+      },
+      "cta_templates": [
+        "Hot take – agree or disagree? 🔥",
+        "Tell me your honest opinion below 👇",
+        "Share this if you agree (or disagree 😅)"
+      ],
+      "ab_variants": [
+        "question format vs statement format",
+        "1 claim vs 2 claims"
+      ],
+      "risk_flags": [
+        "avoid_spammy_engagement_bait"
+      ]
+    },
+    "Mini-Series Hook": {
+      "description": "Video functions as a named episode in a series, driving watch-more and follows through seriality",
+      "keywords": [
+        "series",
+        "episode",
+        "watch more",
+        "follows",
+        "seriality"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "follow"
+      ],
+      "mechanics": [
+        "series",
+        "episode_hook",
+        "cliffhanger"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 15,
+        "max": 90
+      },
+      "cta_templates": [
+        "Follow for Part 2 coming this week 📲",
+        "Drop a 🔔 if you want the next episode",
+        "Part 1 of ? – tell me what to cover next"
+      ],
+      "ab_variants": [
+        "explicit series name vs no series name"
+      ]
+    },
+    "\"I Wish I Knew\" Confessional": {
+      "description": "Mentoring-tone confession builds trust and drives saves plus empathy comments through narrative transport",
+      "keywords": [
+        "mentor",
+        "confession",
+        "wish",
+        "advice",
+        "empathy",
+        "saves"
+      ],
+      "focus": "emotional_core",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment"
+      ],
+      "mechanics": [
+        "confessional",
+        "mentor_voice",
+        "narrative_transport"
+      ],
+      "format_fit": [
+        "reels",
+        "stories"
+      ],
+      "length_bucket_seconds": {
+        "min": 20,
+        "max": 90
+      },
+      "cta_templates": [
+        "Save this for your future self 🔖",
+        "What do YOU wish someone had told you? 👇",
+        "Tag a friend who needs this right now"
+      ],
+      "ab_variants": [
+        "\"I wish I knew…\" vs \"No one told me…\""
+      ]
+    },
+    "\"Rate My Outfit/Plan\"": {
+      "description": "Audience rates an outfit, date plan or morning routine – low barrier to comment triggers high reply volume",
+      "keywords": [
+        "rating",
+        "outfit",
+        "plan",
+        "audience participation",
+        "comment"
+      ],
+      "focus": "audience_connection",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "rating",
+        "audience_participation",
+        "poll"
+      ],
+      "format_fit": [
+        "stories",
+        "reels"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 30
+      },
+      "cta_templates": [
+        "Rate this outfit 1–10 👇",
+        "Team A or Team B – which would YOU pick?",
+        "Give me your honest rating, I can take it 😅"
+      ],
+      "ab_variants": [
+        "1-10 scale vs Team A/B"
+      ]
+    },
+    "Aesthetic Satisfying Loop": {
+      "description": "Visually satisfying process (pouring, folding, organising) where the natural loop rewards repeat viewing through sensory pleasure",
+      "keywords": [
+        "aesthetic",
+        "satisfying",
+        "ASMR",
+        "loop",
+        "sensory",
+        "process"
+      ],
+      "focus": "emotional_core",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "save"
+      ],
+      "mechanics": [
+        "loop",
+        "sensory_reward",
+        "process_video"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 7,
+        "max": 30
+      },
+      "cta_templates": [
+        "Satisfying or not? Be honest 👇",
+        "Watch this to reset your brain 🧠✨",
+        "Save for your next \"I need to calm down\" moment 🔖"
+      ],
+      "ab_variants": [
+        "tempo 0.75x vs 1.25x"
+      ]
+    },
+    "\"2 Endings\" Replay": {
+      "description": "Two possible interpretations of the ending – a second viewing reveals the alternate meaning, driving rewatch and comment debate",
+      "keywords": [
+        "ending",
+        "dual meaning",
+        "replay",
+        "interpretation",
+        "twist"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "dual_ending",
+        "twist",
+        "re_interpretation"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 45
+      },
+      "cta_templates": [
+        "Which ending did YOU see? 👇",
+        "Watch it again – do you get a different meaning?",
+        "Team Ending A or Team Ending B?"
+      ],
+      "ab_variants": [
+        "Ending A first vs Ending B first",
+        "hint vs no hint"
+      ]
+    },
+    "\"Spot the Difference\"": {
+      "description": "Outfit, hair or room 'spot the difference' game – visual search drives rewatch and turns comments into a scoreboard",
+      "keywords": [
+        "spot the difference",
+        "game",
+        "visual",
+        "rewatch",
+        "comment"
+      ],
+      "focus": "hook",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "game",
+        "visual_search",
+        "scoreboard"
+      ],
+      "format_fit": [
+        "reels",
+        "stories"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 30
+      },
+      "cta_templates": [
+        "How many differences did you spot? 👇",
+        "First to find all 5 wins 🏆",
+        "Drop your number – no cheating 😂"
+      ],
+      "ab_variants": [
+        "easy (2 differences) vs hard (5 differences)"
+      ]
+    },
+    "\"One Line Twist\"": {
+      "description": "A single sentence reframes the entire video's meaning, driving shares and a second watch",
+      "keywords": [
+        "twist",
+        "one line",
+        "reframe",
+        "meaning",
+        "shares",
+        "rewatch"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "twist",
+        "reframe",
+        "one_liner"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok"
+      ],
+      "length_bucket_seconds": {
+        "min": 10,
+        "max": 45
+      },
+      "cta_templates": [
+        "Did the last line change everything for you? 👇",
+        "Send this to someone who needs to hear that twist",
+        "Watch it again knowing the ending 😮"
+      ],
+      "ab_variants": [
+        "twist at the end vs twist at the midpoint"
+      ]
+    },
+    "\"Teach Me, Babe\"": {
+      "description": "3–5 genuinely useful micro-steps (beauty, mindset, school, finance) structured for saves and continued watching",
+      "keywords": [
+        "teach",
+        "tutorial",
+        "steps",
+        "saves",
+        "useful",
+        "micro-learning"
+      ],
+      "focus": "key_elements",
+      "weight": 81,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "watch_more"
+      ],
+      "mechanics": [
+        "tutorial",
+        "steps",
+        "utility",
+        "micro_learning"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "length_bucket_seconds": {
+        "min": 20,
+        "max": 60
+      },
+      "cta_templates": [
+        "Save this – try step 3 first 🔖",
+        "Which step are you starting with today?",
+        "Drop a ✅ when you've tried all 5"
+      ],
+      "ab_variants": [
+        "3 steps vs 5 steps",
+        "text overlay vs voice-over"
+      ]
+    },
+    "The Morning Train Confession in Halifax": {
+      "description": "Halifax commute confession story – city-grounded vulnerability drives empathy comments and shares among early-morning audiences",
+      "keywords": [
+        "confession",
+        "morning",
+        "Halifax",
+        "commute",
+        "vulnerability"
+      ],
+      "focus": "emotional_core",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "morning_narrative",
+        "confession"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Has something like this ever happened to you on the way to school?",
+        "Drop your city – does this feel real to you? 👇"
+      ]
+    },
+    "The Girl Who Noticed Something Off in Toronto at 8 AM": {
+      "description": "Subtle wrongness during a Toronto morning commute – mystery hook drives rewatch and 'me too' comments",
+      "keywords": [
+        "mystery",
+        "Toronto",
+        "morning",
+        "observation",
+        "unease"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "mystery",
+        "observation"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Would you have noticed? 👀",
+        "Tell me what YOU think was off 👇"
+      ]
+    },
+    "The Text I Received Before School in New York": {
+      "description": "A pre-school text sets up an emotional or mysterious narrative anchored in New York – drives shares and speculation comments",
+      "keywords": [
+        "text message",
+        "New York",
+        "before school",
+        "mystery",
+        "tension"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "morning_narrative",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "What do you think the text said? 👇",
+        "Have you ever gotten a text that changed your whole day?"
+      ]
+    },
+    "The Silent Walk Through Boston That Changed Everything": {
+      "description": "A wordless Boston morning walk unfolds as a turning-point narrative – atmosphere and emotional shift drive saves and rewatches",
+      "keywords": [
+        "Boston",
+        "walk",
+        "silence",
+        "turning point",
+        "transformation"
+      ],
+      "focus": "emotional_core",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "save",
+        "comment"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "atmosphere",
+        "transformation"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this if a walk has ever changed how you felt 🔖",
+        "Which city would make this hit different for you? 👇"
+      ]
+    },
+    "The Message I Opened Too Late in Montreal": {
+      "description": "A missed or delayed message in Montreal creates emotional regret tension – relatability loop drives long comments",
+      "keywords": [
+        "Montreal",
+        "message",
+        "too late",
+        "regret",
+        "tension"
+      ],
+      "focus": "emotional_core",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "delayed_reveal",
+        "regret"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Have you ever opened a message too late? 😔",
+        "Drop what you would have done 👇"
+      ]
+    },
+    "The Coffee Shop Encounter in Philadelphia": {
+      "description": "A chance coffee-shop meeting in Philadelphia anchors a short emotional or mysterious narrative – immersion boosts completion",
+      "keywords": [
+        "Philadelphia",
+        "coffee shop",
+        "encounter",
+        "chance meeting",
+        "urban"
+      ],
+      "focus": "hook",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "chance_encounter",
+        "morning_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Would you have said something? 👇",
+        "Coffee shop energy is different – drop your city ☕"
+      ]
+    },
+    "The Routine Morning That Felt Different in Toronto": {
+      "description": "A familiar Toronto morning routine subtly shifts – small wrongness drives rewatch for clues",
+      "keywords": [
+        "routine",
+        "Toronto",
+        "morning",
+        "shift",
+        "unease"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "routine_disruption",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Watch it twice – did you catch when it shifted? 👀",
+        "Tell me the moment it felt off to you 👇"
+      ]
+    },
+    "The Stranger Who Sat Next to Me in New York Subway": {
+      "description": "Subway encounter with a stranger in New York – urban tension and curiosity drive comments and shares to friends",
+      "keywords": [
+        "New York",
+        "subway",
+        "stranger",
+        "encounter",
+        "urban tension"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "stranger_encounter",
+        "urban_tension"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Has this ever happened to you on the subway? 👇",
+        "Send this to a friend who takes the subway"
+      ]
+    },
+    "The Snowy Morning Secret in Montreal": {
+      "description": "Winter atmosphere in Montreal wraps a secret or confession – sensory setting deepens emotional engagement and saves",
+      "keywords": [
+        "Montreal",
+        "snow",
+        "winter",
+        "secret",
+        "atmosphere"
+      ],
+      "focus": "emotional_core",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "atmosphere",
+        "secret_reveal"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Snowy morning energy hits different 🌨️ – save if you get it 🔖",
+        "What secret would you reveal on a morning like this? 👇"
+      ]
+    },
+    "The Sunrise Realization in Halifax": {
+      "description": "A Halifax sunrise becomes the backdrop for a quiet pivotal realization – early-morning timing aligns with NST/AST first-wave audiences",
+      "keywords": [
+        "Halifax",
+        "sunrise",
+        "realization",
+        "morning",
+        "introspection"
+      ],
+      "focus": "emotional_core",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "introspection",
+        "morning_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Save this for your next 6 AM morning 🔖",
+        "What realization hit you during a sunrise? 👇"
+      ]
+    },
+    "The Voice Note I Listened to on My Way to School in Boston": {
+      "description": "A voice note heard during a Boston morning commute triggers an emotional turning point – audio-format hook drives rewatch",
+      "keywords": [
+        "Boston",
+        "voice note",
+        "commute",
+        "school",
+        "revelation"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "audio_hook",
+        "morning_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Have you ever heard something in a voice note that changed everything? 👇",
+        "Drop a 🎙️ if you're a voice-note person"
+      ]
+    },
+    "The Day Started Normally in Philadelphia… Until It Didn’t": {
+      "description": "Philadelphia morning routine disrupted by an unexpected event – cliffhanger structure maximises watch-through and part-2 demand",
+      "keywords": [
+        "Philadelphia",
+        "morning",
+        "disruption",
+        "cliffhanger",
+        "twist"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "cliffhanger",
+        "routine_disruption"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Do you want to know what happened? 👇",
+        "Drop a 🔔 for part 2"
+      ]
+    },
+    "The Girl Watching Me on the Train to New York": {
+      "description": "Unsettling observation during a New York-bound train ride – gaze and tension drive rewatch to catch missed details",
+      "keywords": [
+        "New York",
+        "train",
+        "watching",
+        "tension",
+        "observation"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "tension",
+        "observation",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Would you have looked away? 👀",
+        "What do you think she was thinking? 👇"
+      ]
+    },
+    "The Feeling I Had Walking Alone in Toronto": {
+      "description": "Solo Toronto morning walk surfaces an internal emotional or intuitive moment – introspective tone drives saves and relate-comments",
+      "keywords": [
+        "Toronto",
+        "alone",
+        "walking",
+        "feeling",
+        "intuition",
+        "introspection"
+      ],
+      "focus": "emotional_core",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "introspection",
+        "solitude"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save if you’ve ever felt this walking alone 🔖",
+        "Tell me your city and what you were thinking 👇"
+      ]
+    },
+    "The Friend Who Texted Me at 8:03 AM in Boston": {
+      "description": "Hyper-specific Boston morning text anchors a relatable tension or revelation – precise timestamp deepens immersion",
+      "keywords": [
+        "Boston",
+        "friend",
+        "text",
+        "morning",
+        "tension",
+        "specific time"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "friend_tension",
+        "morning_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Has a friend ever texted you something that hit different in the morning? 👇",
+        "Tag the friend who texts at the worst times 😅"
+      ]
+    },
+    "The Last Normal Morning in Montreal": {
+      "description": "Montreal morning before everything changed – nostalgia and loss framing drive deep emotional comments and saves",
+      "keywords": [
+        "Montreal",
+        "last morning",
+        "before",
+        "nostalgia",
+        "loss",
+        "change"
+      ],
+      "focus": "emotional_core",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "before_after",
+        "nostalgia"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this for the day you need to remember it 🔖",
+        "What was your last ‘normal morning’? 👇"
+      ]
+    },
+    "The Uneasy Silence in a Halifax Classroom": {
+      "description": "Classroom silence in Halifax creates ambient tension – shared institutional setting maximises relatability and comment volume",
+      "keywords": [
+        "Halifax",
+        "classroom",
+        "silence",
+        "tension",
+        "school",
+        "unease"
+      ],
+      "focus": "audience_connection",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "ambient_tension",
+        "school_setting"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "You know exactly what silence I mean 👀 – drop your school city 👇",
+        "Has your classroom ever gone THIS quiet?"
+      ]
+    },
+    "The Call I Missed in Philadelphia Morning": {
+      "description": "A missed Philadelphia morning call carries unspoken weight – regret loop and curiosity drive rewatch and speculation comments",
+      "keywords": [
+        "Philadelphia",
+        "missed call",
+        "morning",
+        "regret",
+        "mystery"
+      ],
+      "focus": "hook",
+      "weight": 74,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "regret",
+        "mystery",
+        "delayed_reveal"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Have you ever been too scared to call back? 👇",
+        "Drop who you think was calling 🔕"
+      ]
+    },
+    "The Eye Contact That Felt Wrong in New York": {
+      "description": "Brief intense eye contact in New York triggers an emotional or threat-aware narrative – physical sensation hook drives rewatch",
+      "keywords": [
+        "New York",
+        "eye contact",
+        "wrong feeling",
+        "tension",
+        "urban"
+      ],
+      "focus": "hook",
+      "weight": 75,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "tension",
+        "physical_sensation",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Would you have felt the same? 👀",
+        "Drop a 👀 if you’ve had this exact moment"
+      ]
+    },
+    "The Moment I Knew Something Was About to Happen in Toronto": {
+      "description": "Pre-event intuition narrative set in Toronto – calm-before-the-storm structure drives watch-through and part-2 anticipation",
+      "keywords": [
+        "Toronto",
+        "intuition",
+        "premonition",
+        "before",
+        "tension",
+        "anticipation"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "premonition",
+        "cliffhanger"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Drop a 🔔 if you want to know what happened next",
+        "Have you ever just KNOWN something was coming? 👇"
+      ]
+    },
+    "\"This Happened to Me Before School in Boston\"": {
+      "description": "First-person pre-school confession in Boston – city anchor makes the story feel immediately real and triggers 'me too' comments",
+      "keywords": [
+        "confession",
+        "Boston",
+        "before school",
+        "personal story",
+        "relatable"
+      ],
+      "focus": "emotional_core",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "relatability"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Has this happened to you too? Tell me 👇",
+        "Drop your city if you’ve been here"
+      ]
+    },
+    "The Girl Who Seemed Perfect in New York": {
+      "description": "Unmasking the 'perfect girl' archetype set in New York – social comparison drives high-volume comments and shares",
+      "keywords": [
+        "New York",
+        "perfect",
+        "social comparison",
+        "appearance",
+        "unmasking"
+      ],
+      "focus": "audience_connection",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "social_comparison",
+        "geo_setting",
+        "normative_debate"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Do you know a girl like this? 👇",
+        "Tell me what you REALLY saw 👀"
+      ]
+    },
+    "The Friend Group Shift in Toronto Morning": {
+      "description": "Toronto morning captures a subtle friendship dynamic change – loyalty and belonging anxiety drive long emotional comments",
+      "keywords": [
+        "Toronto",
+        "friend group",
+        "shift",
+        "belonging",
+        "friendship anxiety"
+      ],
+      "focus": "audience_connection",
+      "weight": 81,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "save"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "friendship_tension",
+        "belonging"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Have you ever felt your friend group shift overnight? 👇",
+        "Tag someone from your old friend group 🫂"
+      ]
+    },
+    "The Subtle Red Flag I Ignored in Philadelphia": {
+      "description": "A Philadelphia-set story about overlooking a warning sign – retroactive awareness drives personal confession comments",
+      "keywords": [
+        "Philadelphia",
+        "red flag",
+        "ignored",
+        "hindsight",
+        "relationship"
+      ],
+      "focus": "audience_connection",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "hindsight",
+        "red_flag",
+        "normative_debate"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "What red flag did you ignore? 🚩 Drop it below",
+        "Save this as a reminder 🔖"
+      ]
+    },
+    "The Gut Feeling I Had in Montreal": {
+      "description": "Montreal-anchored intuition story – validating gut feelings drives high emotional resonance and 'same' comments",
+      "keywords": [
+        "Montreal",
+        "gut feeling",
+        "intuition",
+        "emotion",
+        "instinct"
+      ],
+      "focus": "emotional_core",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "intuition",
+        "emotional_validation"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Drop a 🤍 if you’ve had this exact feeling",
+        "Tell me about a gut feeling you ignored or trusted 👇"
+      ]
+    },
+    "The Story I Never Told Anyone in Halifax": {
+      "description": "Quiet Halifax confession of a secret never shared before – intimacy and city grounding make it feel authentic and safe to respond to",
+      "keywords": [
+        "Halifax",
+        "secret",
+        "untold story",
+        "confession",
+        "intimacy"
+      ],
+      "focus": "emotional_core",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "confessional",
+        "intimacy"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Tell me something you’ve never told anyone 💬",
+        "Save this if you have a story like this 🔖"
+      ]
+    },
+    "The Overthinking Spiral on a New York Morning": {
+      "description": "New York morning overthinking spiral – hyper-relatable anxiety loop drives high-volume agreement comments",
+      "keywords": [
+        "New York",
+        "overthinking",
+        "anxiety",
+        "morning",
+        "spiral",
+        "relatable"
+      ],
+      "focus": "audience_connection",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "save"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "anxiety_core",
+        "relatability",
+        "internal_monologue"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Ok which one of us is THIS? 🙋‍♀️",
+        "Drop the thing you overanalysed this morning 👇"
+      ]
+    },
+    "The Quiet Girl Sitting Behind Me in Boston": {
+      "description": "Boston classroom observation of a quiet girl – projection and social curiosity drive imaginative speculative comments",
+      "keywords": [
+        "Boston",
+        "quiet girl",
+        "observation",
+        "school",
+        "curiosity",
+        "projection"
+      ],
+      "focus": "audience_connection",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "observation",
+        "social_curiosity"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me who this is in your class 👇",
+        "Are you the quiet girl? Drop a 🤫"
+      ]
+    },
+    "The One Detail Nobody Noticed in Toronto": {
+      "description": "Overlooked Toronto detail drives curiosity-comment loop – the challenge to notice what others miss fuels rewatch and theory comments",
+      "keywords": [
+        "Toronto",
+        "hidden detail",
+        "overlooked",
+        "observation",
+        "mystery"
+      ],
+      "focus": "hook",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "hidden_detail",
+        "observation_challenge"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you notice it? Drop what you saw 👇",
+        "Watch it twice – still miss it?"
+      ]
+    },
+    "The Morning That Felt Scripted in Montreal": {
+      "description": "Déjà vu or uncanny predictability in a Montreal morning – eerie familiarity triggers psychological comments and rewatch",
+      "keywords": [
+        "Montreal",
+        "scripted",
+        "déjà vu",
+        "uncanny",
+        "morning",
+        "surreal"
+      ],
+      "focus": "hook",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "uncanny",
+        "surreal",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Have you ever had a morning that felt like it was planned? 👇",
+        "Drop a 🌀 if this gave you that feeling"
+      ]
+    },
+    "The Clue Hidden in the First Scene (New York)": {
+      "description": "New York video plants a crucial clue in the opening seconds that only registers on a second watch",
+      "keywords": [
+        "New York",
+        "hidden clue",
+        "first scene",
+        "rewatch",
+        "mystery"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "first_frame_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you catch the clue in the first second? 👀",
+        "Watch it again – it’s right there from the start"
+      ]
+    },
+    "What You Miss on First Watch in Toronto": {
+      "description": "Toronto content with layered information that rewards a second viewing – explicit 'what you miss' framing drives immediate replay",
+      "keywords": [
+        "Toronto",
+        "first watch",
+        "missed detail",
+        "rewatch",
+        "layered"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "replay_reward"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "What did you miss? Drop it 👇",
+        "Watch twice before you answer 👀"
+      ]
+    },
+    "The Detail in the Background (Boston Morning)": {
+      "description": "Background detail in a Boston morning scene carries the real story – environmental storytelling drives rewatch and discovery comments",
+      "keywords": [
+        "Boston",
+        "background detail",
+        "hidden",
+        "morning",
+        "environmental"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_detail",
+        "geo_setting",
+        "background_story"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you see what’s in the background? 👀",
+        "Drop what you found on your second watch 👇"
+      ]
+    },
+    "The Timeline That Doesn’t Add Up in Philadelphia": {
+      "description": "Philadelphia narrative with a subtle timeline inconsistency – the logical puzzle drives rewatch and theory-comment chains",
+      "keywords": [
+        "Philadelphia",
+        "timeline",
+        "inconsistency",
+        "puzzle",
+        "rewatch",
+        "theory"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "timeline_puzzle",
+        "mystery"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you notice the timeline doesn’t add up? 🤔",
+        "Drop your theory – what actually happened? 👇"
+      ]
+    },
+    "The Story That Makes Sense Only at the End (Montreal)": {
+      "description": "Montreal narrative that withholds meaning until the final seconds – deferred comprehension drives rewatch for confirmation",
+      "keywords": [
+        "Montreal",
+        "ending",
+        "deferred meaning",
+        "rewatch",
+        "revelation"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "deferred_reveal",
+        "geo_setting",
+        "payoff"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you get it? Watch it again if not 👀",
+        "Drop your interpretation below 👇"
+      ]
+    },
+    "The Second Watch Changes Everything in Halifax": {
+      "description": "Halifax story explicitly designed to shift meaning on the second viewing – direct rewatch invitation framed around the city",
+      "keywords": [
+        "Halifax",
+        "second watch",
+        "rewatch",
+        "revelation",
+        "shift"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "dual_reading",
+        "replay_reward"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Watch it twice – does it change for you? 👀",
+        "Drop what you noticed the second time 👇"
+      ]
+    },
+    "The Girl Who Was There the Whole Time (New York)": {
+      "description": "New York story where a character present throughout is only noticed upon rewatch – invisible presence drives discovery comments",
+      "keywords": [
+        "New York",
+        "present all along",
+        "hidden character",
+        "rewatch",
+        "revelation"
+      ],
+      "focus": "hook",
+      "weight": 78,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "reveal_on_rewatch"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you see her the first time? 👀",
+        "Drop when you finally noticed her 👇"
+      ]
+    },
+    "The Subtle Foreshadowing in Toronto Sunrise": {
+      "description": "Toronto sunrise visuals contain foreshadowing details that predict the outcome – literary device drives engaged rewatch",
+      "keywords": [
+        "Toronto",
+        "foreshadowing",
+        "sunrise",
+        "prediction",
+        "rewatch",
+        "literary"
+      ],
+      "focus": "hook",
+      "weight": 76,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "save"
+      ],
+      "mechanics": [
+        "foreshadowing",
+        "geo_setting",
+        "sunrise_atmosphere"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you catch the foreshadowing in the opening? ☀️",
+        "Watch it again and tell me what you see now 👇"
+      ]
+    },
+    "The Scene That Feels Different After the Reveal (Boston)": {
+      "description": "Boston scene that gains different emotional weight once the end reveal is known – emotional reframe drives immediate replay",
+      "keywords": [
+        "Boston",
+        "reframe",
+        "reveal",
+        "different feeling",
+        "emotional shift"
+      ],
+      "focus": "emotional_core",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "emotional_reframe",
+        "geo_setting",
+        "reveal_effect"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Go back to the beginning now that you know – different, right? 👀",
+        "Drop how it hit you differently the second time 👇"
+      ]
+    },
+    "The Memory That Doesn’t Match Reality (Montreal)": {
+      "description": "Montreal unreliable-memory narrative – cognitive dissonance between memory and facts drives repeat viewings and theory comments",
+      "keywords": [
+        "Montreal",
+        "memory",
+        "unreliable",
+        "reality",
+        "cognitive dissonance",
+        "mystery"
+      ],
+      "focus": "hook",
+      "weight": 77,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "unreliable_narrator",
+        "geo_setting",
+        "memory_puzzle"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "What do you think really happened? 🧩",
+        "Watch it again with the sound off – does it change? 👀"
+      ]
+    },
+    "The Girl Who Pretended Everything Was Fine in New York": {
+      "description": "New York girl masking emotional pain behind normalcy – relatability of hidden struggle drives deep emotional comments and saves",
+      "keywords": [
+        "New York",
+        "pretending",
+        "mask",
+        "fine",
+        "hidden pain",
+        "relatability"
+      ],
+      "focus": "emotional_core",
+      "weight": 81,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "masked_emotion",
+        "relatability"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this if you’ve been her 🔖",
+        "Tell me what she was actually feeling 👇"
+      ]
+    },
+    "The Quiet Breakdown on a Toronto Morning": {
+      "description": "A subdued Toronto morning emotional breakdown – authenticity of quiet pain drives saves and deeply personal comments",
+      "keywords": [
+        "Toronto",
+        "breakdown",
+        "quiet",
+        "morning",
+        "emotional pain",
+        "authentic"
+      ],
+      "focus": "emotional_core",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "quiet_pain",
+        "authenticity"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this for when you need it 🔖",
+        "Drop a 🤍 if you’ve had this morning"
+      ]
+    },
+    "The Smile That Hid Something in Boston": {
+      "description": "A Boston character's smile conceals a deeper emotional reality – the gap between visible and felt drives psychological curiosity comments",
+      "keywords": [
+        "Boston",
+        "smile",
+        "hiding",
+        "mask",
+        "emotional reality",
+        "psychology"
+      ],
+      "focus": "emotional_core",
+      "weight": 81,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "rewatch"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "masked_emotion",
+        "observation"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Do you know someone who smiles like this? 👇",
+        "Save this if you understand it 🔖"
+      ]
+    },
+    "The Safe Place That Suddenly Felt Unsafe in Montreal": {
+      "description": "A familiar Montreal location loses its safety – the psychological shift of lost sanctuary drives emotional resonance and long comments",
+      "keywords": [
+        "Montreal",
+        "safe place",
+        "unsafe",
+        "sanctuary",
+        "loss",
+        "psychological shift"
+      ],
+      "focus": "emotional_core",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "safety_loss",
+        "emotional_shift"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me about a place that stopped feeling safe to you 👇",
+        "Save this if you know this feeling 🔖"
+      ]
+    },
+    "The Thought I Couldn’t Ignore in Philadelphia": {
+      "description": "An intrusive thought during a Philadelphia morning that refuses to leave – universality of unwanted thoughts drives empathy comments",
+      "keywords": [
+        "Philadelphia",
+        "intrusive thought",
+        "morning",
+        "psychology",
+        "anxiety"
+      ],
+      "focus": "emotional_core",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "intrusive_thought",
+        "anxiety"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Drop the thought you can never fully silence 👇",
+        "Save this if it feels too real 🔖"
+      ]
+    },
+    "The Feeling of Being Watched in Halifax": {
+      "description": "Ambient paranoia during a Halifax day creates soft-dark tension – visceral universality of this feeling drives physical reaction comments",
+      "keywords": [
+        "Halifax",
+        "watched",
+        "paranoia",
+        "tension",
+        "soft dark",
+        "instinct"
+      ],
+      "focus": "hook",
+      "weight": 79,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "ambient_tension",
+        "paranoia"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Drop a 👁️ if you’ve had this exact feeling",
+        "Tell me where you were when you felt it 👇"
+      ]
+    },
+    "The Version of Me No One Saw in New York": {
+      "description": "A hidden private self revealed in a New York moment – authenticity gap drives vulnerable shares and deep personal comments",
+      "keywords": [
+        "New York",
+        "hidden self",
+        "private",
+        "authenticity",
+        "vulnerability",
+        "identity"
+      ],
+      "focus": "emotional_core",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "hidden_identity",
+        "vulnerability"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this if someone has never seen the real you 🔖",
+        "Tell me who sees the hidden version of you 👇"
+      ]
+    },
+    "The Secret I Realized Too Late in Toronto": {
+      "description": "A Toronto story where a secret becomes clear only when it's too late to act – tragic hindsight drives long emotional comment threads",
+      "keywords": [
+        "Toronto",
+        "secret",
+        "too late",
+        "realization",
+        "regret",
+        "tragedy"
+      ],
+      "focus": "emotional_core",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "rewatch"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "hindsight",
+        "regret"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me what you realized too late 💔",
+        "Save this if you’ve lived this 🔖"
+      ]
+    },
+    "The Emotional Shift During a Normal Morning in Boston": {
+      "description": "An ordinary Boston morning interrupted by a sudden internal emotional change – contrast of external normalcy and internal upheaval resonates strongly",
+      "keywords": [
+        "Boston",
+        "emotional shift",
+        "normal morning",
+        "internal change",
+        "contrast"
+      ],
+      "focus": "emotional_core",
+      "weight": 80,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "rewatch"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "contrast",
+        "emotional_shift"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save this if a morning has ever flipped on you 🔖",
+        "What triggered your last unexpected emotional shift? 👇"
+      ]
+    },
+    "The Story That Gets Darker Each Part (Montreal Setting)": {
+      "description": "Montreal-set serialised story that deepens psychologically with each episode – escalating tension drives follows and next-part anticipation",
+      "keywords": [
+        "Montreal",
+        "dark series",
+        "escalation",
+        "serialised",
+        "psychological",
+        "parts"
+      ],
+      "focus": "hook",
+      "weight": 81,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "follow",
+        "comment"
+      ],
+      "mechanics": [
+        "psychological",
+        "geo_setting",
+        "series",
+        "escalation",
+        "soft_dark"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "risk_flags": [
+        "age_sensitive"
+      ],
+      "cta_templates": [
+        "Follow for Part 2 – it gets darker 🔔",
+        "Drop ‘more’ if you need to know what happens next 👇"
+      ]
+    },
+    "Soft Morning Routine → Sudden Disturbance (Toronto)": {
+      "description": "A cosy Toronto morning routine disrupted by an unexpected event – aesthetic-to-shock arc maximises watch-through and rewatch",
+      "keywords": [
+        "Toronto",
+        "morning routine",
+        "disturbance",
+        "contrast",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 84,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "share",
+        "comment"
+      ],
+      "mechanics": [
+        "contrast",
+        "geo_setting",
+        "routine_disruption",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you expect that? 👀",
+        "Save the beginning if you want the cosy part only 😂🔖"
+      ]
+    },
+    "Innocent Beginning → Creepy Realization (New York)": {
+      "description": "Seemingly innocent New York opening slowly becomes something unsettling – tonal shift drives rewatch from the beginning to catch early signs",
+      "keywords": [
+        "New York",
+        "innocent",
+        "creepy",
+        "tonal shift",
+        "realization",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 84,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "share",
+        "comment"
+      ],
+      "mechanics": [
+        "tonal_shift",
+        "geo_setting",
+        "contrast",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Go back to the beginning now – catch the signs 👀",
+        "Drop 😳 if you didn’t see it coming"
+      ]
+    },
+    "Comfort Aesthetic → Psychological Twist (Boston)": {
+      "description": "A comforting Boston aesthetic setting subverted by a psychological twist – contrast of cosy and unsettling drives shares and discussion",
+      "keywords": [
+        "Boston",
+        "comfort aesthetic",
+        "psychological twist",
+        "contrast",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "share",
+        "comment"
+      ],
+      "mechanics": [
+        "contrast",
+        "geo_setting",
+        "aesthetic_subversion",
+        "psychological"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did the cosy aesthetic fool you too? 👀",
+        "Send this to someone who needs a plot twist today 😅"
+      ]
+    },
+    "Relatable POV → Dark Reveal (Montreal)": {
+      "description": "Relatable POV opening in Montreal transitions to a darker reveal – familiar-to-unsettling arc creates strong share motivation",
+      "keywords": [
+        "Montreal",
+        "POV",
+        "relatable",
+        "dark reveal",
+        "contrast",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "share",
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "POV",
+        "geo_setting",
+        "contrast",
+        "dark_reveal",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Send this to someone who will NOT expect that ending 😮",
+        "Drop your reaction to the reveal 👇"
+      ]
+    },
+    "Nostalgic School Morning → Hidden Truth (Halifax)": {
+      "description": "Halifax school morning nostalgia disrupted by a hidden truth – collision of warmth and revelation drives emotional comment threads",
+      "keywords": [
+        "Halifax",
+        "nostalgia",
+        "school morning",
+        "hidden truth",
+        "hybrid",
+        "revelation"
+      ],
+      "focus": "emotional_core",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "rewatch"
+      ],
+      "mechanics": [
+        "nostalgia",
+        "geo_setting",
+        "hidden_truth",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "Save if school mornings meant something to you 🔖",
+        "What hidden truth would change your school memory? 👇"
+      ]
+    },
+    "Cozy Coffee Scene → Unsettling Ending (Philadelphia)": {
+      "description": "Philadelphia coffee shop warmth transitions to an unsettling close – safety-to-unease arc makes it highly shareable",
+      "keywords": [
+        "Philadelphia",
+        "coffee",
+        "cozy",
+        "unsettling ending",
+        "contrast",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "share",
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "contrast",
+        "geo_setting",
+        "cozy_subversion",
+        "unsettling_ending"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did the ending ruin your coffee vibe? ☕😳",
+        "Send this to someone who loves coffee shop content"
+      ]
+    },
+    "Slice of Life → Suspense Escalation (Toronto)": {
+      "description": "Ordinary Toronto slice-of-life footage that gradually escalates into suspense – slow burn drives watch-through completion",
+      "keywords": [
+        "Toronto",
+        "slice of life",
+        "suspense",
+        "escalation",
+        "slow burn",
+        "hybrid"
+      ],
+      "focus": "hook",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "slow_burn",
+        "geo_setting",
+        "escalation",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Keep watching – it builds 👀",
+        "Drop when you first felt the tension shift 👇"
+      ]
+    },
+    "Emotional Confession → Unexpected Clue (New York)": {
+      "description": "New York emotional confession interrupted by an unexpected detail that reframes everything – hybrid emotional/mystery arc",
+      "keywords": [
+        "New York",
+        "confession",
+        "unexpected clue",
+        "reframe",
+        "hybrid",
+        "mystery"
+      ],
+      "focus": "hook",
+      "weight": 84,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "clue",
+        "hybrid_narrative",
+        "reframe"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you catch the clue in the middle of the confession? 👀",
+        "Drop your theory below 👇"
+      ]
+    },
+    "Calm Sunrise → Anxiety Shift (Boston)": {
+      "description": "Peaceful Boston sunrise transitions into an anxiety state – contrast of external calm and internal unease drives relate-comments and saves",
+      "keywords": [
+        "Boston",
+        "sunrise",
+        "anxiety",
+        "calm",
+        "shift",
+        "contrast",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 82,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "save",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "contrast",
+        "geo_setting",
+        "anxiety_shift",
+        "morning_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "stories",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Save if mornings feel calm on the outside but not inside 🔖",
+        "Tell me what your sunrise anxiety looks like 👇"
+      ]
+    },
+    "Ordinary Day → Disturbing Pattern (Montreal)": {
+      "description": "A Montreal ordinary day reveals a disturbing repeating pattern on close inspection – uncanny repetition drives rewatch and theory comments",
+      "keywords": [
+        "Montreal",
+        "ordinary day",
+        "disturbing pattern",
+        "uncanny",
+        "hybrid",
+        "pattern"
+      ],
+      "focus": "hook",
+      "weight": 83,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment",
+        "share"
+      ],
+      "mechanics": [
+        "pattern_reveal",
+        "geo_setting",
+        "uncanny",
+        "hybrid_narrative"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Did you notice the pattern? Drop what you saw 👇",
+        "Watch it twice – do you see it now? 👀"
+      ]
+    },
+    "\"I Shouldn’t Be Telling This (Happened in New York)\"": {
+      "description": "Taboo-flavoured confession anchored in New York – forbidden disclosure framing maximises curiosity and shares",
+      "keywords": [
+        "New York",
+        "shouldn't tell",
+        "forbidden",
+        "confession",
+        "curiosity",
+        "morning"
+      ],
+      "focus": "hook",
+      "weight": 86,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "rewatch"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "forbidden_disclosure",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "risk_flags": [
+        "avoid_spammy_engagement_bait"
+      ],
+      "cta_templates": [
+        "Should I tell the rest? Drop 👀 if yes",
+        "Tag someone you’d tell this to at 8 AM"
+      ]
+    },
+    "\"Nobody Believed Me That Morning in Toronto\"": {
+      "description": "Gaslighting or disbelief narrative set in a Toronto morning – the injustice hook drives protective and empathetic comments",
+      "keywords": [
+        "Toronto",
+        "believed",
+        "morning",
+        "gaslighting",
+        "injustice",
+        "empathy"
+      ],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "share",
+        "save"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "gaslighting",
+        "empathy_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "I believe you – tell me what happened 👇",
+        "Tag someone who would have believed you 🤍"
+      ]
+    },
+    "\"This Still Feels Unreal (Boston Story)\"": {
+      "description": "Boston event so surreal it still hasn't fully processed – unresolved reality loop drives repeat viewing and story-sharing comments",
+      "keywords": [
+        "Boston",
+        "unreal",
+        "surreal",
+        "unprocessed",
+        "story",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "unresolved_reality",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me something that still doesn’t feel real 👇",
+        "Save this if you have a story like this 🔖"
+      ]
+    },
+    "\"I Never Talk About What Happened in Montreal\"": {
+      "description": "Breaking a long silence about a Montreal event – the weight of finally speaking drives deep protective comments and shares",
+      "keywords": [
+        "Montreal",
+        "never talk",
+        "breaking silence",
+        "confession",
+        "vulnerability",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 86,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "breaking_silence",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Thank you for telling us 🤍 – drop your support below",
+        "Save this for when you’re ready to talk too 🔖"
+      ]
+    },
+    "\"You Won’t Notice It at First (Philadelphia)\"": {
+      "description": "Philadelphia story with a hidden element explicitly flagged as hard to see – the challenge drives immediate rewatch",
+      "keywords": [
+        "Philadelphia",
+        "won't notice",
+        "hidden",
+        "challenge",
+        "rewatch",
+        "morning"
+      ],
+      "focus": "hook",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "hidden_clue",
+        "geo_setting",
+        "explicit_challenge",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "shorts",
+        "tiktok"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Watch it again – did you catch it now? 👀",
+        "Drop what you finally noticed on your second watch 👇"
+      ]
+    },
+    "\"This Happened at 8:07 AM in Halifax\"": {
+      "description": "Hyper-specific Halifax morning timestamp gives the story documentary authenticity – precision detail boosts immersion and credibility",
+      "keywords": [
+        "Halifax",
+        "timestamp",
+        "8:07 AM",
+        "specific",
+        "authenticity",
+        "morning"
+      ],
+      "focus": "hook",
+      "weight": 86,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "rewatch",
+        "share"
+      ],
+      "mechanics": [
+        "geo_setting",
+        "hyper_specificity",
+        "documentary_feel",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "NST_AST_EAST"
+      ],
+      "cta_templates": [
+        "What were you doing at 8:07 AM? 👇",
+        "Drop your city and your 8 AM 🌅"
+      ]
+    },
+    "\"It Started Like Any Normal Morning in New York\"": {
+      "description": "Classic unreliable-normalcy opener in New York – contrast promise between opening and what follows maximises watch-through",
+      "keywords": [
+        "New York",
+        "normal morning",
+        "contrast",
+        "false normalcy",
+        "morning hook"
+      ],
+      "focus": "hook",
+      "weight": 86,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "watch_more",
+        "rewatch",
+        "comment"
+      ],
+      "mechanics": [
+        "false_normalcy",
+        "geo_setting",
+        "contrast_promise",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "shorts"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "You already know it didn’t stay normal 👀",
+        "Drop what changed first 👇"
+      ]
+    },
+    "\"Something Felt Off in Toronto and I Ignored It\"": {
+      "description": "Toronto intuition-ignored confession – universal regret of dismissing gut feelings drives protective advice comments",
+      "keywords": [
+        "Toronto",
+        "felt off",
+        "ignored",
+        "intuition",
+        "regret",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "intuition_ignored",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Never ignore that feeling 🙏 – tell me yours 👇",
+        "Save this as a reminder to trust your gut 🔖"
+      ]
+    },
+    "\"The Moment Everything Changed in Boston\"": {
+      "description": "Pivotal Boston moment that split life into before and after – universal experience of a turning-point drives deep emotional comments",
+      "keywords": [
+        "Boston",
+        "turning point",
+        "changed everything",
+        "before after",
+        "pivotal",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "turning_point",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me your ‘everything changed’ moment 👇",
+        "Save this for when you need to remember you survived it 🔖"
+      ]
+    },
+    "\"The Story I Wish I Could Forget (Montreal)\"": {
+      "description": "Montreal memory that won't fade despite wanting it to – tension between remembering and forgetting drives empathetic comment chains",
+      "keywords": [
+        "Montreal",
+        "wish forget",
+        "unwanted memory",
+        "tension",
+        "confession",
+        "morning"
+      ],
+      "focus": "emotional_core",
+      "weight": 85,
+      "audience": "young women 15-25",
+      "engagement_goal": [
+        "comment",
+        "save",
+        "share"
+      ],
+      "mechanics": [
+        "confessional",
+        "geo_setting",
+        "unwanted_memory",
+        "morning_hook"
+      ],
+      "format_fit": [
+        "reels",
+        "tiktok",
+        "stories"
+      ],
+      "geo_time_cluster": [
+        "EAST_CORE"
+      ],
+      "cta_templates": [
+        "Tell me yours if you feel ready 🤍",
+        "Save this if you understand 🔖"
+      ]
     }
   }
 }
