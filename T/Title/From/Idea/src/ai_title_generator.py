@@ -75,7 +75,7 @@ class TitleGeneratorConfig:
     length_gate_min: int = 20
     length_gate_max: int = 80
     score_threshold: float = 0.90
-    use_batch_generation: bool = False
+    use_batch_generation: bool = True
 
 
 class AITitleGenerator:
@@ -207,15 +207,21 @@ class AITitleGenerator:
 
             # Gate 2: AI scoring of length-passing variants
             score_start = time.monotonic()
-            logger.info(f"AI-scoring {len(length_passed)} variant(s)")
-            for variant in length_passed:
-                ai_score = self._ai_score_title(variant.text, idea)
-                if ai_score > 0.0:
-                    # Combine rule-based score (50%) with AI score (50%)
-                    variant.score = (variant.score + ai_score) / 2.0
-                    logger.debug(
-                        f"  Combined score for '{variant.text}': {variant.score:.2f}"
-                    )
+            if self.config.use_batch_generation and len(length_passed) > 1:
+                logger.info(
+                    f"AI-scoring {len(length_passed)} variant(s) in batch mode (1 AI call)"
+                )
+                self._ai_score_titles_batch(length_passed, idea)
+            else:
+                logger.info(f"AI-scoring {len(length_passed)} variant(s)")
+                for variant in length_passed:
+                    ai_score = self._ai_score_title(variant.text, idea)
+                    if ai_score > 0.0:
+                        # Combine rule-based score (50%) with AI score (50%)
+                        variant.score = (variant.score + ai_score) / 2.0
+                        logger.debug(
+                            f"  Combined score for '{variant.text}': {variant.score:.2f}"
+                        )
             score_elapsed = time.monotonic() - score_start
             logger.info(f"AI scoring completed in {score_elapsed:.1f}s")
 
@@ -366,6 +372,68 @@ class AITitleGenerator:
         
         return variants
     
+    def _ai_score_titles_batch(self, variants: List[TitleVariant], idea: Idea) -> None:
+        """Score all title variants in a single AI call.
+
+        Builds one prompt containing all title texts, asks the model to return
+        a numbered list of integer scores (0-100), then applies a 50/50 blend
+        of the rule-based score and the AI score to each variant in-place.
+
+        Falls back to individual scoring via :meth:`_ai_score_title` when the
+        batch call fails or returns a mismatched number of scores.
+
+        Args:
+            variants: TitleVariant objects to score (modified in-place).
+            idea: Original idea for context.
+        """
+        try:
+            template = self.prompt_loader.get_title_scoring_batch_prompt()
+            idea_text = idea.concept or idea.title or ""
+            titles_text = "\n".join(f"{i + 1}. {v.text}" for i, v in enumerate(variants))
+            prompt = template.format(IDEA=idea_text, TITLES=titles_text)
+
+            # Low temperature for consistent, deterministic scoring
+            response_text = self.ollama_client.generate(prompt, temperature=0.1)
+
+            # Strip <think>...</think> blocks
+            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+
+            # Parse each numbered line into a 0-1 float score
+            scores: List[float] = []
+            for line in response_text.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                clean = re.sub(r'^\d+[\.\)\-]\s*', '', line).strip()
+                numbers = re.findall(r'\b(\d{1,3})\b', clean)
+                if numbers:
+                    score_int = max(0, min(100, int(numbers[0])))
+                    scores.append(score_int / 100.0)
+
+            if len(scores) == len(variants):
+                for variant, ai_score in zip(variants, scores):
+                    if ai_score > 0.0:
+                        variant.score = (variant.score + ai_score) / 2.0
+                        logger.debug(
+                            f"  Combined score for '{variant.text}': {variant.score:.2f}"
+                        )
+            else:
+                logger.warning(
+                    f"Batch scoring returned {len(scores)} scores for "
+                    f"{len(variants)} variant(s); falling back to individual scoring"
+                )
+                for variant in variants:
+                    ai_score = self._ai_score_title(variant.text, idea)
+                    if ai_score > 0.0:
+                        variant.score = (variant.score + ai_score) / 2.0
+
+        except Exception as e:
+            logger.warning(f"Batch AI scoring failed ({e}); falling back to individual scoring")
+            for variant in variants:
+                ai_score = self._ai_score_title(variant.text, idea)
+                if ai_score > 0.0:
+                    variant.score = (variant.score + ai_score) / 2.0
+
     def _ai_score_title(self, title_text: str, idea: Idea) -> float:
         """Score a title using AI based on readability, keywords, emotional impact and SEO.
         

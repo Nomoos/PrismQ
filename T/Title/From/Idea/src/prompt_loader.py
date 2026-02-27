@@ -79,3 +79,15 @@ class PromptLoader:
             The title scoring prompt template with {IDEA} and {TITLE} placeholders
         """
         return self.load("title_scoring.txt")
+    
+    def get_title_scoring_batch_prompt(self) -> str:
+        """Load the batch title scoring prompt (multiple titles in one call).
+        
+        This prompt evaluates {COUNT} titles at once and returns a numbered list
+        of integer scores (0-100) that can be parsed by
+        AITitleGenerator._ai_score_titles_batch().
+        
+        Returns:
+            The batch scoring prompt template with {IDEA} and {TITLES} placeholders
+        """
+        return self.load("title_scoring_batch.txt")
