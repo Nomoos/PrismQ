@@ -407,7 +407,12 @@ def get_flavor_weights() -> Dict[str, int]:
 
 def pick_weighted_flavor(seed: Optional[int] = None) -> str:
     """Pick a flavor using weighted random selection.
-    
+
+    Selects by default from the engagement-optimised flavor pool
+    (flavors that carry an ``engagement_goal``). Use
+    :func:`list_flavors` directly if you need unrestricted selection
+    across all flavors.
+
     Args:
         seed: Optional seed for reproducible selection
         
@@ -418,8 +423,8 @@ def pick_weighted_flavor(seed: Optional[int] = None) -> str:
         rng = random.Random(seed)
     else:
         rng = random.Random()
-    
-    flavors = list_flavors()
+
+    flavors = get_engagement_flavors()
     weights_dict = get_flavor_weights()
     weights = [weights_dict.get(f, 50) for f in flavors]
     
