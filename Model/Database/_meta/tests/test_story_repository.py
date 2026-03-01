@@ -773,8 +773,8 @@ class TestModuleTypeDetection:
     def test_review_title_module_types(self, story_repo):
         """Test detection of Review.Title module types."""
         assert story_repo._get_module_type("PrismQ.T.Review.Title.Readability") == "review_title"
-        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Content") == "review_title"
-        assert story_repo._get_module_type("PrismQ.T.Review.Title.By.Content.Idea") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.From.Content") == "review_title"
+        assert story_repo._get_module_type("PrismQ.T.Review.Title.From.Content.Idea") == "review_title"
     
     def test_story_module_types(self, story_repo):
         """Test detection of Story module types."""

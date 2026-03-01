@@ -49,7 +49,7 @@ Review the Title against the Content for final alignment. This is a decision poi
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Title.By.Script - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Title.From.Script - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Reviews will NOT be saved."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Database query** - Loads Title records ready for review
@@ -57,7 +57,7 @@ Review the Title against the Content for final alignment. This is a decision poi
 6. **New state displayed**:
    ```
    ========================================
-   PrismQ.T.Review.Title.By.Script - PREVIEW MODE
+   PrismQ.T.Review.Title.From.Script - PREVIEW MODE
    ========================================
    This mode is for TESTING. Reviews will NOT be saved.
 

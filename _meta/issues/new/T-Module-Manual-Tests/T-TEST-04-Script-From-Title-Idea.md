@@ -33,7 +33,7 @@ Generate initial script (v1) from a Title and Idea combination. Creates the firs
    - `content`: Full script text
    - `sections`: Array of sections
    - `word_count`: Total words
-7. **State set** to `PrismQ.T.Review.Title.By.Script.Idea`
+7. **State set** to `PrismQ.T.Review.Title.From.Script.Idea`
 8. **Database write** - Script object saved
 9. **Success message** displayed with script preview
 10. **Script ends** with word count summary
@@ -69,7 +69,7 @@ Generate initial script (v1) from a Title and Idea combination. Creates the firs
    --- CONCLUSION ---
    [conclusion content preview...]
    
-   Next State: PrismQ.T.Review.Title.By.Script.Idea
+   Next State: PrismQ.T.Review.Title.From.Script.Idea
    ========================================
    ```
 8. **Wait for keystroke** - "Press any key to continue..."
@@ -120,7 +120,7 @@ Idea ID: idea_12345
 - [ ] Script has proper structure (intro, sections, conclusion)
 - [ ] Word count is appropriate (typically 800-2000 words)
 - [ ] Script references Title and Idea IDs
-- [ ] State transitions to `PrismQ.T.Review.Title.By.Script.Idea`
+- [ ] State transitions to `PrismQ.T.Review.Title.From.Script.Idea`
 - [ ] Preview mode shows script preview without saving
 - [ ] Preview mode waits for keystroke
 - [ ] No errors in execution

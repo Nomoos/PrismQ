@@ -80,10 +80,10 @@ The Script Review By Title module has successfully passed comprehensive producti
 
 ## Files Modified
 
-1. `_meta/scripts/10_PrismQ.T.Review.Script.By.Title/Run.bat`
+1. `_meta/scripts/10_PrismQ.T.Review.Script.From.Title/Run.bat`
    - Fixed incorrect module path
 
-2. `_meta/scripts/10_PrismQ.T.Review.Script.By.Title/Preview.bat`
+2. `_meta/scripts/10_PrismQ.T.Review.Script.From.Title/Preview.bat`
    - Fixed incorrect module path
 
 3. `T/Review/Script/From/Title/src/review_script_from_title_interactive.py`
@@ -92,7 +92,7 @@ The Script Review By Title module has successfully passed comprehensive producti
    - Extracted shared validation function
    - Improved exception handling
 
-4. `_meta/issues/new/ISSUE-IMPL-010-10_PrismQ.T.Review.Script.By.Title.md`
+4. `_meta/issues/new/ISSUE-IMPL-010-10_PrismQ.T.Review.Script.From.Title.md`
    - Documented all findings
    - Completed implementation checklist
 

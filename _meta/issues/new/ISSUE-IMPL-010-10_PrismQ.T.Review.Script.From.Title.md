@@ -1,9 +1,9 @@
-# ISSUE-IMPL-010 — Implementation check: `10_PrismQ.T.Review.Script.By.Title`
+# ISSUE-IMPL-010 — Implementation check: `10_PrismQ.T.Review.Script.From.Title`
 
 **Status**: In Progress  
 **Created**: 2025-12-23  
 **Updated**: 2025-12-24  
-**Script Folder**: `PrismQ/_meta/scripts/10_PrismQ.T.Review.Script.By.Title`  
+**Script Folder**: `PrismQ/_meta/scripts/10_PrismQ.T.Review.Script.From.Title`  
 **Module Path**: `T/Review/Script/From/Title`
 
 ---
@@ -141,8 +141,8 @@ Reviews Script/Content quality based on Title. Validates content alignment with 
    - **Actual Path**: `T\Review\Script\From\Title`
    - **Fix**: Updated both `Run.bat` and `Preview.bat` to use correct paths
    - **Files Modified**:
-     - `_meta/scripts/10_PrismQ.T.Review.Script.By.Title/Run.bat`
-     - `_meta/scripts/10_PrismQ.T.Review.Script.By.Title/Preview.bat`
+     - `_meta/scripts/10_PrismQ.T.Review.Script.From.Title/Run.bat`
+     - `_meta/scripts/10_PrismQ.T.Review.Script.From.Title/Preview.bat`
 
 2. **Missing Import Error Details**
    - **Issue**: Import failures showed generic message without details

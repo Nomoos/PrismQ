@@ -21,12 +21,12 @@ This index tracks the implementation compliance checks for all 30 scripts in the
 - [ ] [ISSUE-IMPL-002](ISSUE-IMPL-002-02_PrismQ.T.Story.From.Idea.md) — **02_PrismQ.T.Story.From.Idea**
 - [ ] [ISSUE-IMPL-003](ISSUE-IMPL-003-03_PrismQ.T.Title.From.Idea.md) — **03_PrismQ.T.Title.From.Idea**
 - [ ] [ISSUE-IMPL-004](ISSUE-IMPL-004-04_PrismQ.T.Content.From.Title.Idea.md) — **04_PrismQ.T.Content.From.Title.Idea**
-- [ ] [ISSUE-IMPL-005](ISSUE-IMPL-005-05_PrismQ.T.Review.Title.By.Script.Idea.md) — **05_PrismQ.T.Review.Title.By.Script.Idea**
-- [ ] [ISSUE-IMPL-006](ISSUE-IMPL-006-06_PrismQ.T.Review.Script.By.Title.Idea.md) — **06_PrismQ.T.Review.Script.By.Title.Idea**
-- [ ] [ISSUE-IMPL-007](ISSUE-IMPL-007-07_PrismQ.T.Review.Title.By.Script.md) — **07_PrismQ.T.Review.Title.By.Script**
+- [ ] [ISSUE-IMPL-005](ISSUE-IMPL-005-05_PrismQ.T.Review.Title.From.Script.Idea.md) — **05_PrismQ.T.Review.Title.From.Script.Idea**
+- [ ] [ISSUE-IMPL-006](ISSUE-IMPL-006-06_PrismQ.T.Review.Script.From.Title.Idea.md) — **06_PrismQ.T.Review.Script.From.Title.Idea**
+- [ ] [ISSUE-IMPL-007](ISSUE-IMPL-007-07_PrismQ.T.Review.Title.From.Script.md) — **07_PrismQ.T.Review.Title.From.Script**
 - [ ] [ISSUE-IMPL-008](ISSUE-IMPL-008-08_PrismQ.T.Title.From.Script.Review.Title.md) — **08_PrismQ.T.Title.From.Script.Review.Title**
 - [ ] [ISSUE-IMPL-009](ISSUE-IMPL-009-09_PrismQ.T.Script.From.Title.Review.Script.md) — **09_PrismQ.T.Script.From.Title.Review.Script**
-- [ ] [ISSUE-IMPL-010](ISSUE-IMPL-010-10_PrismQ.T.Review.Script.By.Title.md) — **10_PrismQ.T.Review.Script.By.Title**
+- [ ] [ISSUE-IMPL-010](ISSUE-IMPL-010-10_PrismQ.T.Review.Script.From.Title.md) — **10_PrismQ.T.Review.Script.From.Title**
 - [ ] [ISSUE-IMPL-011](ISSUE-IMPL-011-11_PrismQ.T.Review.Script.Grammar.md) — **11_PrismQ.T.Review.Script.Grammar**
 - [ ] [ISSUE-IMPL-012](ISSUE-IMPL-012-12_PrismQ.T.Review.Script.Tone.md) — **12_PrismQ.T.Review.Script.Tone**
 - [ ] [ISSUE-IMPL-013](ISSUE-IMPL-013-13_PrismQ.T.Review.Script.Content.md) — **13_PrismQ.T.Review.Script.Content**

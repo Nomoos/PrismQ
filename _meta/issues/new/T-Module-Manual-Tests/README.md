@@ -23,12 +23,12 @@ This directory contains individual manual testing subissues for each stage of th
 ### Review Stages (Stages 5-10)
 | # | Issue | Module | Status |
 |---|-------|--------|--------|
-| 05 | [T-TEST-05-Review-Title-By-Script-Idea.md](T-TEST-05-Review-Title-By-Script-Idea.md) | PrismQ.T.Review.Title.By.Script.Idea | 🧪 Ready |
-| 06 | [T-TEST-06-Review-Script-By-Title-Idea.md](T-TEST-06-Review-Script-By-Title-Idea.md) | PrismQ.T.Review.Script.By.Title.Idea | 🧪 Ready |
-| 07 | [T-TEST-07-Review-Title-By-Script.md](T-TEST-07-Review-Title-By-Script.md) | PrismQ.T.Review.Title.By.Script | 🧪 Ready |
+| 05 | [T-TEST-05-Review-Title-By-Script-Idea.md](T-TEST-05-Review-Title-By-Script-Idea.md) | PrismQ.T.Review.Title.From.Script.Idea | 🧪 Ready |
+| 06 | [T-TEST-06-Review-Script-By-Title-Idea.md](T-TEST-06-Review-Script-By-Title-Idea.md) | PrismQ.T.Review.Script.From.Title.Idea | 🧪 Ready |
+| 07 | [T-TEST-07-Review-Title-By-Script.md](T-TEST-07-Review-Title-By-Script.md) | PrismQ.T.Review.Title.From.Script | 🧪 Ready |
 | 08 | [T-TEST-08-Title-From-Script-Review-Title.md](T-TEST-08-Title-From-Script-Review-Title.md) | PrismQ.T.Title.From.Script.Review.Title | 🧪 Ready |
 | 09 | [T-TEST-09-Script-From-Title-Review-Script.md](T-TEST-09-Script-From-Title-Review-Script.md) | PrismQ.T.Script.From.Title.Review.Script | 🧪 Ready |
-| 10 | [T-TEST-10-Review-Script-By-Title.md](T-TEST-10-Review-Script-By-Title.md) | PrismQ.T.Review.Script.By.Title | 🧪 Ready |
+| 10 | [T-TEST-10-Review-Script-By-Title.md](T-TEST-10-Review-Script-By-Title.md) | PrismQ.T.Review.Script.From.Title | 🧪 Ready |
 
 ### Quality Reviews (Stages 11-17)
 | # | Issue | Module | Status |

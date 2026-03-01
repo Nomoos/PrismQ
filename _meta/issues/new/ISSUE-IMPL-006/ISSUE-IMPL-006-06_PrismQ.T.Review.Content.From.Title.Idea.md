@@ -1,8 +1,8 @@
-# ISSUE-IMPL-006 — Implementation check: `06_PrismQ.T.Review.Content.By.Title.Idea`
+# ISSUE-IMPL-006 — Implementation check: `06_PrismQ.T.Review.Content.From.Title.Idea`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea`  
+**Script Folder**: `PrismQ/_meta/scripts/06_PrismQ.T.Review.Content.From.Title.Idea`  
 **Module Path**: `T/Review/Content/From/Title/Idea/` or `T/Review/Content/From/Title/Idea/`
 
 ---
@@ -176,8 +176,8 @@ Reviews Script/Content quality based on Title and Idea context. Validates that g
 
 ### 3. ✅ Fixed Script References
 **Files Updated**:
-- `_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea/Run.bat`
-- `_meta/scripts/06_PrismQ.T.Review.Content.By.Title.Idea/Preview.bat`
+- `_meta/scripts/06_PrismQ.T.Review.Content.From.Title.Idea/Run.bat`
+- `_meta/scripts/06_PrismQ.T.Review.Content.From.Title.Idea/Preview.bat`
 
 **Changes**:
 - Corrected module path from `T\Review\Script\ByTitleIdea\` to `T\Review\Script\`

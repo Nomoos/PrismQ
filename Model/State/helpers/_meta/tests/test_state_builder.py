@@ -120,7 +120,7 @@ class TestStateBuilder:
     def test_build_by_state(self):
         """Test building a By state."""
         state = StateBuilder().output("Review").by_source("Script").build()
-        assert state == "PrismQ.T.Review.By.Script"
+        assert state == "PrismQ.T.Review.From.Script"
     
     def test_build_without_output_raises(self):
         """Test that building without output raises ValueError."""
@@ -208,10 +208,10 @@ class TestParseState:
         assert parts.inputs == ("Script", "Grammar")
     
     def test_parse_by_state(self):
-        """Test parsing a By state."""
-        parts = parse_state("PrismQ.T.Review.By.Script")
+        """Test parsing a From state."""
+        parts = parse_state("PrismQ.T.Review.From.Script")
         assert parts.output == "Review"
-        assert parts.action == "By"
+        assert parts.action == "From"
         assert parts.inputs == ("Script",)
     
     def test_parse_terminal_state(self):
@@ -371,7 +371,7 @@ class TestConstants:
     
     def test_review_action(self):
         """Test REVIEW_ACTION constant."""
-        assert REVIEW_ACTION == "By"
+        assert REVIEW_ACTION == "From"
 
 
 class TestRealWorldStates:

@@ -1,7 +1,7 @@
-# T-TEST-10: PrismQ.T.Review.Script.By.Title Manual Test
+# T-TEST-10: PrismQ.T.Review.Script.From.Title Manual Test
 
-**Module**: PrismQ.T.Review.Script.By.Title  
-**Script**: `_meta/scripts/10_PrismQ.T.Review.Script.By.Title/`  
+**Module**: PrismQ.T.Review.Script.From.Title  
+**Script**: `_meta/scripts/10_PrismQ.T.Review.Script.From.Title/`  
 **Type**: Manual Testing  
 **Status**: 🧪 READY FOR TESTING
 
@@ -17,7 +17,7 @@ Final review of Script against finalized Title. This is a decision point for ent
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Script.By.Title - RUN MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Script.From.Title - RUN MODE"
 2. **Environment setup** occurs (creates/activates virtual environment if needed)
 3. **Prompt appears** asking for Script and Title IDs
 4. **User provides** the two IDs or pastes objects
@@ -46,7 +46,7 @@ Final review of Script against finalized Title. This is a decision point for ent
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Script.By.Title - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Script.From.Title - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Reviews will NOT be saved to database."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Prompt appears** asking for Script and Title
@@ -86,7 +86,7 @@ Final review of Script against finalized Title. This is a decision point for ent
 
 ```batch
 REM Navigate to script directory
-cd _meta\scripts\10_PrismQ.T.Review.Script.By.Title
+cd _meta\scripts\10_PrismQ.T.Review.Script.From.Title
 
 REM Run in Preview Mode (recommended for testing)
 Preview.bat
@@ -114,7 +114,7 @@ Run.bat
 After testing, provide logs in this format:
 
 ```
-### Test: T-TEST-10 Review.Script.By.Title
+### Test: T-TEST-10 Review.Script.From.Title
 ### Mode: [Preview/Run]
 ### Date: YYYY-MM-DD
 

@@ -1,8 +1,8 @@
-# ISSUE-IMPL-005 — Implementation check: `05_PrismQ.T.Review.Title.By.Content.Idea`
+# ISSUE-IMPL-005 — Implementation check: `05_PrismQ.T.Review.Title.From.Content.Idea`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
+**Script Folder**: `PrismQ/_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea`  
 **Module Path**: `T/Review/Title/`
 
 ---

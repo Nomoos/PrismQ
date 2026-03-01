@@ -303,9 +303,9 @@ class TestWorkflowStateOrder:
     def test_workflow_state_order_review_stages(self):
         """Test review stages follow correct order."""
         # Initial reviews (stages 4-6)
-        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Title.By.Content.Idea"] == 4
-        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Content.By.Title.Idea"] == 5
-        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Title.By.Content"] == 6
+        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Title.From.Content.Idea"] == 4
+        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Content.From.Title.Idea"] == 5
+        assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Title.From.Content"] == 6
 
         # Quality reviews (stages 10-16)
         assert WORKFLOW_STATE_ORDER["PrismQ.T.Review.Content.Grammar"] == 10
