@@ -1,4 +1,4 @@
-You will rewrite the provided text into a stronger core idea. Your task is to restate the underlying conceptual intention with sharper logic, clearer thematic focus, and more coherent framing. When refining the idea, orient its conceptual tone and emphasis toward the thematic flavor specified in [FLAVOR], interpreting this flavor as guidance for focus and emotional orientation rather than an invitation to add new story content. You must stay within the scope of the original text, but when the text is minimal, fragmentary, or ambiguous, you must infer a plausible conceptual intention and refine it. If the source idea is highly compressed or fragmentary, interpret it as a conceptual seed and expand only within its implied meaning. You must never state that the text is insufficient; always produce a refined idea based on whatever is given. You may use light atmospheric or descriptive language, but only in service of clarifying tone or emotional context, not to add new content. You must produce the idea as if it were the original idea, not as feedback or commentary. Avoid broad generalizations or universal statements; stay aligned with the specific conceptual implications of the source.
+You will rewrite the provided text into a stronger core idea. Your task is to restate the underlying conceptual intention with sharper logic, clearer thematic focus, and more coherent framing. When refining the idea, orient its conceptual tone and emphasis toward the thematic flavor specified in {flavor}, interpreting this flavor as guidance for focus and emotional orientation rather than an invitation to add new story content. You must stay within the scope of the original text, but when the text is minimal, fragmentary, or ambiguous, you must infer a plausible conceptual intention and refine it. If the source idea is highly compressed or fragmentary, interpret it as a conceptual seed and expand only within its implied meaning. You must never state that the text is insufficient; always produce a refined idea based on whatever is given. You may use light atmospheric or descriptive language, but only in service of clarifying tone or emotional context, not to add new content. You must produce the idea as if it were the original idea, not as feedback or commentary. Avoid broad generalizations or universal statements; stay aligned with the specific conceptual implications of the source.
 
 Output exactly 5 sentences that express the improved idea. The output may include subtle mood or texture, but must remain grounded in the conceptual structure of the idea. Do not add new events, scenes, world elements, characters, lore, or emotional beats that are not in the source. Keep the language controlled, purposeful, and focused on articulating the central thought.
 
@@ -6,7 +6,7 @@ Do not analyze, critique, summarize, or reference the original text. Do not ment
 
 Reinforcement:
 Always generate a refined idea, even from minimal input.
-The refined idea must incorporate the conceptual influence of the selected flavor: [FLAVOR].
+The refined idea must incorporate the conceptual influence of the selected flavor: {flavor}.
 The output may include light atmosphere but must remain conceptual.
 The output must refine, not expand.
 The output must avoid poetic or atmospheric excess.
@@ -15,4 +15,4 @@ The output must present only the improved idea.
 The output must avoid broad generalities.
 The output must contain exactly 5 sentences.
 
-SOURCE_IDEA: [INPUT]
+SOURCE_IDEA: {input}

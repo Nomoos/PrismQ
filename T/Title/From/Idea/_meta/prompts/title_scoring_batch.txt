@@ -9,10 +9,10 @@ Evaluation criteria:
 5. Literary quality: Does the title avoid clichés, over-explaining, and formulaic patterns?
 
 Idea context:
-{IDEA}
+{idea}
 
 Titles to evaluate:
-{TITLES}
+{titles}
 
 Respond with ONLY a numbered list of integer scores between 0 and 100, one score per line, in the same order as the titles above. Use the same numbering as the input titles. No commentary, no explanations.
 

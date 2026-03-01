@@ -268,7 +268,7 @@ class AITitleGenerator:
         """
         template = self.prompt_loader.get_title_generation_batch_prompt()
         idea_text = idea.concept or idea.title or "No idea provided"
-        prompt = template.format(IDEA=idea_text, COUNT=n_variants)
+        prompt = template.format(idea=idea_text, count=n_variants)
         
         logger.info(f"Generating {n_variants} title variants (batch mode, 1 AI call)")
         logger.debug(f"Batch prompt:\n{'-' * 80}\n{prompt}\n{'-' * 80}")
@@ -405,7 +405,7 @@ class AITitleGenerator:
             template = self.prompt_loader.get_title_scoring_batch_prompt()
             idea_text = idea.concept or idea.title or ""
             titles_text = "\n".join(f"{i + 1}. {v.text}" for i, v in enumerate(variants))
-            prompt = template.format(IDEA=idea_text, TITLES=titles_text)
+            prompt = template.format(idea=idea_text, titles=titles_text)
 
             # Low temperature for consistent, deterministic scoring
             response_text = self.ollama_client.generate(prompt, temperature=0.1)
@@ -466,7 +466,7 @@ class AITitleGenerator:
         try:
             template = self.prompt_loader.get_title_scoring_prompt()
             idea_text = idea.concept or idea.title or ""
-            prompt = template.format(IDEA=idea_text, TITLE=title_text)
+            prompt = template.format(idea=idea_text, title=title_text)
             
             # Use low temperature for consistent, deterministic scoring
             response_text = self.ollama_client.generate(prompt, temperature=0.1)
@@ -507,7 +507,7 @@ class AITitleGenerator:
         template = self.prompt_loader.get_title_generation_prompt()
         
         # Format with idea text (direct insertion without analysis)
-        return template.format(IDEA=idea_text)
+        return template.format(idea=idea_text)
     
     def _parse_response(self, response_text: str, idea: Idea) -> Optional[TitleVariant]:
         """Parse AI response into a TitleVariant.

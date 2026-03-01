@@ -122,59 +122,15 @@ def print_debug(text: str, logger: Optional[logging.Logger] = None) -> None:
 
 
 # =============================================================================
-# AI Prompt Template (Narrative Format)
+# AI Prompt Loading
 # =============================================================================
 
-NARRATIVE_PROMPT_TEMPLATE = """You are a senior title editor and viral content strategist.
+_PROMPTS_DIR = MODULE_ROOT / "_meta" / "prompts"
 
-Your task is to WRITE A TEXTUAL REVIEW of a TITLE based on:
-- the STORY IDEA (original intent and promise)
-- the CONTENT (existing / obsolete script or final content)
 
-You are NOT reviewing the content quality.
-You are reviewing the TITLE's effectiveness, accuracy, and emotional performance
-given what the audience is promised (Idea) and what they actually receive (Content).
-
----
-
-INPUT:
-
-STORY IDEA:
-{idea}
-
-CONTENT:
-{content}
-
-CURRENT TITLE:
-{title}
-
----
-
-ANALYSIS RULES (internal, do not output):
-- Compare title promise vs idea intent
-- Compare title promise vs content delivery
-- Detect overpromise, underpromise, or misdirection
-- Judge emotional pull in under 1 second
-- Consider trust, retention, and replay motivation
-- Assume short-form, audio-first, emotion-driven platforms
-
----
-
-OUTPUT RULES (STRICT):
-- Output ONLY a continuous review text (paragraphs allowed)
-- Do NOT use headings, lists, or bullet points
-- Do NOT quote the prompt or structure
-- Do NOT mention scores or labels explicitly
-- Do NOT rewrite or summarize the content
-- Do NOT suggest content changes
-- You MAY suggest title improvements or alternatives naturally within the text
-- Tone: professional, precise, critical but constructive
-
-The review should clearly answer:
-- Does the title fit the idea?
-- Does the title truthfully represent the content?
-- Does it create enough emotional tension to earn the click?
-- What is the main risk of keeping this title as-is?"""
+def _load_prompt(filename: str) -> str:
+    """Load a prompt template from the prompts directory."""
+    return (_PROMPTS_DIR / filename).read_text(encoding="utf-8")
 
 
 # =============================================================================
@@ -283,7 +239,7 @@ def generate_title_review_with_ai(
         logger.debug(f"Content length: {len(content_text)} chars")
 
     # Format the prompt
-    prompt = NARRATIVE_PROMPT_TEMPLATE.format(
+    prompt = _load_prompt("title_review.txt").format(
         title=title_text, idea=idea_summary, content=content_text
     )
 
