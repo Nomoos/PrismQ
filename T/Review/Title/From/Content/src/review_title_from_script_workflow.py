@@ -31,10 +31,15 @@ REPO_ROOT = T_ROOT.parent
 sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 
+# Import Config before service (service modifies sys.path and may shadow REPO_ROOT/src)
+try:
+    from src.config import Config
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
+
 try:
     from review_title_from_script_service import ReviewTitleFromScriptService
-    from src.config import Config
-    
     SERVICE_AVAILABLE = True
 except ImportError as e:
     SERVICE_AVAILABLE = False
@@ -155,10 +160,13 @@ Examples:
         return 1
 
     # Get database path
-    try:
-        db_path = Config.get_database_path()
-    except:
-        db_path = "C:/PrismQ/db.s3db"
+    db_path = "C:/PrismQ/db.s3db"
+    if CONFIG_AVAILABLE:
+        try:
+            config = Config()
+            db_path = config.database_path
+        except Exception:
+            pass
     
     print_info(f"Database: {db_path}")
     

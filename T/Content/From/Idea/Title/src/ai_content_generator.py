@@ -854,41 +854,16 @@ class AIContentGenerator:
                 "You are an expert video content writer specializing in engaging short-form content."
             )
 
-        # Optimized prompt structure for Qwen3:32b
-        prompt = f"""{role_line}
-
-# Your Task
-Write compelling video narration for: "{title}"
-
-# Context
-{idea_text}
-
-# Creative Direction
-Draw subtle inspiration from: {seed}
-(Use this thematically or symbolically—do not mention it directly)
-
-# Requirements
-**Structure**: Begin with an attention-grabbing hook, deliver the core message clearly, end with a natural call-to-action.
-
-**Length**: {target_words} words (target) | {max_words} words (maximum)
-
-**Style Guidelines**:
-- First sentence must create immediate curiosity or tension
-- Use conversational, engaging language throughout
-- Maintain consistent energy and pacing
-- Make every word count—no filler
-- End with a clear action for viewers
-
-**Critical Constraints**:
-- Write ONLY the narration text—no labels, headings, or meta-commentary
-- Never mention "hook", "CTA", "script", or structural elements
-- Never explain what you're doing—just deliver the content
-- Stay within word limit
-
-# Output Format
-Write the complete narration as a single, flowing text. Start immediately with the hook."""
-
-        return prompt
+        # Load prompt template from file and substitute placeholders
+        template = _load_prompt("content_generation.txt")
+        return template.format(
+            role_line=role_line,
+            title=title,
+            idea_text=idea_text,
+            seed=seed,
+            target_words=target_words,
+            max_words=max_words,
+        )
 
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate content.

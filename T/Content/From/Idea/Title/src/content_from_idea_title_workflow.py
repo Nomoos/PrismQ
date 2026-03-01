@@ -28,12 +28,18 @@ T_ROOT = CONTENT_FROM_IDEA_TITLE_ROOT.parent.parent.parent.parent  # .../T
 REPO_ROOT = T_ROOT.parent                                 # repo root
 
 # Add paths for imports
+sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
+
+# Import Config before service (service modifies sys.path and may shadow REPO_ROOT/src)
+try:
+    from src.config import Config
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
 
 try:
     from T.Content.From.Idea.Title.src.story_content_service import StateBasedContentService
-    from src.config import Config
-
     SERVICE_AVAILABLE = True
 except ImportError as e:
     SERVICE_AVAILABLE = False
@@ -223,10 +229,13 @@ Examples:
         print_info("No audience configured in workflow.json — running without audience context.")
 
     # Get database path
-    try:
-        db_path = Config.get_database_path()
-    except:
-        db_path = "C:/PrismQ/db.s3db"
+    db_path = "C:/PrismQ/db.s3db"
+    if CONFIG_AVAILABLE:
+        try:
+            config = Config()
+            db_path = config.database_path
+        except Exception:
+            pass
     
     print_info(f"Database: {db_path}")
     

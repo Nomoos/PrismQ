@@ -31,4 +31,4 @@ Use as few words as possible for maximum emotional impact
 Write a title that feels like it belongs on a haunting, intimate novel
 
 Idea:
-{IDEA}
+{idea}

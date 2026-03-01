@@ -9,10 +9,10 @@ Evaluation criteria:
 5. Literary quality: Does the title avoid clichés, over-explaining, and formulaic patterns?
 
 Idea context:
-{IDEA}
+{idea}
 
 Title to evaluate:
-{TITLE}
+{title}
 
 Respond with ONLY a single integer score between 0 and 100, where:
 - 0-40: Poor quality (generic, too long/short, no emotional hook)
