@@ -468,7 +468,7 @@ class TestManualCreationPipeline:
     1. Idea.Creation (manual entry point)
     2. Title.From.Idea (v1)
     3. Script.From.Title.Idea (v1)
-    4. Review.Title.By.Script.Idea
+    4. Review.Title.From.Script.Idea
     5. Title.From.Script.Review.Title (v2)
     6. Review.Script.From.Title.Idea
     7. Script.From.Title.Review.Script (v2)
@@ -525,10 +525,10 @@ class TestManualCreationPipeline:
             },
         )
 
-        # Stage 4: Review.Title.By.Script.Idea
+        # Stage 4: Review.Title.From.Script.Idea
         assert helper.stage_validator.transition_to(
             "PrismQ.T.Review.Title.From.Script.Idea"
-        ), "Failed to transition to Review.Title.By.Script.Idea"
+        ), "Failed to transition to Review.Title.From.Script.Idea"
 
         # Stage 5: Title.From.Script.Review.Title (v2 - improved title)
         assert helper.stage_validator.transition_to(
@@ -584,7 +584,7 @@ class TestManualCreationPipeline:
             "PrismQ.T.Idea.From.User",  # Idea.Creation
             "PrismQ.T.Title.From.Idea",  # Title.From.Idea
             "PrismQ.T.Script.From.Idea.Title",  # Script.From.Title.Idea
-            "PrismQ.T.Review.Title.From.Script.Idea",  # Review.Title.By.Script.Idea
+            "PrismQ.T.Review.Title.From.Script.Idea",  # Review.Title.From.Script.Idea
             "PrismQ.T.Title.From.Title.Review.Script",  # Title.From.Script.Review.Title
             "PrismQ.T.Review.Script.From.Title.Idea",  # Review.Script.From.Title.Idea
             "PrismQ.T.Script.From.Script.Review.Title",  # Script.From.Title.Review.Script
@@ -738,7 +738,7 @@ class TestManualCreationPipeline:
         script_tracker = helper.start_workflow("Script")
         script_tracker.add_version(1, {"stage": "from_title_and_idea"})
 
-        # Stage 4: Review.Title.By.Script.Idea (Feedback loop)
+        # Stage 4: Review.Title.From.Script.Idea (Feedback loop)
         assert helper.stage_validator.transition_to("PrismQ.T.Review.Title.From.Script.Idea")
 
         # Stage 5: Title.From.Script.Review.Title (v2)

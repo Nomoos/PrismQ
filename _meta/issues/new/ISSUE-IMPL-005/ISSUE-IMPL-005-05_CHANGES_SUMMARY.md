@@ -1,7 +1,7 @@
 # Production Readiness Changes - Quick Reference
 
 **Module**: `T/Review/Title/From/Content/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea`  
 **Date**: 2025-12-23
 
 ---
@@ -11,7 +11,7 @@
 ### 🔴 CRITICAL - Must Fix Immediately
 
 #### 1. Fix Script Paths
-**Files**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`, `Preview.bat`
+**Files**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Run.bat`, `Preview.bat`
 
 **Current (WRONG)**:
 ```batch
@@ -253,7 +253,7 @@ python -m pytest _meta/tests/ --cov=. --cov-report=html
 
 ### Run Script
 ```bash
-cd _meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea
+cd _meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea
 Run.bat          # Full mode (saves to DB)
 Preview.bat      # Preview mode (no save)
 ```
@@ -276,8 +276,8 @@ black by_content_and_idea.py title_review.py --check
 ## Related Files
 
 ### Must Modify
-- `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`
-- `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Preview.bat`
+- `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Run.bat`
+- `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Preview.bat`
 - `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 - `T/Review/Title/From/Content/Idea/requirements.txt`
 

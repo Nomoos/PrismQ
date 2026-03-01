@@ -85,12 +85,12 @@ T/Script/From/Title/Idea/src/
 ### Přehled stages:
 
 ```
-05 → Review.Title.By.Script.Idea
-06 → Review.Script.By.Title.Idea
-07 → Review.Title.By.Script
+05 → Review.Title.From.Script.Idea
+06 → Review.Script.From.Title.Idea
+07 → Review.Title.From.Script
 08 → Title.From.Script.Review.Title
 09 → Script.From.Title.Review.Script
-10 → Review.Script.By.Title
+10 → Review.Script.From.Title
 ```
 
 **Účel:** Iterativní zlepšování titulku a scriptu pomocí AI review
@@ -111,11 +111,11 @@ def review_stage(input_data):
     7. Return review object
 ```
 
-### Stage 05: Review.Title.By.Script.Idea
+### Stage 05: Review.Title.From.Script.Idea
 
 **Implementovat:**
 ```
-T/Review/Title/By/Script/Idea/src/
+T/Review/Title/From/Script/Idea/src/
 ├── title_review_service.py
 ├── ai_title_reviewer.py
 ├── review_scorer.py
@@ -130,11 +130,11 @@ T/Review/Title/By/Script/Idea/src/
 
 ---
 
-### Stage 06: Review.Script.By.Title.Idea
+### Stage 06: Review.Script.From.Title.Idea
 
 **Implementovat:**
 ```
-T/Review/Script/By/Title/Idea/src/
+T/Review/Script/From/Title/Idea/src/
 ├── script_review_service.py
 ├── ai_script_reviewer.py
 ├── consistency_checker.py
@@ -149,11 +149,11 @@ T/Review/Script/By/Title/Idea/src/
 
 ---
 
-### Stage 07: Review.Title.By.Script
+### Stage 07: Review.Title.From.Script
 
 **Implementovat:**
 ```
-T/Review/Title/By/Script/src/
+T/Review/Title/From/Script/src/
 ├── title_script_review_service.py
 ├── alignment_checker.py
 └── requirements.txt
@@ -200,11 +200,11 @@ T/Script/From/Title/Review/Script/src/
 
 ---
 
-### Stage 10: Review.Script.By.Title
+### Stage 10: Review.Script.From.Title
 
 **Implementovat:**
 ```
-T/Review/Script/By/Title/src/
+T/Review/Script/From/Title/src/
 ├── final_review_service.py
 ├── quality_checker.py
 └── requirements.txt

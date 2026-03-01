@@ -32,6 +32,7 @@ T_ROOT = REVIEW_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
 # Add paths for imports
+sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REVIEW_SCRIPT_FROM_TITLE_ROOT))
 sys.path.insert(0, str(REVIEW_SCRIPT_ROOT))

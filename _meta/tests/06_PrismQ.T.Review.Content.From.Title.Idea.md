@@ -46,7 +46,7 @@ Review the Content against the Title and the original Idea to assess alignment a
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Script.By.Title.Idea - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Script.From.Title.Idea - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Reviews will NOT be saved."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Database query** - Loads Content records ready for review
@@ -54,7 +54,7 @@ Review the Content against the Title and the original Idea to assess alignment a
 6. **New state displayed**:
    ```
    ========================================
-   PrismQ.T.Review.Script.By.Title.Idea - PREVIEW MODE
+   PrismQ.T.Review.Script.From.Title.Idea - PREVIEW MODE
    ========================================
    This mode is for TESTING. Reviews will NOT be saved.
 

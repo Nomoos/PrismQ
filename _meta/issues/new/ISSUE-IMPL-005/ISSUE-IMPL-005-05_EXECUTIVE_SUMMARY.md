@@ -4,7 +4,7 @@
 **Date**: December 23, 2025  
 **Reviewer**: GitHub Copilot  
 **Module**: `T/Review/Title/From/Content/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea`
 
 ---
 

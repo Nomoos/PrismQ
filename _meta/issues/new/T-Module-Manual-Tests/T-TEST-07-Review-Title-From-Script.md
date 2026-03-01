@@ -1,7 +1,7 @@
-# T-TEST-07: PrismQ.T.Review.Title.By.Script Manual Test
+# T-TEST-07: PrismQ.T.Review.Title.From.Script Manual Test
 
-**Module**: PrismQ.T.Review.Title.By.Script  
-**Script**: `_meta/scripts/07_PrismQ.T.Review.Title.By.Script/`  
+**Module**: PrismQ.T.Review.Title.From.Script  
+**Script**: `_meta/scripts/07_PrismQ.T.Review.Title.From.Script/`  
 **Type**: Manual Testing  
 **Status**: 🧪 READY FOR TESTING
 
@@ -17,7 +17,7 @@ Review Title against Script for final alignment. This is a decision point - if n
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Title.By.Script - RUN MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Title.From.Script - RUN MODE"
 2. **Environment setup** occurs (creates/activates virtual environment if needed)
 3. **Prompt appears** asking for Title and Script IDs
 4. **User provides** the two IDs or pastes objects
@@ -33,7 +33,7 @@ Review Title against Script for final alignment. This is a decision point - if n
    - `feedback`: Detailed feedback
    - `rejection_reasons`: List (if rejected)
 7. **Decision branch**:
-   - **ACCEPTED**: State set to `PrismQ.T.Review.Script.By.Title`
+   - **ACCEPTED**: State set to `PrismQ.T.Review.Script.From.Title`
    - **REJECTED**: State set to `PrismQ.T.Title.From.Script.Review.Title`
 8. **Database write** - Review object saved
 9. **Decision displayed** with next steps
@@ -45,7 +45,7 @@ Review Title against Script for final alignment. This is a decision point - if n
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Title.By.Script - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Title.From.Script - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Reviews will NOT be saved to database."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Prompt appears** asking for Title and Script
@@ -72,7 +72,7 @@ Review Title against Script for final alignment. This is a decision point - if n
    2. [reason 2]
    
    Next State: [based on decision]
-   - If ACCEPTED: PrismQ.T.Review.Script.By.Title
+   - If ACCEPTED: PrismQ.T.Review.Script.From.Title
    - If REJECTED: PrismQ.T.Title.From.Script.Review.Title
    ========================================
    ```
@@ -86,7 +86,7 @@ Review Title against Script for final alignment. This is a decision point - if n
 
 ```batch
 REM Navigate to script directory
-cd _meta\scripts\07_PrismQ.T.Review.Title.By.Script
+cd _meta\scripts\07_PrismQ.T.Review.Title.From.Script
 
 REM Run in Preview Mode (recommended for testing)
 Preview.bat
@@ -115,7 +115,7 @@ Run.bat
 After testing, provide logs in this format:
 
 ```
-### Test: T-TEST-07 Review.Title.By.Script
+### Test: T-TEST-07 Review.Title.From.Script
 ### Mode: [Preview/Run]
 ### Date: YYYY-MM-DD
 

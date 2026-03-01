@@ -54,12 +54,12 @@ cd _meta/scripts/03_PrismQ.T.Title.From.Idea
 | 02 | Story.From.Idea | ✅ COMPLETE | Generate stories from ideas |
 | 03 | Title.From.Idea | ➡️ **NEXT** | Generate titles from ideas |
 | 04 | Script.From.Title.Idea | ⏳ Pending | Generate scripts from title + idea |
-| 05 | Review.Title.By.Script.Idea | ⏳ Pending | Review title vs script + idea |
-| 06 | Review.Script.By.Title.Idea | ⏳ Pending | Review script vs title + idea |
-| 07 | Review.Title.By.Script | ⏳ Pending | Review title vs script |
+| 05 | Review.Title.From.Script.Idea | ⏳ Pending | Review title vs script + idea |
+| 06 | Review.Script.From.Title.Idea | ⏳ Pending | Review script vs title + idea |
+| 07 | Review.Title.From.Script | ⏳ Pending | Review title vs script |
 | 08 | Title.From.Script.Review.Title | ⏳ Pending | Refine title from review |
 | 09 | Script.From.Title.Review.Script | ⏳ Pending | Refine script from review |
-| 10 | Review.Script.By.Title | ⏳ Pending | Final script review |
+| 10 | Review.Script.From.Title | ⏳ Pending | Final script review |
 | 11 | Review.Script.Grammar | ⏳ Pending | Grammar validation |
 | 12 | Review.Script.Tone | ⏳ Pending | Tone consistency check |
 | 13 | Review.Script.Content | ⏳ Pending | Content accuracy validation |

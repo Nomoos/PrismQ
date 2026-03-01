@@ -33,7 +33,7 @@ Refine Script (v2+) based on Title and review feedback. This is used extensively
    - `improvements_applied`: List of improvements
    - `word_count`: Updated count
    - `changelog`: Summary of changes
-7. **State set** to `PrismQ.T.Review.Title.By.Script`
+7. **State set** to `PrismQ.T.Review.Title.From.Script`
 8. **Database write** - New Script version saved
 9. **Comparison displayed** (v1 vs v2 diff)
 10. **Script ends**
@@ -74,7 +74,7 @@ Refine Script (v2+) based on Title and review feedback. This is used extensively
    Preview of Changes:
    [section with changes highlighted]
    
-   Next State: PrismQ.T.Review.Title.By.Script
+   Next State: PrismQ.T.Review.Title.From.Script
    ========================================
    ```
 8. **Wait for keystroke** - "Press any key to continue..."
@@ -104,7 +104,7 @@ Run.bat
 - [ ] Improvements are clearly documented
 - [ ] Version tracking is correct
 - [ ] Changelog summarizes changes
-- [ ] State transitions to `PrismQ.T.Review.Title.By.Script`
+- [ ] State transitions to `PrismQ.T.Review.Title.From.Script`
 - [ ] Preview mode shows improvements without saving
 - [ ] Preview mode waits for keystroke
 - [ ] No errors in execution

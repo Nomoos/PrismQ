@@ -1,7 +1,7 @@
 # Production Readiness Checklist
 
 **Module**: `T/Review/Title/From/Content/Idea`  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea`  
 **Review Date**: 2025-12-23  
 **Status**: NOT PRODUCTION READY
 
@@ -148,8 +148,8 @@
 ## Quick Reference
 
 ### Files to Modify (Critical)
-1. `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat`
-2. `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Preview.bat`
+1. `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Run.bat`
+2. `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Preview.bat`
 3. `T/Review/Title/From/Content/Idea/by_content_and_idea.py`
 
 ### Files to Create (Critical)

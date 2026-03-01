@@ -53,7 +53,7 @@
 
 **Updated Files**:
 - `ISSUE-IMPL-006-SUMMARY.md` (status updates)
-- `ISSUE-IMPL-006-06_PrismQ.T.Review.Content.By.Title.Idea.md` (details)
+- `ISSUE-IMPL-006-06_PrismQ.T.Review.Content.From.Title.Idea.md` (details)
 
 ---
 
@@ -141,7 +141,7 @@ python review_script_by_title_idea_interactive.py
 
 ### Windows Batch Scripts
 ```bash
-cd _meta/scripts/06_PrismQ.T.Review.Script.By.Title.Idea
+cd _meta/scripts/06_PrismQ.T.Review.Script.From.Title.Idea
 
 # Preview mode
 Preview.bat
