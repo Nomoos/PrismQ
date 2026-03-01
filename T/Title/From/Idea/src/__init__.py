@@ -29,8 +29,8 @@ Example:
     >>> 
     >>> idea = Idea(title="Story", concept="A tale of connection...")
     >>> generator = AITitleGenerator()
-    >>> variants = generator.generate_from_idea(idea, num_variants=5)
-    >>> for variant in variants:
+    >>> variant = generator.generate_from_idea(idea)
+    >>> if variant:
     ...     print(f"{variant.text} (score: {variant.score})")
 """
 

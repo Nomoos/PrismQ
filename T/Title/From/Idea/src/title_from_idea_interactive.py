@@ -733,17 +733,14 @@ def run_state_workflow_mode(
                     error_count += 1
                     continue
 
-                # Generate title variants using AI
-                print_section("Generating AI Title Variants")
+                # Generate title using AI
+                print_section("Generating AI Title")
 
                 try:
-                    # Use service constant for number of variants
-                    num_variants = StoryTitleService.NUM_VARIANTS
+                    print_info(f"Generating title from Idea: '{idea.title[:50]}...'")
 
-                    print_info(f"Generating {num_variants} variants from Idea: '{idea.title[:50]}...'")
-
-                    # Generate variants using AI through the service
-                    variants = service.generate_title_variants(idea, num_variants=num_variants)
+                    # Generate a single title via the service
+                    variant = service.generate_title(idea)
 
                 except AIUnavailableError as e:
                     print_error(f"AI unavailable: {e}")
@@ -754,43 +751,23 @@ def run_state_workflow_mode(
                     conn.close()
                     raise  # Re-raise to stop processing
 
-                if not variants:
-                    print_warning(f"AI could not generate valid variants for Story {story.id}, skipping")
+                if not variant:
+                    print_warning(f"AI could not generate a title for Story {story.id}, skipping")
                     if logger:
-                        logger.warning(f"No variants generated for Story {story.id}")
+                        logger.warning(f"No title generated for Story {story.id}")
                     error_count += 1
                     continue
 
                 try:
-                    print_section("Selecting Best Title (with Similarity Check)")
-                    best_variant, similar_titles = service.select_best_title(variants, story)
+                    # Display the generated title
+                    print(f"\n  {Colors.GREEN}Generated Title:{Colors.END}")
+                    print(f"    {variant.text}")
+                    print(f"    Style: {variant.style} | Length: {variant.length} chars | Score: {variant.score:.2f}")
 
-                    # Display all variants
-                    print(f"\n  {Colors.CYAN}Generated {len(variants)} AI Title Variants:{Colors.END}")
-                    for j, v in enumerate(variants, 1):
-                        is_best = v.text == best_variant.text
-                        marker = f"{Colors.GREEN}★{Colors.END}" if is_best else " "
-                        print(f"  {marker} {j}. [{v.style}] {v.text}")
-                        print(f"       Length: {v.length} chars | Score: {v.score:.2f}")
-
-                    # Show similarity warnings
-                    if similar_titles:
-                        print(f"\n  {Colors.YELLOW}⚠ Similarity warnings:{Colors.END}")
-                        for sim_title, sim_score in similar_titles:
-                            print(f"    - {sim_score:.0%} similar to: '{sim_title[:50]}...'")
-
-                    # Show selected best
-                    print(f"\n  {Colors.GREEN}Selected Best Title:{Colors.END}")
-                    print(f"    {best_variant.text}")
-                    print(f"    Style: {best_variant.style} | Score: {best_variant.score:.2f}")
-
-                    # Save title and update state, reusing the already-generated variants
-                    # to avoid regenerating AI content for the same story.
+                    # Save title and update state
                     print_section("Database Operations")
                     try:
-                        title = service.generate_title_for_story(
-                            story, idea, precomputed_variants=variants
-                        )
+                        title = service.generate_title_for_story(story, idea)
                         if title:
                             print_success(f"Title saved with ID: {title.id}")
                             print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")

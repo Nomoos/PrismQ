@@ -216,34 +216,45 @@ class StoryTitleService:
         """
         return self._ai_title_generator is not None and self._ai_title_generator.is_available()
 
-    def generate_title_variants(
-        self, idea: Idea, num_variants: Optional[int] = None
-    ) -> List[TitleVariant]:
-        """Generate title variants from an Idea.
-
-        Uses AI (Qwen2.5-14B-Instruct) for title generation. Raises an error
-        if AI is unavailable - no fallback to template-based generation.
+    def generate_title(self, idea: Idea) -> Optional[TitleVariant]:
+        """Generate a single title from an Idea using AI.
 
         Args:
-            idea: Idea object to generate titles from
-            num_variants: Number of variants to generate (3-10)
+            idea: Idea object to generate a title from
 
         Returns:
-            List of TitleVariant instances
+            TitleVariant with rule-based score, or None if generation failed
 
         Raises:
             AIUnavailableError: If AI title generation is not available
         """
-        n_variants = num_variants or self.NUM_VARIANTS
-
-        # Check if AI is available - raise error if not
         if not self._ai_title_generator or not self._ai_title_generator.is_available():
             error_msg = "AI title generation unavailable: Ollama not running or not configured"
             logger.error(error_msg)
             raise AIUnavailableError(error_msg)
 
-        # Use AI generation (will raise AIUnavailableError if it fails)
-        return self._ai_title_generator.generate_from_idea(idea, n_variants)
+        return self._ai_title_generator.generate_from_idea(idea)
+
+    def generate_title_variants(
+        self, idea: Idea, num_variants: Optional[int] = None
+    ) -> List[TitleVariant]:
+        """Generate a title from an Idea. Deprecated wrapper kept for backward compatibility.
+
+        Note: ``num_variants`` is ignored. Exactly one title is generated per call.
+        Use :meth:`generate_title` instead.
+
+        Args:
+            idea: Idea object to generate a title from.
+            num_variants: Ignored. Kept for backward-compatibility only.
+
+        Returns:
+            List containing the single generated TitleVariant, or empty list on failure.
+
+        Raises:
+            AIUnavailableError: If AI title generation is not available.
+        """
+        variant = self.generate_title(idea)
+        return [variant] if variant else []
 
     def get_stories_without_titles(self) -> List[Story]:
         """Get Stories that are ready for title generation but don't have titles.
@@ -448,64 +459,10 @@ class StoryTitleService:
         is_unique = len(similar_titles) == 0
         return is_unique, similar_titles
 
-    def select_best_title(
-        self, variants: List[TitleVariant], story: Story, similarity_threshold: float = None
-    ) -> Tuple[TitleVariant, List[Tuple[str, float]]]:
-        """Select the best title variant that is not too similar to siblings.
-
-        Selection criteria:
-        1. Sort variants by score (highest first)
-        2. Check each variant for similarity to existing sibling titles
-        3. If best title is too similar, remove it and try second best
-        4. Repeat until a unique title is found or all exhausted
-        5. If all are too similar, return the highest scored as fallback
-
-        Args:
-            variants: List of TitleVariant options.
-            story: The Story to select a title for.
-            similarity_threshold: Maximum allowed similarity with siblings
-                                  (default: DEFAULT_SIMILARITY_THRESHOLD).
-
-        Returns:
-            Tuple of:
-                - Selected TitleVariant
-                - List of (similar_title, similarity_score) for reference
-        """
-        if not variants:
-            raise ValueError("No variants provided")
-
-        if similarity_threshold is None:
-            similarity_threshold = self.DEFAULT_SIMILARITY_THRESHOLD
-
-        # Sort variants by original score (highest first)
-        sorted_variants = sorted(variants, key=lambda v: v.score, reverse=True)
-
-        # Track the best variant as fallback (highest score, even if similar)
-        fallback_variant = sorted_variants[0]
-        fallback_similar_titles = []
-
-        # Iterate through variants in score order, pick first unique one
-        for variant in sorted_variants:
-            is_unique, similar_titles = self.check_title_uniqueness(
-                variant.text, story, similarity_threshold
-            )
-
-            # Keep track of fallback info from best variant
-            if variant == fallback_variant:
-                fallback_similar_titles = similar_titles
-
-            # If this title is unique enough, select it
-            if is_unique:
-                return variant, similar_titles
-
-        # All variants are too similar - return the highest scored as fallback
-        return fallback_variant, fallback_similar_titles
-
     def generate_title_for_story(
         self,
         story: Story,
         idea: Optional[Idea] = None,
-        precomputed_variants: Optional[List[TitleVariant]] = None,
     ) -> Optional[Title]:
         """Generate a Title (v0) for a single Story using AI.
 
@@ -514,12 +471,7 @@ class StoryTitleService:
 
         Args:
             story: The Story to generate a title for.
-            idea: Idea object for context. Required when precomputed_variants
-                is not provided.
-            precomputed_variants: Optional list of already-generated TitleVariant
-                objects to use instead of regenerating. When provided, ``idea``
-                is only required if variants must still be generated (i.e. this
-                list is empty or None).
+            idea: Idea object for context. Required for AI generation.
 
         Returns:
             Created Title object, or None if story already has a title.
@@ -527,7 +479,7 @@ class StoryTitleService:
         Raises:
             RuntimeError: If no database connection is available.
             AIUnavailableError: If AI title generation is not available.
-            ValueError: If no Idea is provided and variants need to be generated.
+            ValueError: If no Idea is provided.
         """
         if not self._title_repo or not self._story_repo:
             raise RuntimeError("Database connection required for this operation")
@@ -536,39 +488,28 @@ class StoryTitleService:
         if self.story_has_title(story.id):
             return None
 
-        if precomputed_variants:
-            # Use caller-supplied variants — no AI call needed
-            variants = precomputed_variants
-        else:
-            # Idea is required for AI title generation - no fallback
-            if not idea:
-                raise ValueError(
-                    f"Idea object is required for AI title generation (Story ID: {story.id}). "
-                    "The caller must provide a valid Idea object."
-                )
+        if not idea:
+            raise ValueError(
+                f"Idea object is required for AI title generation (Story ID: {story.id}). "
+                "The caller must provide a valid Idea object."
+            )
 
-            # Generate title variants using AI (will raise AIUnavailableError if unavailable)
-            variants = self.generate_title_variants(idea, num_variants=self.NUM_VARIANTS)
+        # Generate a single title using AI
+        variant = self.generate_title(idea)
 
-            if not variants:
-                raise AIUnavailableError(
-                    "AI title generation returned no variants. "
-                    "Ensure Ollama is running and the model is available."
-                )
-
-        # Select best title considering similarity to sibling titles
-        best_variant, similar_titles = self.select_best_title(variants, story)
-        title_text = best_variant.text
+        if not variant:
+            raise AIUnavailableError(
+                "AI title generation returned no result. "
+                "Ensure Ollama is running and the model is available."
+            )
 
         # Create Title (version 0)
-        title = Title(story_id=story.id, version=0, text=title_text)
+        title = Title(story_id=story.id, version=0, text=variant.text)
 
         # Persist Title
         title = self._title_repo.insert(title)
 
         # Update Story state to CONTENT_FROM_IDEA_TITLE (next workflow step)
-        # The workflow is: TITLE_FROM_IDEA -> CONTENT_FROM_IDEA_TITLE
-        # Title already references Story via story_id FK
         story.transition_to(StoryState.CONTENT_FROM_IDEA_TITLE)
         self._story_repo.update(story)
 
@@ -697,15 +638,17 @@ class StoryTitleService:
         if skip_if_exists and self.idea_has_stories(idea, effective_idea_id):
             return None
 
-        # Generate title variants using AI (required - no fallback)
-        # Will raise AIUnavailableError if AI is not available
-        title_variants = self.generate_title_variants(idea, num_variants=self.NUM_STORIES)
-
-        # Create Stories and Titles
+        # Create Stories and Titles — one AI call per story
         stories: List[Story] = []
         titles: List[Title] = []
+        title_variants: List[TitleVariant] = []
 
-        for i, variant in enumerate(title_variants):
+        for _ in range(self.NUM_STORIES):
+            # Generate a single title for this story
+            variant = self.generate_title(idea)
+            if not variant:
+                continue
+
             # Create Story with TITLE_FROM_IDEA state (ready for title processing)
             # Note: This bypasses the Story.From.Idea module for legacy compatibility
             story = Story(
@@ -718,7 +661,7 @@ class StoryTitleService:
                 story = self._story_repo.insert(story)
             else:
                 # Assign a temporary ID for in-memory usage
-                story.id = i + 1
+                story.id = len(stories) + 1
 
             # Create Title (version 0) for this Story
             title = Title(story_id=story.id, version=0, text=variant.text)
@@ -728,7 +671,7 @@ class StoryTitleService:
                 title = self._title_repo.insert(title)
             else:
                 # Assign a temporary ID for in-memory usage
-                title.id = i + 1
+                title.id = len(titles) + 1
 
             # Update Story state to CONTENT_FROM_IDEA_TITLE (next workflow step)
             # Title already references Story via story_id FK
@@ -738,6 +681,7 @@ class StoryTitleService:
 
             stories.append(story)
             titles.append(title)
+            title_variants.append(variant)
 
         return StoryTitleResult(
             idea_id=effective_idea_id, stories=stories, titles=titles, title_variants=title_variants
