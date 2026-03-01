@@ -215,11 +215,11 @@ class ReviewTitleFromContentIdeaService:
             content_id=content_id,
         )
 
-        review_text = review_result.get("text", "No review text")
+        review_text = review_result.primary_concern or review_result.notes or "No review text"
         if idea_text:
             review_text = f"{review_text}\n\nIdea Context: {idea_text[:200]}..."
 
-        return review_text, review_result.get("score", 0)
+        return review_text, review_result.overall_score
 
     def process_oldest_story(self) -> ReviewTitleFromContentIdeaResult:
         """Process the oldest story in PrismQ.T.Review.Title.From.Content.Idea state.
