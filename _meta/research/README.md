@@ -148,11 +148,11 @@ The main research document includes **40+ extractable mechanics** organized into
    - Located: `T/Content/From/Idea/Title/`
 
 5. **Iterative Review and Refinement Cycle** (`05-10_PrismQ.T.Review.*`)
-   - **Title Review by Content and Idea** (`05_PrismQ.T.Review.Title.By.Content.Idea`)
-   - **Content Review by Title and Idea** (`06_PrismQ.T.Review.Content.By.Title.Idea`)
+   - **Title Review by Content and Idea** (`05_PrismQ.T.Review.Title.From.Content.Idea`)
+   - **Content Review by Title and Idea** (`06_PrismQ.T.Review.Content.From.Title.Idea`)
    - **Title Refinement** (`08_PrismQ.T.Title.From.Content.Review.Title`)
    - **Content Refinement** (`09_PrismQ.T.Content.From.Title.Review.Content`)
-   - **Final Content Review** (`10_PrismQ.T.Review.Content.By.Title`)
+   - **Final Content Review** (`10_PrismQ.T.Review.Content.From.Title`)
    - Iterative improvement through multiple review cycles
    - Quality gates ensure content meets standards
 

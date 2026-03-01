@@ -8,7 +8,7 @@ values following the PrismQ.T naming convention:
 State Format:
     - Prefix: "PrismQ.T" (constant)
     - Output: The entity being created/modified (e.g., "Title", "Script", "Review")
-    - Action: "From", "By", or action-specific keyword
+    - Action: "From" or action-specific keyword
     - Inputs: One or more input sources (e.g., "Idea", "Title", "Script")
 
 Examples:
@@ -45,7 +45,7 @@ import re
 # Constants
 STATE_PREFIX = "PrismQ.T"
 GENERATION_ACTION = "From"
-REVIEW_ACTION = "By"
+REVIEW_ACTION = "From"
 
 # Valid state component patterns (alphanumeric only)
 COMPONENT_PATTERN = re.compile(r'^[A-Za-z][A-Za-z0-9]*$')
@@ -171,7 +171,7 @@ class StateBuilder:
         return self
     
     def by_source(self, *sources: str) -> "StateBuilder":
-        """Set sources with 'By' action (for review states).
+        """Set sources with 'From' action (for review states).
         
         Args:
             *sources: Source entities for the review.
@@ -234,7 +234,7 @@ def build_state(output: str, action: Optional[str] = None, *inputs: str) -> str:
     
     Args:
         output: The output/target entity (e.g., "Title", "Script")
-        action: Optional action keyword ("From", "By", etc.)
+        action: Optional action keyword ("From", etc.)
         *inputs: Input sources (e.g., "Idea", "Title")
         
     Returns:

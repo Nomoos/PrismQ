@@ -141,7 +141,7 @@ These issues were identified and claimed as fixed in the initial review:
    - Fixed test assertions
 
 ### Documentation
-4. `_meta/issues/new/ISSUE-IMPL-007-07_PrismQ.T.Review.Title.By.Script.md`
+4. `_meta/issues/new/ISSUE-IMPL-007-07_PrismQ.T.Review.Title.From.Script.md`
    - Added documentation of all 12 issues found
    - Updated test count: 40 → 61
    - Added critical learnings section

@@ -125,12 +125,12 @@ Review-related scripts (05-17) use mixed conventions. Need to verify if these ar
 - Content pipelines (should be `PrismQ.T.Content.*`) - needs change
 
 **Analysis needed for directories:**
-- `05_PrismQ.T.Review.Title.By.Script.Idea`
-- `06_PrismQ.T.Review.Script.By.Title.Idea`
-- `07_PrismQ.T.Review.Title.By.Script`
+- `05_PrismQ.T.Review.Title.From.Script.Idea`
+- `06_PrismQ.T.Review.Script.From.Title.Idea`
+- `07_PrismQ.T.Review.Title.From.Script`
 - `08_PrismQ.T.Title.From.Script.Review.Title`
 - `09_PrismQ.T.Content.From.Title.Review.Script`
-- `10_PrismQ.T.Review.Script.By.Title`
+- `10_PrismQ.T.Review.Script.From.Title`
 - `11_PrismQ.T.Review.Script.Grammar`
 - `12_PrismQ.T.Review.Script.Tone`
 - `13_PrismQ.T.Review.Script.Content`

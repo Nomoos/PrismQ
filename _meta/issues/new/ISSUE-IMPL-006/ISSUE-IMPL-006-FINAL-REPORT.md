@@ -11,7 +11,7 @@
 
 ## What Was Required
 
-The ISSUE-IMPL-006 summary indicated that the script `06_PrismQ.T.Review.Script.By.Title.Idea` was "production ready with database save marked as TODO". The primary gap was:
+The ISSUE-IMPL-006 summary indicated that the script `06_PrismQ.T.Review.Script.From.Title.Idea` was "production ready with database save marked as TODO". The primary gap was:
 
 **PRIMARY REQUIREMENT**: Implement database save functionality to persist review results
 
@@ -113,7 +113,7 @@ pytest-cov>=4.0.0
 
 **Files Updated**:
 - `_meta/issues/new/ISSUE-IMPL-006-SUMMARY.md`
-- `_meta/issues/new/ISSUE-IMPL-006-06_PrismQ.T.Review.Content.By.Title.Idea.md`
+- `_meta/issues/new/ISSUE-IMPL-006-06_PrismQ.T.Review.Content.From.Title.Idea.md`
 
 **Changes**:
 - Updated status from "with database save marked as TODO" to "Database save implemented"
@@ -238,7 +238,7 @@ Created and ran test script (`/tmp/test_review_save.py`) to verify:
    - Added python-dotenv production dependency
 3. `_meta/issues/new/ISSUE-IMPL-006-SUMMARY.md`
    - Updated status, dates, and recommendations
-4. `_meta/issues/new/ISSUE-IMPL-006-06_PrismQ.T.Review.Content.By.Title.Idea.md`
+4. `_meta/issues/new/ISSUE-IMPL-006-06_PrismQ.T.Review.Content.From.Title.Idea.md`
    - Updated status, implementation details, and next steps
 
 ### Total Impact
@@ -301,7 +301,7 @@ Created and ran test script (`/tmp/test_review_save.py`) to verify:
 ### Using Batch Scripts (Windows)
 ```bash
 # Navigate to scripts directory
-cd _meta/scripts/06_PrismQ.T.Review.Script.By.Title.Idea
+cd _meta/scripts/06_PrismQ.T.Review.Script.From.Title.Idea
 
 # Run in preview mode
 Preview.bat
@@ -399,7 +399,7 @@ All required changes for production readiness have been implemented:
 5. ✅ Import validation - all imports verified
 6. ✅ Core functionality - tested and working
 
-The script `06_PrismQ.T.Review.Script.By.Title.Idea` can be deployed to production immediately with proper database configuration.
+The script `06_PrismQ.T.Review.Script.From.Title.Idea` can be deployed to production immediately with proper database configuration.
 
 ### Immediate Next Steps
 1. Configure production environment (.env file)

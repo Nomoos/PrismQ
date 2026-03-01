@@ -1,7 +1,7 @@
-# PrismQ.T.Review.Title.By.Content.Idea - Basic Functionality Steps
+# PrismQ.T.Review.Title.From.Content.Idea - Basic Functionality Steps
 
 **Module**: `T/Review/Title/From/Content/Idea`  
-**Namespace**: `PrismQ.T.Review.Title.By.Content.Idea` (alternative naming)  
+**Namespace**: `PrismQ.T.Review.Title.From.Content.Idea` (alternative naming)  
 **Purpose**: Review Title from content and idea  
 **Date**: 2025-12-23
 

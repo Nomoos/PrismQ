@@ -203,7 +203,7 @@ tension the content actually provides...
 ### Manual Testing
 ```bash
 # 1. Navigate to scripts directory
-cd _meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea
+cd _meta/scripts/05_PrismQ.T.Review.Title.From.Script.Idea
 
 # 2. Run preview mode
 Preview.bat

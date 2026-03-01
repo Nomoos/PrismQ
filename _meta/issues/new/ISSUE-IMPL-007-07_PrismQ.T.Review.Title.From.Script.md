@@ -1,8 +1,8 @@
-# ISSUE-IMPL-007 — Implementation check: `07_PrismQ.T.Review.Title.By.Script`
+# ISSUE-IMPL-007 — Implementation check: `07_PrismQ.T.Review.Title.From.Script`
 
 **Status**: New  
 **Created**: 2025-12-23  
-**Script Folder**: `PrismQ/_meta/scripts/07_PrismQ.T.Review.Title.By.Script`  
+**Script Folder**: `PrismQ/_meta/scripts/07_PrismQ.T.Review.Title.From.Script`  
 **Module Path**: `T/Review/Title/`
 
 ---

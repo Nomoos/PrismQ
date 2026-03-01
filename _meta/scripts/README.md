@@ -35,12 +35,12 @@ Each module has its own numbered directory with `Run.bat` and `Preview.bat` scri
 | 02 | `02_PrismQ.T.Story.From.Idea/` | Generate stories from ideas |
 | 03 | `03_PrismQ.T.Title.From.Idea/` | Generate initial titles from ideas |
 | 04 | `04_PrismQ.T.Script.From.Title.Idea/` | Generate scripts from title + idea |
-| 05 | `05_PrismQ.T.Review.Title.By.Script.Idea/` | Review title against script and idea |
-| 06 | `06_PrismQ.T.Review.Script.By.Title.Idea/` | Review script against title and idea |
-| 07 | `07_PrismQ.T.Review.Title.By.Script/` | Review title against script |
+| 05 | `05_PrismQ.T.Review.Title.From.Script.Idea/` | Review title against script and idea |
+| 06 | `06_PrismQ.T.Review.Script.From.Title.Idea/` | Review script against title and idea |
+| 07 | `07_PrismQ.T.Review.Title.From.Script/` | Review title against script |
 | 08 | `08_PrismQ.T.Title.From.Script.Review.Title/` | Refine title from review feedback |
 | 09 | `09_PrismQ.T.Script.From.Title.Review.Script/` | Refine script from review feedback |
-| 10 | `10_PrismQ.T.Review.Script.By.Title/` | Final script review |
+| 10 | `10_PrismQ.T.Review.Script.From.Title/` | Final script review |
 | 11 | `11_PrismQ.T.Review.Script.Grammar/` | Grammar validation |
 | 12 | `12_PrismQ.T.Review.Script.Tone/` | Tone consistency check |
 | 13 | `13_PrismQ.T.Review.Script.Content/` | Content accuracy validation |

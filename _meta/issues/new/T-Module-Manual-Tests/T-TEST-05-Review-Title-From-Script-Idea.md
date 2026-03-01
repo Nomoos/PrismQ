@@ -1,7 +1,7 @@
-# T-TEST-05: PrismQ.T.Review.Title.By.Script.Idea Manual Test
+# T-TEST-05: PrismQ.T.Review.Title.From.Script.Idea Manual Test
 
-**Module**: PrismQ.T.Review.Title.By.Script.Idea  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Script.Idea/`  
+**Module**: PrismQ.T.Review.Title.From.Script.Idea  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Script.Idea/`  
 **Type**: Manual Testing  
 **Status**: 🧪 READY FOR TESTING
 
@@ -17,7 +17,7 @@ Review the Title against the Script and original Idea to assess alignment. This 
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Title.By.Script.Idea - RUN MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Title.From.Script.Idea - RUN MODE"
 2. **Environment setup** occurs (creates/activates virtual environment if needed)
 3. **Prompt appears** asking for Title, Script, and Idea IDs
 4. **User provides** the three IDs or pastes objects
@@ -35,7 +35,7 @@ Review the Title against the Script and original Idea to assess alignment. This 
    - `feedback`: Detailed feedback
    - `improvements`: List of suggested improvements
    - `keyword_mismatches`: Keywords in title not in script
-7. **State set** to `PrismQ.T.Review.Script.By.Title.Idea`
+7. **State set** to `PrismQ.T.Review.Script.From.Title.Idea`
 8. **Database write** - Review object saved
 9. **Review summary** displayed
 10. **Script ends**
@@ -46,7 +46,7 @@ Review the Title against the Script and original Idea to assess alignment. This 
 
 ### Numbered Steps
 
-1. **Script starts** and displays header "PrismQ.T.Review.Title.By.Script.Idea - PREVIEW MODE"
+1. **Script starts** and displays header "PrismQ.T.Review.Title.From.Script.Idea - PREVIEW MODE"
 2. **Warning displayed**: "This mode is for TESTING. Reviews will NOT be saved to database."
 3. **Environment setup** occurs (creates/activates virtual environment if needed)
 4. **Prompt appears** asking for Title, Script, and Idea
@@ -79,7 +79,7 @@ Review the Title against the Script and original Idea to assess alignment. This 
    Keyword Mismatches:
    - [keyword not found in script]
    
-   Next State: PrismQ.T.Review.Script.By.Title.Idea
+   Next State: PrismQ.T.Review.Script.From.Title.Idea
    ========================================
    ```
 8. **Wait for keystroke** - "Press any key to continue..."
@@ -92,7 +92,7 @@ Review the Title against the Script and original Idea to assess alignment. This 
 
 ```batch
 REM Navigate to script directory
-cd _meta\scripts\05_PrismQ.T.Review.Title.By.Script.Idea
+cd _meta\scripts\05_PrismQ.T.Review.Title.From.Script.Idea
 
 REM Run in Preview Mode (recommended for testing)
 Preview.bat
@@ -109,7 +109,7 @@ Run.bat
 - [ ] All score categories are populated (0-100)
 - [ ] Feedback is meaningful and actionable
 - [ ] Keyword mismatches are identified
-- [ ] State transitions to `PrismQ.T.Review.Script.By.Title.Idea`
+- [ ] State transitions to `PrismQ.T.Review.Script.From.Title.Idea`
 - [ ] Preview mode shows review without saving
 - [ ] Preview mode waits for keystroke
 - [ ] No errors in execution
@@ -121,7 +121,7 @@ Run.bat
 After testing, provide logs in this format:
 
 ```
-### Test: T-TEST-05 Review.Title.By.Script.Idea
+### Test: T-TEST-05 Review.Title.From.Script.Idea
 ### Mode: [Preview/Run]
 ### Date: YYYY-MM-DD
 

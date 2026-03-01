@@ -1,7 +1,7 @@
 # Production Readiness Changes Required
 
 **Module**: `T/Review/Title/From/Content/Idea` (`PrismQ.T.Review.Title.From.Content.Idea`)  
-**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea`  
+**Script**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea`  
 **Date**: 2025-12-23  
 **Status**: Analysis Complete - Implementation Required
 
@@ -312,7 +312,7 @@ No end-to-end workflow test from idea → title → script → review.
 ### Issues Found:
 
 #### Issue 10.1: Run.bat references wrong path
-**Location**: `_meta/scripts/05_PrismQ.T.Review.Title.By.Content.Idea/Run.bat:17,26`
+**Location**: `_meta/scripts/05_PrismQ.T.Review.Title.From.Content.Idea/Run.bat:17,26`
 **Severity**: CRITICAL
 
 Current code:
@@ -431,7 +431,7 @@ Preview.bat likely has same path issues.
 
 - [CODING_GUIDELINES.md](../../docs/guidelines/CODING_GUIDELINES.md)
 - [SCRIPT_COMPLIANCE_AUDIT.md](../../docs/guidelines/SCRIPT_COMPLIANCE_AUDIT.md)
-- [ISSUE-IMPL-005-05 Original](./ISSUE-IMPL-005-05_PrismQ.T.Review.Title.By.Content.Idea.md)
+- [ISSUE-IMPL-005-05 Original](./ISSUE-IMPL-005-05_PrismQ.T.Review.Title.From.Content.Idea.md)
 
 ---
 
