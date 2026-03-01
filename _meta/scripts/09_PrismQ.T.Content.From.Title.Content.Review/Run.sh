@@ -1,6 +1,6 @@
 #!/bin/bash
-# Run.sh - PrismQ.T.Title.From.Script.Review.Title
-# Refine title from script and review feedback - saves to database
+# Run.sh - PrismQ.T.Script.From.Title.Review.Script
+# Refine script from title and review feedback - saves to database
 #
 # Usage: ./Run.sh
 
@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 setup_env() {
-    MODULE_DIR="$SCRIPT_DIR/../../../T/Title/From/Title/Review/Script"
+    MODULE_DIR="$SCRIPT_DIR/../../../T/Content/From/Title/Review/Script"
     VENV_DIR="$MODULE_DIR/.venv"
     REQUIREMENTS="$MODULE_DIR/requirements.txt"
     VENV_MARKER="$VENV_DIR/pyvenv.cfg"
@@ -41,11 +41,11 @@ setup_env() {
 setup_env
 
 echo "========================================"
-echo "PrismQ.T.Title.From.Script.Review.Title - RUN MODE"
+echo "PrismQ.T.Script.From.Title.Review.Script - RUN MODE"
 echo "========================================"
 echo
 
-python3 ../../../T/Title/From/Title/Review/Script/src/title_from_review_workflow.py
+python3 ../../../T/Content/From/Title/Review/Script/src/script_from_review_workflow.py
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Script execution failed"
