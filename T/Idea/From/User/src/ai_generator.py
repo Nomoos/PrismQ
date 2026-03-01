@@ -108,9 +108,13 @@ if not _apply_template_imported:
             placeholders = re.findall(r'\{(\w+)\}', result)
             safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
 
-            # Apply standard format substitution
+            # Apply standard format substitution, preserving unfilled placeholders
             if safe_kwargs:
-                result = result.format(**safe_kwargs)
+                class _SafeFormat(dict):
+                    def __missing__(self, key: str) -> str:
+                        return f'{{{key}}}'
+
+                result = result.format_map(_SafeFormat(safe_kwargs))
         except (KeyError, ValueError) as e:
             logger.warning(f"Template substitution warning: {e}")
 
@@ -399,7 +403,7 @@ class AIIdeaGenerator:
         if flavor:
             kwargs['flavor'] = flavor
             logger.info(f"Using specified flavor: {flavor}")
-        elif use_random_flavor and '[FLAVOR]' in template:
+        elif use_random_flavor and ('[FLAVOR]' in template or '{flavor}' in template):
             # Import here to avoid circular dependency
             from flavors import pick_weighted_flavor
             selected_flavor = pick_weighted_flavor()

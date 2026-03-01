@@ -12,8 +12,8 @@ import pytest
 
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../src"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../Model/src"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../Model"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../../Model/src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../../Model"))
 
 from creation import CreationConfig, IdeaCreator
 

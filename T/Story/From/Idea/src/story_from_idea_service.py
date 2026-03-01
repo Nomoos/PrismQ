@@ -62,8 +62,18 @@ if str(database_path) not in sys.path:
 if str(t_module_dir) not in sys.path:
     sys.path.insert(0, str(t_module_dir))
 
-# Import Idea database table manager
-from idea import IdeaTable
+# Import Idea database table manager.
+# Use importlib to load from the specific repo src/idea.py so this never
+# conflicts with the domain-model 'idea' (T/Idea/Model/src/idea.py).
+import importlib.util as _ilu
+
+_idea_db_spec = _ilu.spec_from_file_location(
+    "_prismq_idea_db",
+    str(t_module_dir.parent / "src" / "idea.py"),
+)
+_idea_db_mod = _ilu.module_from_spec(_idea_db_spec)
+_idea_db_spec.loader.exec_module(_idea_db_mod)  # type: ignore[union-attr]
+IdeaTable = _idea_db_mod.IdeaTable
 
 # Import database models and repositories
 from Model.Database.models.story import Story, StoryState

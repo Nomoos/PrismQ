@@ -54,10 +54,20 @@ except ImportError as e:
 
 # Try to import Idea database
 try:
-    from idea import IdeaTable
+    # Load from repo src/idea.py using importlib to avoid conflict with the
+    # domain-model 'idea' (T/Idea/Model/src/idea.py).
+    import importlib.util as _ilu
+
+    _idea_db_spec = _ilu.spec_from_file_location(
+        "_prismq_idea_db",
+        str(REPO_ROOT / "src" / "idea.py"),
+    )
+    _idea_db_mod = _ilu.module_from_spec(_idea_db_spec)
+    _idea_db_spec.loader.exec_module(_idea_db_mod)  # type: ignore[union-attr]
+    IdeaTable = _idea_db_mod.IdeaTable
 
     IDEA_MODEL_AVAILABLE = True
-except ImportError:
+except (ImportError, AttributeError, TypeError):
     IDEA_MODEL_AVAILABLE = False
 
 # Try to import database connection
