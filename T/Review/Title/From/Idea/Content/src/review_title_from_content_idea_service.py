@@ -144,17 +144,16 @@ class ReviewTitleFromContentIdeaService:
         Returns:
             ReviewTitleFromContentIdeaResult with processing details
         """
-        # Find oldest story in this state
-        stories = self.story_repo.find_by_state(self.INPUT_STATE, limit=1)
+        # Find next story to process (lowest version, then newest)
+        story = self.story_repo.find_next_for_processing(self.INPUT_STATE)
         
-        if not stories:
+        if not story:
             return ReviewTitleFromContentIdeaResult(
                 success=True,
                 story_id=None,
                 error="No stories found in state"
             )
 
-        story = stories[0]
         result = ReviewTitleFromContentIdeaResult(success=False, story_id=story.id)
 
         try:
