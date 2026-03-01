@@ -144,8 +144,8 @@ class ReviewTitleFromContentIdeaService:
         Returns:
             ReviewTitleFromContentIdeaResult with processing details
         """
-        # Find oldest story in this state
-        story = self.story_repo.find_oldest_by_state(self.INPUT_STATE)
+        # Find next story to process (lowest version, then newest)
+        story = self.story_repo.find_next_for_processing(self.INPUT_STATE)
         
         if not story:
             return ReviewTitleFromContentIdeaResult(
