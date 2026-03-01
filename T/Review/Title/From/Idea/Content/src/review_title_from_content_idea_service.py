@@ -3,12 +3,10 @@
 This module provides the service to process stories in the
 PrismQ.T.Review.Title.From.Content.Idea state by:
 1. Selecting the oldest Story in this state
-2. Reviewing the title against the content AND the original idea
-3. Creating a Review record with text and score
-4. Updating the Story state based on review result
-
-This is essentially step 07 (Review.Title.From.Content) but with additional
-Idea context for more comprehensive review.
+2. Loading the associated Title, Content, and Idea objects
+3. Running AI review of the title against content and idea context
+4. Creating a Review record with text and score
+5. Updating the Story state based on review result
 
 State Transitions:
     - If review accepts title (score >= threshold) -> PrismQ.T.Review.Content.From.Title.Idea
@@ -21,7 +19,7 @@ import sqlite3
 import sys
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -38,36 +36,25 @@ if _t_root not in sys.path:
     sys.path.insert(0, _t_root)
 
 from Model.Database.models.review import Review
-from Model.Database.models.content import Content
-from Model.Database.models.story import Story
-from Model.Database.models.title import Title
 from Model.Database.repositories.content_repository import ContentRepository
+from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
 from Model.State.constants.state_names import StateNames
 
-# Try to import Idea database for fetching idea context
-try:
-    sys.path.insert(0, os.path.join(_t_root, "..", "src"))
-    from idea import IdeaTable
-    IDEA_DB_AVAILABLE = True
-except ImportError:
-    IDEA_DB_AVAILABLE = False
-
-# Try to import the review function (reuse from step 07)
+# Try to import the review function
 try:
     from T.Review.Title.From.Content.review_title_from_content_v2 import (
-        SCORE_THRESHOLD_HIGH,
         review_title_from_content_v2,
     )
     REVIEW_AVAILABLE = True
 except ImportError:
     REVIEW_AVAILABLE = False
-    SCORE_THRESHOLD_HIGH = 80  # Default fallback
 
 
 # Score threshold for title acceptance
 TITLE_ACCEPTANCE_THRESHOLD = 70  # Titles with score >= 70 are accepted
+MAX_REVIEW_TEXT_LENGTH = 500  # Maximum characters stored in the Review table
 
 
 @dataclass
@@ -95,24 +82,6 @@ class ReviewTitleFromContentIdeaResult:
     error: Optional[str] = None
 
 
-class ReviewRepository:
-    """SQLite repository for Review entities."""
-
-    def __init__(self, connection: sqlite3.Connection):
-        """Initialize with database connection."""
-        self._conn = connection
-
-    def insert(self, review: Review) -> Review:
-        """Insert a new Review into the database."""
-        cursor = self._conn.execute(
-            "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
-            (review.text, review.score, review.created_at.isoformat()),
-        )
-        self._conn.commit()
-        review.id = cursor.lastrowid
-        return review
-
-
 class ReviewTitleFromContentIdeaService:
     """Service for processing stories in the PrismQ.T.Review.Title.From.Content.Idea state.
 
@@ -120,9 +89,9 @@ class ReviewTitleFromContentIdeaService:
     providing more comprehensive evaluation than step 07 alone.
     """
 
-    INPUT_STATE = "PrismQ.T.Review.Title.From.Content.Idea"
-    OUTPUT_STATE_PASS = "PrismQ.T.Review.Content.From.Title.Idea"  # Step 06
-    OUTPUT_STATE_FAIL = "PrismQ.T.Title.From.Title.Review.Content"  # Step 08
+    INPUT_STATE = StateNames.REVIEW_TITLE_FROM_CONTENT_IDEA
+    OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_FROM_TITLE_IDEA
+    OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
 
     def __init__(self, connection: sqlite3.Connection, preview_mode: bool = False):
         """Initialize the service with database connection.
@@ -138,90 +107,181 @@ class ReviewTitleFromContentIdeaService:
         self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
 
+    def _fetch_idea_text(self, idea_id: Optional[str]) -> str:
+        """Fetch idea text from the shared database.
+
+        Args:
+            idea_id: The idea ID to look up
+
+        Returns:
+            Idea text, or empty string if not found
+        """
+        if not idea_id:
+            return ""
+
+        try:
+            cursor = self._conn.execute(
+                "SELECT text FROM Idea WHERE id = ?", (idea_id,)
+            )
+            row = cursor.fetchone()
+            if row:
+                return row[0] or ""
+        except Exception as e:
+            logger.warning(f"Could not fetch idea {idea_id}: {e}")
+
+        return ""
+
+    def _simple_review(
+        self, title_text: str, content_text: str, idea_text: str
+    ) -> Tuple[str, int]:
+        """Simple fallback review when full review module is not available.
+
+        Args:
+            title_text: Title text to review
+            content_text: Content text to review against
+            idea_text: Idea text for additional context
+
+        Returns:
+            Tuple of (review_text, review_score)
+        """
+        title_lower = title_text.lower()
+        content_lower = content_text.lower()
+        idea_lower = idea_text.lower()
+
+        title_words = set(
+            word for word in title_lower.split() if len(word) > 3 and word.isalpha()
+        )
+
+        content_matches = sum(1 for word in title_words if word in content_lower)
+        idea_matches = sum(1 for word in title_words if word in idea_lower)
+
+        if title_words:
+            content_pct = (content_matches / len(title_words)) * 100
+            idea_pct = (idea_matches / len(title_words)) * 100
+        else:
+            content_pct = 50
+            idea_pct = 50
+
+        score = int(min(100, 40 + content_pct * 0.4 + idea_pct * 0.2))
+
+        if score >= 80:
+            review_text = (
+                f"Title aligns well with content and idea. "
+                f"Content matches: {content_matches}/{len(title_words)}, "
+                f"Idea matches: {idea_matches}/{len(title_words)}."
+            )
+        elif score >= 60:
+            review_text = (
+                f"Fair title alignment. "
+                f"Content matches: {content_matches}/{len(title_words)}, "
+                f"Idea matches: {idea_matches}/{len(title_words)}."
+            )
+        else:
+            review_text = (
+                f"Title needs improvement. "
+                f"Content matches: {content_matches}/{len(title_words)}, "
+                f"Idea matches: {idea_matches}/{len(title_words)}."
+            )
+
+        return review_text, score
+
+    def _generate_review(
+        self,
+        title_text: str,
+        content_text: str,
+        idea_text: str,
+        title_id: Optional[int] = None,
+        content_id: Optional[int] = None,
+    ) -> Tuple[str, int]:
+        """Generate review text and score for a title against content and idea.
+
+        Args:
+            title_text: The title to review
+            content_text: The script/content text
+            idea_text: The original idea text
+            title_id: Optional title database ID
+            content_id: Optional content database ID
+
+        Returns:
+            Tuple of (review_text, review_score)
+        """
+        if not REVIEW_AVAILABLE:
+            return self._simple_review(title_text, content_text, idea_text)
+
+        review_result = review_title_from_content_v2(
+            title_text=title_text,
+            content_text=content_text,
+            title_id=title_id,
+            content_id=content_id,
+        )
+
+        review_text = review_result.get("text", "No review text")
+        if idea_text:
+            review_text = f"{review_text}\n\nIdea Context: {idea_text[:200]}..."
+
+        return review_text, review_result.get("score", 0)
+
     def process_oldest_story(self) -> ReviewTitleFromContentIdeaResult:
         """Process the oldest story in PrismQ.T.Review.Title.From.Content.Idea state.
 
         Returns:
             ReviewTitleFromContentIdeaResult with processing details
         """
-        # Find next story to process (lowest version, then newest)
-        story = self.story_repo.find_next_for_processing(self.INPUT_STATE)
-        
+        story = self.story_repo.find_oldest_by_state(self.INPUT_STATE)
+
         if not story:
             return ReviewTitleFromContentIdeaResult(
                 success=True,
                 story_id=None,
-                error="No stories found in state"
+                error="No stories found in state",
             )
 
         result = ReviewTitleFromContentIdeaResult(success=False, story_id=story.id)
 
         try:
-            # Get title
-            if not story.title_id:
-                result.error = "Story has no title_id"
-                return result
-
-            title = self.title_repo.find_by_id(story.title_id)
+            # Load the latest title for this story
+            title = self.title_repo.find_latest_version(story.id)
             if not title:
-                result.error = f"Title {story.title_id} not found"
+                result.error = f"No title found for story {story.id}"
+                logger.error(result.error)
                 return result
 
-            # Get content
-            if not story.content_id:
-                result.error = "Story has no content_id"
-                return result
-
-            content = self.content_repo.find_by_id(story.content_id)
+            # Load the latest content for this story
+            content = self.content_repo.find_latest_version(story.id)
             if not content:
-                result.error = f"Content {story.content_id} not found"
+                result.error = f"No content found for story {story.id}"
+                logger.error(result.error)
                 return result
 
-            # Get idea context (additional to step 07)
-            idea_text = ""
-            if story.idea_id and IDEA_DB_AVAILABLE:
-                try:
-                    idea_db = IdeaTable(self._conn.execute("PRAGMA database_list").fetchone()[2])
-                    idea_db.connect()
-                    idea = idea_db.get_idea(story.idea_id)
-                    if idea:
-                        idea_text = idea.get("text", "")
-                    idea_db.close()
-                except Exception as e:
-                    logger.warning(f"Could not fetch idea {story.idea_id}: {e}")
+            # Load idea text from the shared database
+            idea_text = self._fetch_idea_text(story.idea_id)
 
-            # Perform review (reusing step 07's function)
-            if not REVIEW_AVAILABLE:
-                result.error = "Review function not available"
-                return result
+            logger.info(
+                f"Story {story.id}: reviewing title v{title.version} "
+                f"against content v{content.version} and idea"
+            )
 
-            # Review includes idea context in the prompt/reasoning
-            review_result = review_title_from_content_v2(
+            # Generate review using title + content + idea
+            review_text, review_score = self._generate_review(
                 title_text=title.text,
                 content_text=content.text,
+                idea_text=idea_text,
                 title_id=title.id,
                 content_id=content.id,
             )
 
-            # If we have idea text, append it to the review for context
-            review_text = review_result.get("text", "No review text")
-            if idea_text:
-                review_text = f"{review_text}\n\nIdea Context: {idea_text[:200]}..."
+            result.text = review_text
+            result.score = review_score
 
-            review_score = review_result.get("score", 0)
-
-            # Create Review record
+            # Save review record to database
             if not self._preview_mode:
                 review = Review(
-                    text=review_text,
+                    text=review_text[:MAX_REVIEW_TEXT_LENGTH] if len(review_text) > MAX_REVIEW_TEXT_LENGTH else review_text,
                     score=review_score,
-                    created_at=datetime.now()
+                    created_at=datetime.now(),
                 )
                 review = self.review_repo.insert(review)
                 result.review_id = review.id
-
-            result.text = review_text
-            result.score = review_score
 
             # Determine next state based on score
             if review_score >= TITLE_ACCEPTANCE_THRESHOLD:
@@ -237,10 +297,21 @@ class ReviewTitleFromContentIdeaService:
                 self.story_repo.update(story)
 
             result.success = True
-            logger.info(f"Story {story.id}: Title review complete, score={review_score}, accepted={result.accepted}")
+            logger.info(
+                f"Story {story.id}: title review complete, "
+                f"score={review_score}, accepted={result.accepted}, "
+                f"next_state={result.next_state}"
+            )
 
         except Exception as e:
             result.error = f"Processing failed: {str(e)}"
             logger.exception(f"Error processing story {story.id}")
 
         return result
+
+
+__all__ = [
+    "ReviewTitleFromContentIdeaService",
+    "ReviewTitleFromContentIdeaResult",
+    "TITLE_ACCEPTANCE_THRESHOLD",
+]
