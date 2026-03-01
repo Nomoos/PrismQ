@@ -395,383 +395,97 @@ class TestParseResponseThinkBlocks:
         assert variant.text == "The Quiet Alchemy"
 
 
-class TestTitleGeneratorConfigGates:
-    """Tests for length_gate_min/max, score_threshold, and use_batch_generation defaults."""
+class TestTitleGeneratorConfig:
+    """Tests for the simplified TitleGeneratorConfig."""
 
-    def test_default_length_gate_min(self):
-        """Default length_gate_min is 20."""
+    def test_default_temperature_min(self):
+        """Default temperature_min is 0.6."""
         config = TitleGeneratorConfig()
-        assert config.length_gate_min == 20
+        assert config.temperature_min == 0.6
 
-    def test_default_length_gate_max(self):
-        """Default length_gate_max is 80."""
+    def test_default_temperature_max(self):
+        """Default temperature_max is 0.8."""
         config = TitleGeneratorConfig()
-        assert config.length_gate_max == 80
+        assert config.temperature_max == 0.8
 
-    def test_default_score_threshold(self):
-        """Default score_threshold is 0.90."""
-        config = TitleGeneratorConfig()
-        assert config.score_threshold == 0.90
-
-    def test_default_use_batch_generation(self):
-        """Default use_batch_generation is True (batch mode)."""
-        config = TitleGeneratorConfig()
-        assert config.use_batch_generation is True
-
-    def test_default_num_variants(self):
-        """Default num_variants is 5."""
-        config = TitleGeneratorConfig()
-        assert config.num_variants == 5
-
-    def test_custom_gates(self):
-        """Custom gate values are respected."""
-        config = TitleGeneratorConfig(length_gate_min=30, length_gate_max=70, score_threshold=0.85)
-        assert config.length_gate_min == 30
-        assert config.length_gate_max == 70
-        assert config.score_threshold == 0.85
+    def test_custom_temperatures(self):
+        """Custom temperature values are respected."""
+        config = TitleGeneratorConfig(temperature_min=0.3, temperature_max=0.5)
+        assert config.temperature_min == 0.3
+        assert config.temperature_max == 0.5
 
 
-class TestLengthGateAndScoreThreshold:
-    """Tests for the 3-gate pipeline in generate_from_idea."""
-
-    def _make_generator(self, score_threshold=0.90, length_gate_min=20, length_gate_max=80):
-        mock_client = MagicMock()
-        mock_client.is_available.return_value = True
-        config = TitleGeneratorConfig(
-            use_batch_generation=False,
-            num_variants=3,
-            length_gate_min=length_gate_min,
-            length_gate_max=length_gate_max,
-            score_threshold=score_threshold,
-        )
-        return AITitleGenerator(config=config, ollama_client=mock_client), mock_client
-
-    def test_length_gate_drops_too_short(self):
-        """Variants shorter than length_gate_min are discarded, not returned."""
-        generator, mock_client = self._make_generator(length_gate_min=30, score_threshold=0.0)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        # Response is only 5 chars — must be dropped by length gate
-        mock_client.generate.return_value = "Short"
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        assert variants == []
-
-    def test_length_gate_drops_too_long(self):
-        """Variants longer than length_gate_max are discarded, not returned."""
-        generator, mock_client = self._make_generator(length_gate_max=20, score_threshold=0.0)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        # Response is 21 chars — must be dropped by length gate
-        mock_client.generate.return_value = "This Title Is Too Long"
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        assert variants == []
-
-    def test_score_threshold_drops_low_scorers(self):
-        """Variants with combined score below score_threshold are excluded."""
-        generator, mock_client = self._make_generator(score_threshold=0.90)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        # Title is 25 chars (passes length gate but scorer gives short_score=0.80)
-        # AI scoring mock returns 0 so combined stays at 0.80 — below threshold
-        mock_client.generate.return_value = "Short But Valid Length Ti"
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        assert variants == []
-
-    def test_score_threshold_accepts_high_scorers(self):
-        """Variants with combined score >= score_threshold are returned."""
-        generator, mock_client = self._make_generator(score_threshold=0.90)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        # 45-char title: ideal length → rule score = 0.95 (already >= 0.90)
-        # AI scoring response is "0" (0.0) → combined = (0.95 + 0) treated as 0.95
-        # Wait — if ai_score == 0.0 the code does NOT update variant.score, so it stays 0.95
-        long_title = "Silence Spoke Loudest in the Crowded Room"  # 41 chars
-        assert 40 <= len(long_title) <= 60  # ideal range
-
-        def generate_side_effect(prompt, temperature=0.7):
-            # Generation calls return the title; scoring calls return "0"
-            if "Score:" in prompt:
-                return "0"
-            return long_title
-
-        mock_client.generate.side_effect = generate_side_effect
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        # All 3 calls produce the same ideal-length title (score 0.95 >= 0.90)
-        assert len(variants) == 3
-        assert all(v.score >= 0.90 for v in variants)
-
-    def test_results_sorted_by_score_descending(self):
-        """Returned variants are sorted highest score first."""
-        generator, mock_client = self._make_generator(score_threshold=0.0, length_gate_min=1)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        titles = [
-            "Short",       # < 20 chars → filtered by default gate... override gate_min=1
-            "Silence Spoke Loudest in the Crowded Room",  # ideal → 0.95
-            "The Quiet Alchemy",  # 17 chars, short → 0.80
-        ]
-        call_count = [0]
-
-        def generate_side_effect(prompt, temperature=0.7):
-            if "Score:" in prompt:
-                return "0"
-            idx = call_count[0] % len(titles)
-            call_count[0] += 1
-            return titles[idx]
-
-        mock_client.generate.side_effect = generate_side_effect
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        scores = [v.score for v in variants]
-        assert scores == sorted(scores, reverse=True)
-
-
-class TestParseBatchResponse:
-    """Tests for _parse_batch_response (batch mode parsing)."""
+class TestGenerateFromIdeaSimplified:
+    """Tests for the single-call generate_from_idea."""
 
     def _make_generator(self):
-        mock_client = MagicMock()
-        mock_client.is_available.return_value = True
-        return AITitleGenerator(ollama_client=mock_client)
-
-    def test_parse_numbered_list(self):
-        """Numbered list response yields one variant per line."""
-        generator = self._make_generator()
-        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
-
-        response = (
-            "1. Silence Spoke Loudest When They Forgot My Name\n"
-            "2. The Weight of Words Never Said\n"
-            "3. Where the Quiet Lives Between Us\n"
-        )
-        variants = generator._parse_batch_response(response, idea)
-
-        assert len(variants) == 3
-        assert variants[0].text == "Silence Spoke Loudest When They Forgot My Name"
-        assert variants[1].text == "The Weight of Words Never Said"
-        assert variants[2].text == "Where the Quiet Lives Between Us"
-
-    def test_parse_batch_strips_think_block(self):
-        """<think> block is stripped before parsing numbered lines."""
-        generator = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
-
-        response = (
-            "<think>\nSome internal reasoning.\n</think>\n"
-            "1. The Unseen Chord\n"
-            "2. What the Silence Holds\n"
-        )
-        variants = generator._parse_batch_response(response, idea)
-
-        assert len(variants) == 2
-        assert variants[0].text == "The Unseen Chord"
-        assert variants[1].text == "What the Silence Holds"
-
-    def test_parse_batch_skips_empty_lines(self):
-        """Empty lines in the response are silently skipped."""
-        generator = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
-
-        response = "\n1. The Quiet Alchemy\n\n2. Blank Slate, Quiet Power\n\n"
-        variants = generator._parse_batch_response(response, idea)
-
-        assert len(variants) == 2
-
-    def test_parse_batch_handles_dot_and_paren_numbering(self):
-        """Both '1.' and '1)' numbering styles are stripped correctly."""
-        generator = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
-
-        response = "1) The Softest Roar\n2. The Unspoken Advantage\n"
-        variants = generator._parse_batch_response(response, idea)
-
-        assert len(variants) == 2
-        assert variants[0].text == "The Softest Roar"
-        assert variants[1].text == "The Unspoken Advantage"
-
-    def test_generate_from_idea_with_batch_enabled(self):
-        """generate_from_idea uses batch generation when use_batch_generation=True."""
-        mock_client = MagicMock()
-        mock_client.is_available.return_value = True
-        # All generate calls return the same batch list; scoring calls will find
-        # leading digit "1" → ai_score=0.01, so use score_threshold=0 for this test.
-        mock_client.generate.return_value = (
-            "1. Silence Spoke Loudest When They Forgot My Name\n"
-            "2. The Weight of Words Never Said\n"
-            "3. Where the Quiet Lives Between Us\n"
-        )
-
-        config = TitleGeneratorConfig(
-            use_batch_generation=True, num_variants=3, score_threshold=0.0
-        )
-        generator = AITitleGenerator(config=config, ollama_client=mock_client)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        # Batch mode: only 1 generation call (plus any scoring calls)
-        assert mock_client.generate.call_count >= 1
-        assert len(variants) >= 1
-
-    def test_generate_from_idea_one_by_one_when_batch_disabled(self):
-        """generate_from_idea uses N AI calls when use_batch_generation=False."""
-        mock_client = MagicMock()
-        mock_client.is_available.return_value = True
-        mock_client.generate.return_value = "The Quiet Alchemy in the Dark"
-
-        config = TitleGeneratorConfig(
-            use_batch_generation=False, num_variants=3, score_threshold=0.0
-        )
-        generator = AITitleGenerator(config=config, ollama_client=mock_client)
-        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
-
-        generator.generate_from_idea(idea, num_variants=3)
-
-        # One-by-one mode: 3 generation calls + up to 3 scoring calls = at most 6
-        assert mock_client.generate.call_count >= 3
-
-
-class TestAiScoreTitlesBatch:
-    """Tests for _ai_score_titles_batch — batch AI scoring of title variants."""
-
-    def _make_generator(self):
-        """Create an AITitleGenerator with a mocked OllamaClient."""
         mock_client = MagicMock()
         mock_client.is_available.return_value = True
         return AITitleGenerator(ollama_client=mock_client), mock_client
 
-    def _make_variant(self, text: str, score: float = 0.90) -> TitleVariant:
-        from title_scorer import TitleScorer
-        scorer = TitleScorer()
-        style = scorer.infer_style(text)
-        return TitleVariant(text=text, style=style, length=len(text), keywords=[], score=score)
-
-    def test_batch_scoring_updates_scores_in_place(self):
-        """Scores returned by the AI are blended with the rule-based score."""
+    def test_returns_variant_on_success(self):
+        """A valid AI response returns a TitleVariant."""
         generator, mock_client = self._make_generator()
-        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
+        mock_client.generate.return_value = "Silence Spoke Loudest in the Crowded Room"
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
 
-        variants = [
-            self._make_variant("Silence Spoke Loudest in the Room", score=0.90),
-            self._make_variant("The Weight of Words Never Said Here", score=0.95),
-        ]
-        # Batch response: two scores
-        mock_client.generate.return_value = "1. 80\n2. 90\n"
+        variant = generator.generate_from_idea(idea)
 
-        generator._ai_score_titles_batch(variants, idea)
+        assert variant is not None
+        assert variant.text == "Silence Spoke Loudest in the Crowded Room"
 
-        # Blended: (0.90 + 0.80) / 2 = 0.85
-        assert abs(variants[0].score - 0.85) < 1e-6
-        # Blended: (0.95 + 0.90) / 2 = 0.925
-        assert abs(variants[1].score - 0.925) < 1e-6
-
-    def test_batch_scoring_strips_think_blocks(self):
-        """<think> block in scoring response is stripped before parsing scores."""
+    def test_makes_exactly_one_ai_call(self):
+        """generate_from_idea makes exactly one AI call."""
         generator, mock_client = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
+        mock_client.generate.return_value = "Silence Spoke Loudest in the Crowded Room"
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
 
-        variants = [self._make_variant("The Quiet Alchemy in the Dark Room", score=0.90)]
-        mock_client.generate.return_value = "<think>\nSome reasoning.\n</think>\n1. 75\n"
-
-        generator._ai_score_titles_batch(variants, idea)
-
-        assert abs(variants[0].score - (0.90 + 0.75) / 2) < 1e-6
-
-    def test_batch_scoring_falls_back_on_mismatch(self):
-        """Falls back to individual scoring when score count != variant count."""
-        generator, mock_client = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
-
-        variants = [
-            self._make_variant("Title One Long Enough to Pass", score=0.90),
-            self._make_variant("Title Two Long Enough to Pass", score=0.90),
-        ]
-        # Batch returns only 1 score for 2 variants → mismatch → fallback
-        call_count = [0]
-
-        def generate_side_effect(prompt, temperature=0.7):
-            call_count[0] += 1
-            if call_count[0] == 1:
-                return "1. 80"  # only one score (mismatch)
-            return "70"  # individual fallback responses
-
-        mock_client.generate.side_effect = generate_side_effect
-
-        generator._ai_score_titles_batch(variants, idea)
-
-        # Fallback path runs individual scoring for each variant (calls 2 and 3)
-        assert mock_client.generate.call_count == 3
-
-    def test_batch_scoring_falls_back_on_exception(self):
-        """Falls back to individual scoring when the batch AI call raises an exception."""
-        generator, mock_client = self._make_generator()
-        idea = Idea(title="Test", concept="A story", status=IdeaStatus.DRAFT)
-
-        variants = [self._make_variant("The Quiet Alchemy in the Dark Room", score=0.90)]
-        call_count = [0]
-
-        def generate_side_effect(prompt, temperature=0.7):
-            call_count[0] += 1
-            if call_count[0] == 1:
-                raise RuntimeError("Network error")
-            return "85"  # individual fallback
-
-        mock_client.generate.side_effect = generate_side_effect
-
-        generator._ai_score_titles_batch(variants, idea)
-
-        # 1 failed batch call + 1 individual fallback call
-        assert mock_client.generate.call_count == 2
-
-    def test_batch_scoring_uses_single_ai_call_for_multiple_variants(self):
-        """Batch scoring issues exactly ONE AI call regardless of variant count."""
-        generator, mock_client = self._make_generator()
-        idea = Idea(title="Test", concept="A family story", status=IdeaStatus.DRAFT)
-
-        variants = [
-            self._make_variant("Silence Spoke Loudest in That Room", score=0.90),
-            self._make_variant("The Weight of Words Never Said Here", score=0.90),
-            self._make_variant("Where the Quiet Lives Between All of Us", score=0.90),
-        ]
-        mock_client.generate.return_value = "1. 80\n2. 85\n3. 90\n"
-
-        generator._ai_score_titles_batch(variants, idea)
+        generator.generate_from_idea(idea)
 
         assert mock_client.generate.call_count == 1
 
-    def test_generate_from_idea_batch_mode_uses_two_ai_calls(self):
-        """Full pipeline in batch mode uses exactly 2 AI calls (generate + score)."""
+    def test_returns_none_on_empty_response(self):
+        """An empty AI response returns None."""
+        generator, mock_client = self._make_generator()
+        mock_client.generate.return_value = ""
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        variant = generator.generate_from_idea(idea)
+
+        assert variant is None
+
+    def test_variant_has_rule_based_score(self):
+        """The returned variant carries a rule-based score (no AI scoring pass)."""
+        generator, mock_client = self._make_generator()
+        title = "Silence Spoke Loudest in the Crowded Room"  # ideal-length title
+        mock_client.generate.return_value = title
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        variant = generator.generate_from_idea(idea)
+
+        assert variant is not None
+        assert 0.0 < variant.score <= 1.0
+        # Exactly one AI call — no second scoring call
+        assert mock_client.generate.call_count == 1
+
+    def test_raises_value_error_for_none_idea(self):
+        """ValueError is raised for None idea."""
+        generator, _ = self._make_generator()
+        with pytest.raises(ValueError, match="Idea cannot be None"):
+            generator.generate_from_idea(None)
+
+    def test_raises_value_error_for_empty_idea(self):
+        """ValueError is raised when idea has no title or concept."""
+        generator, _ = self._make_generator()
+        idea = Idea(title="", concept="", status=IdeaStatus.DRAFT)
+        with pytest.raises(ValueError, match="must have at least"):
+            generator.generate_from_idea(idea)
+
+    def test_raises_when_ai_unavailable(self):
+        """AIUnavailableError is raised when Ollama is not running."""
         mock_client = MagicMock()
-        mock_client.is_available.return_value = True
-
-        generation_response = (
-            "1. Silence Spoke Loudest When They Forgot My Name\n"
-            "2. The Weight of Words Never Said to Anyone\n"
-            "3. Where the Quiet Lives Between You and Me\n"
-        )
-        scoring_response = "1. 85\n2. 90\n3. 80\n"
-        call_count = [0]
-
-        def generate_side_effect(prompt, temperature=0.7):
-            call_count[0] += 1
-            if call_count[0] == 1:
-                return generation_response
-            return scoring_response
-
-        mock_client.generate.side_effect = generate_side_effect
-
-        config = TitleGeneratorConfig(
-            use_batch_generation=True, num_variants=3, score_threshold=0.0
-        )
-        generator = AITitleGenerator(config=config, ollama_client=mock_client)
-        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
-
-        variants = generator.generate_from_idea(idea, num_variants=3)
-
-        # 1 batch generation call + 1 batch scoring call = 2 total
-        assert mock_client.generate.call_count == 2
-        assert len(variants) == 3
+        mock_client.is_available.return_value = False
+        generator = AITitleGenerator(ollama_client=mock_client)
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+        with pytest.raises(AIUnavailableError):
+            generator.generate_from_idea(idea)
