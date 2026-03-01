@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run.sh - PrismQ.T.Title.From.Script.Review.Title
-# Refine title from script and review feedback - displays improved titles
-# Note: Results are not automatically persisted to database
+# Continuous workflow - refine titles interactively from script and review feedback
+# Runs continuously until cancelled (Ctrl+C or close window)
 #
 # Usage: ./Run.sh
 
@@ -42,7 +42,7 @@ setup_env() {
 setup_env
 
 echo "========================================"
-echo "PrismQ.T.Title.From.Script.Review.Title - RUN MODE"
+echo "PrismQ.T.Title.From.Script.Review.Title - CONTINUOUS MODE"
 echo "========================================"
 echo
 

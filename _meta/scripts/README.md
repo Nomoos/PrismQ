@@ -90,26 +90,37 @@ Navigate to any numbered module directory and run:
 
 ```batch
 cd _meta\scripts\01_PrismQ.T.Idea.From.User
-Preview.bat   REM For testing (no database save)
-Run.bat       REM For production (saves to database)
+Run.bat       REM For production (saves to database, runs continuously)
 ```
+
+### Continuous Run Mode
+
+All modules from **Step 02 onwards** run in **CONTINUOUS MODE** by default:
+
+- **Runs indefinitely** until cancelled with Ctrl+C or by closing the window
+- **Waits 30 seconds** when no items are available to process (prevents busy-waiting)
+- **Waits 1ms between iterations** when items are being processed (high throughput)
+- **Saves to database** automatically after each successful processing step
+
+This means you can start multiple steps in parallel in separate windows - each will
+automatically pick up work as soon as the previous step produces output.
 
 ### Example Workflow
 
 ```batch
-REM Step 1: Create idea
+REM Step 1: Create idea (interactive - provides user input)
 cd _meta\scripts\01_PrismQ.T.Idea.From.User
-Preview.bat
+Run.bat
 
-REM Step 2: Generate story from idea
-cd ..\02_PrismQ.T.Story.From.Idea
-Preview.bat
+REM Step 2-20: Start all pipeline steps in separate windows
+REM Each runs continuously and picks up work from database
+cd _meta\scripts\02_PrismQ.T.Story.From.Idea
+Run.bat
 
-REM Step 3: Generate title from idea
-cd ..\03_PrismQ.T.Title.From.Idea
-Preview.bat
+cd _meta\scripts\03_PrismQ.T.Title.From.Idea
+Run.bat
 
-REM Continue through workflow...
+REM Continue through workflow - all steps run continuously...
 ```
 
 ---

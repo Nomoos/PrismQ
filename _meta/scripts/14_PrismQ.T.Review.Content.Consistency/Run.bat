@@ -1,6 +1,7 @@
 @echo off
-REM Run.bat - PrismQ.T.Review.Script.Consistency
-REM Style and consistency validation - saves to database
+REM Run.bat - PrismQ.T.Review.Content.Consistency
+REM Continuous workflow - style consistency validation from database
+REM Runs continuously with 30s wait when idle, 1ms between items
 REM
 REM Usage: Run.bat
 
@@ -10,11 +11,11 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Consistency"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Consistency - RUN MODE
+echo PrismQ.T.Review.Script.Consistency - CONTINUOUS MODE
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Script\Consistency\src\script_consistency_review_service.py
+python ..\..\..\T\Review\Script\Consistency\src\consistency_workflow.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.
