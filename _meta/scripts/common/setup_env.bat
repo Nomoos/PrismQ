@@ -20,6 +20,14 @@ REM Find or install project Python
 call "%~dp0find_python.bat"
 if !ERRORLEVEL! NEQ 0 exit /b 1
 
+REM Remove broken virtual environment (marker exists but Python executable is missing)
+if exist "%VENV_MARKER%" (
+    if not exist "%VENV_DIR%\Scripts\python.exe" (
+        echo [INFO] Virtual environment is broken, removing and recreating...
+        rmdir /s /q "%VENV_DIR%"
+    )
+)
+
 REM Create virtual environment if it does not exist
 if not exist "%VENV_MARKER%" (
     echo [INFO] Creating virtual environment...
