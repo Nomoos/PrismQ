@@ -15,7 +15,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Literal, Optional
 
 # Add parent directories to path for imports
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+# File is at T/Idea/From/User/src/creation.py; go up 4 levels to reach T/Idea
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 model_path = os.path.join(parent_dir, "Model")
 sys.path.insert(0, os.path.join(model_path, "src"))
 sys.path.insert(0, model_path)

@@ -37,7 +37,18 @@ _src_root = str(t_module_dir / ".." / "src")
 if _src_root not in sys.path:
     sys.path.insert(0, _src_root)
 
-from idea import IdeaTable
+# Load IdeaTable from repo src/idea.py using a unique module name so it never
+# conflicts with the domain-model 'idea' (T/Idea/Model/src/idea.py) that may
+# already be cached in sys.modules['idea'] from another test module.
+import importlib.util as _ilu
+
+_idea_db_spec = _ilu.spec_from_file_location(
+    "_prismq_idea_db",
+    str(t_module_dir.parent / "src" / "idea.py"),
+)
+_idea_db_mod = _ilu.module_from_spec(_idea_db_spec)
+_idea_db_spec.loader.exec_module(_idea_db_mod)  # type: ignore[union-attr]
+IdeaTable = _idea_db_mod.IdeaTable
 
 from Model.Database.models.story import Story, StoryState
 from Model.Database.repositories.story_repository import StoryRepository

@@ -105,7 +105,13 @@ def apply_template(template: str, **kwargs) -> str:
         placeholders = re.findall(r'\{(\w+)\}', result)
         safe_kwargs = {k: v for k, v in kwargs.items() if k in placeholders}
         if safe_kwargs:
-            result = result.format(**safe_kwargs)
+            # Use format_map with a safe default that preserves unfilled placeholders
+            # so that providing only {input} doesn't fail when {flavor} is also present.
+            class _SafeFormat(dict):
+                def __missing__(self, key: str) -> str:
+                    return f'{{{key}}}'
+
+            result = result.format_map(_SafeFormat(safe_kwargs))
     except (KeyError, ValueError) as exc:
         logger.warning("Template substitution warning: %s", exc)
 
