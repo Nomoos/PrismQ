@@ -775,3 +775,89 @@ class TestAiScoreTitlesBatch:
         # 1 batch generation call + 1 batch scoring call = 2 total
         assert mock_client.generate.call_count == 2
         assert len(variants) == 3
+
+
+class TestBatchToOneByOneFallback:
+    """Tests for the fallback from batch to one-by-one generation."""
+
+    def _make_generator(self, score_threshold=0.0):
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        config = TitleGeneratorConfig(
+            use_batch_generation=True,
+            num_variants=3,
+            score_threshold=score_threshold,
+        )
+        return AITitleGenerator(config=config, ollama_client=mock_client), mock_client
+
+    def test_fallback_triggered_when_batch_yields_no_variants(self):
+        """When batch generation returns no parseable variants, one-by-one is used."""
+        generator, mock_client = self._make_generator(score_threshold=0.0)
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        call_count = [0]
+
+        def generate_side_effect(prompt, temperature=0.7):
+            call_count[0] += 1
+            # First call: batch generation returns empty string (no parseable titles)
+            if call_count[0] == 1:
+                return ""
+            # Subsequent calls: one-by-one generation returns valid titles
+            return "Silence Spoke Loudest in the Crowded Room"
+
+        mock_client.generate.side_effect = generate_side_effect
+        variants = generator.generate_from_idea(idea, num_variants=3)
+
+        # Fallback ran: 1 batch call + 3 one-by-one generation calls (+ 3 scoring calls) >= 4
+        assert mock_client.generate.call_count >= 4
+        assert len(variants) >= 1
+
+    def test_fallback_not_triggered_when_batch_succeeds(self):
+        """When batch generation yields valid variants, the fallback is NOT triggered."""
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+
+        generation_response = (
+            "1. Silence Spoke Loudest When They Forgot My Name\n"
+            "2. The Weight of Words Never Said to Anyone\n"
+            "3. Where the Quiet Lives Between You and Me\n"
+        )
+        scoring_response = "1. 85\n2. 90\n3. 80\n"
+        call_count = [0]
+
+        def generate_side_effect(prompt, temperature=0.7):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return generation_response
+            return scoring_response
+
+        mock_client.generate.side_effect = generate_side_effect
+
+        config = TitleGeneratorConfig(
+            use_batch_generation=True, num_variants=3, score_threshold=0.0
+        )
+        generator = AITitleGenerator(config=config, ollama_client=mock_client)
+        idea = Idea(title="Test", concept="A quiet family story", status=IdeaStatus.DRAFT)
+
+        variants = generator.generate_from_idea(idea, num_variants=3)
+
+        # 1 batch generation + 1 batch scoring = 2 total (no fallback)
+        assert mock_client.generate.call_count == 2
+        assert len(variants) == 3
+
+    def test_fallback_not_triggered_when_batch_disabled(self):
+        """When use_batch_generation=False, one-by-one is used directly; no extra fallback call."""
+        mock_client = MagicMock()
+        mock_client.is_available.return_value = True
+        mock_client.generate.return_value = "Silence Spoke Loudest in the Crowded Room"
+
+        config = TitleGeneratorConfig(
+            use_batch_generation=False, num_variants=3, score_threshold=0.0
+        )
+        generator = AITitleGenerator(config=config, ollama_client=mock_client)
+        idea = Idea(title="Test", concept="A quiet story", status=IdeaStatus.DRAFT)
+
+        generator.generate_from_idea(idea, num_variants=3)
+
+        # One-by-one: 3 generation + 3 individual scoring = 6 total
+        assert mock_client.generate.call_count == 6

@@ -192,52 +192,19 @@ class AITitleGenerator:
                 f"Generated {len(raw_variants)}/{n_variants} raw variants in {gen_elapsed:.1f}s"
             )
 
-            # Gate 1: Hard length filter — discard variants outside [length_gate_min, length_gate_max]
-            length_passed = [
-                v for v in raw_variants
-                if self.config.length_gate_min <= v.length <= self.config.length_gate_max
-            ]
-            length_dropped = len(raw_variants) - len(length_passed)
-            if length_dropped:
-                logger.info(
-                    f"Length gate [{self.config.length_gate_min}-{self.config.length_gate_max} chars]: "
-                    f"dropped {length_dropped} variant(s)"
-                )
-            logger.info(f"{len(length_passed)} variant(s) passed length gate")
+            variants = self._apply_gates(raw_variants, idea, use_batch_scoring=self.config.use_batch_generation)
 
-            # Gate 2: AI scoring of length-passing variants
-            score_start = time.monotonic()
-            if self.config.use_batch_generation and len(length_passed) > 1:
-                logger.info(
-                    f"AI-scoring {len(length_passed)} variant(s) in batch mode (1 AI call)"
+            # Fallback: if batch generation yielded no valid variants, retry one-by-one
+            if not variants and self.config.use_batch_generation:
+                logger.warning(
+                    "Batch generation yielded no valid variants; "
+                    "falling back to one-by-one generation"
                 )
-                self._ai_score_titles_batch(length_passed, idea)
-            else:
-                logger.info(f"AI-scoring {len(length_passed)} variant(s)")
-                for variant in length_passed:
-                    ai_score = self._ai_score_title(variant.text, idea)
-                    if ai_score > 0.0:
-                        # Combine rule-based score (50%) with AI score (50%)
-                        variant.score = (variant.score + ai_score) / 2.0
-                        logger.debug(
-                            f"  Combined score for '{variant.text}': {variant.score:.2f}"
-                        )
-            score_elapsed = time.monotonic() - score_start
-            logger.info(f"AI scoring completed in {score_elapsed:.1f}s")
-
-            # Gate 3: Score threshold — accept only variants at or above threshold
-            variants = [
-                v for v in length_passed if v.score >= self.config.score_threshold
-            ]
-            below_threshold = len(length_passed) - len(variants)
-            if below_threshold:
+                raw_variants = self._generate_one_by_one_variants(idea, n_variants)
                 logger.info(
-                    f"Score threshold {self.config.score_threshold:.2f}: "
-                    f"dropped {below_threshold} variant(s)"
+                    f"One-by-one fallback generated {len(raw_variants)}/{n_variants} raw variants"
                 )
-
-            # Sort accepted variants by score (highest first)
-            variants.sort(key=lambda v: v.score, reverse=True)
+                variants = self._apply_gates(raw_variants, idea, use_batch_scoring=False)
 
             total_elapsed = time.monotonic() - gen_start
             logger.info(
@@ -251,6 +218,71 @@ class AITitleGenerator:
             logger.error(error_msg)
             raise AIUnavailableError(error_msg) from e
     
+    def _apply_gates(
+        self,
+        raw_variants: List[TitleVariant],
+        idea: Idea,
+        use_batch_scoring: bool = True,
+    ) -> List[TitleVariant]:
+        """Apply length gate, AI scoring, and score-threshold gate to raw variants.
+
+        Args:
+            raw_variants: Variants to filter and score.
+            idea: Original idea (for AI scoring context).
+            use_batch_scoring: When True and there are multiple variants, scores
+                all variants in a single AI call. When False, scores individually.
+
+        Returns:
+            Accepted variants sorted by score (highest first).
+        """
+        # Gate 1: Hard length filter — discard variants outside [length_gate_min, length_gate_max]
+        length_passed = [
+            v for v in raw_variants
+            if self.config.length_gate_min <= v.length <= self.config.length_gate_max
+        ]
+        length_dropped = len(raw_variants) - len(length_passed)
+        if length_dropped:
+            logger.info(
+                f"Length gate [{self.config.length_gate_min}-{self.config.length_gate_max} chars]: "
+                f"dropped {length_dropped} variant(s)"
+            )
+        logger.info(f"{len(length_passed)} variant(s) passed length gate")
+
+        # Gate 2: AI scoring of length-passing variants
+        score_start = time.monotonic()
+        if use_batch_scoring and len(length_passed) > 1:
+            logger.info(
+                f"AI-scoring {len(length_passed)} variant(s) in batch mode (1 AI call)"
+            )
+            self._ai_score_titles_batch(length_passed, idea)
+        else:
+            logger.info(f"AI-scoring {len(length_passed)} variant(s)")
+            for variant in length_passed:
+                ai_score = self._ai_score_title(variant.text, idea)
+                if ai_score > 0.0:
+                    # Combine rule-based score (50%) with AI score (50%)
+                    variant.score = (variant.score + ai_score) / 2.0
+                    logger.debug(
+                        f"  Combined score for '{variant.text}': {variant.score:.2f}"
+                    )
+        score_elapsed = time.monotonic() - score_start
+        logger.info(f"AI scoring completed in {score_elapsed:.1f}s")
+
+        # Gate 3: Score threshold — accept only variants at or above threshold
+        variants = [
+            v for v in length_passed if v.score >= self.config.score_threshold
+        ]
+        below_threshold = len(length_passed) - len(variants)
+        if below_threshold:
+            logger.info(
+                f"Score threshold {self.config.score_threshold:.2f}: "
+                f"dropped {below_threshold} variant(s)"
+            )
+
+        # Sort accepted variants by score (highest first)
+        variants.sort(key=lambda v: v.score, reverse=True)
+        return variants
+
     def _generate_batch_variants(self, idea: Idea, n_variants: int) -> List[TitleVariant]:
         """Generate all title variants in a single AI call.
         
