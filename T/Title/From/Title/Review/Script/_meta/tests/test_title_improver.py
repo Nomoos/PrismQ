@@ -9,11 +9,11 @@ import pytest
 # Add parent directories to path for imports
 test_dir = Path(__file__).parent
 sys.path.insert(0, str(test_dir / "../../src"))
-sys.path.insert(0, str(test_dir / "../../../../Idea/Model/src"))
-sys.path.insert(0, str(test_dir / "../../../../Idea/Model"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Title/From/Content/Idea"))
+sys.path.insert(0, str(test_dir / "../../../../../../../Idea/Model/src"))
+sys.path.insert(0, str(test_dir / "../../../../../../../Idea/Model"))
+sys.path.insert(0, str(test_dir / "../../../../../../../Review/Title/From/Content/Idea"))
 sys.path.insert(0, str(test_dir / "../../../../../../../../T/Review/Script/From/Title"))
-sys.path.insert(0, str(test_dir / "../../../../Review/Content"))
+sys.path.insert(0, str(test_dir / "../../../../../../../Review/Content"))
 
 from script_review import (
     CategoryScore,

@@ -41,7 +41,7 @@ from typing import Any, Dict, List, Optional
 
 # Add parent directories to path for imports
 current_file = Path(__file__)
-t_module_dir = current_file.parent.parent.parent.parent
+t_module_dir = current_file.parent.parent.parent.parent.parent.parent.parent
 
 # Import review models
 review_title_path = t_module_dir / "Review" / "Title" / "From" / "Content" / "Idea"
