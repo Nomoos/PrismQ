@@ -14,9 +14,23 @@ Workflow Position:
     Idea + Title v1 + Content v1 → TitleReview (AI Reviewer) → Title v2 (with feedback)
 """
 
+import json
+import logging
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
+
+# Path to the AI prompt template for v1 review (requests JSON output)
+_PROMPT_FILE = Path(__file__).parent.parent / "_meta" / "prompts" / "title_review_v1.txt"
+
+# AI model configuration
+_AI_MODEL = "qwen3:32b"
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 1000
+_AI_TIMEOUT = 120  # seconds
 
 from .title_review import (
     TitleCategoryScore,
@@ -495,6 +509,93 @@ def generate_improvement_points(
     return improvements
 
 
+def _review_with_ai(
+    title_text: str,
+    content_text: str,
+    idea_summary: str,
+    target_audience: str = "",
+) -> Optional[Dict[str, Any]]:
+    """Call Ollama AI to review a title and return parsed JSON scores.
+
+    Uses the prompt template from _meta/prompts/title_review_v1.txt which
+    instructs the AI to return JSON with overall_score, script_alignment_score,
+    idea_alignment_score, engagement_score, seo_score, strengths, weaknesses,
+    and improvement_points.
+
+    Args:
+        title_text: The title to review
+        content_text: The script/content text
+        idea_summary: The original idea summary
+        target_audience: Optional target audience description
+
+    Returns:
+        Parsed JSON dict from AI response, or None if AI is unavailable/fails
+    """
+    try:
+        import requests
+    except ModuleNotFoundError:
+        logger.debug("requests not available, skipping AI review")
+        return None
+
+    # Check Ollama availability
+    try:
+        check = requests.get("http://localhost:11434/api/tags", timeout=5)
+        if check.status_code != 200:
+            logger.debug("Ollama not available (status %d)", check.status_code)
+            return None
+    except Exception as e:
+        logger.debug("Ollama not available: %s", e)
+        return None
+
+    # Load and format the prompt template
+    try:
+        prompt_template = _PROMPT_FILE.read_text(encoding="utf-8")
+        prompt = prompt_template.format(
+            title_text=title_text,
+            content_text=content_text,
+            idea_summary=idea_summary,
+            target_audience=target_audience or "General audience",
+        )
+    except Exception as e:
+        logger.warning("Failed to load/format AI prompt: %s", e)
+        return None
+
+    # Call Ollama API
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": _AI_MODEL,
+                "prompt": prompt,
+                "stream": False,
+                "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+            },
+            timeout=_AI_TIMEOUT,
+        )
+        response.raise_for_status()
+        raw_text = response.json().get("response", "").strip()
+    except Exception as e:
+        logger.warning("Ollama API call failed: %s", e)
+        return None
+
+    if not raw_text:
+        return None
+
+    # Strip <think>...</think> blocks (Qwen3 thinking mode)
+    raw_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+
+    # Extract and parse JSON from response
+    try:
+        json_match = re.search(r"\{.*\}", raw_text, re.DOTALL)
+        if not json_match:
+            logger.warning("No JSON found in AI response")
+            return None
+        return json.loads(json_match.group())
+    except Exception as e:
+        logger.warning("Failed to parse AI JSON response: %s", e)
+        return None
+
+
 def review_title_from_content_idea(
     title_text: str,
     content_text: str,
@@ -559,26 +660,106 @@ def review_title_from_content_idea(
         else:
             script_summary = content_text
 
-    # Analyze alignments
+    # Run heuristic analysis for structural details (keyword matches, elements, etc.)
     script_alignment = analyze_title_content_alignment(title_text, content_text, script_summary)
     idea_alignment = analyze_title_idea_alignment(title_text, idea_summary, idea_intent)
-
-    # Analyze engagement
     engagement_data = analyze_engagement(title_text)
-
-    # Analyze SEO
     script_keywords = extract_keywords(content_text, max_keywords=20)
     seo_data = analyze_seo(title_text, script_keywords)
 
-    # Calculate overall score (weighted average)
-    overall_score = int(
-        script_alignment.score * 0.30  # 30% weight to script alignment
-        + idea_alignment.score * 0.25  # 25% weight to idea alignment
-        + engagement_data["engagement_score"] * 0.25  # 25% weight to engagement
-        + seo_data["seo_score"] * 0.20  # 20% weight to SEO
+    # Try AI review first; fall back to heuristic scores if unavailable
+    ai_data = _review_with_ai(
+        title_text=title_text,
+        content_text=content_text,
+        idea_summary=idea_summary,
+        target_audience=target_audience or "",
     )
 
-    # Create category scores
+    if ai_data:
+        # Use AI scores – override heuristic values with real AI evaluation
+        logger.info("Using AI scores for title review (Ollama available)")
+        overall_score = int(ai_data.get("overall_score", 0))
+        script_alignment = AlignmentAnalysis(
+            score=int(ai_data.get("script_alignment_score", script_alignment.score)),
+            matches=script_alignment.matches,
+            mismatches=script_alignment.mismatches,
+            key_elements=script_alignment.key_elements,
+            reasoning=script_alignment.reasoning,
+        )
+        idea_alignment = AlignmentAnalysis(
+            score=int(ai_data.get("idea_alignment_score", idea_alignment.score)),
+            matches=idea_alignment.matches,
+            mismatches=idea_alignment.mismatches,
+            key_elements=idea_alignment.key_elements,
+            reasoning=idea_alignment.reasoning,
+        )
+        engagement_data["engagement_score"] = int(
+            ai_data.get("engagement_score", engagement_data["engagement_score"])
+        )
+        seo_data["seo_score"] = int(ai_data.get("seo_score", seo_data["seo_score"]))
+
+        # Parse AI-provided improvement points
+        ai_improvement_points = []
+        for ip_data in ai_data.get("improvement_points", []):
+            try:
+                category_str = ip_data.get("category", "clarity")
+                try:
+                    category = TitleReviewCategory(category_str)
+                except ValueError:
+                    category = TitleReviewCategory.CLARITY
+                ai_improvement_points.append(
+                    TitleImprovementPoint(
+                        category=category,
+                        title=ip_data.get("title", "Improvement needed"),
+                        description=ip_data.get("description", ""),
+                        priority=ip_data.get("priority", "medium"),
+                        impact_score=50,
+                        suggested_fix=ip_data.get("suggested_fix", ""),
+                    )
+                )
+            except Exception as e:
+                logger.warning("Skipping malformed AI improvement point: %s", e)
+                continue
+
+        improvement_points = (
+            ai_improvement_points
+            if ai_improvement_points
+            else generate_improvement_points(
+                title_text, script_alignment, idea_alignment, engagement_data, seo_data
+            )
+        )
+
+        ai_strengths = ai_data.get("strengths", [])
+        strengths = ai_strengths if ai_strengths else [
+            f"Strong {'script' if script_alignment.score >= 80 else 'idea'} alignment",
+            (
+                "Good engagement potential"
+                if engagement_data["engagement_score"] >= 70
+                else "Clear structure"
+            ),
+        ]
+    else:
+        # Heuristic fallback: calculate overall score from weighted components
+        logger.debug("AI unavailable – using heuristic scores for title review")
+        overall_score = int(
+            script_alignment.score * 0.30  # 30% weight to script alignment
+            + idea_alignment.score * 0.25  # 25% weight to idea alignment
+            + engagement_data["engagement_score"] * 0.25  # 25% weight to engagement
+            + seo_data["seo_score"] * 0.20  # 20% weight to SEO
+        )
+        improvement_points = generate_improvement_points(
+            title_text, script_alignment, idea_alignment, engagement_data, seo_data
+        )
+        strengths = [
+            f"Strong {'script' if script_alignment.score >= 80 else 'idea'} alignment",
+            (
+                "Good engagement potential"
+                if engagement_data["engagement_score"] >= 70
+                else "Clear structure"
+            ),
+        ]
+
+    # Create category scores from (potentially AI-updated) values
     category_scores = [
         TitleCategoryScore(
             category=TitleReviewCategory.SCRIPT_ALIGNMENT,
@@ -640,7 +821,7 @@ def review_title_from_content_idea(
         TitleCategoryScore(
             category=TitleReviewCategory.SEO_OPTIMIZATION,
             score=seo_data["seo_score"],
-            reasoning=f"SEO score based on keyword relevance and length optimization",
+            reasoning="SEO score based on keyword relevance and length optimization",
             strengths=[
                 "Good keyword usage" if seo_data["keyword_relevance"] > 70 else "Basic SEO elements"
             ],
@@ -653,11 +834,6 @@ def review_title_from_content_idea(
             ],
         ),
     ]
-
-    # Generate improvement points
-    improvement_points = generate_improvement_points(
-        title_text, script_alignment, idea_alignment, engagement_data, seo_data
-    )
 
     # Determine if major revision needed
     needs_major_revision = overall_score < 65
@@ -698,14 +874,7 @@ def review_title_from_content_idea(
         confidence_score=85,  # Base confidence score
         needs_major_revision=needs_major_revision,
         # Strengths and concerns
-        strengths=[
-            f"Strong {'script' if script_alignment.score >= 80 else 'idea'} alignment",
-            (
-                "Good engagement potential"
-                if engagement_data["engagement_score"] >= 70
-                else "Clear structure"
-            ),
-        ],
+        strengths=strengths,
         primary_concern=(
             improvement_points[0].description if improvement_points else "No major concerns"
         ),
