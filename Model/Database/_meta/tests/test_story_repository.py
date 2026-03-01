@@ -345,10 +345,10 @@ class TestFindNextForProcessingScorePriority:
 class TestFindNextForProcessingCreatedAtPriority:
     """Tests for created_at-based priority in find_next_for_processing."""
     
-    def test_oldest_story_selected_when_version_and_score_equal(
+    def test_newest_story_selected_when_version_and_score_equal(
         self, story_repo
     ):
-        """Test oldest story is selected when version and score are equal."""
+        """Test newest story is selected when version and score are equal."""
         state = "PrismQ.T.Content.From.Idea.Title"
         
         # Create stories with different creation times
@@ -357,12 +357,12 @@ class TestFindNextForProcessingCreatedAtPriority:
         story1 = Story(
             idea_id="1",
             state=state,
-            created_at=now - timedelta(hours=1)  # 1 hour ago
+            created_at=now - timedelta(hours=1)  # 1 hour ago (newest)
         )
         story2 = Story(
             idea_id="2",
             state=state,
-            created_at=now - timedelta(hours=3)  # 3 hours ago (oldest)
+            created_at=now - timedelta(hours=3)  # 3 hours ago
         )
         story3 = Story(
             idea_id="3",
@@ -377,7 +377,7 @@ class TestFindNextForProcessingCreatedAtPriority:
         result = story_repo.find_next_for_processing(state)
         
         assert result is not None
-        assert result.id == saved2.id  # Oldest story
+        assert result.id == saved1.id  # Newest story
 
 
 class TestFindNextForProcessingSortingOrder:
@@ -386,7 +386,7 @@ class TestFindNextForProcessingSortingOrder:
     def test_full_sorting_order(
         self, story_repo, content_repo, title_repo, review_repo
     ):
-        """Test complete sorting: version ASC, score DESC, created_at ASC."""
+        """Test complete sorting: version ASC, score DESC, created_at DESC."""
         state = "PrismQ.T.Content.From.Idea.Title"
         now = datetime.now()
         

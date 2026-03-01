@@ -394,7 +394,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
         1. Story must have the specified state (full module name)
         2. Select by lowest version (based on module type - see below)
         3. Select by highest Story score (AVG of Script and Title review scores)
-        4. Select oldest story by created_at timestamp
+        4. Select newest story by created_at timestamp
         
         Args:
             state: The full module name to filter by
@@ -467,7 +467,7 @@ class StoryRepository(IUpdatableRepository[Story, int]):
             ORDER BY
                 {version_subquery} ASC,
                 {score_subquery} DESC,
-                created_at ASC
+                created_at DESC
             LIMIT 1
         """
         
