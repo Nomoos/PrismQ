@@ -15,13 +15,13 @@ Workflow Position:
     Content v2 + Title v3 + v1 Review → FromTitle v2 Review → ScriptReview Feedback → Content v3
 """
 
-import os
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-# Add parent directories to path for imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
+# Add repo root to path for imports (5 levels up from this file's directory)
+sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 
 from T.Review.Script.From.Title.review_script_from_title import (
     AlignmentScore,
