@@ -29,6 +29,7 @@ from story_title_service import (
     create_stories_from_idea,
 )
 from title_generator import TitleConfig
+from title_variant import TitleVariant
 
 from idea import ContentGenre, Idea, IdeaStatus
 
@@ -528,6 +529,82 @@ class TestTitleUniquenessWithDatabase:
         # Should be unique (no similar titles)
         assert is_unique is True
         assert len(similar_titles) == 0
+
+
+class TestGenerateTitleForStoryWithPreGeneratedVariant:
+    """Tests for generate_title_for_story with a pre-generated TitleVariant."""
+
+    @pytest.fixture
+    def db_connection(self):
+        """Create in-memory SQLite database for testing."""
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        yield conn
+        conn.close()
+
+    def test_uses_pre_generated_variant_without_ai_call(self, db_connection):
+        """Passing a variant reuses it directly instead of making a second AI call."""
+        service = StoryTitleService(db_connection, use_ai=False)
+        service.ensure_tables_exist()
+
+        # Insert a story in TITLE_FROM_IDEA state manually
+        story = Story(idea_id="42", state=StoryState.TITLE_FROM_IDEA.value)
+        story = service._story_repo.insert(story)
+
+        pre_variant = TitleVariant(
+            text="Glass Bodies, Unspoken Scales",
+            style="direct",
+            length=29,
+            keywords=[],
+            score=0.80,
+        )
+
+        # Should succeed using the pre-generated variant without needing Ollama
+        title = service.generate_title_for_story(story, variant=pre_variant)
+
+        assert title is not None
+        assert title.text == "Glass Bodies, Unspoken Scales"
+        assert title.story_id == story.id
+
+    def test_story_state_updated_when_using_pre_generated_variant(self, db_connection):
+        """Story state transitions to CONTENT_FROM_IDEA_TITLE when variant is provided."""
+        service = StoryTitleService(db_connection, use_ai=False)
+        service.ensure_tables_exist()
+
+        story = Story(idea_id="99", state=StoryState.TITLE_FROM_IDEA.value)
+        story = service._story_repo.insert(story)
+
+        pre_variant = TitleVariant(
+            text="Echoes of the Unspoken", style="poetic", length=22, keywords=[], score=0.75
+        )
+
+        service.generate_title_for_story(story, variant=pre_variant)
+
+        # Reload story from DB and verify state
+        updated = service._story_repo.find_by_id(story.id)
+        assert updated.state == StoryState.CONTENT_FROM_IDEA_TITLE.value
+
+    def test_returns_none_when_story_already_has_title(self, db_connection):
+        """Returns None without error when story already has a title."""
+        service = StoryTitleService(db_connection, use_ai=False)
+        service.ensure_tables_exist()
+
+        story = Story(idea_id="7", state=StoryState.TITLE_FROM_IDEA.value)
+        story = service._story_repo.insert(story)
+
+        pre_variant = TitleVariant(
+            text="First Title", style="direct", length=11, keywords=[], score=0.70
+        )
+
+        # Save first title
+        service.generate_title_for_story(story, variant=pre_variant)
+
+        # Reload after state transition
+        story = service._story_repo.find_by_id(story.id)
+
+        # Attempt to save again — should return None (already has a title)
+        result = service.generate_title_for_story(story, variant=pre_variant)
+        assert result is None
 
 
 class TestGetStoriesWithoutTitlesSortOrder:
