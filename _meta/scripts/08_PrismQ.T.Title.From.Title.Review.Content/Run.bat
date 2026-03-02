@@ -10,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Title\From\Title\Review\Scr
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Title.From.Script.Review.Title - RUN MODE
+echo PrismQ.T.Title.From.Script.Review.Title
 echo ========================================
 echo.
 

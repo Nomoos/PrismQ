@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Content.From.Title
-REM Review script against title - saves to database
+REM Review scripts against title from database
 REM
 REM Usage: Run.bat
 
@@ -10,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\From\Title"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Content.From.Title - RUN MODE
+echo PrismQ.T.Review.Content.From.Title
 echo ========================================
 echo.
 

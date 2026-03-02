@@ -1,6 +1,6 @@
 @echo off
-REM Run.bat - PrismQ.T.Review.Script.Tone
-REM Tone and voice consistency check - saves to database
+REM Run.bat - PrismQ.T.Review.Content.Tone
+REM Tone consistency check from database
 REM
 REM Usage: Run.bat
 
@@ -10,11 +10,11 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Tone"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Tone - RUN MODE
+echo PrismQ.T.Review.Content.Tone
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Script\Tone\src\review_script_tone.py
+python ..\..\..\T\Review\Script\Tone\src\tone_workflow.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

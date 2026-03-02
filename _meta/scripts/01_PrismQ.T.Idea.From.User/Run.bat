@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Idea.From.User
-REM RUN MODE: Continuous interactive idea creation - saves to database
+REM Interactive idea creation - saves to database
 REM
 REM Usage: Run.bat
 
@@ -10,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Idea\Creation"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Idea.From.User - Run Mode
+echo PrismQ.T.Idea.From.User
 echo ========================================
 echo.
 

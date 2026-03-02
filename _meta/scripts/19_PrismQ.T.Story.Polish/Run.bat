@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Story.Polish
-REM Expert-level story polish (GPT) - saves to database
+REM Expert-level story polish (GPT) from database
 REM
 REM Usage: Run.bat
 
@@ -10,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Story\Polish"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Story.Polish - RUN MODE
+echo PrismQ.T.Story.Polish
 echo ========================================
 echo.
 
