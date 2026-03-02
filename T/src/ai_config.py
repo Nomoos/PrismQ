@@ -23,9 +23,10 @@ Usage:
 """
 
 import logging
+import os
 import random
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Dict, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,32 @@ DEFAULT_AI_API_BASE = "http://localhost:11434"
 AI_TEMPERATURE_MIN = 0.6
 AI_TEMPERATURE_MAX = 0.8
 DEFAULT_AI_TIMEOUT = 120
+
+# =============================================================================
+# Early-Stage AI Model Configuration (Scripts 01-06)
+# =============================================================================
+
+# Choice list of faster models suitable for early-stage processing (Scripts 01-06).
+# These models trade some quality for speed compared to the default qwen3:32b.
+# Set PRISMQ_AI_MODEL_EARLY_STAGE in your .env or environment to select one.
+EARLY_STAGE_AI_MODELS: Dict[str, str] = {
+    "qwen2.5:3b":           "Fastest  – very lightweight, minimal VRAM",
+    "qwen2.5:7b":           "Very fast – good quality, low VRAM",
+    "qwen2.5:14b":          "Fast     – better quality (recommended default)",
+    "qwen2.5:14b-instruct": "Fast     – instruction-tuned 14 B variant",
+    "qwen3:8b":             "Fast     – Qwen3 smaller variant",
+    "llama3.2:3b":          "Fastest  – Meta Llama 3.2 3B",
+    "llama3.1:8b":          "Fast     – Meta Llama 3.1 8B",
+    "gemma2:9b":            "Fast     – Google Gemma 2 9B",
+    "mistral:7b":           "Fast     – Mistral 7B v0.3",
+}
+
+# Active early-stage model (override via PRISMQ_AI_MODEL_EARLY_STAGE env var).
+# Defaults to qwen2.5:14b – a good balance of speed and quality for early stages.
+DEFAULT_AI_MODEL_EARLY_STAGE: str = os.getenv(
+    "PRISMQ_AI_MODEL_EARLY_STAGE",
+    "qwen2.5:14b",
+)
 
 
 # =============================================================================
@@ -113,6 +140,33 @@ def create_ai_config(
     """
     return AISettings(
         model=model or DEFAULT_AI_MODEL,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_early_stage_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """Factory function to create AI configuration for early-stage scripts (01-06).
+
+    Uses a faster model suited for initial processing steps.  The active model
+    is selected via the ``PRISMQ_AI_MODEL_EARLY_STAGE`` environment variable
+    (default: ``qwen2.5:14b``).  See ``EARLY_STAGE_AI_MODELS`` for the full
+    list of supported choices.
+
+    Args:
+        model: Override AI model (default: value of PRISMQ_AI_MODEL_EARLY_STAGE)
+        api_base: Override API base (default: localhost:11434)
+        timeout: Override timeout (default: 120s)
+
+    Returns:
+        Configured AISettings instance for early-stage operations
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_EARLY_STAGE,
         api_base=api_base or DEFAULT_AI_API_BASE,
         timeout=timeout or DEFAULT_AI_TIMEOUT
     )

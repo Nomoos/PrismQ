@@ -41,10 +41,10 @@ from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.State.constants.state_names import StateNames
 
-# Try to import the review function
+# Import the AI-powered title review function (always required — no algorithmic fallback)
 try:
-    from T.Review.Title.From.Content.review_title_from_content_v2 import (
-        review_title_from_content_v2,
+    from T.Review.Title.From.Content.Idea.review_title_from_content_idea import (
+        review_title_from_content_idea,
     )
     REVIEW_AVAILABLE = True
 except ImportError:
@@ -149,60 +149,6 @@ class ReviewTitleFromContentIdeaService:
         )
         return cursor.fetchone()
 
-    def _simple_review(
-        self, title_text: str, content_text: str, idea_text: str
-    ) -> Tuple[str, int]:
-        """Simple fallback review when full review module is not available.
-
-        Args:
-            title_text: Title text to review
-            content_text: Content text to review against
-            idea_text: Idea text for additional context
-
-        Returns:
-            Tuple of (review_text, review_score)
-        """
-        title_lower = title_text.lower()
-        content_lower = content_text.lower()
-        idea_lower = idea_text.lower()
-
-        title_words = set(
-            word for word in title_lower.split() if len(word) > 3 and word.isalpha()
-        )
-
-        content_matches = sum(1 for word in title_words if word in content_lower)
-        idea_matches = sum(1 for word in title_words if word in idea_lower)
-
-        if title_words:
-            content_pct = (content_matches / len(title_words)) * 100
-            idea_pct = (idea_matches / len(title_words)) * 100
-        else:
-            content_pct = 50
-            idea_pct = 50
-
-        score = int(min(100, 40 + content_pct * 0.4 + idea_pct * 0.2))
-
-        if score >= 80:
-            review_text = (
-                f"Title aligns well with content and idea. "
-                f"Content matches: {content_matches}/{len(title_words)}, "
-                f"Idea matches: {idea_matches}/{len(title_words)}."
-            )
-        elif score >= 60:
-            review_text = (
-                f"Fair title alignment. "
-                f"Content matches: {content_matches}/{len(title_words)}, "
-                f"Idea matches: {idea_matches}/{len(title_words)}."
-            )
-        else:
-            review_text = (
-                f"Title needs improvement. "
-                f"Content matches: {content_matches}/{len(title_words)}, "
-                f"Idea matches: {idea_matches}/{len(title_words)}."
-            )
-
-        return review_text, score
-
     def _generate_review(
         self,
         title_text: str,
@@ -211,7 +157,12 @@ class ReviewTitleFromContentIdeaService:
         title_id: Optional[int] = None,
         content_id: Optional[int] = None,
     ) -> Tuple[str, int]:
-        """Generate review text and score for a title against content and idea.
+        """Generate AI review text and score for a title against content and idea.
+
+        Always calls the AI model (Ollama).  The active model is selected via
+        the PRISMQ_AI_MODEL_EARLY_STAGE environment variable.  Raises
+        RuntimeError if the review module or Ollama is unavailable — no
+        algorithmic fallback is used.
 
         Args:
             title_text: The title to review
@@ -222,21 +173,25 @@ class ReviewTitleFromContentIdeaService:
 
         Returns:
             Tuple of (review_text, review_score)
+
+        Raises:
+            RuntimeError: If AI review is unavailable
         """
         if not REVIEW_AVAILABLE:
-            return self._simple_review(title_text, content_text, idea_text)
+            raise RuntimeError(
+                "AI title review module is not available. "
+                "Ensure the T/Review/Title/From/Content/Idea package is installed."
+            )
 
-        review_result = review_title_from_content_v2(
+        review_result = review_title_from_content_idea(
             title_text=title_text,
             content_text=content_text,
-            title_id=title_id,
-            content_id=content_id,
+            idea_summary=idea_text,
+            title_id=str(title_id) if title_id is not None else None,
+            content_id=str(content_id) if content_id is not None else None,
         )
 
         review_text = review_result.primary_concern or review_result.notes or "No review text"
-        if idea_text:
-            review_text = f"{review_text}\n\nIdea Context: {idea_text[:200]}..."
-
         return review_text, review_result.overall_score
 
     def process_oldest_story(self) -> ReviewTitleFromContentIdeaResult:

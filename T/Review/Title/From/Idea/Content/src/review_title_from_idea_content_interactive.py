@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Interactive Title Review CLI for PrismQ.T.Review.Title.From.Idea.Content
 
-This script provides AI-powered title review using Ollama with Qwen3:32b.
+This script provides AI-powered title review using Ollama.
 It evaluates titles based on Idea (intent) and Content (delivery), producing
 narrative review text.
 
@@ -17,7 +17,7 @@ Modes:
 
 Requirements:
     - Ollama running locally (http://localhost:11434)
-    - Qwen3:32b model installed (ollama pull qwen3:32b)
+    - Model set via PRISMQ_AI_MODEL_EARLY_STAGE env var (default: qwen2.5:14b)
 """
 
 import json
@@ -177,38 +177,42 @@ def check_ollama_available(logger: Optional[logging.Logger] = None) -> bool:
 
 
 def check_qwen3_available(logger: Optional[logging.Logger] = None) -> bool:
-    """Check if Qwen3:32b model is installed in Ollama.
+    """Check if the configured early-stage AI model is installed in Ollama.
+
+    The model is read from the PRISMQ_AI_MODEL_EARLY_STAGE env var
+    (default: qwen2.5:14b).
 
     Args:
         logger: Optional logger for diagnostic output
 
     Returns:
-        True if Qwen3:32b is available, False otherwise
+        True if the configured model is available, False otherwise
     """
     if not REQUESTS_AVAILABLE:
         return False
+
+    _model = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
 
     try:
         response = requests.get("http://localhost:11434/api/tags", timeout=5)
         if response.status_code == 200:
             data = response.json()
             models = [model.get("name", "") for model in data.get("models", [])]
-            
-            # Check for qwen3:32b
-            qwen3_found = any("qwen3" in model and "32b" in model for model in models)
-            
+
+            model_found = _model in models
+
             if logger:
                 logger.info(f"Found models: {', '.join(models)}")
-                if qwen3_found:
-                    logger.info("Qwen3:32b model is available")
+                if model_found:
+                    logger.info(f"Model '{_model}' is available")
                 else:
-                    logger.warning("Qwen3:32b model not found")
-            
-            return qwen3_found
+                    logger.warning(f"Model '{_model}' not found")
+
+            return model_found
         return False
     except Exception as e:
         if logger:
-            logger.error(f"Error checking Qwen3 availability: {e}")
+            logger.error(f"Error checking model availability: {e}")
         return False
 
 
@@ -262,7 +266,7 @@ def generate_title_review_with_ai(
 
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": "qwen3:32b", "prompt": prompt, "stream": False, "options": params},
+            json={"model": os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b"), "prompt": prompt, "stream": False, "options": params},
             timeout=120,  # 2 minutes timeout for AI generation
         )
 
@@ -378,13 +382,14 @@ def main(preview: bool = False, debug: bool = False) -> int:
     print_success("Ollama service is running")
 
     if not check_qwen3_available(logger):
-        print_error("Qwen3:32b model not found")
-        print_info("Please install: ollama pull qwen3:32b")
+        _model = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
+        print_error(f"Model '{_model}' not found")
+        print_info(f"Please install: ollama pull {_model}")
         if logger:
-            logger.error("Qwen3:32b not available")
+            logger.error(f"Model '{_model}' not available")
         return 1
 
-    print_success("Qwen3:32b model available")
+    print_success(f"AI model '{os.getenv('PRISMQ_AI_MODEL_EARLY_STAGE', 'qwen2.5:14b')}' available")
 
     if preview:
         print_warning("Preview mode - for testing AI reviews")

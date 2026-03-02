@@ -10,8 +10,11 @@ Exports:
 from .ai_config import (
     AISettings,
     create_ai_config,
+    create_early_stage_ai_config,
     check_ollama_available,
     DEFAULT_AI_MODEL,
+    DEFAULT_AI_MODEL_EARLY_STAGE,
+    EARLY_STAGE_AI_MODELS,
     DEFAULT_AI_API_BASE,
     AI_TEMPERATURE_MIN,
     AI_TEMPERATURE_MAX,
@@ -21,8 +24,11 @@ from .prompt_utils import apply_template
 __all__ = [
     "AISettings",
     "create_ai_config",
+    "create_early_stage_ai_config",
     "check_ollama_available",
     "DEFAULT_AI_MODEL",
+    "DEFAULT_AI_MODEL_EARLY_STAGE",
+    "EARLY_STAGE_AI_MODELS",
     "DEFAULT_AI_API_BASE",
     "AI_TEMPERATURE_MIN",
     "AI_TEMPERATURE_MAX",

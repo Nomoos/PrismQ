@@ -6,6 +6,7 @@ Follows Single Responsibility Principle - only responsible for API communication
 """
 
 import logging
+import os
 import time
 from dataclasses import dataclass
 from typing import Optional
@@ -26,7 +27,7 @@ class OllamaConfig:
         timeout: Request timeout in seconds
     """
     
-    model: str = "qwen3:32b"  # Qwen3:30b for RTX 5090
+    model: str = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")  # Override via env var
     api_base: str = "http://localhost:11434"
     max_tokens: int = 2000
     timeout: int = 60

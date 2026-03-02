@@ -16,6 +16,7 @@ Workflow Position:
 
 import json
 import logging
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,8 +27,8 @@ logger = logging.getLogger(__name__)
 # Path to the AI prompt template for v1 review (requests JSON output)
 _PROMPT_FILE = Path(__file__).parent.parent / "_meta" / "prompts" / "title_review_v1.txt"
 
-# AI model configuration
-_AI_MODEL = "qwen3:32b"
+# AI model configuration — use early-stage model (override via PRISMQ_AI_MODEL_EARLY_STAGE)
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
 _AI_TEMPERATURE = 0.3
 _AI_MAX_TOKENS = 1000
 _AI_TIMEOUT = 120  # seconds

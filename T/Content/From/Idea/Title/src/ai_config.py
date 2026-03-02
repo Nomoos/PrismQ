@@ -14,6 +14,7 @@ For new code, import directly from T.src.ai_config.
 """
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -35,20 +36,25 @@ try:
     
     # Extract needed items
     DEFAULT_AI_MODEL = t_ai_config.DEFAULT_AI_MODEL
+    DEFAULT_AI_MODEL_EARLY_STAGE = t_ai_config.DEFAULT_AI_MODEL_EARLY_STAGE
     DEFAULT_AI_API_BASE = t_ai_config.DEFAULT_AI_API_BASE
     AI_TEMPERATURE_MIN = t_ai_config.AI_TEMPERATURE_MIN
     AI_TEMPERATURE_MAX = t_ai_config.AI_TEMPERATURE_MAX
     AISettings = t_ai_config.AISettings
     create_ai_config = t_ai_config.create_ai_config
+    create_early_stage_ai_config = t_ai_config.create_early_stage_ai_config
     check_ollama_available = t_ai_config.check_ollama_available
     
     # Backward compatibility wrapper functions
     def get_local_ai_model() -> str:
-        """Get the local AI model name.
+        """Get the local AI model name for early-stage scripts (01-06).
         
+        Returns DEFAULT_AI_MODEL_EARLY_STAGE (configurable via
+        PRISMQ_AI_MODEL_EARLY_STAGE env var).
+
         DEPRECATED: Import from T.src.ai_config instead.
         """
-        return DEFAULT_AI_MODEL
+        return DEFAULT_AI_MODEL_EARLY_STAGE
     
     def get_local_ai_api_base() -> str:
         """Get the local AI API base URL.
@@ -97,12 +103,13 @@ except ImportError as e:
     from typing import Tuple
     
     DEFAULT_AI_MODEL = "qwen3:32b"
+    DEFAULT_AI_MODEL_EARLY_STAGE = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
     DEFAULT_AI_API_BASE = "http://localhost:11434"
     AI_TEMPERATURE_MIN = 0.6
     AI_TEMPERATURE_MAX = 0.8
     
     def get_local_ai_model() -> str:
-        return DEFAULT_AI_MODEL
+        return DEFAULT_AI_MODEL_EARLY_STAGE
     
     def get_local_ai_api_base() -> str:
         return DEFAULT_AI_API_BASE
