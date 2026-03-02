@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Content.Grammar
-REM Continuous workflow - grammar validation from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Grammar validation from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Grammar"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Grammar - CONTINUOUS MODE
+echo PrismQ.T.Review.Content.Grammar
 echo ========================================
 echo.
 

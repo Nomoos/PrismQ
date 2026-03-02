@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Content.Content
-REM Continuous workflow - content accuracy validation from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Content accuracy validation from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Content"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Content - CONTINUOUS MODE
+echo PrismQ.T.Review.Content.Content
 echo ========================================
 echo.
 

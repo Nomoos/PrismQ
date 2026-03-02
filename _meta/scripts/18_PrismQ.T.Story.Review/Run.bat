@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Story.Review
-REM Continuous workflow - expert-level story review (GPT) from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Expert-level story review (GPT) from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Story\Review"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Story.Review - CONTINUOUS MODE
+echo PrismQ.T.Story.Review
 echo ========================================
 echo.
 

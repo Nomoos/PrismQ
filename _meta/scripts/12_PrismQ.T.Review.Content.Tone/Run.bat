@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Content.Tone
-REM Continuous workflow - tone consistency check from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Tone consistency check from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Tone"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Tone - CONTINUOUS MODE
+echo PrismQ.T.Review.Content.Tone
 echo ========================================
 echo.
 

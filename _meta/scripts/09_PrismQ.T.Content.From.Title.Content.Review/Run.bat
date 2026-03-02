@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Script.From.Title.Review.Script
-REM Continuous workflow - refine scripts interactively from title and review feedback
-REM Runs continuously until cancelled (Ctrl+C or close window)
+REM Refine scripts interactively from title and review feedback
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Content\From\Title\Review\S
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Script.From.Title.Review.Script - CONTINUOUS MODE
+echo PrismQ.T.Script.From.Title.Review.Script
 echo ========================================
 echo.
 

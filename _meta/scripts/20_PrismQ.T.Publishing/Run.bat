@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Publishing
-REM Continuous workflow - text publishing with SEO optimization from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Text publishing with SEO optimization from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Publishing"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Publishing - CONTINUOUS MODE
+echo PrismQ.T.Publishing
 echo ========================================
 echo.
 

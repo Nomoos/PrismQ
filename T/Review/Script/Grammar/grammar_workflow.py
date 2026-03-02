@@ -90,7 +90,7 @@ def main():
                         help="Enable debug logging")
     args = parser.parse_args()
 
-    print_header("PrismQ.T.Review.Content.Grammar - CONTINUOUS MODE")
+    print_header("PrismQ.T.Review.Content.Grammar")
     print_info("Processing stories continuously")
     print_info("Waits 30 seconds when no stories to process")
     print_info("Press Ctrl+C to stop")

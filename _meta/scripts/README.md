@@ -90,12 +90,12 @@ Navigate to any numbered module directory and run:
 
 ```batch
 cd _meta\scripts\01_PrismQ.T.Idea.From.User
-Run.bat       REM For production (saves to database, runs continuously)
+Run.bat
 ```
 
-### Continuous Run Mode
+### Run Mode
 
-All modules from **Step 02 onwards** run in **CONTINUOUS MODE** by default:
+All modules from **Step 02 onwards** run continuously by default:
 
 - **Runs indefinitely** until cancelled with Ctrl+C or by closing the window
 - **Waits 30 seconds** when no items are available to process (prevents busy-waiting)
@@ -113,14 +113,14 @@ cd _meta\scripts\01_PrismQ.T.Idea.From.User
 Run.bat
 
 REM Step 2-20: Start all pipeline steps in separate windows
-REM Each runs continuously and picks up work from database
+REM Each picks up work from database automatically
 cd _meta\scripts\02_PrismQ.T.Story.From.Idea
 Run.bat
 
 cd _meta\scripts\03_PrismQ.T.Title.From.Idea
 Run.bat
 
-REM Continue through workflow - all steps run continuously...
+REM Continue through workflow...
 ```
 
 ---

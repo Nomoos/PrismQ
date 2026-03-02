@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Content.Editing
-REM Continuous workflow - final editing pass from database
-REM Runs continuously with 30s wait when idle, 1ms between items
+REM Final editing pass from database
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Script\Editing"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Script.Editing - CONTINUOUS MODE
+echo PrismQ.T.Review.Content.Editing
 echo ========================================
 echo.
 

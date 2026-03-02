@@ -76,7 +76,7 @@ REM Setup environment
 call :setup_env
 
 echo ========================================
-echo Module.Name - CONTINUOUS MODE
+echo Module.Name
 echo ========================================
 
 python ..\..\..\Path\To\Module\src\module_workflow.py
@@ -92,9 +92,9 @@ python ..\..\..\Path\To\Module\src\module_workflow.py
 - **Step 05 (PrismQ.T.Review.Title.From.Content.Idea)** - Continuous with 30s wait
 - **Step 06 (PrismQ.T.Review.Content.From.Title.Idea)** - Continuous with 30s wait
 - **Step 07 (PrismQ.T.Review.Title.From.Content)** - Fixed: workflow runner added
-- **Step 08 (PrismQ.T.Title.From.Script.Review.Title)** - CONTINUOUS MODE: interactive loop (user input driven)
-- **Step 09 (PrismQ.T.Script.From.Title.Review.Script)** - CONTINUOUS MODE: interactive loop (user input driven)
-- **Step 10 (PrismQ.T.Review.Content.From.Title)** - CONTINUOUS MODE: interactive loop (user input driven)
+- **Step 08 (PrismQ.T.Title.From.Script.Review.Title)** - Interactive loop (user input driven)
+- **Step 09 (PrismQ.T.Script.From.Title.Review.Script)** - Interactive loop (user input driven)
+- **Step 10 (PrismQ.T.Review.Content.From.Title)** - Interactive loop (user input driven)
 - **Step 11 (PrismQ.T.Review.Content.Grammar)** - Fixed: workflow runner added (grammar_workflow.py)
 - **Step 12 (PrismQ.T.Review.Content.Tone)** - Fixed: workflow runner added (tone_workflow.py)
 - **Step 13 (PrismQ.T.Review.Content.Content)** - Fixed: workflow runner added (content_review_workflow.py)
@@ -102,9 +102,9 @@ python ..\..\..\Path\To\Module\src\module_workflow.py
 - **Step 15 (PrismQ.T.Review.Content.Editing)** - Fixed: workflow runner added (editing_workflow.py)
 - **Step 16 (PrismQ.T.Review.Title.Readability)** - Fixed: workflow runner added (title_readability_workflow.py)
 - **Step 17 (PrismQ.T.Review.Content.Readability)** - Fixed: workflow runner added (script_readability_workflow.py)
-- **Step 18 (PrismQ.T.Story.Review)** - CONTINUOUS MODE (workflow pending implementation)
-- **Step 19 (PrismQ.T.Story.Polish)** - CONTINUOUS MODE (workflow pending implementation)
-- **Step 20 (PrismQ.T.Publishing)** - CONTINUOUS MODE (workflow pending implementation)
+- **Step 18 (PrismQ.T.Story.Review)** - Run.bat updated (workflow pending implementation)
+- **Step 19 (PrismQ.T.Story.Polish)** - Run.bat updated (workflow pending implementation)
+- **Step 20 (PrismQ.T.Publishing)** - Run.bat updated (workflow pending implementation)
 
 ### ⚠️ Need Review/Update
 Steps 21-30 may need similar updates depending on their execution model.

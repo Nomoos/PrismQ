@@ -1,7 +1,6 @@
 #!/bin/bash
 # Run.sh - PrismQ.T.Title.From.Script.Review.Title
-# Continuous workflow - refine titles interactively from script and review feedback
-# Runs continuously until cancelled (Ctrl+C or close window)
+# Refine titles interactively from script and review feedback
 #
 # Usage: ./Run.sh
 
@@ -42,7 +41,7 @@ setup_env() {
 setup_env
 
 echo "========================================"
-echo "PrismQ.T.Title.From.Script.Review.Title - CONTINUOUS MODE"
+echo "PrismQ.T.Title.From.Script.Review.Title"
 echo "========================================"
 echo
 
