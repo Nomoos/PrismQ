@@ -291,7 +291,7 @@ def run_interactive_mode():
     Database connection is required - exits with error if unavailable.
     """
     # Print header
-    print_header(f"PrismQ Idea Creation - Continuous Mode")
+    print_header("PrismQ Idea Creation")
 
     # Check module availability
     if not VARIANTS_AVAILABLE:

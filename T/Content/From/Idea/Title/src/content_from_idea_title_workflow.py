@@ -207,7 +207,7 @@ Examples:
         print_info(f"Logging to: {log_path}")
 
     # Print header
-    print_header("PrismQ.T.Content.From.Idea.Title - CONTINUOUS MODE")
+    print_header("PrismQ.T.Content.From.Idea.Title")
     print_info("Processing stories continuously")
     print_info("Waits 30 seconds when no stories to process")
     print_info("Press Ctrl+C to stop")

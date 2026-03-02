@@ -5,13 +5,8 @@ This script provides title generation from ideas using local AI (Ollama).
 AI is REQUIRED - no template-based fallback is available.
 
 Usage:
-    python title_from_idea_interactive.py                    # Continuous mode (default)
+    python title_from_idea_interactive.py                    # Process Stories from default DB
     python title_from_idea_interactive.py --db /path/db.s3db # Custom database path
-
-Modes:
-    Default (Continuous): Auto-processes Stories from database without user input
-                         Waits 30 seconds when no Stories are available
-                         No interactivity in the processing cycle
 
 Requirements:
     - Ollama must be running with qwen3:32b model
@@ -579,12 +574,6 @@ def run_state_workflow_mode(
         logger.info(f"Session started - Debug: {debug}")
         print_info(f"Logging to: {log_path}")
 
-    # Print header - CONTINUOUS MODE is now default
-    print_header("PrismQ.T.Title.From.Idea - CONTINUOUS MODE")
-    print_info("Running continuously - 1ms between iterations, 30s when no Stories")
-    print_info("Press Ctrl+C to stop")
-    print()
-
     # Check module availability
     if not TITLE_GENERATOR_AVAILABLE:
         print_error(f"Title generator module not available: {IMPORT_ERROR}")
@@ -639,7 +628,6 @@ def run_state_workflow_mode(
     idea_db = setup_idea_table(db_path)
     print_success("Connected to Idea database")
 
-    # Continuous mode loop (default behavior)
     run_count = 0
     total_processed = 0
     total_errors = 0
@@ -826,13 +814,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Continuous mode (default - automatic processing without user input)
   python title_from_idea_interactive.py                    # Process Stories from default DB
   python title_from_idea_interactive.py --db /path/to/db.s3db  # Use custom DB
   
 Note: 
   - AI (Ollama) is REQUIRED for title generation. No template fallback available.
-  - This module runs in continuous mode only (no interactivity in the cycle).
         """,
     )
 
@@ -863,7 +849,6 @@ Note:
     if args.interactive or args.manual:
         return run_interactive_mode(debug=args.debug, manual=args.manual)
     else:
-        # Default: continuous mode (auto-process Stories without user input)
         return run_state_workflow_mode(args.db, debug=args.debug)
 
 

@@ -229,8 +229,8 @@ def run_continuous_mode(preview: bool = False):
         print_info(f"Logging to: {log_path}")
 
     # Print header
-    mode_text = "PREVIEW MODE" if preview else "CONTINUOUS MODE"
-    print_header(f"PrismQ Story From Idea - {mode_text}")
+    header = "PrismQ Story From Idea - PREVIEW MODE" if preview else "PrismQ Story From Idea"
+    print_header(header)
 
     # Check module availability
     if not SERVICE_AVAILABLE:
@@ -262,7 +262,7 @@ def run_continuous_mode(preview: bool = False):
         logger.info(f"Story database path: {story_db_path}")
         logger.info(f"Idea database path: {idea_db_path}")
 
-    print_section("Continuous Mode")
+    print_section("Processing")
     print("Processing ideas continuously:")
     print("  - 1 ms when unreferenced ideas > 0")
     print("  - 30 seconds when 0 unreferenced ideas")
