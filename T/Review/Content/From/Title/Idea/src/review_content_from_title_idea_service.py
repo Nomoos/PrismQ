@@ -59,8 +59,8 @@ try:
 except ImportError:
     IDEA_DB_AVAILABLE = False
 
-# Active early-stage AI model (override via PRISMQ_AI_MODEL_EARLY_STAGE)
-_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
+# Active AI model for Script 06 – qwen3:14b (override via PRISMQ_AI_MODEL_STAGE_05_06)
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
 _AI_TEMPERATURE = 0.3
 _AI_MAX_TOKENS = 800
 _AI_TIMEOUT = 120  # seconds

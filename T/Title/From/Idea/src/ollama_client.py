@@ -27,7 +27,7 @@ class OllamaConfig:
         timeout: Request timeout in seconds
     """
     
-    model: str = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")  # Override via env var
+    model: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")  # Default: qwen3:8b for Script 03
     api_base: str = "http://localhost:11434"
     max_tokens: int = 2000
     timeout: int = 60

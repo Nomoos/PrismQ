@@ -45,26 +45,26 @@ DEFAULT_AI_TIMEOUT = 120
 # Early-Stage AI Model Configuration (Scripts 01-06)
 # =============================================================================
 
-# Choice list of faster models suitable for early-stage processing (Scripts 01-06).
-# These models trade some quality for speed compared to the default qwen3:32b.
-# Set PRISMQ_AI_MODEL_EARLY_STAGE in your .env or environment to select one.
+# Choice list of Qwen3 models available for early-stage processing (Scripts 01-06).
+# Set the matching PRISMQ_AI_MODEL_STAGE_* env var in your .env to override a stage's model.
 EARLY_STAGE_AI_MODELS: Dict[str, str] = {
-    "qwen2.5:3b":           "Fastest  – very lightweight, minimal VRAM",
-    "qwen2.5:7b":           "Very fast – good quality, low VRAM",
-    "qwen2.5:14b":          "Fast     – better quality (recommended default)",
-    "qwen2.5:14b-instruct": "Fast     – instruction-tuned 14 B variant",
-    "qwen3:8b":             "Fast     – Qwen3 smaller variant",
-    "llama3.2:3b":          "Fastest  – Meta Llama 3.2 3B",
-    "llama3.1:8b":          "Fast     – Meta Llama 3.1 8B",
-    "gemma2:9b":            "Fast     – Google Gemma 2 9B",
-    "mistral:7b":           "Fast     – Mistral 7B v0.3",
+    "qwen3:8b":  "Fast     – Qwen3 8B  (scripts 03-04)",
+    "qwen3:14b": "Balanced – Qwen3 14B (scripts 01, 05-06)",
+    "qwen3:32b": "Quality  – Qwen3 32B (scripts 07+ and default main model)",
 }
 
-# Active early-stage model (override via PRISMQ_AI_MODEL_EARLY_STAGE env var).
-# Defaults to qwen2.5:14b – a good balance of speed and quality for early stages.
+# Per-stage-group model defaults (each overridable via environment variable).
+# Script 01  – Idea generation
+DEFAULT_AI_MODEL_STAGE_01: str = os.getenv("PRISMQ_AI_MODEL_STAGE_01", "qwen3:14b")
+# Scripts 03-04 – Title and Content generation
+DEFAULT_AI_MODEL_STAGE_03_04: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")
+# Scripts 05-06 – Early reviews (title & content)
+DEFAULT_AI_MODEL_STAGE_05_06: str = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
+
+# Keep legacy single-variable for backward compatibility (falls back to stage 05-06 default)
 DEFAULT_AI_MODEL_EARLY_STAGE: str = os.getenv(
     "PRISMQ_AI_MODEL_EARLY_STAGE",
-    "qwen2.5:14b",
+    DEFAULT_AI_MODEL_STAGE_05_06,
 )
 
 
@@ -152,10 +152,8 @@ def create_early_stage_ai_config(
 ) -> AISettings:
     """Factory function to create AI configuration for early-stage scripts (01-06).
 
-    Uses a faster model suited for initial processing steps.  The active model
-    is selected via the ``PRISMQ_AI_MODEL_EARLY_STAGE`` environment variable
-    (default: ``qwen2.5:14b``).  See ``EARLY_STAGE_AI_MODELS`` for the full
-    list of supported choices.
+    Uses the legacy ``PRISMQ_AI_MODEL_EARLY_STAGE`` env var for backward
+    compatibility.  Prefer the stage-specific factories below for new code.
 
     Args:
         model: Override AI model (default: value of PRISMQ_AI_MODEL_EARLY_STAGE)
@@ -167,6 +165,54 @@ def create_early_stage_ai_config(
     """
     return AISettings(
         model=model or DEFAULT_AI_MODEL_EARLY_STAGE,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_stage_01_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """AI config for Script 01 (Idea generation) – default: qwen3:14b.
+
+    Override via ``PRISMQ_AI_MODEL_STAGE_01`` environment variable.
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_STAGE_01,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_stage_03_04_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """AI config for Scripts 03-04 (Title & Content generation) – default: qwen3:8b.
+
+    Override via ``PRISMQ_AI_MODEL_STAGE_03_04`` environment variable.
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_STAGE_03_04,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_stage_05_06_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """AI config for Scripts 05-06 (Early reviews) – default: qwen3:14b.
+
+    Override via ``PRISMQ_AI_MODEL_STAGE_05_06`` environment variable.
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_STAGE_05_06,
         api_base=api_base or DEFAULT_AI_API_BASE,
         timeout=timeout or DEFAULT_AI_TIMEOUT
     )

@@ -37,24 +37,26 @@ try:
     # Extract needed items
     DEFAULT_AI_MODEL = t_ai_config.DEFAULT_AI_MODEL
     DEFAULT_AI_MODEL_EARLY_STAGE = t_ai_config.DEFAULT_AI_MODEL_EARLY_STAGE
+    DEFAULT_AI_MODEL_STAGE_03_04 = t_ai_config.DEFAULT_AI_MODEL_STAGE_03_04
     DEFAULT_AI_API_BASE = t_ai_config.DEFAULT_AI_API_BASE
     AI_TEMPERATURE_MIN = t_ai_config.AI_TEMPERATURE_MIN
     AI_TEMPERATURE_MAX = t_ai_config.AI_TEMPERATURE_MAX
     AISettings = t_ai_config.AISettings
     create_ai_config = t_ai_config.create_ai_config
     create_early_stage_ai_config = t_ai_config.create_early_stage_ai_config
+    create_stage_03_04_ai_config = t_ai_config.create_stage_03_04_ai_config
     check_ollama_available = t_ai_config.check_ollama_available
     
     # Backward compatibility wrapper functions
     def get_local_ai_model() -> str:
-        """Get the local AI model name for early-stage scripts (01-06).
+        """Get the local AI model name for Script 04 (Content generation).
         
-        Returns DEFAULT_AI_MODEL_EARLY_STAGE (configurable via
-        PRISMQ_AI_MODEL_EARLY_STAGE env var).
+        Returns DEFAULT_AI_MODEL_STAGE_03_04 (configurable via
+        PRISMQ_AI_MODEL_STAGE_03_04 env var, default: qwen3:8b).
 
         DEPRECATED: Import from T.src.ai_config instead.
         """
-        return DEFAULT_AI_MODEL_EARLY_STAGE
+        return DEFAULT_AI_MODEL_STAGE_03_04
     
     def get_local_ai_api_base() -> str:
         """Get the local AI API base URL.
@@ -103,13 +105,13 @@ except ImportError as e:
     from typing import Tuple
     
     DEFAULT_AI_MODEL = "qwen3:32b"
-    DEFAULT_AI_MODEL_EARLY_STAGE = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
+    DEFAULT_AI_MODEL_STAGE_03_04 = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")
     DEFAULT_AI_API_BASE = "http://localhost:11434"
     AI_TEMPERATURE_MIN = 0.6
     AI_TEMPERATURE_MAX = 0.8
     
     def get_local_ai_model() -> str:
-        return DEFAULT_AI_MODEL_EARLY_STAGE
+        return DEFAULT_AI_MODEL_STAGE_03_04
     
     def get_local_ai_api_base() -> str:
         return DEFAULT_AI_API_BASE

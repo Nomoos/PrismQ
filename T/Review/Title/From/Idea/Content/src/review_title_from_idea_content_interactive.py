@@ -17,7 +17,7 @@ Modes:
 
 Requirements:
     - Ollama running locally (http://localhost:11434)
-    - Model set via PRISMQ_AI_MODEL_EARLY_STAGE env var (default: qwen2.5:14b)
+    - Model set via PRISMQ_AI_MODEL_STAGE_05_06 env var (default: qwen3:14b)
 """
 
 import json
@@ -179,8 +179,8 @@ def check_ollama_available(logger: Optional[logging.Logger] = None) -> bool:
 def check_qwen3_available(logger: Optional[logging.Logger] = None) -> bool:
     """Check if the configured early-stage AI model is installed in Ollama.
 
-    The model is read from the PRISMQ_AI_MODEL_EARLY_STAGE env var
-    (default: qwen2.5:14b).
+    The model is read from the PRISMQ_AI_MODEL_STAGE_05_06 env var
+    (default: qwen3:14b).
 
     Args:
         logger: Optional logger for diagnostic output
@@ -191,7 +191,7 @@ def check_qwen3_available(logger: Optional[logging.Logger] = None) -> bool:
     if not REQUESTS_AVAILABLE:
         return False
 
-    _model = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
+    _model = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
 
     try:
         response = requests.get("http://localhost:11434/api/tags", timeout=5)
@@ -266,7 +266,7 @@ def generate_title_review_with_ai(
 
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b"), "prompt": prompt, "stream": False, "options": params},
+            json={"model": os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b"), "prompt": prompt, "stream": False, "options": params},
             timeout=120,  # 2 minutes timeout for AI generation
         )
 
@@ -382,14 +382,14 @@ def main(preview: bool = False, debug: bool = False) -> int:
     print_success("Ollama service is running")
 
     if not check_qwen3_available(logger):
-        _model = os.getenv("PRISMQ_AI_MODEL_EARLY_STAGE", "qwen2.5:14b")
+        _model = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
         print_error(f"Model '{_model}' not found")
         print_info(f"Please install: ollama pull {_model}")
         if logger:
             logger.error(f"Model '{_model}' not available")
         return 1
 
-    print_success(f"AI model '{os.getenv('PRISMQ_AI_MODEL_EARLY_STAGE', 'qwen2.5:14b')}' available")
+    print_success(f"AI model '{os.getenv('PRISMQ_AI_MODEL_STAGE_05_06', 'qwen3:14b')}' available")
 
     if preview:
         print_warning("Preview mode - for testing AI reviews")
