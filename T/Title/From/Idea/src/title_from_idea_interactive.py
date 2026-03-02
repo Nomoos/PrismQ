@@ -752,10 +752,10 @@ def run_state_workflow_mode(
                     print(f"    {variant.text}")
                     print(f"    Style: {variant.style} | Length: {variant.length} chars | Score: {variant.score:.2f}")
 
-                    # Save title and update state
+                    # Save title and update state (reuse already-generated variant)
                     print_section("Database Operations")
                     try:
-                        title = service.generate_title_for_story(story, idea)
+                        title = service.generate_title_for_story(story, idea, variant)
                         if title:
                             print_success(f"Title saved with ID: {title.id}")
                             print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
