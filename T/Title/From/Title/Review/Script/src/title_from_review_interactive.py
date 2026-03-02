@@ -27,8 +27,8 @@ from typing import Any, Dict, List, Optional
 
 # Setup paths
 SCRIPT_DIR = Path(__file__).parent.absolute()
-TITLE_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Title/From/Title/Review/Content
-T_TITLE_ROOT = TITLE_FROM_REVIEW_ROOT.parent.parent.parent  # T/Title
+TITLE_FROM_REVIEW_ROOT = SCRIPT_DIR.parent  # T/Title/From/Title/Review/Script
+T_TITLE_ROOT = TITLE_FROM_REVIEW_ROOT.parent.parent.parent.parent  # T/Title
 T_ROOT = T_TITLE_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
 
