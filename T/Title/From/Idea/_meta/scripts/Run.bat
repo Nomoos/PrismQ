@@ -25,7 +25,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo ========================================
-echo PrismQ.T.Title.From.Idea - Continuous Mode
+echo PrismQ.T.Title.From.Idea
 echo ========================================
 echo Press Ctrl+C to stop
 echo.
