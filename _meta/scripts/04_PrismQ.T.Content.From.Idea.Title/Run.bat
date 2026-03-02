@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Content.From.Idea.Title
-REM Continuous workflow - process stories from database
+REM Process stories from database
 REM
 REM Usage: Run.bat
 
@@ -15,7 +15,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Content\From\Idea\Title"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Content.From.Idea.Title - CONTINUOUS MODE
+echo PrismQ.T.Content.From.Idea.Title
 echo ========================================
 echo.
 

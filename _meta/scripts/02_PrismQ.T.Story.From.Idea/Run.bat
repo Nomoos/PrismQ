@@ -1,7 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Story.From.Idea
 REM Create Story objects from Idea - saves to database
-REM Runs continuously with dynamic wait times until cancelled (Ctrl+C or close window)
 REM
 REM Usage: Run.bat
 
@@ -11,7 +10,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Story\From\Idea"
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Story.From.Idea - RUN MODE
+echo PrismQ.T.Story.From.Idea
 echo ========================================
 echo.
 

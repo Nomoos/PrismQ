@@ -1,6 +1,6 @@
 @echo off
 REM Run.bat - PrismQ.T.Review.Title.From.Content.Idea
-REM Continuous workflow - review titles from database (with idea context)
+REM Review titles from database (with idea context)
 REM
 REM Usage: Run.bat
 
@@ -15,7 +15,7 @@ call ..\common\setup_env.bat "%SCRIPT_DIR%..\..\..\T\Review\Title\From\Idea\Cont
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b 1 )
 
 echo ========================================
-echo PrismQ.T.Review.Title.From.Content.Idea - CONTINUOUS MODE
+echo PrismQ.T.Review.Title.From.Content.Idea
 echo ========================================
 echo.
 
