@@ -463,6 +463,7 @@ class StoryTitleService:
         self,
         story: Story,
         idea: Optional[Idea] = None,
+        variant: Optional[TitleVariant] = None,
     ) -> Optional[Title]:
         """Generate a Title (v0) for a single Story using AI.
 
@@ -471,7 +472,10 @@ class StoryTitleService:
 
         Args:
             story: The Story to generate a title for.
-            idea: Idea object for context. Required for AI generation.
+            idea: Idea object for context. Required for AI generation when
+                  variant is not provided.
+            variant: Pre-generated TitleVariant to use directly, skipping the
+                     AI call. If provided, idea is not required.
 
         Returns:
             Created Title object, or None if story already has a title.
@@ -479,29 +483,30 @@ class StoryTitleService:
         Raises:
             RuntimeError: If no database connection is available.
             AIUnavailableError: If AI title generation is not available.
-            ValueError: If no Idea is provided.
+            ValueError: If neither an Idea nor a pre-generated TitleVariant is provided.
         """
         if not self._title_repo or not self._story_repo:
             raise RuntimeError("Database connection required for this operation")
+
+        if variant is None and not idea:
+            raise ValueError(
+                f"Either an Idea object or a pre-generated TitleVariant is required "
+                f"(Story ID: {story.id})."
+            )
 
         # Check if story already has a title
         if self.story_has_title(story.id):
             return None
 
-        if not idea:
-            raise ValueError(
-                f"Idea object is required for AI title generation (Story ID: {story.id}). "
-                "The caller must provide a valid Idea object."
-            )
+        if variant is None:
+            # No pre-generated variant – generate one via AI
+            variant = self.generate_title(idea)
 
-        # Generate a single title using AI
-        variant = self.generate_title(idea)
-
-        if not variant:
-            raise AIUnavailableError(
-                "AI title generation returned no result. "
-                "Ensure Ollama is running and the model is available."
-            )
+            if not variant:
+                raise AIUnavailableError(
+                    "AI title generation returned no result. "
+                    "Ensure Ollama is running and the model is available."
+                )
 
         # Create Title (version 0)
         title = Title(story_id=story.id, version=0, text=variant.text)
