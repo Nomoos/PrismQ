@@ -44,6 +44,8 @@ try:
     AISettings = t_ai_config.AISettings
     create_ai_config = t_ai_config.create_ai_config
     create_early_stage_ai_config = t_ai_config.create_early_stage_ai_config
+    create_qwen3_14b_ai_config = t_ai_config.create_qwen3_14b_ai_config
+    create_qwen3_8b_ai_config = t_ai_config.create_qwen3_8b_ai_config
     create_stage_03_04_ai_config = t_ai_config.create_stage_03_04_ai_config
     check_ollama_available = t_ai_config.check_ollama_available
     

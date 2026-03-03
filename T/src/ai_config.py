@@ -170,14 +170,20 @@ def create_early_stage_ai_config(
     )
 
 
-def create_stage_01_ai_config(
+def create_qwen3_14b_ai_config(
     model: str = None,
     api_base: str = None,
     timeout: int = None
 ) -> AISettings:
-    """AI config for Script 01 (Idea generation) – default: qwen3:14b.
+    """AI config using qwen3:14b (scripts 01 and 05-06).
 
-    Override via ``PRISMQ_AI_MODEL_STAGE_01`` environment variable.
+    The default model is ``qwen3:14b``.  Each caller stage has its own env
+    var override:
+
+    * Script 01  – ``PRISMQ_AI_MODEL_STAGE_01``
+    * Scripts 05-06 – ``PRISMQ_AI_MODEL_STAGE_05_06``
+
+    Pass an explicit *model* argument or set the env var to override.
     """
     return AISettings(
         model=model or DEFAULT_AI_MODEL_STAGE_01,
@@ -186,12 +192,12 @@ def create_stage_01_ai_config(
     )
 
 
-def create_stage_03_04_ai_config(
+def create_qwen3_8b_ai_config(
     model: str = None,
     api_base: str = None,
     timeout: int = None
 ) -> AISettings:
-    """AI config for Scripts 03-04 (Title & Content generation) – default: qwen3:8b.
+    """AI config using qwen3:8b (scripts 03-04).
 
     Override via ``PRISMQ_AI_MODEL_STAGE_03_04`` environment variable.
     """
@@ -202,20 +208,10 @@ def create_stage_03_04_ai_config(
     )
 
 
-def create_stage_05_06_ai_config(
-    model: str = None,
-    api_base: str = None,
-    timeout: int = None
-) -> AISettings:
-    """AI config for Scripts 05-06 (Early reviews) – default: qwen3:14b.
-
-    Override via ``PRISMQ_AI_MODEL_STAGE_05_06`` environment variable.
-    """
-    return AISettings(
-        model=model or DEFAULT_AI_MODEL_STAGE_05_06,
-        api_base=api_base or DEFAULT_AI_API_BASE,
-        timeout=timeout or DEFAULT_AI_TIMEOUT
-    )
+# Backward-compatible aliases (stage-number names)
+create_stage_01_ai_config = create_qwen3_14b_ai_config
+create_stage_03_04_ai_config = create_qwen3_8b_ai_config
+create_stage_05_06_ai_config = create_qwen3_14b_ai_config
 
 
 # =============================================================================
