@@ -103,10 +103,11 @@ def main():
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         print_success("Connected to database")
-    service = ScriptReadabilityReviewService(conn)
     except Exception as e:
         print_error(f"Failed to connect to database: {e}")
         return 1
+
+    service = ScriptReadabilityReviewService(conn)
 
     run_count = 0
     total_processed = 0
