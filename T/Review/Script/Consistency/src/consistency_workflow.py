@@ -22,6 +22,7 @@ SCRIPT_DIR = Path(__file__).parent.absolute()
 # T/Review/Script/Consistency/src/ -> T/Review/Script/Consistency/ -> T/Review/Script/ -> T/Review/ -> T/ -> repo root
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent
 
+sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 
 INPUT_STATE = "PrismQ.T.Review.Content.Consistency"
@@ -33,9 +34,7 @@ except ImportError:
     CONFIG_AVAILABLE = False
 
 try:
-    from T.Review.Script.Consistency.src.script_consistency_review_service import (
-        ScriptConsistencyReviewService,
-    )
+    from script_consistency_review_service import ScriptConsistencyReviewService
     SERVICE_AVAILABLE = True
 except Exception as e:
     SERVICE_AVAILABLE = False
@@ -147,14 +146,14 @@ def main():
                     f"Story {result.story_id}: PASSED consistency review "
                     f"(score: {result.score:.0f})"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_passed += 1
             else:
                 print_warning(
                     f"Story {result.story_id}: FAILED consistency review "
                     f"(score: {result.score:.0f})"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_failed += 1
 
             if total_processed % 10 == 0:

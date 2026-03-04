@@ -145,14 +145,14 @@ def main():
                         f"Story {result.story_id}: PASSED grammar review "
                         f"(score: {result.score:.0f})"
                     )
-                    print_info(f"  Next state: {result.new_state}")
+                    print_info(f"  Next state: {result.next_state}")
                     total_passed += 1
                 else:
                     print_warning(
                         f"Story {result.story_id}: FAILED grammar review "
                         f"(score: {result.score:.0f})"
                     )
-                    print_info(f"  Next state: {result.new_state}")
+                    print_info(f"  Next state: {result.next_state}")
                     total_failed += 1
             else:
                 print_error(f"Story {result.story_id}: Error - {result.error}")

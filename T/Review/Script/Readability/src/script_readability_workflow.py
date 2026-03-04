@@ -22,6 +22,7 @@ SCRIPT_DIR = Path(__file__).parent.absolute()
 # T/Review/Script/Readability/src/ -> T/Review/Script/Readability/ -> T/Review/Script/ -> T/Review/ -> T/ -> repo root
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent
 
+sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 
 INPUT_STATE = "PrismQ.T.Review.Content.Readability"
@@ -33,9 +34,7 @@ except ImportError:
     CONFIG_AVAILABLE = False
 
 try:
-    from T.Review.Script.Readability.src.review_script_readability_service import (
-        process_review_content_readability,
-    )
+    from review_script_readability_service import ScriptReadabilityReviewService
     SERVICE_AVAILABLE = True
 except Exception as e:
     SERVICE_AVAILABLE = False
@@ -104,6 +103,7 @@ def main():
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         print_success("Connected to database")
+    service = ScriptReadabilityReviewService(conn)
     except Exception as e:
         print_error(f"Failed to connect to database: {e}")
         return 1
@@ -132,7 +132,7 @@ def main():
 
             print_success(f"Found {pending_count} stories ready for script readability review")
 
-            result = process_review_content_readability(connection=conn)
+            result = service.process_oldest_story()
 
             if result is None:
                 print_warning("No story found to process")
@@ -140,17 +140,17 @@ def main():
                 continue
 
             total_processed += 1
-            if result.accepted:
+            if result.passes:
                 print_success(
-                    f"Story {result.story.id}: ACCEPTED script readability review"
+                    f"Story {result.story_id}: ACCEPTED script readability review"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_accepted += 1
             else:
                 print_warning(
-                    f"Story {result.story.id}: REJECTED script readability review"
+                    f"Story {result.story_id}: REJECTED script readability review"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_rejected += 1
 
             if total_processed % 10 == 0:

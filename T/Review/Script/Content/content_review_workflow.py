@@ -22,6 +22,7 @@ SCRIPT_DIR = Path(__file__).parent.absolute()
 # T/Review/Script/Content/ -> T/Review/Script/ -> T/Review/ -> T/ -> repo root
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent
 
+sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 
 INPUT_STATE = "PrismQ.T.Review.Content.Content"
@@ -33,7 +34,7 @@ except ImportError:
     CONFIG_AVAILABLE = False
 
 try:
-    from T.Review.Script.Content.script_content_review import ScriptContentReviewer
+    from script_content_review import ScriptContentReviewer
     SERVICE_AVAILABLE = True
 except Exception as e:
     SERVICE_AVAILABLE = False
@@ -145,14 +146,14 @@ def main():
                     f"Story {result.story_id}: PASSED content review "
                     f"(score: {result.overall_score:.0f})"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_passed += 1
             else:
                 print_warning(
                     f"Story {result.story_id}: FAILED content review "
                     f"(score: {result.overall_score:.0f})"
                 )
-                print_info(f"  Next state: {result.new_state}")
+                print_info(f"  Next state: {result.next_state}")
                 total_failed += 1
 
             if total_processed % 10 == 0:

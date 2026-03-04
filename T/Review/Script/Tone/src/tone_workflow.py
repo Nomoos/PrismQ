@@ -22,6 +22,7 @@ SCRIPT_DIR = Path(__file__).parent.absolute()
 # T/Review/Script/Tone/src/ -> T/Review/Script/Tone/ -> T/Review/Script/ -> T/Review/ -> T/ -> repo root
 REPO_ROOT = SCRIPT_DIR.parent.parent.parent.parent.parent
 
+sys.path.insert(0, str(SCRIPT_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 
 INPUT_STATE = "PrismQ.T.Review.Content.Tone"
@@ -33,7 +34,7 @@ except ImportError:
     CONFIG_AVAILABLE = False
 
 try:
-    from T.Review.Script.Tone.src.review_script_tone import process_review_content_tone
+    from review_script_tone import ScriptToneReviewService
     SERVICE_AVAILABLE = True
 except Exception as e:
     SERVICE_AVAILABLE = False
@@ -106,14 +107,21 @@ def main():
         print_error(f"Failed to connect to database: {e}")
         return 1
 
+    service = ScriptToneReviewService(conn)
+
     run_count = 0
     total_processed = 0
-    total_accepted = 0
-    total_rejected = 0
+    total_passed = 0
+    total_failed = 0
 
     try:
         while True:
             run_count += 1
+
+            if run_count > 1:
+                print(f"\n{Colors.CYAN}{'═' * 80}{Colors.END}")
+                print(f"{Colors.CYAN}Run #{run_count} - Checking for stories...{Colors.END}")
+                print(f"{Colors.CYAN}{'═' * 80}{Colors.END}\n")
 
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM Story WHERE state = ?", (INPUT_STATE,))
@@ -122,42 +130,36 @@ def main():
             if pending_count == 0:
                 if run_count == 1:
                     print_info(f"No stories found with state {INPUT_STATE}")
-                    print_info("Waiting for stories from previous steps...")
-                wait = get_wait_interval(0)
-                print_info(f"Waiting {wait:.0f}s before checking again...")
-                time.sleep(wait)
+                print_info("Waiting 30s before checking again...")
+                time.sleep(30)
                 continue
 
-            print_success(f"Found {pending_count} stories ready for tone review")
+            if run_count == 1:
+                print_success(f"Found {pending_count} stories ready for tone review")
+            else:
+                print_success(f"Found {pending_count} pending stories")
 
-            result = process_review_content_tone(connection=conn)
+            result = service.process_oldest_story()
 
-            if result is None:
+            if result.story_id is None:
                 print_warning("No story found to process")
                 time.sleep(1.0)
                 continue
 
             total_processed += 1
-            if result.accepted:
-                print_success(
-                    f"Story {result.story.id}: ACCEPTED tone review"
-                )
-                print_info(f"  Next state: {result.new_state}")
-                total_accepted += 1
+            if result.success:
+                if result.passes:
+                    print_success(f"Story {result.story_id}: Tone ACCEPTED (score: {result.score})")
+                    total_passed += 1
+                else:
+                    print_warning(f"Story {result.story_id}: Tone REJECTED (score: {result.score})")
+                    total_failed += 1
+                print_info(f"  Next state: {result.next_state}")
             else:
-                print_warning(
-                    f"Story {result.story.id}: REJECTED tone review"
-                )
-                print_info(f"  Next state: {result.new_state}")
-                total_rejected += 1
+                print_error(f"Story {result.story_id}: Error - {result.error}")
 
-            if total_processed % 10 == 0:
-                print_info(
-                    f"Progress: {total_accepted} accepted, {total_rejected} rejected"
-                )
-
-            remaining = pending_count - 1
-            time.sleep(get_wait_interval(remaining))
+            print_info("Waiting 1 ms before next story...")
+            time.sleep(get_wait_interval(pending_count - 1))
 
     except KeyboardInterrupt:
         print()
@@ -170,9 +172,7 @@ def main():
     finally:
         conn.close()
         print()
-        print_info(
-            f"Session complete: {total_accepted} accepted, {total_rejected} rejected"
-        )
+        print_info(f"Session complete: {total_passed} passed, {total_failed} failed")
 
     return 0
 
