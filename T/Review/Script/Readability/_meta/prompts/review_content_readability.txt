@@ -14,8 +14,10 @@ Score each criterion 0–25. Deduct for every specific instance you find:
    - Deduct 5 pts per sentence with 2+ embedded clauses (e.g. "the man who had, despite everything he had been told, decided to...")
    - Deduct 3 pts per sentence that chains 3+ independent clauses with 'and'
 
-2. Pronunciation & articulation (0–25): Can every word be spoken cleanly without effort?
+2. Pronunciation, articulation & spoken form (0–25): Can every word and number be spoken cleanly without hesitation?
    - Deduct 7 pts per consonant cluster that forces the narrator to slow down (e.g. "strengths", "sixth", "crisps")
+   - Deduct 6 pts per digit or numeral written as a figure that a narrator must convert on the fly (e.g. "47", "1,200", "3rd") — scripts must spell out numbers in full ("forty-seven", "twelve hundred", "third")
+   - Deduct 5 pts per abbreviation, acronym, or symbol that requires mental expansion during delivery (e.g. "$", "%", "Dr.", "ft.", "approx.") — these must be written out ("dollars", "percent", "Doctor", "feet", "approximately")
    - Deduct 5 pts per technical, foreign, or uncommon word that breaks narrator flow
    - Deduct 4 pts per run of similar-sounding words in sequence (alliteration that causes stumbling, not poetry)
    - Deduct 3 pts per word ending in a consonant followed by a word starting with the same sound (creates blur)
