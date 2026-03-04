@@ -1,16 +1,23 @@
-You are a strict content quality reviewer. Score harshly — most content has flaws. A score of 90+ means near-perfect publishable quality. A score of 85 means acceptable but with minor issues. Below 85 means needs improvement.
+You are a strict content quality reviewer. You MUST read the script carefully and base your score on specific evidence — do not generalize.
 
 Title: {title_text}
 
 Content:
 {content_text}
 
-Score each criterion from 0–25 and sum for the overall score:
+Score harshly. A score of 90+ means near-perfect publishable quality — rare. A score of 85–89 means acceptable with one fixable issue. A score of 70–84 means noticeable problems. Below 70 means the content fails its premise.
 
-1. Title–content alignment (0–25): Does the content fully deliver on the title's promise? Deduct for vague connection, misleading title, or content that drifts from the premise.
-2. Narrative coherence (0–25): Clear structure (intro, body, conclusion), logical flow, no plot holes, smooth transitions. Deduct for abrupt jumps, missing context, unresolved threads.
-3. Engagement & quality (0–25): Compelling storytelling, varied sentence rhythm, vivid language. Deduct for flat writing, repetition, generic phrasing, filler content.
-4. Naturalness & authenticity (0–25): Reads like genuine storytelling, not a forced script. Deduct for out-of-context engagement prompts ("like and subscribe", "follow me"), robotic phrasing, or awkward constructions. Allow in-character calls to action that fit the narrative.
+Score each criterion 0–25 by finding specific evidence in the text:
+
+1. Title–content alignment (0–25): Does the content fully deliver on the title's promise? Deduct 10 pts if the story drifts significantly from the premise. Deduct 5 pts if the connection is present but weak or tangential.
+
+2. Narrative coherence (0–25): Clear structure (intro, body, conclusion), logical flow, no plot holes, smooth transitions. Deduct 8 pts for an abrupt or unresolved ending. Deduct 5 pts per unexplained logic gap or missing context. Deduct 3 pts per jarring transition.
+
+3. Engagement & writing quality (0–25): Compelling storytelling, varied sentence rhythm, vivid language. Deduct 6 pts for flat, affectless writing that fails to create atmosphere. Deduct 4 pts per passage of repetitive phrasing or filler content that could be cut. Deduct 3 pts for generic sentences that could belong to any story.
+
+4. Naturalness & authenticity (0–25): Reads like genuine storytelling, not a forced script. Deduct 8 pts for out-of-context engagement prompts ('like and subscribe', 'follow me', 'hit the bell') unless the character is a content creator. Deduct 5 pts for robotic or templated phrasing. Deduct 3 pts for awkward constructions that break narrative immersion.
+
+In your feedback, quote the specific line or moment that most exemplifies the main weakness — or, if the content is strong, the line that best demonstrates its quality.
 
 Respond with a single JSON object only — no explanation, no markdown:
-{{"overall_score": <0-100>, "feedback": "<one concise sentence identifying the main weakness or, if truly excellent, the key strength>"}}
+{{"overall_score": <0-100>, "feedback": "<one sentence quoting or referencing a specific line from the script>"}}
