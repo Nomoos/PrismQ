@@ -1,2 +1,8 @@
+# Requirements for T.Content.From.Title.Review.Script module
+
+# Production dependencies
+requests>=2.28.0      # For Ollama API calls
+
+# Testing dependencies - only needed for running tests
 pytest>=7.0.0
 pytest-cov>=4.0.0

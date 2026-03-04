@@ -23,10 +23,19 @@ import sqlite3
 import sys
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Tuple
 
 # Setup logging
 logger = logging.getLogger(__name__)
+
+# Prompt template directory
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
+
+
+def _load_prompt(filename: str) -> str:
+    """Load a prompt template from the prompts directory."""
+    return (_PROMPTS_DIR / filename).read_text(encoding="utf-8")
 
 # Setup paths for imports
 _current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -164,16 +173,11 @@ class ReviewContentFromTitleIdeaService:
         except ImportError as exc:
             raise RuntimeError("requests library not available; run: pip install requests") from exc
 
-        prompt = (
-            "You are a professional content reviewer. "
-            "Review the following script and score how well it aligns with its title and the original idea.\n\n"
-            f"TITLE: {title_text}\n\n"
-            f"IDEA: {idea_text or 'Not provided'}\n\n"
-            f"SCRIPT:\n{content_text[:_MAX_CONTENT_PREVIEW_LENGTH]}\n\n"
-            "Respond with a JSON object containing:\n"
-            '  "overall_score": integer 0-100,\n'
-            '  "feedback": one concise sentence of feedback\n'
-            "JSON only, no other text."
+        template = _load_prompt("review_content.txt")
+        prompt = template.format(
+            title_text=title_text,
+            idea_text=idea_text or "Not provided",
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
         )
 
         try:

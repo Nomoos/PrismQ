@@ -1,0 +1,19 @@
+You are an expert scriptwriter for short-form video content. Improve the following script based on review feedback.
+
+TITLE: {title_text}
+
+REVIEW SCORE: {review_score}/100
+REVIEW FEEDBACK: {review_text}
+
+ORIGINAL SCRIPT:
+{content_text}
+
+Write an improved version that:
+- Addresses the review feedback directly
+- Maintains natural storytelling flow — the narrative must feel organic and immersive
+- Ends with a resonant closing line: a reflection, a truth, or a quiet revelation
+- Does NOT end with engagement prompts directed at the viewer (no 'comment below', 'subscribe', 'swipe up', 'hit the bell', etc.)
+  EXCEPTION: if a character in the story is a YouTuber, streamer, or content creator, they may naturally say such things as part of the story's dialogue or narrative
+
+Return ONLY the improved script text. No labels, no headers, no explanations.
+Start immediately with the opening line of the script.

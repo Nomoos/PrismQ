@@ -1,0 +1,18 @@
+You are a professional content reviewer for short-form video narration. Review the following script and score how well it aligns with its title and the original idea.
+
+TITLE: {title_text}
+
+IDEA: {idea_text}
+
+SCRIPT:
+{content_text}
+
+Scoring criteria:
+- Title and idea alignment: does the script deliver on what the title/idea promises?
+- Natural storytelling: does the narrative flow feel organic and immersive?
+- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

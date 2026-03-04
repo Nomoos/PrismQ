@@ -256,13 +256,6 @@ class ScriptImprover:
     def _improve_conclusion(self, script: str, suggested_fix: str) -> str:
         """Improve the conclusion of the script."""
         lines = script.split("\n")
-
-        # Add stronger conclusion if ending seems weak
-        if lines and len(lines[-1]) < 30:
-            lines.append(
-                "\n\nAnd that's the story you needed to hear today. What do you think? Let me know in the comments."
-            )
-
         return "\n".join(lines)
 
     def _improve_title_alignment(self, script: str, title: str) -> str:

@@ -547,14 +547,6 @@ class ScriptImprover:
         """
         try:
             lines = script.split("\n")
-
-            # Add stronger conclusion if ending seems weak
-            if lines and len(lines[-1]) < 30:
-                lines.append(
-                    "\n\nAnd that's the story you needed to hear today. "
-                    "What do you think? Let me know in the comments."
-                )
-
             return "\n".join(lines)
         except Exception as e:
             logger.warning(f"Failed to improve conclusion: {e}")
