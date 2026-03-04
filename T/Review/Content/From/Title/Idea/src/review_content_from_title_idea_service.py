@@ -192,6 +192,7 @@ class ReviewContentFromTitleIdeaService:
                     "model": _AI_MODEL,
                     "prompt": prompt,
                     "stream": False,
+                    "think": False,
                     "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
                 },
                 timeout=_AI_TIMEOUT,

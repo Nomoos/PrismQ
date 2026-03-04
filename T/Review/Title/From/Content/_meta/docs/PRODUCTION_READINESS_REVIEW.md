@@ -43,7 +43,6 @@ The `PrismQ.T.Review.Title.From.Content` module has been reviewed for production
 - `_meta/tests/test_by_content_v2.py`
 - `by_content_v2.py`
 - `src/review_title_from_script_service.py`
-- `src/review_title_from_script_interactive.py`
 - `README.md`
 
 **Verification**: All tests now pass, imports work correctly

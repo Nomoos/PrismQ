@@ -18,7 +18,7 @@ Avoid formulaic patterns and any "You won't believe" constructions
 
 The title must stand alone as a self-contained emotional hook
 
-Output only the title with no commentary or quotation marks
+Output only the title as plain text — no commentary, no quotation marks, no markdown formatting (no asterisks, no bold, no italics, no brackets)
 
 Creative guidance:
 

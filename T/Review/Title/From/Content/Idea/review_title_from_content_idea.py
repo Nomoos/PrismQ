@@ -569,6 +569,7 @@ def _review_with_ai(
                 "model": _AI_MODEL,
                 "prompt": prompt,
                 "stream": False,
+                "think": False,
                 "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
             },
             timeout=_AI_TIMEOUT,
@@ -590,10 +591,12 @@ def _review_with_ai(
         json_match = re.search(r"\{.*\}", raw_text, re.DOTALL)
         if not json_match:
             logger.warning("No JSON found in AI response")
+            logger.warning("Raw AI response:\n%s", raw_text[:500])
             return None
         return json.loads(json_match.group())
     except Exception as e:
         logger.warning("Failed to parse AI JSON response: %s", e)
+        logger.warning("Raw AI response:\n%s", raw_text[:500])
         return None
 
 

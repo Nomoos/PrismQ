@@ -79,6 +79,7 @@ class ReviewTitleFromContentIdeaResult:
     next_state: Optional[str] = None
     accepted: Optional[bool] = None
     error: Optional[str] = None
+    title_text: Optional[str] = None
 
 
 class ReviewTitleFromContentIdeaService:
@@ -92,15 +93,13 @@ class ReviewTitleFromContentIdeaService:
     OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_FROM_TITLE_IDEA
     OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
 
-    def __init__(self, connection: sqlite3.Connection, preview_mode: bool = False):
+    def __init__(self, connection: sqlite3.Connection):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection
-            preview_mode: If True, don't save changes to database
         """
         self._conn = connection
-        self._preview_mode = preview_mode
         self.story_repo = StoryRepository(connection)
         self.review_repo = ReviewRepository(connection)
 
@@ -210,7 +209,7 @@ class ReviewTitleFromContentIdeaService:
             )
 
         story_id = row["story_id"]
-        result = ReviewTitleFromContentIdeaResult(success=False, story_id=story_id)
+        result = ReviewTitleFromContentIdeaResult(success=False, story_id=story_id, title_text=row["title_text"])
 
         try:
             logger.info(
@@ -231,14 +230,13 @@ class ReviewTitleFromContentIdeaService:
             result.score = review_score
 
             # Save review record to database
-            if not self._preview_mode:
-                review = Review(
-                    text=review_text[:MAX_REVIEW_TEXT_LENGTH] if len(review_text) > MAX_REVIEW_TEXT_LENGTH else review_text,
-                    score=review_score,
-                    created_at=datetime.now(),
-                )
-                review = self.review_repo.insert(review)
-                result.review_id = review.id
+            review = Review(
+                text=review_text[:MAX_REVIEW_TEXT_LENGTH] if len(review_text) > MAX_REVIEW_TEXT_LENGTH else review_text,
+                score=review_score,
+                created_at=datetime.now(),
+            )
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
             # Determine next state based on score
             if review_score >= TITLE_ACCEPTANCE_THRESHOLD:
@@ -249,10 +247,9 @@ class ReviewTitleFromContentIdeaService:
                 result.next_state = self.OUTPUT_STATE_FAIL
 
             # Update story state
-            if not self._preview_mode:
-                story = Story(id=story_id, idea_id=row["idea_id"], state=self.INPUT_STATE)
-                story.state = result.next_state
-                self.story_repo.update(story)
+            story = Story(id=story_id, idea_id=row["idea_id"], state=self.INPUT_STATE)
+            story.state = result.next_state
+            self.story_repo.update(story)
 
             result.success = True
             logger.info(

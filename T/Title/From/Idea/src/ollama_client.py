@@ -100,6 +100,7 @@ class OllamaClient:
                     "model": self.config.model,
                     "prompt": prompt,
                     "stream": False,
+                    "think": False,
                     "options": {
                         "temperature": temperature,
                         "num_predict": self.config.max_tokens,

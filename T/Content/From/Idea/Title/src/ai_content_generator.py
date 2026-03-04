@@ -887,6 +887,7 @@ class AIContentGenerator:
                     "model": self.config.model,
                     "prompt": prompt,
                     "stream": False,
+                    "think": False,
                     "options": {
                         "temperature": self.config.temperature,
                         "num_predict": self.config.max_tokens,

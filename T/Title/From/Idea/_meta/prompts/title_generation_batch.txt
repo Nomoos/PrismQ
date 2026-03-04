@@ -30,7 +30,7 @@ Write titles that feel like they belong on haunting, intimate novels
 
 Diversity requirement: Each title must explore a genuinely different emotional angle, metaphor, or perspective. Do not produce variations of the same phrase.
 
-Output format: Output exactly {count} titles, one per line, numbered 1 through {count}. No commentary, no quotation marks, only the numbered titles.
+Output format: Output exactly {count} titles, one per line, numbered 1 through {count}. Plain text only — no commentary, no quotation marks, no markdown formatting (no asterisks, no bold, no italics, no brackets).
 
 Idea:
 {idea}

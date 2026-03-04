@@ -62,6 +62,23 @@ if "!NEEDS_INSTALL!"=="1" (
     copy /y "%REQUIREMENTS%" "%VENV_DIR%\.requirements_installed" >nul
 )
 
+REM ── Ollama model check ──────────────────────────────────────────────────────
+where ollama >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo [INFO] Checking Ollama AI models...
+    for %%M in (qwen3:8b qwen3:14b qwen3:32b) do (
+        ollama list 2>nul | findstr /i /c:"%%M" >nul
+        if errorlevel 1 (
+            echo [INFO] Pulling model: %%M
+            ollama pull %%M
+        ) else (
+            echo [INFO] Model ready: %%M
+        )
+    )
+) else (
+    echo [INFO] Ollama not found - skipping model check
+)
+
 echo [INFO] Environment ready
 endlocal & call "%VENV_DIR%\Scripts\activate.bat"
 exit /b 0
