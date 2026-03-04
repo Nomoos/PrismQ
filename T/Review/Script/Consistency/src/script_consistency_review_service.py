@@ -1,405 +1,207 @@
-"""Content Consistency Review Service - Process stories for consistency review.
+"""Content Consistency Review Service - AI-powered review for PrismQ.T.Review.Content.Consistency.
 
-This module implements PrismQ.T.Review.Content.Consistency workflow step.
-It:
-1. Selects the oldest Story where state is PrismQ.T.Review.Content.Consistency
-2. Performs consistency review on the script content
-3. Creates a Review record with text and score
-4. Links the Review directly to Content via review_id FK
-5. Updates Story state based on review result:
-   - If NOT accepted: PrismQ.T.Content.From.Title.Review.Content
-   - If accepted: PrismQ.T.Review.Content.Content
-
-Usage:
-    >>> import sqlite3
-    >>> from T.Review.Content.Consistency.src.script_consistency_review_service import (
-    ...     ScriptConsistencyReviewService,
-    ...     process_oldest_consistency_review
-    ... )
-    >>>
-    >>> conn = sqlite3.connect("prismq.db")
-    >>> conn.row_factory = sqlite3.Row
-    >>> service = ScriptConsistencyReviewService(conn)
-    >>>
-    >>> # Process oldest story in consistency review state
-    >>> result = service.process_oldest_story()
-    >>> if result.success:
-    ...     print(f"Review completed for story {result.story_id}")
-    ...     print(f"Score: {result.score}, Passes: {result.passes}")
+Processes stories in REVIEW_CONTENT_CONSISTENCY state using local Ollama AI (qwen3:14b).
+On PASS → REVIEW_CONTENT_CONTENT
+On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
 """
 
+import json
+import logging
+import os
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from pathlib import Path
+from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model import StateNames
 
-# Import consistency review functionality using direct path to avoid circular import
-from T.Review.Content.Consistency.consistency_review import (
-    ConsistencyReview,
-    ScriptConsistencyChecker,
-    get_consistency_feedback,
-)
+logger = logging.getLogger(__name__)
 
-# State constants
-CURRENT_STATE = StateNames.REVIEW_CONTENT_CONSISTENCY
-STATE_REVIEW_SCRIPT_CONSISTENCY = StateNames.REVIEW_SCRIPT_CONSISTENCY
-STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-STATE_REVIEW_SCRIPT_CONTENT = StateNames.REVIEW_SCRIPT_CONTENT
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
-# Default pass threshold for consistency review
-DEFAULT_PASS_THRESHOLD = 80
+INPUT_STATE = StateNames.REVIEW_CONTENT_CONSISTENCY
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_EDITING       # → modul 15
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE  # → modul 09
+
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 400
+_AI_TIMEOUT = 120
+_PASS_THRESHOLD = 80
+_MAX_CONTENT_PREVIEW_LENGTH = 3000
 
 
 @dataclass
 class ConsistencyReviewResult:
-    """Result of script consistency review processing.
+    """Result of consistency review processing."""
 
-    Attributes:
-        story_id: ID of the processed story
-        review_id: ID of the created Review record (if successful)
-        content_id: ID of the reviewed script
-        previous_state: Story state before processing
-        new_state: Story state after processing
-        success: Whether the operation succeeded
-        passes: Whether the consistency review passed
-        score: Consistency review score (0-100)
-        error: Error message if failed
-        consistency_review: The ConsistencyReview object with details
-    """
-
+    success: bool
     story_id: Optional[int] = None
     review_id: Optional[int] = None
-    content_id: Optional[int] = None
-    previous_state: Optional[str] = None
-    new_state: Optional[str] = None
-    success: bool = False
-    passes: bool = False
-    score: int = 0
+    score: Optional[int] = None
+    text: Optional[str] = None
+    next_state: Optional[str] = None
+    passes: Optional[bool] = None
     error: Optional[str] = None
-    consistency_review: Optional[ConsistencyReview] = None
 
 
 class ScriptConsistencyReviewService:
-    """Service for PrismQ.T.Review.Content.Consistency workflow state.
+    """AI-powered consistency review service for PrismQ.T.Review.Content.Consistency state.
 
-    This service implements the workflow step that:
-    1. Selects the oldest Story where state is PrismQ.T.Review.Content.Consistency
-    2. Performs consistency review on the script
-    3. Creates a Review record
-    4. Links Review directly to Content via review_id FK
-    5. Updates Story state based on review result:
-       - NOT accepted: PrismQ.T.Content.From.Title.Review.Content
-       - Accepted: PrismQ.T.Review.Content.Content
-
-    The service processes stories in FIFO order (oldest first) to ensure
-    fair processing of the backlog.
-
-    Attributes:
-        story_repo: Repository for Story operations
-        content_repo: Repository for Content operations
-        review_repo: Repository for Review operations
-        consistency_checker: Checker for performing consistency review
-        pass_threshold: Minimum score required to pass (default 80)
-
-    Example:
-        >>> conn = sqlite3.connect(":memory:")
-        >>> conn.row_factory = sqlite3.Row
-        >>> service = ScriptConsistencyReviewService(conn)
-        >>>
-        >>> # Process the oldest story in the state
-        >>> result = service.process_oldest_story()
-        >>> if result.success:
-        ...     print(f"Review completed: score={result.score}, passes={result.passes}")
-        ...     print(f"New state: {result.new_state}")
+    Calls local Ollama with qwen3:14b to evaluate character, timeline, location,
+    and detail consistency.
+    On PASS (score >= 80) → REVIEW_CONTENT_CONTENT
+    On FAIL (score < 80)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
     """
 
-    INPUT_STATE = STATE_REVIEW_SCRIPT_CONSISTENCY
-    OUTPUT_STATE_PASS = STATE_REVIEW_SCRIPT_CONTENT
-    OUTPUT_STATE_FAIL = STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-
-    def __init__(
-        self, connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
-    ):
-        """Initialize the service with database connection.
-
-        Args:
-            connection: SQLite database connection with row_factory = sqlite3.Row
-            pass_threshold: Minimum score (0-100) required to pass review
-        """
+    def __init__(self, connection: sqlite3.Connection):
         self._conn = connection
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
-        self.pass_threshold = pass_threshold
-        self.consistency_checker = ScriptConsistencyChecker(pass_threshold=pass_threshold)
 
-    def count_pending(self) -> int:
-        """Count stories waiting in the input state.
+    def _ai_review(self, content_text: str, title_text: str) -> Tuple[str, int]:
+        """Call Ollama for consistency review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
 
-        Returns:
-            Number of stories with state PrismQ.T.Review.Content.Consistency.
-        """
-        return self.story_repo.count_by_state(self.INPUT_STATE)
-
-    def get_oldest_story(self) -> Optional[Story]:
-        """Get the oldest story in the input state.
-
-        Returns:
-            The oldest Story in state PrismQ.T.Review.Content.Consistency,
-            or None if no stories are in this state.
-        """
-        return self.story_repo.find_oldest_by_state(self.INPUT_STATE)
-
-    def process_oldest_story(self) -> ConsistencyReviewResult:
-        """Process the oldest story in the input state.
-
-        This method:
-        1. Finds the oldest Story with state PrismQ.T.Review.Content.Consistency
-        2. Retrieves the script content
-        3. Performs consistency review
-        4. Creates a Review record
-        5. Links Review directly to Content via review_id FK
-        6. Updates Story state based on review result
-
-        Returns:
-            ConsistencyReviewResult with processing details.
-            If no stories are pending, returns result with success=False.
-        """
-        result = ConsistencyReviewResult()
-
-        # Find the oldest story in the input state
-        story = self.get_oldest_story()
-
-        if story is None:
-            result.error = f"No stories found in state {self.INPUT_STATE}"
-            return result
-
-        result.story_id = story.id
-        result.previous_state = story.state
-
-        # Validate story has content_id
-        if not story.content_id:
-            result.error = f"Story {story.id} has no content_id"
-            return result
-
-        result.content_id = story.content_id
+        template = (_PROMPTS_DIR / "review_consistency.txt").read_text(encoding="utf-8")
+        prompt = template.format(
+            title_text=title_text,
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
+        )
 
         try:
-            # Get the script content
-            script = self.content_repo.find_by_id(story.content_id)
-            if not script:
-                result.error = f"Content with id {story.content_id} not found"
-                return result
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
 
-            content_text = script.text
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
 
-            # Perform consistency review
-            consistency_review = self.consistency_checker.review_content(
-                content_text=content_text,
-                content_id=f"script-{story.content_id}",
-                script_version=f"v{script.version}",
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI consistency review completed."))
+
+        return feedback, score
+
+    def _fetch_story(self) -> Optional[sqlite3.Row]:
+        """Fetch the next story to process with priority ordering."""
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                COALESCE(r.score, 0) AS last_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = c.review_id
+            WHERE s.state = ?
+            ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (INPUT_STATE,),
+        )
+        return cursor.fetchone()
+
+    def process_oldest_story(self) -> ConsistencyReviewResult:
+        """Process the oldest story in REVIEW_CONTENT_CONSISTENCY state."""
+        row = self._fetch_story()
+
+        if not row:
+            return ConsistencyReviewResult(
+                success=True, story_id=None, error="No stories found in state"
             )
 
-            result.consistency_review = consistency_review
-            result.score = consistency_review.overall_score
-            result.passes = consistency_review.passes
+        result = ConsistencyReviewResult(success=False, story_id=row["story_id"])
 
-            # Get feedback for review text
-            feedback = get_consistency_feedback(consistency_review)
-            review_text = self._format_review_text(consistency_review, feedback)
+        try:
+            feedback, score = self._ai_review(
+                content_text=row["content_text"],
+                title_text=row["title_text"],
+            )
 
-            # Create Review record
-            review = Review(text=review_text, score=consistency_review.overall_score)
-            saved_review = self.review_repo.insert(review)
-            result.review_id = saved_review.id
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
-            # Link Review directly to Content via review_id FK
-            self.content_repo.update_review_id(script.id, saved_review.id)
+            self._conn.execute(
+                "UPDATE Content SET review_id = ? WHERE id = ?",
+                (review.id, row["content_id"]),
+            )
+            self._conn.commit()
 
-            # Update story state based on review result
-            if consistency_review.passes:
-                new_state = self.OUTPUT_STATE_PASS
-            else:
-                new_state = self.OUTPUT_STATE_FAIL
+            result.text = feedback
+            result.score = score
+            result.passes = score >= _PASS_THRESHOLD
+            result.next_state = OUTPUT_STATE_PASS if result.passes else OUTPUT_STATE_FAIL
 
-            story.state = new_state
-            story.updated_at = datetime.now()
+            story = self.story_repo.find_by_id(row["story_id"])
+            story.state = result.next_state
             self.story_repo.update(story)
 
-            result.new_state = new_state
             result.success = True
+            logger.info(
+                f"Story {row['story_id']}: consistency review complete, "
+                f"score={score}, passes={result.passes}"
+            )
 
         except Exception as e:
             result.error = f"Consistency review failed: {str(e)}"
+            logger.exception(f"Error processing story {row['story_id']}")
 
         return result
 
-    def _format_review_text(self, consistency_review: ConsistencyReview, feedback: dict) -> str:
-        """Format the review text from consistency review results.
-
-        Args:
-            consistency_review: The ConsistencyReview object
-            feedback: Feedback dictionary from get_consistency_feedback
-
-        Returns:
-            Formatted review text string
-        """
-        lines = [
-            f"Consistency Review - Score: {consistency_review.overall_score}/100",
-            f"Status: {'PASS' if consistency_review.passes else 'FAIL'}",
-            "",
-            f"Summary: {consistency_review.summary}",
-            "",
-            f"Character Score: {consistency_review.character_score}/100",
-            f"Timeline Score: {consistency_review.timeline_score}/100",
-            f"Location Score: {consistency_review.location_score}/100",
-            f"Detail Score: {consistency_review.detail_score}/100",
-        ]
-
-        if consistency_review.primary_concerns:
-            lines.append("")
-            lines.append("Primary Concerns:")
-            for concern in consistency_review.primary_concerns:
-                lines.append(f"  - {concern}")
-
-        if consistency_review.issues:
-            lines.append("")
-            lines.append(f"Issues Found: {len(consistency_review.issues)}")
-            for issue in consistency_review.issues[:5]:  # Limit to first 5
-                lines.append(
-                    f"  [{issue.severity.value.upper()}] {issue.location}: {issue.description}"
-                )
-
-        lines.append("")
-        lines.append(f"Next Action: {feedback.get('next_action', 'N/A')}")
-
-        return "\n".join(lines)
-
-    def process_all_pending(self, limit: Optional[int] = None) -> List[ConsistencyReviewResult]:
-        """Process all stories in the input state.
-
-        This method processes stories in FIFO order (oldest first) until
-        all are processed or the limit is reached.
-
-        Args:
-            limit: Optional maximum number of stories to process.
-
-        Returns:
-            List of ConsistencyReviewResult for each processed story.
-        """
-        results = []
-        processed = 0
-
-        while True:
-            if limit is not None and processed >= limit:
-                break
-
-            result = self.process_oldest_story()
-
-            # Stop if no more stories to process
-            if result.story_id is None:
-                break
-
-            results.append(result)
-            processed += 1
-
-        return results
-
-    def get_processing_summary(self, results: List[ConsistencyReviewResult]) -> dict:
-        """Get a summary of processing results.
-
-        Args:
-            results: List of ConsistencyReviewResult from processing.
-
-        Returns:
-            Dictionary with summary statistics.
-        """
-        successful = [r for r in results if r.success]
-        failed = [r for r in results if not r.success and r.story_id is not None]
-        passed = [r for r in successful if r.passes]
-        not_passed = [r for r in successful if not r.passes]
-
-        return {
-            "total_processed": len(results),
-            "successful": len(successful),
-            "failed": len(failed),
-            "reviews_passed": len(passed),
-            "reviews_not_passed": len(not_passed),
-            "success_rate": len(successful) / len(results) if results else 0,
-            "pass_rate": len(passed) / len(successful) if successful else 0,
-            "average_score": (
-                sum(r.score for r in successful) / len(successful) if successful else 0
-            ),
-            "successful_story_ids": [r.story_id for r in successful],
-            "failed_story_ids": [r.story_id for r in failed],
-            "errors": {r.story_id: r.error for r in failed if r.story_id is not None},
-            "input_state": self.INPUT_STATE,
-            "output_state_pass": self.OUTPUT_STATE_PASS,
-            "output_state_fail": self.OUTPUT_STATE_FAIL,
-        }
+    def count_pending(self) -> int:
+        return self.story_repo.count_by_state(INPUT_STATE)
 
 
-def process_oldest_consistency_review(
-    connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
-) -> ConsistencyReviewResult:
+def process_oldest_consistency_review(connection: sqlite3.Connection) -> ConsistencyReviewResult:
     """Process the oldest story in PrismQ.T.Review.Content.Consistency state.
 
-    This is the main entry point for the PrismQ.T.Review.Content.Consistency module.
-    It finds the oldest story in the state, performs consistency review,
-    and updates the story state based on the result.
-
     Args:
-        connection: SQLite database connection.
-        pass_threshold: Minimum score (0-100) required to pass review.
+        connection: SQLite database connection with row_factory = sqlite3.Row
 
     Returns:
         ConsistencyReviewResult with processing details.
-
-    Example:
-        >>> import sqlite3
-        >>> conn = sqlite3.connect("prismq.db")
-        >>> conn.row_factory = sqlite3.Row
-        >>> result = process_oldest_consistency_review(conn)
-        >>> if result.success:
-        ...     print(f"Review completed: score={result.score}")
-        ...     print(f"Story state changed to {result.new_state}")
-        ... else:
-        ...     print(f"Error: {result.error}")
     """
-    service = ScriptConsistencyReviewService(connection, pass_threshold=pass_threshold)
+    service = ScriptConsistencyReviewService(connection)
     return service.process_oldest_story()
-
-
-def process_all_consistency_reviews(
-    connection: sqlite3.Connection,
-    pass_threshold: int = DEFAULT_PASS_THRESHOLD,
-    limit: Optional[int] = None,
-) -> dict:
-    """Process all stories in PrismQ.T.Review.Content.Consistency state.
-
-    Args:
-        connection: SQLite database connection.
-        pass_threshold: Minimum score (0-100) required to pass review.
-        limit: Optional maximum number of stories to process.
-
-    Returns:
-        Dictionary with processing summary.
-
-    Example:
-        >>> import sqlite3
-        >>> conn = sqlite3.connect("prismq.db")
-        >>> conn.row_factory = sqlite3.Row
-        >>> summary = process_all_consistency_reviews(conn)
-        >>> print(f"Processed {summary['total_processed']} stories")
-        >>> print(f"Pass rate: {summary['pass_rate']:.1%}")
-    """
-    service = ScriptConsistencyReviewService(connection, pass_threshold=pass_threshold)
-    results = service.process_all_pending(limit=limit)
-    return service.get_processing_summary(results)

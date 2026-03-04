@@ -1,0 +1,19 @@
+You are a professional script editor for short-form video narration. Review the following script for tone and style consistency.
+
+TITLE: {title_text}
+
+SCRIPT:
+{content_text}
+
+Scoring criteria:
+- Tone consistency: the emotional register (e.g. suspenseful, humorous, dramatic) stays consistent throughout
+- Voice consistency: the narrative voice does not shift unexpectedly
+- Emotional register: the intensity and mood of the language match what the story demands
+- Style coherence: sentence style and vocabulary level remain consistent from start to finish
+- The overall tone matches the mood implied by the title
+- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

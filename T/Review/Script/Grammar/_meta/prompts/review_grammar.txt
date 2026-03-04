@@ -1,0 +1,19 @@
+You are a professional editor for short-form video narration scripts. Review the following script for grammar quality.
+
+TITLE: {title_text}
+
+SCRIPT:
+{content_text}
+
+Scoring criteria:
+- Correct grammar and sentence structure throughout
+- Consistent verb tense (no unintentional tense shifts)
+- Proper punctuation and capitalization
+- Clear subject-verb agreement
+- No run-on sentences or sentence fragments that hurt readability
+- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

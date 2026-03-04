@@ -1,388 +1,206 @@
-"""Content Grammar Review Service - Process stories in PrismQ.T.Review.Content.Grammar state.
+"""Content Grammar Review Service - AI-powered grammar review for PrismQ.T.Review.Content.Grammar.
 
-This module implements the workflow step that:
-1. Selects the oldest Story where state is PrismQ.T.Review.Content.Grammar
-2. Reviews the script for grammar issues
-3. Creates a Review record with the results
-4. Links the Review to Content directly via FK (Content.review_id)
-5. Updates the Story state based on review outcome:
-   - If review passes: PrismQ.T.Review.Content.Consistency
-   - If review fails: PrismQ.T.Content.From.Title.Review.Content
-
-Note: This module reviews Scripts, not Stories. The Review is linked directly
-to Content via Content.review_id FK. StoryReview linking table is not used here
-as it is reserved for Story-level reviews only.
-
-This is the main entry point for grammar review in the quality review workflow.
-
-Usage:
-    >>> import sqlite3
-    >>> from T.Review.Content.Grammar.script_grammar_service import ScriptGrammarReviewService
-    >>>
-    >>> conn = sqlite3.connect("prismq.db")
-    >>> conn.row_factory = sqlite3.Row
-    >>> service = ScriptGrammarReviewService(conn)
-    >>>
-    >>> # Process oldest story in grammar review state
-    >>> result = service.process_oldest_story()
-    >>> if result.success:
-    ...     print(f"Review score: {result.score}")
-    ...     print(f"Review passed: {result.passes}")
+Processes stories in REVIEW_CONTENT_GRAMMAR state using local Ollama AI (qwen3:14b).
+On PASS → REVIEW_CONTENT_CONSISTENCY
+On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
 """
 
 import json
+import logging
+import os
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from pathlib import Path
+from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.story import Story
 from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
-# Import the grammar checker from the same package
-from .script_grammar_review import (
-    ScriptGrammarChecker,
-    get_grammar_feedback,
-    review_content_grammar,
-)
+logger = logging.getLogger(__name__)
 
-# State constants for this module
-INPUT_STATE = StateNames.REVIEW_CONTENT_GRAMMAR  # PrismQ.T.Review.Content.Grammar
-OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_CONSISTENCY  # PrismQ.T.Review.Content.Consistency
-OUTPUT_STATE_FAIL = (
-    StateNames.CONTENT_FROM_TITLE_REVIEW_CONTENT
-)  # PrismQ.T.Content.From.Title.Review.Content
+_PROMPTS_DIR = Path(__file__).parent / "_meta" / "prompts"
 
-# Default pass threshold for grammar review
-DEFAULT_PASS_THRESHOLD = 85
+INPUT_STATE = StateNames.REVIEW_CONTENT_GRAMMAR
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_TONE          # → modul 12
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_TITLE_REVIEW_CONTENT  # → modul 10 (retry From Title)
+
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 400
+_AI_TIMEOUT = 120
+_PASS_THRESHOLD = 85
+_MAX_CONTENT_PREVIEW_LENGTH = 3000
 
 
 @dataclass
 class GrammarReviewResult:
-    """Result of grammar review processing.
+    """Result of grammar review processing."""
 
-    Attributes:
-        story_id: ID of the processed story
-        content_id: ID of the script that was reviewed
-        review_id: ID of the created review (if successful)
-        previous_state: The state before processing
-        new_state: The state after processing
-        success: Whether the operation succeeded
-        passes: Whether the script passed grammar review
-        score: Grammar review score (0-100)
-        error: Error message if failed
-        summary: Summary of review feedback
-        issues_count: Number of grammar issues found
-    """
-
+    success: bool
     story_id: Optional[int] = None
-    content_id: Optional[int] = None
     review_id: Optional[int] = None
-    previous_state: Optional[str] = None
-    new_state: Optional[str] = None
-    success: bool = False
-    passes: bool = False
-    score: int = 0
+    score: Optional[int] = None
+    text: Optional[str] = None
+    next_state: Optional[str] = None
+    passes: Optional[bool] = None
     error: Optional[str] = None
-    summary: str = ""
-    issues_count: int = 0
 
 
 class ScriptGrammarReviewService:
-    """Service for PrismQ.T.Review.Content.Grammar workflow state.
+    """AI-powered grammar review service for PrismQ.T.Review.Content.Grammar state.
 
-    This service implements the grammar review step that:
-    1. Selects the oldest Story where state is PrismQ.T.Review.Content.Grammar
-    2. Reviews the script for grammar, spelling, punctuation, and tense issues
-    3. Creates a Review record with the results
-    4. Links the Review to Content directly via FK (Content.review_id)
-    5. Updates the Story state based on review outcome:
-       - PASS: PrismQ.T.Review.Content.Consistency
-       - FAIL: PrismQ.T.Content.From.Title.Review.Content
-
-    Note: This reviews Scripts, not Stories. StoryReview linking table is not
-    used here as it is reserved for Story-level reviews only.
-
-    The service processes stories in FIFO order (oldest first) to ensure
-    fair processing of the backlog.
-
-    Attributes:
-        story_repo: Repository for Story operations
-        content_repo: Repository for Content operations
-        review_repo: Repository for Review operations
-        grammar_checker: Grammar checker for reviewing scripts
-
-    Example:
-        >>> conn = sqlite3.connect(":memory:")
-        >>> conn.row_factory = sqlite3.Row
-        >>> service = ScriptGrammarReviewService(conn)
-        >>>
-        >>> # Process the oldest story in grammar review state
-        >>> result = service.process_oldest_story()
-        >>> if result.success:
-        ...     print(f"Story {result.story_id}: Score={result.score}, Passes={result.passes}")
-        ... else:
-        ...     print(f"Error: {result.error}")
+    Calls local Ollama with qwen3:14b to evaluate grammar quality.
+    On PASS (score >= 85) → REVIEW_CONTENT_CONSISTENCY
+    On FAIL (score < 85)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
     """
 
-    def __init__(
-        self, connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
-    ):
-        """Initialize the service with database connection.
-
-        Args:
-            connection: SQLite database connection with row_factory = sqlite3.Row
-            pass_threshold: Minimum score (0-100) required to pass grammar review
-        """
+    def __init__(self, connection: sqlite3.Connection):
         self._conn = connection
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
-        self.grammar_checker = ScriptGrammarChecker(pass_threshold=pass_threshold)
-        self.pass_threshold = pass_threshold
 
-    def count_pending(self) -> int:
-        """Count stories waiting in the grammar review state.
+    def _ai_review(self, content_text: str, title_text: str) -> Tuple[str, int]:
+        """Call Ollama for grammar review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
 
-        Returns:
-            Number of stories with state PrismQ.T.Review.Content.Grammar.
-        """
-        return self.story_repo.count_by_state(INPUT_STATE)
+        template = (_PROMPTS_DIR / "review_grammar.txt").read_text(encoding="utf-8")
+        prompt = template.format(
+            title_text=title_text,
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
+        )
 
-    def get_oldest_story(self) -> Optional[Story]:
-        """Get the oldest story in the grammar review state.
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
 
-        Returns:
-            The oldest Story in state PrismQ.T.Review.Content.Grammar,
-            or None if no stories are in this state.
-        """
-        return self.story_repo.find_oldest_by_state(INPUT_STATE)
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
+
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI grammar review completed."))
+
+        return feedback, score
+
+    def _fetch_story(self) -> Optional[sqlite3.Row]:
+        """Fetch the next story to process with priority ordering."""
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                COALESCE(r.score, 0) AS last_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = c.review_id
+            WHERE s.state = ?
+            ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (INPUT_STATE,),
+        )
+        return cursor.fetchone()
 
     def process_oldest_story(self) -> GrammarReviewResult:
-        """Process the oldest story in the grammar review state.
+        """Process the oldest story in REVIEW_CONTENT_GRAMMAR state."""
+        row = self._fetch_story()
 
-        This method:
-        1. Finds the oldest Story with state PrismQ.T.Review.Content.Grammar
-        2. Gets the current script for the story
-        3. Performs grammar review on the script
-        4. Creates a Review record with the results
-        5. Links the Review to Content via FK (Content.review_id)
-        6. Updates the Story state:
-           - PASS: PrismQ.T.Review.Content.Consistency
-           - FAIL: PrismQ.T.Content.From.Title.Review.Content
-
-        Returns:
-            GrammarReviewResult with processing details.
-            If no stories are pending, returns result with success=False.
-        """
-        result = GrammarReviewResult()
-
-        # Find the oldest story in the input state
-        story = self.get_oldest_story()
-
-        if story is None:
-            result.error = "No stories found in state PrismQ.T.Review.Content.Grammar"
-            return result
-
-        result.story_id = story.id
-        result.previous_state = story.state
-
-        # Get the current script for the story
-        try:
-            scripts = self.content_repo.find_by_story_id(story.id)
-            if not scripts:
-                result.error = f"Story {story.id} has no scripts"
-                return result
-
-            # Get the latest script (highest version)
-            current_content = max(scripts, key=lambda s: s.version)
-            result.content_id = current_content.id
-
-            # Perform grammar review
-            grammar_review = self.grammar_checker.review_content(
-                content_text=current_content.text,
-                content_id=str(current_content.id),
-                script_version=f"v{current_content.version}",
+        if not row:
+            return GrammarReviewResult(
+                success=True, story_id=None, error="No stories found in state"
             )
 
-            # Get structured feedback
-            feedback = get_grammar_feedback(grammar_review)
+        result = GrammarReviewResult(success=False, story_id=row["story_id"])
 
-            # Create review text from feedback
-            review_text = self._format_review_text(grammar_review, feedback)
+        try:
+            feedback, score = self._ai_review(
+                content_text=row["content_text"],
+                title_text=row["title_text"],
+            )
 
-            # Create and save Review record
-            review = Review(text=review_text, score=grammar_review.overall_score)
-            saved_review = self.review_repo.insert(review)
-            result.review_id = saved_review.id
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
-            # Link Review to Content directly via FK (Content.review_id)
-            # Note: StoryReview linking table is not used for Content reviews
-            self.content_repo.update_review_id(current_content.id, saved_review.id)
+            self._conn.execute(
+                "UPDATE Content SET review_id = ? WHERE id = ?",
+                (review.id, row["content_id"]),
+            )
+            self._conn.commit()
 
-            # Update result with review outcome
-            result.score = grammar_review.overall_score
-            result.passes = grammar_review.passes
-            result.issues_count = len(grammar_review.issues)
-            result.summary = grammar_review.summary
+            result.text = feedback
+            result.score = score
+            result.passes = score >= _PASS_THRESHOLD
+            result.next_state = OUTPUT_STATE_PASS if result.passes else OUTPUT_STATE_FAIL
 
-            # Determine next state based on review outcome
-            if grammar_review.passes:
-                new_state = OUTPUT_STATE_PASS
-            else:
-                new_state = OUTPUT_STATE_FAIL
-
-            # Update story state
-            story.state = new_state
-            story.updated_at = datetime.now()
+            story = self.story_repo.find_by_id(row["story_id"])
+            story.state = result.next_state
             self.story_repo.update(story)
 
-            result.new_state = new_state
             result.success = True
+            logger.info(
+                f"Story {row['story_id']}: grammar review complete, "
+                f"score={score}, passes={result.passes}"
+            )
 
         except Exception as e:
             result.error = f"Grammar review failed: {str(e)}"
+            logger.exception(f"Error processing story {row['story_id']}")
 
         return result
 
-    def _format_review_text(self, grammar_review, feedback: dict) -> str:
-        """Format grammar review results into review text.
-
-        Args:
-            grammar_review: GrammarReview object with review details
-            feedback: Structured feedback dictionary
-
-        Returns:
-            Formatted review text string
-        """
-        lines = []
-        lines.append(f"Grammar Review - Score: {grammar_review.overall_score}/100")
-        lines.append(f"Status: {'PASS' if grammar_review.passes else 'FAIL'}")
-        lines.append("")
-        lines.append(f"Summary: {grammar_review.summary}")
-        lines.append("")
-
-        if grammar_review.primary_concerns:
-            lines.append("Primary Concerns:")
-            for concern in grammar_review.primary_concerns:
-                lines.append(f"  - {concern}")
-            lines.append("")
-
-        if grammar_review.quick_fixes:
-            lines.append("Quick Fixes:")
-            for fix in grammar_review.quick_fixes:
-                lines.append(f"  - {fix}")
-            lines.append("")
-
-        if grammar_review.issues:
-            lines.append(f"Issues Found ({len(grammar_review.issues)}):")
-            for issue in grammar_review.issues[:10]:  # Limit to first 10 issues
-                lines.append(
-                    f"  Line {issue.line_number} [{issue.severity.value}]: {issue.explanation}"
-                )
-            if len(grammar_review.issues) > 10:
-                lines.append(f"  ... and {len(grammar_review.issues) - 10} more issues")
-
-        return "\n".join(lines)
-
-    def process_all_pending(self, limit: Optional[int] = None) -> List[GrammarReviewResult]:
-        """Process all stories in the grammar review state.
-
-        This method processes stories in FIFO order (oldest first) until
-        all are processed or the limit is reached.
-
-        Args:
-            limit: Optional maximum number of stories to process.
-
-        Returns:
-            List of GrammarReviewResult for each processed story.
-        """
-        results = []
-        processed = 0
-
-        while True:
-            if limit is not None and processed >= limit:
-                break
-
-            result = self.process_oldest_story()
-
-            # Stop if no more stories to process
-            if result.story_id is None:
-                break
-
-            results.append(result)
-            processed += 1
-
-        return results
-
-    def get_processing_summary(self, results: List[GrammarReviewResult]) -> dict:
-        """Get a summary of processing results.
-
-        Args:
-            results: List of GrammarReviewResult from processing.
-
-        Returns:
-            Dictionary with summary statistics.
-        """
-        successful = [r for r in results if r.success]
-        failed = [r for r in results if not r.success and r.story_id is not None]
-        passed = [r for r in results if r.success and r.passes]
-        not_passed = [r for r in results if r.success and not r.passes]
-
-        return {
-            "total_processed": len(results),
-            "successful": len(successful),
-            "failed": len(failed),
-            "passed_review": len(passed),
-            "failed_review": len(not_passed),
-            "success_rate": len(successful) / len(results) if results else 0,
-            "pass_rate": len(passed) / len(successful) if successful else 0,
-            "average_score": (
-                sum(r.score for r in successful) / len(successful) if successful else 0
-            ),
-            "total_issues": sum(r.issues_count for r in successful),
-            "successful_story_ids": [r.story_id for r in successful],
-            "failed_story_ids": [r.story_id for r in failed],
-            "passed_story_ids": [r.story_id for r in passed],
-            "not_passed_story_ids": [r.story_id for r in not_passed],
-            "errors": {r.story_id: r.error for r in failed if r.story_id is not None},
-            "input_state": INPUT_STATE,
-            "output_state_pass": OUTPUT_STATE_PASS,
-            "output_state_fail": OUTPUT_STATE_FAIL,
-        }
+    def count_pending(self) -> int:
+        return self.story_repo.count_by_state(INPUT_STATE)
 
 
-def process_oldest_grammar_review(
-    connection: sqlite3.Connection, pass_threshold: int = DEFAULT_PASS_THRESHOLD
-) -> GrammarReviewResult:
+def process_oldest_grammar_review(connection: sqlite3.Connection) -> GrammarReviewResult:
     """Process the oldest story in PrismQ.T.Review.Content.Grammar state.
 
-    This is the main entry point for the PrismQ.T.Review.Content.Grammar module.
-    It finds the oldest story in the state, performs grammar review, and updates
-    the story state based on the review outcome.
-
     Args:
-        connection: SQLite database connection.
-        pass_threshold: Minimum score required to pass (default 85).
+        connection: SQLite database connection with row_factory = sqlite3.Row
 
     Returns:
         GrammarReviewResult with processing details.
-
-    Example:
-        >>> import sqlite3
-        >>> conn = sqlite3.connect("prismq.db")
-        >>> conn.row_factory = sqlite3.Row
-        >>> result = process_oldest_grammar_review(conn)
-        >>> if result.success:
-        ...     print(f"Score: {result.score}")
-        ...     print(f"Passes: {result.passes}")
-        ...     print(f"New state: {result.new_state}")
-        ... else:
-        ...     print(f"Error: {result.error}")
     """
-    service = ScriptGrammarReviewService(connection, pass_threshold)
+    service = ScriptGrammarReviewService(connection)
     return service.process_oldest_story()

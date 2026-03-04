@@ -1,486 +1,211 @@
-"""Content Content Review Service - AI-powered content validation for scripts.
+"""Content Content Review Service - AI-powered review for PrismQ.T.Review.Content.Content.
 
-This module provides a service that:
-1. Selects the oldest Story where state is PrismQ.T.Review.Content.Content
-2. Generates content review using ContentReview model from T.Review.Model
-3. Creates Review record and links it to the Content via Content.review_id FK
-4. Updates Story state based on review result:
-   - FAIL: PrismQ.T.Content.From.Content.Review.Title
-   - PASS: PrismQ.T.Review.Content.Tone
-
-Note: This module reviews the SCRIPT, not the whole Story. The Review is linked
-directly to the Content via the Content.review_id foreign key.
-
-This is the main entry point for automated script content review in the workflow.
-
-Usage:
-    >>> import sqlite3
-    >>> from T.Review.Content.Content.script_content_review import ScriptContentReviewer
-    >>>
-    >>> conn = sqlite3.connect("prismq.db")
-    >>> conn.row_factory = sqlite3.Row
-    >>> service = ScriptContentReviewer(conn)
-    >>>
-    >>> # Process oldest story needing content review (by state)
-    >>> result = service.process_oldest_story()
-    >>> if result:
-    ...     print(f"Reviewed script {result.content_id}, passes: {result.passes}")
+Processes stories in REVIEW_CONTENT_CONTENT state using local Ollama AI (qwen3:14b).
+On PASS → REVIEW_CONTENT_TONE
+On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
 """
 
 import json
+import logging
+import os
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.content import Content
-from Model.Database.models.story import Story
+from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
-# Import ContentReview model from local module
-from .content_review import (
-    ContentIssue,
-    ContentIssueType,
-    ContentReview,
-    ContentSeverity,
-)
+logger = logging.getLogger(__name__)
 
-# State constants for this service
-INPUT_STATE = StateNames.REVIEW_SCRIPT_CONTENT  # PrismQ.T.Review.Content.Content
-OUTPUT_STATE_PASS = StateNames.REVIEW_SCRIPT_TONE  # PrismQ.T.Review.Content.Tone
-OUTPUT_STATE_FAIL = (
-    StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE
-)  # PrismQ.T.Content.From.Content.Review.Title
+_PROMPTS_DIR = Path(__file__).parent / "_meta" / "prompts"
+
+INPUT_STATE = StateNames.REVIEW_CONTENT_CONTENT
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_CONSISTENCY   # → modul 14
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE  # → modul 09
+
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 400
+_AI_TIMEOUT = 120
+_PASS_THRESHOLD = 75
+_MAX_CONTENT_PREVIEW_LENGTH = 3000
 
 
 @dataclass
 class ContentReviewResult:
-    """Result of content review for a script.
+    """Result of content accuracy review processing."""
 
-    Attributes:
-        story_id: ID of the story processed
-        content_id: ID of the script that was reviewed
-        review_id: ID of the created Review record (if successful)
-        passes: Whether the content review passed
-        overall_score: Content review score (0-100)
-        error: Error message if review failed
-        content_review: The ContentReview object with detailed results
-        new_state: The state the story was transitioned to
-    """
-
-    story_id: int
-    content_id: Optional[int] = None
+    success: bool
+    story_id: Optional[int] = None
     review_id: Optional[int] = None
-    passes: bool = False
-    overall_score: int = 0
+    score: Optional[int] = None
+    text: Optional[str] = None
+    next_state: Optional[str] = None
+    passes: Optional[bool] = None
     error: Optional[str] = None
-    content_review: Optional[ContentReview] = None
-    new_state: Optional[str] = None
 
 
 class ScriptContentReviewer:
-    """Service for reviewing script content.
+    """AI-powered content accuracy review service for PrismQ.T.Review.Content.Content state.
 
-    This service implements the workflow step:
-        Story (state=PrismQ.T.Review.Content.Content) → Content Content Review
-        → Story (state=PrismQ.T.Review.Content.Tone) if passes
-        → Story (state=PrismQ.T.Content.From.Content.Review.Title) if fails
-
-    Note: This reviews the SCRIPT, not the whole Story. The Review is linked
-    directly to the Content via the Content.review_id foreign key.
-
-    Workflow:
-        - Selects the oldest Story where state is PrismQ.T.Review.Content.Content
-        - Retrieves the associated Content
-        - Performs content review (narrative, plot, character, pacing)
-        - Creates Review record with score and text
-        - Links Review to Content via Content.review_id FK
-        - Updates Story state based on review result
-
-    Attributes:
-        INPUT_STATE: The state to look for stories needing content review
-        OUTPUT_STATE_PASS: State to transition to if review passes
-        OUTPUT_STATE_FAIL: State to transition to if review fails
+    Calls local Ollama with qwen3:14b to evaluate factual accuracy, logical coherence,
+    and premise delivery.
+    On PASS (score >= 75) → REVIEW_CONTENT_TONE
+    On FAIL (score < 75)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
     """
 
     INPUT_STATE = INPUT_STATE
     OUTPUT_STATE_PASS = OUTPUT_STATE_PASS
     OUTPUT_STATE_FAIL = OUTPUT_STATE_FAIL
 
-    def __init__(
-        self,
-        connection: sqlite3.Connection,
-        pass_threshold: int = 75,
-        max_high_severity_issues: int = 3,
-    ):
-        """Initialize the content reviewer service.
-
-        Args:
-            connection: SQLite database connection with row_factory = sqlite3.Row
-            pass_threshold: Minimum score (0-100) required to pass review
-            max_high_severity_issues: Maximum high severity issues before failing
-        """
+    def __init__(self, connection: sqlite3.Connection):
         self._conn = connection
-        self.pass_threshold = pass_threshold
-        self.max_high_severity_issues = max_high_severity_issues
-
-        # Initialize repositories
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
+        self.review_repo = ReviewRepository(connection)
 
-    def get_oldest_story(self) -> Optional[Story]:
-        """Get the oldest story in the INPUT_STATE.
+    def _ai_review(self, content_text: str, title_text: str) -> Tuple[str, int]:
+        """Call Ollama for content accuracy review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
 
-        Returns:
-            The oldest Story entity in PrismQ.T.Review.Content.Content state,
-            or None if no stories are found.
-        """
-        return self.story_repo.find_oldest_by_state(self.INPUT_STATE)
-
-    def get_content(self, story: Story) -> Optional[Content]:
-        """Get the script for a story.
-
-        Args:
-            story: The Story entity to get script for
-
-        Returns:
-            The Content entity, or None if not found
-        """
-        if story.content_id is None:
-            return None
-
-        return self.content_repo.find_by_id(story.content_id)
-
-    def perform_content_review(
-        self, content_text: str, content_id: str, script_version: str = "v3"
-    ) -> ContentReview:
-        """Perform content review on script text.
-
-        This method creates a ContentReview with simulated AI analysis.
-        In production, this would integrate with an actual AI reviewer.
-
-        Args:
-            content_text: The script text to review
-            content_id: Identifier for the script
-            script_version: Version of the script
-
-        Returns:
-            ContentReview object with analysis results
-        """
-        # Create review with analysis scores
-        # In production, these would come from AI analysis
-        review = ContentReview(
-            content_id=content_id,
-            script_version=script_version,
-            pass_threshold=self.pass_threshold,
-            max_high_severity_issues=self.max_high_severity_issues,
+        template = (_PROMPTS_DIR / "review_content_accuracy.txt").read_text(encoding="utf-8")
+        prompt = template.format(
+            title_text=title_text,
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
         )
 
-        # Perform basic content analysis
-        # (In production, this would use NLP/AI for deep analysis)
-        scores = self._analyze_content(content_text)
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
 
-        review.logic_score = scores["logic"]
-        review.plot_score = scores["plot"]
-        review.character_score = scores["character"]
-        review.pacing_score = scores["pacing"]
-
-        # Calculate overall score as weighted average
-        review.overall_score = (
-            scores["logic"] * 0.25
-            + scores["plot"] * 0.30
-            + scores["character"] * 0.25
-            + scores["pacing"] * 0.20
-        )
-        review.overall_score = int(review.overall_score)
-
-        # Detect content issues
-        issues = self._detect_content_issues(content_text)
-        for issue in issues:
-            review.add_issue(issue)
-
-        # Recalculate pass status after setting scores
-        review._recalculate_pass_status()
-
-        # Generate summary
-        review.summary = self._generate_summary(review)
-
-        return review
-
-    def _analyze_content(self, content_text: str) -> dict:
-        """Analyze script content and return scores.
-
-        This is a simplified analysis. In production, this would use
-        AI/NLP for deep content analysis.
-
-        Args:
-            content_text: The script text to analyze
-
-        Returns:
-            Dictionary with scores for logic, plot, character, pacing
-        """
-        # Basic heuristic scoring based on text characteristics
-        text_length = len(content_text)
-        line_count = len(content_text.split("\n"))
-        word_count = len(content_text.split())
-
-        # Simple heuristics for demonstration
-        # In production, these would be sophisticated AI metrics
-        base_score = 80
-
-        # Adjust based on content length
-        if word_count < 100:
-            length_penalty = 15
-        elif word_count < 500:
-            length_penalty = 5
-        else:
-            length_penalty = 0
-
-        # Check for dialogue markers (suggests character development)
-        dialogue_markers = content_text.count('"') + content_text.count("'")
-        character_bonus = min(10, dialogue_markers // 5)
-
-        # Check for scene/section markers (suggests structure)
-        scene_markers = (
-            content_text.lower().count("scene")
-            + content_text.lower().count("act")
-            + content_text.lower().count("chapter")
-        )
-        structure_bonus = min(10, scene_markers * 3)
-
-        return {
-            "logic": max(0, min(100, base_score - length_penalty + structure_bonus)),
-            "plot": max(0, min(100, base_score - length_penalty + structure_bonus)),
-            "character": max(0, min(100, base_score - length_penalty + character_bonus)),
-            "pacing": max(0, min(100, base_score - length_penalty)),
-        }
-
-    def _detect_content_issues(self, content_text: str) -> list:
-        """Detect content issues in script text.
-
-        This is a simplified detection. In production, this would use
-        AI/NLP for deep issue detection.
-
-        Args:
-            content_text: The script text to analyze
-
-        Returns:
-            List of ContentIssue objects
-        """
-        issues = []
-
-        # Check for very short content (potential structural issue)
-        word_count = len(content_text.split())
-        if word_count < 50:
-            issues.append(
-                ContentIssue(
-                    issue_type=ContentIssueType.STRUCTURAL,
-                    severity=ContentSeverity.HIGH,
-                    section="Overall",
-                    description="Content content is very short",
-                    suggestion="Expand the script with more detail and narrative",
-                    impact="Insufficient content for meaningful story",
-                    confidence=90,
-                )
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
             )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
 
-        # Check for missing dialogue (character development)
-        dialogue_count = content_text.count('"') + content_text.count("'")
-        if dialogue_count < 2 and word_count > 100:
-            issues.append(
-                ContentIssue(
-                    issue_type=ContentIssueType.CHARACTER_MOTIVATION,
-                    severity=ContentSeverity.MEDIUM,
-                    section="Dialogue",
-                    description="Limited or no dialogue detected",
-                    suggestion="Add dialogue to develop characters and advance plot",
-                    impact="Character development may feel flat without dialogue",
-                    confidence=75,
-                )
-            )
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
 
-        # Check for repetitive content
-        lines = content_text.split("\n")
-        seen_lines = set()
-        for i, line in enumerate(lines):
-            stripped = line.strip().lower()
-            if stripped and len(stripped) > 20:
-                if stripped in seen_lines:
-                    issues.append(
-                        ContentIssue(
-                            issue_type=ContentIssueType.NARRATIVE_COHERENCE,
-                            severity=ContentSeverity.LOW,
-                            section=f"Line {i+1}",
-                            description="Repetitive content detected",
-                            suggestion="Remove or rephrase duplicate content",
-                            impact="Repetition can disrupt narrative flow",
-                            confidence=85,
-                        )
-                    )
-                    break  # Only report first instance
-                seen_lines.add(stripped)
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI content review completed."))
 
-        return issues
+        return feedback, score
 
-    def _generate_summary(self, review: ContentReview) -> str:
-        """Generate a summary for the content review.
-
-        Args:
-            review: The ContentReview object
-
-        Returns:
-            Summary string
-        """
-        if review.passes:
-            return (
-                f"Content review PASSED with score {review.overall_score}%. "
-                f"Logic: {review.logic_score}%, Plot: {review.plot_score}%, "
-                f"Character: {review.character_score}%, Pacing: {review.pacing_score}%. "
-                f"Content is ready for tone review."
-            )
-        else:
-            issue_summary = (
-                f"{review.critical_count} critical, {review.high_count} high priority issues"
-            )
-            return (
-                f"Content review FAILED with score {review.overall_score}% "
-                f"(threshold: {review.pass_threshold}%). "
-                f"Issues: {issue_summary}. "
-                f"Content needs refinement before proceeding."
-            )
-
-    def create_review_record(self, content_review: ContentReview) -> Review:
-        """Create a Review record from ContentReview.
-
-        Args:
-            content_review: The ContentReview with analysis results
-
-        Returns:
-            Review model instance (not yet persisted)
-        """
-        return Review(text=content_review.summary, score=content_review.overall_score)
-
-    def _insert_review(self, review: Review) -> Review:
-        """Insert Review record into database.
-
-        Args:
-            review: Review model to insert
-
-        Returns:
-            Review with id populated
-        """
+    def _fetch_story(self) -> Optional[sqlite3.Row]:
+        """Fetch the next story to process with priority ordering."""
         cursor = self._conn.execute(
-            "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
-            (review.text, review.score, review.created_at.isoformat()),
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                COALESCE(r.score, 0) AS last_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = c.review_id
+            WHERE s.state = ?
+            ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (INPUT_STATE,),
         )
-        self._conn.commit()
-        review.id = cursor.lastrowid
-        return review
+        return cursor.fetchone()
 
-    def link_review_to_content(self, script: Content, review: Review) -> bool:
-        """Link a Review to a Content via Content.review_id FK.
+    def process_oldest_story(self) -> ContentReviewResult:
+        """Process the oldest story in REVIEW_CONTENT_CONTENT state."""
+        row = self._fetch_story()
 
-        Args:
-            script: The Content entity to update
-            review: The Review entity (must have id)
-
-        Returns:
-            True if the update was successful, False otherwise
-        """
-        return self.content_repo.update_review_id(script.id, review.id)
-
-    def update_story_state(self, story: Story, passes: bool) -> Story:
-        """Update story state based on review result.
-
-        Args:
-            story: The Story entity to update
-            passes: Whether the content review passed
-
-        Returns:
-            The updated Story entity
-        """
-        if passes:
-            story.state = self.OUTPUT_STATE_PASS
-        else:
-            story.state = self.OUTPUT_STATE_FAIL
-
-        return self.story_repo.update(story)
-
-    def process_oldest_story(self) -> Optional[ContentReviewResult]:
-        """Process the oldest story needing script content review.
-
-        This is the main workflow method that:
-        1. Finds the oldest story in PrismQ.T.Review.Content.Content state
-        2. Retrieves the Content
-        3. Performs content review on the Content
-        4. Creates Review record
-        5. Links Review to Content via Content.review_id FK
-        6. Updates Story state
-
-        Returns:
-            ContentReviewResult with processing results, or None if no story found
-        """
-        # Get oldest story needing content review
-        story = self.get_oldest_story()
-        if story is None:
-            return None
-
-        # Get script
-        script = self.get_content(story)
-        if script is None:
+        if not row:
             return ContentReviewResult(
-                story_id=story.id, error=f"Content not found for story {story.id}"
+                success=True, story_id=None, error="No stories found in state"
             )
 
-        # Perform content review on script
-        content_review = self.perform_content_review(
-            content_text=script.text, content_id=str(script.id), script_version=f"v{script.version}"
-        )
+        result = ContentReviewResult(success=False, story_id=row["story_id"])
 
-        # Create and persist Review record
-        review = self.create_review_record(content_review)
-        review = self._insert_review(review)
+        try:
+            feedback, score = self._ai_review(
+                content_text=row["content_text"],
+                title_text=row["title_text"],
+            )
 
-        # Link Review to Content via Content.review_id FK
-        self.link_review_to_content(script, review)
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
-        # Update Story state
-        story = self.update_story_state(story, content_review.passes)
+            self._conn.execute(
+                "UPDATE Content SET review_id = ? WHERE id = ?",
+                (review.id, row["content_id"]),
+            )
+            self._conn.commit()
 
-        return ContentReviewResult(
-            story_id=story.id,
-            content_id=script.id,
-            review_id=review.id,
-            passes=content_review.passes,
-            overall_score=content_review.overall_score,
-            content_review=content_review,
-            new_state=story.state,
-        )
+            result.text = feedback
+            result.score = score
+            result.passes = score >= _PASS_THRESHOLD
+            result.next_state = OUTPUT_STATE_PASS if result.passes else OUTPUT_STATE_FAIL
+
+            story = self.story_repo.find_by_id(row["story_id"])
+            story.state = result.next_state
+            self.story_repo.update(story)
+
+            result.success = True
+            logger.info(
+                f"Story {row['story_id']}: content review complete, "
+                f"score={score}, passes={result.passes}"
+            )
+
+        except Exception as e:
+            result.error = f"Content review failed: {str(e)}"
+            logger.exception(f"Error processing story {row['story_id']}")
+
+        return result
+
+    def count_pending(self) -> int:
+        return self.story_repo.count_by_state(INPUT_STATE)
 
 
-def review_oldest_story_content(
-    connection: sqlite3.Connection, pass_threshold: int = 75
-) -> Optional[ContentReviewResult]:
-    """Convenience function to review oldest story content.
-
-    Creates a ScriptContentReviewer and processes the oldest story.
+def review_oldest_story_content(connection: sqlite3.Connection) -> ContentReviewResult:
+    """Process the oldest story in PrismQ.T.Review.Content.Content state.
 
     Args:
-        connection: SQLite database connection
-        pass_threshold: Minimum score required to pass
+        connection: SQLite database connection with row_factory = sqlite3.Row
 
     Returns:
-        ContentReviewResult or None if no story found
-
-    Example:
-        >>> conn = sqlite3.connect("prismq.db")
-        >>> conn.row_factory = sqlite3.Row
-        >>> result = review_oldest_story_content(conn)
-        >>> if result:
-        ...     print(f"Story {result.story_id}: {'PASS' if result.passes else 'FAIL'}")
+        ContentReviewResult with processing details.
     """
-    service = ScriptContentReviewer(connection, pass_threshold=pass_threshold)
+    service = ScriptContentReviewer(connection)
     return service.process_oldest_story()

@@ -1,0 +1,19 @@
+You are a professional story editor for short-form video narration scripts. Review the following script for internal consistency.
+
+TITLE: {title_text}
+
+SCRIPT:
+{content_text}
+
+Scoring criteria:
+- Character consistency: characters behave and speak consistently with how they were introduced
+- Timeline consistency: events happen in a logical, non-contradictory order
+- Location consistency: places and settings are referenced consistently
+- Detail consistency: facts, names, and details introduced early match later references
+- No contradictions between statements made in different parts of the script
+- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

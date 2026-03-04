@@ -1,0 +1,16 @@
+You are a professional title editor for short-form video content. Review the following title for readability and engagement.
+
+TITLE: {title_text}
+
+Scoring criteria:
+- Clarity: the title is immediately understandable
+- Catchiness: the title grabs attention and sparks curiosity
+- Appropriate length: not too long (hard to read quickly) and not too short (lacks impact)
+- Memorability: the title is easy to remember after reading once
+- Engagement: the title makes the viewer want to watch the video
+- Natural language: the title sounds like something a real person would say or search for
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

@@ -1,380 +1,208 @@
-#!/usr/bin/env python3
-"""PrismQ.T.Review.Content.Readability - Content readability review service.
+"""Content Readability Review Service - AI-powered review for PrismQ.T.Review.Content.Readability.
 
-This module implements the script readability review workflow stage that:
-1. Selects the oldest Story with state 'PrismQ.T.Review.Content.Readability'
-2. Reviews the script for voiceover readability
-3. Outputs a Review model (simple: text, score, created_at)
-4. Updates the Story state based on review acceptance
-
-State Transitions:
-- If review doesn't accept script → 'PrismQ.T.Content.From.Content.Review.Title' (for script refinement)
-- If review accepts script → 'PrismQ.T.Story.Review' (proceed to expert review)
-
-Usage:
-    from T.Review.Content.Readability.src.review_content_readability_service import (
-        process_review_content_readability,
-        ReviewResult
-    )
-
-    # Using database connection
-    result = process_review_content_readability(conn)
-    if result:
-        print(f"Review created with score: {result.review.score}")
-        print(f"Story state changed to: {result.new_state}")
+Processes stories in REVIEW_CONTENT_READABILITY state using local Ollama AI (qwen3:14b).
+Reviews voice-over suitability: pronunciation ease, natural pacing, spoken flow.
+On PASS → STORY_REVIEW
+On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
 """
 
-# Direct import to avoid circular import through T.Review.Content.__init__
-import importlib.util
+import json
+import logging
+import os
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.content import Content
-from Model.Database.models.story import Story
+from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.content_repository import ContentRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model import StateNames
 
-# Load the script_readability_review module directly with error handling
-_module_dir = Path(__file__).parent.parent
-_module_path = _module_dir / "script_readability_review.py"
+logger = logging.getLogger(__name__)
 
-try:
-    if not _module_path.exists():
-        raise FileNotFoundError(f"Required module not found: {_module_path}")
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
-    _spec = importlib.util.spec_from_file_location("script_readability_review", _module_path)
-    if _spec is None or _spec.loader is None:
-        raise ImportError(f"Could not load module spec for: {_module_path}")
+INPUT_STATE = StateNames.REVIEW_CONTENT_READABILITY
+OUTPUT_STATE_PASS = StateNames.STORY_REVIEW
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE
 
-    _readability_module = importlib.util.module_from_spec(_spec)
-    _spec.loader.exec_module(_readability_module)
-
-    review_content_readability = _readability_module.review_content_readability
-    ReadabilityReview = _readability_module.ReadabilityReview
-except (FileNotFoundError, ImportError, SyntaxError, AttributeError) as e:
-    raise ImportError(
-        f"Failed to load script_readability_review module from {_module_path}: {e}"
-    ) from e
-
-
-# Score threshold for accepting a script readability review
-ACCEPTANCE_THRESHOLD = 75
-
-# State constants
-CURRENT_STATE = StateNames.REVIEW_CONTENT_READABILITY
-STATE_REVIEW_SCRIPT_READABILITY = StateNames.REVIEW_SCRIPT_READABILITY
-STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_SCRIPT_REVIEW_TITLE
-STATE_STORY_REVIEW = StateNames.STORY_REVIEW
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 400
+_AI_TIMEOUT = 120
+_PASS_THRESHOLD = 75
+_MAX_CONTENT_PREVIEW_LENGTH = 3000
 
 
 @dataclass
-class ReviewResult:
-    """Result of the review script readability process.
+class ContentReadabilityResult:
+    """Result of content readability review processing."""
 
-    Attributes:
-        story: The Story that was reviewed
-        review: The Review that was created
-        new_state: The new state the story was transitioned to
-        accepted: Whether the script was accepted (passes readability)
-        readability_review: The detailed ReadabilityReview from the checker
+    success: bool
+    story_id: Optional[int] = None
+    review_id: Optional[int] = None
+    score: Optional[int] = None
+    text: Optional[str] = None
+    next_state: Optional[str] = None
+    passes: Optional[bool] = None
+    error: Optional[str] = None
+
+
+class ScriptReadabilityReviewService:
+    """AI-powered content readability review service for PrismQ.T.Review.Content.Readability state.
+
+    Calls local Ollama with qwen3:14b to evaluate voice-over suitability:
+    pronunciation ease, natural pacing, and spoken flow.
+    On PASS (score >= 75) → STORY_REVIEW
+    On FAIL (score < 75)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
     """
 
-    story: Story
-    review: Review
-    new_state: str
-    accepted: bool
-    readability_review: Optional[ReadabilityReview] = None
+    def __init__(self, connection: sqlite3.Connection):
+        self._conn = connection
+        self.story_repo = StoryRepository(connection)
+        self.content_repo = ContentRepository(connection)
+        self.review_repo = ReviewRepository(connection)
+
+    def _ai_review(self, content_text: str, title_text: str) -> Tuple[str, int]:
+        """Call Ollama for content readability review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
+
+        template = (_PROMPTS_DIR / "review_content_readability.txt").read_text(encoding="utf-8")
+        prompt = template.format(
+            title_text=title_text,
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
+        )
+
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
+
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
+
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI readability review completed."))
+
+        return feedback, score
+
+    def _fetch_story(self) -> Optional[sqlite3.Row]:
+        """Fetch the next story to process with priority ordering."""
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                COALESCE(r.score, 0) AS last_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = c.review_id
+            WHERE s.state = ?
+            ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (INPUT_STATE,),
+        )
+        return cursor.fetchone()
+
+    def process_oldest_story(self) -> ContentReadabilityResult:
+        """Process the oldest story in REVIEW_CONTENT_READABILITY state."""
+        row = self._fetch_story()
+
+        if not row:
+            return ContentReadabilityResult(
+                success=True, story_id=None, error="No stories found in state"
+            )
+
+        result = ContentReadabilityResult(success=False, story_id=row["story_id"])
+
+        try:
+            feedback, score = self._ai_review(
+                content_text=row["content_text"],
+                title_text=row["title_text"],
+            )
+
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
+
+            self._conn.execute(
+                "UPDATE Content SET review_id = ? WHERE id = ?",
+                (review.id, row["content_id"]),
+            )
+            self._conn.commit()
+
+            result.text = feedback
+            result.score = score
+            result.passes = score >= _PASS_THRESHOLD
+            result.next_state = OUTPUT_STATE_PASS if result.passes else OUTPUT_STATE_FAIL
+
+            story = self.story_repo.find_by_id(row["story_id"])
+            story.state = result.next_state
+            self.story_repo.update(story)
+
+            result.success = True
+            logger.info(
+                f"Story {row['story_id']}: content readability review complete, "
+                f"score={score}, passes={result.passes}"
+            )
+
+        except Exception as e:
+            result.error = f"Content readability review failed: {str(e)}"
+            logger.exception(f"Error processing story {row['story_id']}")
+
+        return result
+
+    def count_pending(self) -> int:
+        return self.story_repo.count_by_state(INPUT_STATE)
 
 
-def get_story_for_review(
-    story_repository: StoryRepository, content_repository: ContentRepository
-) -> Optional[Story]:
-    """Get the Story whose script has the lowest current version number.
-
-    Selection criteria:
-    1. Get all stories with state 'PrismQ.T.Review.Content.Readability'
-    2. For each story, get its script via story.content_id
-    3. Skip stories without scripts (invalid state - should not be in review)
-    4. For each script, get its current (highest) version number for the same story_id
-    5. Return the story whose script has the lowest current version number
+def process_review_content_readability(connection: sqlite3.Connection) -> ContentReadabilityResult:
+    """Process the oldest story in PrismQ.T.Review.Content.Readability state.
 
     Args:
-        story_repository: Repository for Story database operations
-        content_repository: Repository for Content database operations
+        connection: SQLite database connection with row_factory = sqlite3.Row
 
     Returns:
-        Story with the lowest current script version, or None if none found
+        ContentReadabilityResult with processing details.
     """
-    # Get all stories in the readability review state
-    stories = story_repository.find_by_state(STATE_REVIEW_SCRIPT_READABILITY)
-
-    if not stories:
-        return None
-
-    # Find the story whose script has the lowest current version number
-    # "Current version" = the highest version number among all scripts for a story
-    story_with_lowest_version = None
-    lowest_version = float("inf")
-
-    for story in stories:
-        if story.content_id is None:
-            # Story without a script - skip (invalid state for readability review)
-            continue
-
-        # Get the script by ID to find the story_id
-        script = content_repository.find_by_id(story.content_id)
-        if script is None:
-            # Content not found - skip (invalid state)
-            continue
-
-        # Get the current (highest) version for this story's scripts
-        # This is the "current version" - the most recent version of the script
-        latest_content = content_repository.find_latest_version(script.story_id)
-        if latest_content is None:
-            # No scripts found - skip (invalid state)
-            continue
-
-        current_version = latest_content.version
-
-        if current_version < lowest_version:
-            lowest_version = current_version
-            story_with_lowest_version = story
-
-    return story_with_lowest_version
-
-
-# Keep the old function for backward compatibility but mark as deprecated
-def get_oldest_story_for_review(story_repository: StoryRepository) -> Optional[Story]:
-    """DEPRECATED: Get the oldest Story with state 'PrismQ.T.Review.Content.Readability'.
-
-    This function is deprecated. Use get_story_for_review() instead, which selects
-    stories based on the lowest current script version number.
-
-    Args:
-        story_repository: Repository for Story database operations
-
-    Returns:
-        Oldest Story in the readability review state, or None if none found
-    """
-    stories = story_repository.find_by_state_ordered_by_created(
-        state=STATE_REVIEW_SCRIPT_READABILITY, ascending=True  # Oldest first
-    )
-
-    if stories:
-        return stories[0]
-    return None
-
-
-def determine_next_state(accepted: bool) -> str:
-    """Determine the next state based on review outcome.
-
-    Args:
-        accepted: Whether the script passed readability review
-
-    Returns:
-        The next state name
-    """
-    if not accepted:
-        # Content not accepted - return to script refinement
-        return STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-
-    # Content accepted - proceed to story expert review
-    return STATE_STORY_REVIEW
-
-
-def create_review(score: int, text: str) -> Review:
-    """Create a Review model instance.
-
-    Args:
-        score: Review score (0-100)
-        text: Review text content
-
-    Returns:
-        Review instance
-
-    Raises:
-        ValueError: If score is not in valid range (0-100)
-        TypeError: If score is not an integer
-    """
-    # Validate score type before creating Review
-    if not isinstance(score, int):
-        raise TypeError("score must be an integer value")
-    if score < 0 or score > 100:
-        raise ValueError(f"score must be between 0 and 100, got {score}")
-
-    return Review(text=text, score=score, created_at=datetime.now())
-
-
-def evaluate_content_readability(
-    content_text: str, content_id: str = "script-001", script_version: str = "v3"
-) -> Tuple[int, str, ReadabilityReview]:
-    """Evaluate a script for voiceover readability.
-
-    Uses the ScriptReadabilityChecker to perform comprehensive readability
-    analysis including pronunciation, pacing, flow, and mouthfeel.
-
-    Args:
-        content_text: The script content to review
-        content_id: Identifier for the script
-        script_version: Version of the script
-
-    Returns:
-        Tuple of (score, review_text, readability_review)
-    """
-    # Use the existing readability checker
-    readability_review = review_content_readability(
-        content_text=content_text,
-        content_id=content_id,
-        script_version=script_version,
-        pass_threshold=ACCEPTANCE_THRESHOLD,
-    )
-
-    # Build review text from the readability review
-    review_parts = [readability_review.summary]
-
-    if readability_review.primary_concerns:
-        review_parts.append("Concerns: " + "; ".join(readability_review.primary_concerns))
-
-    if readability_review.voiceover_notes:
-        review_parts.append("Notes: " + "; ".join(readability_review.voiceover_notes))
-
-    # Add score breakdown
-    score_details = (
-        f"Scores - Pronunciation: {readability_review.pronunciation_score}, "
-        f"Pacing: {readability_review.pacing_score}, "
-        f"Flow: {readability_review.flow_score}, "
-        f"Mouthfeel: {readability_review.mouthfeel_score}"
-    )
-    review_parts.append(score_details)
-
-    review_text = " ".join(review_parts)
-
-    return readability_review.overall_score, review_text, readability_review
-
-
-def process_review_content_readability(
-    connection: sqlite3.Connection,
-    content_text: Optional[str] = None,
-    content_id: Optional[str] = None,
-    script_version: Optional[str] = None,
-) -> Optional[ReviewResult]:
-    """Process the script readability review workflow stage.
-
-    This function:
-    1. Finds the Story with the lowest current script version in state 'PrismQ.T.Review.Content.Readability'
-    2. Retrieves the Content associated with the Story via story.content_id
-    3. Evaluates the script for voiceover readability
-    4. Creates a Review record
-    5. Updates the Story state based on review outcome
-
-    Args:
-        connection: SQLite database connection
-        content_text: Optional script text override (for testing)
-        content_id: Optional script ID override (for testing)
-        script_version: Optional script version override (for testing)
-
-    Returns:
-        ReviewResult if a story was processed, None if no stories found
-    """
-    # Set up row factory for proper dict-like access
-    connection.row_factory = sqlite3.Row
-
-    story_repository = StoryRepository(connection)
-    content_repository = ContentRepository(connection)
-
-    # Get story with lowest current script version in readability review state
-    story = get_story_for_review(story_repository, content_repository)
-
-    if story is None:
-        return None
-
-    # Get script text from database if not provided
-    actual_content_text = content_text
-    actual_content_id = content_id
-    actual_content_version = script_version
-
-    if actual_content_text is None and story.content_id is not None:
-        # Get the script from the database
-        script = content_repository.find_by_id(story.content_id)
-        if script is not None:
-            actual_content_text = script.text
-            actual_content_id = str(script.id)
-            actual_content_version = f"v{script.version}"
-
-    # Fallback values for testing or if no script found
-    actual_content_text = actual_content_text or "Sample script content for readability review"
-    actual_content_id = (
-        actual_content_id or f"script-{story.content_id}" if story.content_id else "script-001"
-    )
-    actual_content_version = actual_content_version or "v3"
-
-    # Evaluate the script for readability
-    score, review_text, readability_review = evaluate_content_readability(
-        content_text=actual_content_text,
-        content_id=actual_content_id,
-        script_version=actual_content_version,
-    )
-
-    # Create review
-    review = create_review(score=score, text=review_text)
-
-    # Determine if accepted (passes readability threshold)
-    accepted = readability_review.passes
-
-    # Determine next state
-    new_state = determine_next_state(accepted=accepted)
-
-    # Update story state
-    story.update_state(new_state)
-    story_repository.update(story)
-
-    return ReviewResult(
-        story=story,
-        review=review,
-        new_state=new_state,
-        accepted=accepted,
-        readability_review=readability_review,
-    )
-
-
-def process_all_pending_reviews(connection: sqlite3.Connection) -> List[ReviewResult]:
-    """Process all pending script readability reviews.
-
-    Args:
-        connection: SQLite database connection
-
-    Returns:
-        List of ReviewResult for all processed stories
-    """
-    results = []
-
-    while True:
-        result = process_review_content_readability(connection=connection)
-
-        if result is None:
-            break
-
-        results.append(result)
-
-    return results
-
-
-__all__ = [
-    "ReviewResult",
-    "process_review_content_readability",
-    "process_all_pending_reviews",
-    "get_oldest_story_for_review",
-    "determine_next_state",
-    "create_review",
-    "evaluate_content_readability",
-    "get_story_for_review",
-    "ACCEPTANCE_THRESHOLD",
-    "STATE_REVIEW_SCRIPT_READABILITY",
-    "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
-    "STATE_STORY_REVIEW",
-]
+    service = ScriptReadabilityReviewService(connection)
+    return service.process_oldest_story()

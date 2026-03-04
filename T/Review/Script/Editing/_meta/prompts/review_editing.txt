@@ -1,0 +1,20 @@
+You are a professional copy editor for short-form video narration scripts. Review the following script for editing quality.
+
+TITLE: {title_text}
+
+SCRIPT:
+{content_text}
+
+Scoring criteria:
+- Conciseness: no unnecessary wordiness or padding; every word earns its place
+- Clarity: sentences are easy to understand on first read
+- Flow: the narrative moves smoothly from one sentence to the next
+- Pacing: the script does not drag or rush; it maintains the right rhythm
+- Transitions: logical and smooth connections between sentences and paragraphs
+- No redundant phrases or filler words that weaken the script
+- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+
+Respond with a JSON object containing:
+  "overall_score": integer 0-100,
+  "feedback": one concise sentence of feedback
+JSON only, no other text.

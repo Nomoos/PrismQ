@@ -1,397 +1,196 @@
-#!/usr/bin/env python3
-"""PrismQ.T.Review.Title.Readability - Title readability review module.
+"""Title Readability Review Service - AI-powered review for PrismQ.T.Review.Title.Readability.
 
-This module implements the title readability review workflow stage that:
-1. Selects the Story with state 'PrismQ.T.Review.Title.Readability' that has
-   the Content with the lowest current version number (highest version per story_id)
-2. Reviews the title for readability (voiceover suitability)
-3. Outputs a Review model (simple: text, score, created_at)
-4. Updates the Story state based on review acceptance
-
-State Transitions:
-- If review doesn't accept title → 'PrismQ.T.Content.From.Title.Review.Content' (return to script refinement)
-- If review accepts title → 'PrismQ.T.Story.Review' (proceed to story review)
-
-Review Model Output:
-    Review (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT NOT NULL,
-        score INTEGER CHECK (score >= 0 AND score <= 100),
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
-
-Usage:
-    from T.Review.Title.Readability.src.review_title_readability import (
-        process_review_title_readability,
-        ReviewResult
-    )
-
-    # Using database connection
-    result = process_review_title_readability(conn)
-    if result:
-        print(f"Review created with score: {result.review.score}")
-        print(f"Story state changed to: {result.new_state}")
+Processes stories in REVIEW_TITLE_READABILITY state using local Ollama AI (qwen3:14b).
+Reviews the TITLE (not the content) for clarity, catchiness, length, memorability.
+On PASS → REVIEW_CONTENT_READABILITY
+On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
 """
 
+import json
+import logging
+import os
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Tuple
 
 from Model.Database.models.review import Review
-from Model.Database.models.story import Story
-from Model.Database.repositories.content_repository import ContentRepository
+from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model import StateNames
 
-# Score threshold for accepting a title readability review
-ACCEPTANCE_THRESHOLD = 75
+logger = logging.getLogger(__name__)
 
-# State constants
-CURRENT_STATE = StateNames.REVIEW_TITLE_READABILITY
-STATE_REVIEW_TITLE_READABILITY = StateNames.REVIEW_TITLE_READABILITY
-STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT = StateNames.SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-STATE_STORY_REVIEW = StateNames.STORY_REVIEW
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
+
+INPUT_STATE = StateNames.REVIEW_TITLE_READABILITY
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_READABILITY
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE
+
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 400
+_AI_TIMEOUT = 120
+_PASS_THRESHOLD = 75
 
 
 @dataclass
-class ReviewResult:
-    """Result of the review title readability process.
+class TitleReadabilityResult:
+    """Result of title readability review processing."""
 
-    Attributes:
-        story: The Story that was reviewed
-        review: The Review that was created
-        new_state: The new state the story was transitioned to
-        accepted: Whether the title was accepted
+    success: bool
+    story_id: Optional[int] = None
+    review_id: Optional[int] = None
+    score: Optional[int] = None
+    text: Optional[str] = None
+    next_state: Optional[str] = None
+    passes: Optional[bool] = None
+    error: Optional[str] = None
+
+
+class TitleReadabilityReviewService:
+    """AI-powered title readability review service for PrismQ.T.Review.Title.Readability state.
+
+    Calls local Ollama with qwen3:14b to evaluate title clarity, catchiness,
+    appropriate length, memorability, and engagement.
+    Review is linked to Title via Title.review_id FK.
+    On PASS (score >= 75) → REVIEW_CONTENT_READABILITY
+    On FAIL (score < 75)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
     """
 
-    story: Story
-    review: Review
-    new_state: str
-    accepted: bool
+    def __init__(self, connection: sqlite3.Connection):
+        self._conn = connection
+        self.story_repo = StoryRepository(connection)
+        self.review_repo = ReviewRepository(connection)
 
+    def _ai_review(self, title_text: str) -> Tuple[str, int]:
+        """Call Ollama for title readability review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
 
-def get_story_for_review(
-    connection: sqlite3.Connection, story_repository: StoryRepository
-) -> Optional[Story]:
-    """Get the Story with lowest Content version for review.
+        template = (_PROMPTS_DIR / "review_title_readability.txt").read_text(encoding="utf-8")
+        prompt = template.format(title_text=title_text)
 
-    Selects the Story in 'PrismQ.T.Review.Title.Readability' state that has
-    the Content with the lowest current version number. The "current version"
-    is the highest version number among all scripts for a given story_id.
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
 
-    This ensures stories with less refined scripts (fewer iterations) are
-    processed first. Stories without scripts (NULL version) are treated as
-    having the lowest priority (version -1).
-
-    Args:
-        connection: SQLite database connection
-        story_repository: Repository for Story database operations
-
-    Returns:
-        Story with lowest Content version in the review state, or None if none found
-    """
-    # Query to find stories in the correct state, joined with their scripts,
-    # and ordered by the MAX(version) for each story_id (lowest first)
-    # COALESCE handles NULL versions (stories without scripts) consistently
-    query = """
-        SELECT s.id, s.idea_id, s.idea_json, s.title_id, s.content_id, 
-               s.state, s.created_at, s.updated_at,
-               MAX(sc.version) as max_content_version
-        FROM Story s
-        LEFT JOIN Content sc ON s.id = sc.story_id
-        WHERE s.state = ?
-        GROUP BY s.id
-        ORDER BY COALESCE(max_content_version, -1) ASC, s.created_at ASC
-        LIMIT 1
-    """
-
-    cursor = connection.execute(query, (STATE_REVIEW_TITLE_READABILITY,))
-    row = cursor.fetchone()
-
-    if row is None:
-        return None
-
-    # Convert to Story model
-    created_at = row["created_at"]
-    if isinstance(created_at, str):
-        created_at = datetime.fromisoformat(created_at)
-
-    updated_at = row["updated_at"]
-    if isinstance(updated_at, str):
-        updated_at = datetime.fromisoformat(updated_at)
-
-    return Story(
-        id=row["id"],
-        idea_id=row["idea_id"],
-        idea_json=row["idea_json"],
-        title_id=row["title_id"],
-        content_id=row["content_id"],
-        state=row["state"],
-        created_at=created_at,
-        updated_at=updated_at,
-    )
-
-
-def get_oldest_story_for_review(story_repository: StoryRepository) -> Optional[Story]:
-    """Get the oldest Story with state 'PrismQ.T.Review.Title.Readability'.
-
-    DEPRECATED: This function is kept for backward compatibility.
-    Use get_story_for_review() instead which selects by lowest Content version.
-
-    Args:
-        story_repository: Repository for Story database operations
-
-    Returns:
-        Oldest Story in the review state, or None if none found
-    """
-    stories = story_repository.find_by_state_ordered_by_created(
-        state=STATE_REVIEW_TITLE_READABILITY, ascending=True  # Oldest first
-    )
-
-    if stories:
-        return stories[0]
-    return None
-
-
-def determine_next_state(accepted: bool) -> str:
-    """Determine the next state based on review outcome.
-
-    Args:
-        accepted: Whether the title was accepted
-
-    Returns:
-        The next state name:
-        - STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT if not accepted (return to script refinement)
-        - STATE_STORY_REVIEW if accepted (proceed to story review)
-    """
-    if not accepted:
-        # Title not accepted - return to script refinement
-        return STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT
-
-    # Title accepted - proceed to story review
-    return STATE_STORY_REVIEW
-
-
-def create_review(score: int, text: str) -> Review:
-    """Create a Review model instance.
-
-    Args:
-        score: Review score (0-100)
-        text: Review text content
-
-    Returns:
-        Review instance
-
-    Raises:
-        TypeError: If score is not an integer
-        ValueError: If score is not in valid range (0-100)
-    """
-    # Validate score type before creating Review
-    if not isinstance(score, int):
-        raise TypeError("score must be an integer value")
-    if score < 0 or score > 100:
-        raise ValueError(f"score must be between 0 and 100, got {score}")
-
-    return Review(text=text, score=score, created_at=datetime.now())
-
-
-def evaluate_title_readability(title_text: str) -> Tuple[int, str]:
-    """Evaluate a title for voiceover readability.
-
-    This evaluation checks:
-    - Length appropriateness
-    - Pronunciation difficulty (difficult consonant clusters)
-    - Word complexity
-    - Flow and rhythm
-
-    In production, this could be replaced with AI-powered review.
-
-    Args:
-        title_text: The title content to review
-
-    Returns:
-        Tuple of (score, review_text)
-    """
-    # Base score
-    score = 75
-    review_points = []
-
-    # Check title length (word count)
-    words = title_text.split()
-    word_count = len(words)
-
-    if word_count < 2:
-        score -= 15
-        review_points.append("Title is too short for effective voiceover.")
-    elif word_count > 10:
-        score -= 10
-        review_points.append("Title is quite long, may be hard to read aloud naturally.")
-    elif word_count > 15:
-        score -= 20
-        review_points.append("Title is too long for smooth voiceover delivery.")
-    else:
-        score += 5
-        review_points.append("Title length is appropriate for voiceover.")
-
-    # Check character length
-    char_count = len(title_text)
-    if char_count > 100:
-        score -= 10
-        review_points.append("Title character count is too high for easy reading.")
-    elif char_count > 60:
-        score -= 5
-        review_points.append("Title is slightly long but manageable.")
-
-    # Check for difficult consonant clusters
-    difficult_patterns = ["sths", "ngths", "tchsk", "rchd"]
-    title_lower = title_text.lower()
-    for pattern in difficult_patterns:
-        if pattern in title_lower:
-            score -= 10
-            review_points.append(
-                f"Contains difficult consonant cluster '{pattern}' that may cause pronunciation issues."
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
             )
-            break
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
 
-    # Check for complex/hard-to-pronounce words (simple heuristic: long words)
-    long_words = [w for w in words if len(w) > 10]
-    if long_words:
-        score -= 5 * len(long_words)
-        review_points.append(
-            f"Contains {len(long_words)} long word(s) that may be hard to pronounce."
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI title readability review completed."))
+
+        return feedback, score
+
+    def _fetch_story(self) -> Optional[sqlite3.Row]:
+        """Fetch the next story to process with priority ordering (by title version)."""
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                t.version     AS title_version,
+                COALESCE(r.score, 0) AS last_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = t.review_id
+            WHERE s.state = ?
+            ORDER BY t.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (INPUT_STATE,),
         )
+        return cursor.fetchone()
 
-    # Check for alliteration issues (consecutive words starting with same sound)
-    first_letters = [w[0].lower() for w in words if w]
-    consecutive_same = 0
-    for i in range(1, len(first_letters)):
-        if first_letters[i] == first_letters[i - 1]:
-            consecutive_same += 1
+    def process_oldest_story(self) -> TitleReadabilityResult:
+        """Process the oldest story in REVIEW_TITLE_READABILITY state."""
+        row = self._fetch_story()
 
-    if consecutive_same >= 3:
-        score -= 10
-        review_points.append(
-            "Contains tongue-twister-like alliteration that may be difficult to speak."
-        )
-    elif consecutive_same >= 2:
-        score -= 5
-        review_points.append("Contains some alliteration, may need careful pronunciation.")
+        if not row:
+            return TitleReadabilityResult(
+                success=True, story_id=None, error="No stories found in state"
+            )
 
-    # Check for clear engagement elements
-    engagement_words = [
-        "mystery",
-        "secret",
-        "discover",
-        "amazing",
-        "incredible",
-        "shocking",
-        "ultimate",
-        "best",
-        "worst",
-        "hidden",
-        "revealed",
-    ]
-    has_engagement = any(word.lower() in engagement_words for word in words)
-    if has_engagement:
-        score += 5
-        review_points.append("Contains engaging words that work well for voiceover.")
+        result = TitleReadabilityResult(success=False, story_id=row["story_id"])
 
-    # Ensure score is in valid range
-    score = max(0, min(100, score))
+        try:
+            feedback, score = self._ai_review(title_text=row["title_text"])
 
-    # Build review text
-    review_text = "Title Readability Review: " + " ".join(review_points)
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
-    return score, review_text
+            # Link review to Title via Title.review_id FK
+            self._conn.execute(
+                "UPDATE Title SET review_id = ? WHERE id = ?",
+                (review.id, row["title_id"]),
+            )
+            self._conn.commit()
+
+            result.text = feedback
+            result.score = score
+            result.passes = score >= _PASS_THRESHOLD
+            result.next_state = OUTPUT_STATE_PASS if result.passes else OUTPUT_STATE_FAIL
+
+            story = self.story_repo.find_by_id(row["story_id"])
+            story.state = result.next_state
+            self.story_repo.update(story)
+
+            result.success = True
+            logger.info(
+                f"Story {row['story_id']}: title readability review complete, "
+                f"score={score}, passes={result.passes}"
+            )
+
+        except Exception as e:
+            result.error = f"Title readability review failed: {str(e)}"
+            logger.exception(f"Error processing story {row['story_id']}")
+
+        return result
+
+    def count_pending(self) -> int:
+        return self.story_repo.count_by_state(INPUT_STATE)
 
 
-def process_review_title_readability(
-    connection: sqlite3.Connection, title_text: Optional[str] = None
-) -> Optional[ReviewResult]:
-    """Process the title readability review workflow stage.
-
-    This function:
-    1. Finds the Story with state 'PrismQ.T.Review.Title.Readability' that has
-       the Content with the lowest current version number
-    2. Evaluates the title for voiceover readability
-    3. Creates a Review record
-    4. Updates the Story state based on review outcome
+def process_review_title_readability(connection: sqlite3.Connection) -> TitleReadabilityResult:
+    """Process the oldest story in PrismQ.T.Review.Title.Readability state.
 
     Args:
-        connection: SQLite database connection
-        title_text: Optional title text override (for testing)
+        connection: SQLite database connection with row_factory = sqlite3.Row
 
     Returns:
-        ReviewResult if a story was processed, None if no stories found
+        TitleReadabilityResult with processing details.
     """
-    # Set up row factory for proper dict-like access
-    connection.row_factory = sqlite3.Row
-
-    story_repository = StoryRepository(connection)
-
-    # Get story with lowest script version in review state
-    story = get_story_for_review(connection, story_repository)
-
-    if story is None:
-        return None
-
-    # Get title text (use override if provided, for testing)
-    # In production, this would come from the Title table
-    actual_title_text = title_text or "Sample Title for Review"
-
-    # Evaluate the title for readability
-    score, review_text = evaluate_title_readability(actual_title_text)
-
-    # Create review
-    review = create_review(score=score, text=review_text)
-
-    # Determine if accepted
-    accepted = score >= ACCEPTANCE_THRESHOLD
-
-    # Determine next state
-    new_state = determine_next_state(accepted=accepted)
-
-    # Update story state
-    story.update_state(new_state)
-    story_repository.update(story)
-
-    return ReviewResult(story=story, review=review, new_state=new_state, accepted=accepted)
-
-
-def process_all_pending_reviews(connection: sqlite3.Connection) -> list:
-    """Process all pending title readability reviews.
-
-    Args:
-        connection: SQLite database connection
-
-    Returns:
-        List of ReviewResult for all processed stories
-    """
-    results = []
-
-    while True:
-        result = process_review_title_readability(connection=connection)
-
-        if result is None:
-            break
-
-        results.append(result)
-
-    return results
-
-
-__all__ = [
-    "ReviewResult",
-    "process_review_title_readability",
-    "process_all_pending_reviews",
-    "get_story_for_review",
-    "get_oldest_story_for_review",  # Kept for backward compatibility
-    "determine_next_state",
-    "create_review",
-    "evaluate_title_readability",
-    "ACCEPTANCE_THRESHOLD",
-    "STATE_REVIEW_TITLE_READABILITY",
-    "STATE_SCRIPT_FROM_TITLE_REVIEW_SCRIPT",
-    "STATE_STORY_REVIEW",
-]
+    service = TitleReadabilityReviewService(connection)
+    return service.process_oldest_story()
