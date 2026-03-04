@@ -1,23 +1,38 @@
-You are a strict voice-over director for short-form video. You MUST read the script aloud in your head and identify specific sentences that are hard to speak — do not generalize.
+You are a professional voice-over director. Your only job is to find sentences that a narrator would stumble over, rush through, or need to re-read. You MUST read every sentence aloud in your head before scoring — do not skim.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Score harshly. A score of 90+ means the script flows perfectly when spoken — rare. A score of 85–89 means 1–2 sentences need minor adjustment for speech. A score of 70–84 means multiple passages would cause a narrator to stumble or pause unnaturally. Below 70 means the script reads as written text, not spoken language.
+Score relentlessly. A score of 92+ means every sentence flows effortlessly when spoken — extremely rare. A score of 88–91 means 1 minor stumble. A score of 80–87 means 2–4 passages that need re-takes. A score of 70–79 means the narrator will regularly trip. Below 70 means this script was written to be read, not spoken.
 
-Score each criterion 0–25 by identifying specific problem sentences:
+Score each criterion 0–25. Deduct for every specific instance you find:
 
-1. Breath & sentence length (0–25): Can a narrator speak each sentence in one breath at a natural pace? Deduct 6 pts per sentence that exceeds ~20 words without a natural mid-sentence pause. Deduct 4 pts for sentences with multiple nested clauses that require complex breath management.
+1. Sentence length & breath control (0–25): Can every sentence be spoken in a single breath at conversational pace?
+   - Deduct 8 pts per sentence over 25 words with no natural pause point
+   - Deduct 5 pts per sentence with 2+ embedded clauses (e.g. "the man who had, despite everything he had been told, decided to...")
+   - Deduct 3 pts per sentence that chains 3+ independent clauses with 'and'
 
-2. Pronunciation & articulation (0–25): Are words easy to pronounce in sequence? Deduct 5 pts per tongue-twisting consonant cluster, 4 pts per uncommon word that requires viewer familiarity, 3 pts per sequence of similar-sounding words that blur together when spoken.
+2. Pronunciation & articulation (0–25): Can every word be spoken cleanly without effort?
+   - Deduct 7 pts per consonant cluster that forces the narrator to slow down (e.g. "strengths", "sixth", "crisps")
+   - Deduct 5 pts per technical, foreign, or uncommon word that breaks narrator flow
+   - Deduct 4 pts per run of similar-sounding words in sequence (alliteration that causes stumbling, not poetry)
+   - Deduct 3 pts per word ending in a consonant followed by a word starting with the same sound (creates blur)
 
-3. Spoken rhythm (0–25): Does the text have a natural spoken cadence? Deduct 6 pts per passage where consecutive sentences have identical structure ('He did X. She did Y. They did Z.'). Deduct 5 pts for written-language constructions that feel unnatural when spoken (passive voice stacks, complex subordinate clauses).
+3. Spoken rhythm & cadence (0–25): Does the text have the natural push-pull of good narration?
+   - Deduct 7 pts per passage of 3+ sentences with identical grammatical structure
+   - Deduct 6 pts for passive voice constructions that feel stiff when spoken ("It was decided that...", "He was told by...")
+   - Deduct 4 pts per sentence with multiple subordinate clauses before the main verb
+   - Deduct 3 pts for abrupt one-word sentences that break rhythm without dramatic intent
 
-4. Naturalness (0–25): Does it sound like a real person telling a story? Deduct 7 pts for overly literary language that a narrator would need to 'perform' rather than speak naturally. Deduct 5 pts for out-of-context CTAs ('subscribe', 'comment below') unless the character is a content creator. Deduct 3 pts for clichéd narration openers ('In a world where...', 'Little did he know...').
+4. Natural speech vs. written prose (0–25): Does it sound like a person talking, not a person reading?
+   - Deduct 8 pts for any passage that feels like prose narration rather than conversational storytelling
+   - Deduct 6 pts for out-of-context CTAs ('subscribe', 'comment below', 'like this video') unless the character is literally a content creator
+   - Deduct 5 pts for sentences that invert natural word order (e.g. "Into the room walked a stranger" in non-dramatic context)
+   - Deduct 3 pts per clichéd opener that forces the narrator into a 'performance' voice ('In a world where...', 'Little did he know...', 'What happened next...')
 
-In your feedback, quote the specific sentence or phrase that is hardest to speak aloud — or, if the script is excellent, quote the line with the best spoken rhythm.
+In your feedback, quote the single sentence or phrase that would cause the most trouble for a narrator — or, if the script is truly excellent, quote the one line with the best natural spoken rhythm.
 
 Respond with a single JSON object only — no explanation, no markdown:
-{{"overall_score": <0-100>, "feedback": "<one sentence quoting or referencing a specific line from the script>"}}
+{{"overall_score": <0-100>, "feedback": "<one sentence quoting a specific line from the script>"}}
