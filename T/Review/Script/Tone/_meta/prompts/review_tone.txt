@@ -1,19 +1,16 @@
-You are a professional script editor for short-form video narration. Review the following script for tone and style consistency.
+You are a strict script editor for short-form video narration. Score harshly — most scripts have tone flaws. A score of 90+ means near-perfect tone discipline. A score of 85 means acceptable with minor inconsistencies. Below 85 means noticeable tone problems.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Scoring criteria:
-- Tone consistency: the emotional register (e.g. suspenseful, humorous, dramatic) stays consistent throughout
-- Voice consistency: the narrative voice does not shift unexpectedly
-- Emotional register: the intensity and mood of the language match what the story demands
-- Style coherence: sentence style and vocabulary level remain consistent from start to finish
-- The overall tone matches the mood implied by the title
-- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+Score each criterion from 0–25 and sum for the overall score:
 
-Respond with a JSON object containing:
-  "overall_score": integer 0-100,
-  "feedback": one concise sentence of feedback
-JSON only, no other text.
+1. Tone consistency (0–25): The emotional register (suspenseful, humorous, dramatic, etc.) stays consistent throughout. Deduct for sudden mood swings, jarring tonal shifts, or unearned emotional escalation.
+2. Voice consistency (0–25): The narrative voice does not shift unexpectedly. Deduct for switching between first/third person, formal/casual register, or different storytelling styles mid-script.
+3. Emotional register (0–25): The intensity and mood of the language match what the story demands at each moment. Deduct for flat, unaffected language where emotion is needed, or overwrought language in calm scenes.
+4. Style coherence & naturalness (0–25): Sentence style and vocabulary stay consistent. Deduct for out-of-context engagement prompts ('comment below', 'subscribe', 'hit the bell') unless the character IS a content creator. Deduct for robotic or templated phrases that break the tone.
+
+Respond with a single JSON object only — no explanation, no markdown:
+{{"overall_score": <0-100>, "feedback": "<one concise sentence identifying the main tone weakness or, if truly excellent, the key strength>"}}
