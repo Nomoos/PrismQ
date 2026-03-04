@@ -165,19 +165,11 @@ class ReviewContentFromTitleIdeaService:
             raise RuntimeError("requests library not available; run: pip install requests") from exc
 
         prompt = (
-            "You are a professional content reviewer for short-form storytelling video scripts.\n"
-            "Review the following script on two criteria:\n"
-            "1. How well it aligns with its title and the original idea (0-100)\n"
-            "2. Whether it ends with a forced engagement prompt (comment below, swipe up, tag someone, "
-            "hit subscribe, share this, let's build something, etc.)\n\n"
+            "You are a professional content reviewer. "
+            "Review the following script and score how well it aligns with its title and the original idea.\n\n"
             f"TITLE: {title_text}\n\n"
             f"IDEA: {idea_text or 'Not provided'}\n\n"
             f"SCRIPT:\n{content_text[:_MAX_CONTENT_PREVIEW_LENGTH]}\n\n"
-            "Scoring rules:\n"
-            "- Start from alignment score (0-100)\n"
-            "- If the script ends with ANY forced engagement prompt (calls to comment, swipe, tag, subscribe, share, "
-            "or any instruction to the viewer to interact), subtract 40 points\n"
-            "- The script should end with a natural story resolution — a reflection, truth, or quiet revelation\n\n"
             "Respond with a JSON object containing:\n"
             '  "overall_score": integer 0-100,\n'
             '  "feedback": one concise sentence of feedback\n'
