@@ -11,7 +11,7 @@ Draw subtle inspiration from: {seed}
 (Use this thematically or symbolically—do not mention it directly)
 
 # Requirements
-**Structure**: Begin with an attention-grabbing hook, deliver the core message clearly, end with a natural call-to-action.
+**Structure**: Begin with an attention-grabbing hook, deliver the core story, end with a resonant closing line that feels like a natural conclusion — not a prompt to engage.
 
 **Length**: {target_words} words (target) | {max_words} words (maximum)
 
@@ -20,13 +20,15 @@ Draw subtle inspiration from: {seed}
 - Use conversational, engaging language throughout
 - Maintain consistent energy and pacing
 - Make every word count—no filler
-- End with a clear action for viewers
+- End with a line that lands emotionally — a reflection, a truth, a quiet revelation
 
 **Critical Constraints**:
 - Write ONLY the narration text—no labels, headings, or meta-commentary
 - Never mention "hook", "CTA", "script", or structural elements
 - Never explain what you're doing—just deliver the content
 - Stay within word limit
+- Do NOT end with engagement prompts — no "comment below", "swipe up", "tag someone", "hit subscribe", "share this", or any similar calls to action
+- The story should feel complete on its own, not like a teaser for interaction
 
 # Output Format
 Write the complete narration as a single, flowing text. Start immediately with the hook.

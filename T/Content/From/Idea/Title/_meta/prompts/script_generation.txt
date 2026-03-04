@@ -27,8 +27,9 @@ You are an expert scriptwriter for short-form video content. Write a compelling 
    - Use engaging language
 
 3. **Conclusion** (10-15%):
-   - Satisfying resolution
-   - Memorable ending
+   - Satisfying, natural resolution
+   - Memorable closing line — a reflection, a truth, a quiet revelation
+   - No engagement prompts: never end with "comment below", "swipe up", "tag someone", "hit subscribe", or any call to action
 
 **WRITING STYLE**:
 - Write for narration (spoken word)
