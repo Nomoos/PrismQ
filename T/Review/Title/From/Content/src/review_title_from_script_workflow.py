@@ -190,16 +190,16 @@ def main():
             # Display result
             if result.success:
                 total_processed += 1
-                if result.accepted:
-                    print_success(f"Story {result.story_id}: Title ACCEPTED (score: {result.score:.2f})")
-                    print_info(f"  Next state: {result.next_state}")
+                if result.title_accepted:
+                    print_success(f"Story {result.story_id}: Title ACCEPTED (score: {result.review_score})")
+                    print_info(f"  Next state: {result.new_state}")
                     total_accepted += 1
                 else:
-                    print_warning(f"Story {result.story_id}: Title REJECTED (score: {result.score:.2f})")
-                    print_info(f"  Next state: {result.next_state}")
+                    print_warning(f"Story {result.story_id}: Title REJECTED (score: {result.review_score})")
+                    print_info(f"  Next state: {result.new_state}")
                     total_rejected += 1
             else:
-                print_error(f"Story {result.story_id}: Failed - {result.error}")
+                print_error(f"Story {result.story_id}: Failed - {result.error_message}")
                 total_errors += 1
             
             # Show summary periodically

@@ -14,7 +14,7 @@ echo PrismQ.T.Review.Content.From.Title
 echo ========================================
 echo.
 
-python ..\..\..\T\Review\Script\From\Title\src\review_script_from_title_interactive.py
+python ..\..\..\T\Review\Script\From\Title\src\review_script_from_title_workflow.py
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

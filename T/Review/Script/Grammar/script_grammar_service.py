@@ -27,13 +27,14 @@ _PROMPTS_DIR = Path(__file__).parent / "_meta" / "prompts"
 
 INPUT_STATE = StateNames.REVIEW_CONTENT_GRAMMAR
 OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_TONE          # → modul 12
-OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT     # → modul 08 (soft title improvement)
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE    # → modul 09 (soft content improvement)
 
 _AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
 _AI_TEMPERATURE = 0.3
 _AI_MAX_TOKENS = 400
 _AI_TIMEOUT = 120
 _PASS_THRESHOLD = 85
+DEFAULT_PASS_THRESHOLD = _PASS_THRESHOLD  # public alias for __init__.py re-export
 _MAX_CONTENT_PREVIEW_LENGTH = 3000
 
 

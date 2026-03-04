@@ -1,32 +1,28 @@
-"""PrismQ.T.Review.Title.From.Content Service Module.
+"""PrismQ.T.Review.Title.From.Content Service Module [07].
 
-This module provides the service to process stories in the
-PrismQ.T.Review.Title.From.Content state by:
-1. Selecting the oldest Story in this state
-2. Reviewing the title against the script
-3. Creating a Review record with text and score
-4. Updating the Story state based on review result
+Processes stories in REVIEW_TITLE_FROM_CONTENT state using local Ollama AI (qwen3:14b).
 
-State Transitions:
-    - If review accepts title (score >= threshold) -> PrismQ.T.Review.Script.From.Title
-    - If review does not accept title (score < threshold) -> PrismQ.T.Title.From.Content.Review.Title
+On PASS  → REVIEW_CONTENT_FROM_TITLE [10]
+On FAIL  → TITLE_FROM_TITLE_REVIEW_CONTENT [08] (soft title improvement)
+
+Priority: c.version ASC, COALESCE(r.score,0) DESC, s.created_at ASC
 """
 
+import json
 import logging
 import os
+import re
 import sqlite3
 import sys
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Tuple
-
-# Setup logging
-logger = logging.getLogger(__name__)
+from pathlib import Path
+from typing import Optional, Tuple
 
 # Setup paths for imports
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_module_root = os.path.dirname(_current_dir)  # T/Review/Title/From/Script
-_t_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_module_root))))  # T
+_module_root = os.path.dirname(_current_dir)
+_t_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_module_root))))
 _repo_root = os.path.dirname(_t_root)
 
 if _repo_root not in sys.path:
@@ -35,45 +31,34 @@ if _t_root not in sys.path:
     sys.path.insert(0, _t_root)
 
 from Model.Database.models.review import Review
-from Model.Database.models.content import Content
-from Model.Database.models.story import Story
-from Model.Database.models.title import Title
 from Model.Database.repositories.content_repository import ContentRepository
+from Model.Database.repositories.review_repository import ReviewRepository
 from Model.Database.repositories.story_repository import StoryRepository
 from Model.Database.repositories.title_repository import TitleRepository
-from Model.State.constants.state_names import StateNames
+from Model import StateNames
 
-# Try to import the review function
-try:
-    from T.Review.Title.From.Content.review_title_from_content_v2 import (
-        SCORE_THRESHOLD_HIGH,
-        review_title_from_content_v2,
-    )
+logger = logging.getLogger(__name__)
 
-    REVIEW_AVAILABLE = True
-except ImportError:
-    REVIEW_AVAILABLE = False
-    SCORE_THRESHOLD_HIGH = 80  # Default fallback
+_PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
+INPUT_STATE       = StateNames.REVIEW_TITLE_FROM_CONTENT
+OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_FROM_TITLE        # → [10]
+OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT  # → [08]
 
-# Score threshold for title acceptance
-TITLE_ACCEPTANCE_THRESHOLD = 70  # Titles with score >= 70 are accepted
+_AI_MODEL       = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS  = 400
+_AI_TIMEOUT     = 120
+_PASS_THRESHOLD = 70
+_MAX_CONTENT_PREVIEW_LENGTH = 3000
+
+# Keep for external callers that check this constant
+TITLE_ACCEPTANCE_THRESHOLD = _PASS_THRESHOLD
 
 
 @dataclass
 class ReviewTitleFromScriptResult:
-    """Result of processing a story's title review.
-
-    Attributes:
-        success: Whether the review was processed successfully
-        story_id: ID of the processed story
-        review_id: ID of the created Review record
-        review_score: Score assigned to the title
-        review_text: Review feedback text
-        new_state: The new state the story was transitioned to
-        title_accepted: Whether the title was accepted
-        error_message: Error message if processing failed
-    """
+    """Result of processing a story's title review."""
 
     success: bool
     story_id: Optional[int] = None
@@ -85,113 +70,82 @@ class ReviewTitleFromScriptResult:
     error_message: Optional[str] = None
 
 
-class ReviewRepository:
-    """SQLite repository for Review entities.
-
-    Simple repository for inserting and retrieving Review records.
-    """
-
-    def __init__(self, connection: sqlite3.Connection):
-        """Initialize with database connection."""
-        self._conn = connection
-
-    def insert(self, review: Review) -> Review:
-        """Insert a new Review into the database.
-
-        Args:
-            review: Review entity to insert
-
-        Returns:
-            Review with populated id
-        """
-        cursor = self._conn.execute(
-            "INSERT INTO Review (text, score, created_at) VALUES (?, ?, ?)",
-            (review.text, review.score, review.created_at.isoformat()),
-        )
-        self._conn.commit()
-        review.id = cursor.lastrowid
-        return review
-
-    def find_by_id(self, review_id: int) -> Optional[Review]:
-        """Find a Review by ID.
-
-        Args:
-            review_id: The ID to search for
-
-        Returns:
-            Review if found, None otherwise
-        """
-        cursor = self._conn.execute(
-            "SELECT id, text, score, created_at FROM Review WHERE id = ?", (review_id,)
-        )
-        row = cursor.fetchone()
-        if row is None:
-            return None
-
-        created_at = row[3]
-        if isinstance(created_at, str):
-            created_at = datetime.fromisoformat(created_at)
-
-        return Review(id=row[0], text=row[1], score=row[2], created_at=created_at)
+from Model.Database.repositories.review_repository import ReviewRepository as ReviewRepository_impl
 
 
 class ReviewTitleFromScriptService:
-    """Service for processing stories in the PrismQ.T.Review.Title.From.Content state.
+    """AI quality gate for PrismQ.T.Review.Title.From.Content [07].
 
-    This service implements the workflow logic for reviewing titles against scripts:
-    1. Finds the oldest story in the Review.Title.From.Content state
-    2. Loads the associated title and script
-    3. Performs title review analysis
-    4. Creates a Review record
-    5. Updates the story state based on review result
-
-    Attributes:
-        story_repo: Repository for Story operations
-        title_repo: Repository for Title operations
-        content_repo: Repository for Content operations
-        review_repo: Repository for Review operations
+    Calls Ollama to review the title against the content.
+    PASS (score >= 70) → [10] REVIEW_CONTENT_FROM_TITLE
+    FAIL              → [08] TITLE_FROM_TITLE_REVIEW_CONTENT
     """
 
-    # State names for transitions
-    CURRENT_STATE = StateNames.REVIEW_TITLE_FROM_CONTENT
-    STATE_ON_ACCEPT = StateNames.REVIEW_CONTENT_FROM_TITLE
-    STATE_ON_REJECT = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT
+    CURRENT_STATE  = INPUT_STATE
+    STATE_ON_ACCEPT = OUTPUT_STATE_PASS
+    STATE_ON_REJECT = OUTPUT_STATE_FAIL
 
-    def __init__(
-        self,
-        story_repo: StoryRepository,
-        title_repo: TitleRepository,
-        content_repo: ContentRepository,
-        review_repo: ReviewRepository,
-        acceptance_threshold: int = TITLE_ACCEPTANCE_THRESHOLD,
-    ):
-        """Initialize the service with repositories.
-
-        Args:
-            story_repo: Repository for Story operations
-            title_repo: Repository for Title operations
-            content_repo: Repository for Content operations
-            review_repo: Repository for Review operations
-            acceptance_threshold: Score threshold for accepting titles (default: 70)
-        """
-        self.story_repo = story_repo
-        self.title_repo = title_repo
-        self.content_repo = content_repo
-        self.review_repo = review_repo
+    def __init__(self, connection: sqlite3.Connection, acceptance_threshold: int = _PASS_THRESHOLD):
+        self._conn = connection
+        self.story_repo   = StoryRepository(connection)
+        self.title_repo   = TitleRepository(connection)
+        self.content_repo = ContentRepository(connection)
+        self.review_repo  = ReviewRepository_impl(connection)
         self.acceptance_threshold = acceptance_threshold
-        self._conn = story_repo._conn
+
+    # ── AI review ────────────────────────────────────────────────────────────
+
+    def _ai_review(self, title_text: str, content_text: str) -> Tuple[str, int]:
+        """Call Ollama for title quality review. Returns (feedback, score)."""
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
+
+        template = (_PROMPTS_DIR / "review_title_from_content.txt").read_text(encoding="utf-8")
+        prompt = template.format(
+            title_text=title_text,
+            content_text=content_text[:_MAX_CONTENT_PREVIEW_LENGTH],
+        )
+
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
+
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
+
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON in AI response: {raw[:200]}")
+        data = json.loads(match.group())
+        score = max(0, min(100, int(data.get("overall_score", 50))))
+        feedback = str(data.get("feedback", "AI title review completed."))
+
+        return feedback, score
+
+    # ── story fetch ───────────────────────────────────────────────────────────
 
     def _fetch_story_with_content(self):
-        """Fetch the next story to process using priority ordering.
-
-        Selection priority:
-          1. Lowest content version (ASC) — fewest regen cycles first
-          2. Highest last content review score (DESC) — pick story closest to threshold
-          3. Oldest story (created_at ASC) as tiebreaker
-
-        Returns:
-            sqlite3.Row with story/title/content fields, or None
-        """
         cursor = self._conn.execute(
             """
             SELECT
@@ -202,7 +156,6 @@ class ReviewTitleFromScriptService:
                 c.id          AS content_id,
                 c.text        AS content_text,
                 c.version     AS content_version,
-                c.review_id   AS content_review_id,
                 COALESCE(r.score, 0) AS last_content_review_score
             FROM Story s
             INNER JOIN Title t
@@ -216,308 +169,69 @@ class ReviewTitleFromScriptService:
             ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
             LIMIT 1
             """,
-            (self.CURRENT_STATE,),
+            (INPUT_STATE,),
         )
         return cursor.fetchone()
 
-    def find_oldest_story_to_process(self) -> Optional[Story]:
-        """Find the oldest story in the Review.Title.From.Content state.
-
-        Returns:
-            Oldest Story in the current state, or None if none found
-        """
-        stories = self.story_repo.find_by_state_ordered_by_created(
-            self.CURRENT_STATE, ascending=True
-        )
-        return stories[0] if stories else None
+    # ── public API ────────────────────────────────────────────────────────────
 
     def count_stories_to_process(self) -> int:
-        """Count stories in the Review.Title.From.Content state.
+        return self.story_repo.count_by_state(INPUT_STATE)
 
-        Returns:
-            Number of stories waiting to be processed
-        """
-        return self.story_repo.count_by_state(self.CURRENT_STATE)
-
-    def _generate_review(self, title: Title, script: Content) -> Tuple[str, int]:
-        """Generate review text and score for a title against a script.
-
-        Args:
-            title: The Title to review
-            script: The Content to review against
-
-        Returns:
-            Tuple of (review_text, review_score)
-        """
-        if REVIEW_AVAILABLE:
-            # Use the full review module
-            review_result = review_title_from_content_v2(
-                title_text=title.text,
-                content_text=script.text,
-                title_id=str(title.id),
-                content_id=str(script.id),
-                title_version=f"v{title.version}",
-                script_version=f"v{script.version}",
-            )
-
-            # Generate review text from the review result
-            review_text = self._format_review_text(review_result)
-            return review_text, review_result.overall_score
-        else:
-            # Fallback: simple keyword-based analysis
-            return self._simple_review(title.text, script.text)
-
-    def _format_review_text(self, review_result) -> str:
-        """Format review result into text feedback.
-
-        Args:
-            review_result: TitleReview object from the review module
-
-        Returns:
-            Formatted review text
-        """
-        parts = []
-
-        # Overall assessment
-        if review_result.overall_score >= 80:
-            parts.append("Title is well-aligned with the script content.")
-        elif review_result.overall_score >= 60:
-            parts.append("Title shows fair alignment with script but has room for improvement.")
-        else:
-            parts.append("Title needs significant improvements to align with script content.")
-
-        # Add specific feedback
-        if review_result.script_alignment_score:
-            parts.append(f"Content alignment: {review_result.script_alignment_score}%")
-
-        if review_result.engagement_score:
-            parts.append(f"Engagement score: {review_result.engagement_score}%")
-
-        # Add improvement recommendations if any
-        if hasattr(review_result, "improvement_points") and review_result.improvement_points:
-            high_priority = [p for p in review_result.improvement_points if p.priority == "high"]
-            if high_priority:
-                parts.append("High priority improvements:")
-                for point in high_priority[:3]:
-                    parts.append(f"- {point.title}: {point.description}")
-
-        return " ".join(parts)
-
-    def _simple_review(self, title_text: str, content_text: str) -> Tuple[str, int]:
-        """Simple fallback review when full module is not available.
-
-        Args:
-            title_text: Title text to review
-            content_text: Content text to review against
-
-        Returns:
-            Tuple of (review_text, review_score)
-        """
-        # Simple keyword matching
-        title_lower = title_text.lower()
-        script_lower = content_text.lower()
-
-        # Extract simple keywords from title
-        title_words = set(word for word in title_lower.split() if len(word) > 3 and word.isalpha())
-
-        # Count how many title words appear in script
-        matches = sum(1 for word in title_words if word in script_lower)
-
-        # Calculate simple score
-        if title_words:
-            match_percentage = (matches / len(title_words)) * 100
-        else:
-            match_percentage = 50  # Default for empty title
-
-        # Base score from matching
-        score = int(min(100, 50 + match_percentage * 0.5))
-
-        # Generate review text
-        if score >= 80:
-            review_text = (
-                f"Title aligns well with script. {matches}/{len(title_words)} keywords match."
-            )
-        elif score >= 60:
-            review_text = (
-                f"Fair title-script alignment. {matches}/{len(title_words)} keywords found."
-            )
-        else:
-            review_text = (
-                f"Title needs improvement. Only {matches}/{len(title_words)} keywords match script."
-            )
-
-        return review_text, score
-
-    def process_story(self, story: Story) -> ReviewTitleFromScriptResult:
-        """Process a single story: review its title and update state.
-
-        Args:
-            story: The Story to process
-
-        Returns:
-            ReviewTitleFromScriptResult with processing outcome
-        """
-        logger.info(f"Processing story {story.id} in state {story.state}")
-        
-        # Validate story is in correct state
-        if story.state != self.CURRENT_STATE:
-            error_msg = f"Story is in state '{story.state}', expected '{self.CURRENT_STATE}'"
-            logger.warning(f"Story {story.id}: {error_msg}")
+    def process_oldest_story(self) -> ReviewTitleFromScriptResult:
+        """Process the next story in REVIEW_TITLE_FROM_CONTENT state."""
+        row = self._fetch_story_with_content()
+        if not row:
             return ReviewTitleFromScriptResult(
-                success=False,
-                story_id=story.id,
-                error_message=error_msg,
+                success=False, error_message=f"No stories found in state '{INPUT_STATE}'"
             )
+
+        story_id = row["story_id"]
+        result = ReviewTitleFromScriptResult(success=False, story_id=story_id)
 
         try:
-            # Get the latest title for the story
-            title = self.title_repo.find_latest_version(story.id)
-            if not title:
-                error_msg = "No title found for story"
-                logger.error(f"Story {story.id}: {error_msg}")
-                return ReviewTitleFromScriptResult(
-                    success=False, story_id=story.id, error_message=error_msg
-                )
-            
-            logger.debug(f"Story {story.id}: Found title v{title.version} ({len(title.text)} chars)")
+            feedback, score = self._ai_review(
+                title_text=row["title_text"],
+                content_text=row["content_text"],
+            )
 
-            # Get the latest script for the story
-            script = self.content_repo.find_latest_version(story.id)
-            if not script:
-                error_msg = "No script found for story"
-                logger.error(f"Story {story.id}: {error_msg}")
-                return ReviewTitleFromScriptResult(
-                    success=False, story_id=story.id, error_message=error_msg
-                )
-            
-            logger.debug(f"Story {story.id}: Found script v{script.version} ({len(script.text)} chars)")
+            review = Review(text=feedback, score=score, created_at=datetime.now())
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
-            # Generate the review
-            logger.info(f"Story {story.id}: Generating review for title v{title.version} against script v{script.version}")
-            review_text, review_score = self._generate_review(title, script)
-            logger.info(f"Story {story.id}: Review generated with score {review_score}")
-
-            # Create and save the Review record
-            review = Review(text=review_text, score=review_score, created_at=datetime.now())
-            saved_review = self.review_repo.insert(review)
-            logger.debug(f"Story {story.id}: Review saved with id {saved_review.id}")
-
-            # Link review back to the title that was reviewed
             self._conn.execute(
                 "UPDATE Title SET review_id = ? WHERE id = ?",
-                (saved_review.id, title.id)
+                (review.id, row["title_id"]),
             )
             self._conn.commit()
 
-            # Determine next state based on score
-            title_accepted = review_score >= self.acceptance_threshold
-            new_state = self.STATE_ON_ACCEPT if title_accepted else self.STATE_ON_REJECT
+            title_accepted = score >= self.acceptance_threshold
+            new_state = OUTPUT_STATE_PASS if title_accepted else OUTPUT_STATE_FAIL
 
-            logger.info(
-                f"Story {story.id}: Title {'accepted' if title_accepted else 'rejected'} "
-                f"(score {review_score} vs threshold {self.acceptance_threshold}), "
-                f"transitioning to {new_state}"
-            )
-
-            # Update story state
+            story = self.story_repo.find_by_id(story_id)
             story.state = new_state
-            story.updated_at = datetime.now()
             self.story_repo.update(story)
 
-            logger.info(f"Story {story.id}: Processing completed successfully")
-            return ReviewTitleFromScriptResult(
-                success=True,
-                story_id=story.id,
-                review_id=saved_review.id,
-                review_score=review_score,
-                review_text=review_text,
-                new_state=new_state,
-                title_accepted=title_accepted,
+            result.review_score  = score
+            result.review_text   = feedback
+            result.title_accepted = title_accepted
+            result.new_state     = new_state
+            result.success       = True
+
+            logger.info(
+                f"Story {story_id}: title review complete, "
+                f"score={score}, accepted={title_accepted}, next={new_state}"
             )
-        
-        except ValueError as e:
-            error_msg = f"Validation error: {str(e)}"
-            logger.error(f"Story {story.id}: {error_msg}")
-            return ReviewTitleFromScriptResult(
-                success=False,
-                story_id=story.id,
-                error_message=error_msg,
-            )
+
         except Exception as e:
-            error_msg = f"Unexpected error during processing: {str(e)}"
-            logger.exception(f"Story {story.id}: {error_msg}")
-            return ReviewTitleFromScriptResult(
-                success=False,
-                story_id=story.id,
-                error_message=error_msg,
-            )
+            result.error_message = f"Title review failed: {str(e)}"
+            logger.exception(f"Error processing story {story_id}")
 
-    def process_oldest_story(self) -> ReviewTitleFromScriptResult:
-        """Process the next story in the Review.Title.From.Content state.
-
-        Uses priority ordering: lowest content version ASC, highest content
-        review score DESC, oldest story ASC.
-
-        Returns:
-            ReviewTitleFromScriptResult with processing outcome
-        """
-        logger.info(f"Looking for next story in state {self.CURRENT_STATE}")
-        row = self._fetch_story_with_content()
-        if not row:
-            logger.warning(f"No stories found in state '{self.CURRENT_STATE}'")
-            return ReviewTitleFromScriptResult(
-                success=False, error_message=f"No stories found in state '{self.CURRENT_STATE}'"
-            )
-
-        story = self.story_repo.find_by_id(row["story_id"])
-        return self.process_story(story)
-
-    def process_all_stories(self, limit: Optional[int] = None) -> List[ReviewTitleFromScriptResult]:
-        """Process all stories in the Review.Title.From.Content state.
-
-        Args:
-            limit: Optional maximum number of stories to process
-
-        Returns:
-            List of ReviewTitleFromScriptResult for each processed story
-        """
-        results = []
-        stories = self.story_repo.find_by_state_ordered_by_created(
-            self.CURRENT_STATE, ascending=True
-        )
-
-        if limit:
-            stories = stories[:limit]
-
-        for story in stories:
-            result = self.process_story(story)
-            results.append(result)
-
-        return results
-
-
-def create_review_table_sql() -> str:
-    """Get SQL to create the Review table if it doesn't exist.
-
-    Returns:
-        SQL CREATE TABLE statement for Review
-    """
-    return """
-    CREATE TABLE IF NOT EXISTS Review (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT NOT NULL,
-        score INTEGER NOT NULL CHECK (score >= 0 AND score <= 100),
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    
-    CREATE INDEX IF NOT EXISTS idx_review_score ON Review(score);
-    """
+        return result
 
 
 __all__ = [
     "ReviewTitleFromScriptService",
     "ReviewTitleFromScriptResult",
-    "ReviewRepository",
-    "create_review_table_sql",
     "TITLE_ACCEPTANCE_THRESHOLD",
 ]

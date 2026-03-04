@@ -27,7 +27,7 @@ _PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
 INPUT_STATE = StateNames.REVIEW_CONTENT_TONE
 OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_CONTENT       # → modul 13
-OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT     # → modul 08 (soft title improvement)
+OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE    # → modul 09 (soft content improvement)
 
 _AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
 _AI_TEMPERATURE = 0.3
