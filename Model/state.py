@@ -78,6 +78,7 @@ class StoryState(str, Enum):
 
     # Stages 7-9: Refinement and Re-review
     TITLE_FROM_TITLE_REVIEW_CONTENT = f"{_STATE_PREFIX}.Title.From.Title.Review.Content"
+    CONTENT_FROM_TITLE_CONTENT_REVIEW = f"{_STATE_PREFIX}.Content.From.Title.Content.Review"
     CONTENT_FROM_CONTENT_REVIEW_TITLE = f"{_STATE_PREFIX}.Content.From.Content.Review.Title"
     CONTENT_FROM_TITLE_REVIEW_CONTENT = f"{_STATE_PREFIX}.Content.From.Title.Review.Content"
     REVIEW_CONTENT_FROM_TITLE = f"{_STATE_PREFIX}.Review.Content.From.Title"
@@ -145,6 +146,7 @@ class StateNames:
     # Stages 7-9: Refinement and Re-review
     # =========================================================================
     TITLE_FROM_TITLE_REVIEW_CONTENT = f"{STATE_PREFIX}.Title.From.Title.Review.Content"
+    CONTENT_FROM_TITLE_CONTENT_REVIEW = f"{STATE_PREFIX}.Content.From.Title.Content.Review"
     CONTENT_FROM_CONTENT_REVIEW_TITLE = f"{STATE_PREFIX}.Content.From.Content.Review.Title"
     CONTENT_FROM_TITLE_REVIEW_CONTENT = f"{STATE_PREFIX}.Content.From.Title.Review.Content"
     REVIEW_CONTENT_FROM_TITLE = f"{STATE_PREFIX}.Review.Content.From.Title"
@@ -184,6 +186,7 @@ class StateNames:
             TITLE_FROM_IDEA,
             CONTENT_FROM_IDEA_TITLE,
             TITLE_FROM_TITLE_REVIEW_CONTENT,
+            CONTENT_FROM_TITLE_CONTENT_REVIEW,
             CONTENT_FROM_CONTENT_REVIEW_TITLE,
             CONTENT_FROM_TITLE_REVIEW_CONTENT,
             TITLE_FROM_CONTENT_REVIEW_TITLE,

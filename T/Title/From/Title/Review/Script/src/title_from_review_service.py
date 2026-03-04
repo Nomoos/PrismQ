@@ -162,9 +162,8 @@ def _create_mock_script_review(content: str, title: str, score: int = 65) -> Opt
         return None
 
     return ScriptReview(
-        content_id=f"content-db",
-        content_text=content,
-        script_version="v1",
+        content_id="content-db",
+        script_title=title,
         overall_score=score,
         category_scores=[
             CategoryScore(

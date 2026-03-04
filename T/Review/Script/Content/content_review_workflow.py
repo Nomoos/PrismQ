@@ -144,14 +144,14 @@ def main():
             if result.passes:
                 print_success(
                     f"Story {result.story_id}: PASSED content review "
-                    f"(score: {result.overall_score:.0f})"
+                    f"(score: {result.score:.0f})"
                 )
                 print_info(f"  Next state: {result.next_state}")
                 total_passed += 1
             else:
                 print_warning(
                     f"Story {result.story_id}: FAILED content review "
-                    f"(score: {result.overall_score:.0f})"
+                    f"(score: {result.score:.0f})"
                 )
                 print_info(f"  Next state: {result.next_state}")
                 total_failed += 1
