@@ -1,121 +1,141 @@
-# PrismQ Content Production Workflow
+# PrismQ.T Content Production — State Machine
 
-**Complete State Machine for Content Production from Inspiration to Archive**
+**Complete state diagram for Story production pipeline (modules 03–20)**
 
-> 📖 **See also**: 
-> - [MVP Workflow Overview](./mvp-overview.md) for detailed 26-stage workflow principles
-> - [Workflow Documentation Index](./README.md) for complete navigation
+> 📖 **See also**:
+> - [Workflow Documentation Index](./README.md)
+> - Module reports in `_meta/reports/`
 
-## Overview
+---
 
-This document defines the complete workflow state machine for PrismQ content production, from initial inspiration through publication and analytics to final archival.
-
-## Workflow State Diagram
+## State Diagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> IdeaInspiration
-    IdeaInspiration --> Idea
-    IdeaInspiration --> Archived
+    direction TB
 
-    state Idea {
-        [*] --> Creation
-        Creation --> Outline
-        Outline --> Title
+    %% ── State aliases (short ID → actual PrismQ.T state string) ──────────
+    TitleFromIdea          : PrismQ.T.Title.From.Idea
+    ContentFromIdeaTitle   : PrismQ.T.Content.From.Idea.Title
+    RevTitleFromContentIdea: PrismQ.T.Review.Title.From.Content.Idea
+    RevContentFromTitleIdea: PrismQ.T.Review.Content.From.Title.Idea
+    RevTitleFromContent    : PrismQ.T.Review.Title.From.Content
+    TitleRegen             : PrismQ.T.Title.From.Title.Review.Content
+    ContentRegen09         : PrismQ.T.Content.From.Title.Content.Review
+    RevContentFromTitle    : PrismQ.T.Review.Content.From.Title
+    Grammar                : PrismQ.T.Review.Content.Grammar
+    Tone                   : PrismQ.T.Review.Content.Tone
+    Content                : PrismQ.T.Review.Content.Content
+    Consistency            : PrismQ.T.Review.Content.Consistency
+    Editing                : PrismQ.T.Review.Content.Editing
+    TitleReadability       : PrismQ.T.Review.Title.Readability
+    ContentReadability     : PrismQ.T.Review.Content.Readability
+    StoryReview            : PrismQ.T.Story.Review
+    StoryPolish            : PrismQ.T.Story.Polish
+    Publishing             : PrismQ.T.Publishing
 
-        Title --> [*]   %% Title is the final substate before exiting Idea
-    }
+    %% ── Phase 1–2: Generation ────────────────────────────────────────────
+    [*]                    --> TitleFromIdea
+    TitleFromIdea          --> ContentFromIdeaTitle
 
-    Idea --> ScriptDraft
-    Idea --> IdeaInspiration
-    Idea --> Archived
-    
-    ScriptDraft --> ScriptReview
-    ScriptDraft --> Idea
-    ScriptDraft --> Archived
+    %% ── Phase 3: Initial Review Cycle (modules 05–07) ───────────────────
+    ContentFromIdeaTitle   --> RevTitleFromContentIdea
 
-    ScriptReview --> ScriptApproved
-    ScriptReview --> ScriptDraft
-    ScriptReview --> Idea
-    ScriptReview --> Archived
+    RevTitleFromContentIdea --> RevContentFromTitleIdea : PASS
+    RevTitleFromContentIdea --> TitleRegen              : FAIL
 
-    ScriptApproved --> TextPublishing
-    ScriptApproved --> ScriptReview
-    ScriptApproved --> Archived
+    RevContentFromTitleIdea --> RevTitleFromContent     : PASS
+    RevContentFromTitleIdea --> ContentRegen09          : FAIL
 
-    %% Text Publication Branch
-    TextPublishing --> PublishedText
-    TextPublishing --> ScriptApproved
-    TextPublishing --> Archived
+    RevTitleFromContent     --> RevContentFromTitle     : PASS
+    RevTitleFromContent     --> TitleRegen              : FAIL
 
-    PublishedText --> Voiceover
-    PublishedText --> AnalyticsReviewText
-    PublishedText --> Archived
+    %% ── Phase 4: Regeneration (modules 08–09) ───────────────────────────
+    TitleRegen      --> RevContentFromTitle
+    ContentRegen09  --> RevContentFromTitle
 
-    AnalyticsReviewText --> Archived
-    AnalyticsReviewText --> IdeaInspiration
+    %% ── Phase 5: Pre-Quality Gate (module 10) ───────────────────────────
+    RevContentFromTitle --> Grammar        : PASS
+    RevContentFromTitle --> ContentRegen09 : FAIL
 
-    %% Audio Production uses published text
-    Voiceover --> VoiceoverReview
-    Voiceover --> PublishedText
-    Voiceover --> Archived
+    %% ── Phase 6: Quality Review Chain (modules 11–17) ───────────────────
+    Grammar     --> Tone        : PASS ≥85
+    Grammar     --> TitleRegen  : FAIL
 
-    VoiceoverReview --> VoiceoverApproved
-    VoiceoverReview --> Voiceover
-    VoiceoverReview --> PublishedText
-    VoiceoverReview --> Archived
+    Tone        --> Content     : PASS ≥75
+    Tone        --> TitleRegen  : FAIL
 
-    VoiceoverApproved --> AudioPublishing
-    VoiceoverApproved --> VoiceoverReview
-    VoiceoverApproved --> Archived
+    Content     --> Consistency : PASS ≥75
+    Content     --> TitleRegen  : FAIL
 
-    %% Audio Publication Branch
-    AudioPublishing --> PublishedAudio
-    AudioPublishing --> VoiceoverApproved
-    AudioPublishing --> Archived
+    Consistency --> Editing     : PASS ≥80
+    Consistency --> TitleRegen  : FAIL
 
-    PublishedAudio --> ScenePlanning
-    PublishedAudio --> AnalyticsReviewAudio
-    PublishedAudio --> Archived
+    Editing     --> TitleReadability : PASS ≥75
+    Editing     --> TitleRegen  : FAIL
 
-    AnalyticsReviewAudio --> Archived
-    AnalyticsReviewAudio --> IdeaInspiration
+    TitleReadability    --> ContentReadability : PASS ≥75
+    TitleReadability    --> TitleRegen  : FAIL
 
-    %% Video Production uses published audio
-    ScenePlanning --> KeyframePlanning
-    ScenePlanning --> PublishedAudio
-    ScenePlanning --> Archived
+    ContentReadability  --> StoryReview : PASS ≥75
+    ContentReadability  --> TitleRegen  : FAIL
 
-    KeyframePlanning --> KeyframeGeneration
-    KeyframePlanning --> ScenePlanning
-    KeyframePlanning --> Archived
+    %% ── Quality FAIL → soft title improvement → back to quality gate ─────
+    %% TitleRegen (mod 08) and ContentRegen09 (mod 09) already loop to RevContentFromTitle above
 
-    KeyframeGeneration --> VideoAssembly
-    KeyframeGeneration --> KeyframePlanning
-    KeyframeGeneration --> Archived
+    %% ── Phase 7: Expert Review (modules 18–19) ──────────────────────────
+    StoryReview --> StoryPolish : PASS ≥70
+    StoryReview --> TitleRegen  : FAIL
 
-    VideoAssembly --> VideoReview
-    VideoAssembly --> KeyframeGeneration
-    VideoAssembly --> Archived
+    StoryPolish --> Publishing
 
-    VideoReview --> VideoFinalized
-    VideoReview --> VideoAssembly
-    VideoReview --> KeyframeGeneration
-    VideoReview --> Archived
-
-    VideoFinalized --> PublishPlanning
-    VideoFinalized --> VideoReview
-    VideoFinalized --> Archived
-
-    %% Video Publication Branch
-    PublishPlanning --> PublishedVideo
-    PublishPlanning --> VideoFinalized
-    PublishPlanning --> Archived
-
-    PublishedVideo --> AnalyticsReviewVideo
-    PublishedVideo --> Archived
-
-    AnalyticsReviewVideo --> Archived
-    AnalyticsReviewVideo --> IdeaInspiration
+    Publishing --> [*]
 ```
 
+---
+
+## State Reference Table
+
+| Module | State (PrismQ.T string) | Description |
+|--------|------------------------|-------------|
+| 03 | `PrismQ.T.Title.From.Idea` | AI title generation from Idea |
+| 04 | `PrismQ.T.Content.From.Idea.Title` | AI content generation from Idea + Title |
+| 05 | `PrismQ.T.Review.Title.From.Content.Idea` | AI review: title vs. content + idea |
+| 06 | `PrismQ.T.Review.Content.From.Title.Idea` | AI review: content vs. title + idea |
+| 07 | `PrismQ.T.Review.Title.From.Content` | AI review: title vs. content (final pre-chain) |
+| 08 | `PrismQ.T.Title.From.Title.Review.Content` | Title regeneration from review feedback |
+| 09 | `PrismQ.T.Content.From.Title.Content.Review` | Content regeneration from early review feedback |
+| 10 | `PrismQ.T.Review.Content.From.Title` | **Quality gate**: final review before grammar chain |
+| 11 | `PrismQ.T.Review.Content.Grammar` | Grammar, punctuation, syntax (threshold ≥ 85) |
+| 12 | `PrismQ.T.Review.Content.Tone` | Tone, voice, emotional register (threshold ≥ 75) |
+| 13 | `PrismQ.T.Review.Content.Content` | Factual accuracy, coherence (threshold ≥ 75) |
+| 14 | `PrismQ.T.Review.Content.Consistency` | Character/timeline/detail consistency (threshold ≥ 80) |
+| 15 | `PrismQ.T.Review.Content.Editing` | Clarity, flow, wordiness, pacing (threshold ≥ 75) |
+| 16 | `PrismQ.T.Review.Title.Readability` | Title clarity, catchiness, length (threshold ≥ 75) |
+| 17 | `PrismQ.T.Review.Content.Readability` | Voice-over suitability, spoken flow (threshold ≥ 75) |
+| 18 | `PrismQ.T.Story.Review` | Expert holistic review: title+content (threshold ≥ 70) |
+| 19 | `PrismQ.T.Story.Polish` | Final polish + SEO optimisation |
+| 20 | `PrismQ.T.Publishing` | Terminal state — ready for publication |
+
+### Regeneration States (FAIL destinations)
+
+| State | Used when | Next state |
+|-------|-----------|------------|
+| `PrismQ.T.Content.From.Title.Content.Review` | Module 06 FAIL, Module 10 FAIL | Module 10 |
+| `PrismQ.T.Title.From.Title.Review.Content` | Module 05 FAIL, Module 07 FAIL | Module 10 |
+| `PrismQ.T.Content.From.Title.Review.Content` | Module 11 (Grammar) FAIL | Module 10 |
+| `PrismQ.T.Content.From.Content.Review.Title` | Modules 12–18 FAIL | Module 10 |
+
+---
+
+## AI Model Assignment
+
+| Phase | Modules | Model | Notes |
+|-------|---------|-------|-------|
+| Generation | 03–04 | `qwen3:14b` | Via `PRISMQ_AI_MODEL` env var |
+| Initial reviews | 05–07 | `qwen3:14b` | Via `PRISMQ_AI_MODEL_REVIEW` env var |
+| Regeneration | 08–09 | `qwen3:14b` | |
+| Quality gate | 10 | `qwen3:14b` | |
+| Quality reviews | 11–17 | `qwen3:14b` (local Ollama) | Via `PRISMQ_AI_MODEL_REVIEW` |
+| Expert review | 18 | External (GPT / Claude) | Not Ollama — top expert model |
+| Polish | 19 | `qwen3:14b` | |
