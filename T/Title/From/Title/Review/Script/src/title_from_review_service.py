@@ -213,24 +213,57 @@ class TitleFromReviewService:
         self.title_repo = TitleRepository(connection)
         self.content_repo = ContentRepository(connection)
 
+    def _fetch_next_story(self):
+        """Fetch the next story to process using priority ordering.
+
+        Selection priority:
+          1. Lowest title version (ASC) — fewest regen cycles first
+          2. Highest last title review score (DESC) — pick story closest to threshold
+          3. Oldest story (created_at ASC) as tiebreaker
+
+        Returns:
+            sqlite3.Row with story_id field, or None
+        """
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.version     AS title_version,
+                t.review_id   AS title_review_id,
+                COALESCE(r.score, 0) AS last_title_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = t.review_id
+            WHERE s.state = ?
+            ORDER BY t.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (self.INPUT_STATE,),
+        )
+        return cursor.fetchone()
+
     def process_oldest_story(self) -> TitleImprovementResult:
-        """Process the oldest story in TITLE_FROM_TITLE_REVIEW_CONTENT state.
+        """Process the next story in TITLE_FROM_TITLE_REVIEW_CONTENT state.
+
+        Uses priority ordering: lowest title version ASC, highest title
+        review score DESC, oldest story ASC.
 
         Returns:
             TitleImprovementResult with processing details
         """
-        stories = self.story_repo.find_by_state_ordered_by_created(
-            self.INPUT_STATE, ascending=True
-        )
+        row = self._fetch_next_story()
 
-        if not stories:
+        if not row:
             return TitleImprovementResult(
                 success=True,
                 story_id=None,
                 error="No stories found in state",
             )
 
-        story = stories[0]
+        story = self.story_repo.find_by_id(row["story_id"])
         return self._process_story(story)
 
     def _process_story(self, story: Story) -> TitleImprovementResult:

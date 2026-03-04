@@ -179,6 +179,46 @@ class ReviewTitleFromScriptService:
         self.content_repo = content_repo
         self.review_repo = review_repo
         self.acceptance_threshold = acceptance_threshold
+        self._conn = story_repo._conn
+
+    def _fetch_story_with_content(self):
+        """Fetch the next story to process using priority ordering.
+
+        Selection priority:
+          1. Lowest content version (ASC) — fewest regen cycles first
+          2. Highest last content review score (DESC) — pick story closest to threshold
+          3. Oldest story (created_at ASC) as tiebreaker
+
+        Returns:
+            sqlite3.Row with story/title/content fields, or None
+        """
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                t.version     AS title_version,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                c.review_id   AS content_review_id,
+                COALESCE(r.score, 0) AS last_content_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Review r ON r.id = c.review_id
+            WHERE s.state = ?
+            ORDER BY c.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (self.CURRENT_STATE,),
+        )
+        return cursor.fetchone()
 
     def find_oldest_story_to_process(self) -> Optional[Story]:
         """Find the oldest story in the Review.Title.From.Content state.
@@ -362,10 +402,17 @@ class ReviewTitleFromScriptService:
             saved_review = self.review_repo.insert(review)
             logger.debug(f"Story {story.id}: Review saved with id {saved_review.id}")
 
+            # Link review back to the title that was reviewed
+            self._conn.execute(
+                "UPDATE Title SET review_id = ? WHERE id = ?",
+                (saved_review.id, title.id)
+            )
+            self._conn.commit()
+
             # Determine next state based on score
             title_accepted = review_score >= self.acceptance_threshold
             new_state = self.STATE_ON_ACCEPT if title_accepted else self.STATE_ON_REJECT
-            
+
             logger.info(
                 f"Story {story.id}: Title {'accepted' if title_accepted else 'rejected'} "
                 f"(score {review_score} vs threshold {self.acceptance_threshold}), "
@@ -376,11 +423,6 @@ class ReviewTitleFromScriptService:
             story.state = new_state
             story.updated_at = datetime.now()
             self.story_repo.update(story)
-
-            # Note: The review_id could be linked to Title via FK but Title uses
-            # INSERT-only pattern (create new version instead of update). The review
-            # result is stored separately and the story state tracks progression.
-            # The StoryReview linking table could be used for formal linking if needed.
 
             logger.info(f"Story {story.id}: Processing completed successfully")
             return ReviewTitleFromScriptResult(
@@ -411,19 +453,23 @@ class ReviewTitleFromScriptService:
             )
 
     def process_oldest_story(self) -> ReviewTitleFromScriptResult:
-        """Process the oldest story in the Review.Title.From.Content state.
+        """Process the next story in the Review.Title.From.Content state.
+
+        Uses priority ordering: lowest content version ASC, highest content
+        review score DESC, oldest story ASC.
 
         Returns:
             ReviewTitleFromScriptResult with processing outcome
         """
-        logger.info(f"Looking for oldest story in state {self.CURRENT_STATE}")
-        story = self.find_oldest_story_to_process()
-        if not story:
+        logger.info(f"Looking for next story in state {self.CURRENT_STATE}")
+        row = self._fetch_story_with_content()
+        if not row:
             logger.warning(f"No stories found in state '{self.CURRENT_STATE}'")
             return ReviewTitleFromScriptResult(
                 success=False, error_message=f"No stories found in state '{self.CURRENT_STATE}'"
             )
 
+        story = self.story_repo.find_by_id(row["story_id"])
         return self.process_story(story)
 
     def process_all_stories(self, limit: Optional[int] = None) -> List[ReviewTitleFromScriptResult]:

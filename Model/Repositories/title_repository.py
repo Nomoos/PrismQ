@@ -2,7 +2,7 @@
 
 This module provides SQLite implementations of the IVersionedRepository interface
 for Title entities, handling SQL DML (Data Manipulation Language) operations
-only: SELECT, INSERT.
+only: SELECT, INSERT, UPDATE (limited to review_id FK).
 
 Note:
     This repository does NOT handle schema creation (DDL). Use SchemaManager
@@ -184,6 +184,30 @@ class TitleRepository(IVersionedRepository[Title, int]):
                 "constraint": "story_id, version"
             })
     
+    def update_review_id(self, title_id: int, review_id: int) -> bool:
+        """Update the review_id FK on a Title.
+
+        This is a limited update operation specifically for linking
+        a Review to a Title after quality review is performed.
+
+        Note:
+            This is an exception to the INSERT+READ only pattern,
+            allowed because review_id is a reference field, not content.
+
+        Args:
+            title_id: The title's primary key.
+            review_id: The review to link (FK to Review table).
+
+        Returns:
+            True if the title was updated, False if not found.
+        """
+        cursor = self._conn.execute(
+            "UPDATE Title SET review_id = ? WHERE id = ?",
+            (review_id, title_id)
+        )
+        self._conn.commit()
+        return cursor.rowcount > 0
+
     # === IVersionedRepository Operations ===
     
     def find_latest_version(self, story_id: int) -> Optional[Title]:

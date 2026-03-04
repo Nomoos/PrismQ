@@ -217,60 +217,72 @@ class ReviewContentFromTitleIdeaService:
 
         return feedback, score
 
+    def _fetch_story_with_content(self):
+        """Fetch the next story to process using priority ordering.
+
+        Selection priority:
+          1. Lowest title version (ASC) — fewest regen cycles first
+          2. Highest last title review score (DESC) — pick story closest to threshold
+          3. Oldest story (created_at ASC) as tiebreaker
+
+        Returns:
+            sqlite3.Row with story/title/content/idea fields, or None
+        """
+        cursor = self._conn.execute(
+            """
+            SELECT
+                s.id          AS story_id,
+                s.idea_id     AS idea_id,
+                t.id          AS title_id,
+                t.text        AS title_text,
+                t.version     AS title_version,
+                t.review_id   AS title_review_id,
+                c.id          AS content_id,
+                c.text        AS content_text,
+                c.version     AS content_version,
+                COALESCE(i.text, '') AS idea_text,
+                COALESCE(r.score, 0) AS last_title_review_score
+            FROM Story s
+            INNER JOIN Title t
+                ON t.story_id = s.id
+                AND t.version = (SELECT MAX(t2.version) FROM Title t2 WHERE t2.story_id = s.id)
+            INNER JOIN Content c
+                ON c.story_id = s.id
+                AND c.version = (SELECT MAX(c2.version) FROM Content c2 WHERE c2.story_id = s.id)
+            LEFT JOIN Idea i ON i.id = s.idea_id
+            LEFT JOIN Review r ON r.id = t.review_id
+            WHERE s.state = ?
+            ORDER BY t.version ASC, COALESCE(r.score, 0) DESC, s.created_at ASC
+            LIMIT 1
+            """,
+            (self.INPUT_STATE,),
+        )
+        return cursor.fetchone()
+
     def process_oldest_story(self) -> ReviewContentFromTitleIdeaResult:
         """Process the oldest story in PrismQ.T.Review.Content.From.Title.Idea state.
 
         Returns:
             ReviewContentFromTitleIdeaResult with processing details
         """
-        # Find oldest story in this state
-        stories = self.story_repo.find_by_state_ordered_by_created(
-            self.INPUT_STATE, ascending=True
-        )
+        row = self._fetch_story_with_content()
 
-        if not stories:
+        if not row:
             return ReviewContentFromTitleIdeaResult(
                 success=True,
                 story_id=None,
                 error="No stories found in state"
             )
 
-        story = stories[0]
-        result = ReviewContentFromTitleIdeaResult(success=False, story_id=story.id)
+        result = ReviewContentFromTitleIdeaResult(success=False, story_id=row["story_id"])
 
         try:
-            # Get latest title for the story
-            title = self.title_repo.find_latest_version(story.id)
-            if not title:
-                result.error = "No title found for story"
-                return result
-
-            # Get latest content for the story
-            content = self.content_repo.find_latest_version(story.id)
-            if not content:
-                result.error = "No content found for story"
-                return result
-
-            # Get idea context
-            idea_text = ""
-            if story.idea_id and IDEA_DB_AVAILABLE:
-                try:
-                    cursor = self._conn.execute("PRAGMA database_list")
-                    db_file = cursor.fetchone()[2]
-
-                    idea_db = IdeaTable(db_file)
-                    idea_db.connect()
-                    idea_data = idea_db.get_idea(story.idea_id)
-                    if idea_data:
-                        idea_text = idea_data.get("text", "")
-                    idea_db.close()
-                except Exception as e:
-                    logger.warning(f"Could not fetch idea {story.idea_id}: {e}")
+            idea_text = row["idea_text"]
 
             # Perform AI review with title, content, and idea context (always AI — no fallback)
             review_text, review_score = self._ai_review_content(
-                content_text=content.text,
-                title_text=title.text,
+                content_text=row["content_text"],
+                title_text=row["title_text"],
                 idea_text=idea_text,
             )
 
@@ -282,6 +294,13 @@ class ReviewContentFromTitleIdeaService:
             )
             review = self.review_repo.insert(review)
             result.review_id = review.id
+
+            # Link review back to the content that was reviewed
+            self._conn.execute(
+                "UPDATE Content SET review_id = ? WHERE id = ?",
+                (review.id, row["content_id"])
+            )
+            self._conn.commit()
 
             result.text = review_text
             result.score = review_score
@@ -295,17 +314,18 @@ class ReviewContentFromTitleIdeaService:
                 result.next_state = self.OUTPUT_STATE_FAIL
 
             # Update story state
+            story = self.story_repo.find_by_id(row["story_id"])
             story.state = result.next_state
             self.story_repo.update(story)
 
             result.success = True
             logger.info(
-                f"Story {story.id}: Content review complete, "
+                f"Story {row['story_id']}: Content review complete, "
                 f"score={review_score}, accepted={result.accepted}"
             )
 
         except Exception as e:
             result.error = f"Processing failed: {str(e)}"
-            logger.exception(f"Error processing story {story.id}")
+            logger.exception(f"Error processing story {row['story_id']}")
 
         return result
