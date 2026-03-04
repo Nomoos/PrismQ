@@ -2,6 +2,7 @@
 
 # Production dependencies
 python-dotenv>=1.0.0  # For config management
+requests>=2.28.0      # For Ollama API calls
 
 # Testing dependencies - only needed for running tests
 pytest>=7.0.0
