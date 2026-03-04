@@ -2,7 +2,7 @@
 
 Processes stories in REVIEW_CONTENT_TONE state using local Ollama AI (qwen3:14b).
 On PASS → REVIEW_CONTENT_EDITING
-On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
+On FAIL → TITLE_FROM_TITLE_REVIEW_CONTENT (module 08 — soft title improvement)
 """
 
 import json
@@ -27,7 +27,7 @@ _PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
 INPUT_STATE = StateNames.REVIEW_CONTENT_TONE
 OUTPUT_STATE_PASS = StateNames.REVIEW_CONTENT_CONTENT       # → modul 13
-OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE  # → modul 09
+OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT     # → modul 08 (soft title improvement)
 
 _AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
 _AI_TEMPERATURE = 0.3
@@ -56,8 +56,8 @@ class ScriptToneReviewService:
 
     Calls local Ollama with qwen3:14b to evaluate tone consistency, voice,
     emotional register, and style coherence.
-    On PASS (score >= 75) → REVIEW_CONTENT_EDITING
-    On FAIL (score < 75)  → CONTENT_FROM_CONTENT_REVIEW_TITLE
+    On PASS (score >= 75) → REVIEW_CONTENT_CONTENT
+    On FAIL (score < 75)  → TITLE_FROM_TITLE_REVIEW_CONTENT (module 08)
     """
 
     def __init__(self, connection: sqlite3.Connection):

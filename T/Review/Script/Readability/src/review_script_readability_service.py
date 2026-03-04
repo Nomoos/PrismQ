@@ -3,7 +3,7 @@
 Processes stories in REVIEW_CONTENT_READABILITY state using local Ollama AI (qwen3:14b).
 Reviews voice-over suitability: pronunciation ease, natural pacing, spoken flow.
 On PASS → STORY_REVIEW
-On FAIL → CONTENT_FROM_CONTENT_REVIEW_TITLE (step 09 — AI content regeneration)
+On FAIL → TITLE_FROM_TITLE_REVIEW_CONTENT (module 08 — soft title improvement)
 """
 
 import json
@@ -28,7 +28,7 @@ _PROMPTS_DIR = Path(__file__).parent.parent / "_meta" / "prompts"
 
 INPUT_STATE = StateNames.REVIEW_CONTENT_READABILITY
 OUTPUT_STATE_PASS = StateNames.STORY_REVIEW
-OUTPUT_STATE_FAIL = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE
+OUTPUT_STATE_FAIL = StateNames.TITLE_FROM_TITLE_REVIEW_CONTENT     # → modul 08 (soft title improvement)
 
 _AI_MODEL = os.getenv("PRISMQ_AI_MODEL_REVIEW", "qwen3:14b")
 _AI_TEMPERATURE = 0.3

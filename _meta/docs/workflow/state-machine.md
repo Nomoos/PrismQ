@@ -15,24 +15,24 @@ stateDiagram-v2
     direction TB
 
     %% ── State aliases (short ID → actual PrismQ.T state string) ──────────
-    TitleFromIdea          : PrismQ.T.Title.From.Idea
-    ContentFromIdeaTitle   : PrismQ.T.Content.From.Idea.Title
-    RevTitleFromContentIdea: PrismQ.T.Review.Title.From.Content.Idea
-    RevContentFromTitleIdea: PrismQ.T.Review.Content.From.Title.Idea
-    RevTitleFromContent    : PrismQ.T.Review.Title.From.Content
-    TitleRegen             : PrismQ.T.Title.From.Title.Review.Content
-    ContentRegen09         : PrismQ.T.Content.From.Title.Content.Review
-    RevContentFromTitle    : PrismQ.T.Review.Content.From.Title
-    Grammar                : PrismQ.T.Review.Content.Grammar
-    Tone                   : PrismQ.T.Review.Content.Tone
-    Content                : PrismQ.T.Review.Content.Content
-    Consistency            : PrismQ.T.Review.Content.Consistency
-    Editing                : PrismQ.T.Review.Content.Editing
-    TitleReadability       : PrismQ.T.Review.Title.Readability
-    ContentReadability     : PrismQ.T.Review.Content.Readability
-    StoryReview            : PrismQ.T.Story.Review
-    StoryPolish            : PrismQ.T.Story.Polish
-    Publishing             : PrismQ.T.Publishing
+    TitleFromIdea          : [03] PrismQ.T.Title.From.Idea
+    ContentFromIdeaTitle   : [04] PrismQ.T.Content.From.Idea.Title
+    RevTitleFromContentIdea: [05] PrismQ.T.Review.Title.From.Content.Idea
+    RevContentFromTitleIdea: [06] PrismQ.T.Review.Content.From.Title.Idea
+    RevTitleFromContent    : [07] PrismQ.T.Review.Title.From.Content
+    TitleRegen             : [08] PrismQ.T.Title.From.Title.Review.Content
+    ContentRegen09         : [09] PrismQ.T.Content.From.Title.Content.Review
+    RevContentFromTitle    : [10] PrismQ.T.Review.Content.From.Title
+    Grammar                : [11] PrismQ.T.Review.Content.Grammar
+    Tone                   : [12] PrismQ.T.Review.Content.Tone
+    Content                : [13] PrismQ.T.Review.Content.Content
+    Consistency            : [14] PrismQ.T.Review.Content.Consistency
+    Editing                : [15] PrismQ.T.Review.Content.Editing
+    TitleReadability       : [16] PrismQ.T.Review.Title.Readability
+    ContentReadability     : [17] PrismQ.T.Review.Content.Readability
+    StoryReview            : [18] PrismQ.T.Story.Review
+    StoryPolish            : [19] PrismQ.T.Story.Polish
+    Publishing             : [20] PrismQ.T.Publishing
 
     %% ── Phase 1–2: Generation ────────────────────────────────────────────
     [*]                    --> TitleFromIdea
@@ -55,8 +55,8 @@ stateDiagram-v2
     ContentRegen09  --> RevContentFromTitle
 
     %% ── Phase 5: Pre-Quality Gate (module 10) ───────────────────────────
-    RevContentFromTitle --> Grammar        : PASS
-    RevContentFromTitle --> ContentRegen09 : FAIL
+    RevContentFromTitle --> Grammar    : PASS
+    RevContentFromTitle --> TitleRegen : FAIL
 
     %% ── Phase 6: Quality Review Chain (modules 11–17) ───────────────────
     Grammar     --> Tone        : PASS ≥85
@@ -117,14 +117,12 @@ stateDiagram-v2
 | 19 | `PrismQ.T.Story.Polish` | Final polish + SEO optimisation |
 | 20 | `PrismQ.T.Publishing` | Terminal state — ready for publication |
 
-### Regeneration States (FAIL destinations)
+### Improvement States (FAIL destinations)
 
-| State | Used when | Next state |
-|-------|-----------|------------|
-| `PrismQ.T.Content.From.Title.Content.Review` | Module 06 FAIL, Module 10 FAIL | Module 10 |
-| `PrismQ.T.Title.From.Title.Review.Content` | Module 05 FAIL, Module 07 FAIL | Module 10 |
-| `PrismQ.T.Content.From.Title.Review.Content` | Module 11 (Grammar) FAIL | Module 10 |
-| `PrismQ.T.Content.From.Content.Review.Title` | Modules 12–18 FAIL | Module 10 |
+| Module | State | Triggered by | Next state |
+|--------|-------|--------------|------------|
+| 08 | `PrismQ.T.Title.From.Title.Review.Content` | Mod 05 FAIL, Mod 07 FAIL, Mod 10 FAIL, Mods 11–18 FAIL | Module 10 |
+| 09 | `PrismQ.T.Content.From.Title.Content.Review` | Mod 06 FAIL | Module 10 |
 
 ---
 
