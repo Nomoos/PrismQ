@@ -108,6 +108,35 @@ else
     echo "[INFO] .env file exists: $ENV_FILE"
 fi
 
+
+# =============================================================================
+# Ollama AI Models
+# =============================================================================
+
+echo ""
+echo "[INFO] Checking Ollama AI models..."
+
+OLLAMA_MODELS=("qwen3:8b" "qwen3:14b")
+
+if ! command -v ollama &> /dev/null; then
+    echo "[WARNING] Ollama not found - AI generation will be unavailable"
+    echo "          Install Ollama from: https://ollama.com/"
+else
+    for MODEL in "${OLLAMA_MODELS[@]}"; do
+        if ollama list 2>/dev/null | awk 'NR>1 {print $1}' | grep -qx "$MODEL"; then
+            echo "[INFO] Model already available: $MODEL"
+        else
+            echo "[INFO] Pulling model: $MODEL (this may take several minutes)..."
+            if ollama pull "$MODEL"; then
+                echo "[SUCCESS] Model downloaded: $MODEL"
+            else
+                echo "[WARNING] Failed to pull model: $MODEL"
+                echo "          Pull manually with: ollama pull $MODEL"
+            fi
+        fi
+    done
+fi
+
 echo ""
 echo "========================================"
 echo "Environment Setup Complete"
