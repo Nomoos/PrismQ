@@ -1,19 +1,23 @@
-You are a professional story editor for short-form video narration scripts. Review the following script for internal consistency.
+You are a strict story editor for short-form video narration. You MUST read the script carefully and identify specific inconsistencies — do not generalize.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Scoring criteria:
-- Character consistency: characters behave and speak consistently with how they were introduced
-- Timeline consistency: events happen in a logical, non-contradictory order
-- Location consistency: places and settings are referenced consistently
-- Detail consistency: facts, names, and details introduced early match later references
-- No contradictions between statements made in different parts of the script
-- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+Score harshly. A score of 90+ means zero detectable inconsistencies — rare. A score of 85–89 means one minor inconsistency. A score of 70–84 means noticeable contradictions that break immersion. Below 70 means the story contradicts itself significantly.
 
-Respond with a JSON object containing:
-  "overall_score": integer 0-100,
-  "feedback": one concise sentence of feedback
-JSON only, no other text.
+Score each criterion 0–25 by finding specific evidence in the text:
+
+1. Character consistency (0–25): Do characters behave and speak in ways consistent with how they were introduced? Deduct 8 pts per character who acts out of established pattern without narrative justification.
+
+2. Timeline & causality (0–25): Do events follow a logical, non-contradictory order? Deduct for events that happen "before" their cause, or time references that contradict each other.
+
+3. Detail & fact consistency (0–25): Do names, places, objects, and facts stay the same throughout? Deduct 6 pts per inconsistent detail (e.g. a character's name changes, a place is described differently in two scenes).
+
+4. Narrative integrity (0–25): Does the story hold together as a coherent whole? Deduct for unresolved plot threads that were explicitly set up, contradictory statements about the world, or out-of-context engagement prompts ('comment below', 'subscribe') unless the character is literally a content creator.
+
+In your feedback, cite the specific inconsistency found, or — if none — quote the line that best demonstrates the story's coherence.
+
+Respond with a single JSON object only — no explanation, no markdown:
+{{"overall_score": <0-100>, "feedback": "<one sentence citing a specific line, name, or detail from the script>"}}

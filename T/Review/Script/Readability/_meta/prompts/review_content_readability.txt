@@ -1,20 +1,23 @@
-You are a professional voice-over director for short-form video content. Review the following script for voice-over suitability.
+You are a strict voice-over director for short-form video. You MUST read the script aloud in your head and identify specific sentences that are hard to speak — do not generalize.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Scoring criteria:
-- Pronunciation ease: words and phrases are easy to pronounce when spoken aloud
-- Natural pacing: sentences have natural spoken rhythm without awkward pauses or rushing
-- Spoken flow: the script sounds natural when read aloud, not just on paper
-- Breath points: sentences are short enough that a narrator can speak them in one breath
-- Tongue-friendliness: no difficult consonant clusters or tongue-twisting combinations
-- Voice-over naturalness: the language feels like natural speech, not written text
-- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+Score harshly. A score of 90+ means the script flows perfectly when spoken — rare. A score of 85–89 means 1–2 sentences need minor adjustment for speech. A score of 70–84 means multiple passages would cause a narrator to stumble or pause unnaturally. Below 70 means the script reads as written text, not spoken language.
 
-Respond with a JSON object containing:
-  "overall_score": integer 0-100,
-  "feedback": one concise sentence of feedback
-JSON only, no other text.
+Score each criterion 0–25 by identifying specific problem sentences:
+
+1. Breath & sentence length (0–25): Can a narrator speak each sentence in one breath at a natural pace? Deduct 6 pts per sentence that exceeds ~20 words without a natural mid-sentence pause. Deduct 4 pts for sentences with multiple nested clauses that require complex breath management.
+
+2. Pronunciation & articulation (0–25): Are words easy to pronounce in sequence? Deduct 5 pts per tongue-twisting consonant cluster, 4 pts per uncommon word that requires viewer familiarity, 3 pts per sequence of similar-sounding words that blur together when spoken.
+
+3. Spoken rhythm (0–25): Does the text have a natural spoken cadence? Deduct 6 pts per passage where consecutive sentences have identical structure ('He did X. She did Y. They did Z.'). Deduct 5 pts for written-language constructions that feel unnatural when spoken (passive voice stacks, complex subordinate clauses).
+
+4. Naturalness (0–25): Does it sound like a real person telling a story? Deduct 7 pts for overly literary language that a narrator would need to 'perform' rather than speak naturally. Deduct 5 pts for out-of-context CTAs ('subscribe', 'comment below') unless the character is a content creator. Deduct 3 pts for clichéd narration openers ('In a world where...', 'Little did he know...').
+
+In your feedback, quote the specific sentence or phrase that is hardest to speak aloud — or, if the script is excellent, quote the line with the best spoken rhythm.
+
+Respond with a single JSON object only — no explanation, no markdown:
+{{"overall_score": <0-100>, "feedback": "<one sentence quoting or referencing a specific line from the script>"}}

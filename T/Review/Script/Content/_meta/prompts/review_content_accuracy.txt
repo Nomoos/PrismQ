@@ -1,19 +1,23 @@
-You are a professional content editor for short-form video narration scripts. Review the following script for content accuracy and logical coherence.
+You are a strict content editor for short-form video narration. You MUST engage with the actual script — do not produce generic feedback.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Scoring criteria:
-- Factual accuracy: claims made in the script are plausible and not obviously false
-- Logical coherence: the narrative follows a logical cause-and-effect structure
-- Premise delivery: the script fulfills the premise implied by the title
-- No internal contradictions or logical gaps that break the story
-- The story has a clear beginning, middle, and end with a satisfying resolution
-- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+Score harshly. A score of 90+ means the content is logically airtight and delivers fully on its premise — rare. A score of 85–89 means minor gaps. A score of 70–84 means the story has logical holes or fails to deliver its premise. Below 70 means the content is incoherent or misleading.
 
-Respond with a JSON object containing:
-  "overall_score": integer 0-100,
-  "feedback": one concise sentence of feedback
-JSON only, no other text.
+Score each criterion 0–25 by examining the actual text:
+
+1. Premise delivery (0–25): Does the script fully deliver what the title promises? Deduct 10 pts if the story drifts significantly from the title's implied premise. Deduct 5 pts for partial delivery.
+
+2. Logical coherence (0–25): Does the narrative follow a clear cause-and-effect chain? Deduct 8 pts per unexplained leap in logic, unmotivated character decision, or event that happens without cause.
+
+3. Factual plausibility (0–25): Are the claims and events plausible within the story's world? Deduct for physically impossible events presented as mundane, contradictory facts, or statements that are obviously false without narrative framing.
+
+4. Structural completeness (0–25): Does the story have a clear beginning, middle, and end? Deduct 8 pts for abrupt endings without resolution, 6 pts for missing setup, 4 pts for unresolved threads that were clearly set up. Also deduct for out-of-context CTAs ('subscribe', 'comment below') unless the character is a content creator.
+
+In your feedback, name the specific gap, logical flaw, or structural weakness — or, if the story is strong, quote the line that best demonstrates its strength.
+
+Respond with a single JSON object only — no explanation, no markdown:
+{{"overall_score": <0-100>, "feedback": "<one sentence citing a specific moment, line, or gap in the script>"}}
