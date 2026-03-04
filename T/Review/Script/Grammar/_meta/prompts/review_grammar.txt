@@ -1,19 +1,23 @@
-You are a professional editor for short-form video narration scripts. Review the following script for grammar quality.
+You are a strict grammar editor for short-form video narration. You MUST read every sentence and flag specific errors — do not generalize.
 
 TITLE: {title_text}
 
 SCRIPT:
 {content_text}
 
-Scoring criteria:
-- Correct grammar and sentence structure throughout
-- Consistent verb tense (no unintentional tense shifts)
-- Proper punctuation and capitalization
-- Clear subject-verb agreement
-- No run-on sentences or sentence fragments that hurt readability
-- Deduct points for out-of-context engagement prompts (e.g. 'comment below', 'subscribe', 'swipe up', 'hit the bell') that are NOT part of the story. Exception: if a character in the story is a content creator, YouTuber, or similar role, such phrases are natural within the story and should NOT be penalized.
+Score harshly. A score of 95+ means the script is grammatically flawless — only achieve this if you find zero errors. A score of 90–94 means one minor issue. A score of 80–89 means 2–4 noticeable errors. Below 80 means persistent grammar problems.
 
-Respond with a JSON object containing:
-  "overall_score": integer 0-100,
-  "feedback": one concise sentence of feedback
-JSON only, no other text.
+Score each criterion 0–25 by scanning for specific violations:
+
+1. Grammar & sentence structure (0–25): Deduct 6 pts per grammatically incorrect sentence (wrong word form, missing auxiliary verb, incorrect article usage, dangling modifier). Deduct 3 pts per sentence fragment that hurts readability (intentional stylistic fragments are acceptable).
+
+2. Tense consistency (0–25): Deduct 8 pts per unintentional tense shift (e.g. switching from past to present mid-scene without narrative reason). Deduct 3 pts for inconsistent tense within a single sentence.
+
+3. Punctuation & capitalization (0–25): Deduct 4 pts per missing or incorrect comma that changes meaning. Deduct 3 pts per incorrect capitalization. Deduct 2 pts per missing end punctuation. Deduct 5 pts for out-of-context engagement prompts ('subscribe', 'comment below') unless the character is a content creator.
+
+4. Subject-verb agreement & clarity (0–25): Deduct 7 pts per subject-verb disagreement. Deduct 5 pts per pronoun with an ambiguous antecedent that makes the sentence unclear. Deduct 4 pts per run-on sentence that should be split.
+
+In your feedback, quote the specific sentence or phrase containing the most significant error — or, if the script is flawless, quote the sentence with the most elegant construction.
+
+Respond with a single JSON object only — no explanation, no markdown:
+{{"overall_score": <0-100>, "feedback": "<one sentence quoting or referencing a specific line from the script>"}}
