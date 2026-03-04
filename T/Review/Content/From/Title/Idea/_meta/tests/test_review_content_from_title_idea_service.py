@@ -9,6 +9,7 @@ import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -35,7 +36,6 @@ from T.Review.Content.From.Title.Idea.src.review_content_from_title_idea_service
     ReviewContentFromTitleIdeaResult,
     ReviewContentFromTitleIdeaService,
     ReviewRepository,
-    _format_review_text,
 )
 
 
@@ -91,6 +91,24 @@ def db_connection():
     conn.executescript(CREATE_TABLES_SQL)
     yield conn
     conn.close()
+
+
+@pytest.fixture(autouse=True)
+def mock_ai_review(monkeypatch):
+    """Patch _ai_review_content so tests don't require a running Ollama instance."""
+    def _fake_ai_review(self, content_text, title_text, idea_text):
+        # Return a deterministic score based on simple word overlap for test predictability
+        title_words = set(w.lower() for w in title_text.split() if len(w) > 3)
+        content_words = content_text.lower()
+        matches = sum(1 for w in title_words if w in content_words)
+        score = min(100, 40 + matches * 5)
+        return f"AI review: {matches} keyword matches found.", score
+
+    monkeypatch.setattr(
+        ReviewContentFromTitleIdeaService,
+        "_ai_review_content",
+        _fake_ai_review,
+    )
 
 
 @pytest.fixture
@@ -400,100 +418,3 @@ class TestPreviewMode:
         assert result.success is True
         assert result.score is not None
         assert result.text is not None
-
-
-class TestFormatReviewText:
-    """Tests for the _format_review_text helper function."""
-
-    def test_format_includes_title(self):
-        """Test that formatted review includes the title."""
-        from review_content_from_title_idea import review_content_from_title_idea
-
-        class _Genre:
-            value = "other"
-
-        class _Idea:
-            concept = "test"
-            title = "test"
-            premise = "test"
-            hook = None
-            genre = _Genre()
-            target_audience = None
-            target_platforms = []
-            length_target = None
-            version = 1
-
-        review = review_content_from_title_idea(
-            content_text="Test content for review.",
-            title="My Amazing Title",
-            idea=_Idea(),
-        )
-
-        text = _format_review_text(review, "My Amazing Title")
-
-        assert "My Amazing Title" in text
-        assert "OVERALL SCORE" in text
-
-    def test_format_includes_score(self):
-        """Test that formatted review includes the score."""
-        from review_content_from_title_idea import review_content_from_title_idea
-
-        class _Genre:
-            value = "other"
-
-        class _Idea:
-            concept = "test"
-            title = "test"
-            premise = "test"
-            hook = None
-            genre = _Genre()
-            target_audience = None
-            target_platforms = []
-            length_target = None
-            version = 1
-
-        review = review_content_from_title_idea(
-            content_text="Test content.",
-            title="Title",
-            idea=_Idea(),
-        )
-
-        text = _format_review_text(review, "Title")
-
-        assert str(review.overall_score) in text
-
-    def test_format_shows_accepted_status(self):
-        """Test that accepted content shows correct status."""
-        from review_content_from_title_idea import review_content_from_title_idea
-
-        class _Genre:
-            value = "horror"
-
-        class _Idea:
-            concept = "fear terror darkness"
-            title = "horror story"
-            premise = "A terrifying horror story"
-            hook = None
-            genre = _Genre()
-            target_audience = None
-            target_platforms = []
-            length_target = None
-            version = 1
-
-        # Content that should score well
-        review = review_content_from_title_idea(
-            content_text=(
-                "What if you woke up and everyone was gone? Terror fills your heart as fear "
-                "grips your mind in the darkness. The horror is just beginning... "
-            ) * 5,
-            title="Horror in the Dark",
-            idea=_Idea(),
-        )
-
-        text = _format_review_text(review, "Horror in the Dark")
-
-        assert "STATUS:" in text
-        if review.overall_score >= CONTENT_ACCEPTANCE_THRESHOLD:
-            assert "accepted" in text.lower()
-        else:
-            assert "revision" in text.lower()

@@ -10,6 +10,7 @@ maintenance and editing.
 
 import json
 import logging
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -174,7 +175,7 @@ class AIConfig:
         timeout: Request timeout in seconds
     """
 
-    model: str = "qwen3:32b"  # Default: Best for RTX 5090
+    model: str = os.getenv("PRISMQ_AI_MODEL_STAGE_01", "qwen3:14b")  # Default: qwen3:14b for Script 01
     api_base: str = "http://localhost:11434"
     temperature: float = 0.8
     max_tokens: int = 2000

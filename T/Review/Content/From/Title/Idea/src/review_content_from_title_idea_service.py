@@ -15,13 +15,15 @@ State Transitions:
     - If review does not accept content (score < threshold) -> PrismQ.T.Content.From.Content.Review.Title
 """
 
+import json
 import logging
 import os
+import re
 import sqlite3
 import sys
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -57,12 +59,12 @@ try:
 except ImportError:
     IDEA_DB_AVAILABLE = False
 
-# Try to import the review function (direct import from T/Review/Content directory)
-try:
-    from T.Review.Content.review_content_from_title_idea import review_content_from_title_idea
-    REVIEW_AVAILABLE = True
-except ImportError:
-    REVIEW_AVAILABLE = False
+# Active AI model for Script 06 – qwen3:14b (override via PRISMQ_AI_MODEL_STAGE_05_06)
+_AI_MODEL = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
+_AI_TEMPERATURE = 0.3
+_AI_MAX_TOKENS = 800
+_AI_TIMEOUT = 120  # seconds
+_MAX_CONTENT_PREVIEW_LENGTH = 3000  # Chars sent to AI; keeps prompt within token budget
 
 
 # Score threshold for content acceptance
@@ -137,6 +139,85 @@ class ReviewContentFromTitleIdeaService:
         self.content_repo = ContentRepository(connection)
         self.review_repo = ReviewRepository(connection)
 
+    def _ai_review_content(
+        self,
+        content_text: str,
+        title_text: str,
+        idea_text: str,
+    ) -> Tuple[str, int]:
+        """Review content against title and idea using the AI model (Ollama).
+
+        Always calls AI — no algorithmic fallback.  The model is selected
+        via the PRISMQ_AI_MODEL_EARLY_STAGE environment variable.
+
+        Args:
+            content_text: The script/content to review
+            title_text: The title to evaluate alignment against
+            idea_text: The original idea for context
+
+        Returns:
+            Tuple of (review_text, review_score 0-100)
+
+        Raises:
+            RuntimeError: If Ollama is not available or the API call fails
+        """
+        try:
+            import requests as _requests
+        except ImportError as exc:
+            raise RuntimeError("requests library not available; run: pip install requests") from exc
+
+        prompt = (
+            "You are a professional content reviewer. "
+            "Review the following script and score how well it aligns with its title and the original idea.\n\n"
+            f"TITLE: {title_text}\n\n"
+            f"IDEA: {idea_text or 'Not provided'}\n\n"
+            f"SCRIPT:\n{content_text[:_MAX_CONTENT_PREVIEW_LENGTH]}\n\n"
+            "Respond with a JSON object containing:\n"
+            '  "overall_score": integer 0-100,\n'
+            '  "feedback": one concise sentence of feedback\n'
+            "JSON only, no other text."
+        )
+
+        try:
+            check = _requests.get("http://localhost:11434/api/tags", timeout=5)
+            if check.status_code != 200:
+                raise RuntimeError(f"Ollama not available (status {check.status_code})")
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama not reachable: {exc}") from exc
+
+        try:
+            response = _requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": _AI_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                },
+                timeout=_AI_TIMEOUT,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "").strip()
+        except _requests.exceptions.RequestException as exc:
+            raise RuntimeError(f"Ollama API call failed: {exc}") from exc
+
+        # Strip <think>...</think> blocks (Qwen3 thinking mode)
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        # Parse JSON response
+        try:
+            match = re.search(r"\{.*\}", raw, re.DOTALL)
+            if not match:
+                raise ValueError("No JSON in AI response")
+            data = json.loads(match.group())
+            score = max(0, min(100, int(data.get("overall_score", 50))))
+            feedback = str(data.get("feedback", "AI review completed."))
+        except Exception as exc:
+            logger.warning(f"Failed to parse AI content review response: {exc}")
+            raise RuntimeError(f"Could not parse AI review response: {exc}") from exc
+
+        return feedback, score
+
     def process_oldest_story(self) -> ReviewContentFromTitleIdeaResult:
         """Process the oldest story in PrismQ.T.Review.Content.From.Title.Idea state.
 
@@ -187,41 +268,12 @@ class ReviewContentFromTitleIdeaService:
                 except Exception as e:
                     logger.warning(f"Could not fetch idea {story.idea_id}: {e}")
 
-            # Perform review with title, content, and idea context
-            if not REVIEW_AVAILABLE:
-                result.error = "Review function not available"
-                return result
-
-            # Create a context object compatible with review_content_from_title_idea
-            class _GenreContext:
-                def __init__(self):
-                    self.value = "other"
-
-            class _IdeaContext:
-                def __init__(self, text):
-                    self.concept = text
-                    self.title = text[:100] if text else ""
-                    self.premise = text
-                    self.hook = None
-                    self.genre = _GenreContext()
-                    self.target_audience = None
-                    self.target_platforms = []
-                    self.length_target = None
-                    self.version = 1
-
-            idea_obj = _IdeaContext(idea_text)
-
-            # Review content against title and idea
-            review_result = review_content_from_title_idea(
+            # Perform AI review with title, content, and idea context (always AI — no fallback)
+            review_text, review_score = self._ai_review_content(
                 content_text=content.text,
-                title=title.text,
-                idea=idea_obj,
-                content_id=str(content.id) if content.id else None,
+                title_text=title.text,
+                idea_text=idea_text,
             )
-
-            review_score = review_result.overall_score
-            # Format review as human-readable text
-            review_text = _format_review_text(review_result, title.text)
 
             # Create Review record
             if not self._preview_mode:
@@ -260,44 +312,3 @@ class ReviewContentFromTitleIdeaService:
             logger.exception(f"Error processing story {story.id}")
 
         return result
-
-
-def _format_review_text(review_result, title: str) -> str:
-    """Format a ScriptReview result as human-readable text.
-
-    Args:
-        review_result: ScriptReview object from review_content_from_title_idea
-        title: The title being reviewed against
-
-    Returns:
-        Formatted review text suitable for database storage
-    """
-    lines = [
-        f"CONTENT REVIEW: {title}",
-        "=" * 60,
-        f"OVERALL SCORE: {review_result.overall_score}%",
-    ]
-
-    if hasattr(review_result, "metadata") and review_result.metadata:
-        if "title_alignment_score" in review_result.metadata:
-            lines.append(f"Title Alignment: {review_result.metadata['title_alignment_score']}%")
-        if "idea_alignment_score" in review_result.metadata:
-            lines.append(f"Idea Alignment: {review_result.metadata['idea_alignment_score']}%")
-
-    lines.append("")
-
-    if review_result.overall_score >= CONTENT_ACCEPTANCE_THRESHOLD:
-        lines.append("STATUS: Content accepted")
-    else:
-        lines.append("STATUS: Content needs revision")
-
-    if hasattr(review_result, "primary_concern") and review_result.primary_concern:
-        lines.append(f"PRIMARY CONCERN: {review_result.primary_concern}")
-
-    if hasattr(review_result, "improvement_points") and review_result.improvement_points:
-        lines.append("")
-        lines.append("TOP IMPROVEMENTS:")
-        for point in review_result.improvement_points[:3]:
-            lines.append(f"  [{point.priority.upper()}] {point.title}: {point.description}")
-
-    return "\n".join(lines)

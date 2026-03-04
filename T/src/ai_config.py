@@ -23,9 +23,10 @@ Usage:
 """
 
 import logging
+import os
 import random
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Dict, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,32 @@ DEFAULT_AI_API_BASE = "http://localhost:11434"
 AI_TEMPERATURE_MIN = 0.6
 AI_TEMPERATURE_MAX = 0.8
 DEFAULT_AI_TIMEOUT = 120
+
+# =============================================================================
+# Early-Stage AI Model Configuration (Scripts 01-06)
+# =============================================================================
+
+# Choice list of Qwen3 models available for early-stage processing (Scripts 01-06).
+# Set the matching PRISMQ_AI_MODEL_STAGE_* env var in your .env to override a stage's model.
+EARLY_STAGE_AI_MODELS: Dict[str, str] = {
+    "qwen3:8b":  "Fast     – Qwen3 8B  (scripts 03-04)",
+    "qwen3:14b": "Balanced – Qwen3 14B (scripts 01, 05-06)",
+    "qwen3:32b": "Quality  – Qwen3 32B (scripts 07+ and default main model)",
+}
+
+# Per-stage-group model defaults (each overridable via environment variable).
+# Script 01  – Idea generation
+DEFAULT_AI_MODEL_STAGE_01: str = os.getenv("PRISMQ_AI_MODEL_STAGE_01", "qwen3:14b")
+# Scripts 03-04 – Title and Content generation
+DEFAULT_AI_MODEL_STAGE_03_04: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")
+# Scripts 05-06 – Early reviews (title & content)
+DEFAULT_AI_MODEL_STAGE_05_06: str = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
+
+# Keep legacy single-variable for backward compatibility (falls back to stage 05-06 default)
+DEFAULT_AI_MODEL_EARLY_STAGE: str = os.getenv(
+    "PRISMQ_AI_MODEL_EARLY_STAGE",
+    DEFAULT_AI_MODEL_STAGE_05_06,
+)
 
 
 # =============================================================================
@@ -116,6 +143,75 @@ def create_ai_config(
         api_base=api_base or DEFAULT_AI_API_BASE,
         timeout=timeout or DEFAULT_AI_TIMEOUT
     )
+
+
+def create_early_stage_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """Factory function to create AI configuration for early-stage scripts (01-06).
+
+    Uses the legacy ``PRISMQ_AI_MODEL_EARLY_STAGE`` env var for backward
+    compatibility.  Prefer the stage-specific factories below for new code.
+
+    Args:
+        model: Override AI model (default: value of PRISMQ_AI_MODEL_EARLY_STAGE)
+        api_base: Override API base (default: localhost:11434)
+        timeout: Override timeout (default: 120s)
+
+    Returns:
+        Configured AISettings instance for early-stage operations
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_EARLY_STAGE,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_qwen3_14b_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """AI config using qwen3:14b (scripts 01 and 05-06).
+
+    The default model is ``qwen3:14b``.  Each caller stage has its own env
+    var override:
+
+    * Script 01  – ``PRISMQ_AI_MODEL_STAGE_01``
+    * Scripts 05-06 – ``PRISMQ_AI_MODEL_STAGE_05_06``
+
+    Pass an explicit *model* argument or set the env var to override.
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_STAGE_01,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+def create_qwen3_8b_ai_config(
+    model: str = None,
+    api_base: str = None,
+    timeout: int = None
+) -> AISettings:
+    """AI config using qwen3:8b (scripts 03-04).
+
+    Override via ``PRISMQ_AI_MODEL_STAGE_03_04`` environment variable.
+    """
+    return AISettings(
+        model=model or DEFAULT_AI_MODEL_STAGE_03_04,
+        api_base=api_base or DEFAULT_AI_API_BASE,
+        timeout=timeout or DEFAULT_AI_TIMEOUT
+    )
+
+
+# Backward-compatible aliases (stage-number names)
+create_stage_01_ai_config = create_qwen3_14b_ai_config
+create_stage_03_04_ai_config = create_qwen3_8b_ai_config
+create_stage_05_06_ai_config = create_qwen3_14b_ai_config
 
 
 # =============================================================================

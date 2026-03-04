@@ -67,7 +67,7 @@ def get_default_db_path() -> str:
 
 # Module constants
 DEFAULT_COUNT = 10
-DEFAULT_MODEL = "qwen3:32b"
+DEFAULT_MODEL = os.getenv("PRISMQ_AI_MODEL_STAGE_01", "qwen3:14b")
 DEFAULT_TEMPERATURE = 0.8
 MAX_COUNT = 100
 MIN_COUNT = 1
@@ -520,8 +520,8 @@ Examples:
 
     parser.add_argument(
         "--model",
-        default="qwen3:32b",
-        help="AI model to use (default: qwen3:32b)",
+        default=DEFAULT_MODEL,
+        help=f"AI model to use (default: {DEFAULT_MODEL}, override: PRISMQ_AI_MODEL_STAGE_01)",
     )
 
     parser.add_argument(
