@@ -160,15 +160,13 @@ class ScriptFromReviewService:
     INPUT_STATE = StateNames.CONTENT_FROM_CONTENT_REVIEW_TITLE
     OUTPUT_STATE = StateNames.REVIEW_CONTENT_FROM_TITLE
 
-    def __init__(self, connection: sqlite3.Connection, preview_mode: bool = False):
+    def __init__(self, connection: sqlite3.Connection):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection
-            preview_mode: If True, don't save changes to database
         """
         self._conn = connection
-        self._preview_mode = preview_mode
         self.story_repo = StoryRepository(connection)
         self.title_repo = TitleRepository(connection)
         self.content_repo = ContentRepository(connection)
@@ -251,25 +249,19 @@ class ScriptFromReviewService:
                 f"Story {story.id}: Content improved from v{content.version} to v{new_version_num}"
             )
 
-            if not self._preview_mode:
-                # Save new content version
-                new_content = Content(
-                    story_id=story.id,
-                    version=new_version_num,
-                    text=improved.new_version.text,
-                    created_at=datetime.now(),
-                )
-                self.content_repo.insert(new_content)
+            # Save new content version
+            new_content = Content(
+                story_id=story.id,
+                version=new_version_num,
+                text=improved.new_version.text,
+                created_at=datetime.now(),
+            )
+            self.content_repo.insert(new_content)
 
-                # Update story state
-                story.state = self.OUTPUT_STATE
-                self.story_repo.update(story)
-                logger.info(f"Story {story.id}: State updated to {self.OUTPUT_STATE}")
-            else:
-                logger.info(
-                    f"Story {story.id}: PREVIEW - would save content v{new_version_num} "
-                    f"and transition to {self.OUTPUT_STATE}"
-                )
+            # Update story state
+            story.state = self.OUTPUT_STATE
+            self.story_repo.update(story)
+            logger.info(f"Story {story.id}: State updated to {self.OUTPUT_STATE}")
 
             result.success = True
             result.new_content_version = new_version_num

@@ -7,8 +7,7 @@ It waits with dynamic intervals when no stories are available:
 - 1 ms between iterations when stories are available
 
 Usage:
-    python tone_workflow.py           # Run continuously with DB save
-    python tone_workflow.py --preview # Preview mode (no DB save)
+    python tone_workflow.py  # Run continuously
 
 Press Ctrl+C or close the window to stop.
 """
@@ -79,17 +78,6 @@ def get_wait_interval(pending_count: int) -> float:
 
 
 def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Continuous Tone Review Workflow for PrismQ"
-    )
-    parser.add_argument("--preview", "-p", action="store_true",
-                        help="Preview mode - do not save to database")
-    parser.add_argument("--debug", "-d", action="store_true",
-                        help="Enable debug logging")
-    args = parser.parse_args()
-
     print_header("PrismQ.T.Review.Content.Tone")
     print_info("Processing stories continuously")
     print_info("Waits 30 seconds when no stories to process")
@@ -117,9 +105,6 @@ def main():
     except Exception as e:
         print_error(f"Failed to connect to database: {e}")
         return 1
-
-    if args.preview:
-        print_warning("PREVIEW MODE - Changes will not be saved to database")
 
     run_count = 0
     total_processed = 0
@@ -179,9 +164,8 @@ def main():
         print_info("Workflow interrupted by user")
     except Exception as e:
         print_error(f"Unexpected error: {e}")
-        if args.debug:
-            import traceback
-            traceback.print_exc()
+        import traceback
+        traceback.print_exc()
         return 1
     finally:
         conn.close()

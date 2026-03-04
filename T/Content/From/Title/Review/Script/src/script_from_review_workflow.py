@@ -9,17 +9,14 @@ Wait strategy:
 - 30 seconds when idle (no items to process)
 
 Usage:
-    python script_from_review_workflow.py           # Run continuously with DB save
-    python script_from_review_workflow.py --preview # Preview mode (no DB save)
+    python script_from_review_workflow.py  # Run continuously
 
 Press Ctrl+C or close the window to stop.
 """
 
-import logging
 import sqlite3
 import sys
 import time
-from datetime import datetime
 from pathlib import Path
 
 # Setup paths
@@ -104,45 +101,6 @@ def format_wait_time(interval: float) -> str:
 
 def main():
     """Main continuous workflow runner."""
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Continuous Content Improvement Workflow for PrismQ",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python script_from_review_workflow.py           # Run continuously with DB save
-  python script_from_review_workflow.py --preview # Preview mode (no DB save)
-        """,
-    )
-
-    parser.add_argument(
-        "--preview", "-p", action="store_true",
-        help="Preview mode - do not save to database"
-    )
-    parser.add_argument(
-        "--debug", "-d", action="store_true",
-        help="Enable debug logging"
-    )
-
-    args = parser.parse_args()
-
-    # Setup logging
-    if args.debug:
-        log_filename = f"script_from_review_workflow_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-        log_path = SCRIPT_DIR / log_filename
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format="%(asctime)s - %(levelname)s - %(message)s",
-            handlers=[
-                logging.FileHandler(log_path),
-                logging.StreamHandler(),
-            ],
-        )
-        logger = logging.getLogger("PrismQ.Content.From.Review")
-        logger.info("Workflow started")
-        print_info(f"Logging to: {log_path}")
-
     # Print header
     print_header("PrismQ.T.Content.From.Content.Review.Title")
     print_info("Processing stories continuously")
@@ -176,10 +134,7 @@ Examples:
         return 1
 
     # Initialize service
-    service = ScriptFromReviewService(conn, preview_mode=args.preview)
-
-    if args.preview:
-        print_warning("PREVIEW MODE - Changes will not be saved to database")
+    service = ScriptFromReviewService(conn)
 
     # Continuous processing loop
     run_count = 0
@@ -255,9 +210,8 @@ Examples:
         print_info("Workflow interrupted by user")
     except Exception as e:
         print_error(f"Unexpected error: {e}")
-        if args.debug:
-            import traceback
-            traceback.print_exc()
+        import traceback
+        traceback.print_exc()
         return 1
     finally:
         conn.close()

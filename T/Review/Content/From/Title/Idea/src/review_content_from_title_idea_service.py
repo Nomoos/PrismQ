@@ -125,15 +125,13 @@ class ReviewContentFromTitleIdeaService:
     OUTPUT_STATE_PASS = "PrismQ.T.Review.Title.From.Content"  # Step 06 pass
     OUTPUT_STATE_FAIL = "PrismQ.T.Content.From.Content.Review.Title"  # Step 06 fail -> regenerate content
 
-    def __init__(self, connection: sqlite3.Connection, preview_mode: bool = False):
+    def __init__(self, connection: sqlite3.Connection):
         """Initialize the service with database connection.
 
         Args:
             connection: SQLite database connection
-            preview_mode: If True, don't save changes to database
         """
         self._conn = connection
-        self._preview_mode = preview_mode
         self.story_repo = StoryRepository(connection)
         self.title_repo = TitleRepository(connection)
         self.content_repo = ContentRepository(connection)
@@ -277,14 +275,13 @@ class ReviewContentFromTitleIdeaService:
             )
 
             # Create Review record
-            if not self._preview_mode:
-                review = Review(
-                    text=review_text,
-                    score=review_score,
-                    created_at=datetime.now()
-                )
-                review = self.review_repo.insert(review)
-                result.review_id = review.id
+            review = Review(
+                text=review_text,
+                score=review_score,
+                created_at=datetime.now()
+            )
+            review = self.review_repo.insert(review)
+            result.review_id = review.id
 
             result.text = review_text
             result.score = review_score
@@ -298,9 +295,8 @@ class ReviewContentFromTitleIdeaService:
                 result.next_state = self.OUTPUT_STATE_FAIL
 
             # Update story state
-            if not self._preview_mode:
-                story.state = result.next_state
-                self.story_repo.update(story)
+            story.state = result.next_state
+            self.story_repo.update(story)
 
             result.success = True
             logger.info(

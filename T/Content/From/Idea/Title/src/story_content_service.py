@@ -543,7 +543,6 @@ class ContentFromIdeaTitleService:
         connection: sqlite3.Connection,
         content_generator_config: Optional[ContentGeneratorConfig] = None,
         audience: Optional[dict] = None,
-        preview_mode: bool = False,
     ):
         """Initialize the service with database connection.
 
@@ -552,12 +551,9 @@ class ContentFromIdeaTitleService:
             content_generator_config: Optional configuration for content generation
             audience: Optional target audience dict (age_range, gender, country).
                 If None the AI prompt is generated without audience context.
-            preview_mode: If True, generate content but skip all database writes
-                and state transitions.
         """
         self._conn = connection
         self._audience = audience
-        self._preview_mode = preview_mode
         self.story_repo = StoryRepository(connection)
         self.content_repo = ContentRepository(connection)
         self.title_repo = TitleRepository(connection)
@@ -596,9 +592,8 @@ class ContentFromIdeaTitleService:
         2. Loads the Idea record from the Idea table via story.idea_id
         3. Loads the latest Title record for the story from the Title table
         4. Generates Content using the Idea and Title (with optional audience)
-        5. Saves the Content to the database (skipped in preview_mode)
+        5. Saves the Content to the database
         6. Updates the Story state to PrismQ.T.Review.Title.From.Content.Idea
-           (skipped in preview_mode)
 
         Returns:
             StateBasedContentResult with processing details.
@@ -671,12 +666,6 @@ class ContentFromIdeaTitleService:
             # Populate word count and duration from the generated content
             result.word_count = len(script_v1.full_text.split())
             result.duration = float(script_v1.total_duration_seconds)
-
-            if self._preview_mode:
-                logger.info(f"Story {story.id}: Preview mode — skipping database save")
-                result.success = True
-                result.script_v1 = script_v1
-                return result
 
             # Save Content to database
             logger.debug(f"Story {story.id}: Saving content to database")
