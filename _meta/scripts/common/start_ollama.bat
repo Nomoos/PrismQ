@@ -26,8 +26,12 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
+REM Set parallel request limit before starting Ollama
+REM Increase OLLAMA_NUM_PARALLEL to match worker_count in step 03 workflow.json
+if not defined OLLAMA_NUM_PARALLEL set OLLAMA_NUM_PARALLEL=4
+
 REM Start Ollama in a new CMD window
-start "Ollama Server" cmd /c "ollama serve"
+start "Ollama Server" cmd /c "set OLLAMA_NUM_PARALLEL=%OLLAMA_NUM_PARALLEL% && ollama serve"
 
 echo [INFO] Waiting for Ollama to start...
 
