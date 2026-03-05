@@ -62,25 +62,25 @@ stateDiagram-v2
 
     %% ── Phase 6: Quality Review Chain (modules 11–17) ───────────────────
     %% content issues → [09] content regen; title issue → [08] title regen
-    Grammar     --> Tone             : PASS ≥85
+    Grammar     --> Tone             : PASS ≥95
     Grammar     --> ContentRegen09   : FAIL
 
-    Tone        --> Content          : PASS ≥75
+    Tone        --> Content          : PASS ≥90
     Tone        --> ContentRegen09   : FAIL
 
-    Content     --> Consistency      : PASS ≥75
+    Content     --> Consistency      : PASS ≥85
     Content     --> ContentRegen09   : FAIL
 
-    Consistency --> Editing          : PASS ≥80
+    Consistency --> Editing          : PASS ≥85
     Consistency --> ContentRegen09   : FAIL
 
-    Editing     --> TitleReadability : PASS ≥75
+    Editing     --> TitleReadability : PASS ≥85
     Editing     --> ContentRegen09   : FAIL
 
-    TitleReadability --> ContentReadability : PASS ≥75
+    TitleReadability --> ContentReadability : PASS ≥85
     TitleReadability --> TitleRegen         : FAIL
 
-    ContentReadability --> StoryReview    : PASS ≥75
+    ContentReadability --> StoryReview    : PASS ≥90
     ContentReadability --> ContentRegen09 : FAIL
 
     %% ── Phase 7: Expert Review (modules 18–19) ──────────────────────────
@@ -106,13 +106,13 @@ stateDiagram-v2
 | 08 | `PrismQ.T.Title.From.Title.Review.Content` | Title regeneration from review feedback |
 | 09 | `PrismQ.T.Content.From.Title.Content.Review` | Content regeneration from early review feedback |
 | 10 | `PrismQ.T.Review.Content.From.Title` | **Quality gate**: final review before grammar chain |
-| 11 | `PrismQ.T.Review.Content.Grammar` | Grammar, punctuation, syntax (threshold ≥ 85) |
-| 12 | `PrismQ.T.Review.Content.Tone` | Tone, voice, emotional register (threshold ≥ 75) |
-| 13 | `PrismQ.T.Review.Content.Content` | Factual accuracy, coherence (threshold ≥ 75) |
-| 14 | `PrismQ.T.Review.Content.Consistency` | Character/timeline/detail consistency (threshold ≥ 80) |
-| 15 | `PrismQ.T.Review.Content.Editing` | Clarity, flow, wordiness, pacing (threshold ≥ 75) |
-| 16 | `PrismQ.T.Review.Title.Readability` | Title clarity, catchiness, length (threshold ≥ 75) |
-| 17 | `PrismQ.T.Review.Content.Readability` | Voice-over suitability, spoken flow (threshold ≥ 75) |
+| 11 | `PrismQ.T.Review.Content.Grammar` | Grammar, punctuation, syntax (threshold ≥ 95) |
+| 12 | `PrismQ.T.Review.Content.Tone` | Tone, voice, emotional register (threshold ≥ 90) |
+| 13 | `PrismQ.T.Review.Content.Content` | Factual accuracy, coherence (threshold ≥ 85) |
+| 14 | `PrismQ.T.Review.Content.Consistency` | Character/timeline/detail consistency (threshold ≥ 85) |
+| 15 | `PrismQ.T.Review.Content.Editing` | Clarity, flow, wordiness, pacing (threshold ≥ 85) |
+| 16 | `PrismQ.T.Review.Title.Readability` | Title clarity, catchiness, length (threshold ≥ 85) |
+| 17 | `PrismQ.T.Review.Content.Readability` | Voice-over suitability, spoken flow (threshold ≥ 90) |
 | 18 | `PrismQ.T.Story.Review` | Expert holistic review: title+content (threshold ≥ 70) |
 | 19 | `PrismQ.T.Story.Polish` | Final polish + SEO optimisation |
 | 20 | `PrismQ.T.Publishing` | Terminal state — ready for publication |
