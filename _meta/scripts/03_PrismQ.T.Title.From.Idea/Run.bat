@@ -21,7 +21,7 @@ echo PrismQ.T.Title.From.Idea
 echo ========================================
 echo.
 
-python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py
+python ..\..\..\T\Title\From\Idea\src\title_from_idea_interactive.py --worker-id 0
 
 if %ERRORLEVEL% NEQ 0 ( echo ERROR: Script execution failed & pause & exit /b 1 )
 echo.

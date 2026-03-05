@@ -1,0 +1,4 @@
+{
+  "_comment": "PrismQ.T.Title.From.Idea workflow configuration. Set worker_count to the total number of parallel instances running simultaneously. Each parallel Run.bat must pass --worker-id <N> (0-based).",
+  "worker_count": 1
+}

@@ -31,6 +31,21 @@ TITLE_FROM_ROOT = TITLE_FROM_IDEA_ROOT.parent  # T/Title/From
 TITLE_ROOT = TITLE_FROM_ROOT.parent  # T/Title
 T_ROOT = TITLE_ROOT.parent  # T
 REPO_ROOT = T_ROOT.parent  # repo root
+_WORKFLOW_JSON = (
+    REPO_ROOT / "_meta" / "scripts" / "03_PrismQ.T.Title.From.Idea" / "workflow.json"
+)
+
+
+def _load_worker_count() -> int:
+    """Read worker_count from workflow.json. Returns 1 if file missing or invalid."""
+    import json as _json
+    try:
+        data = _json.loads(_WORKFLOW_JSON.read_text(encoding="utf-8"))
+        val = int(data.get("worker_count", 1))
+        return max(1, val)
+    except Exception:
+        return 1
+
 
 # Add paths for imports
 sys.path.insert(0, str(SCRIPT_DIR))  # Current directory for local imports
@@ -527,7 +542,7 @@ def run_interactive_mode(preview: bool = False, debug: bool = False, manual: boo
 
 
 def run_state_workflow_mode(
-    db_path: Optional[str] = None, debug: bool = False
+    db_path: Optional[str] = None, debug: bool = False, worker_id: int = 0
 ):
     """Run the state-based workflow mode for title generation in continuous mode.
 
@@ -623,6 +638,13 @@ def run_state_workflow_mode(
         )
     print_success("AI title generation is available")
 
+    # Worker sharding configuration
+    worker_count = _load_worker_count()
+    if worker_count > 1:
+        print_info(f"Worker sharding: worker {worker_id} of {worker_count} (stories where id % {worker_count} == {worker_id})")
+    else:
+        print_info("Worker sharding: single instance (worker_count=1)")
+
     # Connect to Idea database to fetch Idea content
     # Use the same database path for Idea table (it's in the same database)
     idea_db = setup_idea_table(db_path)
@@ -647,6 +669,8 @@ def run_state_workflow_mode(
                 print_section("Finding Stories for Title Generation")
             
             stories_to_process = service.get_stories_without_titles()
+            if worker_count > 1:
+                stories_to_process = [s for s in stories_to_process if s.id % worker_count == worker_id]
 
             if not stories_to_process:
                 if run_count == 1:
@@ -843,13 +867,19 @@ Note:
         default=None,
         help="Path to SQLite database (default: from Config or C:/PrismQ/db.s3db)",
     )
+    parser.add_argument(
+        "--worker-id",
+        type=int,
+        default=0,
+        help="0-based index of this worker instance (default: 0). Used with worker_count in workflow.json.",
+    )
 
     args = parser.parse_args()
 
     if args.interactive or args.manual:
         return run_interactive_mode(debug=args.debug, manual=args.manual)
     else:
-        return run_state_workflow_mode(args.db, debug=args.debug)
+        return run_state_workflow_mode(args.db, debug=args.debug, worker_id=args.worker_id)
 
 
 if __name__ == "__main__":

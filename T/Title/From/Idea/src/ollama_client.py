@@ -30,7 +30,7 @@ class OllamaConfig:
     model: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")  # Default: qwen3:8b for Script 03
     api_base: str = "http://localhost:11434"
     max_tokens: int = 2000
-    timeout: int = 60
+    timeout: int = 300
 
 
 class OllamaClient:
