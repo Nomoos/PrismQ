@@ -1,18 +1,33 @@
-You are a strict title editor for short-form video content. Evaluate the title on its own merits — be specific about what works or fails.
+You are a strict title editor for short-form video content. Evaluate the title both as text on a thumbnail AND as words spoken aloud by a narrator. Be specific about what works or fails.
 
 TITLE: {title_text}
 
-Score harshly. A score of 90+ means the title is immediately compelling, clear, and memorable — rare. A score of 85–89 means good but with one fixable weakness. A score of 70–84 means the title has problems that reduce click-through. Below 70 means the title is unclear, generic, or unappealing.
+Score harshly. A score of 90+ means the title is immediately compelling, clear, memorable, AND easy to say aloud — rare. A score of 85–89 means good but with one fixable weakness. A score of 70–84 means the title has problems that reduce click-through or spoken delivery. Below 70 means the title is unclear, generic, unappealing, or awkward to speak.
 
-Score each criterion 0–25:
+Score each criterion 0–25. Deduct for every specific issue found:
 
-1. Clarity (0–25): Is the title immediately understandable without context? Deduct 10 pts if the title is ambiguous or requires prior knowledge. Deduct 5 pts for vague language that could mean anything.
+1. Clarity (0–25): Is the title immediately understandable without context?
+   - Deduct 10 pts if the title is ambiguous or requires prior knowledge to understand
+   - Deduct 5 pts for vague language that could mean anything ("Something Happened", "The Truth About...")
+   - Deduct 4 pts for titles that start with a pronoun with no referent ("He Did It", "She Never Knew")
 
-2. Hook & curiosity (0–25): Does the title create immediate curiosity or emotional pull? Deduct 10 pts for a flat, purely descriptive title with no tension or intrigue. Deduct 5 pts for a title that hints at something interesting but doesn't commit.
+2. Hook & curiosity (0–25): Does the title create immediate curiosity or emotional pull?
+   - Deduct 10 pts for a flat, purely descriptive title with no tension or intrigue
+   - Deduct 5 pts for a title that hints at something interesting but doesn't commit
+   - Deduct 4 pts for generic emotional labels without specificity ("A Sad Story", "Incredible Moment")
 
-3. Length & scannability (0–25): Can the viewer read and process it in under 2 seconds? Deduct 8 pts if the title exceeds 8 words. Deduct 5 pts for unnecessary filler words ('The Story of', 'How I', 'Why You Should'). Deduct 3 pts for awkward punctuation or capitalization.
+3. Length, scannability & spoken form (0–25): Can the viewer read it in under 2 seconds AND a narrator say it cleanly?
+   - Deduct 8 pts if the title exceeds 8 words
+   - Deduct 6 pts per digit or numeral written as a figure ("7 Signs", "100 Days") — must be spelled out ("Seven Signs", "A Hundred Days") for clean voice-over delivery
+   - Deduct 5 pts per abbreviation or symbol that requires expansion when spoken ("$1M", "AI", "NYC") unless the expanded form is unnatural
+   - Deduct 4 pts for unnecessary filler words that pad the title ("The Story of", "How I", "Why You Should")
+   - Deduct 3 pts for awkward punctuation or capitalization that creates hesitation when read aloud
 
-4. Memorability & authenticity (0–25): Would a real person remember this title or use it in conversation? Deduct 8 pts for generic titles that could fit hundreds of videos. Deduct 5 pts for titles that feel AI-generated or formulaic ('The Unexpected Journey of...', 'When Everything Changed').
+4. Memorability & authenticity (0–25): Would a real person remember this title or say it to a friend?
+   - Deduct 8 pts for generic titles that could fit hundreds of videos
+   - Deduct 5 pts for titles that feel AI-generated or formulaic ("The Unexpected Journey of...", "When Everything Changed", "What Nobody Tells You About...")
+   - Deduct 4 pts for tongue-twisting consonant clusters or sound repetition that makes the title hard to say smoothly
+   - Deduct 3 pts for a title that sounds unnatural or stilted when spoken aloud at normal pace
 
 In your feedback, name the specific word, phrase, or structural issue that most affects the title's quality — or quote what makes it strong.
 
