@@ -143,15 +143,21 @@ def main():
             total_processed += 1
             if result.passes:
                 print_success(
-                    f"Story {result.story_id}: ACCEPTED editing review"
+                    f"Story {result.story_id}: ACCEPTED editing review "
+                    f"(score: {result.score:.0f})"
                 )
                 print_info(f"  Next state: {result.next_state}")
+                if result.text:
+                    print_info(f"  Feedback: {result.text}")
                 total_accepted += 1
             else:
                 print_warning(
-                    f"Story {result.story_id}: REJECTED editing review"
+                    f"Story {result.story_id}: REJECTED editing review "
+                    f"(score: {result.score:.0f})"
                 )
                 print_info(f"  Next state: {result.next_state}")
+                if result.text:
+                    print_info(f"  Feedback: {result.text}")
                 total_rejected += 1
 
             if total_processed % 10 == 0:
