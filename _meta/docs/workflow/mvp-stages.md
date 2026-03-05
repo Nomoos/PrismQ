@@ -344,15 +344,19 @@ acceptance = check_content_acceptance(content=content_v3, title=title_v3)
 
 ### Stages 14-20: Quality Reviews
 
-These stages validate 7 quality dimensions using local AI reviews.
+These stages validate 7 quality dimensions using local AI reviews (Ollama). All prompts are evidence-based, requiring specific line citations to justify scores.
 
-**Stage 14**: Grammar Review - Technical correctness  
-**Stage 15**: Tone Review - Emotional and stylistic consistency  
-**Stage 16**: Content Review - Narrative logic and coherence  
-**Stage 17**: Consistency Review - Internal continuity  
-**Stage 18**: Editing Review - Clarity and flow  
-**Stage 19**: Title Readability - Final title validation  
-**Stage 20**: Content Readability - Voiceover quality validation
+> **Note**: This document uses a 26-stage numbering scheme. The corresponding script module numbers (used in `_meta/scripts/` and `state-machine.md`) are shown in parentheses.
+
+| Stage (this doc) | Module (scripts) | Review | Threshold |
+|-----------------|------------------|--------|-----------|
+| Stage 14 | Module 11 | Grammar Review — Technical correctness | ≥ **95** |
+| Stage 15 | Module 12 | Tone Review — Emotional and stylistic consistency | ≥ **90** |
+| Stage 16 | Module 13 | Content Review — Narrative logic and coherence | ≥ **85** |
+| Stage 17 | Module 14 | Consistency Review — Internal continuity | ≥ **85** |
+| Stage 18 | Module 15 | Editing Review — Clarity and flow | ≥ **85** |
+| Stage 19 | Module 16 | Title Readability — Final title validation | ≥ **85** |
+| Stage 20 | Module 17 | Content Readability — Voiceover quality validation | ≥ **90** |
 
 Each quality review follows the same pattern:
 

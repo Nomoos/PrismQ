@@ -27,6 +27,12 @@ Each module has its own numbered directory with `Run.bat` and `Preview.bat` scri
 - **Run.bat** - Runs the module in production mode (saves to database)
 - **Preview.bat** - Runs in preview/testing mode (no database save, extensive logging)
 
+### Monitor (00)
+
+| # | Directory | Description |
+|---|-----------|-------------|
+| 00 | `00_PrismQ.Monitor/` | Pipeline monitor — real-time story state distribution |
+
 ### T Module - Text Generation Pipeline (01-20)
 
 | # | Directory | Description |
@@ -34,20 +40,20 @@ Each module has its own numbered directory with `Run.bat` and `Preview.bat` scri
 | 01 | `01_PrismQ.T.Idea.From.User/` | Idea creation from inspiration |
 | 02 | `02_PrismQ.T.Story.From.Idea/` | Generate stories from ideas |
 | 03 | `03_PrismQ.T.Title.From.Idea/` | Generate initial titles from ideas |
-| 04 | `04_PrismQ.T.Script.From.Title.Idea/` | Generate scripts from title + idea |
-| 05 | `05_PrismQ.T.Review.Title.From.Script.Idea/` | Review title against script and idea |
-| 06 | `06_PrismQ.T.Review.Script.From.Title.Idea/` | Review script against title and idea |
-| 07 | `07_PrismQ.T.Review.Title.From.Script/` | Review title against script |
-| 08 | `08_PrismQ.T.Title.From.Script.Review.Title/` | Refine title from review feedback |
-| 09 | `09_PrismQ.T.Script.From.Title.Review.Script/` | Refine script from review feedback |
-| 10 | `10_PrismQ.T.Review.Script.From.Title/` | Final script review |
-| 11 | `11_PrismQ.T.Review.Script.Grammar/` | Grammar validation |
-| 12 | `12_PrismQ.T.Review.Script.Tone/` | Tone consistency check |
-| 13 | `13_PrismQ.T.Review.Script.Content/` | Content accuracy validation |
-| 14 | `14_PrismQ.T.Review.Script.Consistency/` | Style consistency check |
-| 15 | `15_PrismQ.T.Review.Script.Editing/` | Final editing pass |
-| 16 | `16_PrismQ.T.Review.Title.Readability/` | Title readability check |
-| 17 | `17_PrismQ.T.Review.Script.Readability/` | Script readability check |
+| 04 | `04_PrismQ.T.Content.From.Idea.Title/` | Generate content from title + idea |
+| 05 | `05_PrismQ.T.Review.Title.From.Content.Idea/` | Review title against content and idea |
+| 06 | `06_PrismQ.T.Review.Content.From.Title.Idea/` | Review content against title and idea |
+| 07 | `07_PrismQ.T.Review.Title.From.Content/` | Review title against content |
+| 08 | `08_PrismQ.T.Title.From.Title.Review.Content/` | Refine title from review feedback |
+| 09 | `09_PrismQ.T.Content.From.Title.Content.Review/` | Refine content from review feedback |
+| 10 | `10_PrismQ.T.Review.Content.From.Title/` | Quality gate: final content review |
+| 11 | `11_PrismQ.T.Review.Content.Grammar/` | Grammar validation (≥ 95) |
+| 12 | `12_PrismQ.T.Review.Content.Tone/` | Tone consistency check (≥ 90) |
+| 13 | `13_PrismQ.T.Review.Content.Content/` | Content accuracy validation (≥ 85) |
+| 14 | `14_PrismQ.T.Review.Content.Consistency/` | Consistency check (≥ 85) |
+| 15 | `15_PrismQ.T.Review.Content.Editing/` | Final editing pass (≥ 85) |
+| 16 | `16_PrismQ.T.Review.Title.Readability/` | Title readability check (≥ 85) |
+| 17 | `17_PrismQ.T.Review.Content.Readability/` | Content readability / voiceover check (≥ 90) |
 | 18 | `18_PrismQ.T.Story.Review/` | Expert GPT story review |
 | 19 | `19_PrismQ.T.Story.Polish/` | Expert GPT story polish |
 | 20 | `20_PrismQ.T.Publishing/` | Text publishing with SEO |
@@ -104,6 +110,19 @@ All modules from **Step 02 onwards** run continuously by default:
 
 This means you can start multiple steps in parallel in separate windows - each will
 automatically pick up work as soon as the previous step produces output.
+
+### Step 00: Monitor
+
+`00_PrismQ.Monitor/Run.bat` launches a real-time dashboard that refreshes every 30 seconds
+and shows how many stories are waiting in each pipeline state. Start it at any time to
+observe pipeline progress without interfering with processing.
+
+### Step 03: Parallel Workers (Orchestrator)
+
+`03_PrismQ.T.Title.From.Idea/Run.bat` calls `orchestrate.py`, which reads
+`workflow.json` and launches the configured number of parallel worker windows
+automatically. To change the number of parallel title-generation workers, edit
+`worker_count` in `03_PrismQ.T.Title.From.Idea/workflow.json`.
 
 ### Example Workflow
 
