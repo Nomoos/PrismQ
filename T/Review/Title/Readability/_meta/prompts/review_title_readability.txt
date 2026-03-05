@@ -29,7 +29,7 @@ Score each criterion 0–25. Deduct for every specific issue found:
    - Deduct 4 pts for tongue-twisting consonant clusters or sound repetition that makes the title hard to say smoothly
    - Deduct 3 pts for a title that sounds unnatural or stilted when spoken aloud at normal pace
 
-In your feedback, name the specific word, phrase, or structural issue that most affects the title's quality — or quote what makes it strong.
+In your feedback, state the single most impactful issue (or strength) directly and confidently. Do NOT use hedging language ("slightly", "may", "could", "might", "somewhat"). Either the title has a problem or it does not — say which and why with a specific example.
 
 Respond with a single JSON object only — no explanation, no markdown:
-{{"overall_score": <0-100>, "feedback": "<one sentence identifying a specific word, phrase, or structural issue in the title>"}}
+{{"overall_score": <0-100>, "feedback": "<one direct sentence naming the specific word, phrase, or structural issue in the title>"}}
