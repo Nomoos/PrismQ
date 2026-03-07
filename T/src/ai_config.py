@@ -57,7 +57,7 @@ EARLY_STAGE_AI_MODELS: Dict[str, str] = {
 # Script 01  – Idea generation
 DEFAULT_AI_MODEL_STAGE_01: str = os.getenv("PRISMQ_AI_MODEL_STAGE_01", "qwen3:14b")
 # Scripts 03-04 – Title and Content generation
-DEFAULT_AI_MODEL_STAGE_03_04: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:8b")
+DEFAULT_AI_MODEL_STAGE_03_04: str = os.getenv("PRISMQ_AI_MODEL_STAGE_03_04", "qwen3:14b")
 # Scripts 05-06 – Early reviews (title & content)
 DEFAULT_AI_MODEL_STAGE_05_06: str = os.getenv("PRISMQ_AI_MODEL_STAGE_05_06", "qwen3:14b")
 

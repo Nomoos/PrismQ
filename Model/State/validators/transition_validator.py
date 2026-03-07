@@ -41,8 +41,10 @@ _TRANSITIONS_DICT: Dict[str, List[str]] = {
     ],
     
     # Content from idea+title goes to initial title review (Stage 3 -> 4)
+    # Can also go back to title generation if title is invalid (error recovery)
     StateNames.CONTENT_FROM_IDEA_TITLE: [
         StateNames.REVIEW_TITLE_FROM_CONTENT_IDEA,
+        StateNames.TITLE_FROM_IDEA,  # Error recovery: invalid title → regenerate
     ],
     
     # Initial title review (Stage 4)

@@ -23,6 +23,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Setup paths - Now in T/Title/From/Idea/src/
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -135,6 +136,73 @@ except ImportError:
     # Define a placeholder exception if import fails
     class AIGenUnavailableError(Exception):
         pass
+
+
+# Number of parallel threads — should match OLLAMA_NUM_PARALLEL
+PARALLEL_WORKERS = int(os.getenv("PRISMQ_PARALLEL_WORKERS", "4"))
+
+
+def _worker_process_story(story, db_path: str) -> tuple:
+    """Process one story in a dedicated thread with its own database connection.
+
+    Returns:
+        (success, story_id, title_text_or_None, error_or_None)
+        On AI unavailability, error starts with "AI_UNAVAILABLE:" prefix.
+    """
+    import sqlite3 as _sqlite3
+
+    conn = _sqlite3.connect(db_path, timeout=30)
+    conn.row_factory = _sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    idea_db_local = None
+    try:
+        service = StoryTitleService(conn, auto_create_schema=False)
+        idea_db_local = setup_idea_table(db_path)
+
+        # Fetch Idea content from DB
+        idea = None
+        if story.idea_id is not None:
+            try:
+                idea_id = int(story.idea_id)
+                idea_dict = idea_db_local.get_idea(idea_id)
+                if idea_dict:
+                    idea_text = idea_dict.get("text", "")
+                    if idea_text and IDEA_MODEL_AVAILABLE:
+                        title_text = (
+                            idea_text if len(idea_text) <= 100 else idea_text[:97] + "..."
+                        )
+                        idea = Idea(title=title_text, concept=idea_text, genre=ContentGenre.OTHER)
+            except (ValueError, TypeError):
+                pass
+
+        if idea is None:
+            return (False, story.id, None, "No idea data available")
+
+        # Generate title via AI — I/O bound, releases GIL while waiting for Ollama
+        try:
+            variant = service.generate_title(idea)
+        except AIUnavailableError as e:
+            return (False, story.id, None, f"AI_UNAVAILABLE:{e}")
+
+        if not variant:
+            return (False, story.id, None, "AI returned no title")
+
+        # Save to DB and transition state
+        title_obj = service.generate_title_for_story(story, idea, variant)
+        if title_obj:
+            return (True, story.id, variant.text, None)
+        else:
+            return (False, story.id, None, "Story already has a title")
+
+    except Exception as e:
+        return (False, story.id, None, str(e))
+    finally:
+        conn.close()
+        if idea_db_local:
+            try:
+                idea_db_local.close()
+            except Exception:
+                pass
 
 
 def get_database_paths() -> tuple:
@@ -638,12 +706,14 @@ def run_state_workflow_mode(
         )
     print_success("AI title generation is available")
 
-    # Worker sharding configuration
+    # Worker sharding configuration (only used when --worker-id >= 0)
     worker_count = _load_worker_count()
-    if worker_count > 1:
+    if worker_id >= 0 and worker_count > 1:
         print_info(f"Worker sharding: worker {worker_id} of {worker_count} (stories where id % {worker_count} == {worker_id})")
+    elif worker_id < 0:
+        print_info(f"Threading: {PARALLEL_WORKERS} parallel threads (internal, no sharding)")
     else:
-        print_info("Worker sharding: single instance (worker_count=1)")
+        print_info("Single worker mode (worker_count=1)")
 
     # Connect to Idea database to fetch Idea content
     # Use the same database path for Idea table (it's in the same database)
@@ -669,7 +739,7 @@ def run_state_workflow_mode(
                 print_section("Finding Stories for Title Generation")
             
             stories_to_process = service.get_stories_without_titles()
-            if worker_count > 1:
+            if worker_id >= 0 and worker_count > 1:
                 stories_to_process = [s for s in stories_to_process if s.id % worker_count == worker_id]
 
             if not stories_to_process:
@@ -689,117 +759,63 @@ def run_state_workflow_mode(
             # Track processing results for this run
             processed_count = 0
             error_count = 0
+            ai_unavailable_error = None
+            total = len(stories_to_process)
 
-            # Process each story
-            for i, story in enumerate(stories_to_process, 1):
-                print_section(f"Processing Story {i}/{len(stories_to_process)} (ID: {story.id})")
-                print(f"  Idea ID: {story.idea_id}")
+            use_parallel = worker_id < 0
 
-                # Get sibling stories for context
-                siblings = service.get_sibling_stories(story)
-                sibling_titles = service.get_sibling_titles(story)
-
-                print(f"  Sibling Stories: {len(siblings)}")
-                print(f"  Existing Sibling Titles: {len(sibling_titles)}")
-
-                if sibling_titles:
-                    print(f"\n  {Colors.GRAY}Existing titles from same Idea:{Colors.END}")
-                    for st in sibling_titles[:5]:  # Show up to 5
-                        print(f"    - {st.text[:60]}{'...' if len(st.text) > 60 else ''}")
-                    if len(sibling_titles) > 5:
-                        print(f"    ... and {len(sibling_titles) - 5} more")
-
-                # Fetch Idea from Idea database using story.idea_id
-                idea = None
-                if story.idea_id is not None:
-                    try:
-                        idea_id = int(story.idea_id)
-                        idea_dict = idea_db.get_idea(idea_id)
-                        if idea_dict:
-                            # Get idea text from dict
-                            idea_text = idea_dict.get("text", "")
-                            if idea_text and IDEA_MODEL_AVAILABLE:
-                                # Truncate title to reasonable length (max 100 chars)
-                                MAX_TITLE_LENGTH = 100
-                                if len(idea_text) <= MAX_TITLE_LENGTH:
-                                    title = idea_text
-                                else:
-                                    title = idea_text[: MAX_TITLE_LENGTH - 3] + "..."
-                                idea = Idea(title=title, concept=idea_text, genre=ContentGenre.OTHER)
-                                print_info(f"Fetched Idea from database (ID: {idea_id})")
-                                if logger:
-                                    logger.info(f"Created Idea from database: {idea_text[:50]}...")
-                            else:
-                                print_warning(f"Idea {idea_id} has no text content")
-                        else:
-                            print_warning(f"Idea {idea_id} not found in database")
-                    except (ValueError, TypeError) as e:
-                        print_warning(f"Invalid idea_id format: {story.idea_id}")
-                        if logger:
-                            logger.warning(f"Failed to parse idea_id: {e}")
-
-                # AI title generation requires an Idea - no fallback
-                if idea is None:
-                    print_error(f"Cannot generate title: No Idea data available for Story {story.id}")
-                    print_error("Ensure the Idea exists in the database with valid text content")
-                    error_count += 1
-                    continue
-
-                # Generate title using AI
-                print_section("Generating AI Title")
-
-                try:
-                    print_info(f"Generating title from Idea: '{idea.title[:50]}...'")
-
-                    # Generate a single title via the service
-                    variant = service.generate_title(idea)
-
-                except AIUnavailableError as e:
-                    print_error(f"AI unavailable: {e}")
-                    print_error("Stopping processing - AI is required for title generation")
-                    if logger:
-                        logger.error(f"AI unavailable: {e}")
-                    idea_db.close()
-                    conn.close()
-                    raise  # Re-raise to stop processing
-
-                if not variant:
-                    print_warning(f"AI could not generate a title for Story {story.id}, skipping")
-                    if logger:
-                        logger.warning(f"No title generated for Story {story.id}")
-                    error_count += 1
-                    continue
-
-                try:
-                    # Display the generated title
-                    print(f"\n  {Colors.GREEN}Generated Title:{Colors.END}")
-                    print(f"    {variant.text}")
-                    print(f"    Style: {variant.style} | Length: {variant.length} chars | Score: {variant.score:.2f}")
-
-                    # Save title and update state (reuse already-generated variant)
-                    print_section("Database Operations")
-                    try:
-                        title = service.generate_title_for_story(story, idea, variant)
-                        if title:
-                            print_success(f"Title saved with ID: {title.id}")
-                            print_success(f"State changed to: PrismQ.T.Content.From.Idea.Title")
+            if use_parallel:
+                # Parallel mode: ThreadPoolExecutor — 4 Ollama calls in flight simultaneously
+                print_info(f"Processing {total} stories with {PARALLEL_WORKERS} parallel threads...")
+                with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
+                    future_map = {
+                        executor.submit(_worker_process_story, story, db_path): (i, story)
+                        for i, story in enumerate(stories_to_process, 1)
+                    }
+                    for future in as_completed(future_map):
+                        i, story = future_map[future]
+                        success, sid, title_text, err = future.result()
+                        if success:
+                            print_success(f"[{i}/{total}] Story {sid}: \"{title_text}\"")
+                            if logger:
+                                logger.info(f"Story {sid}: '{title_text}'")
                             processed_count += 1
+                        elif err and err.startswith("AI_UNAVAILABLE:"):
+                            actual_err = err[len("AI_UNAVAILABLE:"):]
+                            print_error(f"Story {sid}: AI unavailable — {actual_err}")
+                            ai_unavailable_error = actual_err
+                            for f in future_map:
+                                f.cancel()
+                            break
                         else:
-                            print_warning("Story already has a title, skipped")
-                    except Exception as e:
-                        print_error(f"Failed to save title: {e}")
+                            print_warning(f"[{i}/{total}] Story {sid}: {err}")
+                            if logger:
+                                logger.warning(f"Story {sid}: {err}")
+                            error_count += 1
+            else:
+                # Sequential mode: used when --worker-id is explicitly set (multiple bat windows)
+                for i, story in enumerate(stories_to_process, 1):
+                    success, sid, title_text, err = _worker_process_story(story, db_path)
+                    if success:
+                        print_success(f"[{i}/{total}] Story {sid}: \"{title_text}\"")
                         if logger:
-                            logger.exception("Database save failed")
+                            logger.info(f"Story {sid}: '{title_text}'")
+                        processed_count += 1
+                    elif err and err.startswith("AI_UNAVAILABLE:"):
+                        actual_err = err[len("AI_UNAVAILABLE:"):]
+                        print_error(f"Story {sid}: AI unavailable — {actual_err}")
+                        ai_unavailable_error = actual_err
+                        break
+                    else:
+                        print_warning(f"[{i}/{total}] Story {sid}: {err}")
+                        if logger:
+                            logger.warning(f"Story {sid}: {err}")
                         error_count += 1
 
-                except AIUnavailableError as e:
-                    print_error(f"AI title generation failed: {e}")
-                    print_error("Stopping processing - AI is required for title generation")
-                    if logger:
-                        logger.error(f"AI unavailable: {e}")
-                    idea_db.close()
-                    conn.close()
-                    raise  # Re-raise to stop processing
+            if ai_unavailable_error:
+                idea_db.close()
+                conn.close()
+                raise AIUnavailableError(f"AI unavailable: {ai_unavailable_error}")
 
             # Summary for this run
             total_processed += processed_count
@@ -870,8 +886,11 @@ Note:
     parser.add_argument(
         "--worker-id",
         type=int,
-        default=0,
-        help="0-based index of this worker instance (default: 0). Used with worker_count in workflow.json.",
+        default=-1,
+        help=(
+            "Worker shard index (0-based). Default -1 = internal multithreading (recommended). "
+            "Set to 0,1,2... when running multiple separate bat windows with sharding."
+        ),
     )
 
     args = parser.parse_args()

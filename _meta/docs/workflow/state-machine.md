@@ -1,6 +1,6 @@
 # PrismQ.T Content Production — State Machine
 
-**Complete state diagram for Story production pipeline (modules 03–20)**
+**Complete state diagram for Story production pipeline (modules 03–21)**
 
 > 📖 **See also**:
 > - [Workflow Documentation Index](./README.md)
@@ -30,9 +30,21 @@ stateDiagram-v2
     Editing                : [15] PrismQ.T.Review.Content.Editing
     TitleReadability       : [16] PrismQ.T.Review.Title.Readability
     ContentReadability     : [17] PrismQ.T.Review.Content.Readability
+
+    %% ── Expert review + polish entry points ──────────────────────────────
     StoryReview            : [18] PrismQ.T.Story.Review
-    StoryPolish            : [19] PrismQ.T.Story.Polish
-    Publishing             : [20] PrismQ.T.Publishing
+    StoryPolish            : [20] PrismQ.T.Story.Polish
+    Publishing             : [21+] PrismQ.T.Publishing
+
+    %% ── Expert review pending states (one per model track) ───────────────
+    RevGPTPending    : [19.1] PrismQ.T.Story.Review.GPT.Pending
+    RevClaudePending : [19.2] PrismQ.T.Story.Review.Claude.Pending
+    RevManualPending : [19.3] PrismQ.T.Story.Review.Manual.Pending
+
+    %% ── Polish pending states (one per model track) ──────────────────────
+    PolGPTPending    : [21.1] PrismQ.T.Story.Polish.GPT.Pending
+    PolClaudePending : [21.2] PrismQ.T.Story.Polish.Claude.Pending
+    PolManualPending : [21.3] PrismQ.T.Story.Polish.Manual.Pending
 
     %% ── Phase 1–2: Generation ────────────────────────────────────────────
     [*]                    --> TitleFromIdea
@@ -50,10 +62,8 @@ stateDiagram-v2
     RevTitleFromContent     --> RevContentFromTitle     : PASS
     RevTitleFromContent     --> TitleRegen              : FAIL
 
-    %% ── Phase 4: Regeneration loops (modules 08–09) ────────────────────
-    %% [08] title improvement → [10] quality gate (content checked against new title)
+    %% ── Phase 4: Regeneration loops (modules 08–09) ─────────────────────
     TitleRegen     --> RevContentFromTitle
-    %% [09] content improvement → [10] quality gate
     ContentRegen09 --> RevContentFromTitle
 
     %% ── Phase 5: Pre-Quality Gate (module 10) ───────────────────────────
@@ -61,7 +71,6 @@ stateDiagram-v2
     RevContentFromTitle --> ContentRegen09 : FAIL
 
     %% ── Phase 6: Quality Review Chain (modules 11–17) ───────────────────
-    %% content issues → [09] content regen; title issue → [08] title regen
     Grammar     --> Tone             : PASS ≥85
     Grammar     --> ContentRegen09   : FAIL
 
@@ -83,11 +92,29 @@ stateDiagram-v2
     ContentReadability --> StoryReview    : PASS ≥75
     ContentReadability --> ContentRegen09 : FAIL
 
-    %% ── Phase 7: Expert Review (modules 18–19) ──────────────────────────
-    StoryReview --> StoryPolish    : PASS ≥70
-    StoryReview --> ContentRegen09 : FAIL
+    %% ── Phase 7: Expert Review — Submit [18] ────────────────────────────
+    %% One model is active per run (PRISMQ_REVIEW_MODE env var)
+    StoryReview --> RevGPTPending    : [18.1] GPT submit
+    StoryReview --> RevClaudePending : [18.2] Claude submit
+    StoryReview --> RevManualPending : [18.3] Manual submit
 
-    StoryPolish --> Publishing
+    %% ── Phase 7: Expert Review — Poll [19] ──────────────────────────────
+    RevGPTPending    --> StoryPolish    : [19.1] GPT PASS ≥75
+    RevGPTPending    --> ContentRegen09 : [19.1] GPT FAIL
+    RevClaudePending --> StoryPolish    : [19.2] Claude PASS ≥75
+    RevClaudePending --> ContentRegen09 : [19.2] Claude FAIL
+    RevManualPending --> StoryPolish    : [19.3] Manual PASS ≥75
+    RevManualPending --> ContentRegen09 : [19.3] Manual FAIL
+
+    %% ── Phase 8: Polish — Submit [20] ───────────────────────────────────
+    StoryPolish --> PolGPTPending    : [20.1] GPT submit
+    StoryPolish --> PolClaudePending : [20.2] Claude submit
+    StoryPolish --> PolManualPending : [20.3] Manual submit
+
+    %% ── Phase 8: Polish — Poll [21] ─────────────────────────────────────
+    PolGPTPending    --> Publishing : [21.1] GPT done
+    PolClaudePending --> Publishing : [21.2] Claude done
+    PolManualPending --> Publishing : [21.3] Manual done
 
     Publishing --> [*]
 ```
@@ -113,16 +140,24 @@ stateDiagram-v2
 | 15 | `PrismQ.T.Review.Content.Editing` | Clarity, flow, wordiness, pacing (threshold ≥ 75) |
 | 16 | `PrismQ.T.Review.Title.Readability` | Title clarity, catchiness, length (threshold ≥ 75) |
 | 17 | `PrismQ.T.Review.Content.Readability` | Voice-over suitability, spoken flow (threshold ≥ 75) |
-| 18 | `PrismQ.T.Story.Review` | Expert holistic review: title+content (threshold ≥ 70) |
-| 19 | `PrismQ.T.Story.Polish` | Final polish + SEO optimisation |
-| 20 | `PrismQ.T.Publishing` | Terminal state — ready for publication |
+| 18 | `PrismQ.T.Story.Review` | Expert review entry — routes to model track |
+| 18.1 | `PrismQ.T.Story.Review.GPT.Pending` | OpenAI Batch in flight |
+| 18.2 | `PrismQ.T.Story.Review.Claude.Pending` | Anthropic Batch in flight |
+| 18.3 | `PrismQ.T.Story.Review.Manual.Pending` | Waiting for user review file |
+| 19 | *(poll step — no DB state)* | Poll active review batches / manual files |
+| 20 | `PrismQ.T.Story.Polish` | Polish entry — routes to model track |
+| 20.1 | `PrismQ.T.Story.Polish.GPT.Pending` | OpenAI Batch in flight |
+| 20.2 | `PrismQ.T.Story.Polish.Claude.Pending` | Anthropic Batch in flight |
+| 20.3 | `PrismQ.T.Story.Polish.Manual.Pending` | Waiting for user polish file |
+| 21 | *(poll step — no DB state)* | Poll active polish batches / manual files |
+| 22 | `PrismQ.T.Publishing` | Terminal state — ready for publication |
 
 ### Improvement States (FAIL destinations)
 
 | Module | State | Triggered by | Next state |
 |--------|-------|--------------|------------|
-| 08 | `PrismQ.T.Title.From.Title.Review.Content` | Mod 05 FAIL, Mod 07 FAIL, Mod 16 FAIL | Module 10 (content checked against new title) |
-| 09 | `PrismQ.T.Content.From.Title.Content.Review` | Mod 06 FAIL, Mod 10 FAIL, Mods 11–15 FAIL, Mod 17 FAIL, Mod 18 FAIL | Module 10 (basic content review, no idea) |
+| 08 | `PrismQ.T.Title.From.Title.Review.Content` | Mod 05 FAIL, Mod 07 FAIL, Mod 16 FAIL | Module 10 |
+| 09 | `PrismQ.T.Content.From.Title.Content.Review` | Mod 06 FAIL, Mod 10 FAIL, Mods 11–15 FAIL, Mod 17 FAIL, Mods 19.x FAIL | Module 10 |
 
 ---
 
@@ -135,5 +170,15 @@ stateDiagram-v2
 | Regeneration | 08–09 | `qwen3:32b` | Via `PRISMQ_AI_MODEL_CONTENT_IMPROVE` env var |
 | Quality gate | 10 | `qwen3:14b` | |
 | Quality reviews | 11–17 | `qwen3:14b` (local Ollama) | Via `PRISMQ_AI_MODEL_REVIEW` |
-| Expert review | 18 | External (GPT / Claude) | Not Ollama — top expert model |
-| Polish | 19 | External (GPT / Claude) | Not Ollama — top expert model |
+| Expert review submit | 18.x | GPT / Claude / Manual | `PRISMQ_REVIEW_MODE=gpt\|claude\|manual` |
+| Expert review poll | 19 | *(polls all pending states)* | |
+| Polish submit | 20.x | GPT / Claude / Manual | Same env var |
+| Polish poll | 21 | *(polls all pending states)* | |
+
+### Expert Review / Polish Model Defaults
+
+| Track | Model | API |
+|-------|-------|-----|
+| GPT   | `gpt-5.2` + `reasoning_effort=medium` (override: `PRISMQ_GPT_MODEL`) | OpenAI Batch `/v1/chat/completions` |
+| Claude | `claude-opus-4-6` (override: `PRISMQ_CLAUDE_MODEL`) | Anthropic Batch `/v1/messages/batches` |
+| Manual | *(user)* | File in `PRISMQ_MANUAL_DIR` (default: `C:/PrismQ/manual`) |

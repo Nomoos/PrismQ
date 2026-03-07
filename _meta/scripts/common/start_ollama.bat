@@ -26,12 +26,21 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-REM Set parallel request limit before starting Ollama
-REM Increase OLLAMA_NUM_PARALLEL to match worker_count in step 03 workflow.json
-if not defined OLLAMA_NUM_PARALLEL set OLLAMA_NUM_PARALLEL=4
+REM ── Ollama performance settings for RTX 5090 (32 GB VRAM) ──────────────────
+REM FLASH_ATTN=1          enables flash attention (reduces KV cache overhead)
+REM KV_CACHE_TYPE=q8_0    quantizes KV cache → saves ~4-5 GB on qwen3:32b
+REM MAX_LOADED_MODELS=2   keeps qwen3:32b + qwen3:14b both hot in VRAM simultaneously
+REM NUM_PARALLEL=4        saturates 4 review workers + 4 step-03 workers
+REM KEEP_ALIVE=-1         never evict models; they stay loaded until Ollama stops
+REM These are also set as permanent Windows User env vars via SetEnvironmentVariable
+if not defined OLLAMA_FLASH_ATTN         set OLLAMA_FLASH_ATTN=1
+if not defined OLLAMA_KV_CACHE_TYPE      set OLLAMA_KV_CACHE_TYPE=q8_0
+if not defined OLLAMA_MAX_LOADED_MODELS  set OLLAMA_MAX_LOADED_MODELS=2
+if not defined OLLAMA_NUM_PARALLEL       set OLLAMA_NUM_PARALLEL=4
+if not defined OLLAMA_KEEP_ALIVE         set OLLAMA_KEEP_ALIVE=-1
 
 REM Start Ollama in a new CMD window
-start "Ollama Server" cmd /c "set OLLAMA_NUM_PARALLEL=%OLLAMA_NUM_PARALLEL% && ollama serve"
+start "Ollama Server" cmd /c "set OLLAMA_FLASH_ATTN=%OLLAMA_FLASH_ATTN% && set OLLAMA_KV_CACHE_TYPE=%OLLAMA_KV_CACHE_TYPE% && set OLLAMA_MAX_LOADED_MODELS=%OLLAMA_MAX_LOADED_MODELS% && set OLLAMA_NUM_PARALLEL=%OLLAMA_NUM_PARALLEL% && set OLLAMA_KEEP_ALIVE=%OLLAMA_KEEP_ALIVE% && ollama serve"
 
 echo [INFO] Waiting for Ollama to start...
 

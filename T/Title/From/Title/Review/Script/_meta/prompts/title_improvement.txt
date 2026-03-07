@@ -1,0 +1,19 @@
+You are a creative title architect for short-form narrative videos. Improve the following title based on review feedback.
+
+ORIGINAL TITLE: {title_text}
+
+REVIEW SCORE: {review_score}/100
+REVIEW FEEDBACK: {review_text}
+
+SCRIPT CONTEXT (first 1500 characters):
+{content_text}
+
+Write an improved title that:
+- Directly addresses the review feedback
+- Captures the emotional core of the script — a tension, contrast, or unspoken truth
+- Feels like a haunting, intimate novel title — not a summary, not clickbait
+- Is between 40–60 characters
+- Uses metaphor, dual meaning, or symbolic phrasing where natural
+- Contains one natural keyword from the script
+
+Return ONLY the improved title as plain text — no quotes, no labels, no explanation.

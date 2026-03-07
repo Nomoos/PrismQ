@@ -891,6 +891,7 @@ class AIContentGenerator:
                     "options": {
                         "temperature": self.config.temperature,
                         "num_predict": self.config.max_tokens,
+                        "num_ctx": 4096,
                     },
                 },
                 timeout=self.config.timeout,
