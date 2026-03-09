@@ -71,25 +71,26 @@ stateDiagram-v2
     RevContentFromTitle --> ContentRegen09 : FAIL
 
     %% ── Phase 6: Quality Review Chain (modules 11–17) ───────────────────
-    Grammar     --> Tone             : PASS ≥85
+    %% content issues → [09] content regen; title issue → [08] title regen
+    Grammar     --> Tone             : PASS ≥95
     Grammar     --> ContentRegen09   : FAIL
 
-    Tone        --> Content          : PASS ≥75
+    Tone        --> Content          : PASS ≥90
     Tone        --> ContentRegen09   : FAIL
 
-    Content     --> Consistency      : PASS ≥75
+    Content     --> Consistency      : PASS ≥85
     Content     --> ContentRegen09   : FAIL
 
-    Consistency --> Editing          : PASS ≥80
+    Consistency --> Editing          : PASS ≥85
     Consistency --> ContentRegen09   : FAIL
 
-    Editing     --> TitleReadability : PASS ≥75
+    Editing     --> TitleReadability : PASS ≥85
     Editing     --> ContentRegen09   : FAIL
 
-    TitleReadability --> ContentReadability : PASS ≥75
+    TitleReadability --> ContentReadability : PASS ≥85
     TitleReadability --> TitleRegen         : FAIL
 
-    ContentReadability --> StoryReview    : PASS ≥75
+    ContentReadability --> StoryReview    : PASS ≥90
     ContentReadability --> ContentRegen09 : FAIL
 
     %% ── Phase 7: Expert Review — Submit [18] ────────────────────────────
