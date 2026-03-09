@@ -158,7 +158,7 @@ class ScriptFromReviewService:
                     "prompt": prompt,
                     "stream": False,
                     "think": False,
-                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS},
+                    "options": {"temperature": _AI_TEMPERATURE, "num_predict": _AI_MAX_TOKENS, "num_ctx": 4096},
                 },
                 timeout=_AI_TIMEOUT,
             )

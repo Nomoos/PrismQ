@@ -1,6 +1,9 @@
 # Python version requirement
 # Requires Python 3.8 or higher
 
+# Runtime dependencies
+requests>=2.28.0
+
 # Testing dependencies
 pytest>=7.0.0
 pytest-cov>=4.0.0

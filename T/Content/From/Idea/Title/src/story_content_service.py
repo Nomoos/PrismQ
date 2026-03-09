@@ -689,6 +689,15 @@ class ContentFromIdeaTitleService:
         except ValueError as e:
             result.error = f"Invalid idea or title: {str(e)}"
             logger.error(f"Story {story.id}: {result.error}")
+            # Title is invalid — delete it and send story back to title generation
+            try:
+                self._conn.execute("DELETE FROM Title WHERE story_id = ?", (story.id,))
+                self._conn.commit()
+                story.update_state(StateNames.TITLE_FROM_IDEA)
+                self.story_repo.update(story)
+                logger.warning(f"Story {story.id}: Bad title deleted, state reset to TITLE_FROM_IDEA for regeneration")
+            except Exception as reset_err:
+                logger.error(f"Story {story.id}: Failed to reset state after invalid title: {reset_err}")
         except Exception as e:
             result.error = f"Content generation failed: {str(e)}"
             logger.exception(f"Story {story.id}: Unexpected error during content generation")

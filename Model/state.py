@@ -93,9 +93,15 @@ class StoryState(str, Enum):
     REVIEW_TITLE_READABILITY = f"{_STATE_PREFIX}.Review.Title.Readability"
     REVIEW_CONTENT_READABILITY = f"{_STATE_PREFIX}.Review.Content.Readability"
 
-    # Stages 17-18: Expert Review Loop
+    # Stages 17-18: Expert Review Loop (external AI + manual review)
     STORY_REVIEW = f"{_STATE_PREFIX}.Story.Review"
+    STORY_REVIEW_GPT_PENDING    = f"{_STATE_PREFIX}.Story.Review.GPT.Pending"
+    STORY_REVIEW_CLAUDE_PENDING = f"{_STATE_PREFIX}.Story.Review.Claude.Pending"
+    STORY_REVIEW_MANUAL_PENDING = f"{_STATE_PREFIX}.Story.Review.Manual.Pending"
     STORY_POLISH = f"{_STATE_PREFIX}.Story.Polish"
+    STORY_POLISH_GPT_PENDING    = f"{_STATE_PREFIX}.Story.Polish.GPT.Pending"
+    STORY_POLISH_CLAUDE_PENDING = f"{_STATE_PREFIX}.Story.Polish.Claude.Pending"
+    STORY_POLISH_MANUAL_PENDING = f"{_STATE_PREFIX}.Story.Polish.Manual.Pending"
 
     # Terminal State
     PUBLISHING = f"{_STATE_PREFIX}.Publishing"
@@ -165,10 +171,20 @@ class StateNames:
     REVIEW_CONTENT_READABILITY = f"{STATE_PREFIX}.Review.Content.Readability"
 
     # =========================================================================
-    # Stages 17-18: Expert Review Loop
+    # Stages 18-21: Expert Review + Polish (external AI + manual; substep model routing)
+    # 18 = submit review  (18.1 GPT, 18.2 Claude, 18.3 Manual)
+    # 19 = poll review    (19.1 GPT, 19.2 Claude, 19.3 Manual)
+    # 20 = submit polish  (20.1 GPT, 20.2 Claude, 20.3 Manual)
+    # 21 = poll polish    (21.1 GPT, 21.2 Claude, 21.3 Manual)
     # =========================================================================
     STORY_REVIEW = f"{STATE_PREFIX}.Story.Review"
+    STORY_REVIEW_GPT_PENDING    = f"{STATE_PREFIX}.Story.Review.GPT.Pending"
+    STORY_REVIEW_CLAUDE_PENDING = f"{STATE_PREFIX}.Story.Review.Claude.Pending"
+    STORY_REVIEW_MANUAL_PENDING = f"{STATE_PREFIX}.Story.Review.Manual.Pending"
     STORY_POLISH = f"{STATE_PREFIX}.Story.Polish"
+    STORY_POLISH_GPT_PENDING    = f"{STATE_PREFIX}.Story.Polish.GPT.Pending"
+    STORY_POLISH_CLAUDE_PENDING = f"{STATE_PREFIX}.Story.Polish.Claude.Pending"
+    STORY_POLISH_MANUAL_PENDING = f"{STATE_PREFIX}.Story.Polish.Manual.Pending"
 
     # =========================================================================
     # Terminal State
@@ -204,9 +220,15 @@ class StateNames:
             REVIEW_TITLE_READABILITY,
             REVIEW_CONTENT_READABILITY,
             STORY_REVIEW,
+            STORY_REVIEW_GPT_PENDING,
+            STORY_REVIEW_CLAUDE_PENDING,
+            STORY_REVIEW_MANUAL_PENDING,
         ],
         StateCategory.REFINEMENT: [
             STORY_POLISH,
+            STORY_POLISH_GPT_PENDING,
+            STORY_POLISH_CLAUDE_PENDING,
+            STORY_POLISH_MANUAL_PENDING,
         ],
         StateCategory.PUBLISHING: [
             PUBLISHING,
@@ -384,7 +406,16 @@ class StateNames:
 # Convenience aliases for common state groups
 INITIAL_STATES = [StateNames.IDEA_CREATION]
 TERMINAL_STATES = [StateNames.PUBLISHING]
-EXPERT_REVIEW_STATES = [StateNames.STORY_REVIEW, StateNames.STORY_POLISH]
+EXPERT_REVIEW_STATES = [
+    StateNames.STORY_REVIEW,
+    StateNames.STORY_REVIEW_GPT_PENDING,
+    StateNames.STORY_REVIEW_CLAUDE_PENDING,
+    StateNames.STORY_REVIEW_MANUAL_PENDING,
+    StateNames.STORY_POLISH,
+    StateNames.STORY_POLISH_GPT_PENDING,
+    StateNames.STORY_POLISH_CLAUDE_PENDING,
+    StateNames.STORY_POLISH_MANUAL_PENDING,
+]
 
 # Re-export TransitionValidator for convenience (imported at end to avoid circular import)
 # This is intentionally placed here to break the circular dependency
